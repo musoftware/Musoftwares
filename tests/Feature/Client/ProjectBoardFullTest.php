@@ -772,4 +772,153 @@ class ProjectBoardFullTest extends TestCase
             'title' => 'bad',
         ])->assertStatus(422);
     }
+
+    // ───────── Reschedule (admin-only) ─────────
+
+    public function test_admin_can_reschedule_a_task_to_another_day()
+    {
+        $client = $this->makeClient();
+        $admin = $this->makeAdmin();
+        $project = $this->makeProject($client);
+        $today = now()->toDateString();
+        $tomorrow = now()->addDay()->toDateString();
+
+        $task = $project->tasks()->create([
+            'user_id' => $client->id,
+            'task_name' => 'Move me',
+            'due_date' => $today,
+        ]);
+        $project->boardItems()->create([
+            'for_date' => $today,
+            'itemable_type' => Task::class,
+            'itemable_id' => $task->id,
+            'lane' => 'backlog',
+            'pos_x' => 0,
+            'pos_y' => 0,
+        ]);
+
+        $response = $this->actingAs($admin)->postJson(
+            route('client.projects.board.reschedule-card', $project),
+            ['for_date' => $tomorrow, 'type' => 'task', 'id' => $task->id],
+        );
+
+        $response->assertSuccessful();
+        $fresh = $task->fresh();
+        $this->assertSame(
+            $tomorrow,
+            is_string($fresh->due_date) ? $fresh->due_date : $fresh->due_date->toDateString(),
+        );
+        $this->assertDatabaseHas('project_board_items', [
+            'project_id' => $project->id,
+            'itemable_type' => Task::class,
+            'itemable_id' => $task->id,
+            'for_date' => $tomorrow,
+        ]);
+    }
+
+    public function test_client_cannot_reschedule_a_card()
+    {
+        $client = $this->makeClient();
+        $project = $this->makeProject($client);
+        $today = now()->toDateString();
+        $tomorrow = now()->addDay()->toDateString();
+
+        $task = $project->tasks()->create([
+            'user_id' => $client->id,
+            'task_name' => 'Mine',
+            'due_date' => $today,
+        ]);
+
+        $this->actingAs($client)->postJson(
+            route('client.projects.board.reschedule-card', $project),
+            ['for_date' => $tomorrow, 'type' => 'task', 'id' => $task->id],
+        )->assertStatus(403);
+
+        $fresh = $task->fresh();
+        $this->assertSame(
+            $today,
+            is_string($fresh->due_date) ? $fresh->due_date : $fresh->due_date->toDateString(),
+        );
+    }
+
+    public function test_reschedule_rejects_file_type()
+    {
+        $client = $this->makeClient();
+        $admin = $this->makeAdmin();
+        $project = $this->makeProject($client);
+        $today = now()->toDateString();
+        $tomorrow = now()->addDay()->toDateString();
+
+        $file = ProjectFile::create([
+            'project_id' => $project->id,
+            'uploaded_by' => $admin->id,
+            'disk_path' => 'fake/path.txt',
+            'original_name' => 'x.txt',
+            'mime' => 'text/plain',
+            'size' => 1,
+        ]);
+
+        $this->actingAs($admin)->postJson(
+            route('client.projects.board.reschedule-card', $project),
+            ['for_date' => $tomorrow, 'type' => 'file', 'id' => $file->id],
+        )->assertStatus(422);
+    }
+
+    public function test_admin_can_reschedule_a_todo_to_another_day_and_it_leaves_today()
+    {
+        $client = $this->makeClient();
+        $admin = $this->makeAdmin();
+        $project = $this->makeProject($client);
+        $today = now()->toDateString();
+        $tomorrow = now()->addDay()->toDateString();
+
+        $todo = $project->todos()->create([
+            'user_id' => $client->id,
+            'title' => 'Reschedule me',
+            'inDate' => $today,
+        ]);
+        $project->boardItems()->create([
+            'for_date' => $today,
+            'itemable_type' => Todo::class,
+            'itemable_id' => $todo->id,
+            'lane' => 'backlog',
+            'pos_x' => 0,
+            'pos_y' => 0,
+        ]);
+
+        $todayCards = collect(
+            app(\App\Services\ProjectBoardService::class)->cardsForDate($project, now(), applyFutureGating: false),
+        );
+        $this->assertTrue(
+            $todayCards->contains(fn ($c) => $c['type'] === 'todo' && $c['id'] === $todo->id),
+            'Todo should appear on today\'s board before reschedule.',
+        );
+
+        $this->actingAs($admin)->postJson(
+            route('client.projects.board.reschedule-card', $project),
+            ['for_date' => $tomorrow, 'type' => 'todo', 'id' => $todo->id],
+        )->assertSuccessful();
+
+        $fresh = $todo->fresh();
+        $this->assertSame(
+            $tomorrow,
+            is_string($fresh->inDate) ? $fresh->inDate : $fresh->inDate->toDateString(),
+        );
+
+        $todayCardsAfter = collect(
+            app(\App\Services\ProjectBoardService::class)->cardsForDate($project, now(), applyFutureGating: false),
+        );
+        $this->assertFalse(
+            $todayCardsAfter->contains(fn ($c) => $c['type'] === 'todo' && $c['id'] === $todo->id),
+            'Todo should NOT reappear on today\'s board after being rescheduled to tomorrow.',
+        );
+
+        $tomorrowCards = collect(
+            app(\App\Services\ProjectBoardService::class)->cardsForDate($project, now()->addDay(), applyFutureGating: false),
+        );
+        $this->assertTrue(
+            $tomorrowCards->contains(fn ($c) => $c['type'] === 'todo' && $c['id'] === $todo->id),
+            'Todo should appear on tomorrow\'s board after reschedule.',
+        );
+    }
 }

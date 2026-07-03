@@ -43,10 +43,15 @@ class ProjectBoardService
         $reportsQuery = $applyFutureGating ? $project->publishedReports() : $project->reports();
         $reports = $reportsQuery->whereDate('published_at', $date->toDateString())->get();
 
+        $dateString = $date->toDateString();
+
         $todos = $project->todos()
-            ->where(function($q) use ($date) {
-                $q->whereDate('inDate', $date->toDateString())
-                  ->orWhereDate('created_at', $date->toDateString());
+            ->where(function($q) use ($dateString) {
+                $q->whereDate('inDate', $dateString)
+                  ->orWhere(function($q2) use ($dateString) {
+                      $q2->whereNull('inDate')
+                         ->whereDate('created_at', $dateString);
+                  });
             })
             ->get();
 

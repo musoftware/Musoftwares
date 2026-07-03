@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import {
     Plus, Trash2, StickyNote, ListTodo, FileText, CheckCircle2, Circle, GripVertical,
     Filter, StickyNote as NoteIcon, AlertCircle, ChevronDown, RotateCcw, Search, Paperclip,
-    ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye
+    ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye,
+    ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon
 } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -21,6 +22,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -104,11 +106,17 @@ export default function ProjectBoard({
     projectId, date, lanes, initialCards, hideFuture, readOnly = false,
     externalFilter, guestMode = false, shareToken = null,
 }: ProjectBoardProps) {
+    const { auth } = usePage().props as any;
+    const userRoles: string[] = auth?.user?.roles ?? [];
+    const isAdmin: boolean = !readOnly && (userRoles.includes('admin') || userRoles.includes('super_admin'));
+
     const [cards, setCards] = useState<BoardCard[]>(initialCards);
     const [query, setQuery] = useState('');
-    
+
     const [statusPopover, setStatusPopover] = useState<{ cardId: number; type: CardType; x: number; y: number } | null>(null);
     const [contextMenu, setContextMenu] = useState<{ card: BoardCard; x: number; y: number } | null>(null);
+    const [rescheduleDialog, setRescheduleDialog] = useState<{ card: BoardCard; targetDate: string } | null>(null);
+    const [rescheduling, setRescheduling] = useState(false);
 
     const [activeModal, setActiveModal] = useState<{
         type: 'note' | 'task' | 'todo' | 'file' | 'report';
@@ -208,6 +216,51 @@ export default function ProjectBoard({
             toast.error(__('general.could_not_save_card_position') || 'Failed to update status.');
         });
     }, [projectId, date, readOnly]);
+
+    // ─── Reschedule (admin-only) ───────────────────────────────────────
+    // Sends the card to a new for_date and removes it from the current day.
+    // The underlying modelable's own date column is also updated server-side
+    // so the card surfaces on the new day rather than vanishing entirely.
+    const performReschedule = useCallback(async (card: BoardCard, targetDate: string) => {
+        if (!isAdmin) {
+            toast.error(__('general.card_reschedule_admin_only'));
+            return;
+        }
+        if (card.type === 'file') {
+            toast.error(__('general.card_reschedule_not_supported'));
+            return;
+        }
+        try {
+            await axios.post(
+                route('client.projects.board.reschedule-card', { project: projectId }),
+                { for_date: targetDate, type: card.type, id: card.id },
+            );
+            setCards((prev) => prev.filter((c) => !(c.type === card.type && c.id === card.id)));
+            toast.success(
+                __('general.card_rescheduled', { date: targetDate }, `Card rescheduled to ${targetDate}.`),
+                {
+                    action: {
+                        label: __('general.view') || 'View',
+                        onClick: () => router.visit(
+                            route('admin.projects.board', { project: projectId, date: targetDate }),
+                            { preserveScroll: true, preserveState: false },
+                        ),
+                    },
+                },
+            );
+        } catch (err) {
+            const message = (err as any)?.response?.data?.message;
+            toast.error(message || __('general.card_reschedule_failed') || 'Failed to reschedule card.');
+        }
+    }, [projectId, isAdmin]);
+
+    const shiftDay = useCallback((card: BoardCard, days: number) => {
+        const today = new Date(date + 'T00:00:00');
+        today.setDate(today.getDate() + days);
+        const target = today.toISOString().slice(0, 10);
+        if (target === date) return;
+        void performReschedule(card, target);
+    }, [date, performReschedule]);
 
     const reportHtml = useMemo(() => {
         if (!viewingCard) return '';
@@ -429,8 +482,8 @@ export default function ProjectBoard({
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="relative w-72">
+            <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative w-full sm:w-72">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <input
                         value={query}
@@ -441,16 +494,16 @@ export default function ProjectBoard({
                 </div>
 
                 {!readOnly && (
-                    <div className="flex gap-2">
+                    <div className="-mx-1 flex flex-wrap items-center gap-2 px-1 sm:mx-0 sm:px-0">
                         <button
                             onClick={() => openCreateModal('note')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+                            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
                         >
                             <Plus className="h-4 w-4 text-amber-500" /> {__('general.board_add_note')}
                         </button>
                         <button
                             onClick={() => openCreateModal('task')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+                            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
                         >
                             <Plus className="h-4 w-4 text-sky-500" /> {__('general.board_add_task')}
                         </button>
@@ -629,9 +682,12 @@ export default function ProjectBoard({
             )}
 
             {statusPopover && (
-                <div 
+                <div
                     className="fixed z-50 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 p-1.5 shadow-xl backdrop-blur animate-in fade-in slide-in-from-top-1 duration-150"
-                    style={{ left: statusPopover.x, top: statusPopover.y + 4 }}
+                    style={{
+                        left: Math.max(8, Math.min(statusPopover.x, (typeof window !== 'undefined' ? window.innerWidth : 1024) - 220)),
+                        top: statusPopover.y + 4,
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {Object.entries(LANE_META).map(([laneKey, meta]) => {
@@ -645,9 +701,10 @@ export default function ProjectBoard({
                                     setStatusPopover(null);
                                 }}
                                 className={cn(
-                                    'flex h-8 w-8 items-center justify-center rounded-full text-base transition-all hover:scale-125 hover:bg-slate-50 shadow-sm active:scale-90',
+                                    'flex h-9 w-9 items-center justify-center rounded-full text-base transition-all hover:scale-110 hover:bg-slate-50 shadow-sm active:scale-90',
                                 )}
                                 title={__(meta.labelKey)}
+                                aria-label={__(meta.labelKey)}
                             >
                                 <LaneIcon className="h-4 w-4" />
                             </button>
@@ -658,11 +715,14 @@ export default function ProjectBoard({
 
             {contextMenu && (
                 <div
-                    className="fixed z-50 w-44 rounded-xl border border-slate-200 bg-white py-1 shadow-2xl animate-in zoom-in-95 duration-100"
-                    style={{ left: contextMenu.x, top: contextMenu.y }}
+                    className="fixed z-50 w-56 max-w-[calc(100vw-1rem)] rounded-xl border border-slate-200 bg-white py-1 shadow-2xl animate-in zoom-in-95 duration-100"
+                    style={{
+                        left: Math.max(8, Math.min(contextMenu.x, (typeof window !== 'undefined' ? window.innerWidth : 1024) - 224)),
+                        top: contextMenu.y,
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider truncate">
                         {contextMenu.card.title}
                     </div>
                     <button
@@ -700,8 +760,109 @@ export default function ProjectBoard({
                             </button>
                         );
                     })}
+
+                    {isAdmin && contextMenu.card.type !== 'file' && (
+                        <>
+                            <div className="border-t border-slate-100 my-1" />
+                            <div className="px-3 py-1 text-[9px] font-semibold text-slate-400 uppercase tracking-wider inline-flex items-center gap-1">
+                                <CalendarClock className="h-3 w-3" />
+                                <span>{__('general.reschedule') || 'Reschedule'}</span>
+                            </div>
+                            <button
+                                onClick={() => { const c = contextMenu.card; setContextMenu(null); shiftDay(c, -1); }}
+                                className="flex w-full items-center gap-2 px-3 py-1.5 text-start text-xs text-slate-600 hover:bg-slate-50"
+                            >
+                                <ArrowLeft className="h-3.5 w-3.5" />
+                                <span>{__('general.reschedule_back_day') || 'Back 1 day'}</span>
+                            </button>
+                            <button
+                                onClick={() => { const c = contextMenu.card; setContextMenu(null); shiftDay(c, 1); }}
+                                className="flex w-full items-center gap-2 px-3 py-1.5 text-start text-xs text-slate-600 hover:bg-slate-50"
+                            >
+                                <ArrowRight className="h-3.5 w-3.5" />
+                                <span>{__('general.reschedule_next_day') || 'Next 1 day'}</span>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const c = contextMenu.card;
+                                    setContextMenu(null);
+                                    const today = new Date(date + 'T00:00:00');
+                                    const next = new Date(today);
+                                    next.setDate(next.getDate() + 1);
+                                    setRescheduleDialog({ card: c, targetDate: next.toISOString().slice(0, 10) });
+                                }}
+                                className="flex w-full items-center gap-2 px-3 py-1.5 text-start text-xs text-slate-600 hover:bg-slate-50"
+                            >
+                                <CalendarIcon className="h-3.5 w-3.5" />
+                                <span>{__('general.reschedule_choose_date') || 'Choose date…'}</span>
+                            </button>
+                        </>
+                    )}
                 </div>
             )}
+
+            <Dialog open={rescheduleDialog !== null} onOpenChange={(open) => { if (!open) setRescheduleDialog(null); }}>
+                <DialogContent className="w-full sm:max-w-md max-h-[calc(100vh-3rem)] flex flex-col gap-0 p-0 overflow-hidden">
+                    <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
+                        <DialogHeader>
+                            <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500 inline-flex items-center gap-2">
+                                <CalendarClock className="h-4 w-4 text-indigo-500" />
+                                {__('general.reschedule_dialog_title') || 'Reschedule card'}
+                            </DialogTitle>
+                            <DialogDescription className="text-xs text-slate-500 mt-1">
+                                {__('general.reschedule_dialog_description') || 'Pick the new date for this card. The card will be moved out of the current day.'}
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+                    <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-3">
+                        {rescheduleDialog && (
+                            <>
+                                <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 text-[11px] text-slate-600 truncate">
+                                    <span className="font-bold uppercase tracking-wider text-slate-400 mr-2">Card</span>
+                                    <span className="font-semibold text-slate-700">{rescheduleDialog.card.title}</span>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-bold text-slate-600">{__('general.reschedule_choose_date') || 'Choose date'}</Label>
+                                    <Input
+                                        type="date"
+                                        value={rescheduleDialog.targetDate}
+                                        onChange={(e) => setRescheduleDialog({ ...rescheduleDialog, targetDate: e.target.value })}
+                                        className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
+                        <button
+                            type="button"
+                            onClick={() => setRescheduleDialog(null)}
+                            disabled={rescheduling}
+                            className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                        >
+                            {__('general.cancel') || 'Cancel'}
+                        </button>
+                        <button
+                            type="button"
+                            disabled={rescheduling || !rescheduleDialog?.targetDate || rescheduleDialog.targetDate === date}
+                            onClick={async () => {
+                                if (!rescheduleDialog) return;
+                                setRescheduling(true);
+                                try {
+                                    await performReschedule(rescheduleDialog.card, rescheduleDialog.targetDate);
+                                    setRescheduleDialog(null);
+                                } finally {
+                                    setRescheduling(false);
+                                }
+                            }}
+                            className="rounded-xl bg-indigo-600 text-white px-4 py-2 text-xs font-semibold hover:bg-indigo-500 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm"
+                        >
+                            <CalendarClock className="h-3.5 w-3.5" />
+                            <span>{rescheduling ? '…' : __('general.reschedule_card') || 'Reschedule'}</span>
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Dialog open={activeModal?.type === 'note'} onOpenChange={() => setActiveModal(null)}>
                 <DialogContent className="w-full sm:max-w-3xl max-h-[calc(100vh-3rem)] flex flex-col gap-0 p-0 overflow-hidden">
@@ -720,6 +881,7 @@ export default function ProjectBoard({
                                 onChange={(e) => setNoteForm({ ...noteForm, content: e.target.value })}
                                 placeholder="Write down your notes here..."
                                 rows={6}
+                                maxLength={61440}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>
