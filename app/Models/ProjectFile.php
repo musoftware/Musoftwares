@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class ProjectFile extends Model
 {
@@ -24,6 +25,11 @@ class ProjectFile extends Model
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(ProjectComment::class, 'commentable');
     }
 
     public function humanSize(): string

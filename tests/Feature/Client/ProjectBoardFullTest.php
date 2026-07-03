@@ -172,6 +172,28 @@ class ProjectBoardFullTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function test_admin_can_add_sticky_note_for_a_future_date_even_when_gating_enabled()
+    {
+        $client = $this->makeClient();
+        $project = $this->makeProject($client, ['hide_future_tasks' => true]);
+        $admin = $this->makeAdmin();
+        $future = now()->addWeek()->toDateString();
+
+        $response = $this->actingAs($admin)->postJson(route('client.projects.board.store-note', $project), [
+            'for_date' => $future,
+            'content' => 'admin future note',
+            'color' => 'yellow',
+        ]);
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('project_board_notes', [
+            'project_id' => $project->id,
+            'for_date' => $future,
+            'content' => 'admin future note',
+            'author_id' => $admin->id,
+        ]);
+    }
+
     // ───────── Task CRUD ─────────
 
     public function test_client_can_add_a_task()

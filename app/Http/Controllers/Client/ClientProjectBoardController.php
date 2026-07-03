@@ -32,8 +32,9 @@ class ClientProjectBoardController extends Controller
 
         $data = $request->validated();
         $date = $data['for_date'];
+        $isAdmin = $request->user()?->isAdmin() === true;
 
-        if ($this->shouldHideFuture($project, Carbon::createFromFormat('!Y-m-d', $date))) {
+        if (! $isAdmin && $this->shouldHideFuture($project, Carbon::createFromFormat('!Y-m-d', $date))) {
             abort(422, __('general.future_items_are_hidden'));
         }
 
@@ -391,6 +392,13 @@ class ClientProjectBoardController extends Controller
 
         $data = $request->validated();
         $morphClass = $request->morphClass();
+        $isAdmin = $request->user()?->isAdmin() === true;
+
+        // Admins may reschedule a card to any date (past, today, or future).
+        // Clients are restricted by the per-project hide-future flag.
+        if (! $isAdmin && $this->shouldHideFuture($project, Carbon::createFromFormat('!Y-m-d', $data['for_date']))) {
+            abort(422, __('general.future_items_are_hidden'));
+        }
 
         // The referenced card must belong to this project (guard against forged IDs).
         $this->resolveOwnedItemable($project, $data['type'], (int) $data['id']);
@@ -423,6 +431,13 @@ class ClientProjectBoardController extends Controller
         ]);
 
         $targetDate = $data['for_date'];
+        $isAdmin = $request->user()?->isAdmin() === true;
+
+        // Admins may bring undone items onto any date; clients cannot target future dates
+        // when the per-project hide-future flag is enabled.
+        if (! $isAdmin && $this->shouldHideFuture($project, Carbon::createFromFormat('!Y-m-d', $targetDate))) {
+            abort(422, __('general.future_items_are_hidden'));
+        }
 
         // Find all placements before the target date
         $pastPlacements = ProjectBoardItem::where('project_id', $project->id)

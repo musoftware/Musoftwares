@@ -151,6 +151,8 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                     readOnly={true}
                     hideToolbar={true}
                     externalFilter={filter}
+                    guestMode={true}
+                    shareToken={project.share_token}
                 />
             </main>
 

@@ -7,13 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\Project\StoreCommentRequest;
 use App\Models\Project;
 use App\Models\ProjectComment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ClientProjectCommentController extends Controller
 {
     use ResolvesClientProject;
 
-    public function commentsIndex(Request $request, Project $project, string $type, int $id)
+    public function commentsIndex(Request $request, Project $project, string $type, int $id): JsonResponse
     {
         $this->authorizeProject($project);
 
@@ -22,7 +23,7 @@ class ClientProjectCommentController extends Controller
         return response()->json(['comments' => $this->serialize($commentable->comments()->with('author')->latest()->get())]);
     }
 
-    public function store(StoreCommentRequest $request, Project $project)
+    public function store(StoreCommentRequest $request, Project $project): JsonResponse
     {
         $this->authorizeProject($project);
 
@@ -31,7 +32,7 @@ class ClientProjectCommentController extends Controller
 
         $comment = $commentable->comments()->create([
             'project_id' => $project->id,
-            'author_id' => $request->user()->id,
+            'author_id' => $request->user()?->id,
             'body' => $data['body'],
         ]);
         $comment->load('author');
@@ -47,7 +48,9 @@ class ClientProjectCommentController extends Controller
         $model = match ($type) {
             'note' => $project->boardNotes()->whereKey($id)->first(),
             'task' => $project->tasks()->whereKey($id)->first(),
+            'todo' => $project->todos()->whereKey($id)->first(),
             'report' => $project->publishedReports()->whereKey($id)->first(),
+            'file' => $project->files()->whereKey($id)->first(),
             default => null,
         };
 
@@ -66,6 +69,9 @@ class ClientProjectCommentController extends Controller
             'id' => $comment->id,
             'body' => $comment->body,
             'author_name' => $comment->author?->name,
+            'is_guest' => $comment->author_id === null,
+            'guest_name' => $comment->guest_name,
+            'guest_email' => $comment->guest_email,
             'created_at' => $comment->created_at?->toIso8601String(),
         ])->all();
     }

@@ -179,6 +179,15 @@ Route::get('/shared-board/{token}/{date}', [\App\Http\Controllers\PublicProjectB
     ->name('shared-board.show')
     ->middleware('signed');
 
+// Guest comments on shared-board cards (notes, tasks, todos, reports, files).
+// Auth is the unguessable share_token — guests do not need to register.
+Route::prefix('/shared-board/{token}')->name('public.comments.')->group(function () {
+    Route::get('/comments/{type}/{id}', [\App\Http\Controllers\PublicProjectCommentController::class, 'index'])
+        ->name('index');
+    Route::post('/comments', [\App\Http\Controllers\PublicProjectCommentController::class, 'store'])
+        ->name('store');
+});
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 

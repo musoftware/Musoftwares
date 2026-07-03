@@ -48,7 +48,7 @@ class ClientProjectCalendarController extends Controller
             'date' => $dateCarbon->toDateString(),
             'lanes' => $this->boardService->lanes(),
             'cards' => fn () => $cards,
-            'hideFuture' => $this->shouldHideFuture($project, $dateCarbon),
+            'hideFuture' => ! $isAdmin && $this->shouldHideFuture($project, $dateCarbon),
             'isAdmin' => $isAdmin,
             'activeDates' => $activeDates,
         ]);

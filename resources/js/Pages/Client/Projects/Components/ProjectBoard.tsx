@@ -26,6 +26,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Checkbox } from '@/Components/ui/checkbox';
+import CommentsPopover from '@/Pages/Client/Projects/Components/CommentsPopover';
 
 export type CardType = 'note' | 'task' | 'report' | 'todo' | 'file';
 
@@ -61,6 +62,10 @@ interface ProjectBoardProps {
     readOnly?: boolean;
     externalFilter?: string;
     hideToolbar?: boolean;
+    /** Mark cards as guest-viewable for the comment endpoints. */
+    guestMode?: boolean;
+    /** Required when `guestMode` is true. */
+    shareToken?: string | null;
 }
 
 const NOTE_COLORS: Record<string, { bg: string; border: string; text: string; swatch: string }> = {
@@ -97,7 +102,7 @@ const PRIORITY_STYLES: Record<string, string> = {
 
 export default function ProjectBoard({
     projectId, date, lanes, initialCards, hideFuture, readOnly = false,
-    externalFilter,
+    externalFilter, guestMode = false, shareToken = null,
 }: ProjectBoardProps) {
     const [cards, setCards] = useState<BoardCard[]>(initialCards);
     const [query, setQuery] = useState('');
@@ -117,7 +122,7 @@ export default function ProjectBoard({
     const [newCheckItem, setNewCheckItem] = useState('');
     const [fileForm, setFileForm] = useState<File | null>(null);
     const [reportForm, setReportForm] = useState({ title: '', body: '', published_at: '' });
-    const [viewingReport, setViewingReport] = useState<BoardCard | null>(null);
+    const [viewingCard, setViewingCard] = useState<BoardCard | null>(null);
     const [uploading, setUploading] = useState(false);
     const [highlightedCardKey, setHighlightedCardKey] = useState<string | null>(null);
     const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -205,10 +210,14 @@ export default function ProjectBoard({
     }, [projectId, date, readOnly]);
 
     const reportHtml = useMemo(() => {
-        if (!viewingReport?.body) return '';
-        const raw = marked.parse(viewingReport.body, { async: false }) as string;
+        if (!viewingCard) return '';
+        const source = viewingCard.type === 'report'
+            ? viewingCard.body
+            : (viewingCard.content || viewingCard.description || '');
+        if (!source) return '';
+        const raw = marked.parse(source, { async: false }) as string;
         return DOMPurify.sanitize(raw);
-    }, [viewingReport?.body]);
+    }, [viewingCard]);
 
     const openCreateModal = (type: 'note' | 'task' | 'todo' | 'file' | 'report') => {
         setNoteForm({ content: '', color: 'yellow' });
@@ -567,22 +576,32 @@ export default function ProjectBoard({
                                         )}
 
                                         {card.type === 'report' && (
-                                            <div className="mt-2 flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
-                                                <span className="text-[10px] text-slate-400 inline-flex items-center gap-1 font-semibold">
-                                                    <CalendarDays className="h-3 w-3" />
-                                                    {card.published_at ? new Date(card.published_at).toLocaleDateString() : date}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setViewingReport(card)}
-                                                    className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200 hover:bg-emerald-100 hover:ring-emerald-300 transition-colors"
-                                                >
-                                                    <Eye className="h-3 w-3" />
-                                                    {__('general.view') || 'View'}
-                                                </button>
+                                            <div className="mt-2 flex items-center gap-1 text-[10px] text-slate-400 font-semibold">
+                                                <CalendarDays className="h-3 w-3" />
+                                                <span>{card.published_at ? new Date(card.published_at).toLocaleDateString() : date}</span>
                                             </div>
                                         )}
                                     </div>
+                                </div>
+
+                                <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-100/60" onClick={(e) => e.stopPropagation()}>
+                                    <CommentsPopover
+                                        card={card}
+                                        projectId={projectId}
+                                        guestMode={guestMode}
+                                        shareToken={shareToken}
+                                        initialCount={(card as any).comments_count}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewingCard(card)}
+                                        className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-200 hover:bg-emerald-100 hover:ring-emerald-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                                        title={__('general.view') || 'View'}
+                                        aria-label={__('general.view') || 'View'}
+                                    >
+                                        <Eye className="h-3.5 w-3.5" />
+                                        <span>{__('general.view') || 'View'}</span>
+                                    </button>
                                 </div>
 
                                 {!readOnly && (
@@ -950,61 +969,116 @@ export default function ProjectBoard({
                 </DialogContent>
             </Dialog>
 
-            {/* View Report Dialog */}
-            <Dialog open={!!viewingReport} onOpenChange={(open) => !open && setViewingReport(null)}>
+            {/* View Card Dialog (works for any card type so guests can read full content) */}
+            <Dialog open={!!viewingCard} onOpenChange={(open) => !open && setViewingCard(null)}>
                 <DialogContent className="w-full sm:max-w-3xl max-h-[calc(100vh-3rem)] flex flex-col gap-0 p-0 overflow-hidden">
-                    <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0 bg-gradient-to-b from-emerald-50/60 to-white">
-                        <DialogHeader>
-                            <div className="flex items-center gap-2 text-emerald-600">
-                                <FileText className="h-4 w-4" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider">
-                                    {__('general.report') || 'Report'}
-                                </span>
-                            </div>
-                            <DialogTitle className="text-lg font-bold text-slate-900 mt-1">
-                                {viewingReport?.title}
-                            </DialogTitle>
-                            {viewingReport?.published_at && (
-                                <p className="mt-1 text-xs text-slate-400">
-                                    {new Date(viewingReport.published_at).toLocaleString()}
-                                </p>
-                            )}
-                        </DialogHeader>
-                    </div>
-                    <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5">
-                        {reportHtml ? (
-                            <article
-                                className="prose prose-slate max-w-none prose-headings:font-heading prose-a:text-emerald-600 prose-pre:bg-slate-900 prose-pre:text-slate-100"
-                                dangerouslySetInnerHTML={{ __html: reportHtml }}
-                            />
-                        ) : (
-                            <p className="text-sm text-slate-400 italic text-center py-8">
-                                {__('general.no_content') || 'No content available for this report.'}
-                            </p>
-                        )}
-                    </div>
-                    <DialogFooter className="gap-2 sm:gap-0 px-6 py-3 border-t border-slate-100 bg-slate-50/60 shrink-0">
-                        <a
-                            href={viewingReport ? route('client.projects.board.export-report-pdf', {
-                                project: projectId,
-                                report: viewingReport.id,
-                            }) : '#'}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-disabled={!viewingReport}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                        >
-                            <Download className="h-3.5 w-3.5" />
-                            {__('general.export_as_pdf') || 'Export as PDF'}
-                        </a>
-                        <button
-                            type="button"
-                            onClick={() => setViewingReport(null)}
-                            className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-white"
-                        >
-                            {__('general.close') || 'Close'}
-                        </button>
-                    </DialogFooter>
+                    {viewingCard && (() => {
+                        const meta = TYPE_META[viewingCard.type];
+                        const TypeIcon = meta.icon;
+                        const isNote = viewingCard.type === 'note';
+                        const headerGradient = isNote
+                            ? 'from-amber-50/80 to-white'
+                            : 'from-emerald-50/60 to-white';
+                        const headerIconColor = isNote ? 'text-amber-600' : 'text-emerald-600';
+                        return (
+                            <>
+                                <div className={cn('px-6 pt-5 pb-3 border-b border-slate-100 shrink-0 bg-gradient-to-b', headerGradient)}>
+                                    <DialogHeader>
+                                        <div className={cn('flex items-center gap-2', headerIconColor)}>
+                                            <TypeIcon className="h-4 w-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">
+                                                {__(`general.${viewingCard.type === 'note' ? 'note' : viewingCard.type === 'task' ? 'task' : viewingCard.type === 'todo' ? 'todo' : viewingCard.type === 'file' ? 'file' : 'report'}`) || meta.label}
+                                            </span>
+                                        </div>
+                                        <DialogTitle className="text-lg font-bold text-slate-900 mt-1">
+                                            {viewingCard.title}
+                                        </DialogTitle>
+                                        {(viewingCard.published_at || viewingCard.due_at) && (
+                                            <p className="mt-1 text-xs text-slate-400">
+                                                {viewingCard.published_at && new Date(viewingCard.published_at).toLocaleString()}
+                                            </p>
+                                        )}
+                                    </DialogHeader>
+                                </div>
+                                <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5">
+                                    {viewingCard.type === 'file' ? (
+                                        <div className="flex flex-col items-center justify-center gap-4 py-6 text-center">
+                                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 ring-1 ring-orange-200">
+                                                <Paperclip className="h-8 w-8" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-800">{viewingCard.title}</p>
+                                                <p className="text-xs text-slate-500">{viewingCard.mime} · {viewingCard.human_size}</p>
+                                            </div>
+                                            {viewingCard.download_url && (
+                                                <a
+                                                    href={viewingCard.download_url}
+                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors"
+                                                >
+                                                    <Download className="h-3.5 w-3.5" />
+                                                    {__('general.download') || 'Download'}
+                                                </a>
+                                            )}
+                                        </div>
+                                    ) : viewingCard.type === 'todo' && viewingCard.checklist && viewingCard.checklist.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {viewingCard.description && (
+                                                <p className="text-sm text-slate-600 whitespace-pre-wrap">{viewingCard.description}</p>
+                                            )}
+                                            <ul className="space-y-2">
+                                                {viewingCard.checklist.map((chk, i) => (
+                                                    <li key={chk.id ?? i} className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50/60 p-3">
+                                                        {chk.is_completed ? (
+                                                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                                                        ) : (
+                                                            <Circle className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                                                        )}
+                                                        <span className={cn('text-sm', chk.is_completed ? 'line-through text-slate-400' : 'text-slate-700')}>
+                                                            {chk.title}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ) : reportHtml ? (
+                                        <article
+                                            className="prose prose-slate max-w-none prose-headings:font-heading prose-a:text-emerald-600 prose-pre:bg-slate-900 prose-pre:text-slate-100"
+                                            dangerouslySetInnerHTML={{ __html: reportHtml }}
+                                        />
+                                    ) : viewingCard.description ? (
+                                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{viewingCard.description}</p>
+                                    ) : (
+                                        <p className="text-sm text-slate-400 italic text-center py-8">
+                                            {__('general.no_content') || 'No content available.'}
+                                        </p>
+                                    )}
+                                </div>
+                                <DialogFooter className="gap-2 sm:gap-0 px-6 py-3 border-t border-slate-100 bg-slate-50/60 shrink-0">
+                                    {viewingCard.type === 'report' && (
+                                        <a
+                                            href={route('client.projects.board.export-report-pdf', {
+                                                project: projectId,
+                                                report: viewingCard.id,
+                                            })}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                                        >
+                                            <Download className="h-3.5 w-3.5" />
+                                            {__('general.export_as_pdf') || 'Export as PDF'}
+                                        </a>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewingCard(null)}
+                                        className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-white"
+                                    >
+                                        {__('general.close') || 'Close'}
+                                    </button>
+                                </DialogFooter>
+                            </>
+                        );
+                    })()}
                 </DialogContent>
             </Dialog>
         </div>

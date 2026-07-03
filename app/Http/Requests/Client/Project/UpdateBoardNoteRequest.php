@@ -15,7 +15,7 @@ class UpdateBoardNoteRequest extends FormRequest
     {
         return [
             'content' => ['nullable', 'string', 'max:2000'],
-            'color' => ['nullable', 'string', 'in:yellow,green,blue,red,purple,pink'],
+            'color' => ['nullable', 'string', 'in:yellow,green,blue,red,purple,pink,slate'],
         ];
     }
 }
