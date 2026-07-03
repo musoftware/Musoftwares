@@ -248,6 +248,21 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                         <Briefcase className="me-2 h-4 w-4" />
                                         <span>{__('general.activate_membership')}</span>
                                     </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            const dupId = window.prompt('Duplicate user ID to merge into this account:');
+                                            if (!dupId || isNaN(Number(dupId))) return;
+                                            const id = Number(dupId);
+                                            if (id === client.id) {
+                                                alert('Cannot merge a user into itself.');
+                                                return;
+                                            }
+                                            router.get(`/admin/users/${client.id}/merge`, { duplicate_id: id });
+                                        }}
+                                    >
+                                        <Trash2 className="me-2 h-4 w-4 text-red-600" />
+                                        <span className="text-red-600">Merge into another client…</span>
+                                    </DropdownMenuItem>
                                 </DropdownMenuGroup>
                             </div>
 

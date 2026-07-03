@@ -687,6 +687,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::put('/users/{id}', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [UsersController::class, 'destroy'])->name('users.destroy');
 
+    Route::get('/users/{user}/merge', [App\Http\Controllers\Admin\UserMergeController::class, 'preview'])->name('users.merge.preview');
+    Route::post('/users/{user}/merge/confirm', [App\Http\Controllers\Admin\UserMergeController::class, 'confirm'])->name('users.merge.confirm');
+
     // User Loans
     Route::post('/users/{user}/loans', [AdminUserLoanController::class, 'store'])->name('users.loans.store');
     Route::put('/users/{user}/loans/{loan}', [AdminUserLoanController::class, 'update'])->name('users.loans.update');
