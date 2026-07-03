@@ -2,16 +2,26 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2, X } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-export default function View({ invoice, transactions, upcomingSchedule, total_stat }) {
+export default function View({ invoice, records, transactions, upcomingSchedule, total_stat }) {
+    const historyItems = records || transactions || [];
+    const scheduleItems = Array.isArray(upcomingSchedule) ? upcomingSchedule : [];
     const [activeTab, setActiveTab] = useState<'history' | 'schedule'>('history');
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this Recurring Invoice?')) {
             router.delete(route('admin.recurring_invoices.delete', invoice.id));
+        }
+    };
+
+    const handleRemoveRecord = (recordId: number) => {
+        if (confirm(__('general.confirm_remove_transaction') || 'Are you sure you want to remove this transaction?')) {
+            router.delete(route('admin.recurring_invoices.records.delete', { invoice: invoice.id, record: recordId }), {
+                preserveScroll: true,
+            });
         }
     };
 
@@ -93,7 +103,7 @@ export default function View({ invoice, transactions, upcomingSchedule, total_st
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-500">Cumulative Paid:</span>
                                 <span className="text-sm font-bold text-red-650 bg-red-50 px-2 py-0.5 border border-red-100 rounded">
-                                    {total_stat.total_cost}
+                                    {total_stat?.total_cost ?? total_stat?.cumulative_paid ?? '—'}
                                 </span>
                             </div>
                         </div>
@@ -116,7 +126,7 @@ export default function View({ invoice, transactions, upcomingSchedule, total_st
                         }`}
                         onClick={() => setActiveTab('history')}
                     >
-                        <History className="w-4 h-4" /> Payroll History ({transactions.length})
+                        <History className="w-4 h-4" /> Payroll History ({historyItems.length})
                     </button>
                     <button
                         className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-all ${
@@ -132,7 +142,7 @@ export default function View({ invoice, transactions, upcomingSchedule, total_st
                 <div className="p-6">
                     {activeTab === 'history' && (
                         <div>
-                            {transactions.length === 0 ? (
+                            {historyItems.length === 0 ? (
                                 <div className="text-center py-8 text-gray-500">
                                     <List className="w-8 h-8 mx-auto text-gray-300 mb-2" />
                                     <p className="text-sm">{__('general.no_payroll_transactions_have_been_recorded_yet_for_this_salary_schedule')}</p>
@@ -144,12 +154,12 @@ export default function View({ invoice, transactions, upcomingSchedule, total_st
                                             <tr>
                                                 <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.date_recorded')}</th>
                                                 <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.transaction_id')}</th>
-                                                <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.reason')}</th>
                                                 <th className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
+                                                <th className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.actions') || 'Actions'}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
-                                            {transactions.map((tx: any) => (
+                                            {historyItems.map((tx: any) => (
                                                 <tr key={tx.id} className="hover:bg-slate-50">
                                                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
                                                         {new Date(tx.created_at).toLocaleString()}
@@ -157,11 +167,19 @@ export default function View({ invoice, transactions, upcomingSchedule, total_st
                                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-mono text-slate-500">
                                                         #{tx.id}
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900">
-                                                        {tx.reason}
-                                                    </td>
                                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-red-600 text-end">
                                                         -{formatCurrency(tx.amount, tx.currency)}
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap text-end">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveRecord(tx.id)}
+                                                            className="inline-flex items-center justify-center h-8 w-8 rounded-md text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
+                                                            aria-label={__('general.remove_transaction') || 'Remove transaction'}
+                                                            title={__('general.remove_transaction') || 'Remove'}
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -183,7 +201,7 @@ export default function View({ invoice, transactions, upcomingSchedule, total_st
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {upcomingSchedule.map((run: any, idx: number) => (
+                                    {scheduleItems.map((run: any, idx: number) => (
                                         <tr key={idx} className="hover:bg-slate-50">
                                             <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-800">
                                                 {new Date(run.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}

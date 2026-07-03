@@ -14,7 +14,7 @@ class UpdateBoardNoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['nullable', 'string', 'max:2000'],
+            'content' => ['nullable', 'string', 'max:61440'],
             'color' => ['nullable', 'string', 'in:yellow,green,blue,red,purple,pink,slate'],
         ];
     }

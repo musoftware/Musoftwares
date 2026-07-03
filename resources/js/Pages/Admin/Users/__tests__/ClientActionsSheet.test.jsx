@@ -1,11 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ClientActionsSheet from '../ClientActionsSheet';
-import { Link } from '@inertiajs/react';
 
-// Mock Inertia Link
+// Mock Inertia Link + router
 vi.mock('@inertiajs/react', () => ({
-    Link: ({ children, href, className }) => <a href={href} className={className}>{children}</a>,
+    Link: ({ children, href, className, target, rel }) => (
+        <a href={href} className={className} target={target} rel={rel}>{children}</a>
+    ),
+    router: { post: vi.fn(), get: vi.fn(), delete: vi.fn() },
 }));
 
 // Mock ResizeObserver which might be needed for Radix UI components
@@ -45,25 +47,30 @@ describe('ClientActionsSheet', () => {
             expect(linkElement).toHaveAttribute('href', href);
         };
 
-        // Check for specific links/buttons
+        // Finance links
         expectLink('New Invoice', '/admin/invoices/create?user=1');
+        expectLink('Create Recurring Invoice', '/admin/business/recurring/invoices/create?user=1');
+        expectLink('Recurring Payout', '/admin/business/recurring/salaries?action=create&user=1');
+        expectLink('New Payout', '/admin/payouts/create?user=1');
+        expectLink('Invoices', '/admin/invoices?client_id=1');
         expectLink('Receive Money', '/admin/transactions/create?user=1&type=receive');
         expectLink('Send Money', '/admin/transactions/create?user=1&type=send-money');
         expectLink('Refund Money', '/admin/transactions/create?user=1&type=refund');
-        expectLink('Invoices', '/admin/invoices?user=1');
-        expectLink('Swap Budgets', '/admin/transactions/transfer?user=1');
+        expectLink('Swap Projects Budget', '/admin/transactions/transfer?user=1');
         expectLink('All Transactions', '/admin/transactions?user=1');
-        
+
+        // Workspace & Tools
         expectLink('Projects', '/admin/projects?user_id=1');
         expectLink('Assign Task', '/admin/users/1/tasks/add');
-        expectLink('Notes', '/admin/users/1/notes');
-        expectLink('User Files', '/admin/users/1/files');
-        expectLink('View Profile', '/admin/users/1');
-        expectLink('Edit Client', '/admin/users/1/edit');
+        expectLink('Files', '/admin/users/1/files');
+        expectLink('Reports', '/admin/users/1/reports');
+        expectLink('Manage Referrals', '/admin/users/1/referrals');
 
-        // These are actual buttons with onClick handlers, not links
+        // Buttons (handlers / dynamic)
         expect(screen.getByText('Login As').closest('button')).toBeInTheDocument();
         expect(screen.getByText('Reset Password').closest('button')).toBeInTheDocument();
+        expect(screen.getByText('Change Role').closest('button')).toBeInTheDocument();
+        expect(screen.getByText('Recalc Balance').closest('button')).toBeInTheDocument();
     });
 
     it('calls onLoginAs when Login As button is clicked', () => {

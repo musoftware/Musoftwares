@@ -8,13 +8,20 @@ import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { ArrowLeft, Plus, Save } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-export default function Create({ currencies, users }) {
-    const { errors } = usePage().props;
+export default function Create({ currencies, users, preselectedUserId }) {
+    const { errors, props } = usePage().props;
     const currenciesList = Array.isArray(currencies) ? currencies : (currencies ? Object.values(currencies) : []);
     const usersList = Array.isArray(users) ? users : (users ? Object.values(users) : []);
 
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const queryUserId = urlParams ? urlParams.get('user') : null;
+
     const defaultCurrencyId = currenciesList[0]?.id || '';
-    const defaultUserId = usersList[0]?.id || '';
+    const defaultUserId =
+        preselectedUserId ??
+        (queryUserId ? Number(queryUserId) : null) ??
+        usersList[0]?.id ??
+        '';
 
     const [form, setForm] = useState({
         user_id: defaultUserId,

@@ -24,12 +24,17 @@ export default function Index({ salaries, currencies, users }) {
   const usersList = Array.isArray(users) ? users : users ? Object.values(users) : [];
 
   // Dialog State
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const queryAction = urlParams ? urlParams.get('action') : null;
+  const queryUserId = urlParams ? urlParams.get('user') : null;
 
   const defaultCurrencyId = currenciesList[0]?.id || '';
+  const defaultUserId = queryUserId ? String(queryUserId) : (usersList[0]?.id || '');
+
+  const [isCreateOpen, setIsCreateOpen] = useState(queryAction === 'create');
 
   const [newSalary, setNewSalary] = useState({
-    user_id: usersList[0]?.id || '',
+    user_id: defaultUserId,
     title: 'Monthly Salary',
     amount: '',
     currency: defaultCurrencyId,
@@ -52,7 +57,7 @@ export default function Index({ salaries, currencies, users }) {
       onSuccess: () => {
         setIsCreateOpen(false);
         setNewSalary({
-          user_id: usersList[0]?.id || '',
+          user_id: defaultUserId,
           title: 'Monthly Salary',
           amount: '',
           currency: defaultCurrencyId,

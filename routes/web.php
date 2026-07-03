@@ -1103,6 +1103,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::get('invoices/{id}', [RecurringInvoiceController::class, 'view'])->name('recurring_invoices.view');
         Route::delete('invoices/{id}/delete', [RecurringInvoiceController::class, 'delete'])->name('recurring_invoices.delete');
         Route::post('invoices/{id}/toggle-status', [RecurringInvoiceController::class, 'toggle'])->name('recurring_invoices.toggle');
+        Route::delete('invoices/{invoice}/records/{record}', [RecurringInvoiceController::class, 'deleteRecord'])->name('recurring_invoices.records.delete');
     });
 
     // ── Admin Hours Calendar ──────────────────────────────────────

@@ -881,6 +881,7 @@ export default function ProjectBoard({
                                 onChange={(e) => setNoteForm({ ...noteForm, content: e.target.value })}
                                 placeholder="Write down your notes here..."
                                 rows={6}
+                                maxLength={61440}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>

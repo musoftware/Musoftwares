@@ -8,6 +8,7 @@ use App\Models\RecurringInvoice;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class RecurringInvoiceController extends Controller
@@ -236,5 +237,30 @@ class RecurringInvoiceController extends Controller
         $invoice->is_active = !$invoice->is_active;
         $invoice->save();
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
+    }
+
+    public function deleteRecord(Request $request, RecurringInvoice $invoice, \App\Models\RecurringInvoiceRecord $record)
+    {
+        if ($record->recurring_invoice_id !== $invoice->id) {
+            abort(404);
+        }
+
+        DB::transaction(function () use ($record) {
+            if ($record->invoice_id) {
+                $linkedInvoice = \App\Models\Invoice::find($record->invoice_id);
+                if ($linkedInvoice) {
+                    $linkedInvoice->items()->delete();
+                    $linkedInvoice->delete();
+                }
+            }
+            $record->delete();
+        });
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => __('general.transaction_removed_successfully')]);
+        }
+
+        return redirect()->route('admin.recurring_invoices.view', $invoice->id)
+            ->with('success', __('general.transaction_removed_successfully'));
     }
 }
