@@ -230,6 +230,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::get('/projects/{project}/board/reports/{report}/export-pdf', [ClientProjectBoardController::class, 'exportReportPdf'])->name('board.export-report-pdf');
 
     Route::post('/projects/{project}/board/move', [ClientProjectBoardController::class, 'moveCard'])->name('board.move-card');
+    Route::post('/projects/{project}/board/reschedule', [ClientProjectBoardController::class, 'rescheduleCard'])->name('board.reschedule-card');
     Route::post('/projects/{project}/board/bring-undone', [ClientProjectBoardController::class, 'bringUndone'])->name('board.bring-undone');
 });
 

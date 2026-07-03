@@ -7025,6 +7025,19 @@ return [
     'try_changing_filter' => 'حاول تغيير التصفية أو عبارة البحث.',
     'undone_cards_brought' => 'تم إحضار :count مهام غير مكتملة إلى الأمام!',
     'user_created_successfully_send_set_password_link' => 'تم إنشاء المستخدم بنجاح. تم إرسال رابط تعيين كلمة المرور.',
+
+    // Reschedule card (admin-only)
+    'reschedule' => 'إعادة جدولة',
+    'reschedule_back_day' => 'يوم سابق',
+    'reschedule_next_day' => 'يوم تالٍ',
+    'reschedule_choose_date' => 'اختر التاريخ…',
+    'reschedule_dialog_title' => 'إعادة جدولة البطاقة',
+    'reschedule_dialog_description' => 'اختر التاريخ الجديد لهذه البطاقة. سيتم نقل البطاقة من اليوم الحالي.',
+    'reschedule_card' => 'إعادة الجدولة',
+    'card_rescheduled' => 'تمت إعادة جدولة البطاقة إلى :date.',
+    'card_reschedule_failed' => 'تعذرت إعادة جدولة البطاقة.',
+    'card_reschedule_admin_only' => 'إعادة الجدولة متاحة للمسؤولين فقط.',
+    'card_reschedule_not_supported' => 'لا يمكن إعادة جدولة هذا النوع من البطاقات.',
     'view_report' => 'عرض التقرير',
 
     // Admin Projects — advanced filters & card grid

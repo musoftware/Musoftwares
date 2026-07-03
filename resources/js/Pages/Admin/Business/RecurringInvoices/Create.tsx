@@ -100,7 +100,7 @@ export default function Create({ currencies, users }) {
                             value={form.user_id || null}
                             onChange={(val) => setForm({ ...form, user_id: val as any })}
                             options={initialClientOptions}
-                            asyncEndpoint={route('projects.search-clients')}
+                            asyncEndpoint={route('admin.projects.search-clients')}
                             searchParam="q"
                             placeholder={__('general.select_user')}
                             searchPlaceholder={`${__('general.search') || 'Search'} ${__('general.user_user').toLowerCase()}...`}

@@ -7063,6 +7063,19 @@ return [
     'undone_cards_brought' => 'Brought :count incomplete tasks forward!',
     'user_created_successfully_send_set_password_link' => 'User created successfully. A set-password link has been sent.',
 
+    // Reschedule card (admin-only)
+    'reschedule' => 'Reschedule',
+    'reschedule_back_day' => 'Back 1 day',
+    'reschedule_next_day' => 'Next 1 day',
+    'reschedule_choose_date' => 'Choose date…',
+    'reschedule_dialog_title' => 'Reschedule card',
+    'reschedule_dialog_description' => 'Pick the new date for this card. The card will be moved out of the current day.',
+    'reschedule_card' => 'Reschedule',
+    'card_rescheduled' => 'Card rescheduled to :date.',
+    'card_reschedule_failed' => 'Could not reschedule card.',
+    'card_reschedule_admin_only' => 'Only admins can reschedule cards.',
+    'card_reschedule_not_supported' => 'This card type cannot be rescheduled.',
+
     // Admin Projects — advanced filters & card grid
     'grid_view' => 'Grid View',
     'table_view' => 'Table View',

@@ -5,19 +5,21 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Client\Concerns\ResolvesClientProject;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\Project\MoveCardRequest;
+use App\Http\Requests\Client\Project\RescheduleCardRequest;
 use App\Http\Requests\Client\Project\StoreBoardNoteRequest;
 use App\Http\Requests\Client\Project\UpdateBoardNoteRequest;
 use App\Models\Project;
 use App\Models\ProjectBoardItem;
 use App\Models\ProjectBoardNote;
-use App\Models\Task;
-use App\Models\Todo;
 use App\Models\ProjectFile;
 use App\Models\ProjectReport;
+use App\Models\Task;
+use App\Models\Todo;
 use App\Models\TodoChecklistItem;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ClientProjectBoardController extends Controller
@@ -419,6 +421,51 @@ class ClientProjectBoardController extends Controller
             'lane' => $placement->lane,
             'pos_x' => $placement->pos_x,
             'pos_y' => $placement->pos_y,
+        ]);
+    }
+
+    public function rescheduleCard(RescheduleCardRequest $request, Project $project)
+    {
+        $this->authorizeProject($project);
+
+        $data = $request->validated();
+        $type = $data['type'];
+        $id = (int) $data['id'];
+        $newDate = $data['for_date'];
+
+        // Guard against forged IDs — the card must belong to this project.
+        $this->resolveOwnedItemable($project, $type, $id);
+
+        $morphClass = ProjectBoardItem::morphClassFor($type);
+
+        // Files have no separate board-date column (their `created_at` is the
+        // board day), so rescheduling a file is intentionally not supported.
+        // The Form Request restricts rescheduling to the four itemables that
+        // own an explicit date column.
+        if ($type === 'file') {
+            abort(422, __('general.card_reschedule_not_supported'));
+        }
+
+        DB::transaction(function () use ($project, $type, $morphClass, $id, $newDate) {
+            match ($type) {
+                'note' => $project->boardNotes()->whereKey($id)->update(['for_date' => $newDate]),
+                'task' => $project->tasks()->whereKey($id)->update(['due_date' => $newDate]),
+                'todo' => $project->todos()->whereKey($id)->update(['inDate' => $newDate]),
+                'report' => $project->reports()->whereKey($id)->update(['published_at' => $newDate]),
+                default => null,
+            };
+
+            // Move every saved placement row for this card to the new date so
+            // the saved lane / pos_x / pos_y layout survives the reschedule.
+            ProjectBoardItem::where('project_id', $project->id)
+                ->where('itemable_type', $morphClass)
+                ->where('itemable_id', $id)
+                ->update(['for_date' => $newDate]);
+        });
+
+        return response()->json([
+            'ok' => true,
+            'for_date' => $newDate,
         ]);
     }
 
