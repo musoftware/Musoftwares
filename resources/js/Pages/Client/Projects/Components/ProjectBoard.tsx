@@ -429,8 +429,8 @@ export default function ProjectBoard({
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="relative w-72">
+            <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative w-full sm:w-72">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <input
                         value={query}
@@ -441,16 +441,16 @@ export default function ProjectBoard({
                 </div>
 
                 {!readOnly && (
-                    <div className="flex gap-2">
+                    <div className="-mx-1 flex flex-wrap items-center gap-2 px-1 sm:mx-0 sm:px-0">
                         <button
                             onClick={() => openCreateModal('note')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+                            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
                         >
                             <Plus className="h-4 w-4 text-amber-500" /> {__('general.board_add_note')}
                         </button>
                         <button
                             onClick={() => openCreateModal('task')}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+                            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
                         >
                             <Plus className="h-4 w-4 text-sky-500" /> {__('general.board_add_task')}
                         </button>
@@ -629,9 +629,12 @@ export default function ProjectBoard({
             )}
 
             {statusPopover && (
-                <div 
+                <div
                     className="fixed z-50 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 p-1.5 shadow-xl backdrop-blur animate-in fade-in slide-in-from-top-1 duration-150"
-                    style={{ left: statusPopover.x, top: statusPopover.y + 4 }}
+                    style={{
+                        left: Math.max(8, Math.min(statusPopover.x, (typeof window !== 'undefined' ? window.innerWidth : 1024) - 220)),
+                        top: statusPopover.y + 4,
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {Object.entries(LANE_META).map(([laneKey, meta]) => {
@@ -645,9 +648,10 @@ export default function ProjectBoard({
                                     setStatusPopover(null);
                                 }}
                                 className={cn(
-                                    'flex h-8 w-8 items-center justify-center rounded-full text-base transition-all hover:scale-125 hover:bg-slate-50 shadow-sm active:scale-90',
+                                    'flex h-9 w-9 items-center justify-center rounded-full text-base transition-all hover:scale-110 hover:bg-slate-50 shadow-sm active:scale-90',
                                 )}
                                 title={__(meta.labelKey)}
+                                aria-label={__(meta.labelKey)}
                             >
                                 <LaneIcon className="h-4 w-4" />
                             </button>
@@ -658,8 +662,11 @@ export default function ProjectBoard({
 
             {contextMenu && (
                 <div
-                    className="fixed z-50 w-44 rounded-xl border border-slate-200 bg-white py-1 shadow-2xl animate-in zoom-in-95 duration-100"
-                    style={{ left: contextMenu.x, top: contextMenu.y }}
+                    className="fixed z-50 w-44 max-w-[calc(100vw-1rem)] rounded-xl border border-slate-200 bg-white py-1 shadow-2xl animate-in zoom-in-95 duration-100"
+                    style={{
+                        left: Math.max(8, Math.min(contextMenu.x, (typeof window !== 'undefined' ? window.innerWidth : 1024) - 192)),
+                        top: contextMenu.y,
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">
