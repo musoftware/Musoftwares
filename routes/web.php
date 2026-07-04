@@ -230,6 +230,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::get('/projects/{project}/board/reports/{report}/export-pdf', [ClientProjectBoardController::class, 'exportReportPdf'])->name('board.export-report-pdf');
 
     Route::post('/projects/{project}/board/move', [ClientProjectBoardController::class, 'moveCard'])->name('board.move-card');
+    Route::post('/projects/{project}/board/reorder', [ClientProjectBoardController::class, 'reorderCards'])->name('board.reorder-cards');
     Route::post('/projects/{project}/board/reschedule', [ClientProjectBoardController::class, 'rescheduleCard'])->name('board.reschedule-card');
     Route::post('/projects/{project}/board/bring-undone', [ClientProjectBoardController::class, 'bringUndone'])->name('board.bring-undone');
 });
@@ -611,6 +612,15 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // ── Project Board (canvas + lanes) — admin "view project" landing ──
     Route::get('/projects/{project}/board', [ProjectController::class, 'boardIndex'])->name('projects.board.index');
     Route::get('/projects/{project}/board/{date}', [ProjectController::class, 'board'])->name('projects.board');
+
+    // ── Project Finance / Cost Analysis (cost transactions + paid/pending invoices) ──
+    Route::get('/projects/{project}/finance', [ProjectController::class, 'finance'])->name('projects.finance.index');
+
+    // ── Project Board Categories (admin manages the project's label taxonomy) ──
+    Route::get('/projects/{project}/board-categories', [\App\Http\Controllers\Admin\BoardCategoryController::class, 'index'])->name('projects.board.categories.index');
+    Route::post('/projects/{project}/board-categories', [\App\Http\Controllers\Admin\BoardCategoryController::class, 'store'])->name('projects.board.categories.store');
+    Route::put('/projects/{project}/board-categories/{category}', [\App\Http\Controllers\Admin\BoardCategoryController::class, 'update'])->name('projects.board.categories.update');
+    Route::delete('/projects/{project}/board-categories/{category}', [\App\Http\Controllers\Admin\BoardCategoryController::class, 'destroy'])->name('projects.board.categories.destroy');
 
     // Contract AI generator
     Route::post('/contracts/ai/generate', [ContractAiController::class, 'generate'])->name('contracts.ai.generate');
@@ -1000,6 +1010,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/invoices/{invoice}/create-timer', [App\Http\Controllers\Admin\InvoiceController::class, 'createTimerItem'])->name('invoices.create-timer');
     Route::post('/invoices/bulk-action', [App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
     Route::get('/invoices/{invoice}', [App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{invoice}/linked-transactions', [App\Http\Controllers\Admin\InvoiceController::class, 'linkedTransactions'])->name('invoices.linked-transactions');
     Route::get('/invoices/{invoice}/download-pdf', [App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
     Route::get('/invoices/{invoice}/print-pdf', [App\Http\Controllers\Admin\InvoiceController::class, 'printPdf'])->name('invoices.print-pdf');
 

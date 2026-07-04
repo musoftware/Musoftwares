@@ -25,6 +25,7 @@ class PublicProjectBoardController extends Controller
         }
 
         $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: false);
+        $categories = $this->boardService->categoriesFor($project);
 
         $project->loadCount(['tasks', 'reports', 'files']);
         $currency = $project->currencyRow();
@@ -54,6 +55,14 @@ class PublicProjectBoardController extends Controller
             'date' => $dateCarbon->toDateString(),
             'lanes' => $this->boardService->lanes(),
             'cards' => $cards,
+            'categories' => $categories->map(fn ($c) => [
+                'id' => $c->id,
+                'slug' => $c->slug,
+                'name' => $c->localizedName(),
+                'color' => $c->color,
+                'text_color' => $c->text_color,
+                'is_system' => (bool) $c->is_system,
+            ])->values(),
             'activeDates' => $activeDates,
         ]);
     }

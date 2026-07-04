@@ -104,6 +104,11 @@ class Project extends Model
         return $this->hasMany(ProjectBoardItem::class, 'project_id');
     }
 
+    public function boardCategories()
+    {
+        return $this->hasMany(ProjectBoardCategory::class, 'project_id');
+    }
+
     /* public function swimlanes()
     {
         return $this->hasMany(TodoSwimlane::class, 'project_id');
@@ -287,6 +292,75 @@ class Project extends Model
         return -1 * abs($this->invoices()->where('currency', $currency)->whereIn('status', ['partially_paid', 'unpaid'])->sum('unpaid'));
     }
 
+    /**
+     * Resolve this project's own currency id (falls back to the client's currency).
+     * Used as the target currency for all per-project financial aggregations.
+     */
+    public function resolveCurrencyId(): ?int
+    {
+        return $this->get_currency();
+    }
+
+    /**
+     * Total COST incurred on this project (sum of cost_transactions),
+     * converted into the project currency. This is real spend, not a cached slice.
+     */
+    public function costAmount(): float
+    {
+        $currencyId = $this->resolveCurrencyId();
+        $total = 0;
+        foreach ($this->costTransactions()->groupBy('currency_id')
+            ->selectRaw('sum(amount) as total_amount, currency_id')
+            ->get() as $item) {
+            if ($item->total_amount == 0) {
+                continue;
+            }
+            $total += (float) CurrenciesExchange::RateTodayNoRound($item->total_amount, $item->currency_id, $currencyId);
+        }
+
+        return (float) $total;
+    }
+
+    /**
+     * Total amount PAID against this project's invoices,
+     * converted into the project currency.
+     */
+    public function paidInvoicesAmount(): float
+    {
+        $currencyId = $this->resolveCurrencyId();
+        $total = 0;
+        foreach ($this->invoices()->groupBy('currency_id')
+            ->selectRaw('sum(paid) as total_amount, currency_id')
+            ->get() as $item) {
+            if ($item->total_amount == 0) {
+                continue;
+            }
+            $total += (float) CurrenciesExchange::RateTodayNoRound($item->total_amount, $item->currency_id, $currencyId);
+        }
+
+        return (float) $total;
+    }
+
+    /**
+     * Total OUTSTANDING (pending/unpaid) amount on this project's invoices,
+     * converted into the project currency. Only unpaid/partially_paid invoices count.
+     */
+    public function pendingInvoicesAmount(): float
+    {
+        $currencyId = $this->resolveCurrencyId();
+        $total = 0;
+        foreach ($this->invoices()->whereIn('status', ['unpaid', 'partially_paid'])->groupBy('currency_id')
+            ->selectRaw('sum(unpaid) as total_amount, currency_id')
+            ->get() as $item) {
+            if ($item->total_amount == 0) {
+                continue;
+            }
+            $total += (float) CurrenciesExchange::RateTodayNoRound($item->total_amount, $item->currency_id, $currencyId);
+        }
+
+        return (float) $total;
+    }
+
     public function work_time()
     {
         $invoices2 = $this->invoice_item_timers();
@@ -317,6 +391,11 @@ class Project extends Model
     public function cost_transactions(): HasMany
     {
         return $this->hasMany(CostTransaction::class, 'project_id');
+    }
+
+    public function costTransactions(): HasMany
+    {
+        return $this->cost_transactions();
     }
 
     public function contracts(): HasMany

@@ -1,4 +1,5 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, Check, Tag } from 'lucide-react';
 import axios from 'axios';
 import { router } from '@inertiajs/react';
@@ -10,6 +11,8 @@ import {
     categoryPalette,
     type BoardCategoryLike,
 } from './BoardCategoryChip';
+
+const POPOVER_WIDTH = 240; // matches Tailwind w-60 (15rem)
 
 export interface BoardCategory extends BoardCategoryLike {
     id: number;
@@ -47,20 +50,54 @@ export default function BoardCategoryPicker({
     const [newName, setNewName] = useState('');
     const [newColor, setNewColor] = useState('rose');
     const [creating, setCreating] = useState(false);
+    const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
     const wrapRef = useRef<HTMLDivElement | null>(null);
+    const buttonRef = useRef<HTMLButtonElement | null>(null);
+    const popoverRef = useRef<HTMLDivElement | null>(null);
 
     const selected = useMemo(
         () => (selectedId ? categories.find((c) => c.id === selectedId) ?? null : null),
         [selectedId, categories],
     );
 
+    const computeCoords = (button: HTMLButtonElement) => {
+        const rect = button.getBoundingClientRect();
+        return {
+            top: rect.bottom + 6, // mt-1.5 = 6px
+            left: align === 'end' ? rect.right - POPOVER_WIDTH : rect.left,
+        };
+    };
+
+    const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (!open && buttonRef.current) {
+            setCoords(computeCoords(buttonRef.current));
+        }
+        setOpen((v) => !v);
+    };
+
     React.useEffect(() => {
         if (!open) return;
         const onDoc = (e: MouseEvent) => {
-            if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+            const t = e.target as Node;
+            if (wrapRef.current?.contains(t)) return;
+            if (popoverRef.current?.contains(t)) return;
+            setOpen(false);
         };
         window.addEventListener('mousedown', onDoc);
         return () => window.removeEventListener('mousedown', onDoc);
+    }, [open]);
+
+    // Close on scroll/resize so the portaled popover doesn't drift from its anchor.
+    useEffect(() => {
+        if (!open) return;
+        const onScroll = () => setOpen(false);
+        window.addEventListener('scroll', onScroll, true);
+        window.addEventListener('resize', onScroll);
+        return () => {
+            window.removeEventListener('scroll', onScroll, true);
+            window.removeEventListener('resize', onScroll);
+        };
     }, [open]);
 
     const submitNew = async () => {
@@ -87,9 +124,10 @@ export default function BoardCategoryPicker({
     return (
         <div className="relative inline-block" ref={wrapRef}>
             <button
+                ref={buttonRef}
                 type="button"
                 disabled={disabled}
-                onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+                onClick={handleToggle}
                 className={cn(
                     'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border transition-colors shadow-sm active:scale-95 ring-1 ring-inset',
                     selected
@@ -105,12 +143,11 @@ export default function BoardCategoryPicker({
                 </span>
             </button>
 
-            {open && (
+            {open && coords && typeof document !== 'undefined' && createPortal(
                 <div
-                    className={cn(
-                        'absolute z-40 mt-1.5 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-150',
-                        align === 'end' ? 'right-0' : 'left-0',
-                    )}
+                    ref={popoverRef}
+                    style={{ position: 'fixed', top: coords.top, left: coords.left, width: POPOVER_WIDTH }}
+                    className="z-[1000] rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-150"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -217,7 +254,8 @@ export default function BoardCategoryPicker({
                             </div>
                         </div>
                     )}
-                </div>
+                </div>,
+                document.body,
             )}
         </div>
     );

@@ -17,7 +17,6 @@ interface ProjectItem {
     date_start: string | null;
     date_end: string | null;
     budget: string;
-    project_balance: string;
     total_paid: string;
     hide_future_tasks: boolean;
     currency: { currency: string; symbol: string; string_format?: string } | null;

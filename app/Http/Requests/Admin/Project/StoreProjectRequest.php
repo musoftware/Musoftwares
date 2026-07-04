@@ -18,7 +18,6 @@ class StoreProjectRequest extends FormRequest
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'project_name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
-            'project_balance' => ['nullable', 'numeric', 'min:0'],
             'budget' => ['nullable', 'numeric', 'min:0'],
             'hour_rate' => ['nullable', 'numeric', 'min:0'],
             'percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],

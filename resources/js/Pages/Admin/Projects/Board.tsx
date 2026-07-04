@@ -6,6 +6,7 @@ import { router } from '@inertiajs/react';
 import AdminBoardLayout from '@/Layouts/AdminBoardLayout';
 import ProjectBoard, { type BoardCard } from '@/Pages/Client/Projects/Components/ProjectBoard';
 import BoardTopNav, { type BoardFilter } from './Components/BoardTopNav';
+import BoardCategoriesManager, { type BoardCategory } from './Components/BoardCategoriesManager';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatMoney, formatDate } from '@/lib/utils';
@@ -18,6 +19,7 @@ interface Props {
     lanes: string[];
     cards: BoardCard[];
     activeDates: string[];
+    categories?: BoardCategory[];
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -32,9 +34,10 @@ const STATUS_LABEL_KEY: Record<string, string> = {
     closed: 'general.status_closed',
 };
 
-export default function AdminProjectBoard({ project, date, lanes, cards, activeDates }: Props) {
+export default function AdminProjectBoard({ project, date, lanes, cards, activeDates, categories }: Props) {
     const day = parseISO(date);
     const [filter, setFilter] = useState<string>('all');
+    const [showCategories, setShowCategories] = useState<boolean>(false);
 
     const triggerAddNote = useCallback(() => {
         const btn = document.querySelector<HTMLButtonElement>('[data-board-add-note]');
@@ -90,6 +93,7 @@ export default function AdminProjectBoard({ project, date, lanes, cards, activeD
                 date={date}
                 onAdd={handleAdd}
                 activeDates={activeDates}
+                onManageCategories={() => setShowCategories(true)}
             />
 
             <div className="w-full space-y-6 px-4 py-6 sm:px-6 lg:px-8 max-w-none">
@@ -101,12 +105,22 @@ export default function AdminProjectBoard({ project, date, lanes, cards, activeD
                     initialCards={cards}
                     hideFuture={false}
                     externalFilter={filter as any}
+                    categories={categories}
                 />
 
                 <p className="text-center text-xs text-slate-400">
                     {__('general.board_persistence_hint')}
                 </p>
             </div>
+
+            {categories && (
+                <BoardCategoriesManager
+                    projectId={project.id}
+                    open={showCategories}
+                    onClose={() => setShowCategories(false)}
+                    initialCategories={categories}
+                />
+            )}
         </AdminBoardLayout>
     );
 }

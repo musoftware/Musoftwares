@@ -41,6 +41,8 @@ class ProjectBoardItem extends Model
     protected $casts = [
         'pos_x' => 'integer',
         'pos_y' => 'integer',
+        'sort' => 'integer',
+        'category_id' => 'integer',
     ];
 
     public function project(): BelongsTo
@@ -51,5 +53,10 @@ class ProjectBoardItem extends Model
     public function itemable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ProjectBoardCategory::class, 'category_id');
     }
 }

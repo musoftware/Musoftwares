@@ -3,7 +3,7 @@ import { Link, router } from '@inertiajs/react';
 import {
     ChevronLeft, ChevronRight, CalendarDays, LayoutDashboard,
     StickyNote, ListTodo, FileText, Paperclip, ClipboardList, Plus,
-    ChevronDown, ArrowLeft, Wallet, Share2, Calendar as LucideCalendar, Sparkles
+    ChevronDown, ArrowLeft, Wallet, Share2, Calendar as LucideCalendar, Sparkles, Tag
 } from 'lucide-react';
 import {
     FaRegStickyNote, FaBolt, FaSearch, FaCheckCircle, FaGlobe, FaRegClipboard
@@ -55,6 +55,8 @@ interface BoardTopNavProps {
     date: string;
     onAdd: (kind: 'note' | 'task' | 'todo' | 'file' | 'report') => void;
     activeDates?: string[];
+    /** Renders a small "Manage categories" action button. Admin-only. */
+    onManageCategories?: () => void;
 }
 
 const FILTER_META: Record<BoardFilter, { labelKey: string; icon: IconType; activeColor: string; baseColor: string; shadowColor: string }> = {
@@ -81,7 +83,7 @@ const ADD_MENU: { kind: 'note' | 'task' | 'todo' | 'file' | 'report'; labelKey: 
 
 const FILTERS: BoardFilter[] = ['all', 'backlog', 'in_progress', 'review', 'done'];
 
-export default function BoardTopNav({ project, activeFilter, onFilterChange, counts, date, onAdd, activeDates = [] }: BoardTopNavProps) {
+export default function BoardTopNav({ project, activeFilter, onFilterChange, counts, date, onAdd, activeDates = [], onManageCategories }: BoardTopNavProps) {
     const day = parseISO(date);
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const prev = format(new Date(day.getTime() - 86400000), 'yyyy-MM-dd');
@@ -267,6 +269,20 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                             >
                                 <Share2 className="h-4 w-4 text-slate-500 sm:h-3.5 sm:w-3.5" />
                                 <span className="hidden sm:inline">{__('general.board_share_btn') || 'Share'}</span>
+                            </button>
+                        )}
+
+                        {/* Manage categories (admin-only). Hidden when no callback is provided. */}
+                        {onManageCategories && (
+                            <button
+                                type="button"
+                                onClick={onManageCategories}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors sm:w-auto sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
+                                title={__('general.board_manage_categories') || 'Manage categories'}
+                                aria-label={__('general.board_manage_categories') || 'Manage categories'}
+                            >
+                                <Tag className="h-4 w-4 text-amber-500 sm:h-3.5 sm:w-3.5" />
+                                <span className="hidden sm:inline">{__('general.board_manage_categories') || 'Manage categories'}</span>
                             </button>
                         )}
 

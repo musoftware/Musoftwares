@@ -388,14 +388,21 @@ export default function Show({ invoice }: { invoice: any }) {
                         </Button>
                     </div>
                     {(isUnpaid || invoice.status === 'partially_paid') && (
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             className="h-10 px-4 bg-white"
                             onClick={() => setRescheduleModal(true)}
                         >
                             <Clock className="w-4 h-4 me-2" /> {__('admin.reschedule_invoice')}
                         </Button>
                     )}
+                    <Button
+                        variant="outline"
+                        className="h-10 px-4 bg-white"
+                        onClick={() => router.visit(route('admin.invoices.linked-transactions', { invoice: String(invoice.id) }))}
+                    >
+                        <Network className="w-4 h-4 me-2" /> {__('admin.view_linked_transactions')}
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button className="bg-slate-900 hover:bg-slate-900 h-10 px-4">

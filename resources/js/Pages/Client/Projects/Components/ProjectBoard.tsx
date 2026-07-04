@@ -4,7 +4,7 @@ import {
     Plus, Trash2, StickyNote, ListTodo, FileText, CheckCircle2, Circle, GripVertical,
     Filter, StickyNote as NoteIcon, AlertCircle, ChevronDown, RotateCcw, Search, Paperclip,
     ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye,
-    ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon
+    ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon, Tag
 } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -12,6 +12,12 @@ import {
     FaRegStickyNote, FaBolt, FaSearch, FaCheckCircle, FaGlobe, FaRegClipboard
 } from 'react-icons/fa';
 import type { IconType } from 'react-icons';
+import {
+    DragDropContext,
+    Draggable,
+    Droppable,
+    type DropResult,
+} from '@hello-pangea/dnd';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -29,6 +35,8 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Checkbox } from '@/Components/ui/checkbox';
 import CommentsPopover from '@/Pages/Client/Projects/Components/CommentsPopover';
+import BoardCategoryChip, { categoryPalette, type BoardCategoryLike } from './BoardCategoryChip';
+import BoardCategoryPicker, { type BoardCategory } from './BoardCategoryPicker';
 
 export type CardType = 'note' | 'task' | 'report' | 'todo' | 'file';
 
@@ -39,6 +47,7 @@ export interface BoardCard {
     lane: string;
     pos_x: number;
     pos_y: number;
+    sort?: number;
     color?: string;
     content?: string;
     description?: string;
@@ -54,6 +63,8 @@ export interface BoardCard {
     mime?: string;
     download_url?: string;
     comments_count?: number;
+    category_id?: number | null;
+    category?: BoardCategoryLike | null;
 }
 
 interface ProjectBoardProps {
@@ -69,6 +80,8 @@ interface ProjectBoardProps {
     guestMode?: boolean;
     /** Required when `guestMode` is true. */
     shareToken?: string | null;
+    /** Per-project category taxonomy. Falls back to a default-derived list when undefined. */
+    categories?: BoardCategory[];
 }
 
 const NOTE_COLORS: Record<string, { bg: string; border: string; text: string; swatch: string }> = {
@@ -105,7 +118,7 @@ const PRIORITY_STYLES: Record<string, string> = {
 
 export default function ProjectBoard({
     projectId, date, lanes, initialCards, hideFuture, readOnly = false,
-    externalFilter, guestMode = false, shareToken = null,
+    externalFilter, guestMode = false, shareToken = null, categories,
 }: ProjectBoardProps) {
     const { auth } = usePage().props as any;
     const userRoles: string[] = auth?.user?.roles ?? [];
@@ -113,6 +126,7 @@ export default function ProjectBoard({
 
     const [cards, setCards] = useState<BoardCard[]>(initialCards);
     const [query, setQuery] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState<'all' | 'uncategorized' | number>('all');
 
     const [statusPopover, setStatusPopover] = useState<{ cardId: number; type: CardType; x: number; y: number } | null>(null);
     const [contextMenu, setContextMenu] = useState<{ card: BoardCard; x: number; y: number } | null>(null);
@@ -185,6 +199,18 @@ export default function ProjectBoard({
         setCards(initialCards);
     }, [initialCards]);
 
+    // Fall back to the four canonical system categories if the parent didn't pass any.
+    // This keeps the chip + filter UI functional in non-seeded environments (e.g. tests).
+    const effectiveCategories: BoardCategory[] = useMemo(() => {
+        if (categories && categories.length > 0) return categories;
+        return [
+            { id: -1, slug: 'urgent', name: __('general.board_category_urgent') || 'Urgent', color: 'rose', is_system: true },
+            { id: -2, slug: 'important', name: __('general.board_category_important') || 'Important', color: 'amber', is_system: true },
+            { id: -3, slug: 'normal', name: __('general.board_category_normal') || 'Normal', color: 'slate', is_system: true },
+            { id: -4, slug: 'idea', name: __('general.board_category_idea') || 'Idea', color: 'sky', is_system: true },
+        ];
+    }, [categories]);
+
     useEffect(() => {
         const handler = (e: Event) => {
             const newCards = (e as CustomEvent).detail?.cards;
@@ -209,6 +235,14 @@ export default function ProjectBoard({
                 if (isLane && c.lane !== externalFilter) return false;
                 if (!isLane && c.type !== externalFilter) return false;
             }
+            // 'all' shows everything; numeric = a real category id; 'uncategorized' = no chip.
+            if (categoryFilter !== 'all') {
+                if (categoryFilter === 'uncategorized') {
+                    if (c.category_id) return false;
+                } else if (c.category_id !== categoryFilter) {
+                    return false;
+                }
+            }
             if (!q) return true;
             return (
                 c.title.toLowerCase().includes(q) ||
@@ -216,7 +250,7 @@ export default function ProjectBoard({
                 (c.content ?? '').toLowerCase().includes(q)
             );
         });
-    }, [cards, externalFilter, query, lanes]);
+    }, [cards, externalFilter, query, lanes, categoryFilter]);
 
     const updateCardLane = useCallback((type: CardType, id: number, nextLane: string) => {
         if (readOnly) return;
@@ -234,6 +268,83 @@ export default function ProjectBoard({
             toast.error(__('general.could_not_save_card_position') || 'Failed to update status.');
         });
     }, [projectId, date, readOnly]);
+
+    /**
+     * Persist a brand-new sort order for the visible lane after a drag-drop interaction.
+     * `order` is the array of card keys in the desired final order; we send it bulk so the
+     * server can write sequential sort values in one transaction rather than N PATCH calls.
+     */
+    const reorderCards = useCallback(async (lane: string, order: { type: CardType; id: number }[]) => {
+        if (readOnly) return;
+        if (order.length === 0) return;
+        try {
+            await axios.post(route('client.projects.board.reorder-cards', { project: projectId }), {
+                for_date: date,
+                lane,
+                order,
+            });
+            // The server is the source of truth — rebuild the sort field from the new order
+            // so a refresh keeps the user's drag sequence even if the API response carries no payload.
+            const orderIndex = new Map<string, number>();
+            order.forEach((o, idx) => orderIndex.set(`${o.type}-${o.id}`, idx));
+            setCards((prev) => prev.map((c) => (
+                orderIndex.has(`${c.type}-${c.id}`)
+                    ? { ...c, sort: orderIndex.get(`${c.type}-${c.id}`)! }
+                    : c
+            )));
+            toast.success(__('general.board_reorder_saved') || 'Order saved.');
+        } catch (err) {
+            toast.error(__('general.board_reorder_failed') || 'Could not save the new order.');
+        }
+    }, [projectId, date, readOnly]);
+
+    /**
+     * Update only a card's category; we don't change lane or order. The card payload is returned
+     * by `move-card` so the UI reflects the canonical server state.
+     */
+    const updateCardCategory = useCallback(async (type: CardType, id: number, categoryId: number | null) => {
+        if (readOnly) return;
+        try {
+            const res = await axios.post(
+                route('client.projects.board.move-card', { project: projectId }),
+                { for_date: date, type, id, lane: undefined, category_id: categoryId },
+            );
+            const meta = res.data;
+            setCards((prev) => prev.map((c) => {
+                if (!(c.type === type && c.id === id)) return c;
+                const newCategory = categoryId == null ? null : (effectiveCategories.find((x) => x.id === categoryId) ?? null);
+                return {
+                    ...c,
+                    category_id: meta?.category_id ?? categoryId,
+                    category: newCategory
+                        ? { id: newCategory.id, slug: newCategory.slug, name: newCategory.name, color: newCategory.color, text_color: newCategory.text_color }
+                        : null,
+                };
+            }));
+        } catch (err) {
+            toast.error(__('general.board_category_assign_failed') || 'Could not assign the category.');
+        }
+    }, [projectId, date, readOnly, effectiveCategories]);
+
+    /**
+     * `DragDropContext` callback. Because the board renders only the filter-selected lane
+     * (the user filters via BoardTopNav), we always reorder the single visible lane and
+     * pass the post-drag order to `reorderCards`. When no lane filter is active we fall
+     * back to the card's current lane.
+     */
+    const onDragEnd = useCallback((result: DropResult) => {
+        if (readOnly) return;
+        if (!result.destination) return;
+        if (result.destination.index === result.source.index) return;
+
+        const ordered = filteredCards.map((c) => ({ type: c.type, id: c.id }));
+        // Reorder in-place based on the drag interaction.
+        const [moved] = ordered.splice(result.source.index, 1);
+        ordered.splice(result.destination.index, 0, moved);
+
+        const targetLane = ordered[0] ? (filteredCards.find((c) => c.type === ordered[0].type && c.id === ordered[0].id)?.lane ?? 'backlog') : 'backlog';
+        void reorderCards(targetLane, ordered);
+    }, [readOnly, filteredCards, reorderCards]);
 
     // ─── Reschedule (admin-only) ───────────────────────────────────────
     // Sends the card to a new for_date and removes it from the current day.
@@ -501,13 +612,22 @@ export default function ProjectBoard({
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-                <div className="relative w-full sm:w-72">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <input
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder={__('general.search_cards') || 'Search board cards...'}
-                        className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-300 transition-all"
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                    <div className="relative w-full sm:w-72">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <input
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder={__('general.search_cards') || 'Search board cards...'}
+                            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-300 transition-all"
+                        />
+                    </div>
+
+                    {/* Category filter — chip select that mirrors the project's category taxonomy */}
+                    <CategoryFilterDropdown
+                        categories={effectiveCategories}
+                        value={categoryFilter}
+                        onChange={setCategoryFilter}
                     />
                 </div>
 
@@ -538,171 +658,216 @@ export default function ProjectBoard({
                     <p className="text-xs text-slate-400">{__('general.try_changing_filter') || 'Try switching top status tabs'}</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                    {filteredCards.map((card) => {
-                        const isNote = card.type === 'note';
-                        const noteColor = NOTE_COLORS[card.color ?? 'yellow'] ?? NOTE_COLORS.yellow;
-                        const meta = TYPE_META[card.type];
-                        const TypeIcon = meta.icon;
-                        const priorityCls = card.priority ? PRIORITY_STYLES[card.priority] : null;
-                        const lane = LANE_META[card.lane] || LANE_META.backlog;
-                        const LaneIcon = lane.icon;
-                        const cardKey = `${card.type}:${card.id}`;
-                        const isHighlighted = cardKey === highlightedCardKey;
-
-                        return (
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId={`board-${externalFilter ?? date}`} direction="vertical" isDropDisabled={readOnly}>
+                        {(provided) => (
                             <div
-                                key={cardKey}
-                                data-card-key={cardKey}
-                                onContextMenu={(e) => {
-                                    if (readOnly) return;
-                                    e.preventDefault();
-                                    setContextMenu({ card, x: e.clientX, y: e.clientY });
-                                }}
-                                className={cn(
-                                    'group relative flex flex-col justify-between rounded-2xl border p-4 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 ease-out cursor-pointer',
-                                    isHighlighted && 'ring-2 ring-emerald-400 ring-offset-2 animate-in zoom-in-95 fade-in duration-700',
-                                    isNote ? cn(noteColor.bg, noteColor.border, noteColor.text) : 'border-slate-200 bg-white text-slate-900'
-                                )}
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
                             >
-                                {isHighlighted && (
-                                    <span className="pointer-events-none absolute -top-2.5 -end-2.5 z-10 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg ring-2 ring-white">
-                                        <CheckCircle2 className="h-3 w-3" /> Uploaded
-                                    </span>
-                                )}
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring)}>
-                                            <TypeIcon className="h-2.5 w-2.5" />
-                                            {meta.label}
-                                        </span>
+                                {filteredCards.map((card, index) => {
+                                    const isNote = card.type === 'note';
+                                    const noteColor = NOTE_COLORS[card.color ?? 'yellow'] ?? NOTE_COLORS.yellow;
+                                    const meta = TYPE_META[card.type];
+                                    const TypeIcon = meta.icon;
+                                    const priorityCls = card.priority ? PRIORITY_STYLES[card.priority] : null;
+                                    const lane = LANE_META[card.lane] || LANE_META.backlog;
+                                    const LaneIcon = lane.icon;
+                                    const cardKey = `${card.type}:${card.id}`;
+                                    const draggableId = cardKey;
+                                    const isHighlighted = cardKey === highlightedCardKey;
 
-                                        <button
-                                            type="button"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                if (readOnly) return;
-                                                const rect = e.currentTarget.getBoundingClientRect();
-                                                setStatusPopover({ cardId: card.id, type: card.type, x: rect.left, y: rect.bottom + window.scrollY });
-                                            }}
-                                            className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border transition-colors shadow-sm active:scale-95', lane.bg, lane.border)}
-                                        >
-                                            <LaneIcon className="h-2.5 w-2.5" />
-                                            <span>{__(lane.labelKey)}</span>
-                                            {!readOnly && <ChevronDown className="h-2.5 w-2.5 opacity-60" />}
-                                        </button>
-                                    </div>
+                                    return (
+                                        <Draggable draggableId={draggableId} index={index} isDragDisabled={readOnly} key={cardKey}>
+                                            {(dragProvided, dragSnapshot) => (
+                                                <div
+                                                    ref={dragProvided.innerRef}
+                                                    {...dragProvided.draggableProps}
+                                                    data-card-key={cardKey}
+                                                    onContextMenu={(e) => {
+                                                        if (readOnly) return;
+                                                        e.preventDefault();
+                                                        setContextMenu({ card, x: e.clientX, y: e.clientY });
+                                                    }}
+                                                    className={cn(
+                                                        'group relative flex flex-col justify-between rounded-2xl border p-4 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 ease-out cursor-pointer',
+                                                        dragSnapshot.isDragging && 'shadow-2xl ring-2 ring-slate-400/40 rotate-1 scale-[1.02] z-50',
+                                                        isHighlighted && 'ring-2 ring-emerald-400 ring-offset-2 animate-in zoom-in-95 fade-in duration-700',
+                                                        isNote ? cn(noteColor.bg, noteColor.border, noteColor.text) : 'border-slate-200 bg-white text-slate-900'
+                                                    )}
+                                                >
+                                                    {isHighlighted && (
+                                                        <span className="pointer-events-none absolute -top-2.5 -end-2.5 z-10 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg ring-2 ring-white">
+                                                            <CheckCircle2 className="h-3 w-3" /> Uploaded
+                                                        </span>
+                                                    )}
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            {!readOnly && (
+                                                                <span
+                                                                    {...dragProvided.dragHandleProps}
+                                                                    className="inline-flex h-5 w-5 items-center justify-center rounded-md text-slate-300 group-hover:text-slate-500 hover:bg-slate-100 transition-colors cursor-grab active:cursor-grabbing"
+                                                                    title={__('general.board_drag_handle') || 'Drag handle'}
+                                                                    aria-label={__('general.board_drag_handle') || 'Drag handle'}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <GripVertical className="h-3.5 w-3.5" />
+                                                                </span>
+                                                            )}
+                                                            <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring)}>
+                                                                <TypeIcon className="h-2.5 w-2.5" />
+                                                                {meta.label}
+                                                            </span>
 
-                                    <div className="space-y-1.5" onClick={() => !readOnly && openEditModal(card)}>
-                                        <h3 className={cn('line-clamp-2 leading-snug tracking-tight', isNote ? 'text-sm font-extrabold' : 'text-sm font-extrabold')}>
-                                            {card.title}
-                                        </h3>
-                                        {isNote && card.content && (
-                                            <p className="line-clamp-4 text-xs leading-relaxed opacity-80 break-words">
-                                                {card.content}
-                                            </p>
-                                        )}
-                                        {!isNote && card.description && (
-                                            <p className="line-clamp-3 text-xs text-slate-500 leading-relaxed">
-                                                {card.description}
-                                            </p>
-                                        )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    if (readOnly) return;
+                                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                                    setStatusPopover({ cardId: card.id, type: card.type, x: rect.left, y: rect.bottom + window.scrollY });
+                                                                }}
+                                                                className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border transition-colors shadow-sm active:scale-95', lane.bg, lane.border)}
+                                                            >
+                                                                <LaneIcon className="h-2.5 w-2.5" />
+                                                                <span>{__(lane.labelKey)}</span>
+                                                                {!readOnly && <ChevronDown className="h-2.5 w-2.5 opacity-60" />}
+                                                            </button>
+                                                        </div>
 
-                                        {card.type === 'task' && priorityCls && (
-                                            <div className="pt-1">
-                                                <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ring-1 ring-inset', priorityCls)}>
-                                                    {card.priority}
-                                                </span>
-                                            </div>
-                                        )}
+                                                        {card.category && (
+                                                            <div onClick={(e) => e.stopPropagation()}>
+                                                                <BoardCategoryChip category={card.category} />
+                                                            </div>
+                                                        )}
 
-                                        {card.type === 'todo' && card.checklist && card.checklist.length > 0 && (
-                                            <div className="mt-2 space-y-1 text-[11px] text-slate-500 bg-slate-50/50 p-2 rounded-xl border border-slate-100">
-                                                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                                    <span>Progress</span>
-                                                    <span>
-                                                        {card.checklist.filter(c => c.is_completed).length} / {card.checklist.length}
-                                                    </span>
+                                                        <div className="space-y-1.5" onClick={() => !readOnly && openEditModal(card)}>
+                                                            <h3 className={cn('line-clamp-2 leading-snug tracking-tight', isNote ? 'text-sm font-extrabold' : 'text-sm font-extrabold')}>
+                                                                {card.title}
+                                                            </h3>
+                                                            {isNote && card.content && (
+                                                                <p className="line-clamp-4 text-xs leading-relaxed opacity-80 break-words">
+                                                                    {card.content}
+                                                                </p>
+                                                            )}
+                                                            {!isNote && card.description && (
+                                                                <p className="line-clamp-3 text-xs text-slate-500 leading-relaxed">
+                                                                    {card.description}
+                                                                </p>
+                                                            )}
+
+                                                            {card.type === 'task' && priorityCls && (
+                                                                <div className="pt-1">
+                                                                    <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ring-1 ring-inset', priorityCls)}>
+                                                                        {card.priority}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+
+                                                            {card.type === 'todo' && card.checklist && card.checklist.length > 0 && (
+                                                                <div className="mt-2 space-y-1 text-[11px] text-slate-500 bg-slate-50/50 p-2 rounded-xl border border-slate-100">
+                                                                    <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                                        <span>Progress</span>
+                                                                        <span>
+                                                                            {card.checklist.filter(c => c.is_completed).length} / {card.checklist.length}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="h-1 w-full bg-slate-200/80 rounded-full overflow-hidden">
+                                                                        <div
+                                                                            className="h-full bg-violet-500 transition-all duration-300"
+                                                                            style={{ width: `${(card.checklist.filter(c => c.is_completed).length / card.checklist.length) * 100}%` }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {card.type === 'file' && (
+                                                                <div className="mt-2 flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100" onClick={(e) => e.stopPropagation()} title={card.title}>
+                                                                    <div className="min-w-0 flex-1">
+                                                                        <p className="truncate text-[10px] font-bold text-slate-700">{card.mime}</p>
+                                                                        <p className="text-[10px] font-mono text-slate-500">{card.human_size}</p>
+                                                                    </div>
+                                                                    {card.download_url && (
+                                                                        <a
+                                                                            href={card.download_url}
+                                                                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
+                                                                            title={`Download ${card.title}`}
+                                                                        >
+                                                                            <Download className="h-3.5 w-3.5" />
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+                                                            )}
+
+                                                            {card.type === 'report' && (
+                                                                <div className="mt-2 flex items-center gap-1 text-[10px] text-slate-400 font-semibold">
+                                                                    <CalendarDays className="h-3 w-3" />
+                                                                    <span>{card.published_at ? new Date(card.published_at).toLocaleDateString() : date}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-100/60" onClick={(e) => e.stopPropagation()}>
+                                                        <CommentsPopover
+                                                            card={card}
+                                                            projectId={projectId}
+                                                            guestMode={guestMode}
+                                                            shareToken={shareToken}
+                                                            initialCount={card.comments_count}
+                                                            onCountChange={makeCountHandler(`${card.type}-${card.id}`)}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setViewingCard(card)}
+                                                            className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-200 hover:bg-emerald-100 hover:ring-emerald-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                                                            title={__('general.view') || 'View'}
+                                                            aria-label={__('general.view') || 'View'}
+                                                        >
+                                                            <Eye className="h-3.5 w-3.5" />
+                                                            <span>{__('general.view') || 'View'}</span>
+                                                        </button>
+                                                    </div>
+
+                                                    {!readOnly && (
+                                                        <div className="mt-3 flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pt-2 border-t border-slate-100/50">
+                                                            {!guestMode && (
+                                                                <div onClick={(e) => e.stopPropagation()} title={__('general.board_category') || 'Category'}>
+                                                                    <BoardCategoryPicker
+                                                                        projectId={projectId}
+                                                                        categories={effectiveCategories}
+                                                                        selectedId={card.category_id ?? null}
+                                                                        onChange={(next) => updateCardCategory(card.type, card.id, next)}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <button
+                                                                onClick={() => openEditModal(card)}
+                                                                className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
+                                                                title="Edit Card"
+                                                            >
+                                                                <Edit3 className="h-3.5 w-3.5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteCard(card)}
+                                                                className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                                                                title="Delete Card"
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <div className="h-1 w-full bg-slate-200/80 rounded-full overflow-hidden">
-                                                    <div 
-                                                        className="h-full bg-violet-500 transition-all duration-300"
-                                                        style={{ width: `${(card.checklist.filter(c => c.is_completed).length / card.checklist.length) * 100}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {card.type === 'file' && (
-                                            <div className="mt-2 flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100" onClick={(e) => e.stopPropagation()} title={card.title}>
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="truncate text-[10px] font-bold text-slate-700">{card.mime}</p>
-                                                    <p className="text-[10px] font-mono text-slate-500">{card.human_size}</p>
-                                                </div>
-                                                {card.download_url && (
-                                                    <a
-                                                        href={card.download_url}
-                                                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
-                                                        title={`Download ${card.title}`}
-                                                    >
-                                                        <Download className="h-3.5 w-3.5" />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {card.type === 'report' && (
-                                            <div className="mt-2 flex items-center gap-1 text-[10px] text-slate-400 font-semibold">
-                                                <CalendarDays className="h-3 w-3" />
-                                                <span>{card.published_at ? new Date(card.published_at).toLocaleDateString() : date}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-100/60" onClick={(e) => e.stopPropagation()}>
-                                    <CommentsPopover
-                                        card={card}
-                                        projectId={projectId}
-                                        guestMode={guestMode}
-                                        shareToken={shareToken}
-                                        initialCount={card.comments_count}
-                                        onCountChange={makeCountHandler(`${card.type}-${card.id}`)}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setViewingCard(card)}
-                                        className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-200 hover:bg-emerald-100 hover:ring-emerald-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-                                        title={__('general.view') || 'View'}
-                                        aria-label={__('general.view') || 'View'}
-                                    >
-                                        <Eye className="h-3.5 w-3.5" />
-                                        <span>{__('general.view') || 'View'}</span>
-                                    </button>
-                                </div>
-
-                                {!readOnly && (
-                                    <div className="mt-3 flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pt-2 border-t border-slate-100/50">
-                                        <button
-                                            onClick={() => openEditModal(card)}
-                                            className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
-                                            title="Edit Card"
-                                        >
-                                            <Edit3 className="h-3.5 w-3.5" />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteCard(card)}
-                                            className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
-                                            title="Delete Card"
-                                        >
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                        </button>
-                                    </div>
-                                )}
+                                            )}
+                                        </Draggable>
+                                    );
+                                })}
+                                {provided.placeholder}
                             </div>
-                        );
-                    })}
-                </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
             )}
 
             {statusPopover && (
@@ -1286,3 +1451,93 @@ export default function ProjectBoard({
         </div>
     );
 }
+
+const CategoryFilterDropdown: React.FC<{
+    categories: BoardCategory[];
+    value: 'all' | 'uncategorized' | number;
+    onChange: (next: 'all' | 'uncategorized' | number) => void;
+}> = ({ categories, value, onChange }) => {
+    const [open, setOpen] = useState(false);
+    const wrapRef = React.useRef<HTMLDivElement | null>(null);
+
+    React.useEffect(() => {
+        if (!open) return;
+        const onDoc = (e: MouseEvent) => {
+            if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+        };
+        window.addEventListener('mousedown', onDoc);
+        return () => window.removeEventListener('mousedown', onDoc);
+    }, [open]);
+
+    const selectedLabel = (() => {
+        if (value === 'all') return __('general.board_clear_category_filter') || 'All categories';
+        if (value === 'uncategorized') return __('general.board_no_category') || 'No category';
+        return categories.find((c) => c.id === value)?.name ?? '—';
+    })();
+
+    return (
+        <div className="relative" ref={wrapRef}>
+            <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-colors"
+            >
+                <Tag className="h-3.5 w-3.5 text-slate-400" />
+                <span className="truncate max-w-[10rem]">{selectedLabel}</span>
+                <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+            </button>
+            {open && (
+                <div className="absolute right-0 sm:left-0 z-30 mt-1.5 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        {__('general.board_filter_by_category') || 'Filter by category'}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => { onChange('all'); setOpen(false); }}
+                        className={cn(
+                            'flex w-full items-center gap-2 rounded-xl px-3 py-1.5 text-start text-xs transition-colors',
+                            value === 'all' ? 'bg-slate-50 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50',
+                        )}
+                    >
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200/60 text-slate-500">
+                            <Tag className="h-3 w-3" />
+                        </span>
+                        <span className="flex-1 truncate">{__('general.board_clear_category_filter') || 'All categories'}</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => { onChange('uncategorized'); setOpen(false); }}
+                        className={cn(
+                            'flex w-full items-center gap-2 rounded-xl px-3 py-1.5 text-start text-xs transition-colors',
+                            value === 'uncategorized' ? 'bg-slate-50 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50',
+                        )}
+                    >
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-dashed border-slate-300 text-slate-400">—</span>
+                        <span className="flex-1 truncate">{__('general.board_no_category') || 'No category'}</span>
+                    </button>
+                    {categories.length > 0 && <div className="my-1 border-t border-slate-100" />}
+                    <div className="max-h-56 overflow-y-auto">
+                        {categories.map((c) => {
+                            const palette = categoryPalette(c);
+                            const isActive = value === c.id;
+                            return (
+                                <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => { onChange(c.id); setOpen(false); }}
+                                    className={cn(
+                                        'flex w-full items-center gap-2 rounded-xl px-3 py-1.5 text-start text-xs transition-colors',
+                                        isActive ? 'bg-slate-50 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50',
+                                    )}
+                                >
+                                    <span className={cn('h-3 w-3 shrink-0 rounded-full ring-1 ring-inset', palette.dot, palette.ring)} />
+                                    <span className="flex-1 truncate">{c.name}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};

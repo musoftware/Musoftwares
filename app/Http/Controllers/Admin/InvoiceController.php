@@ -18,9 +18,11 @@ use App\Models\InvoiceCostLine;
 use App\Models\InvoiceItem;
 use App\Models\InvoiceItemTimer;
 use App\Models\Project;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Notifications\InvoiceCreatedNotification;
 use App\Services\InvoiceService;
+use App\Models\CostTransaction;
 use App\Services\WhatsAppNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -234,6 +236,137 @@ class InvoiceController extends Controller
 
         return Inertia::render('Admin/Invoices/Show', [
             'invoice' => (new InvoiceResource($invoice))->resolve(),
+        ]);
+    }
+
+    /**
+     * Display every transaction / cost / cost-line linked to the given invoice.
+     */
+    public function linkedTransactions(Invoice $invoice)
+    {
+        $invoice->load([
+            'user:id,name,email',
+            'project:id,project_name',
+        ]);
+
+        // Pivot: invoice_transaction → Income-side ledger rows tied to this invoice.
+        $transactions = Transaction::query()
+            ->whereIn('id', function ($q) use ($invoice) {
+                $q->select('transaction_id')
+                    ->from('invoice_transaction')
+                    ->where('invoice_id', $invoice->id);
+            })
+            ->with(['user:id,name,email', 'project:id,project_name'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'created_at' => $t->created_at?->toIso8601String(),
+                    'type' => $t->type,
+                    'amount' => (float) $t->amount,
+                    'currency' => $t->currency_id,
+                    'business_amount' => (float) ($t->business_amount ?? 0),
+                    'reason' => $t->reason,
+                    'user' => $t->user ? ['id' => $t->user->id, 'name' => $t->user->name, 'email' => $t->user->email] : null,
+                    'project' => $t->project ? ['id' => $t->project->id, 'project_name' => $t->project->project_name] : null,
+                    'source' => 'Transaction (ledger)',
+                ];
+            });
+
+        // Pivot: cost_transaction_invoice → cost-side ledger rows.
+        $costTransactions = CostTransaction::query()
+            ->whereIn('id', function ($q) use ($invoice) {
+                $q->select('cost_transaction_id')
+                    ->from('cost_transaction_invoice')
+                    ->where('invoice_id', $invoice->id);
+            })
+            ->with(['user:id,name,email', 'project:id,project_name'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'created_at' => $t->created_at?->toIso8601String(),
+                    'amount' => (float) $t->amount,
+                    'currency' => $t->currency_id,
+                    'business_amount' => (float) ($t->business_amount ?? 0),
+                    'reason' => $t->reason,
+                    'user' => $t->user ? ['id' => $t->user->id, 'name' => $t->user->name, 'email' => $t->user->email] : null,
+                    'project' => $t->project ? ['id' => $t->project->id, 'project_name' => $t->project->project_name] : null,
+                    'source' => 'CostTransaction',
+                ];
+            });
+
+        // Internal cost lines attached directly to the invoice.
+        $costLines = $invoice->costLines()
+            ->with('creditUser:id,name')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(function ($line) use ($invoice) {
+                return [
+                    'id' => $line->id,
+                    'line_type' => $line->line_type,
+                    'amount' => (float) $line->amount,
+                    'currency' => $invoice->currency_id,
+                    'description' => $line->description,
+                    'credit_user' => $line->creditUser ? ['id' => $line->creditUser->id, 'name' => $line->creditUser->name] : null,
+                    'cost_transaction_id' => $line->cost_transaction_id,
+                    'earned_transaction_id' => $line->earned_transaction_id,
+                    'processed' => $line->isProcessed(),
+                    'source' => 'InvoiceCostLine',
+                ];
+            });
+
+        // Wallet / payment ledger rows where invoice_id column matches.
+        $walletTransactions = \App\Models\WalletTransaction::query()
+            ->where('invoice_id', $invoice->id)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($w) {
+                return [
+                    'id' => $w->id,
+                    'created_at' => $w->created_at?->toIso8601String(),
+                    'amount' => (float) ($w->amount ?? 0),
+                    'currency' => $w->currency_id,
+                    'type' => $w->type,
+                    'wallet_id' => $w->wallet_id,
+                    'source' => 'WalletTransaction',
+                ];
+            });
+
+        return Inertia::render('Admin/Invoices/LinkedTransactions', [
+            'invoice' => [
+                'id' => $invoice->id,
+                'invoice_number' => $invoice->enc_id(),
+                'status' => $invoice->status,
+                'currency_id' => $invoice->currency_id,
+                'currency' => optional(Currency::find($invoice->currency_id))?->currency,
+                'currency_symbol' => optional(Currency::find($invoice->currency_id))?->symbol,
+                'total' => $invoice->total(),
+                'paid' => (float) $invoice->paid,
+                'unpaid' => $invoice->unpaid_total(),
+                'user' => $invoice->user ? [
+                    'id' => $invoice->user->id,
+                    'name' => $invoice->user->name,
+                    'email' => $invoice->user->email,
+                ] : null,
+                'project' => $invoice->project ? [
+                    'id' => $invoice->project->id,
+                    'project_name' => $invoice->project->project_name,
+                ] : null,
+                'created_at' => $invoice->created_at?->toIso8601String(),
+            ],
+            'transactions' => $transactions,
+            'costTransactions' => $costTransactions,
+            'costLines' => $costLines,
+            'walletTransactions' => $walletTransactions,
+            'counts' => [
+                'transactions' => $transactions->count(),
+                'cost_transactions' => $costTransactions->count(),
+                'cost_lines' => $costLines->count(),
+                'wallet_transactions' => $walletTransactions->count(),
+            ],
         ]);
     }
 

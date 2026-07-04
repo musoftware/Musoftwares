@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Models\ProjectBoardCategory;
 use App\Models\ProjectBoardItem;
 use App\Models\Todo;
 use App\Models\ProjectFile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Builds per-day board cards (notes + tasks + reports + todos + files merged with their saved placements).
@@ -19,6 +21,44 @@ class ProjectBoardService
     public function lanes(): array
     {
         return ['backlog', 'in_progress', 'review', 'done'];
+    }
+
+    /**
+     * Ensure a project has the canonical set of system categories. Idempotent —
+     * existing rows with the same slug are skipped, so re-running is safe.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, ProjectBoardCategory>
+     */
+    public function ensureDefaultCategories(Project $project)
+    {
+        return DB::transaction(function () use ($project) {
+            $existing = $project->boardCategories()
+                ->whereIn('slug', array_column(ProjectBoardCategory::DEFAULTS, 'slug'))
+                ->pluck('slug')
+                ->all();
+
+            foreach (ProjectBoardCategory::DEFAULTS as $row) {
+                if (in_array($row['slug'], $existing, true)) {
+                    continue;
+                }
+                $project->boardCategories()->create(array_merge($row, [
+                    'is_system' => true,
+                ]));
+            }
+
+            return $project->boardCategories()->ordered()->get();
+        });
+    }
+
+    /** Ordered categories for the board UI; lazily seeds defaults when empty. */
+    public function categoriesFor(Project $project)
+    {
+        $categories = $project->boardCategories()->ordered()->get();
+        if ($categories->isEmpty()) {
+            $categories = $this->ensureDefaultCategories($project);
+        }
+
+        return $categories;
     }
 
     /**
@@ -77,6 +117,7 @@ class ProjectBoardService
     private function buildCards(Project $project, Carbon $date, $notes, $tasks, $reports, $todos, $files): array
     {
         $placements = $project->boardItems()
+            ->with('category')
             ->whereDate('for_date', $date->toDateString())
             ->get()
             ->keyBy(fn (ProjectBoardItem $item) => $item->itemable_type.':'.$item->itemable_id);
@@ -86,9 +127,19 @@ class ProjectBoardService
 
         $addCard = function (string $type, int $id, string $title, array $extra = []) use (&$cards, $placements, &$autoIndex) {
             $morph = ProjectBoardItem::morphClassFor($type);
+            /** @var ProjectBoardItem|null $placement */
             $placement = $placements->get("{$morph}:{$id}");
 
             $extra['comments_count'] = (int) ($extra['comments_count'] ?? 0);
+            $extra['sort'] = (int) ($placement->sort ?? 0);
+            $extra['category_id'] = $placement->category_id ?? null;
+            $extra['category'] = $placement?->category ? [
+                'id' => $placement->category->id,
+                'slug' => $placement->category->slug,
+                'name' => $placement->category->localizedName(),
+                'color' => $placement->category->color,
+                'text_color' => $placement->category->text_color,
+            ] : null;
 
             $cards[] = array_merge([
                 'type' => $type,
@@ -153,6 +204,18 @@ class ProjectBoardService
                 'comments_count' => $file->comments_count,
             ]);
         }
+
+        // Cards are rendered by lane-filter on the frontend, but the persisted `sort`
+        // is per-lane on the DB. So within a single visible filter (a single lane),
+        // sort by `sort`. Cross-lane fallback keeps the file ordering stable.
+        usort($cards, function ($a, $b) {
+            if (($a['lane'] ?? null) !== ($b['lane'] ?? null)) {
+                return ($a['lane'] ?? '') <=> ($b['lane'] ?? '');
+            }
+            $sa = (int) ($a['sort'] ?? 0);
+            $sb = (int) ($b['sort'] ?? 0);
+            return $sa <=> $sb ?: ($a['id'] ?? 0) <=> ($b['id'] ?? 0);
+        });
 
         return $cards;
     }

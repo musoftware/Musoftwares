@@ -19,7 +19,10 @@ interface ProjectDetail {
     date_start: string | null;
     date_end: string | null;
     budget: string;
-    project_balance: string;
+    // Logical, derivable financial metrics (no cached/fake "balance").
+    cost: string;
+    paid_invoices: string;
+    pending_invoices: string;
     total_paid: string;
     hide_future_tasks: boolean;
     currency: { currency: string; symbol: string; string_format?: string } | null;
@@ -65,8 +68,8 @@ export default function ProjectShow({ project, recentReports = [] }: Props) {
                 {/* Financial summary */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <MetricCard label={__('general.budget')} value={formatMoney(project.budget, project.currency)} icon={PiggyBank} />
-                    <MetricCard label={__('general.paid')} value={formatMoney(project.total_paid, project.currency)} icon={Wallet} />
-                    <MetricCard label={__('general.remaining_balance')} value={formatMoney(project.project_balance, project.currency)} icon={Wallet} />
+                    <MetricCard label={__('general.paid_invoices')} value={formatMoney(project.paid_invoices, project.currency)} icon={Wallet} />
+                    <MetricCard label={__('general.pending_invoices')} value={formatMoney(project.pending_invoices, project.currency)} icon={Wallet} />
                     <MetricCard label={__('general.progress')} value={`${Math.round(project.percentage)}%`} icon={Clock} />
                 </div>
 

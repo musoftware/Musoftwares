@@ -12,7 +12,6 @@ export type ProjectFormState = {
     user_id: string;
     project_name: string;
     description: string;
-    project_balance: string;
     budget: string;
     hour_rate: string;
     percentage: string;
@@ -26,7 +25,6 @@ export const EMPTY_PROJECT_FORM: ProjectFormState = {
     user_id: '',
     project_name: '',
     description: '',
-    project_balance: '',
     budget: '',
     hour_rate: '',
     percentage: '',
@@ -40,7 +38,6 @@ export function projectToForm(project: {
     user_id?: number | null;
     project_name?: string | null;
     description?: string | null;
-    project_balance?: string | number | null;
     budget?: string | number | null;
     hour_rate?: string | number | null;
     percentage?: number | string | null;
@@ -54,7 +51,6 @@ export function projectToForm(project: {
         user_id: project.user_id ? String(project.user_id) : '',
         project_name: project.project_name ?? '',
         description: project.description ?? '',
-        project_balance: project.project_balance != null ? String(project.project_balance) : '',
         budget: project.budget != null ? String(project.budget) : '',
         hour_rate: project.hour_rate != null ? String(project.hour_rate) : '',
         percentage: project.percentage != null ? String(project.percentage) : '',
@@ -70,7 +66,6 @@ export function formToPayload(form: ProjectFormState): Record<string, string | n
         user_id: form.user_id,
         project_name: form.project_name,
         description: form.description || null,
-        project_balance: form.project_balance || null,
         budget: form.budget || null,
         hour_rate: form.hour_rate || null,
         percentage: form.percentage || null,
@@ -175,17 +170,6 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                     type="date"
                     value={form.date_end}
                     onChange={(e) => setForm((prev) => ({ ...prev, date_end: e.target.value }))}
-                    disabled={disabled}
-                />
-            </div>
-            <div>
-                <Label htmlFor="project_balance">{__('general.project_balance')}</Label>
-                <Input
-                    id="project_balance"
-                    type="number"
-                    step="0.01"
-                    value={form.project_balance}
-                    onChange={(e) => setForm((prev) => ({ ...prev, project_balance: e.target.value }))}
                     disabled={disabled}
                 />
             </div>

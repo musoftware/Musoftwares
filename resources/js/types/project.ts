@@ -30,7 +30,10 @@ export interface Project {
     owner_id: number | null;
     project_name: string;
     description: string | null;
-    project_balance: string;
+    // Logical, derivable financial metrics (computed server-side).
+    cost: string;
+    paid_invoices: string;
+    pending_invoices: string;
     budget: string;
     total_paid: string;
     hour_rate: string;
@@ -90,7 +93,9 @@ export interface BoardProject {
     status: string | null;
     archived: boolean;
     budget: string;
-    project_balance: string;
+    cost: string;
+    paid_invoices: string;
+    pending_invoices: string;
     total_paid: string;
     hour_rate: string;
     percentage: number;
@@ -112,7 +117,7 @@ export interface BoardProject {
 
 export type ProjectTab = 'active' | 'archived' | 'all';
 
-export type ProjectSort = 'id' | 'project_name' | 'status' | 'created_at' | 'date_start' | 'date_end' | 'budget' | 'project_balance' | 'percentage';
+export type ProjectSort = 'id' | 'project_name' | 'status' | 'created_at' | 'date_start' | 'date_end' | 'budget' | 'percentage';
 
 export type ProjectViewMode = 'grid' | 'table';
 
@@ -130,8 +135,6 @@ export interface ProjectFiltersState {
     status_filter: ProjectStatus | null;
     budget_min: string | null;
     budget_max: string | null;
-    balance_min: string | null;
-    balance_max: string | null;
     percent_min: string | null;
     percent_max: string | null;
     start_from: string | null;

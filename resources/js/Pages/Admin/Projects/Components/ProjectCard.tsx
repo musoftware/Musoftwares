@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { AlertCircle, Archive, ArchiveRestore, Edit, LayoutDashboard, ListTodo, FileText, Paperclip, Trash2, User } from 'lucide-react';
+import { AlertCircle, Archive, ArchiveRestore, Edit, LayoutDashboard, ListTodo, FileText, Paperclip, Trash2, User, Wallet } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -30,6 +30,7 @@ export interface ProjectCardProps {
     onSelect: (id: number) => void;
     onEdit: (project: Project) => void;
     onOpenBoard: (project: Project) => void;
+    onAnalyze: (project: Project) => void;
     onArchive: (id: number) => void;
     onRestore: (id: number) => void;
     onDelete: (id: number) => void;
@@ -41,6 +42,7 @@ export function ProjectCard({
     onSelect,
     onEdit,
     onOpenBoard,
+    onAnalyze,
     onArchive,
     onRestore,
     onDelete,
@@ -123,19 +125,19 @@ export function ProjectCard({
                     </div>
                 </div>
 
-                {/* Budget / Paid / Balance stat tiles */}
+                {/* Cost / Paid / Pending stat tiles */}
                 <div className="mb-4 grid grid-cols-3 gap-2 text-sm">
-                    <div className="rounded-lg bg-slate-50 p-2">
-                        <p className="text-[10px] uppercase tracking-wide text-slate-400">{__('general.budget')}</p>
-                        <p className="font-mono text-xs font-semibold text-slate-800">{formatMoney(project.budget, project.currency)}</p>
+                    <div className="rounded-lg bg-rose-50 p-2">
+                        <p className="text-[10px] uppercase tracking-wide text-rose-500/70">{__('general.cost')}</p>
+                        <p className="font-mono text-xs font-semibold text-rose-700">{formatMoney(project.cost, project.currency)}</p>
                     </div>
                     <div className="rounded-lg bg-emerald-50 p-2">
-                        <p className="text-[10px] uppercase tracking-wide text-emerald-500/70">{__('general.paid')}</p>
-                        <p className="font-mono text-xs font-semibold text-emerald-700">{formatMoney(project.total_paid, project.currency)}</p>
+                        <p className="text-[10px] uppercase tracking-wide text-emerald-500/70">{__('general.paid_invoices')}</p>
+                        <p className="font-mono text-xs font-semibold text-emerald-700">{formatMoney(project.paid_invoices, project.currency)}</p>
                     </div>
-                    <div className="rounded-lg bg-slate-50 p-2">
-                        <p className="text-[10px] uppercase tracking-wide text-slate-400">{__('general.balance')}</p>
-                        <p className="font-mono text-xs font-semibold text-slate-800">{formatMoney(project.project_balance, project.currency)}</p>
+                    <div className="rounded-lg bg-amber-50 p-2">
+                        <p className="text-[10px] uppercase tracking-wide text-amber-500/70">{__('general.pending_invoices')}</p>
+                        <p className="font-mono text-xs font-semibold text-amber-700">{formatMoney(project.pending_invoices, project.currency)}</p>
                     </div>
                 </div>
 
@@ -165,6 +167,9 @@ export function ProjectCard({
                 <div className="mt-3 flex items-center justify-end gap-1.5">
                     <Button variant="outline" size="sm" onClick={() => onOpenBoard(project)} aria-label={__('general.board')} title={__('general.board')}>
                         <LayoutDashboard className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => onAnalyze(project)} aria-label={__('general.cost_analysis')} title={__('general.cost_analysis')}>
+                        <Wallet className="h-3.5 w-3.5" />
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => onEdit(project)} aria-label={__('general.edit')} title={__('general.edit')}>
                         <Edit className="h-3.5 w-3.5" />

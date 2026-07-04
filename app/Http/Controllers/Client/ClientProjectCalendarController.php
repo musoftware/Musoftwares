@@ -36,6 +36,7 @@ class ClientProjectCalendarController extends Controller
         $isAdmin = $request->user()?->isAdmin() === true;
 
         $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
+        $categories = $this->boardService->categoriesFor($project);
 
         $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
             ->distinct()
@@ -48,6 +49,16 @@ class ClientProjectCalendarController extends Controller
             'date' => $dateCarbon->toDateString(),
             'lanes' => $this->boardService->lanes(),
             'cards' => fn () => $cards,
+            'categories' => fn () => $categories->map(fn ($c) => [
+                'id' => $c->id,
+                'slug' => $c->slug,
+                'name' => $c->localizedName(),
+                'name_ar' => $c->name_ar,
+                'color' => $c->color,
+                'text_color' => $c->text_color,
+                'is_system' => (bool) $c->is_system,
+                'sort' => (int) $c->sort,
+            ])->values(),
             'hideFuture' => ! $isAdmin && $this->shouldHideFuture($project, $dateCarbon),
             'isAdmin' => $isAdmin,
             'activeDates' => $activeDates,

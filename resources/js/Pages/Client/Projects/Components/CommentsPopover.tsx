@@ -221,6 +221,9 @@ export default function CommentsPopover({
     };
 
     const showInitialBadge = typeof initialCount === 'number' && comments.length === 0;
+    const displayCount = showInitialBadge
+        ? (initialCount ?? 0)
+        : count;
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -238,14 +241,9 @@ export default function CommentsPopover({
             >
                 <MessageSquareMore className="h-3.5 w-3.5" />
                 {!iconOnly && <span>{__('general.comments') || 'Comments'}</span>}
-                {showInitialBadge && initialCount! > 0 && (
+                {displayCount > 0 && (
                     <span className="absolute -top-1.5 -end-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white ring-2 ring-white">
-                        {initialCount}
-                    </span>
-                )}
-                {!showInitialBadge && count > 0 && (
-                    <span className="ml-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-sky-700 px-1 text-[10px] font-bold text-white">
-                        {count}
+                        {displayCount}
                     </span>
                 )}
             </PopoverTrigger>

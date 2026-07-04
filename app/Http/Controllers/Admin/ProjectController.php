@@ -29,7 +29,6 @@ class ProjectController extends Controller
         'date_start' => 'date_start',
         'date_end' => 'date_end',
         'budget' => 'budget',
-        'project_balance' => 'project_balance',
         'percentage' => 'percentage',
     ];
 
@@ -90,7 +89,6 @@ class ProjectController extends Controller
         }
 
         $this->applyNumericRange($query, $request, 'budget_min', 'budget_max', 'budget');
-        $this->applyNumericRange($query, $request, 'balance_min', 'balance_max', 'project_balance');
         $this->applyNumericRange($query, $request, 'percent_min', 'percent_max', 'percentage');
         $this->applyDateRange($query, $request, 'start_from', 'start_to', 'date_start');
         $this->applyDateRange($query, $request, 'created_from', 'created_to', 'created_at');
@@ -233,8 +231,6 @@ class ProjectController extends Controller
                 'status_filter' => $statusFilter,
                 'budget_min' => self::presentInput($request, 'budget_min'),
                 'budget_max' => self::presentInput($request, 'budget_max'),
-                'balance_min' => self::presentInput($request, 'balance_min'),
-                'balance_max' => self::presentInput($request, 'balance_max'),
                 'percent_min' => self::presentInput($request, 'percent_min'),
                 'percent_max' => self::presentInput($request, 'percent_max'),
                 'start_from' => self::presentInput($request, 'start_from'),
@@ -371,7 +367,8 @@ class ProjectController extends Controller
         $filename = "projects_{$tab}_".now()->format('Ymd_His').'.csv';
         $columns = [
             'id', 'project_name', 'description', 'client', 'owner', 'status', 'archived',
-            'date_start', 'date_end', 'project_balance', 'budget', 'hour_rate', 'percentage',
+            'date_start', 'date_end', 'budget', 'hour_rate', 'percentage',
+            'cost', 'paid_invoices', 'pending_invoices',
             'created_at', 'archived_at',
         ];
 
@@ -405,6 +402,7 @@ class ProjectController extends Controller
         $date = $this->parseBoardDate($request->route('date'));
 
         $cards = $this->boardService->cardsForDate($project, $date, applyFutureGating: false);
+        $categories = $this->boardService->categoriesFor($project);
 
         $project->loadCount(['tasks', 'reports', 'files']);
 
@@ -434,7 +432,9 @@ class ProjectController extends Controller
                 'short_url' => $shortUrl,
                 'archived' => (bool) $project->archived,
                 'budget' => (string) ($project->budget ?? 0),
-                'project_balance' => (string) ($project->project_balance ?? 0),
+                'cost' => (string) $project->costAmount(),
+                'paid_invoices' => (string) $project->paidInvoicesAmount(),
+                'pending_invoices' => (string) $project->pendingInvoicesAmount(),
                 'total_paid' => (string) ($project->total_paid ?? 0),
                 'hour_rate' => (string) ($project->hour_rate ?? 0),
                 'percentage' => (float) ($project->percentage ?? 0),
@@ -457,7 +457,94 @@ class ProjectController extends Controller
             'date' => $date->toDateString(),
             'lanes' => $this->boardService->lanes(),
             'cards' => fn () => $cards,
+            'categories' => fn () => $categories->map(fn ($c) => [
+                'id' => $c->id,
+                'slug' => $c->slug,
+                'name' => $c->localizedName(),
+                'name_ar' => $c->name_ar,
+                'color' => $c->color,
+                'text_color' => $c->text_color,
+                'is_system' => (bool) $c->is_system,
+                'sort' => (int) $c->sort,
+            ])->values(),
             'activeDates' => $activeDates,
+        ]);
+    }
+
+    /**
+     * Project Finance / Cost Analysis page.
+     *
+     * Shows the REAL, derivable numbers for a project (no cached "balance"):
+     *   - Cost transactions (real spend)
+     *   - Paid invoices (amount already collected)
+     *   - Pending/unpaid invoices (outstanding)
+     *   - A currency-aware summary in the project's own currency.
+     */
+    public function finance(Request $request, Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $project->load([
+            'costTransactions' => fn ($q) => $q->latest('created_at'),
+            'invoices' => fn ($q) => $q->latest('created_at'),
+            'client',
+            'owner',
+        ]);
+
+        $currency = $project->currencyRow();
+
+        $costRows = $project->costTransactions->map(fn ($c) => [
+            'id' => $c->id,
+            'reason' => $c->reason,
+            'amount' => (string) $c->amount,
+            'currency_id' => $c->currency_id,
+            'currency_code' => optional(\App\Models\Currency::find($c->currency_id))->currency,
+            'business_amount' => (string) ($c->business_amount ?? 0),
+            'created_at' => optional($c->created_at)->toIso8601String(),
+        ])->values();
+
+        $invoiceRows = $project->invoices->map(fn ($inv) => [
+            'id' => $inv->id,
+            'uuid' => $inv->uuid,
+            'status' => $inv->status,
+            'total' => (string) $inv->total(),
+            'paid' => (string) $inv->paid,
+            'unpaid' => (string) $inv->unpaid_total(),
+            'currency_id' => $inv->currency_id,
+            'currency_code' => optional(\App\Models\Currency::find($inv->currency_id))->currency,
+            'created_at' => optional($inv->created_at)->toIso8601String(),
+        ])->values();
+
+        $businessCurrency = \App\Models\AdminSettings::business_currency();
+        $businessCurrencyCode = optional(\App\Models\Currency::find($businessCurrency))->currency;
+
+        return Inertia::render('Admin/Projects/Finance', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->project_name,
+                'description' => $project->description,
+                'status' => $project->status,
+                'archived' => (bool) $project->archived,
+                'budget' => (string) ($project->budget ?? 0),
+                'client_name' => $project->client?->name,
+                'owner_name' => $project->owner?->name,
+                'currency' => $currency ? [
+                    'id' => $currency->id,
+                    'currency' => $currency->currency,
+                    'symbol' => $currency->symbol,
+                    'string_format' => $currency->string_format,
+                ] : null,
+            ],
+            'summary' => [
+                'cost' => (string) $project->costAmount(),
+                'paid_invoices' => (string) $project->paidInvoicesAmount(),
+                'pending_invoices' => (string) $project->pendingInvoicesAmount(),
+                'budget' => (string) ($project->budget ?? 0),
+                'business_cost' => (string) $project->costTransactions()->sum('business_amount'),
+                'business_currency_code' => $businessCurrencyCode,
+            ],
+            'costTransactions' => $costRows,
+            'invoices' => $invoiceRows,
         ]);
     }
 

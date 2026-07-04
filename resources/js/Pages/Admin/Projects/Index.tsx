@@ -43,6 +43,10 @@ export default function Index(props: ProjectsIndexProps) {
         setIsSheetOpen(true);
     };
 
+    const openFinance = (project: Project) => {
+        router.visit(route('admin.projects.finance.index', project.id));
+    };
+
     const openEditModal = (project: Project) => {
         setEditingProject(project);
         setEditForm(projectToForm(project));
@@ -119,8 +123,6 @@ export default function Index(props: ProjectsIndexProps) {
             statuses: filters?.statuses ?? null,
             budget_min: filters?.budget_min ?? null,
             budget_max: filters?.budget_max ?? null,
-            balance_min: filters?.balance_min ?? null,
-            balance_max: filters?.balance_max ?? null,
             percent_min: filters?.percent_min ?? null,
             percent_max: filters?.percent_max ?? null,
             start_from: filters?.start_from ?? null,
@@ -169,8 +171,6 @@ export default function Index(props: ProjectsIndexProps) {
             status_filter: null,
             budget_min: null,
             budget_max: null,
-            balance_min: null,
-            balance_max: null,
             percent_min: null,
             percent_max: null,
             start_from: null,
@@ -192,7 +192,6 @@ export default function Index(props: ProjectsIndexProps) {
         if ((f.statuses?.length ?? 0) > 0) n++;
         if (f.status_filter) n++;
         if (f.budget_min || f.budget_max) n++;
-        if (f.balance_min || f.balance_max) n++;
         if (f.percent_min || f.percent_max) n++;
         if (f.start_from || f.start_to) n++;
         if (f.created_from || f.created_to) n++;
@@ -225,8 +224,6 @@ export default function Index(props: ProjectsIndexProps) {
         (f?.statuses ?? []).forEach((s) => params.append('statuses[]', s));
         set('budget_min', f?.budget_min);
         set('budget_max', f?.budget_max);
-        set('balance_min', f?.balance_min);
-        set('balance_max', f?.balance_max);
         set('percent_min', f?.percent_min);
         set('percent_max', f?.percent_max);
         set('start_from', f?.start_from);
@@ -303,12 +300,6 @@ export default function Index(props: ProjectsIndexProps) {
             label: __('general.budget'),
             sortable: true,
             render: (project: Project) => (project.budget && Number(project.budget) > 0 ? formatMoney(project.budget, project.currency) : '—'),
-        },
-        {
-            key: 'project_balance',
-            label: __('general.project_balance'),
-            sortable: true,
-            render: (project: Project) => (project.project_balance ? formatMoney(project.project_balance, project.currency) : '—'),
         },
         {
             key: 'status',
@@ -510,6 +501,7 @@ export default function Index(props: ProjectsIndexProps) {
                                     onSelect={toggleSelected}
                                     onEdit={openEditModal}
                                     onOpenBoard={openProjectSheet}
+                                    onAnalyze={openFinance}
                                     onArchive={handleArchive}
                                     onRestore={handleRestore}
                                     onDelete={handleDelete}

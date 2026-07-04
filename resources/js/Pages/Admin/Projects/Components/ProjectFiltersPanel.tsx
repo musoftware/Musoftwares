@@ -21,7 +21,6 @@ const SORT_OPTIONS: { value: ProjectSort; label: string }[] = [
     { value: 'project_name', label: __('general.name') },
     { value: 'status', label: __('general.status') },
     { value: 'budget', label: __('general.budget') },
-    { value: 'project_balance', label: __('general.project_balance') },
     { value: 'percentage', label: __('general.percentage') },
     { value: 'date_start', label: __('general.start_date') },
     { value: 'date_end', label: __('general.end_date') },
@@ -62,16 +61,12 @@ export function ProjectFiltersPanel({
     const [search, setSearch] = useState(filters.search ?? '');
     const [budgetMin, setBudgetMin] = useState(filters.budget_min ?? '');
     const [budgetMax, setBudgetMax] = useState(filters.budget_max ?? '');
-    const [balanceMin, setBalanceMin] = useState(filters.balance_min ?? '');
-    const [balanceMax, setBalanceMax] = useState(filters.balance_max ?? '');
     const [percentMin, setPercentMin] = useState(filters.percent_min ?? '');
     const [percentMax, setPercentMax] = useState(filters.percent_max ?? '');
 
     useEffect(() => setSearch(filters.search ?? ''), [filters.search]);
     useEffect(() => setBudgetMin(filters.budget_min ?? ''), [filters.budget_min]);
     useEffect(() => setBudgetMax(filters.budget_max ?? ''), [filters.budget_max]);
-    useEffect(() => setBalanceMin(filters.balance_min ?? ''), [filters.balance_min]);
-    useEffect(() => setBalanceMax(filters.balance_max ?? ''), [filters.balance_max]);
     useEffect(() => setPercentMin(filters.percent_min ?? ''), [filters.percent_min]);
     useEffect(() => setPercentMax(filters.percent_max ?? ''), [filters.percent_max]);
 
@@ -173,17 +168,6 @@ export function ProjectFiltersPanel({
                             onChange={(e) => { setBudgetMin(e.target.value); debounce({ budget_min: e.target.value }); }} className="h-9" />
                         <Input type="number" step="0.01" min="0" value={budgetMax} placeholder={__('general.max')}
                             onChange={(e) => { setBudgetMax(e.target.value); debounce({ budget_max: e.target.value }); }} className="h-9" />
-                    </div>
-                </div>
-
-                {/* Balance range */}
-                <div className="sm:col-span-2 xl:col-span-2">
-                    <Label>{__('general.balance_range')}</Label>
-                    <div className="mt-1 grid grid-cols-2 gap-2">
-                        <Input type="number" step="0.01" value={balanceMin} placeholder={__('general.min')}
-                            onChange={(e) => { setBalanceMin(e.target.value); debounce({ balance_min: e.target.value }); }} className="h-9" />
-                        <Input type="number" step="0.01" value={balanceMax} placeholder={__('general.max')}
-                            onChange={(e) => { setBalanceMax(e.target.value); debounce({ balance_max: e.target.value }); }} className="h-9" />
                     </div>
                 </div>
 

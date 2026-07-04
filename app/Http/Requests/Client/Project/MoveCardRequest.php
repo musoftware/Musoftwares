@@ -4,6 +4,7 @@ namespace App\Http\Requests\Client\Project;
 
 use App\Models\ProjectBoardItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MoveCardRequest extends FormRequest
 {
@@ -21,6 +22,11 @@ class MoveCardRequest extends FormRequest
             'lane' => ['nullable', 'string', 'max:50'],
             'pos_x' => ['nullable', 'integer', 'min:0'],
             'pos_y' => ['nullable', 'integer', 'min:0'],
+            // Optional: explicit new ordering within the target lane. When omitted,
+            // the card is appended at the end.
+            'sort' => ['nullable', 'integer', 'min:0'],
+            // Optional: change the card's category in the same call. null clears it.
+            'category_id' => ['nullable', 'integer', 'exists:project_board_categories,id'],
         ];
     }
 

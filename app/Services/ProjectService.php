@@ -15,7 +15,6 @@ class ProjectService extends BaseService
         'owner_id',
         'project_name',
         'description',
-        'project_balance',
         'budget',
         'hour_rate',
         'percentage',
@@ -237,7 +236,10 @@ class ProjectService extends BaseService
             'archived_at' => $project->archived_at?->toIso8601String() ?? '',
             'created_at' => $project->created_at?->toIso8601String() ?? '',
             'description' => (string) ($project->description ?? ''),
-            'project_balance', 'budget', 'total_paid', 'hour_rate' => (string) ($project->{$column} ?? '0'),
+            'budget', 'total_paid', 'hour_rate' => (string) ($project->{$column} ?? '0'),
+            'cost' => (string) $project->costAmount(),
+            'paid_invoices' => (string) $project->paidInvoicesAmount(),
+            'pending_invoices' => (string) $project->pendingInvoicesAmount(),
             default => (string) ($project->{$column} ?? ''),
         };
     }
