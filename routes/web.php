@@ -612,6 +612,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // ── Project Board (canvas + lanes) — admin "view project" landing ──
     Route::get('/projects/{project}/board', [ProjectController::class, 'boardIndex'])->name('projects.board.index');
     Route::get('/projects/{project}/board/{date}', [ProjectController::class, 'board'])->name('projects.board');
+    Route::put('/projects/{project}/board/preferences', [ProjectController::class, 'updateBoardPreferences'])->name('projects.board.preferences.update');
 
     // ── Project Finance / Cost Analysis (cost transactions + paid/pending invoices) ──
     Route::get('/projects/{project}/finance', [ProjectController::class, 'finance'])->name('projects.finance.index');

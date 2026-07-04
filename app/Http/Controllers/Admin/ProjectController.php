@@ -401,7 +401,9 @@ class ProjectController extends Controller
 
         $date = $this->parseBoardDate($request->route('date'));
 
-        $cards = $this->boardService->cardsForDate($project, $date, applyFutureGating: false);
+        $preferences = $this->boardService->getPreference($request->user(), $project);
+
+        $cards = $this->boardService->cardsForDate($project, $date, applyFutureGating: false, preferences: $preferences);
         $categories = $this->boardService->categoriesFor($project);
 
         $project->loadCount(['tasks', 'reports', 'files']);
@@ -468,7 +470,33 @@ class ProjectController extends Controller
                 'sort' => (int) $c->sort,
             ])->values(),
             'activeDates' => $activeDates,
+            'preferences' => $preferences,
         ]);
+    }
+
+    /**
+     * Persist the viewer's preferred board view-mode + sort selection.
+     * Used by the toolbar so the choice follows the user across devices/browsers
+     * instead of living only in localStorage.
+     */
+    public function updateBoardPreferences(Request $request, Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $preferences = $this->boardService->setPreference(
+            $request->user(),
+            $project,
+            $request->only(['view_mode', 'sort_by', 'sort_dir']),
+        );
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'preferences' => $preferences,
+                'message' => __('general.board_preferences_saved'),
+            ]);
+        }
+
+        return back()->with('success', __('general.board_preferences_saved'));
     }
 
     /**

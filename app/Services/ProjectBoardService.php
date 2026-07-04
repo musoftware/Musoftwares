@@ -5,10 +5,13 @@ namespace App\Services;
 use App\Models\Project;
 use App\Models\ProjectBoardCategory;
 use App\Models\ProjectBoardItem;
+use App\Models\ProjectBoardPreference;
 use App\Models\Todo;
 use App\Models\ProjectFile;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 /**
  * Builds per-day board cards (notes + tasks + reports + todos + files merged with their saved placements).
@@ -62,9 +65,181 @@ class ProjectBoardService
     }
 
     /**
+     * Default per-(user, project) board UI preferences. Returned for any caller
+     * (admins, clients, guests) so the frontend can hydrate the toolbar before
+     * the user has ever saved a preference.
+     *
+     * @return array{view_mode: string, sort_by: string, sort_dir: string}
+     */
+    public function defaultPreferences(): array
+    {
+        return [
+            'view_mode' => ProjectBoardPreference::VIEW_CARDS,
+            'sort_by' => ProjectBoardPreference::SORT_MANUAL,
+            'sort_dir' => ProjectBoardPreference::DIR_ASC,
+        ];
+    }
+
+    /**
+     * Resolve the saved preference row for a (user, project) pair, falling back
+     * to `defaultPreferences()` when no row exists or the user is a guest.
+     *
+     * @return array{view_mode: string, sort_by: string, sort_dir: string}
+     */
+    public function getPreference(?User $user, Project $project): array
+    {
+        if (!$user) {
+            return $this->defaultPreferences();
+        }
+
+        $row = ProjectBoardPreference::query()
+            ->where('user_id', $user->id)
+            ->where('project_id', $project->id)
+            ->first();
+
+        if (!$row) {
+            return $this->defaultPreferences();
+        }
+
+        return [
+            'view_mode' => $row->view_mode,
+            'sort_by' => $row->sort_by,
+            'sort_dir' => $row->sort_dir,
+        ];
+    }
+
+    /**
+     * Persist the user's board view/sort preference. Validates against the
+     * canonical whitelists on ProjectBoardPreference so arbitrary column names
+     * can't be smuggled into the DB.
+     *
+     * @param  array{view_mode?: string, sort_by?: string, sort_dir?: string}  $data
+     * @return array{view_mode: string, sort_by: string, sort_dir: string}
+     */
+    public function setPreference(User $user, Project $project, array $data): array
+    {
+        $validated = validator($data, [
+            'view_mode' => ['sometimes', 'string', Rule::in(ProjectBoardPreference::VIEWS)],
+            'sort_by' => ['sometimes', 'string', Rule::in(ProjectBoardPreference::SORTS)],
+            'sort_dir' => ['sometimes', 'string', Rule::in(ProjectBoardPreference::DIRS)],
+        ])->validate();
+
+        $current = $this->getPreference($user, $project);
+
+        $next = array_merge($current, array_intersect_key($validated, $current));
+
+        ProjectBoardPreference::query()->updateOrCreate(
+            ['user_id' => $user->id, 'project_id' => $project->id],
+            $next,
+        );
+
+        return $next;
+    }
+
+    /**
+     * Sort a flat list of board cards by the user's chosen key/direction.
+     * "manual" returns the input untouched so the caller's drag-drop order wins.
+     * Anything else returns a freshly sorted copy — never mutates the input.
+     *
+     * @param  array<int, array<string, mixed>>  $cards
      * @return array<int, array<string, mixed>>
      */
-    public function cardsForDate(Project $project, Carbon $date, bool $applyFutureGating): array
+    public function applySort(array $cards, string $sortBy, string $sortDir): array
+    {
+        if ($sortBy === ProjectBoardPreference::SORT_MANUAL || empty($cards)) {
+            return $cards;
+        }
+
+        $dir = strtolower($sortDir) === ProjectBoardPreference::DIR_DESC ? -1 : 1;
+        $laneOrder = ['backlog' => 0, 'in_progress' => 1, 'review' => 2, 'done' => 3];
+        $typeOrder = ['note' => 0, 'task' => 1, 'todo' => 2, 'report' => 3, 'file' => 4];
+        $priorityOrder = ['urgent' => 0, 'high' => 1, 'normal' => 2, 'low' => 3];
+
+        $key = $sortBy;
+
+        usort($cards, function ($a, $b) use ($key, $dir, $laneOrder, $typeOrder, $priorityOrder) {
+            $cmp = 0;
+            switch ($key) {
+                case ProjectBoardPreference::SORT_TITLE:
+                    $cmp = strcmp(
+                        mb_strtolower((string) ($a['title'] ?? '')),
+                        mb_strtolower((string) ($b['title'] ?? '')),
+                    );
+                    break;
+                case ProjectBoardPreference::SORT_TYPE:
+                    $ta = $typeOrder[$a['type'] ?? ''] ?? 99;
+                    $tb = $typeOrder[$b['type'] ?? ''] ?? 99;
+                    $cmp = $ta <=> $tb;
+                    if ($cmp === 0) {
+                        $cmp = strcmp(
+                            mb_strtolower((string) ($a['title'] ?? '')),
+                            mb_strtolower((string) ($b['title'] ?? '')),
+                        );
+                    }
+                    break;
+                case ProjectBoardPreference::SORT_LANE:
+                    $la = $laneOrder[$a['lane'] ?? ''] ?? 99;
+                    $lb = $laneOrder[$b['lane'] ?? ''] ?? 99;
+                    $cmp = $la <=> $lb;
+                    if ($cmp === 0) {
+                        $sa = (int) ($a['sort'] ?? 0);
+                        $sb = (int) ($b['sort'] ?? 0);
+                        $cmp = $sa <=> $sb;
+                    }
+                    break;
+                case ProjectBoardPreference::SORT_PRIORITY:
+                    $pa = $priorityOrder[$a['priority'] ?? ''] ?? 99;
+                    $pb = $priorityOrder[$b['priority'] ?? ''] ?? 99;
+                    $cmp = $pa <=> $pb;
+                    if ($cmp === 0) {
+                        $cmp = strcmp(
+                            mb_strtolower((string) ($a['title'] ?? '')),
+                            mb_strtolower((string) ($b['title'] ?? '')),
+                        );
+                    }
+                    break;
+                case ProjectBoardPreference::SORT_CATEGORY:
+                    $ca = $a['category_id'] ?? null;
+                    $cb = $b['category_id'] ?? null;
+                    // Nulls always sort to the end regardless of direction.
+                    if ($ca === null && $cb === null) {
+                        $cmp = 0;
+                    } elseif ($ca === null) {
+                        return 1;
+                    } elseif ($cb === null) {
+                        return -1;
+                    } else {
+                        $cmp = $ca <=> $cb;
+                    }
+                    if ($cmp === 0) {
+                        $cmp = strcmp(
+                            mb_strtolower((string) ($a['title'] ?? '')),
+                            mb_strtolower((string) ($b['title'] ?? '')),
+                        );
+                    }
+                    break;
+                default:
+                    return 0;
+            }
+
+            if ($cmp === 0) {
+                $cmp = strcmp(
+                    (string) ($a['type'] ?? '').':'.(int) ($a['id'] ?? 0),
+                    (string) ($b['type'] ?? '').':'.(int) ($b['id'] ?? 0),
+                );
+            }
+
+            return $cmp * $dir;
+        });
+
+        return $cards;
+    }
+
+    /**
+     * @param  array{view_mode?: string, sort_by?: string, sort_dir?: string}|null  $preferences
+     * @return array<int, array<string, mixed>>
+     */
+    public function cardsForDate(Project $project, Carbon $date, bool $applyFutureGating, ?array $preferences = null): array
     {
         // Clients with the flag enabled never see a board for a future date.
         if ($applyFutureGating && $project->hide_future_tasks && $date->isAfter(Carbon::today())) {
@@ -124,6 +299,16 @@ class ProjectBoardService
             }
             return strcmp(($a['type'] ?? '').':'.($a['id'] ?? 0), ($b['type'] ?? '').':'.($b['id'] ?? 0));
         });
+
+        // Apply the per-viewer's sort preference last so it wins over the lane/sort
+        // baseline above. Manual sort is a no-op (the manual drag-drop order is
+        // already encoded in the persisted `sort` column after `usort`).
+        $preferences = $preferences ?? $this->defaultPreferences();
+        $cards = $this->applySort(
+            $cards,
+            $preferences['sort_by'] ?? ProjectBoardPreference::SORT_MANUAL,
+            $preferences['sort_dir'] ?? ProjectBoardPreference::DIR_ASC,
+        );
 
         return $cards;
     }

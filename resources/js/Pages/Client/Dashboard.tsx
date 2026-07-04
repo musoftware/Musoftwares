@@ -54,33 +54,33 @@ export default function Dashboard({
     return (
         <AuthenticatedLayout>
             <Head title={__('general.dashboard')} />
-            <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-                
-                {/* SECTION 1: HEADER & IDENTITY */}
+                <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+
+                {/* SECTION 1: PENDING INVOICES BANNER (FIRST — most urgent) */}
+                <PendingInvoicesBanner
+                    stats={stats}
+                />
+
+                {/* SECTION 2: HEADER & IDENTITY */}
                 <div className="mb-2">
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">
                         {__('general.welcome')}, {user?.name}
                     </h1>
                 </div>
 
-                {/* SECTION 2: FINANCIAL CONSOLIDATION (2 COLS) */}
+                {/* SECTION 3: FINANCIAL CONSOLIDATION (2 COLS) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <MetricCard 
+                    <MetricCard
                         label={__('general.account_balance')}
                         value={formatMoney(stats.walletBalance, stats.currency)}
                         icon={Wallet}
                     />
-                    <MetricCard 
+                    <MetricCard
                         label={__('general.monthly_subscription')}
                         value={formatMoney(stats.totalMonthlySubscription, stats.currency)}
                         icon={Sparkles}
                     />
                 </div>
-
-                {/* SECTION 2.5: PENDING INVOICES BANNER */}
-                <PendingInvoicesBanner 
-                    stats={stats} 
-                />
 
                 {/* SECTION 3: CORE OPERATIONS (3 ACTION CARDS) */}
                 <CoreOperationsCards 

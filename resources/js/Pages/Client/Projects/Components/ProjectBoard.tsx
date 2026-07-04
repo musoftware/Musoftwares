@@ -4,7 +4,8 @@ import {
     Plus, Trash2, StickyNote, ListTodo, FileText, CheckCircle2, Circle, GripVertical,
     Filter, StickyNote as NoteIcon, AlertCircle, ChevronDown, RotateCcw, Search, Paperclip,
     ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye,
-    ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon, Tag
+    ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon, Tag,
+    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList
 } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -39,6 +40,16 @@ import BoardCategoryChip, { categoryPalette, type BoardCategoryLike } from './Bo
 import BoardCategoryPicker, { type BoardCategory } from './BoardCategoryPicker';
 
 export type CardType = 'note' | 'task' | 'report' | 'todo' | 'file';
+
+export type ViewMode = 'cards' | 'grid' | 'lines' | 'table';
+export type SortBy = 'manual' | 'title' | 'type' | 'lane' | 'priority' | 'category';
+export type SortDir = 'asc' | 'desc';
+
+export interface BoardPreferences {
+    view_mode: ViewMode;
+    sort_by: SortBy;
+    sort_dir: SortDir;
+}
 
 export interface BoardCard {
     type: CardType;
@@ -82,6 +93,10 @@ interface ProjectBoardProps {
     shareToken?: string | null;
     /** Per-project category taxonomy. Falls back to a default-derived list when undefined. */
     categories?: BoardCategory[];
+    /** Server-persisted view + sort preference. The component still works without it
+     * (it falls back to local defaults) but the toolbar only persists changes when
+     * this prop is provided by the parent. */
+    preferences?: BoardPreferences;
 }
 
 const NOTE_COLORS: Record<string, { bg: string; border: string; text: string; swatch: string }> = {
@@ -116,9 +131,55 @@ const PRIORITY_STYLES: Record<string, string> = {
     low: 'bg-slate-100 text-slate-600 ring-slate-200',
 };
 
+const PRIORITY_RANK: Record<string, number> = {
+    urgent: 0,
+    high: 1,
+    normal: 2,
+    low: 3,
+};
+
+const LANE_RANK: Record<string, number> = {
+    backlog: 0,
+    in_progress: 1,
+    review: 2,
+    done: 3,
+};
+
+const TYPE_RANK: Record<CardType, number> = {
+    note: 0,
+    task: 1,
+    todo: 2,
+    report: 3,
+    file: 4,
+};
+
+const VIEW_MODES: ViewMode[] = ['cards', 'grid', 'lines', 'table'];
+
+const SORT_KEYS: SortBy[] = ['manual', 'title', 'type', 'lane', 'priority', 'category'];
+
+const DEFAULT_PREFERENCES: BoardPreferences = {
+    view_mode: 'cards',
+    sort_by: 'manual',
+    sort_dir: 'asc',
+};
+
+/**
+ * Server-side persistence is the source of truth for view/sort preferences.
+ * The PUT endpoint accepts a partial payload and merges with the existing row,
+ * so callers can send one field at a time without clobbering the others.
+ */
+function persistPreferences(projectId: number | string, patch: Partial<BoardPreferences>): void {
+    const url = route('admin.projects.board.preferences.update', { project: projectId });
+    axios.put(url, patch).catch(() => {
+        // The board stays usable even if persistence fails; just toast the user.
+        toast.error(__('general.error') || 'Could not save board preference.');
+    });
+}
+
 export default function ProjectBoard({
     projectId, date, lanes, initialCards, hideFuture, readOnly = false,
     externalFilter, guestMode = false, shareToken = null, categories,
+    preferences,
 }: ProjectBoardProps) {
     const { auth } = usePage().props as any;
     const userRoles: string[] = auth?.user?.roles ?? [];
@@ -127,6 +188,44 @@ export default function ProjectBoard({
     const [cards, setCards] = useState<BoardCard[]>(initialCards);
     const [query, setQuery] = useState('');
     const [categoryFilter, setCategoryFilter] = useState<'all' | 'uncategorized' | number>('all');
+
+    // View/sort state hydrates from server preference when provided. We still
+    // allow unsynced local toggles (e.g. in guest read-only mode) but only fire
+    // the PUT when `preferences` was passed by the parent (admin/client portal).
+    const initialPrefs: BoardPreferences = useMemo(() => ({
+        ...DEFAULT_PREFERENCES,
+        ...(preferences ?? {}),
+    }), [preferences]);
+    const [viewMode, setViewMode] = useState<ViewMode>(initialPrefs.view_mode);
+    const [sortBy, setSortBy] = useState<SortBy>(initialPrefs.sort_by);
+    const [sortDir, setSortDir] = useState<SortDir>(initialPrefs.sort_dir);
+
+    useEffect(() => {
+        setViewMode(initialPrefs.view_mode);
+        setSortBy(initialPrefs.sort_by);
+        setSortDir(initialPrefs.sort_dir);
+    }, [initialPrefs.view_mode, initialPrefs.sort_by, initialPrefs.sort_dir]);
+
+    const updateViewMode = useCallback((next: ViewMode) => {
+        setViewMode(next);
+        if (preferences && next !== preferences.view_mode) {
+            persistPreferences(projectId, { view_mode: next });
+        }
+    }, [preferences, projectId]);
+
+    const updateSortBy = useCallback((next: SortBy) => {
+        setSortBy(next);
+        if (preferences && next !== preferences.sort_by) {
+            persistPreferences(projectId, { sort_by: next });
+        }
+    }, [preferences, projectId]);
+
+    const updateSortDir = useCallback((next: SortDir) => {
+        setSortDir(next);
+        if (preferences && next !== preferences.sort_dir) {
+            persistPreferences(projectId, { sort_dir: next });
+        }
+    }, [preferences, projectId]);
 
     const [statusPopover, setStatusPopover] = useState<{ cardId: number; type: CardType; x: number; y: number } | null>(null);
     const [contextMenu, setContextMenu] = useState<{ card: BoardCard; x: number; y: number } | null>(null);
@@ -250,11 +349,64 @@ export default function ProjectBoard({
                 (c.content ?? '').toLowerCase().includes(q)
             );
         });
-        // Stable sort by the persisted `sort` column so the visual order matches the
-        // stored order (the backend already returns lane-grouped data; this is the
-        // within-lane tiebreaker) and drag/drop index math lines up with the server.
-        return [...list].sort((a, b) => (a.sort ?? 1e9) - (b.sort ?? 1e9));
-    }, [cards, externalFilter, query, lanes, categoryFilter]);
+
+        // The server already returns cards in lane-grouped, drag-drop order, but we
+        // re-sort client-side to honor the user's chosen key/direction without
+        // waiting for a round-trip. "manual" preserves the server's saved order so
+        // drag-and-drop matches what gets persisted.
+        const sorted = [...list];
+        const dir = sortDir === 'desc' ? -1 : 1;
+
+        const byTitle = (a: BoardCard, b: BoardCard) =>
+            (a.title ?? '').localeCompare(b.title ?? '', undefined, { sensitivity: 'base' });
+
+        const byStableId = (a: BoardCard, b: BoardCard) =>
+            `${a.type}:${a.id}`.localeCompare(`${b.type}:${b.id}`);
+
+        switch (sortBy) {
+            case 'manual':
+                sorted.sort((a, b) => (a.sort ?? 1e9) - (b.sort ?? 1e9));
+                break;
+            case 'title':
+                sorted.sort((a, b) => dir * (byTitle(a, b) || byStableId(a, b)));
+                break;
+            case 'type':
+                sorted.sort((a, b) => {
+                    const cmp = (TYPE_RANK[a.type] ?? 99) - (TYPE_RANK[b.type] ?? 99);
+                    return cmp !== 0 ? dir * cmp : dir * (byTitle(a, b) || byStableId(a, b));
+                });
+                break;
+            case 'lane':
+                sorted.sort((a, b) => {
+                    const cmp = (LANE_RANK[a.lane] ?? 99) - (LANE_RANK[b.lane] ?? 99);
+                    return cmp !== 0 ? dir * cmp : dir * ((a.sort ?? 0) - (b.sort ?? 0));
+                });
+                break;
+            case 'priority':
+                sorted.sort((a, b) => {
+                    // Tasks are the only type with a priority. Non-tasks sort last
+                    // so the priority order remains meaningful.
+                    const ap = a.type === 'task' ? (PRIORITY_RANK[a.priority ?? ''] ?? 99) : 100;
+                    const bp = b.type === 'task' ? (PRIORITY_RANK[b.priority ?? ''] ?? 99) : 100;
+                    const cmp = ap - bp;
+                    return cmp !== 0 ? dir * cmp : dir * (byTitle(a, b) || byStableId(a, b));
+                });
+                break;
+            case 'category':
+                sorted.sort((a, b) => {
+                    const ac = a.category_id;
+                    const bc = b.category_id;
+                    if (ac == null && bc == null) return byStableId(a, b);
+                    if (ac == null) return 1; // nulls always at the bottom regardless of dir
+                    if (bc == null) return -1;
+                    const cmp = ac - bc;
+                    return cmp !== 0 ? dir * cmp : dir * (byTitle(a, b) || byStableId(a, b));
+                });
+                break;
+        }
+
+        return sorted;
+    }, [cards, externalFilter, query, lanes, categoryFilter, sortBy, sortDir]);
 
     const updateCardLane = useCallback((type: CardType, id: number, nextLane: string) => {
         if (readOnly) return;
@@ -655,6 +807,17 @@ export default function ProjectBoard({
                         value={categoryFilter}
                         onChange={setCategoryFilter}
                     />
+
+                    {/* Sort dropdown — persists to server via PUT preferences */}
+                    <SortDropdown
+                        sortBy={sortBy}
+                        sortDir={sortDir}
+                        onChangeBy={updateSortBy}
+                        onChangeDir={updateSortDir}
+                    />
+
+                    {/* View-mode toggle: cards / grid / lines / table */}
+                    <ViewModeToggle value={viewMode} onChange={updateViewMode} />
                 </div>
 
                 {!readOnly && (
@@ -683,15 +846,50 @@ export default function ProjectBoard({
                     <p className="text-sm font-semibold text-slate-600">{__('general.no_cards_match_filter') || 'No cards matches filter'}</p>
                     <p className="text-xs text-slate-400">{__('general.try_changing_filter') || 'Try switching top status tabs'}</p>
                 </div>
+            ) : viewMode === 'table' ? (
+                <BoardTableView
+                    cards={filteredCards}
+                    categories={effectiveCategories}
+                    onView={(card) => setViewingCard(card)}
+                    onEdit={(card) => !readOnly && openEditModal(card)}
+                    onDelete={(card) => handleDeleteCard(card)}
+                    onOpenMenu={(card, x, y) => setContextMenu({ card, x, y })}
+                    readOnly={readOnly}
+                />
+            ) : viewMode === 'grid' ? (
+                <BoardGridView
+                    cards={filteredCards}
+                    onOpenMenu={(card, x, y) => setContextMenu({ card, x, y })}
+                    onView={(card) => setViewingCard(card)}
+                    onEdit={(card) => !readOnly && openEditModal(card)}
+                    onDelete={(card) => handleDeleteCard(card)}
+                    readOnly={readOnly}
+                    highlightedKey={highlightedCardKey}
+                />
+            ) : viewMode === 'lines' ? (
+                <BoardLinesView
+                    cards={filteredCards}
+                    onOpenMenu={(card, x, y) => setContextMenu({ card, x, y })}
+                    onView={(card) => setViewingCard(card)}
+                    onEdit={(card) => !readOnly && openEditModal(card)}
+                    onDelete={(card) => handleDeleteCard(card)}
+                    readOnly={readOnly}
+                />
             ) : (
                 <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId={`board-${externalFilter ?? date}`} direction="vertical" isDropDisabled={readOnly}>
+                    <Droppable droppableId={`board-${externalFilter ?? date}`} direction="vertical" isDropDisabled={readOnly || sortBy !== 'manual'}>
                         {(provided, snapshot) => (
                             <div
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
                                 className="flex flex-col gap-4"
                             >
+                                {sortBy !== 'manual' && (
+                                    <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-800">
+                                        <AlertCircle className="h-3.5 w-3.5" />
+                                        <span>{__('general.board_drag_disabled_when_sorted') || 'Drag-to-reorder is only available when sort is set to Manual order.'}</span>
+                                    </div>
+                                )}
                                 {filteredCards.map((card, index) => {
                                     const isNote = card.type === 'note';
                                     const noteColor = NOTE_COLORS[card.color ?? 'yellow'] ?? NOTE_COLORS.yellow;
@@ -703,9 +901,10 @@ export default function ProjectBoard({
                                     const cardKey = `${card.type}:${card.id}`;
                                     const draggableId = cardKey;
                                     const isHighlighted = cardKey === highlightedCardKey;
+                                    const dragDisabled = readOnly || sortBy !== 'manual';
 
                                     return (
-                                        <Draggable draggableId={draggableId} index={index} isDragDisabled={readOnly} key={cardKey}>
+                                        <Draggable draggableId={draggableId} index={index} isDragDisabled={dragDisabled} key={cardKey}>
                                             {(dragProvided, dragSnapshot) => (
                                                 <div
                                                     ref={dragProvided.innerRef}
@@ -731,15 +930,25 @@ export default function ProjectBoard({
                                                     <div className="space-y-3">
                                                         <div className="flex items-center justify-between gap-2">
                                                             {!readOnly && (
-                                                                <span
-                                                                    {...dragProvided.dragHandleProps}
-                                                                    className="inline-flex h-5 w-5 items-center justify-center rounded-md text-slate-300 group-hover:text-slate-500 hover:bg-slate-100 transition-colors cursor-grab active:cursor-grabbing"
-                                                                    title={__('general.board_drag_handle') || 'Drag handle'}
-                                                                    aria-label={__('general.board_drag_handle') || 'Drag handle'}
-                                                                    onClick={(e) => e.stopPropagation()}
-                                                                >
-                                                                    <GripVertical className="h-3.5 w-3.5" />
-                                                                </span>
+                                                                dragDisabled ? (
+                                                                    <span
+                                                                        className="inline-flex h-5 w-5 items-center justify-center rounded-md text-slate-200 cursor-not-allowed"
+                                                                        title={__('general.board_drag_disabled_when_sorted') || 'Drag disabled while sorted.'}
+                                                                        aria-label={__('general.board_drag_handle') || 'Drag handle'}
+                                                                    >
+                                                                        <GripVertical className="h-3.5 w-3.5" />
+                                                                    </span>
+                                                                ) : (
+                                                                    <span
+                                                                        {...dragProvided.dragHandleProps}
+                                                                        className="inline-flex h-5 w-5 items-center justify-center rounded-md text-slate-300 group-hover:text-slate-500 hover:bg-slate-100 transition-colors cursor-grab active:cursor-grabbing"
+                                                                        title={__('general.board_drag_handle') || 'Drag handle'}
+                                                                        aria-label={__('general.board_drag_handle') || 'Drag handle'}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        <GripVertical className="h-3.5 w-3.5" />
+                                                                    </span>
+                                                                )
                                                             )}
                                                             <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring)}>
                                                                 <TypeIcon className="h-2.5 w-2.5" />
@@ -1569,6 +1778,392 @@ const CategoryFilterDropdown: React.FC<{
                     </div>
                 </div>
             )}
+        </div>
+    );
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// View-mode toggle, sort dropdown, and the alternate board renderings.
+// Kept in the same file because they share LANE_META / TYPE_META / NOTE_COLORS
+// tables; if a third view lands they can graduate to ./views/*.
+// ──────────────────────────────────────────────────────────────────────────────
+
+const ViewModeToggle: React.FC<{
+    value: ViewMode;
+    onChange: (next: ViewMode) => void;
+}> = ({ value, onChange }) => {
+    const items: { id: ViewMode; icon: React.ElementType; label: string }[] = [
+        { id: 'cards', icon: LayoutList, label: __('general.board_view_cards') || 'Cards' },
+        { id: 'grid', icon: LayoutGrid, label: __('general.board_view_grid') || 'Grid' },
+        { id: 'lines', icon: Rows3, label: __('general.board_view_lines') || 'Lines' },
+        { id: 'table', icon: Table2, label: __('general.board_view_table') || 'Table' },
+    ];
+
+    return (
+        <div className="inline-flex h-10 items-center rounded-xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
+            {items.map(({ id, icon: Icon, label }) => {
+                const active = value === id;
+                return (
+                    <button
+                        key={id}
+                        type="button"
+                        onClick={() => onChange(id)}
+                        className={cn(
+                            'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold transition-colors',
+                            active
+                                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
+                                : 'text-slate-500 hover:text-slate-900',
+                        )}
+                        aria-pressed={active}
+                        aria-label={label}
+                        title={label}
+                    >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">{label}</span>
+                    </button>
+                );
+            })}
+        </div>
+    );
+};
+
+const SortDropdown: React.FC<{
+    sortBy: SortBy;
+    sortDir: SortDir;
+    onChangeBy: (next: SortBy) => void;
+    onChangeDir: (next: SortDir) => void;
+}> = ({ sortBy, sortDir, onChangeBy, onChangeDir }) => {
+    const [open, setOpen] = useState(false);
+    const wrapRef = React.useRef<HTMLDivElement | null>(null);
+
+    React.useEffect(() => {
+        if (!open) return;
+        const onDoc = (e: MouseEvent) => {
+            if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+        };
+        window.addEventListener('mousedown', onDoc);
+        return () => window.removeEventListener('mousedown', onDoc);
+    }, [open]);
+
+    const label = (() => {
+        switch (sortBy) {
+            case 'manual': return __('general.board_sort_manual') || 'Manual';
+            case 'title': return __('general.board_sort_title') || 'Title';
+            case 'type': return __('general.board_sort_type') || 'Type';
+            case 'lane': return __('general.board_sort_lane') || 'Status';
+            case 'priority': return __('general.board_sort_priority') || 'Priority';
+            case 'category': return __('general.board_sort_category') || 'Category';
+        }
+    })();
+
+    const DirIcon = sortDir === 'desc' ? ArrowDown : ArrowUp;
+
+    return (
+        <div className="relative" ref={wrapRef}>
+            <div className="inline-flex h-10 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                <button
+                    type="button"
+                    onClick={() => setOpen((v) => !v)}
+                    className="inline-flex h-full items-center gap-1.5 px-3 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                    <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="text-slate-400">{__('general.board_sort_label') || 'Sort'}:</span>
+                    <span>{label}</span>
+                    <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onChangeDir(sortDir === 'asc' ? 'desc' : 'asc')}
+                    className="inline-flex h-full items-center gap-1 border-l border-slate-200 px-2.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+                    title={__('general.board_sort_direction') || 'Sort direction'}
+                    aria-label={__('general.board_sort_direction') || 'Sort direction'}
+                >
+                    <DirIcon className="h-3.5 w-3.5 text-slate-400" />
+                </button>
+            </div>
+            {open && (
+                <div className="absolute right-0 sm:left-0 z-30 mt-1.5 w-56 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-150">
+                    {SORT_KEYS.map((key) => {
+                        const itemLabel = (() => {
+                            switch (key) {
+                                case 'manual': return __('general.board_sort_manual') || 'Manual order';
+                                case 'title': return __('general.board_sort_title') || 'Title';
+                                case 'type': return __('general.board_sort_type') || 'Type';
+                                case 'lane': return __('general.board_sort_lane') || 'Status';
+                                case 'priority': return __('general.board_sort_priority') || 'Priority';
+                                case 'category': return __('general.board_sort_category') || 'Category';
+                            }
+                        })();
+                        const isActive = sortBy === key;
+                        return (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => { onChangeBy(key); setOpen(false); }}
+                                className={cn(
+                                    'flex w-full items-center gap-2 rounded-xl px-3 py-1.5 text-start text-xs transition-colors',
+                                    isActive ? 'bg-slate-50 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50',
+                                )}
+                            >
+                                <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
+                                <span className="flex-1 truncate">{itemLabel}</span>
+                                {isActive && (
+                                    <DirIcon className={cn('h-3.5 w-3.5 text-slate-400', sortDir === 'desc' && 'rotate-180')} />
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Compact shared card chrome (type badge + lane pill + category) used by the
+// grid/lines/table views. Centralized so the alternate views stay consistent
+// with the rich cards view.
+const CardChrome: React.FC<{
+    card: BoardCard;
+    size?: 'sm' | 'md';
+    onClick?: (e: React.MouseEvent) => void;
+}> = ({ card, size = 'sm', onClick }) => {
+    const isNote = card.type === 'note';
+    const noteColor = NOTE_COLORS[card.color ?? 'yellow'] ?? NOTE_COLORS.yellow;
+    const meta = TYPE_META[card.type];
+    const TypeIcon = meta.icon;
+    const lane = LANE_META[card.lane] || LANE_META.backlog;
+    const LaneIcon = lane.icon;
+    const sizeCls = size === 'sm' ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-0.5';
+
+    return (
+        <div className={cn('flex items-center gap-1.5', onClick && 'cursor-pointer')} onClick={onClick}>
+            <span className={cn('inline-flex items-center gap-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring, sizeCls)}>
+                <TypeIcon className="h-2.5 w-2.5" />
+                {meta.label}
+            </span>
+            <span className={cn('inline-flex items-center gap-1 rounded-full border font-bold', lane.bg, lane.border, sizeCls)}>
+                <LaneIcon className="h-2.5 w-2.5" />
+                <span>{__(lane.labelKey)}</span>
+            </span>
+            {isNote && (
+                <span className={cn('inline-flex h-2 w-2 rounded-full ring-1 ring-inset ring-white/40', noteColor.swatch)} />
+            )}
+        </div>
+    );
+};
+
+const BoardGridView: React.FC<{
+    cards: BoardCard[];
+    onOpenMenu: (card: BoardCard, x: number, y: number) => void;
+    onView: (card: BoardCard) => void;
+    onEdit: (card: BoardCard) => void;
+    onDelete: (card: BoardCard) => void;
+    readOnly: boolean;
+    highlightedKey?: string | null;
+}> = ({ cards, onOpenMenu, onView, onEdit, onDelete, readOnly, highlightedKey }) => {
+    return (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {cards.map((card) => {
+                const isNote = card.type === 'note';
+                const noteColor = NOTE_COLORS[card.color ?? 'yellow'] ?? NOTE_COLORS.yellow;
+                const cardKey = `${card.type}:${card.id}`;
+                const isHighlighted = cardKey === highlightedKey;
+                return (
+                    <div
+                        key={cardKey}
+                        data-card-key={cardKey}
+                        onClick={() => onView(card)}
+                        onContextMenu={(e) => {
+                            if (readOnly) return;
+                            e.preventDefault();
+                            onOpenMenu(card, e.clientX, e.clientY);
+                        }}
+                        className={cn(
+                            'group relative flex h-full flex-col justify-between gap-3 rounded-2xl border p-3.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer',
+                            isHighlighted && 'ring-2 ring-emerald-400 ring-offset-2',
+                            isNote ? cn(noteColor.bg, noteColor.border, noteColor.text) : 'border-slate-200 bg-white text-slate-900',
+                        )}
+                    >
+                        <div className="space-y-2">
+                            <CardChrome card={card} size="sm" />
+                            <h3 className="line-clamp-2 text-xs font-extrabold leading-snug">
+                                {card.title}
+                            </h3>
+                            {isNote && card.content && (
+                                <p className="line-clamp-3 text-[11px] leading-relaxed opacity-80 break-words">
+                                    {card.content}
+                                </p>
+                            )}
+                            {!isNote && card.description && (
+                                <p className="line-clamp-2 text-[11px] text-slate-500 leading-relaxed">
+                                    {card.description}
+                                </p>
+                            )}
+                            {card.category && (
+                                <BoardCategoryChip category={card.category} />
+                            )}
+                        </div>
+                        {!readOnly && (
+                            <div className="flex items-center justify-end gap-1 border-t border-slate-100/50 pt-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                    <Edit3 className="h-3.5 w-3.5" />
+                                </button>
+                                <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+const BoardLinesView: React.FC<{
+    cards: BoardCard[];
+    onOpenMenu: (card: BoardCard, x: number, y: number) => void;
+    onView: (card: BoardCard) => void;
+    onEdit: (card: BoardCard) => void;
+    onDelete: (card: BoardCard) => void;
+    readOnly: boolean;
+}> = ({ cards, onOpenMenu, onView, onEdit, onDelete, readOnly }) => {
+    return (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <ul className="divide-y divide-slate-100">
+                {cards.map((card) => {
+                    const isNote = card.type === 'note';
+                    const noteColor = NOTE_COLORS[card.color ?? 'yellow'] ?? NOTE_COLORS.yellow;
+                    const cardKey = `${card.type}:${card.id}`;
+                    return (
+                        <li
+                            key={cardKey}
+                            data-card-key={cardKey}
+                            onClick={() => onView(card)}
+                            onContextMenu={(e) => {
+                                if (readOnly) return;
+                                e.preventDefault();
+                                onOpenMenu(card, e.clientX, e.clientY);
+                            }}
+                            className={cn(
+                                'group flex items-center gap-3 px-4 py-2.5 transition-colors cursor-pointer',
+                                isNote ? noteColor.bg : 'hover:bg-slate-50',
+                            )}
+                        >
+                            <div className="min-w-0 flex-1 flex items-center gap-3">
+                                <CardChrome card={card} size="sm" />
+                                <span className="truncate text-xs font-semibold text-slate-800">{card.title}</span>
+                                {card.category && (
+                                    <span className="hidden md:inline-flex">
+                                        <BoardCategoryChip category={card.category} />
+                                    </span>
+                                )}
+                            </div>
+                            {!readOnly && (
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                    <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                        <Edit3 className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            )}
+                        </li>
+                    );
+                })}
+            </ul>
+        </div>
+    );
+};
+
+const BoardTableView: React.FC<{
+    cards: BoardCard[];
+    categories: BoardCategory[];
+    onView: (card: BoardCard) => void;
+    onEdit: (card: BoardCard) => void;
+    onDelete: (card: BoardCard) => void;
+    onOpenMenu: (card: BoardCard, x: number, y: number) => void;
+    readOnly: boolean;
+}> = ({ cards, categories, onView, onEdit, onDelete, onOpenMenu, readOnly }) => {
+    return (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-200 text-xs">
+                    <thead className="bg-slate-50">
+                        <tr>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_type') || 'Type'}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_title') || 'Title'}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_lane') || 'Status'}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_category') || 'Category'}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_priority') || 'Priority'}</th>
+                            <th scope="col" className="px-4 py-2.5 text-end text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {cards.map((card) => {
+                            const cardKey = `${card.type}:${card.id}`;
+                            const priorityCls = card.priority ? PRIORITY_STYLES[card.priority] : null;
+                            return (
+                                <tr
+                                    key={cardKey}
+                                    data-card-key={cardKey}
+                                    onClick={() => onView(card)}
+                                    onContextMenu={(e) => {
+                                        if (readOnly) return;
+                                        e.preventDefault();
+                                        onOpenMenu(card, e.clientX, e.clientY);
+                                    }}
+                                    className="cursor-pointer hover:bg-slate-50/80 transition-colors"
+                                >
+                                    <td className="px-4 py-2.5 whitespace-nowrap">
+                                        <CardChrome card={card} size="sm" />
+                                    </td>
+                                    <td className="px-4 py-2.5">
+                                        <span className="font-semibold text-slate-800">{card.title}</span>
+                                        {card.description && (
+                                            <p className="line-clamp-1 text-[10px] text-slate-500 mt-0.5">{card.description}</p>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-2.5 whitespace-nowrap text-slate-600">
+                                        {__(LANE_META[card.lane]?.labelKey ?? 'general.lane_backlog')}
+                                    </td>
+                                    <td className="px-4 py-2.5 whitespace-nowrap">
+                                        {card.category ? (
+                                            <BoardCategoryChip category={card.category} />
+                                        ) : (
+                                            <span className="text-slate-300">—</span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-2.5 whitespace-nowrap">
+                                        {priorityCls ? (
+                                            <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ring-1 ring-inset', priorityCls)}>
+                                                {card.priority}
+                                            </span>
+                                        ) : (
+                                            <span className="text-slate-300">—</span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-2.5 whitespace-nowrap text-end" onClick={(e) => e.stopPropagation()}>
+                                        {!readOnly ? (
+                                            <div className="inline-flex items-center gap-1">
+                                                <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                                    <Edit3 className="h-3.5 w-3.5" />
+                                                </button>
+                                                <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <span className="text-slate-300">—</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
