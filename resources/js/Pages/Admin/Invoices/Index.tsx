@@ -411,7 +411,16 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             )}
                                         </TableCell>
                                         <TableCell className="font-medium text-foreground" data-label={__('general.project')}>
-                                            {invoice.project ? invoice.project.project_name : '-'}
+                                            {invoice.project ? (
+                                                <Link
+                                                    href={route('admin.projects.board.index', invoice.project.id)}
+                                                    className="text-primary hover:underline font-semibold"
+                                                >
+                                                    {invoice.project.project_name}
+                                                </Link>
+                                            ) : (
+                                                '-'
+                                            )}
                                         </TableCell>
                                         <TableCell className="text-muted-foreground text-sm" data-label={__('general.date')}>
                                             {new Date(invoice.created_at).toLocaleDateString()}

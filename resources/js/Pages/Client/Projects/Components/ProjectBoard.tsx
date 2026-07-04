@@ -229,7 +229,7 @@ export default function ProjectBoard({
 
     const filteredCards = useMemo(() => {
         const q = query.trim().toLowerCase();
-        return cards.filter((c) => {
+        const list = cards.filter((c) => {
             if (externalFilter && externalFilter !== 'all') {
                 const isLane = lanes.includes(externalFilter);
                 if (isLane && c.lane !== externalFilter) return false;
@@ -250,6 +250,10 @@ export default function ProjectBoard({
                 (c.content ?? '').toLowerCase().includes(q)
             );
         });
+        // Stable sort by the persisted `sort` column so the visual order matches the
+        // stored order (the backend already returns lane-grouped data; this is the
+        // within-lane tiebreaker) and drag/drop index math lines up with the server.
+        return [...list].sort((a, b) => (a.sort ?? 1e9) - (b.sort ?? 1e9));
     }, [cards, externalFilter, query, lanes, categoryFilter]);
 
     const updateCardLane = useCallback((type: CardType, id: number, nextLane: string) => {
@@ -337,12 +341,34 @@ export default function ProjectBoard({
         if (!result.destination) return;
         if (result.destination.index === result.source.index) return;
 
-        const ordered = filteredCards.map((c) => ({ type: c.type, id: c.id }));
-        // Reorder in-place based on the drag interaction.
-        const [moved] = ordered.splice(result.source.index, 1);
-        ordered.splice(result.destination.index, 0, moved);
+        const draggedCard = filteredCards[result.source.index];
+        if (!draggedCard) return;
+        const targetLane = draggedCard.lane ?? 'backlog';
 
-        const targetLane = ordered[0] ? (filteredCards.find((c) => c.type === ordered[0].type && c.id === ordered[0].id)?.lane ?? 'backlog') : 'backlog';
+        // The droppable can mix lanes when the top-nav filter is "all" (or a type).
+        // The backend reorder endpoint is per-lane and would silently move cards
+        // across lanes if we submitted the whole flat list — restrict the payload
+        // to the dragged card's lane and translate the flat drop index into a
+        // lane-local index so within-lane order persists correctly.
+        const laneCards = filteredCards.filter(
+            (c) => (c.lane ?? 'backlog') === targetLane,
+        );
+        const sourceLaneIdx = laneCards.findIndex(
+            (c) => c.type === draggedCard.type && c.id === draggedCard.id,
+        );
+        if (sourceLaneIdx === -1) return;
+
+        let destLaneIdx = 0;
+        for (let i = 0; i < result.destination.index && i < filteredCards.length; i++) {
+            if ((filteredCards[i].lane ?? 'backlog') === targetLane) destLaneIdx++;
+        }
+        destLaneIdx = Math.min(destLaneIdx, laneCards.length - 1);
+        if (sourceLaneIdx === destLaneIdx) return;
+
+        const ordered = laneCards.map((c) => ({ type: c.type, id: c.id }));
+        const [moved] = ordered.splice(sourceLaneIdx, 1);
+        ordered.splice(destLaneIdx, 0, moved);
+
         void reorderCards(targetLane, ordered);
     }, [readOnly, filteredCards, reorderCards]);
 
@@ -660,11 +686,11 @@ export default function ProjectBoard({
             ) : (
                 <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId={`board-${externalFilter ?? date}`} direction="vertical" isDropDisabled={readOnly}>
-                        {(provided) => (
+                        {(provided, snapshot) => (
                             <div
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
-                                className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+                                className="flex flex-col gap-4"
                             >
                                 {filteredCards.map((card, index) => {
                                     const isNote = card.type === 'note';
@@ -863,7 +889,12 @@ export default function ProjectBoard({
                                         </Draggable>
                                     );
                                 })}
-                                {provided.placeholder}
+                                {snapshot.isDraggingOver && provided.placeholder
+                                    ? React.cloneElement(provided.placeholder as React.ReactElement<{ className?: string }>, {
+                                          className:
+                                              'rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 transition-colors',
+                                      })
+                                    : provided.placeholder}
                             </div>
                         )}
                     </Droppable>

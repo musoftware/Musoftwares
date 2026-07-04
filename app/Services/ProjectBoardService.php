@@ -103,7 +103,29 @@ class ProjectBoardService
             ->whereDate('created_at', $date->toDateString())
             ->get();
 
-        return $this->buildCards($project, $date, $notes, $tasks, $reports, $todos, $files);
+        $cards = $this->buildCards($project, $date, $notes, $tasks, $reports, $todos, $files);
+
+        // `buildCards()` appends in a fixed type-grouped order (notes → tasks → reports
+        // → todos → files). That's fine for building, but the UI displays cards grouped
+        // by status lane and ordered by the persisted `sort` column. Sort here so that
+        // the initial render matches the order the user expects (and the order written
+        // back by the drag-drop reorder endpoint).
+        $laneOrder = ['backlog' => 0, 'in_progress' => 1, 'review' => 2, 'done' => 3];
+        usort($cards, function ($a, $b) use ($laneOrder) {
+            $la = $laneOrder[$a['lane']] ?? 99;
+            $lb = $laneOrder[$b['lane']] ?? 99;
+            if ($la !== $lb) {
+                return $la <=> $lb;
+            }
+            $sa = $a['sort'] ?? PHP_INT_MAX;
+            $sb = $b['sort'] ?? PHP_INT_MAX;
+            if ($sa !== $sb) {
+                return $sa <=> $sb;
+            }
+            return strcmp(($a['type'] ?? '').':'.($a['id'] ?? 0), ($b['type'] ?? '').':'.($b['id'] ?? 0));
+        });
+
+        return $cards;
     }
 
     /**
