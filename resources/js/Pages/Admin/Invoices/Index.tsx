@@ -35,6 +35,8 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@/Components/ui/dialog';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { toast } from 'sonner';
 
 const filterByOptions = [
     { value: 'all', label: 'All' },
@@ -80,6 +82,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const [bulkActionProject, setBulkActionProject] = useState('');
     const [jobStatusDialog, setJobStatusDialog] = useState(null);
     const [newJobStatus, setNewJobStatus] = useState('');
+    const [pendingAction, setPendingAction] = useState<{ type: 'mark_paid' | 'cancel' | 'bulk'; id?: any } | null>(null);
 
     useEffect(() => {
         if (selectAll) {
@@ -114,16 +117,38 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         router.post(route('admin.users.reset-password', id));
     };
 
-    const handleMarkPaid = (id) => {
-        if (confirm('Are you sure you want to mark this invoice as paid manually? This will adjust balances directly.')) {
-            router.post(route('admin.invoices.mark-paid', id));
-        }
+    const handleMarkPaid = (id: any) => setPendingAction({ type: 'mark_paid', id });
+
+    const confirmMarkPaid = () => {
+        if (!pendingAction || pendingAction.type !== 'mark_paid') return;
+        router.post(route('admin.invoices.mark-paid', pendingAction.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(__('general.invoice_marked_paid') || 'Invoice marked as paid');
+                setPendingAction(null);
+            },
+            onError: () => {
+                toast.error(__('general.error_occurred') || 'Something went wrong');
+                setPendingAction(null);
+            },
+        });
     };
 
-    const handleCancel = (id) => {
-        if (confirm('Are you sure you want to cancel this invoice? If it was partially paid, the user will be refunded their wallet balance.')) {
-            router.post(route('admin.invoices.cancel', id));
-        }
+    const handleCancel = (id: any) => setPendingAction({ type: 'cancel', id });
+
+    const confirmCancel = () => {
+        if (!pendingAction || pendingAction.type !== 'cancel') return;
+        router.post(route('admin.invoices.cancel', pendingAction.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(__('general.invoice_cancelled') || 'Invoice cancelled');
+                setPendingAction(null);
+            },
+            onError: () => {
+                toast.error(__('general.error_occurred') || 'Something went wrong');
+                setPendingAction(null);
+            },
+        });
     };
 
     const handleChangeJobStatus = () => {
@@ -142,38 +167,44 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const applyBulkAction = () => {
         const selectedIds = Object.keys(selectedInvoices).filter(id => selectedInvoices[id]);
         if (selectedIds.length === 0) {
-            alert('Please select at least one invoice.');
+            toast.error(__('general.select_at_least_one_invoice') || 'Please select at least one invoice.');
             return;
         }
         if (!bulkAction) {
-            alert('Select Bulk Action first');
+            toast.error(__('general.select_bulk_action_first') || 'Select a bulk action first.');
             return;
         }
 
-        const messages = {
-            convert_to_transaction: 'Are you sure you want to convert these invoices to transactions?',
-            delete: 'Are you sure you want to delete selected invoices permanently?',
-            send_whatsapp_reminder: 'Are you sure you want to send WhatsApp reminders for selected invoices?'
+        const messages: Record<string, string> = {
+            convert_to_transaction: __('general.confirm_convert_to_transactions') || 'Convert these invoices to transactions?',
+            delete: __('general.confirm_delete_invoices') || 'Permanently delete the selected invoices?',
+            send_whatsapp_reminder: __('general.confirm_send_whatsapp_reminders') || 'Send WhatsApp reminders for the selected invoices?',
         };
 
-        if (messages[bulkAction]) {
-            if (!confirm(messages[bulkAction])) return;
-        } else {
-            if (!confirm(`Are you sure you want to apply this bulk action?`)) return;
-        }
+        setPendingAction({ type: 'bulk', id: { action: bulkAction, ids: selectedIds, projectId: bulkActionProject, message: messages[bulkAction] || __('general.confirm_bulk_action') || 'Apply this bulk action?' } });
+    };
 
+    const confirmBulkAction = () => {
+        if (!pendingAction || pendingAction.type !== 'bulk') return;
+        const { action, ids, projectId } = pendingAction.id;
         router.post(route('admin.invoices.bulk-action'), {
-            action: bulkAction,
-            invoices: selectedIds,
-            project_id: bulkActionProject
+            action,
+            invoices: ids,
+            project_id: projectId
         }, {
             preserveScroll: true,
             onSuccess: () => {
+                toast.success(__('general.bulk_action_applied') || 'Bulk action applied');
                 setSelectedInvoices({});
                 setSelectAll(false);
                 setBulkAction('');
                 setBulkActionProject('');
-            }
+                setPendingAction(null);
+            },
+            onError: () => {
+                toast.error(__('general.error_occurred') || 'Something went wrong');
+                setPendingAction(null);
+            },
         });
     };
 
@@ -606,6 +637,38 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmModal
+                isOpen={pendingAction?.type === 'mark_paid'}
+                title={__('general.mark_as_paid') || 'Mark as paid?'}
+                description={__('general.confirm_mark_paid_desc') || 'This will adjust balances directly.'}
+                confirmLabel={__('general.mark_as_paid')}
+                cancelLabel={__('general.cancel')}
+                onConfirm={confirmMarkPaid}
+                onCancel={() => setPendingAction(null)}
+            />
+
+            <ConfirmModal
+                isOpen={pendingAction?.type === 'cancel'}
+                title={__('general.cancel_invoice') || 'Cancel invoice?'}
+                description={__('general.confirm_cancel_invoice_desc') || 'If it was partially paid, the user will be refunded their wallet balance.'}
+                confirmLabel={__('general.cancel_invoice')}
+                cancelLabel={__('general.keep_invoice')}
+                variant="danger"
+                onConfirm={confirmCancel}
+                onCancel={() => setPendingAction(null)}
+            />
+
+            <ConfirmModal
+                isOpen={pendingAction?.type === 'bulk'}
+                title={__('general.confirm_bulk_action_title') || 'Confirm bulk action'}
+                description={pendingAction?.type === 'bulk' ? pendingAction.id?.message : ''}
+                confirmLabel={__('general.apply')}
+                cancelLabel={__('general.cancel')}
+                variant={pendingAction?.type === 'bulk' && pendingAction.id?.action === 'delete' ? 'danger' : 'default'}
+                onConfirm={confirmBulkAction}
+                onCancel={() => setPendingAction(null)}
+            />
         </AdminSidebarLayout>
     );
 }

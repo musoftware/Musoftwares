@@ -10,10 +10,29 @@ import {
     DialogTrigger,
     DialogFooter,
 } from '@/Components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Tag, Plus, Pencil, Trash2, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Tag, Plus, Pencil, Trash2, CheckCircle, XCircle, Eye, MoreHorizontal } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { EmptyState } from '@/Components/ui/EmptyState';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
+import { Card, CardContent } from '@/Components/ui/card';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/Components/ui/table';
 import { __ } from '@/lib/i18n';
 
 const emptyForm = {
@@ -69,6 +88,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingCoupon, setEditingCoupon] = useState<CouponData | null>(null);
+    const [pendingDelete, setPendingDelete] = useState<CouponData | null>(null);
     const [formData, setFormData] = useState({ ...emptyForm });
 
     const set = (key: string, value: any) =>
@@ -82,7 +102,9 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
             onSuccess: () => {
                 setIsCreateOpen(false);
                 resetForm();
+                toastSuccess(__('general.created') || 'Coupon created');
             },
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
         });
     };
 
@@ -93,7 +115,9 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 setIsEditOpen(false);
                 setEditingCoupon(null);
                 resetForm();
+                toastSuccess(__('general.updated') || 'Coupon updated');
             },
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
         });
     };
 
@@ -118,15 +142,18 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
         setIsEditOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this coupon?')) {
-            router.delete(route('admin.coupons.destroy', id));
-        }
+    const confirmDelete = () => {
+        if (!pendingDelete) return;
+        const id = pendingDelete.id;
+        setPendingDelete(null);
+        router.delete(route('admin.coupons.destroy', id), {
+            onSuccess: () => toastSuccess(__('general.deleted') || 'Coupon deleted'),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+        });
     };
 
     const renderFormFields = () => (
         <div className="space-y-4 max-h-[65vh] overflow-y-auto p-1 pe-2">
-            {/* Code & Name */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <Label htmlFor="code">{__('general.coupon_code')}</Label>
@@ -149,7 +176,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </div>
             </div>
 
-            {/* Description */}
             <div>
                 <Label htmlFor="description">{__('general.description')}</Label>
                 <textarea
@@ -162,7 +188,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 />
             </div>
 
-            {/* Type */}
             <div>
                 <Label htmlFor="type">{__('general.discount_type')}<span className="text-red-500">*</span></Label>
                 <select
@@ -177,7 +202,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </select>
             </div>
 
-            {/* Discount fields */}
             <div className="grid grid-cols-2 gap-4">
                 {formData.type === 'fixed' ? (
                     <div>
@@ -209,7 +233,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 )}
                 <div>
                     <Label htmlFor="currency">{__('general.currency')}<span className="text-red-500">*</span></Label>
-                    <CurrencySelect 
+                    <CurrencySelect
                         currencies={currencies}
                         value={formData.currency}
                         onChange={(val) => set('currency', val)}
@@ -217,7 +241,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </div>
             </div>
 
-            {/* Min Purchase */}
             <div>
                 <Label htmlFor="min_purchase_amount">{__('general.minimum_purchase_amount')}</Label>
                 <Input
@@ -231,7 +254,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 />
             </div>
 
-            {/* Usage Limits */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <Label htmlFor="max_uses_per_user">{__('general.max_uses_user')}</Label>
@@ -257,7 +279,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </div>
             </div>
 
-            {/* Dates */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <Label htmlFor="starts_at">{__('general.starts_at')}</Label>
@@ -279,7 +300,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </div>
             </div>
 
-            {/* Admin Notes */}
             <div>
                 <Label htmlFor="admin_notes">{__('general.admin_notes')}</Label>
                 <textarea
@@ -292,7 +312,6 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 />
             </div>
 
-            {/* Active toggle */}
             <div className="flex items-center space-x-2">
                 <input
                     type="checkbox"
@@ -307,12 +326,12 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
     );
 
     const items = coupons?.data ?? [];
+    const paginationLinks = coupons?.links;
 
     return (
         <AdminSidebarLayout title={__('general.coupons')} header="Coupons Manager">
             <Head title={__('general.admin_coupons')} />
 
-            {/* Header bar */}
             <div className="mb-6 flex items-center justify-end gap-4">
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Tag className="h-4 w-4" />
@@ -337,126 +356,130 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </Dialog>
             </div>
 
-            {/* Table */}
-            <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-start text-sm">
-                    <thead className="border-b bg-gray-50">
-                        <tr>
-                            <th className="p-4 font-medium text-gray-600">{__('general.code')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.name')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.type')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.discount')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.uses')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.expires')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.status')}</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((c) => (
-                            <tr key={c.id} className="border-b hover:bg-gray-50">
-                                <td className="p-4">
-                                    <span className="font-bold font-mono text-gray-900 bg-gray-100 px-2 py-0.5 rounded text-xs">
-                                        {c.code}
-                                    </span>
-                                </td>
-                                <td className="p-4">
-                                    <div className="font-medium text-gray-900">{c.name}</div>
-                                    {c.description && (
-                                        <div className="text-xs text-gray-400 truncate max-w-[160px]">{c.description}</div>
-                                    )}
-                                </td>
-                                <td className="p-4">
-                                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
-                                        c.type === 'fixed' ? 'bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'
-                                    }`}>
-                                        {c.type}
-                                    </span>
-                                </td>
-                                <td className="p-4 text-sm text-gray-700">
-                                    {c.type === 'percentage'
-                                        ? <span className="font-medium">{parseFloat(String(c.discount_percentage ?? 0)).toFixed(2)}%</span>
-                                        : (
-                                            <>
-                                                <span className="font-medium">{parseFloat(String(c.discount_amount ?? 0)).toFixed(2)}</span>
-                                                {c.currency_relation && (
-                                                    <span className="text-gray-400 ms-1">{c.currency_relation.currency}</span>
-                                                )}
-                                            </>
-                                        )
-                                    }
-                                </td>
-                                <td className="p-4 text-sm text-gray-700">
-                                    <span className="font-bold">{c.current_uses ?? 0}</span>
-                                    <span className="text-gray-400"> / {c.max_total_uses ?? '∞'}</span>
-                                </td>
-                                <td className="p-4 text-sm text-gray-500">
-                                    {c.expires_at ? (
-                                        <div>
-                                            <div className={new Date(c.expires_at) < new Date() ? 'text-red-600 font-bold' : ''}>
-                                                {new Date(c.expires_at).toLocaleDateString()}
-                                            </div>
-                                            <div className="text-xs text-gray-400">
-                                                {new Date(c.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <span className="text-gray-400">{__('general.never')}</span>
-                                    )}
-                                </td>
-                                <td className="p-4">
-                                    {c.is_active ? (
-                                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800">
-                                            <CheckCircle className="h-3 w-3" /> {__('general.active')}</span>
-                                    ) : (
-                                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-800">
-                                            <XCircle className="h-3 w-3" /> {__('general.inactive')}</span>
-                                    )}
-                                </td>
-                                <td className="p-4 space-x-2 text-end">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => router.visit(route('admin.coupons.show', c.id))}
-                                    >
-                                        <Eye className="h-3.5 w-3.5 me-1" /> {__('general.view')}</Button>
-                                    <Button variant="outline" size="sm" onClick={() => openEditModal(c)}>
-                                        <Pencil className="h-3.5 w-3.5 me-1" /> {__('general.edit')}</Button>
-                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(c.id)}>
-                                        <Trash2 className="h-3.5 w-3.5 me-1" /> {__('general.delete')}</Button>
-                                </td>
-                            </tr>
-                        ))}
-                        {items.length === 0 && (
-                            <tr>
-                                <td colSpan={8} className="p-8 text-center text-gray-400">
-                                    <Tag className="mx-auto mb-2 h-8 w-8 opacity-30" />{__('general.no_coupons_found')}</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            {items.length === 0 ? (
+                <EmptyState
+                    icon={Tag}
+                    title={__('general.no_coupons_found') || 'No coupons found'}
+                    description={__('general.create_first_coupon_cta') || 'Create your first coupon to get started.'}
+                />
+            ) : (
+                <Card className="overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>{__('general.code')}</TableHead>
+                                    <TableHead>{__('general.name')}</TableHead>
+                                    <TableHead>{__('general.type')}</TableHead>
+                                    <TableHead>{__('general.discount')}</TableHead>
+                                    <TableHead>{__('general.uses')}</TableHead>
+                                    <TableHead>{__('general.expires')}</TableHead>
+                                    <TableHead className="text-center">{__('general.status')}</TableHead>
+                                    <TableHead className="text-end">{__('general.actions')}</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {items.map((c) => (
+                                    <TableRow key={c.id}>
+                                        <TableCell>
+                                            <span className="font-bold font-mono text-gray-900 bg-gray-100 px-2 py-0.5 rounded text-xs">
+                                                {c.code}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="font-medium text-gray-900">{c.name}</div>
+                                            {c.description && (
+                                                <div className="text-xs text-gray-400 truncate max-w-[160px]">{c.description}</div>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
+                                                c.type === 'fixed'
+                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                            }`}>
+                                                {c.type}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-gray-700">
+                                            {c.type === 'percentage'
+                                                ? <span className="font-medium">{parseFloat(String(c.discount_percentage ?? 0)).toFixed(2)}%</span>
+                                                : (
+                                                    <>
+                                                        <span className="font-medium">{parseFloat(String(c.discount_amount ?? 0)).toFixed(2)}</span>
+                                                        {c.currency_relation && (
+                                                            <span className="text-gray-400 ms-1">{c.currency_relation.currency}</span>
+                                                        )}
+                                                    </>
+                                                )
+                                            }
+                                        </TableCell>
+                                        <TableCell className="text-sm text-gray-700">
+                                            <span className="font-bold">{c.current_uses ?? 0}</span>
+                                            <span className="text-gray-400"> / {c.max_total_uses ?? '∞'}</span>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-gray-500">
+                                            {c.expires_at ? (
+                                                <div>
+                                                    <div className={new Date(c.expires_at) < new Date() ? 'text-red-600 font-bold' : ''}>
+                                                        {new Date(c.expires_at).toLocaleDateString()}
+                                                    </div>
+                                                    <div className="text-xs text-gray-400">
+                                                        {new Date(c.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-400">{__('general.never')}</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <StatusBadge status={c.is_active ? 'active' : 'inactive'} />
+                                        </TableCell>
+                                        <TableCell className="text-end">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <span className="sr-only">{__('general.actions')}</span>
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => router.visit(route('admin.coupons.show', c.id))}>
+                                                        <Eye className="h-4 w-4 me-2" /> {__('general.view')}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => openEditModal(c)}>
+                                                        <Pencil className="h-4 w-4 me-2" /> {__('general.edit')}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => setPendingDelete(c)} className="text-red-600 focus:text-red-600">
+                                                        <Trash2 className="h-4 w-4 me-2" /> {__('general.delete')}
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </Card>
+            )}
 
-            {/* Pagination */}
-            {coupons?.links && (
+            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
                 <div className="mt-4 flex justify-center gap-1">
-                    {coupons.links.map((link, i) => (
-                        <button
+                    {paginationLinks.map((link, i) => (
+                        <Button
                             key={i}
+                            variant={link.active ? 'default' : 'outline'}
+                            size="sm"
                             disabled={!link.url}
                             onClick={() => link.url && router.visit(link.url)}
-                            className={`px-3 py-1 rounded text-sm border ${
-                                link.active
-                                    ? 'bg-black text-white border-black'
-                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50 disabled:opacity-40'
-                            }`}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                        />
+                        >
+                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                        </Button>
                     ))}
                 </div>
             )}
 
-            {/* Edit Modal */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
@@ -472,6 +495,17 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmModal
+                isOpen={pendingDelete !== null}
+                title={__('general.delete_coupon') || 'Delete coupon?'}
+                description={__('general.confirm_delete_coupon_desc') || `This will permanently delete coupon "${pendingDelete?.code}".`}
+                confirmLabel={__('general.delete')}
+                cancelLabel={__('general.cancel')}
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setPendingDelete(null)}
+            />
         </AdminSidebarLayout>
     );
 }

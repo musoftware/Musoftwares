@@ -9,7 +9,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
-import { useToast } from '@/Components/ui/use-toast';
+import { useToast, toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 import {
     MoreHorizontal,
@@ -110,8 +110,8 @@ export default function Index({ methods, filters, stats }: Props) {
             { status },
             {
                 preserveScroll: true,
-                onSuccess: () => toast({ title: `Payment method marked as ${statusLabel[status] ?? status}.` }),
-                onError:   () => toast({ title: 'Update failed.', variant: 'destructive' }),
+                onSuccess: () => toastSuccess(__('general.payment_method_marked_as', { status: statusLabel[status] ?? status }) || `Payment method marked as ${statusLabel[status] ?? status}.`),
+                onError:   () => toastError(__('general.update_failed') || 'Update failed.'),
             }
         );
     };

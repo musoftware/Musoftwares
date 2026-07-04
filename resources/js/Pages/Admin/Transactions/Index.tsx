@@ -6,15 +6,15 @@ import TransactionUserCard from './Components/TransactionUserCard';
 
 export default function Index({ filters, filteredUser }) {
     useEffect(() => {
-        router.get('/admin/transactions', { ...filters, type: 'income' }, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        router.get('/admin/transactions', { type: 'income' }, { replace: true });
     }, []);
 
     return (
         <AdminSidebarLayout title={__('erp.transactions')} header={__('erp.transactions')}>
+            <Head title={__('erp.transactions')} />
             {filteredUser && <TransactionUserCard user={filteredUser} />}
             <div className="flex items-center justify-center h-64">
-                <span className="text-slate-500">{__('erp.loading_transactions')}</span>
+                <span className="text-slate-500 animate-pulse">{__('erp.loading_transactions')}</span>
             </div>
         </AdminSidebarLayout>
     );

@@ -1018,6 +1018,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/invoices/{invoice}/change-job-status', [App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
     Route::post('/invoices/{invoice}/notify', [App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
     Route::post('/invoices/{invoice}/partial-pay', [App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
+    Route::post('/invoices/{invoice}/external-pay', [App\Http\Controllers\Admin\InvoiceController::class, 'externalPay'])->name('invoices.external-pay');
+    Route::post('/invoices/{invoice}/cost-lines/{line}/record-paid', [App\Http\Controllers\Admin\InvoiceController::class, 'recordCostLinePaid'])->name('invoices.cost-lines.record-paid');
     Route::post('/invoices/{invoice}/pay-service/calculate', [App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
     Route::post('/invoices/{invoice}/pay-service/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
     Route::post('/invoices/{invoice}/share-link', [App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');

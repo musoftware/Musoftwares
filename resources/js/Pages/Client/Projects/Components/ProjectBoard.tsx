@@ -53,6 +53,7 @@ export interface BoardCard {
     human_size?: string;
     mime?: string;
     download_url?: string;
+    comments_count?: number;
 }
 
 interface ProjectBoardProps {
@@ -124,7 +125,7 @@ export default function ProjectBoard({
         cardId?: number;
     } | null>(null);
 
-    const [noteForm, setNoteForm] = useState({ content: '', color: 'yellow' });
+    const [noteForm, setNoteForm] = useState({ title: '', content: '', color: 'yellow' });
     const [taskForm, setTaskForm] = useState({ task_name: '', task_description: '', priority: 'normal' });
     const [todoForm, setTodoForm] = useState({ title: '', description: '', completed: false, checklist: [] as { id?: number; title: string; is_completed: boolean }[] });
     const [newCheckItem, setNewCheckItem] = useState('');
@@ -134,6 +135,23 @@ export default function ProjectBoard({
     const [uploading, setUploading] = useState(false);
     const [highlightedCardKey, setHighlightedCardKey] = useState<string | null>(null);
     const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const updateCardCount = useCallback((cardKey: string, count: number) => {
+        setCards((prev) => {
+            const current = prev.find((c) => `${c.type}-${c.id}` === cardKey);
+            if (current && (current.comments_count ?? 0) === count) return prev;
+            return prev.map((c) => (`${c.type}-${c.id}` === cardKey ? { ...c, comments_count: count } : c));
+        });
+    }, []);
+
+    const handlerCacheRef = useRef<Map<string, (count: number) => void>>(new Map());
+    const makeCountHandler = useCallback((cardKey: string) => {
+        const cached = handlerCacheRef.current.get(cardKey);
+        if (cached) return cached;
+        const fn = (count: number) => updateCardCount(cardKey, count);
+        handlerCacheRef.current.set(cardKey, fn);
+        return fn;
+    }, [updateCardCount]);
 
     useEffect(() => {
         const handler = (e: Event) => {
@@ -273,7 +291,7 @@ export default function ProjectBoard({
     }, [viewingCard]);
 
     const openCreateModal = (type: 'note' | 'task' | 'todo' | 'file' | 'report') => {
-        setNoteForm({ content: '', color: 'yellow' });
+        setNoteForm({ title: '', content: '', color: 'yellow' });
         setTaskForm({ task_name: '', task_description: '', priority: 'normal' });
         setTodoForm({ title: '', description: '', completed: false, checklist: [] });
         setFileForm(null);
@@ -283,7 +301,7 @@ export default function ProjectBoard({
 
     const openEditModal = (card: BoardCard) => {
         if (card.type === 'note') {
-            setNoteForm({ content: card.content || card.title, color: card.color || 'yellow' });
+            setNoteForm({ title: card.title ?? '', content: card.content ?? '', color: card.color || 'yellow' });
         } else if (card.type === 'task') {
             setTaskForm({ task_name: card.title, task_description: card.description || '', priority: card.priority || 'normal' });
         } else if (card.type === 'todo') {
@@ -316,9 +334,9 @@ export default function ProjectBoard({
             ? route('client.projects.board.update-note', { project: projectId, note: activeModal?.cardId })
             : route('client.projects.board.store-note', { project: projectId });
 
-        const payload = isEdit 
-            ? { content: noteForm.content, color: noteForm.color }
-            : { for_date: date, content: noteForm.content, color: noteForm.color, lane: 'backlog' };
+        const payload = isEdit
+            ? { title: noteForm.title, content: noteForm.content, color: noteForm.color }
+            : { for_date: date, title: noteForm.title, content: noteForm.content, color: noteForm.color, lane: 'backlog' };
 
         axios({ method: isEdit ? 'put' : 'post', url, data: payload })
             .then(({ data }) => {
@@ -576,10 +594,15 @@ export default function ProjectBoard({
                                     </div>
 
                                     <div className="space-y-1.5" onClick={() => !readOnly && openEditModal(card)}>
-                                        <h3 className="line-clamp-2 text-sm font-extrabold leading-snug tracking-tight">
+                                        <h3 className={cn('line-clamp-2 leading-snug tracking-tight', isNote ? 'text-sm font-extrabold' : 'text-sm font-extrabold')}>
                                             {card.title}
                                         </h3>
-                                        {card.description && (
+                                        {isNote && card.content && (
+                                            <p className="line-clamp-4 text-xs leading-relaxed opacity-80 break-words">
+                                                {card.content}
+                                            </p>
+                                        )}
+                                        {!isNote && card.description && (
                                             <p className="line-clamp-3 text-xs text-slate-500 leading-relaxed">
                                                 {card.description}
                                             </p>
@@ -611,7 +634,7 @@ export default function ProjectBoard({
                                         )}
 
                                         {card.type === 'file' && (
-                                            <div className="mt-2 flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100" onClick={(e) => e.stopPropagation()}>
+                                            <div className="mt-2 flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100" onClick={(e) => e.stopPropagation()} title={card.title}>
                                                 <div className="min-w-0 flex-1">
                                                     <p className="truncate text-[10px] font-bold text-slate-700">{card.mime}</p>
                                                     <p className="text-[10px] font-mono text-slate-500">{card.human_size}</p>
@@ -620,7 +643,7 @@ export default function ProjectBoard({
                                                     <a
                                                         href={card.download_url}
                                                         className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
-                                                        title="Download file"
+                                                        title={`Download ${card.title}`}
                                                     >
                                                         <Download className="h-3.5 w-3.5" />
                                                     </a>
@@ -643,7 +666,8 @@ export default function ProjectBoard({
                                         projectId={projectId}
                                         guestMode={guestMode}
                                         shareToken={shareToken}
-                                        initialCount={(card as any).comments_count}
+                                        initialCount={card.comments_count}
+                                        onCountChange={makeCountHandler(`${card.type}-${card.id}`)}
                                     />
                                     <button
                                         type="button"
@@ -874,6 +898,16 @@ export default function ProjectBoard({
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-slate-600">{__('general.note_title') || 'Title'}</Label>
+                            <Input
+                                value={noteForm.title}
+                                onChange={(e) => setNoteForm({ ...noteForm, title: e.target.value })}
+                                placeholder={__('general.note_title_placeholder') || 'Give your note a short title…'}
+                                maxLength={255}
+                                className="rounded-xl border-slate-200 text-sm focus:ring-slate-300"
+                            />
+                        </div>
                         <div className="space-y-1">
                             <Label className="text-xs font-bold text-slate-600">Note Content</Label>
                             <Textarea
@@ -1152,8 +1186,8 @@ export default function ProjectBoard({
                                                 {__(`general.${viewingCard.type === 'note' ? 'note' : viewingCard.type === 'task' ? 'task' : viewingCard.type === 'todo' ? 'todo' : viewingCard.type === 'file' ? 'file' : 'report'}`) || meta.label}
                                             </span>
                                         </div>
-                                        <DialogTitle className="text-lg font-bold text-slate-900 mt-1">
-                                            {viewingCard.title}
+                                        <DialogTitle className="text-lg font-bold text-slate-900 mt-1 break-words">
+                                            {viewingCard.title || __('general.sticky_note')}
                                         </DialogTitle>
                                         {(viewingCard.published_at || viewingCard.due_at) && (
                                             <p className="mt-1 text-xs text-slate-400">
@@ -1207,6 +1241,12 @@ export default function ProjectBoard({
                                             className="prose prose-slate max-w-none prose-headings:font-heading prose-a:text-emerald-600 prose-pre:bg-slate-900 prose-pre:text-slate-100"
                                             dangerouslySetInnerHTML={{ __html: reportHtml }}
                                         />
+                                    ) : isNote && viewingCard.content ? (
+                                        <p className="text-sm text-slate-700 whitespace-pre-wrap break-words">{viewingCard.content}</p>
+                                    ) : isNote ? (
+                                        <p className="text-sm text-slate-400 italic text-center py-8">
+                                            {__('general.no_content') || 'No content available.'}
+                                        </p>
                                     ) : viewingCard.description ? (
                                         <p className="text-sm text-slate-700 whitespace-pre-wrap">{viewingCard.description}</p>
                                     ) : (

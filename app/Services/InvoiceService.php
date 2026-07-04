@@ -21,6 +21,10 @@ class InvoiceService extends BaseService
                 $invoice->update(['discount' => $data['discount']]);
             }
 
+            if (isset($data['second_discount'])) {
+                $invoice->update(['second_discount' => $data['second_discount']]);
+            }
+
             // Will delete items after reassignment
 
             if (! empty($data['items'])) {

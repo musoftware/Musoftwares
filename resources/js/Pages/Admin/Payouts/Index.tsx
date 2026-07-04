@@ -16,21 +16,36 @@ import {
 import { Card, CardContent } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
+import { useState } from 'react';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ payouts, filters = {}, projects = [] }: any) {
     const paginationLinks = payouts.meta?.links || payouts.links;
+    const [pendingMarkPaid, setPendingMarkPaid] = useState<any>(null);
+    const [pendingDelete, setPendingDelete] = useState<any>(null);
 
-    const handleMarkPaid = (id) => {
-        if (confirm('Are you sure you want to mark this payout as paid? This will add balance to the user and then deduct it (recording the payout transaction).')) {
-            router.post(route('admin.payouts.mark-paid', id));
-        }
+    const confirmMarkPaid = () => {
+        if (!pendingMarkPaid) return;
+        const id = pendingMarkPaid;
+        setPendingMarkPaid(null);
+        router.post(route('admin.payouts.mark-paid', id), {}, {
+            preserveScroll: true,
+            onSuccess: () => toastSuccess(__('general.payout_marked_paid') || 'Payout marked as paid'),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+        });
     };
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this payout?')) {
-            router.delete(route('admin.payouts.destroy', id));
-        }
+    const confirmDelete = () => {
+        if (!pendingDelete) return;
+        const id = pendingDelete;
+        setPendingDelete(null);
+        router.delete(route('admin.payouts.destroy', id), {
+            preserveScroll: true,
+            onSuccess: () => toastSuccess(__('general.deleted') || 'Payout deleted'),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+        });
     };
 
     const getStatusBadge = (status) => {
@@ -131,13 +146,14 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {payout.status !== 'paid' && (
-                                                        <DropdownMenuItem onClick={() => handleMarkPaid(payout.id)}>
+                                                        <DropdownMenuItem onClick={() => setPendingMarkPaid(payout.id)}>
                                                             <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('general.mark_as_paid')}
                                                         </DropdownMenuItem>
                                                     )}
+
                                                     {payout.status !== 'paid' && (
-                                                        <DropdownMenuItem onClick={() => handleDelete(payout.id)} className="text-red-600 focus:text-red-600">
-                                                            <XCircle className="me-2 h-4 w-4" />Delete Payout
+                                                        <DropdownMenuItem onClick={() => setPendingDelete(payout.id)} className="text-red-600 focus:text-red-600">
+                                                            <XCircle className="me-2 h-4 w-4" />{__('general.delete_payout')}
                                                         </DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
@@ -165,8 +181,8 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
                                 key={i}
                                 href={link.url || '#'}
                                 className={`px-3 py-2 text-sm border ${
-                                    link.active 
-                                        ? 'z-10 bg-primary border-primary text-primary-foreground font-medium' 
+                                    link.active
+                                        ? 'z-10 bg-primary border-primary text-primary-foreground font-medium'
                                         : 'bg-background border-input text-muted-foreground hover:bg-muted'
                                 } ${i === 0 ? 'rounded-s-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-e-md' : ''}`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
@@ -175,6 +191,27 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={pendingMarkPaid !== null}
+                title={__('general.mark_as_paid') || 'Mark as paid?'}
+                description={__('general.confirm_mark_payout_paid_desc') || 'This will credit the user\'s wallet and add an offsetting transaction to balance it.'}
+                confirmLabel={__('general.mark_as_paid')}
+                cancelLabel={__('general.cancel')}
+                onConfirm={confirmMarkPaid}
+                onCancel={() => setPendingMarkPaid(null)}
+            />
+
+            <ConfirmModal
+                isOpen={pendingDelete !== null}
+                title={__('general.delete_payout') || 'Delete payout?'}
+                description={__('general.confirm_delete_payout_desc') || 'This will permanently delete the payout record.'}
+                confirmLabel={__('general.delete')}
+                cancelLabel={__('general.cancel')}
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setPendingDelete(null)}
+            />
         </AdminSidebarLayout>
     );
 }

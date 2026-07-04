@@ -20,7 +20,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
-import { useToast } from '@/Components/ui/use-toast';
+import { useToast, toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { __ } from '@/lib/i18n';
@@ -185,17 +185,17 @@ export default function Index({ todos, filters, stats, users }: Props) {
             put(route('admin.employee-todos.update', editingId), {
                 onSuccess: () => {
                     setShowModal(false);
-                    toast({ title: 'Todo updated successfully.' });
+                    toastSuccess(__('general.todo_updated') || 'Todo updated successfully.');
                 },
-                onError: () => toast({ title: 'Failed to update todo.', variant: 'destructive' }),
+                onError: () => toastError(__('general.failed_update_todo') || 'Failed to update todo.'),
             });
         } else {
             post(route('admin.employee-todos.store'), {
                 onSuccess: () => {
                     setShowModal(false);
-                    toast({ title: 'Todo created successfully.' });
+                    toastSuccess(__('general.todo_created') || 'Todo created successfully.');
                 },
-                onError: () => toast({ title: 'Failed to create todo.', variant: 'destructive' }),
+                onError: () => toastError(__('general.failed_create_todo') || 'Failed to create todo.'),
             });
         }
     };
@@ -207,9 +207,9 @@ export default function Index({ todos, filters, stats, users }: Props) {
         router.delete(route('admin.employee-todos.destroy', deleteId), {
             onSuccess: () => {
                 setDeleteId(null);
-                toast({ title: 'Todo deleted.' });
+                toastSuccess(__('general.todo_deleted') || 'Todo deleted.');
             },
-            onError: () => toast({ title: 'Failed to delete.', variant: 'destructive' }),
+            onError: () => toastError(__('general.failed_delete') || 'Failed to delete.'),
         });
     };
 

@@ -17,6 +17,8 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { Plus, Copy, ExternalLink, Trash2, MoreHorizontal, Search, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 
 interface ShortLinkItem {
     id: number;
@@ -56,6 +58,7 @@ export default function Index({ links, filters, translations }: Props) {
         label: '',
         expires_at: '',
     });
+    const [pendingDelete, setPendingDelete] = useState<ShortLinkItem | null>(null);
 
     const t = (key: string, fallback = key) => translations[key] ?? fallback;
 
@@ -80,6 +83,7 @@ export default function Index({ links, filters, translations }: Props) {
                 onSuccess: () => {
                     setForm({ destination_url: '', label: '', expires_at: '' });
                     setCreateOpen(false);
+                    toastSuccess('Short link created');
                 },
                 onError: () => {
                     toast.error(t('invalid_url', 'Please check the entered URL.'));
@@ -90,13 +94,22 @@ export default function Index({ links, filters, translations }: Props) {
     };
 
     const toggleStatus = (item: ShortLinkItem) => {
-        router.post(route('admin.shortlinks.toggle', item.id), {}, { preserveScroll: true });
+        router.post(route('admin.shortlinks.toggle', item.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => toastSuccess(item.is_active ? 'Link deactivated' : 'Link activated'),
+            onError: () => toastError('Failed to update link status'),
+        });
     };
 
-    const deleteLink = (item: ShortLinkItem) => {
-        if (confirm(t('confirm_delete'))) {
-            router.delete(route('admin.shortlinks.destroy', item.id), { preserveScroll: true });
-        }
+    const confirmDelete = () => {
+        if (!pendingDelete) return;
+        const id = pendingDelete.id;
+        setPendingDelete(null);
+        router.delete(route('admin.shortlinks.destroy', id), {
+            preserveScroll: true,
+            onSuccess: () => toastSuccess('Link deleted'),
+            onError: () => toastError('Failed to delete link'),
+        });
     };
 
     const onSearch = (value: string) => {
@@ -228,7 +241,7 @@ export default function Index({ links, filters, translations }: Props) {
                                                         {t('copy')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        onClick={() => deleteLink(item)}
+                                                        onClick={() => setPendingDelete(item)}
                                                         className="flex cursor-pointer items-center text-red-600 focus:text-red-700"
                                                     >
                                                         <Trash2 className="me-2 h-4 w-4" />
@@ -266,6 +279,17 @@ export default function Index({ links, filters, translations }: Props) {
                     )}
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={pendingDelete !== null}
+                title="Delete short link?"
+                description={`This will permanently delete "/l/${pendingDelete?.short_code}".`}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setPendingDelete(null)}
+            />
 
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogContent className="sm:max-w-[520px]">

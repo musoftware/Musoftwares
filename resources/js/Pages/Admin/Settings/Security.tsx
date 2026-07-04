@@ -6,6 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { ShieldAlert, Activity, Trash2, ShieldCheck } from 'lucide-react';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
 export default function Security({ blockedIps, rateLimits }: any) {
@@ -27,28 +28,33 @@ export default function Security({ blockedIps, rateLimits }: any) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         router.post(route('admin.settings.security.rate-limits.store'), form as any, {
-            onSuccess: () => setForm({
-                module: '',
-                tenant_id: '',
-                ip_address: '',
-                max_requests: 60,
-                decay_minutes: 1,
-                is_active: true
-            })
+            onSuccess: () => {
+                setForm({
+                    module: '',
+                    tenant_id: '',
+                    ip_address: '',
+                    max_requests: 60,
+                    decay_minutes: 1,
+                    is_active: true
+                });
+                toastSuccess(__('general.created') || 'Rate limit created');
+            },
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
         });
     };
 
     const confirmDelete = () => {
         if (!deleteModal.id) return;
-        if (deleteModal.type === 'ip') {
-            router.delete(route('admin.settings.security.unblock-ip', deleteModal.id), {
-                onSuccess: () => setDeleteModal({ open: false, type: 'ip', id: null })
-            });
-        } else {
-            router.delete(route('admin.settings.security.rate-limits.destroy', deleteModal.id), {
-                onSuccess: () => setDeleteModal({ open: false, type: 'rateLimit', id: null })
-            });
-        }
+        const id = deleteModal.id;
+        const isIp = deleteModal.type === 'ip';
+        setDeleteModal({ open: false, type: 'ip', id: null });
+        const routeName = isIp ? 'admin.settings.security.unblock-ip' : 'admin.settings.security.rate-limits.destroy';
+        router.delete(route(routeName, id), {
+            onSuccess: () => toastSuccess(isIp
+                ? (__('general.ip_unblocked') || 'IP unblocked')
+                : (__('general.deleted') || 'Rate limit deleted')),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+        });
     };
 
     return (

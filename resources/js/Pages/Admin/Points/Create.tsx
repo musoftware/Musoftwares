@@ -6,6 +6,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { ArrowDownLeft, Coins, ArrowUpRight } from 'lucide-react';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
 interface Props {
@@ -28,7 +29,11 @@ export default function Create({ client }: Props) {
         post(route('points.adjust', client.id), {
             onSuccess: () => {
                 reset();
-            }
+                toastSuccess(__('general.points_adjusted') || 'Points adjusted successfully.');
+            },
+            onError: () => {
+                toastError(__('general.error_occurred') || 'Something went wrong.');
+            },
         });
     };
 

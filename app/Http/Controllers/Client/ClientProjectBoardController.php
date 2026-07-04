@@ -43,6 +43,7 @@ class ClientProjectBoardController extends Controller
         $note = $project->boardNotes()->create([
             'author_id' => $request->user()->id,
             'for_date' => $date,
+            'title' => $data['title'] ?? null,
             'content' => $data['content'] ?? null,
             'color' => $data['color'] ?? 'yellow',
         ]);
@@ -61,6 +62,9 @@ class ClientProjectBoardController extends Controller
         $owned = $project->boardNotes()->whereKey($note->id)->firstOrFail();
 
         $data = $request->validated();
+        if (array_key_exists('title', $data)) {
+            $owned->title = $data['title'];
+        }
         if (array_key_exists('content', $data)) {
             $owned->content = $data['content'];
         }
@@ -641,15 +645,18 @@ class ClientProjectBoardController extends Controller
 
     private function noteToCard(ProjectBoardNote $note, ?ProjectBoardItem $placement): array
     {
+        $title = $note->title ?: ($note->content ? mb_strimwidth($note->content, 0, 80, '…') : __('general.sticky_note'));
+
         return [
             'type' => 'note',
             'id' => $note->id,
-            'title' => $note->content ?: __('general.sticky_note'),
+            'title' => $title,
             'lane' => $placement->lane ?? 'backlog',
             'pos_x' => $placement->pos_x ?? 24,
             'pos_y' => $placement->pos_y ?? 24,
             'color' => $note->color,
             'content' => $note->content,
+            'comments_count' => (int) $note->comments()->count(),
         ];
     }
 
@@ -665,6 +672,7 @@ class ClientProjectBoardController extends Controller
             'pos_y' => $placement->pos_y ?? 24,
             'priority' => $task->priority,
             'done' => method_exists($task, 'completed') ? $task->completed() : false,
+            'comments_count' => (int) $task->comments()->count(),
         ];
     }
 
@@ -686,6 +694,7 @@ class ClientProjectBoardController extends Controller
             'pos_y' => $placement->pos_y ?? 24,
             'completed' => (bool)$todo->completed,
             'checklist' => $checklist,
+            'comments_count' => (int) $todo->comments()->count(),
         ];
     }
 
@@ -702,6 +711,7 @@ class ClientProjectBoardController extends Controller
             'human_size' => $file->humanSize(),
             'mime' => $file->mime,
             'download_url' => route('client.projects.files.download', [$file->project_id, $file->id]),
+            'comments_count' => (int) $file->comments()->count(),
         ];
     }
 
@@ -717,6 +727,7 @@ class ClientProjectBoardController extends Controller
             'pos_x' => $placement->pos_x ?? 24,
             'pos_y' => $placement->pos_y ?? 24,
             'published_at' => optional($report->published_at)->toIso8601String(),
+            'comments_count' => (int) $report->comments()->count(),
         ];
     }
 }

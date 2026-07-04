@@ -35,6 +35,8 @@ interface CommentsPopoverProps {
     /** Compact trigger button (icon only) — defaults to false. */
     iconOnly?: boolean;
     className?: string;
+    /** Called whenever the comment count changes (initial fetch, post, etc.). */
+    onCountChange?: (count: number) => void;
 }
 
 const GUEST_NAME_KEY = 'musoftware.guest.name';
@@ -60,6 +62,7 @@ export default function CommentsPopover({
     initialCount,
     iconOnly = false,
     className,
+    onCountChange,
 }: CommentsPopoverProps) {
     const [open, setOpen] = useState(false);
     const [comments, setComments] = useState<BoardComment[]>(initialComments ?? []);
@@ -69,6 +72,15 @@ export default function CommentsPopover({
     const [guestName, setGuestName] = useState('');
     const [guestEmail, setGuestEmail] = useState('');
     const listRef = useRef<HTMLDivElement | null>(null);
+    const onCountChangeRef = useRef<typeof onCountChange>(onCountChange);
+    // null sentinel = "never reported a real count yet".
+    // Avoids emitting 0 on mount when the real count comes from `initialCount`.
+    const lastReportedCountRef = useRef<number | null>(null);
+    const hasInitialCount = typeof initialCount === 'number';
+
+    useEffect(() => {
+        onCountChangeRef.current = onCountChange;
+    }, [onCountChange]);
 
     // Read guest identity from localStorage so returning guests only type it once.
     useEffect(() => {
@@ -84,6 +96,25 @@ export default function CommentsPopover({
     }, [guestMode]);
 
     const count = useMemo(() => comments.length, [comments]);
+
+    // Report count changes to parent only after we have an authoritative value
+    // (either an explicit count from the server response, or after the comments
+    // list has been fetched at least once). This prevents emitting `0` on mount
+    // when `initialCount` was already known, which would clobber the badge.
+    useEffect(() => {
+        if (lastReportedCountRef.current === null) {
+            if (open) {
+                lastReportedCountRef.current = hasInitialCount ? initialCount! : count;
+                if (lastReportedCountRef.current !== (hasInitialCount ? initialCount! : count)) {
+                    onCountChangeRef.current?.(lastReportedCountRef.current);
+                }
+            }
+            return;
+        }
+        if (count === lastReportedCountRef.current) return;
+        lastReportedCountRef.current = count;
+        onCountChangeRef.current?.(count);
+    }, [count, open, hasInitialCount, initialCount]);
 
     const fetchComments = useCallback(async () => {
         setLoading(true);
@@ -103,14 +134,21 @@ export default function CommentsPopover({
                 });
             }
             const { data } = await axios.get<{ comments: BoardComment[]; count?: number }>(url);
-            setComments(Array.isArray(data?.comments) ? data.comments : []);
+            const next = Array.isArray(data?.comments) ? data.comments : [];
+            setComments(next);
+            if (typeof data?.count === 'number') {
+                if (lastReportedCountRef.current !== data.count) {
+                    lastReportedCountRef.current = data.count;
+                    onCountChangeRef.current?.(data.count);
+                }
+            }
         } catch (e) {
             // Keep the popover usable even if the list fails — user can still try to post.
             console.warn('Failed to load comments', e);
         } finally {
             setLoading(false);
         }
-    }, [card.id, card.type, guestMode, projectId, shareToken]);
+    }, [card.id, card.type, guestMode, projectId, shareToken, onCountChange]);
 
     // Lazy-load on first open; refresh whenever the popover re-opens.
     useEffect(() => {

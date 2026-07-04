@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Helpers\FinanceHelper;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\DB;
 
 class CostTransaction extends Model
@@ -22,7 +24,7 @@ class CostTransaction extends Model
             }
             $currency = $costTransaction->currency_id;
             $businessCurrencyId = \App\Models\AdminSettings::business_currency();
-            
+
             $date = $costTransaction->created_at ?? now();
             $costTransaction->business_amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
                 $date,
@@ -54,6 +56,22 @@ class CostTransaction extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function recurringSources(): BelongsToMany
+    {
+        return $this->belongsToMany(RecurringCost::class, 'recurring_cost_transactions', 'cost_transaction_id', 'recurring_cost_id')
+            ->withPivot([]);
+    }
+
+    public function scopeExcludingSalaries(Builder $query): Builder
+    {
+        return $query->where('reason', '!=', 'salary');
+    }
+
+    public function scopeInYearMonth(Builder $query, int $year, int $month): Builder
+    {
+        return $query->whereYear('created_at', $year)->whereMonth('created_at', $month);
+    }
+
     public function amount_str()
     {
         return FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
@@ -81,9 +99,11 @@ class CostTransaction extends Model
         $c->reason = $reason;
         $c->currency = $currency ?? optional($user)->currency_id;
 
-        DB::transaction(function () use ($c, $project, $amount, $user) {
+        DB::transaction(function () use ($c, $user) {
             $c->save();
-            optional($user)->increment('total_cost', $amount);
+            if ($user) {
+                \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+            }
         });
         return $c->id;
     }

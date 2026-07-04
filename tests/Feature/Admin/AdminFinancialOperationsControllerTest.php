@@ -80,7 +80,7 @@ class AdminFinancialOperationsControllerTest extends TestCase
         $cost = CostTransaction::forceCreate([
             'reason' => 'Test',
             'amount' => 100,
-            'currency' => 1,
+            'currency_id' => 1,
             'business_amount' => 100
         ]);
 

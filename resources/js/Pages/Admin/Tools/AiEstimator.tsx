@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Bot, Calculator, Clock, Loader2 } from 'lucide-react';
+import { toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 import axios from 'axios';
 import { formatMoney } from '@/lib/utils';
@@ -54,6 +56,7 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
             }
         } catch (err: any) {
             setError(err.response?.data?.error || 'An error occurred while estimating.');
+            toastError('Estimator failed');
         } finally {
             setLoading(false);
         }
@@ -86,10 +89,9 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div className="space-y-2">
                                 <Label htmlFor="income">{__('admin.expected_monthly_income')}</Label>
-                                <input
+                                <Input
                                     id="income"
                                     type="number"
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     value={income || ''}
                                     onChange={(e) => setIncome(parseFloat(e.target.value) || 0)}
                                     placeholder="e.g. 5000"
@@ -97,10 +99,9 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="days">{__('admin.work_days_per_month')}</Label>
-                                <input
+                                <Input
                                     id="days"
                                     type="number"
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     value={days || ''}
                                     onChange={(e) => setDays(parseFloat(e.target.value) || 0)}
                                     placeholder="e.g. 20"
@@ -108,10 +109,9 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="hours">{__('admin.hours_per_day')}</Label>
-                                <input
+                                <Input
                                     id="hours"
                                     type="number"
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     value={hours || ''}
                                     onChange={(e) => setHours(parseFloat(e.target.value) || 0)}
                                     placeholder="e.g. 8"

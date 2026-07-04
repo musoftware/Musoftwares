@@ -65,7 +65,7 @@ class FinancialOperationsTest extends TestCase
         $cost = new CostTransaction();
         $cost->reason = 'server';
         $cost->amount = 100;
-        $cost->currency = 1;
+        $cost->currency_id = 1;
         $cost->status = 'pending';
         $cost->business_amount = 100;
         $cost->save();
@@ -94,7 +94,7 @@ class FinancialOperationsTest extends TestCase
         $cost = new CostTransaction();
         $cost->reason = 'server';
         $cost->amount = 100;
-        $cost->currency = 1;
+        $cost->currency_id = 1;
         $cost->status = 'pending';
         $cost->business_amount = 100;
         $cost->save();
@@ -111,7 +111,7 @@ class FinancialOperationsTest extends TestCase
         $cost = new CostTransaction();
         $cost->reason = 'server';
         $cost->amount = 100;
-        $cost->currency = 1;
+        $cost->currency_id = 1;
         $cost->status = 'pending';
         $cost->business_amount = 100;
         $cost->save();

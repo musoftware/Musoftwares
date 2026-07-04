@@ -97,18 +97,26 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
         }
     };
 
+    const findExchangeRate = (fromCurr: number, toCurr: number): number | null => {
+        const direct = exchanges.find(e => Number(e.currency1) === Number(fromCurr) && Number(e.currency2) === Number(toCurr));
+        if (direct) return direct.rate;
+        const inverse = exchanges.find(e => Number(e.currency1) === Number(toCurr) && Number(e.currency2) === Number(fromCurr));
+        if (inverse && inverse.rate) return 1 / inverse.rate;
+        return null;
+    };
+
     const handleExchangeCalc = (amt: number, fromCurr: number) => {
-        const exchange = exchanges.find(e => Number(e.currency1) === Number(fromCurr) && Number(e.currency2) === Number(currencyId));
-        if (exchange) {
-            setToAmount(Math.floor(amt * exchange.rate * 1000) / 1000);
+        const rate = findExchangeRate(fromCurr, currencyId);
+        if (rate !== null && amt > 0) {
+            setToAmount(Math.floor(amt * rate * 1000) / 1000);
         } else {
-            setToAmount(0); // Add default fallback if no direct rate found, or implement inverse lookup
+            setToAmount(0);
         }
     };
 
     const applyExchange = () => {
         if (toAmount <= 0) {
-            toast.error('Amount must be greater than zero');
+            toast.error(__('general.amount_must_be_positive') || 'Amount must be greater than zero');
             return;
         }
         setAmount(toAmount);
@@ -118,19 +126,19 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
     const handleAdd = () => {
         const numAmount = Number(amount);
         if (numAmount <= 0) {
-            toast.error('Amount is zero or invalid.');
+            toast.error(__('general.amount_invalid') || 'Amount is zero or invalid.');
             return;
         }
         if (numAmount > maxAmount) {
-            toast.error('Amount exceeds available source balance.');
+            toast.error(__('general.amount_exceeds_balance') || 'Amount exceeds available source balance.');
             return;
         }
         if (!sourceProject || !targetProject) {
-            toast.error('Select source and target projects.');
+            toast.error(__('general.select_source_target') || 'Select source and target projects.');
             return;
         }
         if (sourceProject === targetProject) {
-            toast.error('Source and target cannot be the same.');
+            toast.error(__('general.source_target_same') || 'Source and target cannot be the same.');
             return;
         }
 

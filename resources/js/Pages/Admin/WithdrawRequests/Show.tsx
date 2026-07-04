@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { useToast } from '@/Components/ui/use-toast';
+import { useToast, toastSuccess, toastError } from '@/Components/ui/use-toast';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { ArrowLeft, User, Wallet, Calendar, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
@@ -42,8 +43,8 @@ export default function Show({ withdrawRequest }: Props) {
             `/admin/withdraw-requests/${withdrawRequest.id}`,
             { status },
             {
-                onSuccess: () => toast({ title: `Status updated to "${status}".` }),
-                onError: () => toast({ title: 'Failed to update status.', variant: 'destructive' }),
+                onSuccess: () => toastSuccess(__('general.status_updated_to', { status }) || `Status updated to "${status}".`),
+                onError: () => toastError(__('general.failed_update_status') || 'Failed to update status.'),
                 onFinish: () => setLoading(false),
             }
         );

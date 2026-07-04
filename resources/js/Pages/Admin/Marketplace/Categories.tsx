@@ -1,116 +1,149 @@
+import React, { useState } from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
-import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Textarea } from '@/Components/ui/textarea';
+import { Plus, Trash2, FolderTree } from 'lucide-react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/Components/ui/table';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { EmptyState } from '@/Components/ui/EmptyState';
+import { toast } from 'sonner';
 
 export default function Categories({ categories }: any) {
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
+    const { data, setData, post, processing, reset, errors } = useForm({
+        name: '',
+        description: '',
+    });
+    const [pendingDelete, setPendingDelete] = useState<number | null>(null);
 
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(
-            route('admin.marketplace.categories.store'),
-            { name, description },
-            {
-                onSuccess: () => {
-                    setName('');
-                    setDescription('');
-                },
+        post(route('admin.marketplace.categories.store'), {
+            onSuccess: () => {
+                reset();
+                toast.success(__('general.created') || 'Created');
             },
-        );
+            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+        });
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure?')) {
-            router.delete(route('admin.marketplace.categories.destroy', id));
-        }
+    const handleDelete = () => {
+        if (!pendingDelete) return;
+        router.delete(route('admin.marketplace.categories.destroy', pendingDelete), {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(__('general.deleted') || 'Deleted');
+                setPendingDelete(null);
+            },
+            onError: () => {
+                toast.error(__('general.error_occurred') || 'Something went wrong');
+                setPendingDelete(null);
+            },
+        });
     };
 
     return (
-        <AdminSidebarLayout title={__('general.marketplace_categories')} header="Marketplace Categories">
+        <AdminSidebarLayout title={__('general.marketplace_categories')} header={__('general.marketplace_categories')}>
             <Head title={__('general.marketplace_categories')} />
-            <div className="py-12">
-                <div className="mx-auto flex max-w-7xl gap-6 sm:px-6 lg:px-8">
-                    <div className="h-fit w-1/3 bg-white p-6 shadow-sm sm:rounded-lg">
-                        <h3 className="mb-4 text-lg font-bold">{__('general.add_category')}</h3>
-                        <form onSubmit={handleCreate}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    {__('general.name')}</label>
-                                <input
-                                    required
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-900 focus:ring-slate-900"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    {__('general.description')}</label>
-                                <textarea
-                                    value={description}
-                                    onChange={(e) =>
-                                        setDescription(e.target.value)
-                                    }
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-900 focus:ring-slate-900"
-                                ></textarea>
-                            </div>
-                            <button
-                                type="submit"
-                                className="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-900"
-                            >
-                                {__('general.save')}</button>
-                        </form>
-                    </div>
 
-                    <div className="w-2/3 bg-white p-6 shadow-sm sm:rounded-lg">
-                        <h3 className="mb-4 text-lg font-bold">{__('general.categories_list')}</h3>
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                        {__('general.name')}</th>
-                                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                        {__('general.slug')}</th>
-                                    <th className="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">
-                                        {__('general.actions')}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {categories.map((cat: any) => (
-                                    <tr key={cat.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {cat.name}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                                            {cat.slug}
-                                        </td>
-                                        <td className="px-6 py-4 text-end text-sm font-medium whitespace-nowrap">
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(cat.id)
-                                                }
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                {__('general.delete')}</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {categories.length === 0 && (
-                                    <tr>
-                                        <td
-                                            colSpan={3}
-                                            className="px-6 py-4 text-center text-gray-500"
-                                        >{__('general.no_categories_found')}</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1">
+                    <Card>
+                        <CardContent className="p-6">
+                            <h3 className="mb-4 text-lg font-bold">{__('general.add_category')}</h3>
+                            <form onSubmit={handleCreate} className="space-y-4">
+                                <div>
+                                    <Label htmlFor="name">{__('general.name')}</Label>
+                                    <Input
+                                        id="name"
+                                        required
+                                        value={data.name}
+                                        onChange={(e) => setData('name', e.target.value)}
+                                    />
+                                    {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
+                                </div>
+                                <div>
+                                    <Label htmlFor="description">{__('general.description')}</Label>
+                                    <Textarea
+                                        id="description"
+                                        rows={3}
+                                        value={data.description}
+                                        onChange={(e) => setData('description', e.target.value)}
+                                    />
+                                </div>
+                                <Button type="submit" disabled={processing} className="w-full gap-2">
+                                    <Plus className="w-4 h-4" />{__('general.save')}
+                                </Button>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="lg:col-span-2">
+                    <Card>
+                        <CardContent className="p-6">
+                            <h3 className="mb-4 text-lg font-bold">{__('general.categories_list')}</h3>
+                            {categories.length === 0 ? (
+                                <EmptyState
+                                    icon={FolderTree}
+                                    title={__('general.no_categories_found')}
+                                    description={__('general.create_your_first_category') || 'Create your first marketplace category.'}
+                                />
+                            ) : (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-muted/50">
+                                            <TableHead className="uppercase text-xs">{__('general.name')}</TableHead>
+                                            <TableHead className="uppercase text-xs">{__('general.slug')}</TableHead>
+                                            <TableHead className="text-end uppercase text-xs">{__('general.actions')}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {categories.map((cat: any) => (
+                                            <TableRow key={cat.id}>
+                                                <TableCell className="font-medium">{cat.name}</TableCell>
+                                                <TableCell className="text-slate-500 font-mono text-sm">{cat.slug}</TableCell>
+                                                <TableCell className="text-end">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => setPendingDelete(cat.id)}
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 me-1" />{__('general.delete')}
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={pendingDelete !== null}
+                title={__('general.delete') || 'Delete?'}
+                description={__('general.confirm_delete_category') || 'This category will be permanently deleted.'}
+                confirmLabel={__('general.delete')}
+                cancelLabel={__('general.cancel')}
+                variant="danger"
+                onConfirm={handleDelete}
+                onCancel={() => setPendingDelete(null)}
+            />
         </AdminSidebarLayout>
     );
 }

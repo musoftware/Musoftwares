@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -8,7 +8,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/Components/ui/card';
 import { __ } from '@/lib/i18n';
 import { Loader2, Plus, Trash2, Save, FileText } from 'lucide-react';
-import axios from 'axios';
+import { toast } from 'sonner';
 
 export default function Form({ contract, priceItems, currencies, exchangeRates }: any) {
     const { data: formData, setData: setFormData, post, put, processing: isLoading, errors } = useForm({
@@ -74,23 +74,24 @@ export default function Form({ contract, priceItems, currencies, exchangeRates }
     const saveAsGlobalItem = async (index: number) => {
         const itemData = formData.content.pricing_items[index];
         if (!itemData.item || !itemData.price) {
-            alert('Title and Price are required to save to the global price list.');
+            toast.error(__('general.title_and_price_required') || 'Title and Price are required to save to the global price list.');
             return;
         }
 
-        try {
-            const res = await axios.post('/admin/contract-price-items', {
-                name: itemData.item,
-                description: itemData.description,
-                default_price: itemData.price,
-                currency_id: itemData.currency_id || formData.currency_id,
-            });
-            setGlobalItems([...globalItems, res.data]);
-            alert('Item added to Global Price List.');
-        } catch (e) {
-            console.error(e);
-            alert('Failed to save global item.');
-        }
+        router.post('/admin/contract-price-items', {
+            name: itemData.item,
+            description: itemData.description,
+            default_price: itemData.price,
+            currency_id: itemData.currency_id || formData.currency_id,
+        }, {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const created = (page?.props as any)?.flash?.item ?? null;
+                if (created) setGlobalItems([...globalItems, created]);
+                toast.success(__('general.added_to_global_price_list') || 'Item added to Global Price List');
+            },
+            onError: () => toast.error(__('general.failed_save_global_item') || 'Failed to save global item.'),
+        });
     };
 
     return (

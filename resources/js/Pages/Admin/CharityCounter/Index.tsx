@@ -36,14 +36,19 @@ interface CharityCounterProps {
 }
 
 export default function CharityCounterIndex({ charityCounters, filters, stats }: CharityCounterProps) {
-  const [searchQuery, setSearchQuery] = useState(filters.search || '');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSubtractModalOpen, setIsSubtractModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState(filters.search || '');
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isSubtractModalOpen, setIsSubtractModalOpen] = useState(false);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.get(route('admin.charity-counter.index'), { search: searchQuery }, { preserveState: true });
-  };
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(route('admin.charity-counter.index'), { search: searchQuery }, { preserveState: true });
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
+        router.get(route('admin.charity-counter.index'));
+    };
 
   const addForm = useForm({
     amount: '',

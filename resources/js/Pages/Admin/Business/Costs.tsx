@@ -50,7 +50,11 @@ export default function Costs() {
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin.costs.index'), { search: searchTerm }, { preserveState: true });
+        router.get(route('admin.costs.index'), {
+            search: searchTerm,
+            year: filters?.year,
+            month: filters?.month,
+        }, { preserveState: true });
     };
 
     const [deleteId, setDeleteId] = useState<number | null>(null);

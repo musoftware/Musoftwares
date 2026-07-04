@@ -15,7 +15,7 @@ import {
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt,
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
     ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown,
-    Bell
+    Bell, Mail
 } from 'lucide-react';
 
 export default function Show({ invoice }: { invoice: any }) {
@@ -42,6 +42,20 @@ export default function Show({ invoice }: { invoice: any }) {
             console.error("Failed to generate share link", error);
             alert(__('general.error_occurred'));
         }
+    };
+
+    const [isSendingNotification, setIsSendingNotification] = useState<'fcm' | 'email' | null>(null);
+
+    const handleSendNotification = (channel: 'fcm' | 'email') => {
+        setIsSendingNotification(channel);
+        router.post(
+            route('admin.invoices.notify', { invoice: String(invoice.id) }),
+            { channel },
+            {
+                preserveScroll: true,
+                onFinish: () => setIsSendingNotification(null),
+            }
+        );
     };
     
     // Feature states
@@ -983,7 +997,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                                     }
                                                                     setCostLines(newLines);
                                                                 }}
-                                                                asyncEndpoint={route('admin.resellers.search-users')}
+                                                                asyncEndpoint={route('admin.notifications.search_users')}
                                                                 placeholder={__('general.search_user')}
                                                                 searchPlaceholder="Search by name or email..."
                                                                 className="h-9"
@@ -997,7 +1011,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                             type="button"
                                                             onClick={(e) => {
                                                                 e.preventDefault();
-                                                                router.post(route('invoices.cost-lines.record-paid', { invoice: invoice.id, line: line.id }));
+                                                                router.post(route('admin.invoices.cost-lines.record-paid', { invoice: invoice.id, line: line.id }));
                                                             }}
                                                             className="bg-slate-900 hover:bg-slate-900 text-white h-8 px-3 text-xs font-semibold"
                                                         >
@@ -1088,14 +1102,40 @@ export default function Show({ invoice }: { invoice: any }) {
                         )}
 
                         {invoice.status !== 'cancelled' && invoice.user?.id && (
-                            <Button
-                                variant="outline"
-                                title={__('admin.send_fcm_notification')}
-                                onClick={() => router.post(route('admin.invoices.notify', { invoice: String(invoice.id) }))}
-                            >
-                                <Bell className="w-4 h-4 me-2" />
-                                {__('admin.send_fcm_notification')}
-                            </Button>
+                            <div className="inline-flex rounded-md shadow-sm" role="group">
+                                <Button
+                                    variant="outline"
+                                    title={__('admin.send_fcm_notification')}
+                                    disabled={isSendingNotification !== null}
+                                    onClick={() => handleSendNotification('fcm')}
+                                    className="rounded-e-none border-e-0"
+                                >
+                                    <Bell className="w-4 h-4 me-2" />
+                                    {isSendingNotification === 'fcm' ? __('general.saving') + '...' : __('admin.send_fcm_notification')}
+                                </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            disabled={isSendingNotification !== null}
+                                            className="rounded-s-none px-2 border-s"
+                                            title={__('admin.send_email_notification')}
+                                            aria-label={__('admin.send_email_notification')}
+                                        >
+                                            <ChevronDown className="w-4 h-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem
+                                            disabled={isSendingNotification !== null}
+                                            onClick={() => handleSendNotification('email')}
+                                        >
+                                            <Mail className="w-4 h-4 me-2" />
+                                            {isSendingNotification === 'email' ? __('general.saving') + '...' : __('admin.send_email_notification')}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         )}
                     </div>
                 </div>

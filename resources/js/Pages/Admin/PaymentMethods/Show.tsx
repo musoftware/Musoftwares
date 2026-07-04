@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { useToast } from '@/Components/ui/use-toast';
+import { useToast, toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 import {
     ArrowLeft,
@@ -103,8 +103,8 @@ export default function Show({ paymentMethod }: Props) {
             { status },
             {
                 preserveScroll: true,
-                onSuccess: () => toast({ title: `Payment method marked as ${statusLabel[status] ?? status}.` }),
-                onError:   () => toast({ title: 'Update failed.', variant: 'destructive' }),
+                onSuccess: () => toastSuccess(__('general.payment_method_marked_as', { status: statusLabel[status] ?? status }) || `Payment method marked as ${statusLabel[status] ?? status}.`),
+                onError:   () => toastError(__('general.update_failed') || 'Update failed.'),
             }
         );
     };

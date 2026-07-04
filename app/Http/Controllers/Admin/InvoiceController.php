@@ -593,13 +593,24 @@ class InvoiceController extends Controller
     /**
      * Notify the client about their invoice.
      *
-     * Dispatches the queued `InvoiceCreatedNotification` (mail + database +
-     * Kreait FCM via `MuFcmChannel`) and additionally sends an ad-hoc direct
-     * push through `FcmHelper` using the chart.cash-style data shape so older
-     * mobile clients that key off `order_id`/`type` keep working.
+     * Accepts an optional `channel` request parameter:
+     *   - 'all'   (default): mail + database + direct FCM push + Kreait FCM
+     *   - 'email': mail + database only (no push)
+     *   - 'fcm'  : direct FCM push only (no mail/database)
+     *
+     * When the channel allows queued channels, `InvoiceCreatedNotification` is
+     * dispatched (mail + database + Kreait FCM via `MuFcmChannel`). When the
+     * channel is 'fcm' (or 'all'), an ad-hoc direct push through `FcmHelper`
+     * is sent using the chart.cash-style data shape so older mobile clients
+     * that key off `order_id`/`type` keep working.
      */
-    public function notify(Invoice $invoice)
+    public function notify(Request $request, Invoice $invoice)
     {
+        $channel = $request->input('channel', 'all');
+        if (! in_array($channel, ['all', 'email', 'fcm'], true)) {
+            $channel = 'all';
+        }
+
         $invoice->loadMissing('user');
 
         $client = $invoice->user;
@@ -607,38 +618,50 @@ class InvoiceController extends Controller
             return redirect()->back()->with('success', __('admin.notification_sent'));
         }
 
-        try {
-            $client->notify(new InvoiceCreatedNotification($invoice));
-        } catch (\Throwable $e) {
-            \Log::error('Invoice notification failed for invoice #'.$invoice->id.': '.$e->getMessage());
-
-            return redirect()->back()->with('error', __('admin.notification_failed').': '.$e->getMessage());
+        $emailError = null;
+        if ($channel === 'all' || $channel === 'email') {
+            try {
+                $notif = new InvoiceCreatedNotification($invoice);
+                $notif->forceChannels = ['mail', 'database'];
+                $client->notify($notif);
+            } catch (\Throwable $e) {
+                \Log::error('Invoice email notification failed for invoice #'.$invoice->id.': '.$e->getMessage());
+                $emailError = $e->getMessage();
+            }
         }
 
         $fcmError = null;
-        try {
-            $tokens = $client->deviceTokens()->pluck('token')->filter()->values()->all();
-            if (! empty($tokens)) {
-                FcmHelper::send_push_notif_to_device(
-                    $tokens,
-                    [
-                        'title' => __('general.notif_invoice_created_title'),
-                        'description' => __('general.notif_invoice_created_body', [
-                            'invoice' => $invoice->invoice_number ?? '#'.$invoice->id,
-                        ]),
-                        'image' => '',
-                        'order_id' => (string) $invoice->id,
-                        'type' => 'invoice_created',
-                        'data_id' => (string) $invoice->id,
-                    ],
-                    url('/app/invoices/'.$invoice->id)
-                );
+        if ($channel === 'all' || $channel === 'fcm') {
+            try {
+                $tokens = $client->deviceTokens()->pluck('token')->filter()->values()->all();
+                if (! empty($tokens)) {
+                    FcmHelper::send_push_notif_to_device(
+                        $tokens,
+                        [
+                            'title' => __('general.notif_invoice_created_title'),
+                            'description' => __('general.notif_invoice_created_body', [
+                                'invoice' => $invoice->invoice_number ?? '#'.$invoice->id,
+                            ]),
+                            'image' => '',
+                            'order_id' => (string) $invoice->id,
+                            'type' => 'invoice_created',
+                            'data_id' => (string) $invoice->id,
+                        ],
+                        url('/app/invoices/'.$invoice->id)
+                    );
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('FcmHelper push failed for invoice #'.$invoice->id.': '.$e->getMessage());
+                $fcmError = $e->getMessage();
             }
-        } catch (\Throwable $e) {
-            \Log::warning('FcmHelper push failed for invoice #'.$invoice->id.': '.$e->getMessage());
-            $fcmError = $e->getMessage();
         }
 
+        if ($emailError !== null && $fcmError !== null) {
+            return redirect()->back()->with('error', __('admin.notification_failed').': '.$emailError.' / '.$fcmError);
+        }
+        if ($emailError !== null) {
+            return redirect()->back()->with('error', __('admin.notification_failed').': '.$emailError);
+        }
         if ($fcmError !== null) {
             return redirect()->back()->with('error', __('admin.notification_failed').': '.$fcmError);
         }

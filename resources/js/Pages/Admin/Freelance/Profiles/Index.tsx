@@ -5,20 +5,27 @@ import { Button } from '@/Components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
 import { MoreHorizontal, Edit, Trash2, User } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ profiles, filters }: any) {
   const [search, setSearch] = useState(filters.search || '');
+  const [pendingDelete, setPendingDelete] = useState<any>(null);
 
   const handleSearch = (e: any) => {
     e.preventDefault();
     router.get(route('admin.freelance.profiles.index'), { search }, { preserveState: true });
   };
 
-  const handleDelete = (id: any) => {
-    if (confirm('Are you sure you want to delete this profile?')) {
-      router.delete(route('admin.freelance.profiles.destroy', id));
-    }
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    const id = pendingDelete;
+    setPendingDelete(null);
+    router.delete(route('admin.freelance.profiles.destroy', id), {
+      onSuccess: () => toastSuccess('Profile deleted'),
+      onError: () => toastError('Failed to delete profile'),
+    });
   };
 
   return (
@@ -113,7 +120,7 @@ export default function Index({ profiles, filters }: any) {
                                             </DropdownMenuItem>
 
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => handleDelete(profile.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                            <DropdownMenuItem onClick={() => setPendingDelete(profile.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
                                                 <Trash2 className="me-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
@@ -150,6 +157,17 @@ export default function Index({ profiles, filters }: any) {
                     </div>
                 </div>
       }
+
+            <ConfirmModal
+                isOpen={pendingDelete !== null}
+                title="Delete profile?"
+                description="This profile will be permanently deleted."
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setPendingDelete(null)}
+            />
         </AdminSidebarLayout>);
 
 }

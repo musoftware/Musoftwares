@@ -99,11 +99,21 @@ export default function Show({ webhook }: Props) {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <FileJson className="w-5 h-5 text-slate-400" /> {__('general.headers')}</CardTitle>
+                                <FileJson className="w-5 h-5 text-slate-400" /> {__('general.headers')}
+                            </CardTitle>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(JSON.stringify(webhook.headers, null, 2));
+                                }}
+                                className="text-xs text-slate-500 hover:text-slate-900"
+                            >
+                                {__('general.copy') || 'Copy'}
+                            </button>
                         </CardHeader>
                         <CardContent>
                             <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">
-                                <pre className="text-slate-900 text-xs font-mono">
+                                <pre className="text-slate-100 text-xs font-mono">
                                     {JSON.stringify(webhook.headers, null, 2)}
                                 </pre>
                             </div>
@@ -114,11 +124,21 @@ export default function Show({ webhook }: Props) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <FileJson className="w-5 h-5 text-slate-400" /> {__('general.payload')}</CardTitle>
+                            <FileJson className="w-5 h-5 text-slate-400" /> {__('general.payload')}
+                        </CardTitle>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                navigator.clipboard.writeText(JSON.stringify(webhook.payload, null, 2));
+                            }}
+                            className="text-xs text-slate-500 hover:text-slate-900"
+                        >
+                            {__('general.copy') || 'Copy'}
+                        </button>
                     </CardHeader>
                     <CardContent>
                         <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">
-                            <pre className="text-slate-900 text-xs font-mono leading-relaxed">
+                            <pre className="text-slate-100 text-xs font-mono leading-relaxed">
                                 {JSON.stringify(webhook.payload, null, 2)}
                             </pre>
                         </div>

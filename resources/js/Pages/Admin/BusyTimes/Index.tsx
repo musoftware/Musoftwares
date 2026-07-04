@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DataTable } from '@/Components/ui/DataTable';
@@ -11,7 +11,8 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { MoreHorizontal, ToggleLeft, ToggleRight, Trash2, Clock, RefreshCw, CalendarDays, AlertCircle } from 'lucide-react';
-import { useToast } from '@/Components/ui/use-toast';
+import { useToast, toastSuccess, toastError } from '@/Components/ui/use-toast';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
 
 interface BusyTime {
@@ -44,8 +45,7 @@ interface Props {
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function Index({ busyTimes, filters, stats }: Props) {
-    const { toast } = useToast();
-
+    const [pendingDelete, setPendingDelete] = useState<BusyTime | null>(null);
     const handleFilter = (key: string, value: string) => {
         router.get(
             '/admin/busy-times',
@@ -77,17 +77,19 @@ export default function Index({ busyTimes, filters, stats }: Props) {
             {},
             {
                 preserveState: true,
-                onSuccess: () => toast({ title: `Busy time ${row.is_active ? 'deactivated' : 'activated'}.` }),
-                onError: () => toast({ title: 'Failed to update status.', variant: 'destructive' }),
+                onSuccess: () => toastSuccess(__('general.status_updated') || `Busy time ${row.is_active ? 'deactivated' : 'activated'}.`),
+                onError: () => toastError(__('general.failed_update_status') || 'Failed to update status.'),
             }
         );
     };
 
-    const handleDelete = (row: BusyTime) => {
-        if (!confirm(`Delete this busy time entry for ${row.user?.name ?? 'unknown user'}?`)) return;
-        router.delete(`/admin/busy-times/${row.id}`, {
-            onSuccess: () => toast({ title: 'Busy time deleted.' }),
-            onError: () => toast({ title: 'Failed to delete.', variant: 'destructive' }),
+    const confirmDelete = () => {
+        if (!pendingDelete) return;
+        const id = pendingDelete.id;
+        setPendingDelete(null);
+        router.delete(`/admin/busy-times/${id}`, {
+            onSuccess: () => toastSuccess(__('general.deleted') || 'Busy time deleted.'),
+            onError: () => toastError(__('general.failed_delete') || 'Failed to delete.'),
         });
     };
 
@@ -229,7 +231,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                             )}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            onClick={() => handleDelete(row)}
+                            onClick={() => setPendingDelete(row)}
                             className="text-red-600 focus:text-red-700"
                         >
                             <Trash2 className="me-2 h-4 w-4" /> {__('general.delete')}</DropdownMenuItem>
@@ -305,6 +307,17 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 onSort={handleSort}
                 emptyTitle="No busy times found"
                 emptyDescription="Users haven't configured any busy time slots yet."
+            />
+
+            <ConfirmModal
+                isOpen={pendingDelete !== null}
+                title={__('general.delete') || 'Delete busy time?'}
+                description={__('general.confirm_delete_busy_time') || `This will permanently delete the busy time entry for ${pendingDelete?.user?.name ?? 'unknown user'}.`}
+                confirmLabel={__('general.delete')}
+                cancelLabel={__('general.cancel')}
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setPendingDelete(null)}
             />
         </AdminSidebarLayout>
     );

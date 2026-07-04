@@ -14,6 +14,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { MoreHorizontal, Edit, Trash2, CheckCircle, XCircle, Ban } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ skills, filters }: any) {
@@ -27,6 +29,8 @@ export default function Index({ skills, filters }: any) {
   });
   const [bulkSkills, setBulkSkills] = useState('');
   const [search, setSearch] = useState(filters.search || '');
+  const [pendingDelete, setPendingDelete] = useState<any>(null);
+  const [pendingBlock, setPendingBlock] = useState<any>(null);
 
   const handleSearch = (e: any) => {
     e.preventDefault();
@@ -39,7 +43,9 @@ export default function Index({ skills, filters }: any) {
       onSuccess: () => {
         setIsCreateOpen(false);
         resetForm();
-      }
+        toastSuccess('Skill created');
+      },
+      onError: () => toastError('Failed to create skill'),
     });
   };
 
@@ -49,7 +55,9 @@ export default function Index({ skills, filters }: any) {
       onSuccess: () => {
         setIsBulkCreateOpen(false);
         setBulkSkills('');
-      }
+        toastSuccess('Skills added');
+      },
+      onError: () => toastError('Failed to add skills'),
     });
   };
 
@@ -61,7 +69,9 @@ export default function Index({ skills, filters }: any) {
         setIsEditOpen(false);
         setEditingSkill(null);
         resetForm();
-      }
+        toastSuccess('Skill updated');
+      },
+      onError: () => toastError('Failed to update skill'),
     });
   };
 
@@ -81,24 +91,41 @@ export default function Index({ skills, filters }: any) {
     setIsEditOpen(true);
   };
 
-  const handleDelete = (id: any) => {
-    if (confirm('Are you sure you want to delete this skill permanently?')) {
-      router.delete(route('admin.freelance.skills.destroy', id));
-    }
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    const id = pendingDelete;
+    setPendingDelete(null);
+    router.delete(route('admin.freelance.skills.destroy', id), {
+      onSuccess: () => toastSuccess('Skill deleted'),
+      onError: () => toastError('Failed to delete skill'),
+    });
   };
 
   const handleApprove = (id: any) => {
-    router.post(route('admin.freelance.skills.approve', id), {}, { preserveScroll: true });
+    router.post(route('admin.freelance.skills.approve', id), {}, {
+      preserveScroll: true,
+      onSuccess: () => toastSuccess('Skill approved'),
+      onError: () => toastError('Failed to approve skill'),
+    });
   };
 
   const handleReject = (id: any) => {
-    router.post(route('admin.freelance.skills.reject', id), {}, { preserveScroll: true });
+    router.post(route('admin.freelance.skills.reject', id), {}, {
+      preserveScroll: true,
+      onSuccess: () => toastSuccess('Skill declined'),
+      onError: () => toastError('Failed to decline skill'),
+    });
   };
 
-  const handleBlockUser = (userId: any, userName: string) => {
-    if (confirm(`Are you sure you want to block ${userName} from adding new skills?`)) {
-      router.post(route('admin.freelance.skills.block-user', userId), {}, { preserveScroll: true });
-    }
+  const confirmBlockUser = () => {
+    if (!pendingBlock) return;
+    const { userId, userName } = pendingBlock;
+    setPendingBlock(null);
+    router.post(route('admin.freelance.skills.block-user', userId), {}, {
+      preserveScroll: true,
+      onSuccess: () => toastSuccess(`${userName} blocked from adding new skills`),
+      onError: () => toastError('Failed to block user'),
+    });
   };
 
   const renderFormFields = () =>
@@ -256,14 +283,14 @@ export default function Index({ skills, filters }: any) {
                                             </DropdownMenuItem>
                                             
                                             {skill.creator &&
-                    <DropdownMenuItem onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="cursor-pointer text-yellow-600">
+                    <DropdownMenuItem onClick={() => setPendingBlock({ userId: skill.creator.id, userName: skill.creator.name })} className="cursor-pointer text-yellow-600">
                                                     <Ban className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.block_user_skills', undefined, 'Block User')}</span>
                                                 </DropdownMenuItem>
                     }
 
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => handleDelete(skill.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                            <DropdownMenuItem onClick={() => setPendingDelete(skill.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
                                                 <Trash2 className="me-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
@@ -318,6 +345,27 @@ export default function Index({ skills, filters }: any) {
                     </form>
                 </DialogContent>
             </Dialog>
-        </AdminSidebarLayout>);
 
+            <ConfirmModal
+                isOpen={pendingDelete !== null}
+                title="Delete skill?"
+                description="This skill will be permanently deleted."
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setPendingDelete(null)}
+            />
+
+            <ConfirmModal
+                isOpen={pendingBlock !== null}
+                title={`Block ${pendingBlock?.userName || 'user'}?`}
+                description="This user will no longer be able to add new skills."
+                confirmLabel="Block User"
+                cancelLabel="Cancel"
+                variant="danger"
+                onConfirm={confirmBlockUser}
+                onCancel={() => setPendingBlock(null)}
+            />
+        </AdminSidebarLayout>);
 }

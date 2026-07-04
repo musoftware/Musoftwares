@@ -14,6 +14,8 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
 
     public $invoice;
 
+    public ?array $forceChannels = null;
+
     public function __construct($invoice)
     {
         $this->invoice = $invoice;
@@ -21,6 +23,10 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
+        if (is_array($this->forceChannels) && ! empty($this->forceChannels)) {
+            return $this->forceChannels;
+        }
+
         return \App\Models\AdminSettings::invoiceNotificationChannels('invoice_created');
     }
 

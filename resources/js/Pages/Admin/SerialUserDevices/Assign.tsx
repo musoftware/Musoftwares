@@ -8,6 +8,7 @@ import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Textarea } from '@/Components/ui/textarea';
 import { ArrowLeft, Monitor, User } from 'lucide-react';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
 interface AvailableDevice {
@@ -31,8 +32,16 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+        setErrors({});
         router.post(route('admin.serial-user-devices.store'), form, {
-            onError: errs => setErrors(errs),
+            onSuccess: () => {
+                toastSuccess(__('general.assignment_created') || 'Device assigned successfully');
+                setForm({ user_id: '', device_id: '', status: 'active', notes: '' });
+            },
+            onError: (errs: any) => {
+                setErrors(errs);
+                toastError(errs.error || errs.message || __('general.error_occurred') || 'Something went wrong');
+            },
         });
     };
 
@@ -41,88 +50,82 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
     return (
         <AdminSidebarLayout title={__('general.assign_device')} header="Assign Device">
             <Head title={__('general.assign_device')} />
-            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-3xl mx-auto space-y-6">
                 <div className="flex items-center gap-3">
-                    <Link href={route('admin.serial-user-devices.index')} className="text-zinc-400 hover:text-white transition-colors">
+                    <Link href={route('admin.serial-user-devices.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-xl font-bold text-white">{__('general.assign_device_to_user')}</h1>
-                        <p className="text-zinc-400 text-sm">{availableDevices.length} unassigned devices available</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.assign_device_to_user')}</h1>
+                        <p className="text-slate-500 text-sm">{availableDevices.length} unassigned devices available</p>
                     </div>
                 </div>
 
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card>
                     <CardContent className="p-6">
                         <form onSubmit={submit} className="space-y-5">
-                            {/* Device Selection */}
                             <div className="space-y-2">
-                                <Label className="text-zinc-300 font-medium">{__('general.device')}</Label>
+                                <Label>{__('general.device')}</Label>
                                 <Select value={form.device_id} onValueChange={v => setForm(f => ({ ...f, device_id: v || '' }))}>
-                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                    <SelectTrigger>
                                         <SelectValue placeholder={__('general.select_a_device')} />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-zinc-700 max-h-60">
+                                    <SelectContent className="max-h-60">
                                         {availableDevices.map(d => (
                                             <SelectItem key={d.device_id} value={d.device_id}>
-                                                <span className="font-mono text-xs text-slate-200">{d.device_id}</span>
-                                                <span className="text-zinc-400 ms-2">· {d.machine_name}</span>
+                                                <span className="font-mono text-xs">{d.device_id}</span>
+                                                <span className="text-slate-500 ms-2">· {d.machine_name}</span>
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.device_id && <p className="text-red-400 text-xs">{errors.device_id}</p>}
+                                {errors.device_id && <p className="text-sm text-destructive">{errors.device_id}</p>}
                             </div>
 
-                            {/* Device Preview */}
                             {selectedDevice && (
-                                <div className="bg-zinc-800 rounded-lg p-3 flex items-center gap-3 text-sm">
-                                    <Monitor className="w-4 h-4 text-zinc-400 shrink-0" />
+                                <div className="bg-slate-50 rounded-lg p-3 flex items-center gap-3 text-sm border">
+                                    <Monitor className="w-4 h-4 text-slate-500 shrink-0" />
                                     <div>
-                                        <p className="text-zinc-300">{selectedDevice.machine_name} <span className="text-zinc-500">({selectedDevice.user_name})</span></p>
-                                        {selectedDevice.software && <p className="text-zinc-500 text-xs">{selectedDevice.software.name}</p>}
+                                        <p className="text-slate-700">{selectedDevice.machine_name} <span className="text-slate-500">({selectedDevice.user_name})</span></p>
+                                        {selectedDevice.software && <p className="text-slate-500 text-xs">{selectedDevice.software.name}</p>}
                                     </div>
                                 </div>
                             )}
 
-                            {/* User Selection */}
                             <div className="space-y-2">
-                                <Label className="text-zinc-300 font-medium">{__('general.assign_to_user')}</Label>
+                                <Label>{__('general.assign_to_user')}</Label>
                                 <Select value={form.user_id} onValueChange={v => setForm(f => ({ ...f, user_id: v || '' }))}>
-                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                    <SelectTrigger>
                                         <SelectValue placeholder={__('general.select_a_user')} />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-zinc-700 max-h-60">
+                                    <SelectContent className="max-h-60">
                                         {users.map(u => (
                                             <SelectItem key={u.id} value={String(u.id)}>
-                                                <span className="text-white">{u.name}</span>
-                                                <span className="text-zinc-500 ms-2 text-xs">{u.email}</span>
+                                                <span>{u.name}</span>
+                                                <span className="text-slate-500 ms-2 text-xs">{u.email}</span>
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.user_id && <p className="text-red-400 text-xs">{errors.user_id}</p>}
+                                {errors.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
                             </div>
 
-                            {/* Status */}
                             <div className="space-y-2">
-                                <Label className="text-zinc-300 font-medium">{__('general.initial_status')}</Label>
+                                <Label>{__('general.initial_status')}</Label>
                                 <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v || 'active' }))}>
-                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                    <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-zinc-700">
+                                    <SelectContent>
                                         <SelectItem value="active">{__('general.active')}</SelectItem>
                                         <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
-                            {/* Notes */}
                             <div className="space-y-2">
-                                <Label className="text-zinc-300 font-medium">Notes (optional)</Label>
+                                <Label>Notes (optional)</Label>
                                 <Textarea
-                                    className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 resize-none"
                                     placeholder={__('general.internal_notes_about_this_assignment')}
                                     rows={3}
                                     value={form.notes}
@@ -131,9 +134,9 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                             </div>
 
                             <div className="flex gap-3 pt-2">
-                                <Button type="submit" className="bg-slate-900 hover:bg-slate-900 text-white">{__('general.assign_device')}</Button>
+                                <Button type="submit">{__('general.assign_device')}</Button>
                                 <Link href={route('admin.serial-user-devices.index')}>
-                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white">{__('general.cancel')}</Button>
+                                    <Button type="button" variant="outline">{__('general.cancel')}</Button>
                                 </Link>
                             </div>
                         </form>

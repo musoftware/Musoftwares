@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 
 interface Currency {
     id: number;
@@ -212,18 +213,31 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
     const set = <K extends keyof SettingsData>(key: K, value: SettingsData[K]) =>
         setForm((prev) => ({ ...prev, [key]: value }));
 
+    const [pendingBulk, setPendingBulk] = useState(false);
+    const [pendingSync, setPendingSync] = useState(false);
+
     const handleSettingsSave = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(route('admin.settings.store'), form as any);
+        router.post(route('admin.settings.store'), form as any, {
+            onSuccess: () => toastSuccess(__('general.saved') || 'Settings saved'),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+        });
     };
 
     const handleBulkPriceUpdate = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!confirm('Are you sure you want to update prices for ALL clients?')) return;
+        setPendingBulk(true);
+    };
+
+    const confirmBulkPriceUpdate = () => {
+        setPendingBulk(false);
         router.post(route('admin.settings.do-update-prices'), {
             hour_rate: computedRate,
             currency: bulkCurrency,
             update_projects: updateProjects ? '1' : '0',
+        }, {
+            onSuccess: () => toastSuccess(__('general.prices_updated') || 'Prices updated'),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
         });
     };
 
@@ -626,7 +640,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                     <p className="text-sm font-medium text-gray-700 mb-4">{__('general.fetches_latest_global_exchange_rates_and_updates_internal_caches_for_multi_currency_computations')}</p>
                     <form onSubmit={(e) => {
                         e.preventDefault();
-                        setSyncConfirmOpen(true);
+                        setPendingSync(true);
                     }} className="space-y-4">
                         <Button type="submit" variant="outline" className="w-full">{__('general.sync_exchange_rates_now')}</Button>
                     </form>
@@ -642,15 +656,29 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
 
 
             <ConfirmModal
-                isOpen={syncConfirmOpen}
+                isOpen={pendingBulk}
+                title={__('general.update_all_prices') || 'Update all prices?'}
+                description={__('general.warning_this_will_update_the_hourly_rate_for_all_clients_and_optionally_all_open_projects') || 'This will update the hourly rate for ALL clients and optionally all open projects.'}
+                confirmLabel={__('general.update_all')}
+                cancelLabel={__('general.cancel')}
+                variant="danger"
+                onConfirm={confirmBulkPriceUpdate}
+                onCancel={() => setPendingBulk(false)}
+            />
+
+            <ConfirmModal
+                isOpen={pendingSync}
                 title={__('general.sync_exchange_rates_now') || 'Sync Exchange Rates'}
                 description="Are you sure you want to sync exchange rates from the external API?"
                 confirmLabel="Yes, Sync"
                 onConfirm={() => {
-                    setSyncConfirmOpen(false);
-                    router.post(route('admin.settings.sync-exchange-rates'));
+                    setPendingSync(false);
+                    router.post(route('admin.settings.sync-exchange-rates'), {}, {
+                        onSuccess: () => toastSuccess(__('general.exchange_rates_synced') || 'Exchange rates synced'),
+                        onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+                    });
                 }}
-                onCancel={() => setSyncConfirmOpen(false)}
+                onCancel={() => setPendingSync(false)}
             />
         </AdminSidebarLayout>
     );

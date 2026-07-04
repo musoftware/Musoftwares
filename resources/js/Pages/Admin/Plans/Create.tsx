@@ -9,6 +9,7 @@ import { Input } from '@/Components/ui/input';
 import { AsyncCombobox } from '@/Components/ui/AsyncCombobox';
 import { Building2, MessageSquare, Zap, Store, Sparkles, Wrench, Check, Layers } from 'lucide-react';
 import { toast } from '@/Components/ui/use-toast';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/Components/ui/radio-group';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -70,10 +71,12 @@ export default function Create({ services }) {
         e.preventDefault();
         post(route('admin.plans.store'), {
             onSuccess: () => {
-                toast({
-                    title: __('admin.success'),
-                    description: __('admin.subscription_assigned_successfully'),
-                });
+                toastSuccess(
+                    __('admin.subscription_assigned_successfully') || 'Subscription assigned successfully.',
+                );
+            },
+            onError: () => {
+                toastError(__('general.error_occurred') || 'Something went wrong.');
             },
         });
     };

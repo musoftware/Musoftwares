@@ -32,20 +32,23 @@ class ProjectBoardService
         }
 
         $notes = $project->boardNotes()
+            ->withCount('comments')
             ->whereDate('for_date', $date->toDateString())
             ->get();
 
         $tasks = $project->tasks()
+            ->withCount('comments')
             ->whereDate('due_date', $date->toDateString())
             ->get();
 
         // Clients only see published reports; admins see all reports for the date.
         $reportsQuery = $applyFutureGating ? $project->publishedReports() : $project->reports();
-        $reports = $reportsQuery->whereDate('published_at', $date->toDateString())->get();
+        $reports = $reportsQuery->withCount('comments')->whereDate('published_at', $date->toDateString())->get();
 
         $dateString = $date->toDateString();
 
         $todos = $project->todos()
+            ->withCount('comments')
             ->where(function($q) use ($dateString) {
                 $q->whereDate('inDate', $dateString)
                   ->orWhere(function($q2) use ($dateString) {
@@ -56,6 +59,7 @@ class ProjectBoardService
             ->get();
 
         $files = $project->files()
+            ->withCount('comments')
             ->whereDate('created_at', $date->toDateString())
             ->get();
 
@@ -84,6 +88,8 @@ class ProjectBoardService
             $morph = ProjectBoardItem::morphClassFor($type);
             $placement = $placements->get("{$morph}:{$id}");
 
+            $extra['comments_count'] = (int) ($extra['comments_count'] ?? 0);
+
             $cards[] = array_merge([
                 'type' => $type,
                 'id' => $id,
@@ -97,9 +103,11 @@ class ProjectBoardService
         };
 
         foreach ($notes as $note) {
-            $addCard('note', $note->id, $note->content ?: __('general.sticky_note'), [
+            $noteTitle = $note->title ?: ($note->content ? mb_strimwidth($note->content, 0, 80, '…') : __('general.sticky_note'));
+            $addCard('note', $note->id, $noteTitle, [
                 'color' => $note->color,
                 'content' => $note->content,
+                'comments_count' => $note->comments_count,
             ]);
         }
 
@@ -108,6 +116,7 @@ class ProjectBoardService
                 'description' => $task->task_description,
                 'priority' => $task->priority,
                 'done' => method_exists($task, 'completed') ? $task->completed() : false,
+                'comments_count' => $task->comments_count,
             ]);
         }
 
@@ -116,6 +125,7 @@ class ProjectBoardService
                 'description' => $report->body,
                 'body' => $report->body,
                 'published_at' => optional($report->published_at)->toIso8601String(),
+                'comments_count' => $report->comments_count,
             ]);
         }
 
@@ -130,6 +140,7 @@ class ProjectBoardService
                 'description' => $todo->description,
                 'completed' => (bool)$todo->completed,
                 'checklist' => $checklist,
+                'comments_count' => $todo->comments_count,
             ]);
         }
 
@@ -139,6 +150,7 @@ class ProjectBoardService
                 'human_size' => $file->humanSize(),
                 'mime' => $file->mime,
                 'download_url' => route('client.projects.files.download', [$project->id, $file->id]),
+                'comments_count' => $file->comments_count,
             ]);
         }
 

@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { formatMoney } from '@/lib/utils';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { Plus, Trash, ArrowLeft, CheckCircle } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
 export default function Show({ payout }: any) {
@@ -17,6 +19,8 @@ export default function Show({ payout }: any) {
     const [notes, setNotes] = useState(payout.notes || '');
     const [tax, setTax] = useState(payout.tax || 0);
     const [items, setItems] = useState(payout.items || []);
+    const [pendingMarkPaid, setPendingMarkPaid] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleAddItem = () => {
         setItems([...items, { description: '', qty: 1, amount: 0 }]);
@@ -35,17 +39,25 @@ export default function Show({ payout }: any) {
     };
 
     const handleSave = () => {
+        setSaving(true);
         router.put(route('admin.payouts.update', payout.id), {
             notes,
             tax,
             items,
+        }, {
+            onSuccess: () => toastSuccess(__('general.saved') || 'Payout saved'),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onFinish: () => setSaving(false),
         });
     };
 
-    const handleMarkPaid = () => {
-        if (confirm('Are you sure you want to mark this payout as paid? This will credit the user\'s wallet and add an offsetting transaction to balance it.')) {
-            router.post(route('admin.payouts.mark-paid', payout.id));
-        }
+    const confirmMarkPaid = () => {
+        setPendingMarkPaid(false);
+        router.post(route('admin.payouts.mark-paid', payout.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => toastSuccess(__('general.payout_marked_paid') || 'Payout marked as paid'),
+            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+        });
     };
 
     const calculateSubtotal = () => {
@@ -68,9 +80,9 @@ export default function Show({ payout }: any) {
                 </div>
                 {!isPaid && (
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleSave}>Save Changes</Button>
-                        <Button onClick={handleMarkPaid} className="bg-green-600 hover:bg-green-700">
-                            <CheckCircle className="mr-2 h-4 w-4" /> Mark as Paid
+                        <Button variant="outline" onClick={handleSave} disabled={saving}>{saving ? __('general.saving') : __('general.save_changes')}</Button>
+                        <Button onClick={() => setPendingMarkPaid(true)} className="bg-green-600 hover:bg-green-700">
+                            <CheckCircle className="mr-2 h-4 w-4" /> {__('general.mark_as_paid')}
                         </Button>
                     </div>
                 )}
@@ -191,9 +203,9 @@ export default function Show({ payout }: any) {
                             <CardTitle>Notes</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <Textarea 
-                                value={notes} 
-                                onChange={(e) => setNotes(e.target.value)} 
+                            <Textarea
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
                                 disabled={isPaid}
                                 placeholder="Add any private notes here..."
                                 rows={4}
@@ -202,6 +214,16 @@ export default function Show({ payout }: any) {
                     </Card>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={pendingMarkPaid}
+                title={__('general.mark_as_paid') || 'Mark as paid?'}
+                description={__('general.confirm_mark_payout_paid_desc') || 'This will credit the user\'s wallet and add an offsetting transaction to balance it.'}
+                confirmLabel={__('general.mark_as_paid')}
+                cancelLabel={__('general.cancel')}
+                onConfirm={confirmMarkPaid}
+                onCancel={() => setPendingMarkPaid(false)}
+            />
         </AdminSidebarLayout>
     );
 }

@@ -13,9 +13,12 @@ import {
     MessageSquare,
 } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import { toastSuccess, toastError, toastInfo } from '@/Components/ui/use-toast';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
 
 /* ─── Types ─────────────────────────────────────────────────── */
+import { useState } from 'react';
 interface Ticket {
     id: number;
     ticket_subject: string;
@@ -94,6 +97,7 @@ function StatCard({
 /* ─── Main ───────────────────────────────────────────────────── */
 export default function Index({ tickets, filters, stats }: Props) {
     const { toast } = useToast();
+    const [pendingCloseId, setPendingCloseId] = useState<number | null>(null);
 
     const applyFilter = (update: Record<string, string>) =>
         router.get('/admin/tickets', { ...filters, ...update, page: 1 }, { preserveState: true, replace: true });
@@ -108,20 +112,22 @@ export default function Index({ tickets, filters, stats }: Props) {
         router.get('/admin/tickets', { ...filters, sort: key, direction }, { preserveState: true, replace: true });
     };
 
-    const handleClose = (id: number) => {
-        if (!confirm('Close this ticket?')) return;
+    const confirmClose = () => {
+        if (!pendingCloseId) return;
+        const id = pendingCloseId;
+        setPendingCloseId(null);
         router.put(`/admin/tickets/${id}`, { action: 'close' }, {
             preserveState: true,
-            onSuccess: () => toast({ title: 'Ticket closed successfully.' }),
-            onError:   () => toast({ title: 'Failed to close ticket.', variant: 'destructive' }),
+            onSuccess: () => toastSuccess(__('general.ticket_closed') || 'Ticket closed successfully.'),
+            onError:   () => toastError(__('general.failed_close_ticket') || 'Failed to close ticket.'),
         });
     };
 
     const handleReopen = (id: number) => {
         router.put(`/admin/tickets/${id}`, { action: 'reopen' }, {
             preserveState: true,
-            onSuccess: () => toast({ title: 'Ticket reopened successfully.' }),
-            onError:   () => toast({ title: 'Failed to reopen ticket.', variant: 'destructive' }),
+            onSuccess: () => toastSuccess(__('general.ticket_reopened') || 'Ticket reopened successfully.'),
+            onError:   () => toastError(__('general.failed_reopen_ticket') || 'Failed to reopen ticket.'),
         });
     };
 
@@ -213,7 +219,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                                 <Eye className="me-2 h-4 w-4" />{__('general.view_ticket')}</Link>
                         </DropdownMenuItem>
                         {t.ticket_status !== 'closed' ? (
-                            <DropdownMenuItem onClick={() => handleClose(t.id)} className="text-slate-900 focus:text-green-800">
+                            <DropdownMenuItem onClick={() => setPendingCloseId(t.id)} className="text-slate-900 focus:text-green-800">
                                 <CheckCircle className="me-2 h-4 w-4" />{__('general.close_ticket')}</DropdownMenuItem>
                         ) : (
                             <DropdownMenuItem onClick={() => handleReopen(t.id)} className="text-yellow-700 focus:text-yellow-800">
@@ -326,6 +332,16 @@ export default function Index({ tickets, filters, stats }: Props) {
                     emptyDescription="Adjust filters or wait for support requests."
                 />
             </div>
+
+            <ConfirmModal
+                isOpen={pendingCloseId !== null}
+                title={__('general.close_ticket') || 'Close ticket?'}
+                description={__('general.confirm_close_ticket') || 'This ticket will be marked as resolved. You can reopen it later.'}
+                confirmLabel={__('general.close_ticket') || 'Close ticket'}
+                cancelLabel={__('general.cancel') || 'Cancel'}
+                onConfirm={confirmClose}
+                onCancel={() => setPendingCloseId(null)}
+            />
         </AdminSidebarLayout>
     );
 }
