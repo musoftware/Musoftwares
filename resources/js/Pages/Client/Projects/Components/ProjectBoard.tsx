@@ -855,6 +855,10 @@ export default function ProjectBoard({
                     onDelete={(card) => handleDeleteCard(card)}
                     onOpenMenu={(card, x, y) => setContextMenu({ card, x, y })}
                     readOnly={readOnly}
+                    projectId={projectId}
+                    guestMode={guestMode}
+                    shareToken={shareToken}
+                    makeCountHandler={makeCountHandler}
                 />
             ) : viewMode === 'grid' ? (
                 <BoardGridView
@@ -865,6 +869,10 @@ export default function ProjectBoard({
                     onDelete={(card) => handleDeleteCard(card)}
                     readOnly={readOnly}
                     highlightedKey={highlightedCardKey}
+                    projectId={projectId}
+                    guestMode={guestMode}
+                    shareToken={shareToken}
+                    makeCountHandler={makeCountHandler}
                 />
             ) : viewMode === 'lines' ? (
                 <BoardLinesView
@@ -874,6 +882,10 @@ export default function ProjectBoard({
                     onEdit={(card) => !readOnly && openEditModal(card)}
                     onDelete={(card) => handleDeleteCard(card)}
                     readOnly={readOnly}
+                    projectId={projectId}
+                    guestMode={guestMode}
+                    shareToken={shareToken}
+                    makeCountHandler={makeCountHandler}
                 />
             ) : (
                 <DragDropContext onDragEnd={onDragEnd}>
@@ -1960,7 +1972,11 @@ const BoardGridView: React.FC<{
     onDelete: (card: BoardCard) => void;
     readOnly: boolean;
     highlightedKey?: string | null;
-}> = ({ cards, onOpenMenu, onView, onEdit, onDelete, readOnly, highlightedKey }) => {
+    projectId: ProjectBoardProps['projectId'];
+    guestMode?: boolean;
+    shareToken?: string | null;
+    makeCountHandler: (cardKey: string) => (count: number) => void;
+}> = ({ cards, onOpenMenu, onView, onEdit, onDelete, readOnly, highlightedKey, projectId, guestMode = false, shareToken = null, makeCountHandler }) => {
     return (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cards.map((card) => {
@@ -2003,16 +2019,26 @@ const BoardGridView: React.FC<{
                                 <BoardCategoryChip category={card.category} />
                             )}
                         </div>
-                        {!readOnly && (
-                            <div className="flex items-center justify-end gap-1 border-t border-slate-100/50 pt-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                                <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
-                                    <Edit3 className="h-3.5 w-3.5" />
-                                </button>
-                                <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex items-center justify-between gap-1 border-t border-slate-100/50 pt-2" onClick={(e) => e.stopPropagation()}>
+                            <CommentsPopover
+                                card={card}
+                                projectId={projectId}
+                                guestMode={guestMode}
+                                shareToken={shareToken}
+                                initialCount={card.comments_count}
+                                onCountChange={makeCountHandler(`${card.type}-${card.id}`)}
+                            />
+                            {!readOnly && (
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                        <Edit3 className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
             })}
@@ -2027,7 +2053,11 @@ const BoardLinesView: React.FC<{
     onEdit: (card: BoardCard) => void;
     onDelete: (card: BoardCard) => void;
     readOnly: boolean;
-}> = ({ cards, onOpenMenu, onView, onEdit, onDelete, readOnly }) => {
+    projectId: ProjectBoardProps['projectId'];
+    guestMode?: boolean;
+    shareToken?: string | null;
+    makeCountHandler: (cardKey: string) => (count: number) => void;
+}> = ({ cards, onOpenMenu, onView, onEdit, onDelete, readOnly, projectId, guestMode = false, shareToken = null, makeCountHandler }) => {
     return (
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <ul className="divide-y divide-slate-100">
@@ -2059,16 +2089,26 @@ const BoardLinesView: React.FC<{
                                     </span>
                                 )}
                             </div>
-                            {!readOnly && (
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                                    <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
-                                        <Edit3 className="h-3.5 w-3.5" />
-                                    </button>
-                                    <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                    </button>
-                                </div>
-                            )}
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <CommentsPopover
+                                    card={card}
+                                    projectId={projectId}
+                                    guestMode={guestMode}
+                                    shareToken={shareToken}
+                                    initialCount={card.comments_count}
+                                    onCountChange={makeCountHandler(`${card.type}-${card.id}`)}
+                                />
+                                {!readOnly && (
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                            <Edit3 className="h-3.5 w-3.5" />
+                                        </button>
+                                        <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </li>
                     );
                 })}
@@ -2085,7 +2125,11 @@ const BoardTableView: React.FC<{
     onDelete: (card: BoardCard) => void;
     onOpenMenu: (card: BoardCard, x: number, y: number) => void;
     readOnly: boolean;
-}> = ({ cards, categories, onView, onEdit, onDelete, onOpenMenu, readOnly }) => {
+    projectId: ProjectBoardProps['projectId'];
+    guestMode?: boolean;
+    shareToken?: string | null;
+    makeCountHandler: (cardKey: string) => (count: number) => void;
+}> = ({ cards, categories, onView, onEdit, onDelete, onOpenMenu, readOnly, projectId, guestMode = false, shareToken = null, makeCountHandler }) => {
     return (
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="overflow-x-auto">
@@ -2097,6 +2141,7 @@ const BoardTableView: React.FC<{
                             <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_lane') || 'Status'}</th>
                             <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_category') || 'Category'}</th>
                             <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_priority') || 'Priority'}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.comments') || 'Comments'}</th>
                             <th scope="col" className="px-4 py-2.5 text-end text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Actions</th>
                         </tr>
                     </thead>
@@ -2143,6 +2188,16 @@ const BoardTableView: React.FC<{
                                         ) : (
                                             <span className="text-slate-300">—</span>
                                         )}
+                                    </td>
+                                    <td className="px-4 py-2.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                                        <CommentsPopover
+                                            card={card}
+                                            projectId={projectId}
+                                            guestMode={guestMode}
+                                            shareToken={shareToken}
+                                            initialCount={card.comments_count}
+                                            onCountChange={makeCountHandler(`${card.type}-${card.id}`)}
+                                        />
                                     </td>
                                     <td className="px-4 py-2.5 whitespace-nowrap text-end" onClick={(e) => e.stopPropagation()}>
                                         {!readOnly ? (

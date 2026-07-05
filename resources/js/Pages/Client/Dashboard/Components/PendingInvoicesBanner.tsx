@@ -42,8 +42,8 @@ export default function PendingInvoicesBanner({ stats }: PendingInvoicesBannerPr
                                 </div>
                                 <p className="mt-1 text-sm leading-relaxed text-white/90 sm:text-base">
                                     {__('general.you_have_an_outstanding_balance_of')}
-                                    <span className="mx-1.5 inline-block rounded-md bg-white/15 px-2 py-0.5 text-base font-extrabold text-white sm:text-lg">
-                                        <CurrencyDisplay amount={amount} currency={stats.currency} />
+                                    <span className="mx-1.5 inline-block rounded-md bg-white px-2.5 py-1 text-xl font-extrabold text-slate-900 sm:text-2xl tabular-nums">
+                                        <CurrencyDisplay amount={amount} currency={stats.currency} className="font-sans" />
                                     </span>
                                     {__('general.that_needs_to_be_settled')}
                                 </p>
@@ -86,8 +86,8 @@ export default function PendingInvoicesBanner({ stats }: PendingInvoicesBannerPr
                             </div>
                             <p className="mt-1 text-sm leading-relaxed text-slate-600">
                                 {__('general.you_have_an_outstanding_balance_of')}
-                                <span className="mx-1 font-bold text-slate-900">
-                                    <CurrencyDisplay amount={amount} currency={stats.currency} />
+                                <span className="mx-1 font-bold text-slate-900 tabular-nums">
+                                    <CurrencyDisplay amount={amount} currency={stats.currency} className="font-sans" />
                                 </span>
                                 {__('general.that_needs_to_be_settled')}
                             </p>

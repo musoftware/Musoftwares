@@ -30,7 +30,7 @@ import UserLoansTab from './UserLoansTab';
 export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0 }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
-    const [newPassword, setNewPassword] = useState('');
+    const [resetPasswordInfo, setResetPasswordInfo] = useState(null);
     const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
     const [selectedRole, setSelectedRole] = useState(client.role || 'client');
     
@@ -66,7 +66,10 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
     const handleResetPassword = async () => {
         try {
             const res = await window.axios.post(`/admin/users/${client.id}/generate-password`);
-            setNewPassword(res.data.new_password);
+            setResetPasswordInfo({
+                message: res.data?.message || __('general.password_reset_success_email_sent') || 'Password reset successful and email sent!',
+                expiresInHours: res.data?.expires_in_hours ?? 24,
+            });
         } catch (e) {
             alert('Failed to reset password.');
         }
@@ -182,7 +185,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                             <span>{__('general.edit_profile')}</span>
                                         </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setNewPassword(''); }}>
+                                    <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setResetPasswordInfo(null); }}>
                                         <Key className="me-2 h-4 w-4" />
                                         <span>{__('general.reset_password')}</span>
                                     </DropdownMenuItem>
@@ -460,25 +463,24 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                         <DialogTitle>{__('general.reset_password')}</DialogTitle>
                         <DialogDescription>{__('general.are_you_sure_you_want_to_reset_this_user_s_password_a_new_secure_password_will_be_generated')}</DialogDescription>
                     </DialogHeader>
-                    {newPassword ? (
+{resetPasswordInfo ? (
                         <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-                            <p className="text-sm text-green-800 mb-2">{__('general.password_reset_success_email_sent') || 'Password reset successful and email sent! You can also copy the details below:'}</p>
-                            <div className="font-mono text-sm bg-white p-4 rounded relative border border-green-100">
-                                <pre className="whitespace-pre-wrap font-sans text-sm text-slate-700">
-{`Hello, ${client.name} 
-Here is your login details:
-Email:
-${client.email}
-Password:
-${newPassword}`}
-                                </pre>
-                                <Button variant="ghost" size="sm" className="absolute top-2 end-2" onClick={() => copyToClipboard(`Hello, ${client.name} \nHere is your login details:\nEmail:\n${client.email}\nPassword:\n${newPassword}`)}><Copy size={14}/></Button>
-                            </div>
+                            <p className="text-sm text-green-800 mb-2">
+                                {resetPasswordInfo.message || __('general.password_reset_success_email_sent') || 'Password reset successful and email sent!'}
+                            </p>
+                            <p className="text-xs text-green-700">
+                                {__('general.the_set_password_link_is_valid_for_n_hours_and_can_be_used_once', { n: resetPasswordInfo.expiresInHours }) || `The link is valid for ${resetPasswordInfo.expiresInHours} hours and can be used once.`}
+                            </p>
                         </div>
                     ) : (
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsResetPassOpen(false)}>{__('general.cancel')}</Button>
+                            <Button variant="outline" onClick={() => setIsResetPassOpen(false)}>{__("general.cancel")}</Button>
                             <Button variant="destructive" onClick={handleResetPassword}>{__('general.reset_password')}</Button>
+                        </DialogFooter>
+                    )}
+                    {resetPasswordInfo && (
+                        <DialogFooter>
+                            <Button onClick={() => { setIsResetPassOpen(false); setResetPasswordInfo(null); }}>{__('general.done') || 'Done'}</Button>
                         </DialogFooter>
                     )}
                 </DialogContent>

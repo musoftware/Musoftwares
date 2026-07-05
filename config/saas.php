@@ -22,7 +22,7 @@ return [
         'erp' => 10000,
         'crm' => 5000,
         'sms-payment-gateway' => 1000,
-        'gold-saver' => 1000,
+        'gold-saver' => 5000,
         'booking' => 3000,
         'tool' => 1000,
         'affiliate-pos' => 4000,
@@ -65,18 +65,7 @@ return [
 
         // ── ERP Add-ons (disabled for now) ──
         // ── GOLD SAVER ──
-        'gold-live-prices'      => ['price' => 500, 'name' => 'Live Gold Prices',    'desc' => 'Realtime prices & charts',          'icon' => 'TrendingUp',   'parent' => 'gold-saver'],
-        'gold-analytics'        => ['price' => 500, 'name' => 'Portfolio Analytics', 'desc' => 'Profit/loss & growth charts',        'icon' => 'PieChart',     'parent' => 'gold-saver'],
-        'gold-investment-reports' => ['price' => 500, 'name' => 'Investment Reports','desc' => 'Monthly/yearly returns',             'icon' => 'FileText',     'parent' => 'gold-saver'],
-        'gold-historical-charts'=> ['price' => 500, 'name' => 'Historical Charts',   'desc' => 'Advanced historical price data',     'icon' => 'LineChart',    'parent' => 'gold-saver'],
-        'gold-buy-sell-analytics' => ['price' => 500, 'name' => 'Buy/Sell Analytics','desc' => 'History & trade performance',        'icon' => 'Activity',     'parent' => 'gold-saver'],
-        'gold-smart-insights'   => ['price' => 500, 'name' => 'Smart Insights',      'desc' => 'Trends, opportunities & top prices', 'icon' => 'Lightbulb',   'parent' => 'gold-saver'],
-        'gold-price-alerts'     => ['price' => 500, 'name' => 'Price Alerts',        'desc' => 'WhatsApp, SMS & Push alerts',        'icon' => 'Bell',         'parent' => 'gold-saver'],
-        'gold-whatsapp-reports' => ['price' => 500, 'name' => 'WhatsApp Reports',    'desc' => 'Weekly portfolio summary via WA',    'icon' => 'MessageSquare','parent' => 'gold-saver'],
-        'gold-api'              => ['price' => 500, 'name' => 'API Access',           'desc' => 'Programmatic data access',           'icon' => 'Code',         'parent' => 'gold-saver'],
-        'gold-multi-wallets'    => ['price' => 500, 'name' => 'Multi Wallets',        'desc' => 'Separate goals & funds',             'icon' => 'Wallet',       'parent' => 'gold-saver'],
-        'gold-goal-tracking'    => ['price' => 500, 'name' => 'Goal Tracking',        'desc' => 'Target-based saving system',         'icon' => 'Target',       'parent' => 'gold-saver'],
-        'gold-shop-integration' => ['price' => 500, 'name' => 'Gold Shop Integration','desc' => 'Connect with local vendors',         'icon' => 'Store',        'parent' => 'gold-saver'],
+        // Add-on catalog removed — Gold Saver now ships with every feature included at the single 500 price.
         
         // ── AFFILIATE + POS ──
         'affiliate-storefront'      => ['price' => 500, 'name' => 'Online Storefront',    'desc' => 'Public branded e-commerce page',       'icon' => 'Globe',           'parent' => 'affiliate-pos'],

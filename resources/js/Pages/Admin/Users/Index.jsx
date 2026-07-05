@@ -36,7 +36,7 @@ export default function Index({ clients, filters, stats }) {
     const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
     const [selectedRoleUser, setSelectedRoleUser] = useState(null);
     const [selectedRole, setSelectedRole] = useState('client');
-    const [resetPasswordState, setResetPasswordState] = useState({ isOpen: false, clientId: null, client: null, status: 'confirm', newPassword: '' });
+    const [resetPasswordState, setResetPasswordState] = useState({ isOpen: false, clientId: null, client: null, status: 'confirm', info: null });
 
     const handleSearch = (search) => {
         router.get(
@@ -79,7 +79,7 @@ export default function Index({ clients, filters, stats }) {
     };
 
     const handleResetPassword = (client) => {
-        setResetPasswordState({ isOpen: true, clientId: client.id, client: client, status: 'confirm', newPassword: '' });
+        setResetPasswordState({ isOpen: true, clientId: client.id, client: client, status: 'confirm', info: null });
     };
 
     const handleUpdateRoleSubmit = (e) => {
@@ -380,7 +380,7 @@ export default function Index({ clients, filters, stats }) {
                 open={resetPasswordState.isOpen} 
                 onOpenChange={(open) => {
                     if (!open && resetPasswordState.status !== 'loading') {
-                        setResetPasswordState({ isOpen: false, clientId: null, client: null, status: 'confirm', newPassword: '' });
+                        setResetPasswordState({ isOpen: false, clientId: null, client: null, status: 'confirm', info: null });
                     }
                 }}
             >
@@ -401,7 +401,7 @@ export default function Index({ clients, filters, stats }) {
                                     onClick={() => {
                                         setResetPasswordState(prev => ({ ...prev, status: 'loading' }));
                                         axios.post(`/admin/users/${resetPasswordState.clientId}/reset-password`).then((response) => {
-                                            setResetPasswordState(prev => ({ ...prev, status: 'success', newPassword: response.data.new_password }));
+                                            setResetPasswordState(prev => ({ ...prev, status: 'success', info: { message: response.data?.message, expiresInHours: response.data?.expires_in_hours ?? 24 } }));
                                         }).catch(() => {
                                             toast({
                                                 title: "Error",
@@ -429,37 +429,24 @@ export default function Index({ clients, filters, stats }) {
                             <DialogHeader>
                                 <DialogTitle className="text-green-600 flex items-center gap-2">
                                     <CheckCircle2 className="h-5 w-5" />
-                                    {__('general.password_reset_success_email_sent') || 'Password reset successful and email sent! You can also copy the details below:'}
+                                    {resetPasswordState.info?.message || __('general.password_reset_success_email_sent') || 'Password reset successful and email sent!'}
                                 </DialogTitle>
+                                <DialogDescription className="pt-2 text-slate-600">
+                                    {__('general.the_set_password_link_is_valid_for_n_hours_and_can_be_used_once', { n: resetPasswordState.info?.expiresInHours ?? 24 }) || `The link is valid for ${resetPasswordState.info?.expiresInHours ?? 24} hours and can be used once.`}
+                                </DialogDescription>
                             </DialogHeader>
                             <div className="my-6">
-                                <div className="font-mono text-sm bg-slate-50 border border-slate-200 p-4 rounded relative">
+                                <div className="font-mono text-sm bg-slate-50 border border-slate-200 p-4 rounded">
                                     <pre className="whitespace-pre-wrap font-sans text-sm text-slate-700">
-{`Hello, ${resetPasswordState.client?.name} 
-Here is your login details:
-URL:
-https://www.musoftwares.com/
-Email:
-${resetPasswordState.client?.email}
-Password:
-${resetPasswordState.newPassword}`}
+{`Hello, ${resetPasswordState.client?.name},
+An administrator has issued a one-time link to set or reset the password on your account.
+Please check your email (${resetPasswordState.client?.email}) for the secure link.
+This link is valid for ${resetPasswordState.info?.expiresInHours ?? 24} hours and can be used only once.`}
                                     </pre>
-                                    <Button 
-                                        variant="outline" 
-                                        size="icon"
-                                        className="absolute top-2 end-2 h-8 w-8 shrink-0"
-                                        onClick={() => {
-                                            const txt = `Hello, ${resetPasswordState.client?.name} \nHere is your login details:\nEmail:\n${resetPasswordState.client?.email}\nPassword:\n${resetPasswordState.newPassword}`;
-                                            navigator.clipboard.writeText(txt);
-                                            toast({ title: "Copied!", description: "Message copied to clipboard." });
-                                        }}
-                                    >
-                                        <Copy className="h-4 w-4 text-slate-600" />
-                                    </Button>
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button className="w-full sm:w-auto" onClick={() => setResetPasswordState({ isOpen: false, clientId: null, client: null, status: 'confirm', newPassword: '' })}>
+                                <Button className="w-full sm:w-auto" onClick={() => setResetPasswordState({ isOpen: false, clientId: null, client: null, status: 'confirm', info: null })}>
                                     {__('general.done')}</Button>
                             </DialogFooter>
                         </>
