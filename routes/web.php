@@ -38,6 +38,7 @@ use App\Http\Controllers\Admin\ProjectFileController;
 use App\Http\Controllers\Admin\ProjectReportController;
 use App\Http\Controllers\Admin\RecurringBusinessController;
 use App\Http\Controllers\Admin\RecurringInvoiceController;
+use App\Http\Controllers\Admin\RecurringNoticeController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\SerialDeviceController;
@@ -1118,6 +1119,15 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::delete('invoices/{id}/delete', [RecurringInvoiceController::class, 'delete'])->name('recurring_invoices.delete');
         Route::post('invoices/{id}/toggle-status', [RecurringInvoiceController::class, 'toggle'])->name('recurring_invoices.toggle');
         Route::delete('invoices/{invoice}/records/{record}', [RecurringInvoiceController::class, 'deleteRecord'])->name('recurring_invoices.records.delete');
+
+        // Notices
+        Route::get('notices', [RecurringNoticeController::class, 'index'])->name('recurring_notices.index');
+        Route::get('notices/create', [RecurringNoticeController::class, 'create'])->name('recurring_notices.create');
+        Route::post('notices', [RecurringNoticeController::class, 'store'])->name('recurring_notices.store');
+        Route::get('notices/edit/{id}', [RecurringNoticeController::class, 'edit'])->name('recurring_notices.edit');
+        Route::put('notices/{id}', [RecurringNoticeController::class, 'update'])->name('recurring_notices.update');
+        Route::delete('notices/{id}/delete', [RecurringNoticeController::class, 'destroy'])->name('recurring_notices.delete');
+        Route::post('notices/{id}/toggle-status', [RecurringNoticeController::class, 'toggle'])->name('recurring_notices.toggle');
     });
 
     // ── Admin Hours Calendar ──────────────────────────────────────

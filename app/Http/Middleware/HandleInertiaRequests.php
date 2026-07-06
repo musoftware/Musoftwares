@@ -161,6 +161,23 @@ class HandleInertiaRequests extends Middleware
             ],
             'locale' => app()->getLocale(),
             'is_lance_domain' => $request->getHost() === 'lance.musoftwares.com',
+            'recurring_notices_today' => function () use ($user) {
+                if (!$user || !class_exists(\App\Models\RecurringNotice::class)) {
+                    return [];
+                }
+                try {
+                    return \App\Models\RecurringNotice::dueToday()
+                        ->map(fn ($notice) => [
+                            'id' => $notice->id,
+                            'title' => $notice->title,
+                            'message' => $notice->message,
+                            'type' => $notice->type,
+                        ])
+                        ->toArray();
+                } catch (\Throwable $e) {
+                    return [];
+                }
+            },
         ];
     }
 }

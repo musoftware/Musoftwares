@@ -56,7 +56,8 @@ export default function Edit({ notice }: { notice: NoticeForm }) {
 
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
-        router.put(route('admin.recurring_notices.update', form.id), form);
+        const { id, ...payload } = form;
+        router.put(route('admin.recurring_notices.update', id), payload as any);
     };
 
     return (

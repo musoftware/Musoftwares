@@ -1,23 +1,26 @@
 import React, { PropsWithChildren } from 'react';
 import { Head } from '@inertiajs/react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
+import BoardNoticesRail from '@/Components/Admin/BoardNoticesRail';
 
 interface AdminBoardLayoutProps extends PropsWithChildren {
     title?: string;
 }
 
 /**
- * Minimal standalone shell for the project board workspace.
+ * Standalone shell for the project board workspace.
  * No admin sidebar, no admin chrome — the BoardTopNav IS the page header.
- * Provides a clean canvas focused 100% on the board.
+ * Renders the BoardNoticesRail on the left when there are due-today notices,
+ * leaving the board canvas free to scroll horizontally inside the flex-1 column.
  */
 export default function AdminBoardLayout({ title, children }: AdminBoardLayoutProps) {
     useInertiaNotifications();
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="flex min-h-screen bg-slate-50">
             {title && <Head title={title} />}
-            {children}
+            <BoardNoticesRail />
+            <div className="flex-1 min-w-0">{children}</div>
         </div>
     );
 }

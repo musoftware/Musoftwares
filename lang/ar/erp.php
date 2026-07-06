@@ -447,4 +447,8 @@ return [
     'resend_invite' => 'إعادة إرسال الدعوة',
     'welcome_back_owner' => 'مرحباً بعودتك، المالك',
     'you_are_invited' => 'أنت مدعو',
+    'workspace_login' => 'تسجيل الدخول إلى مساحة العمل',
+    'enter_credentials_to_access_workspace' => 'أدخل بيانات الاعتماد الخاصة بك للوصول إلى مساحة العمل',
+    'are_you_a_business_owner' => 'هل أنت صاحب عمل؟',
+    'login_to_main_portal' => 'تسجيل الدخول إلى البوابة الرئيسية',
 ];

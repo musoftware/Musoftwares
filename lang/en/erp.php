@@ -447,4 +447,8 @@ return [
     'resend_invite' => 'Resend Invite',
     'welcome_back_owner' => 'Welcome Back, Owner',
     'you_are_invited' => 'You Are Invited',
+    'workspace_login' => 'Workspace Login',
+    'enter_credentials_to_access_workspace' => 'Enter your credentials to access your workspace',
+    'are_you_a_business_owner' => 'Are you a business owner?',
+    'login_to_main_portal' => 'Login to main portal',
 ];

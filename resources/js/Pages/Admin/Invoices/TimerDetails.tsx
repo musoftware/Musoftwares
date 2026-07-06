@@ -60,21 +60,66 @@ function parseDateTime(dateStr: string | null) {
     };
 }
 
+interface TimerCache {
+    isRunning: boolean;
+    activeSessionStart: string | null;
+    timers: Timer[];
+    reason: string;
+    rate: number;
+}
+
 export default function TimerDetails({
     item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds,
     system_base_rate, client_rate, hour_rate,
 }: Props) {
-    const [timers, setTimers] = useState<Timer[]>(initialTimers || []);
-    const [isRunning, setIsRunning] = useState(false);
-    const [activeSessionStart, setActiveSessionStart] = useState<Date | null>(null);
+    const storageKey = `timer-details-${item.id}`;
+
+    const loadCache = (): TimerCache | null => {
+        if (typeof window === 'undefined') return null;
+        try {
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw) as TimerCache;
+            if (parsed && Array.isArray(parsed.timers)) return parsed;
+        } catch {
+            return null;
+        }
+        return null;
+    };
+
+    const cache = loadCache();
+
+    const [timers, setTimers] = useState<Timer[]>(
+        cache?.timers && cache.timers.length > 0 ? cache.timers : (initialTimers || [])
+    );
+    const [isRunning, setIsRunning] = useState<boolean>(cache?.isRunning ?? false);
+    const [activeSessionStart, setActiveSessionStart] = useState<Date | null>(
+        cache?.activeSessionStart ? new Date(cache.activeSessionStart) : null
+    );
     const [liveSeconds, setLiveSeconds] = useState(0);
 
     const [manualHours, setManualHours] = useState('');
     const [manualMinutes, setManualMinutes] = useState('');
-    const [rate, setRate] = useState<number>(hour_rate);
+    const [rate, setRate] = useState<number>(cache?.rate ?? hour_rate);
     const [rateVisible, setRateVisible] = useState(false);
-    const [reason, setReason] = useState(item.item_title || '');
+    const [reason, setReason] = useState(cache?.reason ?? (item.item_title || ''));
     const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const payload: TimerCache = {
+            isRunning,
+            activeSessionStart: activeSessionStart ? activeSessionStart.toISOString() : null,
+            timers,
+            reason,
+            rate,
+        };
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(payload));
+        } catch {
+            // ignore quota errors
+        }
+    }, [storageKey, isRunning, activeSessionStart, timers, reason, rate]);
 
     useEffect(() => {
         if (!isRunning || !activeSessionStart) return;
@@ -175,6 +220,7 @@ export default function TimerDetails({
         }, {
             onSuccess: () => {
                 setIsSaving(false);
+                try { localStorage.removeItem(storageKey); } catch {}
                 toast.success(__('general.saved') || 'Saved');
             },
             onError: () => setIsSaving(false),
