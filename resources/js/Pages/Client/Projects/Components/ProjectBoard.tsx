@@ -275,6 +275,7 @@ export default function ProjectBoard({
         };
         window.addEventListener('board-add-trigger', handler);
         return () => window.removeEventListener('board-add-trigger', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {

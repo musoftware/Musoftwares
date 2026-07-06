@@ -7,6 +7,7 @@ import AdminBoardLayout from '@/Layouts/AdminBoardLayout';
 import ProjectBoard, { type BoardCard, type BoardPreferences } from '@/Pages/Client/Projects/Components/ProjectBoard';
 import BoardTopNav, { type BoardFilter } from './Components/BoardTopNav';
 import BoardCategoriesManager, { type BoardCategory } from './Components/BoardCategoriesManager';
+import { NOTICES_MANAGER_OPEN_EVENT } from '@/Components/Admin/NoticesManager';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatMoney, formatDate } from '@/lib/utils';
@@ -95,6 +96,7 @@ export default function AdminProjectBoard({ project, date, lanes, cards, activeD
                 onAdd={handleAdd}
                 activeDates={activeDates}
                 onManageCategories={() => setShowCategories(true)}
+                onManageNotices={() => window.dispatchEvent(new CustomEvent(NOTICES_MANAGER_OPEN_EVENT))}
             />
 
             <div className="w-full space-y-6 px-4 py-6 sm:px-6 lg:px-8 max-w-none">

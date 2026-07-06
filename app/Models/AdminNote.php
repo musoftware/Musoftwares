@@ -14,6 +14,9 @@ class AdminNote extends Model
 
     protected $casts = [
         'is_pinned' => 'boolean',
+        'rotated_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'last_revealed_at' => 'datetime',
     ];
 
     public function noteable()

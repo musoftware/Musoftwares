@@ -272,7 +272,7 @@ function AuthenticatedContent({
                                                                             <Link href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-yellow-50/50 text-slate-600 font-medium">
                                                                                 <Coins className="w-4 h-4 text-yellow-500" /> {__('general.gold_savers')}
                                                                             </Link>
-                                                                            <Link href={safeRoute('tools.explore')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-fuchsia-50/50 text-slate-600 font-medium">
+                                                                            <Link href={safeRoute('sso.redirect', { system: 'toolsys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-fuchsia-50/50 text-slate-600 font-medium">
                                                                                 <Wrench className="w-4 h-4 text-fuchsia-500" /> {__('general.tools_amp_plugins')}
                                                                             </Link>
                                                                         </div>
@@ -617,7 +617,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={safeRoute('tools.explore')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<Link href={safeRoute('sso.redirect', { system: 'toolsys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",

@@ -71,4 +71,38 @@ class AdminTransactionTest extends TestCase
             'type' => 'earned',
         ]);
     }
+
+    public function test_admin_can_store_transaction_with_custom_date_time(): void
+    {
+        $customDate = '2026-05-15 14:30:00';
+        $response = $this->actingAs($this->admin)->post(route('admin.transactions.store'), [
+            'user' => $this->clientUser->id,
+            'type' => 'earned',
+            'data' => [
+                [
+                    'amount' => 125,
+                    'fee' => 10,
+                    'reason' => 'Custom Date Test',
+                    'currency' => $this->clientUser->currency_id,
+                    'created_at' => $customDate
+                ]
+            ]
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $this->clientUser->id,
+            'type' => 'earned',
+            'amount' => 125,
+            'created_at' => $customDate,
+        ]);
+
+        $this->assertDatabaseHas('cost_transactions', [
+            'user_id' => $this->clientUser->id,
+            'amount' => 10,
+            'created_at' => $customDate,
+        ]);
+    }
 }

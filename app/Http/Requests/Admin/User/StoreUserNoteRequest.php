@@ -14,9 +14,10 @@ class StoreUserNoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'    => 'required|string|max:255',
-            'content'  => 'required|string',
-            'category' => 'required|in:password,anydesk,notes',
+            'title'      => 'required|string|max:255',
+            'content'    => 'required|string',
+            'category'   => 'required|in:password,anydesk,notes',
+            'expires_at' => 'nullable|date',
         ];
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +20,7 @@ class UserReferral extends Model
 
     /**
      * Resolve a ref string (key, custom slug, or referrer's username/slug) to the UserReferral.
+     * Uses one query against user_referrals (key OR slug) plus one against users (slug).
      */
     public static function resolveRef(string $ref): ?self
     {
@@ -27,17 +28,16 @@ class UserReferral extends Model
         if ($ref === '') {
             return null;
         }
-        // 1) By referral key (existing hash)
-        $referral = self::where('key', $ref)->first();
+
+        $referral = self::query()
+            ->where(function (Builder $q) use ($ref) {
+                $q->where('key', $ref)->orWhere('slug', $ref);
+            })
+            ->first();
         if ($referral) {
             return $referral;
         }
-        // 2) By referral slug (custom link slug)
-        $referral = self::where('slug', $ref)->first();
-        if ($referral) {
-            return $referral;
-        }
-        // 3) By user slug (username-style: same as users.slug)
+
         $user = User::where('slug', $ref)->first();
         if ($user) {
             return $user->referrals()->first();

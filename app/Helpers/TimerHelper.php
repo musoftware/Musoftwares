@@ -34,7 +34,8 @@ class TimerHelper
             (($request->input('type') == 'timer-received') ? 1 : -1) * abs($item['amount']),
             ($item['reason']), $item['fee'],
             ($request->input('type') == 'timer-received') ? 'received' : 'used',
-            isset($item['is_used']) && $item['is_used'] == '1');
+            isset($item['is_used']) && $item['is_used'] == '1',
+            $item['created_at'] ?? $item['transaction_date'] ?? $item['date'] ?? null);
 
 //        $client->add_balance((($request->input('type') == 'timer-received') ? 1 : -1) * abs($item['amount']),
 //            ($item['reason']),
@@ -67,7 +68,8 @@ class TimerHelper
             abs($item['amount']),
             ($item['reason']), $item['fee'],
             'received',
-            isset($item['is_used']) && $item['is_used'] == '1');
+            isset($item['is_used']) && $item['is_used'] == '1',
+            $item['created_at'] ?? $item['transaction_date'] ?? $item['date'] ?? null);
 
 
 //
@@ -131,22 +133,22 @@ class TimerHelper
     }
 
 
-    private function addTransaction(Request|null $request, $client, $project, $amount, $reason, $fee, $type, $is_used)
+    private function addTransaction(Request|null $request, $client, $project, $amount, $reason, $fee, $type, $is_used, $createdAt = null)
     {
-        DB::transaction(function () use ($client, $project, $amount, $reason, $fee, $type, $is_used) {
+        DB::transaction(function () use ($client, $project, $amount, $reason, $fee, $type, $is_used, $createdAt) {
             $client->add_balance($amount,
                 $reason,
                 $type
-                , null, $project);
+                , null, $project, $createdAt);
 
             \App\Models\CostTransaction::add_cost_balance($client, $fee,
                 ($reason . ' Fee')
-                , null, $project);
+                , null, $project, $createdAt);
 
             if ($is_used) {
                 $client->add_balance(-1 * abs($amount),
                     $reason . ' Used', 'used'
-                    , null, $project);
+                    , null, $project, $createdAt);
             }
         });
 
@@ -192,7 +194,8 @@ class TimerHelper
             -1 * abs($item['amount']),
             ($item['reason']), ($item['fee'] ?? 0),
             'used',
-            isset($item['is_used']) && $item['is_used'] == '1');
+            isset($item['is_used']) && $item['is_used'] == '1',
+            $item['created_at'] ?? $item['transaction_date'] ?? $item['date'] ?? null);
 
         return 1;
     }
@@ -202,12 +205,15 @@ class TimerHelper
 
         if ($item['amount'] == 0) return 0;
 
+        $createdAt = $item['created_at'] ?? $item['transaction_date'] ?? $item['date'] ?? null;
+
         // Create the 'sent' transaction (negative amount)
         $this->addTransaction($request, $client, $project,
             -1 * abs($item['amount']),
             ($item['reason']), $item['fee'],
             'sent',
-            isset($item['is_used']) && $item['is_used'] == '1');
+            isset($item['is_used']) && $item['is_used'] == '1',
+            $createdAt);
 
         // For employees/freelancers: automatically create 'earned' transaction to zero out balance
         // This matches the pattern: received + used = zero, sent + earned = zero
@@ -223,7 +229,8 @@ class TimerHelper
                 $earnedReason,
                 0, // No fee for earned transaction
                 'earned',
-                false // Don't add 'used' transaction for earned
+                false, // Don't add 'used' transaction for earned
+                $createdAt
             );
         }
 
@@ -249,7 +256,8 @@ class TimerHelper
             -1 * abs($item['amount']),
             ($item['reason']), ($item['fee']),
             'refunded',
-            isset($item['is_used']) && $item['is_used'] == '1');
+            isset($item['is_used']) && $item['is_used'] == '1',
+            $item['created_at'] ?? $item['transaction_date'] ?? $item['date'] ?? null);
 
     }
     public function addEarned(Request $request, $client, $project, $item)
@@ -260,7 +268,8 @@ class TimerHelper
             abs($item['amount']),
             ($item['reason']), ($item['fee']),
             'earned',
-            isset($item['is_used']) && $item['is_used'] == '1');
+            isset($item['is_used']) && $item['is_used'] == '1',
+            $item['created_at'] ?? $item['transaction_date'] ?? $item['date'] ?? null);
 
     }
 

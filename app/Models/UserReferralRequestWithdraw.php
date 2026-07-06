@@ -109,13 +109,15 @@ class UserReferralRequestWithdraw extends Model
     public function changeStatus($new_status)
     {
         DB::transaction(function () use ($new_status) {
-            $user = User::find($this->user_id);
+            // Lock the user row to prevent the BalanceService::recalculateUserBalance
+            // race where a concurrent update to user_balance could overwrite our changes.
+            $user = User::where('id', $this->user_id)->lockForUpdate()->first();
 
             if ($this->transaction_id == null && $new_status == 'approved') {
                 $this->transaction_id = $this->user->add_balance(
                     -1 * abs($this->amount),
-                    'Withdraw',
-                    'sent',
+                    __('general.withdrawal_label'),
+                    'withdrawn',
                     $this->currency
                 );
                 $this->save();

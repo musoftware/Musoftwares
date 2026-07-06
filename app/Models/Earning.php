@@ -20,7 +20,7 @@ class Earning extends Model
             if ($earning->user_id && $earning->user) {
                 $userCurrencyId = $earning->user->currency_id ?? \App\Models\AdminSettings::business_currency();
                 $currentCurrencyId = $earning->currency_id ?? $earning->currency ?? \App\Models\AdminSettings::business_currency();
-                
+
                 if ($currentCurrencyId != $userCurrencyId) {
                     $date = $earning->created_at ?? now();
                     $earning->amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
@@ -29,9 +29,20 @@ class Earning extends Model
                         $currentCurrencyId,
                         $userCurrencyId
                     );
-                    
+
                     $earning->currency = $userCurrencyId;
                     $earning->currency_id = $userCurrencyId;
+                }
+            }
+
+            // Track the first time a referred user generated a commission.
+            // This drives the boosted commission window (10% for 1 month, per
+            // 2026_03_02_..._add_first_referral_payment_at_to_users_table migration).
+            if (!empty($earning->referred_user_id)) {
+                $referred = $earning->referred_user ?? User::find($earning->referred_user_id);
+                if ($referred && empty($referred->first_referral_payment_at)) {
+                    $referred->first_referral_payment_at = $earning->created_at ?? now();
+                    $referred->saveQuietly();
                 }
             }
         });

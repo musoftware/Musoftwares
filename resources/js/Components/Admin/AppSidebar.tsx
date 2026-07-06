@@ -58,7 +58,6 @@ const items: MenuItem[] = [
     subItems: [
         { title: "Costs", url: "/admin/business/costs" },
         { title: "Recurring Costs", url: "/admin/business/recurring/costs" },
-        { title: "Recurring Notices", url: "/admin/business/recurring/notices" },
         { title: "Income", url: "/admin/business/income" },
         { title: "Recurring Income", url: "/admin/business/recurring/income" },
         { title: "Recurring Salaries", url: "/admin/business/recurring/salaries" },

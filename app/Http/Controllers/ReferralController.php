@@ -12,23 +12,29 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use App\Services\ReferralService;
+use App\Services\BalanceService;
 
 class ReferralController extends Controller
 {
     use \App\Traits\ConvertsCurrency;
 
     protected ReferralService $referralService;
+    protected BalanceService $balanceService;
 
-    public function __construct(ReferralService $referralService)
+    public function __construct(ReferralService $referralService, BalanceService $balanceService)
     {
         $this->referralService = $referralService;
+        $this->balanceService = $balanceService;
     }
 
     public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Auto-activate referral system and get/create primary link
+        // Auto-activate referral system and get/create primary link.
+        // Note: ensureReferralSystemActive mutates the user's allow_referral_system
+        // flag and creates a UserReferral row on read. If that side-effect is
+        // undesirable, move it behind a POST activation endpoint instead.
         $referral = $this->referralService->ensureReferralSystemActive($user);
 
         return Inertia::render('Client/Dashboard/Referrals/Index', [
@@ -40,16 +46,19 @@ class ReferralController extends Controller
     public function earns(Request $request)
     {
         $user = Auth::user();
-        
-        // Use the exact database columns that are synced by BalancesHelper
-        $pending_balance = $user->pending_commission;
+
+        // pending_commission = earned but not yet moved to user_balance.
+        // available_commission = pending_commission minus any in-flight withdrawals.
+        // The legacy calculation (user_balance - withdrawing_commission) was wrong
+        // because user_balance mixes deposits with earned funds and would inflate
+        // the visible commission to anyone with a positive deposit balance.
+        $pending_balance = (float) ($user->pending_commission ?? 0);
         $pending_balance_str = $this->formatAmount($pending_balance, $user->currency_id ?: 1);
 
-        // Available commission in legacy was: user_balance - withdrawing_commission
-        $available_commission = max(0, (float)($user->user_balance - $user->withdrawing_commission));
+        $available_commission = $this->balanceService->availableEarnedBalance($user);
         $available_commission_str = $this->formatAmount($available_commission, $user->currency_id ?: 1);
 
-        $withdrawed_commission = $user->withdrawn_commission;
+        $withdrawed_commission = (float) ($user->withdrawn_commission ?? 0);
         $withdrawed_commission_str = $this->formatAmount($withdrawed_commission, $user->currency_id ?: 1);
 
         return Inertia::render('Client/Dashboard/Referrals/Earns', [
@@ -68,6 +77,14 @@ class ReferralController extends Controller
             $request->validate([
                 'title' => ['required', 'max:255'],
             ]);
+
+            // A user has exactly one primary referral campaign. Multiple
+            // campaigns per user created ambiguity in the dashboard which
+            // assumed a single primary link.
+            $existing = UserReferral::where('user_id', Auth::id())->first();
+            if ($existing) {
+                return redirect()->route('referrals.index')->with('info', __('messages.referral_already_exists'));
+            }
 
             $client_request = new UserReferral();
             $client_request->user_id = Auth::id();
@@ -105,7 +122,9 @@ class ReferralController extends Controller
                 'max:100',
                 'min:2',
                 'regex:/^[a-z0-9\-]+$/',
-                Rule::unique('user_referrals', 'slug')->ignore($referral->id),
+                Rule::unique('user_referrals', 'slug')
+                    ->ignore($referral->id)
+                    ->whereNull('deleted_at'),
             ],
         ], [
             'slug.regex' => __('messages.referral_slug_regex_hint'),
@@ -123,44 +142,32 @@ class ReferralController extends Controller
     public function registers()
     {
         $auth = Auth::user();
-        
-        // This requires a my_ref_users() relationship on the User model
+
         if (method_exists($auth, 'my_ref_users')) {
             $referred_users = $auth->my_ref_users()
+                ->whereNotNull('email_verified_at')
                 ->orderBy('created_at', 'desc')
                 ->paginate(14);
         } else {
-            // Fallback assuming users table has ref_user_id
             $referred_users = \App\Models\User::where('ref_user_id', $auth->id)
+                ->whereNotNull('email_verified_at')
                 ->orderBy('created_at', 'desc')
                 ->paginate(14);
         }
 
         $commissionByUserId = $this->referralService->calculateCommissionByUserId($auth, $referred_users);
 
+        // Global aggregate over *all* referred users, not just the current page.
+        // Without this, the dashboard table per-user totals look incomplete on
+        // page 2+ and have historically misled referrers into thinking their
+        // commissions were lost.
+        $globalTotal = $this->referralService->calculateTotalCommissionForReferrer($auth);
+
         return Inertia::render('Client/Dashboard/Referrals/Registers', [
             'referred_users' => $referred_users,
-            'commissionByUserId' => $commissionByUserId
+            'commissionByUserId' => $commissionByUserId,
+            'global_commission_total' => $globalTotal,
         ]);
-    }
-
-    public function reward()
-    {
-        RateLimiter::attempt(
-            'ref_reward:' . Auth::user()->id,
-            $perMinute = 1,
-            function () {
-                // In the legacy system, EarnPerRegister::regEquivalent() simply returned 0.
-                // We keep the exact behavior of blocking/doing nothing if 0.
-                $amount = 0; 
-
-                if ($amount > 0) {
-                    // Logic would go here if EarnPerRegister was fully ported
-                }
-            }
-        );
-
-        return redirect(route('referrals.registers'));
     }
 
     public function referral_redirect(Request $request, $ref = null)
@@ -172,7 +179,7 @@ class ReferralController extends Controller
         $valueRef = $request->session()->get('referral');
 
         if ($HasRef) {
-            $referral = $this->referralService->processReferralRedirect($valueRef);
+            $referral = $this->referralService->processReferralRedirect($valueRef, $request);
             if (!$referral) {
                 return abort(404, __('messages.bad_referral'));
             }
@@ -181,7 +188,11 @@ class ReferralController extends Controller
         $to = $request->query('to');
         if ($to !== null && $to !== '') {
             $to = ltrim($to, '/');
-            if (!preg_match('#^https?://#i', $to) && preg_match('#^[a-z0-9\-/_]+$#i', $to)) {
+
+            // Restrict ?to= to local relative paths. The previous regex allowed
+            // payloads like `//evil.example.com` after ltrim('/') which became
+            // `/evil.example.com` and triggered an open redirect.
+            if (preg_match('#^[a-z0-9][a-z0-9\-/_]*$#i', $to) && ! str_starts_with($to, '//')) {
                 return redirect()->to('/' . $to);
             }
         }
@@ -206,24 +217,39 @@ class ReferralController extends Controller
 
     public function store_user(Request $request)
     {
-        if (Auth::user()->allow_referral_system == '1') {
-            $request->validate([
-                'name' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
-                    if (!\Illuminate\Support\Str::contains($value, ' ')) {
-                        $fail(__('messages.name_must_include_last_name'));
-                    }
-                }],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
-                'phone_number' => ['nullable', 'string', 'max:20'],
-                'affiliate_commission_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
-            ]);
-
-            $this->referralService->registerReferredUser(Auth::user(), $request->all());
-
-            return redirect()->route('referrals.index')->with('success', __('messages.user_created_referral_success'));
+        if (Auth::user()->allow_referral_system != '1') {
+            return redirect()->route('referrals.index');
         }
 
-        return redirect()->route('referrals.index');
+        // Rate-limit referrer-driven user creation so this surface can't be
+        // abused to mass-register disposable accounts.
+        $executed = RateLimiter::attempt(
+            'store_user_ref:' . Auth::id(),
+            $perMinute = 5,
+            function () {
+                return true;
+            }
+        );
+
+        if (! $executed) {
+            return redirect()->route('referrals.index')
+                ->with('error', __('messages.too_many_referral_user_creation_attempts'));
+        }
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if (!\Illuminate\Support\Str::contains($value, ' ')) {
+                    $fail(__('messages.name_must_include_last_name'));
+                }
+            }],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'phone_number' => ['nullable', 'string', 'max:20'],
+            'affiliate_commission_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+        ]);
+
+        $this->referralService->registerReferredUser(Auth::user(), $request->all());
+
+        return redirect()->route('referrals.index')->with('success', __('messages.user_created_referral_success'));
     }
 }

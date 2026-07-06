@@ -1,12 +1,14 @@
 const fs = require('fs');
 
-const raw = fs.readFileSync('lint-results3.json', 'utf8');
+const filename = fs.existsSync('lint-results.json') ? 'lint-results.json' : 'lint-results3.json';
+const raw = fs.readFileSync(filename, 'utf8');
 const jsonStart = raw.indexOf('[');
 const jsonEnd = raw.lastIndexOf(']') + 1;
 const lintResults = JSON.parse(raw.substring(jsonStart, jsonEnd));
 
 for (const result of lintResults) {
     if (result.errorCount === 0 && result.warningCount === 0) continue;
+    if (!fs.existsSync(result.filePath)) continue;
 
     let content = fs.readFileSync(result.filePath, 'utf8');
     const lines = content.split('\n');

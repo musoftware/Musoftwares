@@ -20,13 +20,13 @@ export default function Referrals({ client, referrals }) {
     };
 
     const handleUnlink = (referralId) => {
-        if (confirm('Are you sure you want to remove this user from referrals?')) {
+        if (confirm(__('general.confirm_unlink_referral'))) {
             router.delete(`/admin/users/${client.id}/referrals/${referralId}/unlink`);
         }
     };
 
     const handleDelete = (referralId) => {
-        if (confirm('Are you sure you want to PERMANENTLY delete this user?')) {
+        if (confirm(__('general.confirm_delete_user_permanently'))) {
             router.delete(`/admin/users/${referralId}`);
         }
     };

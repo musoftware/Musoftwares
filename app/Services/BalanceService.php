@@ -37,7 +37,7 @@ class BalanceService extends BaseService
             ->sum('amount');
 
         $debits = Transaction::where('user_id', $user->id)
-            ->whereIn('type', ['paid', 'used', 'withdrawn'])
+            ->whereIn('type', ['paid', 'used', 'withdrawn', 'sent'])
             ->sum('amount');
 
         $calculatedBalance = round($credits - $debits, 2);

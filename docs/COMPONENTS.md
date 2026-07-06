@@ -58,13 +58,18 @@ import CommandPalette from '@/Components/CommandPalette';
 <CommandPalette />
 ```
 
-### `AdminNotesPanel` (`resources/js/Components/AdminNotesPanel.tsx`)
-Internal moderation notes panel attached to withdrawal requests and marketplace orders. Allows super-admins to leave private audit trails invisible to standard clients.
+### `AdminNotesPanel` (`resources/js/Pages/Admin/Users/Notes.jsx`)
 
-```tsx
-import AdminNotesPanel from '@/Components/AdminNotesPanel';
+The legacy `resources/js/Components/AdminNotesPanel.tsx` (with hardcoded `/pin` route and
+unencrypted `marked` rendering) was removed in favour of the full-page route
+`/admin/users/{id}/notes` served by `Admin/Users/Notes.jsx`. That page drives the
+`UserNoteController` end-to-end (E2EE cipher, audit log, edit/bulk/reveal).
 
-<AdminNotesPanel targetId={order.id} targetType="marketplace_order" notes={notesList} />
+```js
+import Notes from '@/Pages/Admin/Users/Notes';
+
+// Served via /admin/users/{id}/notes (no manual import required).
+<Notes user={user} notes={notes} stats={stats} />
 ```
 
 ### `GlobalErrorHandler` (`resources/js/Components/GlobalErrorHandler.tsx`)

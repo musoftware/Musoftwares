@@ -41,4 +41,6 @@ return [
     'embed_modules' => 'Embed Modules',
     'share_referral_desc' => 'Share your referral link to earn a commission from all payments made by your referrals.',
     'your_referral_link' => 'Your Referral Link',
+    'referral_already_exists' => 'Referral already exists.',
+    'too_many_referral_user_creation_attempts' => 'Too many attempts to create referral users. Please try again later.',
 ];

@@ -342,7 +342,7 @@ class User extends Authenticatable
         return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency_id, $currency);
     }
 
-    public function add_balance($amount, $reason, $type, $currency = null, $project = null)
+    public function add_balance($amount, $reason, $type, $currency = null, $project = null, $createdAt = null)
     {
         if ($amount == 0) {
             return null;
@@ -361,6 +361,10 @@ class User extends Authenticatable
             $client_balance->reason = $reason;
         }
         $client_balance->currency_id = $currency;
+        if ($createdAt) {
+            $client_balance->created_at = \Carbon\Carbon::parse($createdAt);
+            $client_balance->updated_at = \Carbon\Carbon::parse($createdAt);
+        }
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($client_balance, $project, $amount, $type, $currency) {
             $client_balance->save();
@@ -480,13 +484,29 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the affiliate commission percentage for this user
-     * Returns the percentage as a multiplier (e.g., 1.01 for 1%)
+     * Get the affiliate commission percentage for this user.
+     *
+     * IMPORTANT: This method returns the percentage as a MULTIPLIER
+     * (e.g. 1.01 = 1%, 1.10 = 10%). It is NOT a percent value. If you want
+     * the percent value for display, use `(getAffiliateCommissionPercentage() - 1) * 100`.
+     *
+     * The underlying column `affiliate_commission_percentage` is stored as a
+     * percent number where 1.00 means 1%. Do not multiply amounts by
+     * $this->affiliate_commission_percentage directly — that yields 100x the
+     * intended commission.
      */
     public function getAffiliateCommissionPercentage()
     {
-        $pct = $this->affiliate_commission_percentage ?? 1;
-        return (float) $pct / 100.0 + 1;
+        $pct = $this->affiliateCommissionPercent();
+        return $pct / 100.0 + 1;
+    }
+
+    /**
+     * Raw percent value (e.g. 1.0 = 1%, 10.0 = 10%). Use this for display.
+     */
+    public function affiliateCommissionPercent(): float
+    {
+        return (float) ($this->affiliate_commission_percentage ?? 1);
     }
 
     /**
@@ -499,11 +519,27 @@ class User extends Authenticatable
 
     /**
      * Calculate commission amount based on the base amount.
+     *
+     * When a referred user is supplied AND has made their first payment within
+     * the boosted window (default: 1 month), a higher commission percent is
+     * applied (default: 10%). See
+     * 2026_03_02_000000_add_first_referral_payment_at_to_users_table migration.
      */
     public function calculateCommissionAmount($baseAmount, $currencyId = null, $referredUser = null)
     {
-        $commissionPercentage = $this->getAffiliateCommissionPercentage();
-        $commissionAmount = $baseAmount * ($commissionPercentage - 1);
+        $percent = $this->affiliateCommissionPercent();
+
+        if ($referredUser instanceof User && !empty($referredUser->first_referral_payment_at)) {
+            $boostPercent = (float) config('referrals.boost_percent', 10);
+            $boostDays   = (int)  config('referrals.boost_days', 30);
+            $windowEnd   = $referredUser->first_referral_payment_at->copy()->addDays($boostDays);
+            if (now()->lessThan($windowEnd)) {
+                $percent = max($percent, $boostPercent);
+            }
+        }
+
+        $commissionMultiplier = $percent / 100.0 + 1;
+        $commissionAmount = $baseAmount * ($commissionMultiplier - 1);
 
         if ($currencyId && $currencyId != $this->currency_id) {
             $commissionAmount = \App\Models\CurrenciesExchange::RateToday($commissionAmount, $this->currency_id, $currencyId);

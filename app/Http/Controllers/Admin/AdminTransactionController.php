@@ -135,6 +135,14 @@ class AdminTransactionController extends Controller
             'user' => 'required|exists:users,id',
             'type' => 'required|in:timer-received,timer-due,out-timer-received,refund,earned,send,used',
             'data' => 'required|array',
+            'data.*.amount' => 'required|numeric',
+            'data.*.fee' => 'nullable|numeric',
+            'data.*.reason' => 'nullable|string',
+            'data.*.is_used' => 'nullable|in:0,1',
+            'data.*.project' => 'nullable|exists:projects,id',
+            'data.*.created_at' => 'nullable|date',
+            'data.*.transaction_date' => 'nullable|date',
+            'data.*.date' => 'nullable|date',
         ]);
 
         $user = User::findOrFail($request->user);

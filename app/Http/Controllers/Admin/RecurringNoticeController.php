@@ -12,12 +12,29 @@ class RecurringNoticeController extends Controller
 {
     public function index(Request $request)
     {
-        $notices = RecurringNotice::latest()->paginate(50);
+        if ($request->wantsJson() || $request->ajax()) {
+            return $this->jsonIndex();
+        }
 
-        $notices->getCollection()->transform(function ($notice) {
-            $notice->is_due_today = $notice->isDueToday();
-            $notice->schedule_label = $notice->scheduleLabel();
-            return $notice;
+        return redirect()->route('admin.projects.index');
+    }
+
+    private function jsonIndex(): \Illuminate\Http\JsonResponse
+    {
+        $notices = RecurringNotice::latest()->get()->map(function (RecurringNotice $notice) {
+            return [
+                'id' => $notice->id,
+                'title' => $notice->title,
+                'message' => $notice->message,
+                'type' => $notice->type,
+                'start_date' => $notice->start_date?->toDateString(),
+                'recurring' => $notice->recurring,
+                'recurring_times' => (int) $notice->recurring_times,
+                'recurring_times_week' => $notice->recurring_times_week,
+                'recurring_times_month' => $notice->recurring_times_month,
+                'recurring_times_year' => $notice->recurring_times_year,
+                'is_active' => (bool) $notice->is_active,
+            ];
         });
 
         $stats = [
@@ -25,15 +42,7 @@ class RecurringNoticeController extends Controller
             'due_today' => RecurringNotice::dueToday()->count(),
         ];
 
-        return Inertia::render('Admin/Business/RecurringNotices/Index', [
-            'notices' => $notices,
-            'stats' => $stats,
-        ]);
-    }
-
-    public function create()
-    {
-        return Inertia::render('Admin/Business/RecurringNotices/Create');
+        return response()->json(['notices' => $notices, 'stats' => $stats]);
     }
 
     public function store(Request $request)
@@ -44,27 +53,41 @@ class RecurringNoticeController extends Controller
         $this->fillNotice($notice, $data);
         $notice->save();
 
-        return redirect()->route('admin.recurring_notices.index')->with('success', __('general.recurring_notice_added_successfully'));
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'notice' => $notice->id]);
+        }
+
+        return redirect()->route('admin.projects.index')->with('success', __('general.recurring_notice_added_successfully'));
+    }
+
+    public function show(Request $request, $id)
+    {
+        $notice = RecurringNotice::findOrFail($id);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'notice' => [
+                    'id' => $notice->id,
+                    'title' => $notice->title,
+                    'message' => $notice->message,
+                    'type' => $notice->type,
+                    'start_date' => $notice->start_date?->toDateString(),
+                    'recurring' => $notice->recurring,
+                    'recurring_times' => (int) $notice->recurring_times,
+                    'recurring_times_week' => $notice->recurring_times_week,
+                    'recurring_times_month' => $notice->recurring_times_month,
+                    'recurring_times_year' => $notice->recurring_times_year,
+                    'is_active' => (bool) $notice->is_active,
+                ],
+            ]);
+        }
+
+        return redirect()->route('admin.projects.index');
     }
 
     public function edit($id)
     {
-        $notice = RecurringNotice::findOrFail($id);
-
-        return Inertia::render('Admin/Business/RecurringNotices/Edit', [
-            'notice' => [
-                'id' => $notice->id,
-                'title' => $notice->title,
-                'message' => $notice->message,
-                'type' => $notice->type,
-                'start_date' => $notice->start_date,
-                'recurring' => $notice->recurring,
-                'recurring_times' => $notice->recurring_times,
-                'recurring_times_week' => $notice->recurring_times_week ? explode(',', $notice->recurring_times_week) : [],
-                'recurring_times_month' => $notice->recurring_times_month ? explode(',', $notice->recurring_times_month) : [],
-                'recurring_times_year' => $notice->recurring_times_year ? explode(',', $notice->recurring_times_year) : [],
-            ],
-        ]);
+        return redirect()->route('admin.projects.index');
     }
 
     public function update(Request $request, $id)
@@ -75,22 +98,34 @@ class RecurringNoticeController extends Controller
         $this->fillNotice($notice, $data);
         $notice->save();
 
-        return redirect()->route('admin.recurring_notices.index')->with('success', __('general.recurring_notice_updated_successfully'));
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'notice' => $notice->id]);
+        }
+
+        return redirect()->route('admin.projects.index')->with('success', __('general.recurring_notice_updated_successfully'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $notice = RecurringNotice::findOrFail($id);
         $notice->delete();
 
-        return redirect()->route('admin.recurring_notices.index')->with('success', __('general.recurring_notice_deleted'));
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['ok' => true]);
+        }
+
+        return redirect()->route('admin.projects.index')->with('success', __('general.recurring_notice_deleted'));
     }
 
-    public function toggle($id)
+    public function toggle(Request $request, $id)
     {
         $notice = RecurringNotice::findOrFail($id);
         $notice->is_active = !$notice->is_active;
         $notice->save();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'is_active' => (bool) $notice->is_active]);
+        }
 
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }

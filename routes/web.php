@@ -269,11 +269,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/referrals', [ReferralController::class, 'store_referral'])->name('referrals.store');
     Route::post('/referrals/update-slug', [ReferralController::class, 'update_slug'])->name('referrals.update_slug');
     Route::post('/referrals/activate', [ReferralController::class, 'activate_ref'])->name('referrals.activate');
-    Route::post('/referrals/reward', [ReferralController::class, 'reward'])->name('referrals.reward');
 });
 
 // Public Referral Redirect Route
-Route::get('/r/{ref}', [ReferralController::class, 'referral_redirect'])->name('ref');
+Route::get('/r/{ref}', [ReferralController::class, 'referral_redirect'])
+    ->middleware([\App\Http\Middleware\ReferralRedirectHeaders::class, 'throttle:30,1'])
+    ->name('ref');
 
 // Tracking Route for Campaigns
 Route::get('/track/campaign/{id}', [TrackingController::class, 'trackCampaign'])->name('track.campaign');
@@ -744,10 +745,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/{userId}/notes/json', [UserNoteController::class, 'indexJson'])->name('users.notes.json');
     Route::get('/users/{userId}/notes', [UserNoteController::class, 'index'])->name('users.notes.index');
     Route::post('/users/{userId}/notes', [UserNoteController::class, 'store'])->name('users.notes.store');
+    Route::put('/users/{userId}/notes/{noteId}', [UserNoteController::class, 'update'])->name('users.notes.update');
     Route::delete('/users/{userId}/notes/{noteId}', [UserNoteController::class, 'destroy'])->name('users.notes.destroy');
     Route::post('/users/{userId}/notes/{noteId}/archive', [UserNoteController::class, 'archive'])->name('users.notes.archive');
     Route::post('/users/{userId}/notes/{noteId}/unarchive', [UserNoteController::class, 'unarchive'])->name('users.notes.unarchive');
     Route::post('/users/{userId}/notes/{noteId}/toggle-pin', [UserNoteController::class, 'togglePin'])->name('users.notes.togglePin');
+    Route::post('/users/{userId}/notes/{noteId}/reveal', [UserNoteController::class, 'reveal'])->name('users.notes.reveal');
+    Route::post('/users/{userId}/notes/bulk', [UserNoteController::class, 'bulkAction'])->name('users.notes.bulk');
 
     // ── User Files ───────────────────────────────────────────────────
     // Recovered from old project: Admin/FileController
@@ -1120,11 +1124,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::post('invoices/{id}/toggle-status', [RecurringInvoiceController::class, 'toggle'])->name('recurring_invoices.toggle');
         Route::delete('invoices/{invoice}/records/{record}', [RecurringInvoiceController::class, 'deleteRecord'])->name('recurring_invoices.records.delete');
 
-        // Notices
+        // Notices — managed inline from the Board page (no admin CRUD pages).
         Route::get('notices', [RecurringNoticeController::class, 'index'])->name('recurring_notices.index');
-        Route::get('notices/create', [RecurringNoticeController::class, 'create'])->name('recurring_notices.create');
+        Route::get('notices/json', [RecurringNoticeController::class, 'index'])->name('recurring_notices.json');
         Route::post('notices', [RecurringNoticeController::class, 'store'])->name('recurring_notices.store');
-        Route::get('notices/edit/{id}', [RecurringNoticeController::class, 'edit'])->name('recurring_notices.edit');
+        Route::get('notices/{id}', [RecurringNoticeController::class, 'show'])->name('recurring_notices.show');
         Route::put('notices/{id}', [RecurringNoticeController::class, 'update'])->name('recurring_notices.update');
         Route::delete('notices/{id}/delete', [RecurringNoticeController::class, 'destroy'])->name('recurring_notices.delete');
         Route::post('notices/{id}/toggle-status', [RecurringNoticeController::class, 'toggle'])->name('recurring_notices.toggle');

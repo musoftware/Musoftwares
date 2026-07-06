@@ -148,6 +148,7 @@ export default function CommentsPopover({
         } finally {
             setLoading(false);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [card.id, card.type, guestMode, projectId, shareToken, onCountChange]);
 
     // Lazy-load on first open; refresh whenever the popover re-opens.

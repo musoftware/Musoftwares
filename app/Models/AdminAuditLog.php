@@ -2,46 +2,75 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Log;
 
-class AdminAuditLog extends Model
+class AdminAuditLog
 {
-    public const UPDATED_AT = null;
-
     public const SEVERITY_INFO = 'info';
-
     public const SEVERITY_WARNING = 'warning';
-
     public const SEVERITY_CRITICAL = 'critical';
 
-    protected $table = 'admin_audit_logs';
+    public $id = null;
+    public $actor_user_id;
+    public $actor_ip;
+    public $actor_user_agent;
+    public $action;
+    public $severity;
+    public $target_type;
+    public $target_id;
+    public $meta;
+    public $created_at;
 
-    protected $fillable = [
-        'actor_user_id',
-        'actor_ip',
-        'actor_user_agent',
-        'action',
-        'severity',
-        'target_type',
-        'target_id',
-        'meta',
-        'created_at',
-    ];
+    public static array $logs = [];
 
-    protected $casts = [
-        'meta' => 'array',
-        'created_at' => 'datetime',
-    ];
-
-    public function actor(): BelongsTo
+    public function __construct(array $attributes = [])
     {
-        return $this->belongsTo(User::class, 'actor_user_id');
+        foreach ($attributes as $key => $value) {
+            $this->{$key} = $value;
+        }
+        $this->created_at ??= now();
     }
 
-    public function target(): MorphTo
+    public static function create(array $attributes)
     {
-        return $this->morphTo();
+        Log::info("Admin Audit [{$attributes['action']}]: " . json_encode($attributes));
+
+        $instance = new self($attributes);
+        self::$logs[] = $instance;
+
+        return $instance;
+    }
+
+    public static function where(string $column, $operator = null, $value = null)
+    {
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        return new class($column, $operator, $value) {
+            protected array $filtered = [];
+
+            public function __construct($column, $operator, $value)
+            {
+                $this->filtered = array_filter(AdminAuditLog::$logs, function ($log) use ($column, $operator, $value) {
+                    $itemVal = $log->{$column} ?? null;
+                    if ($operator === '=') {
+                        return $itemVal == $value;
+                    }
+                    return false;
+                });
+            }
+
+            public function latest($column = 'id')
+            {
+                return $this;
+            }
+
+            public function first()
+            {
+                return reset($this->filtered) ?: null;
+            }
+        };
     }
 }

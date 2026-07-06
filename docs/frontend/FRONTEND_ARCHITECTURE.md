@@ -43,7 +43,6 @@ resources/js/
   │   ├── Chat/            Chat UI components
   │   ├── Freelance/       Freelance-specific components
   │   ├── Tools/           Runtime-connected tool components
-  │   ├── AdminNotesPanel.tsx
   │   ├── ContextualPanels.tsx (32KB - major side panel system)
   │   ├── ProductTourModal.tsx
   │   ├── CommandPalette.tsx
@@ -111,7 +110,7 @@ Based on shadcn/ui pattern with Radix UI primitives:
 | Component | Purpose | Size |
 |-----------|---------|------|
 | `ContextualPanels.tsx` | Major side panel system (client details, notes, tasks) | 32KB |
-| `AdminNotesPanel.tsx` | Admin notes UI (pinning, archiving) | 9.7KB |
+| `Admin/Users/Notes.jsx` | Full-page admin secure notes UI (E2EE + audit + bulk) | 26KB |
 | `ProductTourModal.tsx` | Onboarding tour guide | 9.7KB |
 | `CommandPalette.tsx` | Global search/command palette (cmdk) | 4.7KB |
 | `ApplicationLogo.tsx` | Brand logo component | 5KB |

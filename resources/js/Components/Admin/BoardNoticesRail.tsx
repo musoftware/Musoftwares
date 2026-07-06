@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, Bell, Settings2 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { NOTICES_MANAGER_OPEN_EVENT } from './NoticesManager';
 
 export type RecurringNoticeToday = {
     id: number;
@@ -136,13 +137,14 @@ export default function BoardNoticesRail() {
             </div>
 
             <div className="border-t p-3">
-                <Link
-                    href={route('admin.recurring_notices.index')}
-                    className="flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent(NOTICES_MANAGER_OPEN_EVENT))}
+                    className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 >
                     <Settings2 className="h-3.5 w-3.5" />
                     {__('general.manage_notices')}
-                </Link>
+                </button>
             </div>
         </aside>
     );

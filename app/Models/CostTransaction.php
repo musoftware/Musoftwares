@@ -77,7 +77,7 @@ class CostTransaction extends Model
         return FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
     }
 
-    public static function add_cost_balance($user, $amount, $reason, $currency = null, $project = null)
+    public static function add_cost_balance($user, $amount, $reason, $currency = null, $project = null, $createdAt = null)
     {
         if ($amount == 0) return null;
         $user_id = null;
@@ -98,6 +98,10 @@ class CostTransaction extends Model
         $c->amount = $amount;
         $c->reason = $reason;
         $c->currency = $currency ?? optional($user)->currency_id;
+        if ($createdAt) {
+            $c->created_at = \Carbon\Carbon::parse($createdAt);
+            $c->updated_at = \Carbon\Carbon::parse($createdAt);
+        }
 
         DB::transaction(function () use ($c, $user) {
             $c->save();

@@ -2533,6 +2533,24 @@ parameters:
 			path: app/Http/Resources/UserNoteResource.php
 
 		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserNoteResource\:\:\$rotated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserNoteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserNoteResource\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/UserNoteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\UserNoteResource\:\:\$last_revealed_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/UserNoteResource.php
+
+		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$add_commission_to_total\.$#'
 			identifier: property.notFound
 			count: 1

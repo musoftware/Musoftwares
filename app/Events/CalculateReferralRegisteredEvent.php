@@ -22,23 +22,18 @@ class CalculateReferralRegisteredEvent
     /**
      * Create a new event instance.
      *
+     * The constructor is intentionally side-effect-free. Resolving the ref
+     * and incrementing the `registered` counter happen in the listener
+     * (CalculateReferralListener) so the event remains cheap to dispatch and
+     * can be replayed safely from queues.
+     *
      * @return void
      */
-    /** @phpstan-ignore-next-line */
     public function __construct($user, $referral, $ip)
     {
         $this->user = $user;
         $this->referral = $referral;
         $this->ip = $ip;
-
-        if (isset($referral) && $referral !== '') {
-            $get_ref = \App\Helper\ReferralHelper::GetRef($referral);
-            if ($get_ref !== null) {
-                $user->ref_user_id = $get_ref->user_id;
-                $user->save();
-                $get_ref->increment('registered');
-            }
-        }
     }
 
     /**

@@ -7,9 +7,11 @@ use App\Models\User;
 use App\Models\UserCredential;
 use App\Services\UserNoteService;
 use App\Http\Requests\Admin\User\StoreUserNoteRequest;
+use App\Http\Requests\Admin\User\UpdateUserNoteRequest;
 use App\Http\Resources\UserNoteResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -22,166 +24,193 @@ use Inertia\Response as InertiaResponse;
  *   - Archive moves note to 'archived' while saving original_category
  *   - Unarchive restores original_category
  *   - Statistics returned on every mutating action (for reactive UI)
+ *   - Every mutation writes an entry to AdminAuditLog
  */
 class UserNoteController extends Controller
 {
     public function __construct(
         protected UserNoteService $userNoteService
     ) {}
-    /**
-     * Show notes index page for a user (Inertia full-page).
-     */
+
     public function index(Request $request, int $userId): InertiaResponse
     {
         $user  = User::findOrFail($userId);
-        $notes = UserCredential::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn($note) => (new UserNoteResource($note))->resolve());
+        $notes = $this->fetchNotes($request, $userId);
 
         return Inertia::render('Admin/Users/Notes', [
             'user'  => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
             'notes' => $notes,
             'stats' => $this->userNoteService->getStats($userId),
+            'flash' => session()->only(['success', 'error', 'warning']),
         ]);
     }
 
-    /**
-     * Return notes as JSON for AJAX (AdminNotesPanel).
-     */
     public function indexJson(Request $request, int $userId): JsonResponse
     {
         User::findOrFail($userId);
 
-        $notes = UserCredential::where('user_id', $userId)
-            ->orderByDesc('is_pinned')
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(fn($note) => (new UserNoteResource($note))->resolve());
-
         return response()->json([
-            'data'  => $notes,
+            'data'  => $this->fetchNotes($request, $userId),
             'stats' => $this->userNoteService->getStats($userId),
         ]);
     }
 
-    /**
-     * Create a new note for a user.
-     * Recovered from old project: UserNotesController::addNote()
-     */
     public function store(StoreUserNoteRequest $request, int $userId)
     {
         User::findOrFail($userId);
 
         $note = $this->userNoteService->createNote($userId, $request->validated());
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Note added successfully.',
-                'note'    => (new UserNoteResource($note))->resolve(),
-                'stats'   => $this->userNoteService->getStats($userId),
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Note added successfully.');
+        return $this->respond($request, $userId, 'Note added successfully.', [
+            'note' => (new UserNoteResource($note))->resolve(),
+        ]);
     }
 
-    /**
-     * Delete a note permanently.
-     * Recovered from old project: UserNotesController::deleteNote()
-     */
+    public function update(UpdateUserNoteRequest $request, int $userId, int $noteId)
+    {
+        $note = $this->userNoteService->updateNote($userId, $noteId, $request->validated());
+
+        return $this->respond($request, $userId, 'Note updated.', [
+            'note' => (new UserNoteResource($note))->resolve(),
+        ]);
+    }
+
     public function destroy(Request $request, int $userId, int $noteId)
     {
         $this->userNoteService->deleteNote($userId, $noteId);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Note deleted.',
-                'stats'   => $this->userNoteService->getStats($userId),
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Note deleted.');
+        return $this->respond($request, $userId, 'Note deleted.');
     }
 
-    /**
-     * Archive a note — moves to 'archived' category, saves original category.
-     * Recovered from old project: UserNotesController::archiveNote()
-     */
     public function archive(Request $request, int $userId, int $noteId)
     {
         try {
             $this->userNoteService->archiveNote($userId, $noteId);
         } catch (\Exception $e) {
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ], 400);
-            }
-            return redirect()->back()->with('error', $e->getMessage());
+            return $this->respondError($request, $e->getMessage());
         }
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Note archived.',
-                'stats'   => $this->userNoteService->getStats($userId),
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Note archived.');
+        return $this->respond($request, $userId, 'Note archived.');
     }
 
-    /**
-     * Restore an archived note to its original category.
-     * Recovered from old project: UserNotesController::unarchiveNote()
-     */
     public function unarchive(Request $request, int $userId, int $noteId)
     {
         try {
             $originalCategory = $this->userNoteService->unarchiveNote($userId, $noteId);
         } catch (\Exception $e) {
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ], 400);
-            }
-            return redirect()->back()->with('error', $e->getMessage());
+            return $this->respondError($request, $e->getMessage());
         }
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Note restored to ' . ($originalCategory ?: 'notes') . '.',
-                'stats'   => $this->userNoteService->getStats($userId),
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Note restored to ' . ($originalCategory ?: 'notes') . '.');
+        return $this->respond(
+            $request,
+            $userId,
+            'Note restored to ' . ($originalCategory ?: 'notes') . '.'
+        );
     }
 
-    /**
-     * Toggle the pinned status of a note.
-     */
     public function togglePin(Request $request, int $userId, int $noteId)
     {
-        $note = UserCredential::where('user_id', $userId)->findOrFail($noteId);
-        $note->is_pinned = !$note->is_pinned;
-        $note->save();
+        $note = $this->userNoteService->togglePin($userId, $noteId);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Note pin status toggled.',
-                'is_pinned' => (bool) $note->is_pinned,
-                'stats'   => $this->userNoteService->getStats($userId),
-            ]);
+        return $this->respondJsonOrRedirect($request,
+            ['success' => true, 'message' => 'Note pin status toggled.', 'is_pinned' => (bool) $note->is_pinned, 'stats' => $this->userNoteService->getStats($userId)],
+            'Note pin status toggled.'
+        );
+    }
+
+    public function reveal(Request $request, int $userId, int $noteId)
+    {
+        $note = $this->userNoteService->revealNote($userId, $noteId);
+
+        return $this->respondJsonOrRedirect($request,
+            ['success' => true, 'stats' => $this->userNoteService->getStats($userId)],
+            'Note revealed.'
+        );
+    }
+
+    public function bulkAction(Request $request, int $userId)
+    {
+        $validated = $request->validate([
+            'action'   => 'required|string|in:archive,unarchive,delete',
+            'note_ids' => 'required|array|min:1|max:100',
+            'note_ids.*' => 'integer',
+        ]);
+
+        $count = match ($validated['action']) {
+            'archive'   => $this->userNoteService->bulkArchive($userId, $validated['note_ids']),
+            'unarchive' => $this->userNoteService->bulkUnarchive($userId, $validated['note_ids']),
+            'delete'    => $this->userNoteService->bulkDelete($userId, $validated['note_ids']),
+        };
+
+        $message = ucfirst($validated['action']) . " applied to {$count} note(s).";
+
+        return $this->respond($request, $userId, $message, ['count' => $count]);
+    }
+
+    protected function fetchNotes(Request $request, int $userId): array
+    {
+        $query = UserCredential::where('user_id', $userId);
+
+        if ($category = $request->query('category')) {
+            if ($category === 'active') {
+                $query->where('category', '!=', 'archived');
+            } elseif (in_array($category, ['password', 'anydesk', 'notes', 'archived'], true)) {
+                $query->where('category', $category);
+            }
         }
 
-        return redirect()->back()->with('success', 'Note pin status toggled.');
+        if ($pinned = $request->query('pinned')) {
+            $query->where('is_pinned', (bool) $pinned);
+        }
+
+        $perPage = min(50, max(5, (int) $request->query('per_page', 24)));
+
+        $page = $query
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+
+        $items = collect($page->items())
+            ->map(fn ($note) => (new UserNoteResource($note))->resolve())
+            ->all();
+
+        return [
+            'items'       => $items,
+            'current_page'=> $page->currentPage(),
+            'last_page'   => $page->lastPage(),
+            'total'       => $page->total(),
+            'per_page'    => $page->perPage(),
+        ];
+    }
+
+    protected function respond(Request $request, int $userId, string $message, array $extra = []): JsonResponse|\Illuminate\Http\RedirectResponse
+    {
+        $payload = array_merge([
+            'success' => true,
+            'message' => $message,
+            'stats'   => $this->userNoteService->getStats($userId),
+        ], $extra);
+
+        if ($request->wantsJson()) {
+            return response()->json($payload);
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    protected function respondJsonOrRedirect(Request $request, array $jsonPayload, string $redirectMessage): JsonResponse|\Illuminate\Http\RedirectResponse
+    {
+        if ($request->wantsJson()) {
+            return response()->json($jsonPayload);
+        }
+        return redirect()->back()->with('success', $redirectMessage);
+    }
+
+    protected function respondError(Request $request, string $message): JsonResponse|\Illuminate\Http\RedirectResponse
+    {
+        if ($request->wantsJson()) {
+            return response()->json(['success' => false, 'message' => $message], 400);
+        }
+        return redirect()->back()->with('error', $message);
     }
 }

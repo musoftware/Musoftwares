@@ -40,6 +40,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
     const [fee, setFee] = useState<string>('');
     const [reason, setReason] = useState<string>('');
     const [isUsed, setIsUsed] = useState<boolean>(false);
+    const [createdAt, setCreatedAt] = useState<string>('');
     
     // Exchange State
     const [showExchange, setShowExchange] = useState(false);
@@ -140,7 +141,8 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                     fee: fee ? (parseFloat(fee) * perc).toFixed(2) : 0,
                     reason: reason,
                     is_used: isUsed ? 1 : 0,
-                    project: split.projectId
+                    project: split.projectId,
+                    created_at: createdAt || null
                 };
             });
             setStagedItems([...stagedItems, ...newItems]);
@@ -150,7 +152,8 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                 fee: fee ? parseFloat(fee) : 0,
                 reason: reason,
                 is_used: isUsed ? 1 : 0,
-                project: selectedProject?.id || null
+                project: selectedProject?.id || null,
+                created_at: createdAt || null
             }]);
         }
         
@@ -158,6 +161,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
         setAmount('');
         setFee('');
         setReason('');
+        setCreatedAt('');
     };
 
     const removeItem = (index: number) => {
@@ -309,15 +313,28 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                         </div>
                     </div>
 
-                    {/* Reason */}
-                    <div className="space-y-1">
-                        <Label>{__('general.reason_description')}</Label>
-                        <Input 
-                            value={reason} 
-                            onChange={e => setReason(e.target.value)} 
-                            placeholder={__('general.description_of_the_transaction')} 
-                            onKeyDown={e => e.key === 'Enter' && addItem()}
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Reason */}
+                        <div className="space-y-1">
+                            <Label>{__('general.reason_description')}</Label>
+                            <Input 
+                                value={reason} 
+                                onChange={e => setReason(e.target.value)} 
+                                placeholder={__('general.description_of_the_transaction')} 
+                                onKeyDown={e => e.key === 'Enter' && addItem()}
+                                className="bg-white"
+                            />
+                        </div>
+                        {/* Date & Time */}
+                        <div className="space-y-1">
+                            <Label>{__('general.date_time_1')}</Label>
+                            <Input 
+                                type="datetime-local"
+                                value={createdAt} 
+                                onChange={e => setCreatedAt(e.target.value)} 
+                                className="bg-white text-muted-foreground focus:text-foreground"
+                            />
+                        </div>
                     </div>
 
                     {/* Project Splitter (Only if no specific project is selected initially) */}
@@ -410,7 +427,15 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                 <tbody className="divide-y bg-background">
                                     {stagedItems.map((item, idx) => (
                                         <tr key={idx} className="hover:bg-muted/20">
-                                            <td className="px-4 py-3 font-medium">{item.reason || '-'}</td>
+                                            <td className="px-4 py-3 font-medium">
+                                                <div>{item.reason || '-'}</div>
+                                                {item.created_at && (
+                                                    <div className="text-[10px] text-muted-foreground mt-0.5 font-normal flex items-center gap-1">
+                                                        <span className="opacity-70">{__('general.date_time_1')}:</span>
+                                                        <span>{item.created_at.replace('T', ' ')}</span>
+                                                    </div>
+                                                )}
+                                            </td>
                                             {projectSplits.length > 0 && (
                                                 <td className="px-4 py-3 text-muted-foreground">
                                                     {activeProjects.find(p => p.id.toString() === item.project?.toString())?.project_name || '-'}

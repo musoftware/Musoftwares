@@ -115,4 +115,8 @@ return [
         'retry_sleep' => env('TOOLSYS_RETRY_SLEEP', 300),
     ],
 
+    'iphub' => [
+        'key' => env('IPHUB_API_KEY'),
+    ],
+
 ];

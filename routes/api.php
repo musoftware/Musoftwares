@@ -38,6 +38,17 @@ Route::post('serial/device',
     [SerialDeviceController::class, 'register']
 )->middleware(['force.json', 'throttle:60,1']);
 
+// ── Paid Commission Play ─────────────────────────────────────────────────────
+// Read-only check used by external client software to determine whether the
+// user has an active paid subscription for a given app id. Requires Sanctum
+// auth; only reveals existence of a paid invoice item, never invoice/user
+// details.
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+    Route::post('paid-commision-play',
+        [\App\Http\Controllers\Api\CommissionController::class, 'checkStatus']
+    );
+});
+
 // ── Runtime Version Manifest (public) ─────────────────────────────────────────
 // Polled by local runtime agents to check for updates.
 // Served from public/downloads/runtime/latest.json

@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use App\Models\UserReferral;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class ReferralHelper
 {
@@ -39,19 +40,39 @@ class ReferralHelper
         $request->session()->put('referral', $string);
     }
 
-    public static function isProxy($ipAddress)
+    /**
+     * Best-effort proxy/VPN detection via iphub.info.
+     *
+     * Reads IPHUB_API_KEY from config/services.php (which in turn reads
+     * env('IPHUB_API_KEY')). When the key is missing the function returns
+     * null so callers can decide to skip the check instead of failing.
+     *
+     * Never hardcode API keys in source — they belong in the environment.
+     */
+    public static function isProxy($ipAddress): ?bool
     {
-        $client = new Client();
-        $apiKey = 'MjA0NjQ6V3owSWpCdk1HZHkxWmdXcVN3ZVlyd0lUaGt6cGl2ZjA=';
+        $apiKey = config('services.iphub.key');
+        if (empty($apiKey) || empty($ipAddress)) {
+            return null;
+        }
 
-        $response = $client->get("http://v2.api.iphub.info/ip/{$ipAddress}", [
-            'headers' => [
-                'X-Key' => $apiKey,
-            ],
-        ]);
+        try {
+            $client = new Client(['timeout' => 3]);
+            $response = $client->get("http://v2.api.iphub.info/ip/{$ipAddress}", [
+                'headers' => [
+                    'X-Key' => $apiKey,
+                ],
+            ]);
 
-        $data = json_decode($response->getBody(), true);
+            $data = json_decode((string) $response->getBody(), true);
 
-        return $data['block'];
+            return $data['block'] ?? null;
+        } catch (\Throwable $e) {
+            Log::warning('iphub lookup failed', [
+                'ip' => $ipAddress,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
     }
 }

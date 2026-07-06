@@ -24,6 +24,17 @@ class UserCredential extends Model
         'content',
         'note',
         'is_pinned',
+        'rotated_at',
+        'expires_at',
+        'last_revealed_at',
+        'last_revealed_by',
+    ];
+
+    protected $casts = [
+        'is_pinned'         => 'boolean',
+        'rotated_at'        => 'datetime',
+        'expires_at'        => 'datetime',
+        'last_revealed_at'  => 'datetime',
     ];
 
     /** Valid active categories (excludes 'archived') */

@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\UserReferral;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -19,22 +20,25 @@ class CalculateReferralListener
             'user_id' => $event->user->id ?? null,
             'referral' => $event->referral ?? null,
         ]);
-        
-        if (isset($event->user) && $event->user->ref_user_id) {
-            $referrer = \App\Models\User::find($event->user->ref_user_id);
-            if ($referrer) {
-                // Here we would look up the specific reward value from settings
-                // Defaulting to 0 since legacy EarnPerRegister returned 0
-                $rewardAmount = 0; 
-                
-                if ($rewardAmount > 0) {
-                    // Assuming add_balance method exists on User model for wallet features
-                    if (method_exists($referrer, 'add_balance')) {
-                        $referrer->add_balance($rewardAmount, 'Referral Bonus for new registration', 'received');
-                    }
-                    Log::info("Referral bonus of {$rewardAmount} added to referrer ID {$referrer->id}");
-                }
+
+        // Resolve the referral key and increment the `registered` counter
+        // here, in the listener, rather than in the event constructor.
+        // Constructor side-effects broke replay and queued dispatch.
+        if (!empty($event->referral)) {
+            $ref = UserReferral::resolveRef((string) $event->referral);
+            if ($ref !== null) {
+                $ref->increment('registered');
             }
         }
+
+        // No referral sign-up reward is paid in this codebase. The legacy
+        // EarnPerRegister::regEquivalent() returned 0, and there is no settings
+        // surface to configure a non-zero value. Keeping this listener as an
+        // explicit no-op so the queue wiring stays intact for future reward
+        // logic without misleading anyone reading the logs.
+        //
+        // When a real reward is introduced, set $rewardAmount from settings
+        // and call $referrer->add_balance($rewardAmount, 'Referral Bonus ...', 'received').
+        return;
     }
 }

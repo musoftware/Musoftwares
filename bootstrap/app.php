@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureOnboardingCompleted;
 use App\Http\Middleware\ForceJsonRequest;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ModeratorMiddleware;
+use App\Http\Middleware\ReferralRedirectHeaders;
 use App\Http\Middleware\RemoveSecurityHeaders;
 use App\Http\Middleware\SecurityEnforcement;
 use App\Http\Middleware\SetLocale;

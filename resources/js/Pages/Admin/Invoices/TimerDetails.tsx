@@ -220,7 +220,7 @@ export default function TimerDetails({
         }, {
             onSuccess: () => {
                 setIsSaving(false);
-                try { localStorage.removeItem(storageKey); } catch {}
+                try { localStorage.removeItem(storageKey); } catch { /* empty */ }
                 toast.success(__('general.saved') || 'Saved');
             },
             onError: () => setIsSaving(false),

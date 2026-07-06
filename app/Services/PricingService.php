@@ -61,9 +61,13 @@ class PricingService extends BaseService
             ];
         }
 
-        // 2. Addons
+        // 2. Addons — Gold Saver is sold as a single bundle with every feature included,
+        // so any stale gold-* entries in the config (from before the removal) are skipped here.
         $addonsConfig = config('saas.addons', []);
         foreach ($addonsConfig as $id => $configItem) {
+            if (str_starts_with((string) $id, 'gold-')) {
+                continue;
+            }
             $monthly = $configItem['price'] / 10;
             $items[] = [
                 'id' => $id,

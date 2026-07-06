@@ -13,14 +13,18 @@ use Illuminate\Http\Request;
  * app identifier.
  *
  * Flow:
- * 1. Client posts `appname` (and may post packagename / commissionRate as metadata).
- * 2. We look for any InvoiceItem whose `item_title` LIKE %appname% and whose parent
- *    Invoice has `status = 'paid'`.
+ * 1. Authenticated client posts `appname` (and may post packagename as metadata).
+ * 2. We look for any InvoiceItem whose `item_title` matches `appname` *exactly*
+ *    AND whose parent Invoice has `status = 'paid'`. Exact match prevents
+ *    cross-tenant information leaks via short substring appnames (e.g. "the").
  * 3. Response: `{ "paid": true|false }` so the client can enable/disable access.
  *
- * This endpoint is intentionally unauthenticated and read-only: it only reveals
- * whether *some* invoice for the app has been paid. It does NOT leak any invoice,
- * user, or pricing details.
+ * Auth: Sanctum (the calling client software must hold a valid personal-access
+ *       token with the `serial.device` ability or any token scoped to this app).
+ *       Unauthenticated callers receive 401 — see api.php route definition.
+ *
+ * This endpoint only reveals whether *some* invoice for the app has been paid.
+ * It does NOT leak any invoice, user, or pricing details.
  */
 class CommissionController extends Controller
 {
@@ -34,7 +38,7 @@ class CommissionController extends Controller
         $appName = $validated['appname'];
 
         $paid = InvoiceItem::query()
-            ->where('item_title', 'like', '%'.$appName.'%')
+            ->where('item_title', '=', $appName)
             ->whereHas('invoice', function ($query) {
                 $query->where('status', 'paid');
             })

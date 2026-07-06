@@ -89,23 +89,35 @@ class BusinessController extends Controller
         $monthlyTrends = [];
         $trendStart = now()->subMonths(5)->startOfMonth();
         $trendEnd = now()->endOfMonth();
-        $txByMonth = Transaction::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, type, SUM(business_amount) as total")
+
+        $txs = Transaction::select('created_at', 'type', 'business_amount')
             ->whereBetween('created_at', [$trendStart, $trendEnd])
             ->whereIn('type', ['received', 'refunded', 'sent'])
-            ->groupBy('ym', 'type')
-            ->pluck('total', 'ym', 'type');
-        $costByMonth = CostTransaction::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, SUM(business_amount) as total")
+            ->get();
+
+        $txData = [];
+        foreach ($txs as $tx) {
+            $ym = $tx->created_at->format('Y-m');
+            $txData[$ym][$tx->type] = ($txData[$ym][$tx->type] ?? 0.0) + (float) $tx->business_amount;
+        }
+
+        $costs = CostTransaction::select('created_at', 'business_amount')
             ->excludingSalaries()
             ->whereBetween('created_at', [$trendStart, $trendEnd])
-            ->groupBy('ym')
-            ->pluck('total', 'ym');
+            ->get();
+
+        $costByMonth = [];
+        foreach ($costs as $cost) {
+            $ym = $cost->created_at->format('Y-m');
+            $costByMonth[$ym] = ($costByMonth[$ym] ?? 0.0) + (float) $cost->business_amount;
+        }
 
         for ($i = 5; $i >= 0; $i--) {
             $m = now()->subMonths($i);
             $ym = $m->format('Y-m');
-            $mReceived = (float) ($txByMonth[$ym]['received'] ?? 0);
-            $mRefunded = (float) ($txByMonth[$ym]['refunded'] ?? 0);
-            $mSent = (float) ($txByMonth[$ym]['sent'] ?? 0);
+            $mReceived = (float) ($txData[$ym]['received'] ?? 0);
+            $mRefunded = (float) ($txData[$ym]['refunded'] ?? 0);
+            $mSent = (float) ($txData[$ym]['sent'] ?? 0);
             $mCosts = (float) ($costByMonth[$ym] ?? 0);
 
             $monthlyTrends[] = [

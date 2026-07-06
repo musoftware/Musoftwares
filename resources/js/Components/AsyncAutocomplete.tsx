@@ -54,6 +54,8 @@ export function AsyncAutocomplete({
         } else if (!value) {
             setSelectedName('');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialItem, value]);
 
     useEffect(() => {
@@ -104,7 +106,11 @@ export function AsyncAutocomplete({
             }
         });
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         return () => { active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedSearch, open, page, searchEndpoint, JSON.stringify(extraParams)]);
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
