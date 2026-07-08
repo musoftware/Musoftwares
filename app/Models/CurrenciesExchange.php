@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,21 @@ class CurrenciesExchange extends Model
     use SoftDeletes, HasFactory;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'rate' => 'float',
+        'date_string' => 'date:Y-m-d',
+    ];
+
+    public function currencyFrom(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency1');
+    }
+
+    public function currencyTo(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency2');
+    }
 
     /**
      * In-memory cache to prevent N+1 queries during bulk conversions

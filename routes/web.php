@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AdminBlogArticleController;
 use App\Http\Controllers\Admin\AdminBusyTimesController;
 use App\Http\Controllers\Admin\AdminContractController;
 use App\Http\Controllers\Admin\AdminCouponController;
+use App\Http\Controllers\Admin\AdminCurrencyController;
+use App\Http\Controllers\Admin\AdminCurrencyExchangeController;
 use App\Http\Controllers\Admin\AdminFreeDownloadController;
 use App\Http\Controllers\Admin\AdminLanguageLineController;
 use App\Http\Controllers\Admin\AdminPaymentMethodController;
@@ -61,6 +63,7 @@ use App\Http\Controllers\Client\ClientProjectController;
 use App\Http\Controllers\Client\ClientProjectFileController;
 use App\Http\Controllers\Client\ClientProjectReportController;
 use App\Http\Controllers\Client\ClientProjectTaskController;
+use App\Http\Controllers\Client\ClientTasksAggregatorController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceTokenController;
@@ -197,6 +200,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // per-day visual workflow board. Ownership is enforced per-route via ProjectPolicy.
 Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')->group(function () {
     Route::get('/projects', [ClientProjectController::class, 'index'])->name('index');
+    Route::get('/projects/tasks', [ClientTasksAggregatorController::class, 'index'])->name('all-tasks');
     Route::get('/projects/{project}', [ClientProjectController::class, 'show'])->name('show');
     Route::get('/projects/{project}/tasks', [ClientProjectTaskController::class, 'tasksIndex'])->name('tasks.index');
     Route::get('/projects/{project}/reports/{report}', [ClientProjectReportController::class, 'show'])->name('reports.show');
@@ -713,6 +717,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/{user}/merge', [App\Http\Controllers\Admin\UserMergeController::class, 'preview'])->name('users.merge.preview');
     Route::post('/users/{user}/merge/confirm', [App\Http\Controllers\Admin\UserMergeController::class, 'confirm'])->name('users.merge.confirm');
 
+    // User email aliases
+    Route::get   ('/users/{user}/emails',                          [App\Http\Controllers\Admin\UserEmailController::class, 'index'])->name('users.emails.index');
+    Route::post  ('/users/{user}/emails',                          [App\Http\Controllers\Admin\UserEmailController::class, 'store'])->name('users.emails.store');
+    Route::delete('/users/{user}/emails/{email}',                  [App\Http\Controllers\Admin\UserEmailController::class, 'destroy'])->name('users.emails.destroy');
+    Route::post  ('/users/{user}/emails/{email}/verify',           [App\Http\Controllers\Admin\UserEmailController::class, 'verify'])->name('users.emails.verify');
+
     // User Loans
     Route::post('/users/{user}/loans', [AdminUserLoanController::class, 'store'])->name('users.loans.store');
     Route::put('/users/{user}/loans/{loan}', [AdminUserLoanController::class, 'update'])->name('users.loans.update');
@@ -734,6 +744,14 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Admin Point Packages ───────────────────────────────────────
     Route::resource('point-packages', AdminPointPackageController::class)->except(['show']);
+
+    // ── Admin Currencies ───────────────────────────────────────────
+    Route::resource('currencies', AdminCurrencyController::class)->except(['show']);
+
+    // ── Admin Currency Exchanges ───────────────────────────────────
+    Route::resource('currency-exchanges', AdminCurrencyExchangeController::class)
+        ->except(['show'])
+        ->parameters(['currency-exchanges' => 'currencyExchange']);
 
     // ── Charity Counter ──────────────────────────────────────────────
     Route::get('/charity-counter', [CharityCounterController::class, 'index'])->name('charity-counter.index');

@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Currency extends Model
 {
@@ -22,5 +23,15 @@ class Currency extends Model
             $as_array[$item->id] = $item;
         }
         return $as_array;
+    }
+
+    public function exchangesFrom(): HasMany
+    {
+        return $this->hasMany(CurrenciesExchange::class, 'currency1');
+    }
+
+    public function exchangesTo(): HasMany
+    {
+        return $this->hasMany(CurrenciesExchange::class, 'currency2');
     }
 }

@@ -68,6 +68,8 @@ const items: MenuItem[] = [
         { title: "Hours Calendar", url: "/admin/hours-calendar" },
         { title: "Transactions", url: "/admin/transactions?type=income" },
         { title: "Cost Transactions", url: "/admin/transactions?type=cost" },
+        { title: "Currencies", url: "/admin/currencies" },
+        { title: "Currency Exchanges", url: "/admin/currency-exchanges" },
     ]
   },
   { 
