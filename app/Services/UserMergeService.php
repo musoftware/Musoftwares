@@ -288,39 +288,51 @@ class UserMergeService
                 $duplicateOtherValues  = $this->otherColumnValuesFor($table, $fkCol, $duplicateId);
 
                 $skipped = 0;
-                foreach ($duplicateOtherValues as $row) {
-                    $otherCol = $row['other_col'];
-                    $otherVal = $row['other_val'];
+                if ($duplicateOtherValues !== []) {
+                    foreach ($duplicateOtherValues as $row) {
+                        $otherCol = $row['other_col'];
+                        $otherVal = $row['other_val'];
 
-                    if ($otherCol === null || $otherVal === null) {
-                        continue;
+                        if ($otherCol === null || $otherVal === null) {
+                            continue;
+                        }
+
+                        if (in_array($otherCol, self::PROTECTED_COLUMNS, true)) {
+                            continue;
+                        }
+
+                        if (isset($existingSurvivorPairs[$otherCol][(string) $otherVal])) {
+                            $skipped++;
+                            $collisions[] = sprintf(
+                                '%s.%s already exists for survivor on %s=%s (duplicate row left intact)',
+                                $table,
+                                $fkCol,
+                                $otherCol,
+                                $otherVal
+                            );
+                            continue;
+                        }
+
+                        DB::table($table)
+                            ->where($fkCol, $duplicateId)
+                            ->where($otherCol, $otherVal)
+                            ->update([$fkCol => $survivorId]);
+
+                        $existingSurvivorPairs[$otherCol][(string) $otherVal] = true;
                     }
 
-                    if (in_array($otherCol, self::PROTECTED_COLUMNS, true)) {
-                        continue;
+                    // Reassign remaining rows where the composite columns are null
+                    $query = DB::table($table)->where($fkCol, $duplicateId);
+                    foreach (array_keys($existingSurvivorPairs) as $otherCol) {
+                        $query->whereNull($otherCol);
                     }
-
-                    if (isset($existingSurvivorPairs[$otherCol][(string) $otherVal])) {
-                        $skipped++;
-                        $collisions[] = sprintf(
-                            '%s.%s already exists for survivor on %s=%s (duplicate row left intact)',
-                            $table,
-                            $fkCol,
-                            $otherCol,
-                            $otherVal
-                        );
-                        continue;
-                    }
-
+                    $query->update([$fkCol => $survivorId]);
+                } else {
                     DB::table($table)
                         ->where($fkCol, $duplicateId)
-                        ->where($otherCol, $otherVal)
                         ->update([$fkCol => $survivorId]);
-
-                    $existingSurvivorPairs[$otherCol][(string) $otherVal] = true;
                 }
 
-                $updated = DB::table($table)->whereIn($fkCol, [$duplicateId])->count();
                 $report[] = [
                     'table'   => $table,
                     'column'  => $fkCol,
@@ -343,7 +355,7 @@ class UserMergeService
         return DB::table($table)
             ->where('tokenable_type', User::class)
             ->where('tokenable_id', $duplicateId)
-            ->update(['revoked' => 1]);
+            ->delete();
     }
 
     private function mergeRolesAndPermissions(int $duplicateId, int $survivorId): int
@@ -490,7 +502,41 @@ class UserMergeService
         if ($driver === 'pgsql') {
             return $this->pgsqlCompositeIndexesOn($table, $fkCol);
         }
+        if ($driver === 'sqlite') {
+            return $this->sqliteCompositeIndexesOn($table, $fkCol);
+        }
         return [];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function sqliteCompositeIndexesOn(string $table, string $fkCol): array
+    {
+        $indexes = DB::select("PRAGMA index_list(\"{$table}\")");
+        $result = [];
+
+        foreach ($indexes as $idx) {
+            $idxName = $idx->name ?? null;
+            if (!$idxName) {
+                continue;
+            }
+            $colsInfo = DB::select("PRAGMA index_info(\"{$idxName}\")");
+            $cols = [];
+            foreach ($colsInfo as $colInfo) {
+                if (!empty($colInfo->name)) {
+                    $cols[] = $colInfo->name;
+                }
+            }
+            if (in_array($fkCol, $cols, true) && count($cols) > 1) {
+                foreach ($cols as $c) {
+                    if ($c !== $fkCol && !in_array($c, self::PROTECTED_COLUMNS, true)) {
+                        $result[$c] = true;
+                    }
+                }
+            }
+        }
+        return array_keys($result);
     }
 
     /**

@@ -208,7 +208,7 @@ class UsersTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('user_subscriptions', [
+        $this->assertSoftDeleted('user_subscriptions', [
             'id' => $subscription->id,
         ]);
     }

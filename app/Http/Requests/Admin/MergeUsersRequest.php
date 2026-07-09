@@ -12,6 +12,20 @@ class MergeUsersRequest extends FormRequest
         return $user !== null && $user->isAdmin();
     }
 
+    protected function prepareForValidation(): void
+    {
+        $userParam = $this->route('user');
+        $userId    = is_object($userParam) && method_exists($userParam, 'getKey')
+            ? (int) $userParam->getKey()
+            : (int) ($userParam ?? 0);
+
+        if ($userId > 0) {
+            $this->merge([
+                'survivor_id' => $userId,
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [

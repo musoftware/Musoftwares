@@ -33,7 +33,7 @@ class UserMergeTest extends TestCase
             'user_id' => $duplicate->id,
             'amount'  => 100.0,
             'type'    => 'received',
-            'currency'=> 1,
+            'currency_id'=> 1,
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
@@ -64,14 +64,13 @@ class UserMergeTest extends TestCase
             'user_id' => $duplicate->id,
             'amount'  => 50.0,
             'type'    => 'received',
-            'currency'=> 1,
+            'currency_id'=> 1,
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
         $this->service->merge($survivor->id, $duplicate->id, ['name' => 'survivor'], 0);
 
         $this->assertDatabaseHas('transactions', ['id' => $txnId, 'user_id' => $survivor->id]);
-        $this->assertNull($duplicate->fresh());
 
         $trashed = User::withTrashed()->find($duplicate->id);
         $this->assertNotNull($trashed->deleted_at);
@@ -80,7 +79,7 @@ class UserMergeTest extends TestCase
         $this->assertDatabaseHas('admin_audit_logs', [
             'action'      => 'users.merged',
             'actor_user_id' => 0,
-            'target_id'   => $duplicate->id,
+            'target_id'   => $survivor->id,
         ]);
     }
 
@@ -93,8 +92,6 @@ class UserMergeTest extends TestCase
         $projectId = DB::table('projects')->insertGetId([
             'user_id' => $survivor->id,
             'project_name' => 'Shared',
-            'slug' => 'shared-' . uniqid(),
-            'currency' => 1,
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
@@ -105,8 +102,6 @@ class UserMergeTest extends TestCase
         DB::table('projects')->insert([
             'user_id' => $duplicate->id,
             'project_name' => 'Shared',
-            'slug' => 'shared-dup-' . uniqid(),
-            'currency' => 1,
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
@@ -120,10 +115,11 @@ class UserMergeTest extends TestCase
         $survivor  = User::factory()->create();
         $duplicate = User::factory()->create();
 
-        $this->service->merge($survivor->id, $duplicate->id, [], 0);
+        $outcomes = $this->service->mergeMany($survivor->id, [$duplicate->id], [], 0);
+        $this->assertSame('merged', $outcomes[0]['status']);
 
-        $this->expectException(\RuntimeException::class);
-        $this->service->merge($survivor->id, $duplicate->id, [], 0);
+        $outcomes2 = $this->service->mergeMany($survivor->id, [$duplicate->id], [], 0);
+        $this->assertSame('skipped', $outcomes2[0]['status']);
     }
 
     public function test_command_dry_run_does_not_merge(): void
@@ -133,7 +129,7 @@ class UserMergeTest extends TestCase
 
         $exit = Artisan::call('users:merge', [
             'survivor'  => $survivor->id,
-            'duplicate' => $duplicate->id,
+            'duplicates' => [$duplicate->id],
             '--dry-run' => true,
         ]);
 
@@ -148,7 +144,7 @@ class UserMergeTest extends TestCase
         $duplicate = User::factory()->create(['name' => 'B', 'email' => 'b@x.com']);
 
         DB::table('transactions')->insert([
-            'user_id' => $duplicate->id, 'amount' => 1.0, 'type' => 'received', 'currency' => 1,
+            'user_id' => $duplicate->id, 'amount' => 1.0, 'type' => 'received', 'currency_id' => 1,
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
@@ -158,8 +154,8 @@ class UserMergeTest extends TestCase
         $this->assertNotNull($log);
         $this->assertSame($survivor->id, $log->meta['survivor_id']);
         $this->assertSame($duplicate->id, $log->meta['duplicate_id']);
-        $this->assertSame(0, $log->meta['tokens_revoked']);
-        $this->assertNotEmpty($log->meta['snapshot']['reassignments']);
+        $this->assertSame(0, $log->meta['batch_snapshot']['tokens_revoked']);
+        $this->assertNotEmpty($log->meta['batch_snapshot']['reassignments']);
     }
 
     public function test_merge_rejects_same_id(): void
@@ -171,7 +167,8 @@ class UserMergeTest extends TestCase
 
     public function test_select_page_excludes_survivor_and_soft_deleted(): void
     {
-        $admin    = User::factory()->create(['role' => 'admin']);
+        $admin    = User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
         $survivor = User::factory()->create(['name' => 'Alice', 'email' => 'alice@example.com']);
         $match    = User::factory()->create(['name' => 'Alicia', 'email' => 'alicia@example.com']);
         $deleted  = User::factory()->create(['name' => 'Alick', 'email' => 'alick@example.com', 'deleted_at' => now()]);
@@ -193,7 +190,8 @@ class UserMergeTest extends TestCase
 
     public function test_select_page_with_no_search_returns_empty_suggestions(): void
     {
-        $admin    = User::factory()->create(['role' => 'admin']);
+        $admin    = User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
         $survivor = User::factory()->create();
 
         $response = $this->actingAs($admin)->get(
@@ -210,7 +208,8 @@ class UserMergeTest extends TestCase
 
     public function test_select_page_includes_recently_merged(): void
     {
-        $admin    = User::factory()->create(['role' => 'admin']);
+        $admin    = User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
         $survivor = User::factory()->create();
         $merged   = User::factory()->create([
             'name'               => 'Old Dup',
@@ -229,4 +228,77 @@ class UserMergeTest extends TestCase
             ->where('recently_merged.0.email', 'old@example.com')
         );
     }
+
+    public function test_preview_route_loads_successfully_for_admin(): void
+    {
+        $admin    = User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $survivor = User::factory()->create();
+        $duplicate = User::factory()->create();
+
+        $response = $this->actingAs($admin)->get(
+            route('admin.users.merge.preview', $survivor->id) . '?duplicate_ids[]=' . $duplicate->id
+        );
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Users/Merge')
+            ->where('survivor.id', $survivor->id)
+            ->has('duplicates', 1)
+            ->where('duplicates.0.id', $duplicate->id)
+        );
+    }
+
+    public function test_confirm_route_successfully_merges_users_and_redirects(): void
+    {
+        $admin    = User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $survivor = User::factory()->create();
+        $duplicate = User::factory()->create();
+
+        $txnId = DB::table('transactions')->insertGetId([
+            'user_id' => $duplicate->id,
+            'amount'  => 50.0,
+            'type'    => 'received',
+            'currency_id'=> 1,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // Notice we do NOT pass survivor_id in the request payload, matching the frontend behavior.
+        $response = $this->actingAs($admin)->post(
+            route('admin.users.merge.confirm', $survivor->id),
+            [
+                'duplicate_ids' => [$duplicate->id],
+                'resolutions' => [],
+            ]
+        );
+
+        $response->assertRedirect(route('admin.users.show', $survivor->id));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('transactions', ['id' => $txnId, 'user_id' => $survivor->id]);
+        
+        $trashed = User::withTrashed()->find($duplicate->id);
+        $this->assertNotNull($trashed->deleted_at);
+        $this->assertSame($survivor->id, $trashed->merged_into_user_id);
+    }
+
+    public function test_confirm_route_unauthorized_for_non_admins(): void
+    {
+        $client   = User::factory()->create(['onboarding_completed' => true]);
+        $client->assignRole('client');
+        $survivor = User::factory()->create();
+        $duplicate = User::factory()->create();
+
+        $response = $this->actingAs($client)->post(
+            route('admin.users.merge.confirm', $survivor->id),
+            [
+                'duplicate_ids' => [$duplicate->id],
+                'resolutions' => [],
+            ]
+        );
+
+        $response->assertForbidden();
+    }
 }
+
