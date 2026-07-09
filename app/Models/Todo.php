@@ -36,6 +36,17 @@ class Todo extends Model
         'paused',
         'start_at',
         'end_at',
+        'completed_at',
+        'sort_index',
+    ];
+
+    protected $casts = [
+        'completed'    => 'boolean',
+        'paused'       => 'boolean',
+        'start_at'     => 'datetime',
+        'end_at'       => 'datetime',
+        'completed_at' => 'datetime',
+        'tags'         => 'array',
     ];
 
     public static function parseItems($items)
@@ -85,6 +96,16 @@ class Todo extends Model
         return $this->belongsTo(Task::class);
     }
 
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'currency_id');
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
     public function checklistItems()
     {
         return $this->hasMany(TodoChecklistItem::class, 'todo_id');
@@ -115,6 +136,40 @@ class Todo extends Model
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * Scope: incomplete and not paused. Pure status filter — does NOT consider
+     * whether the related task exists or is archived. Use this whenever the
+     * question is "is this todo still actionable?" regardless of its board.
+     *
+     * @param  Builder<Todo>  $query
+     * @return Builder<Todo>
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query
+            ->where(function ($q) {
+                $q->where('completed', false)->orWhereNull('completed');
+            })
+            ->where(function ($q) {
+                $q->where('paused', false)->orWhereNull('paused');
+            });
+    }
+
+    /**
+     * Scope: active todos whose parent task (if any) is not archived. Use this
+     * to drive the admin "Active Tasks" list. Counted both for the list AND
+     * the stat cards so they can never drift.
+     *
+     * @param  Builder<Todo>  $query
+     * @return Builder<Todo>
+     */
+    public function scopeForActiveList(Builder $query): Builder
+    {
+        return $query->active()->whereHas('task', function ($q) {
+            $q->where('archived', false);
+        });
     }
 
     public function checklist_items()

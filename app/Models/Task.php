@@ -14,7 +14,7 @@ class Task extends Model
 
     protected $guarded = [];
 
-    protected $fillable = ['task_name', 'task_description', 'project_id', 'user_id', 'swimlane_id', 'assigned_to_admin', 'due_date', 'priority'];
+    protected $fillable = ['task_name', 'task_description', 'project_id', 'user_id', 'swimlane_id', 'assigned_to_admin', 'due_date', 'priority', 'archived'];
 
     protected static function booted(): void
     {

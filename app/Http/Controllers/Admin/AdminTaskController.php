@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\Currency;
 use App\Models\InvoiceItemTimer;
+use App\Services\Admin\TodoListQueryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -40,137 +41,125 @@ class AdminTaskController extends Controller
     /**
      * Display a listing of active checklist items for all clients.
      */
-    public function asList(Request $request): InertiaResponse
+    public function asList(Request $request, TodoListQueryService $svc): InertiaResponse
     {
-        $search = $request->get('search');
-        $clientId = $request->get('client_id') ?? $request->get('tenant_id');
+        $filters   = $svc->normalizeFilters($request->all());
+        $paginator = $svc->paginate($filters, $filters['per_page']);
+        $stats     = $svc->computeStats();
 
-        $query = Todo::where('completed', false)
-            ->where('paused', false)
-            ->whereHas('task', function ($q) {
-                $q->where('archived', false);
-            })
-            ->with([
-                'task.user',
-                'user',
-                'children' => function ($q) {
-                    $q->orderBy('sort_index')->orderBy('id');
-                },
+        $clients = User::role('client')
+            ->orderBy('name')
+            ->get(['id', 'name', 'avatar_url'])
+            ->map(fn ($u) => [
+                'id'   => $u->id,
+                'name' => $u->name,
             ]);
 
-        // Filter by client
-        if ($clientId) {
-            $query->where('user_id', $clientId);
-        }
-
-        // Search filter
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        $todos = $query->orderBy('user_id')->orderBy('id')->get();
-
-        $data = [];
-
-        foreach ($todos as $todo) {
-            $task = $todo->task;
-            $client = $todo->user;
-            if (!$task || !$client) {
-                continue;
-            }
-
-            $userId = $client->id;
-            $taskId = $task->id;
-
-            if (!isset($data[$userId])) {
-                $data[$userId] = [
-                    'client' => [
-                        'id'    => $client->id,
-                        'name'  => $client->name,
-                        'email' => $client->email,
-                    ],
-                    'tasks' => [],
-                ];
-            }
-
-            if (!isset($data[$userId]['tasks'][$taskId])) {
-                $data[$userId]['tasks'][$taskId] = [
-                    'id'        => $task->id,
-                    'task_name' => $task->task_name,
-                    'status'    => $task->status ?? 'open',
-                    'todos'     => [],
-                ];
-            }
-
-            // Resolve currency
-            $currencyName = 'EGP';
-            if ($todo->currency_id) {
-                $curr = Currency::find($todo->currency_id);
-                if ($curr) {
-                    $currencyName = $curr->currency;
-                }
-            } else {
-                $currencyName = $client->currency_name();
-            }
-
-            // Parse tags safely
-            $tags = [];
-            if ($todo->tags) {
-                if (is_array($todo->tags)) {
-                    $tags = $todo->tags;
-                } else {
-                    $tags = json_decode($todo->tags, true) ?? [];
-                }
-            }
-
-            $data[$userId]['tasks'][$taskId]['todos'][] = [
-                'id'             => $todo->id,
-                'title'          => $todo->title,
-                'description'    => $todo->description,
-                'priority'       => $todo->priority ?? 'normal',
-                'priority_color' => $todo->priorityColor,
-                'paused'         => (bool)$todo->paused,
-                'is_paid'        => (bool)$todo->is_paid,
-                'cost'           => $todo->cost,
-                'cost_currency'  => $currencyName,
-                'start_at'       => $todo->start_at ? \Carbon\Carbon::parse($todo->start_at)->toISOString() : null,
-                'end_at'         => $todo->end_at ? \Carbon\Carbon::parse($todo->end_at)->toISOString() : null,
-                'tags'           => $tags,
-                'created_at'     => $todo->created_at->toISOString(),
-            ];
-        }
-
-        // Convert to indexed arrays
-        $arrangedClients = array_values($data);
-        foreach ($arrangedClients as &$clientData) {
-            $clientData['tasks'] = array_values($clientData['tasks']);
-        }
-
-        // All platform clients for the filter dropdown
-        $clients = User::role('client')->orderBy('name')->get()->map(fn($u) => [
-            'id'   => $u->id,
-            'name' => $u->name,
-        ]);
-
-        // Stats
-        $totalActive = Todo::where('completed', false)
-            ->where('paused', false)
-            ->count();
+        $stats['total_clients'] = $clients->count();
 
         return Inertia::render('Admin/Tasks/AsList', $this->sanitizeUtf8([
-            'arrangedClients' => $arrangedClients,
+            'arrangedClients' => $svc->arrange($paginator),
             'clients'         => $clients,
-            'filters'         => $request->only(['search', 'client_id', 'tenant_id']),
-            'stats'           => [
-                'total_active_todos' => $totalActive,
-                'total_clients'      => count($clients),
+            'filters'         => $filters,
+            'pagination'      => [
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
             ],
+            'stats'           => $stats,
         ]));
+    }
+
+    /**
+     * Bulk-complete (or un-complete) a set of platform todos. Used by the
+     * admin "Active Tasks" list. Validates ownership via the active scope.
+     */
+    public function bulkCompleteTodos(Request $request)
+    {
+        $data = $request->validate([
+            'todo_ids'   => ['required', 'array', 'min:1', 'max:500'],
+            'todo_ids.*' => ['integer', 'exists:todos,id'],
+            'completed'  => ['required', 'boolean'],
+        ]);
+
+        $now = now();
+        $affected = Todo::query()
+            ->active()
+            ->whereIn('id', $data['todo_ids'])
+            ->update([
+                'completed'    => (bool) $data['completed'],
+                'completed_at' => $data['completed'] ? $now : null,
+                'updated_at'   => $now,
+            ]);
+
+        return response()->json([
+            'status'   => 'success',
+            'message'  => __('general.task_status_updated_successfully'),
+            'affected' => $affected,
+        ]);
+    }
+
+    /**
+     * Export the current filtered view of the Active Tasks list to CSV.
+     * Reuses the same filters as asList() — search, client, priority, paid,
+     * paused, date_from, date_to, sort. Uses the shared service so behavior
+     * stays in lock-step with the on-screen list.
+     */
+    public function exportAsList(Request $request, TodoListQueryService $svc)
+    {
+        $filters = $svc->normalizeFilters($request->all());
+
+        $query = $svc->baseQuery(liveOnly: false)->with(['task', 'user']);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('todos', 'currency_id')) {
+            $query->with('currency');
+        }
+        $svc->applyFilters($query, $filters);
+        $svc->applySort($query, $filters['sort']);
+
+        $filename = 'active-tasks-' . now()->format('Ymd-His') . '.csv';
+        $headers  = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($query) {
+            $out = fopen('php://output', 'w');
+            // UTF-8 BOM for Excel
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, [
+                'Todo ID', 'Title', 'Description', 'Priority', 'Paused', 'Paid',
+                'Cost', 'Currency', 'Start At', 'End At', 'Created At',
+                'Client ID', 'Client Name', 'Client Email',
+                'Task ID', 'Task Name', 'Is Orphan',
+            ]);
+            $query->chunk(500, function ($rows) use ($out) {
+                foreach ($rows as $t) {
+                    fputcsv($out, [
+                        $t->id,
+                        $t->title,
+                        $t->description,
+                        $t->priority ?? 'normal',
+                        $t->paused ? '1' : '0',
+                        $t->is_paid ? '1' : '0',
+                        $t->cost,
+                        $t->currency?->currency ?? $t->user?->currency_name(),
+                        $t->start_at,
+                        $t->end_at,
+                        $t->created_at?->toDateTimeString(),
+                        $t->user_id,
+                        $t->user?->name,
+                        $t->user?->email,
+                        $t->task_id,
+                        $t->task?->task_name,
+                        $t->task ? '0' : '1',
+                    ]);
+                }
+            });
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
@@ -342,57 +331,65 @@ class AdminTaskController extends Controller
      */
     public function calendar(Request $request): InertiaResponse
     {
-        $year = (int) $request->get('year', date('Y'));
+        $year  = (int) $request->get('year', date('Y'));
         $month = (int) $request->get('month', date('n'));
         $clientId = $request->get('client_id') ?? $request->get('tenant_id');
 
-        // We want to fetch tasks, todos, and busy times for this month
-        $startOfMonth = \Carbon\Carbon::create($year, $month, 1)->startOfMonth();
-        $endOfMonth = \Carbon\Carbon::create($year, $month, 1)->endOfMonth();
+        $tz = 'Africa/Cairo';
 
-        // Expand range to cover startOfWeek of startOfMonth and endOfWeek of endOfMonth
-        $startDate = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
-        $endDate = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
+        // Build the visible date range pinned to the user-facing timezone so
+        // server- and client-side date strings agree regardless of php.ini.
+        $startOfMonth = \Carbon\Carbon::create($year, $month, 1, 0, 0, 0, $tz)->startOfMonth();
+        $endOfMonth   = $startOfMonth->copy()->endOfMonth();
+        $startDate    = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
+        $endDate      = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
 
-        // 1. Fetch scheduled Todos in the range
+        $eventType = $request->get('event_type'); // all|tasks|todos|busy
+
+        // 1. Scheduled todos in range. Eager-load currency & task to avoid
+        //    N+1s when serializing the Inertia payload.
         $todosQuery = Todo::whereNotNull('start_at')
             ->whereNotNull('end_at')
-            ->where(function($q) use ($startDate, $endDate) {
-                $q->whereBetween('start_at', [$startDate->toDateTimeString(), $endDate->toDateTimeString()])
-                  ->orWhereBetween('end_at', [$startDate->toDateTimeString(), $endDate->toDateTimeString()]);
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('start_at', [$startDate, $endDate])
+                  ->orWhereBetween('end_at', [$startDate, $endDate]);
             })
-            ->with(['task.user', 'user']);
+            ->with(['task', 'user']);
 
         if ($clientId) {
             $todosQuery->where('user_id', $clientId);
         }
-
         $todos = $todosQuery->get();
 
-        // 2. Fetch Tasks due in this range
+        // 2. Tasks due in this range. Use a subquery for completion so we
+        //    don't lazy-load `task_todo_items` for every row (N+1 fix).
         $tasksQuery = Task::whereNotNull('due_date')
             ->whereBetween('due_date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->with('user');
+            ->with(['user'])
+            ->withCount([
+                'task_todo_items as all_todos_count',
+                'task_todo_items as open_todos_count' => fn ($q) => $q->where('completed', false),
+            ]);
 
         if ($clientId) {
             $tasksQuery->where('user_id', $clientId);
         }
-
         $tasks = $tasksQuery->get();
 
-        // 3. Fetch Recurring & Specific Busy Times
-        $busyTimes = \App\Models\RecurringBusyTime::where('is_active', true)->get();
+        // 3. Recurring & specific busy times (cached briefly).
+        $busyTimes = \Illuminate\Support\Facades\Cache::remember(
+            'admin:calendar:active-busy-times',
+            now()->addMinutes(5),
+            fn () => \App\Models\RecurringBusyTime::where('is_active', true)->get()
+        );
 
-        // Group everything by date string "Y-m-d" Cairo local time
+        // Pre-fill the events map and expand busy times in a SINGLE pass.
         $events = [];
-
-        // Pre-fill days in the interval
         $period = new \DatePeriod(
             $startDate,
             new \DateInterval('P1D'),
             $endDate->copy()->addDay()
         );
-
         foreach ($period as $date) {
             $dateStr = $date->format('Y-m-d');
             $events[$dateStr] = [
@@ -400,13 +397,8 @@ class AdminTaskController extends Controller
                 'todos'      => [],
                 'busy_times' => [],
             ];
-        }
 
-        // Add busy times day by day
-        foreach ($period as $date) {
-            $dateStr = $date->format('Y-m-d');
             $dayOfWeek = $date->format('l');
-
             foreach ($busyTimes as $bt) {
                 $matches = false;
                 if ($bt->is_recurring && strcasecmp($bt->day_of_week, $dayOfWeek) === 0) {
@@ -414,12 +406,11 @@ class AdminTaskController extends Controller
                 } elseif (!$bt->is_recurring && $bt->specific_date && $bt->specific_date->format('Y-m-d') === $dateStr) {
                     $matches = true;
                 }
-
-                if ($matches) {
+                if ($matches && (!$clientId || (int) $bt->user_id === (int) $clientId || $bt->user_id === null)) {
                     $events[$dateStr]['busy_times'][] = [
                         'id'          => 'busy-' . $bt->id,
-                        'title'       => $bt->reason ?: 'Busy',
-                        'is_full_day' => (bool)$bt->is_full_day,
+                        'title'       => $bt->reason ?: __('general.busy'),
+                        'is_full_day' => (bool) $bt->is_full_day,
                         'start_time'  => $bt->start_time ? \Carbon\Carbon::parse($bt->start_time)->format('H:i') : null,
                         'end_time'    => $bt->end_time ? \Carbon\Carbon::parse($bt->end_time)->format('H:i') : null,
                     ];
@@ -427,50 +418,73 @@ class AdminTaskController extends Controller
             }
         }
 
-        // Add Tasks to events map
-        foreach ($tasks as $task) {
-            $dateStr = \Carbon\Carbon::parse($task->due_date)->format('Y-m-d');
-            if (isset($events[$dateStr])) {
+        // Tasks
+        if ($eventType === null || $eventType === 'all' || $eventType === 'tasks') {
+            foreach ($tasks as $task) {
+                $dateStr = \Carbon\Carbon::parse($task->due_date, $tz)->format('Y-m-d');
+                if (!isset($events[$dateStr])) {
+                    continue;
+                }
+                $isDone = $task->all_todos_count > 0
+                    ? ((int) $task->open_todos_count === 0)
+                    : false;
                 $events[$dateStr]['tasks'][] = [
                     'id'        => $task->id,
                     'title'     => $task->task_name,
                     'priority'  => $task->priority ?? 'normal',
-                    'completed' => $task->completed(),
-                    'client'    => $task->user?->name ?? 'Unknown',
+                    'completed' => $isDone,
+                    'client_id' => $task->user_id,
+                    'client'    => $task->user?->name ?? __('general.unknown'),
                 ];
             }
         }
 
-        // Add Todos to events map
-        foreach ($todos as $todo) {
-            $dateStr = \Carbon\Carbon::parse($todo->start_at)->format('Y-m-d');
-            if (isset($events[$dateStr])) {
+        // Todos
+        if ($eventType === null || $eventType === 'all' || $eventType === 'todos') {
+            foreach ($todos as $todo) {
+                $dateStr = \Carbon\Carbon::parse($todo->start_at, $tz)->format('Y-m-d');
+                if (!isset($events[$dateStr])) {
+                    continue;
+                }
                 $events[$dateStr]['todos'][] = [
                     'id'             => $todo->id,
                     'title'          => $todo->title,
                     'priority'       => $todo->priority ?? 'normal',
                     'priority_color' => $todo->priorityColor,
-                    'completed'      => (bool)$todo->completed,
+                    'completed'      => (bool) $todo->completed,
                     'task_id'        => $todo->task_id,
-                    'client'         => $todo->user?->name ?? 'Unknown',
-                    'start_time'     => \Carbon\Carbon::parse($todo->start_at)->format('H:i'),
+                    'client_id'      => $todo->user_id,
+                    'client'         => $todo->user?->name ?? __('general.unknown'),
+                    'start_time'     => \Carbon\Carbon::parse($todo->start_at, $tz)->format('H:i'),
+                    'end_time'       => $todo->end_at ? \Carbon\Carbon::parse($todo->end_at, $tz)->format('H:i') : null,
                 ];
             }
         }
 
-        // List of all clients for selection filter
-        $clients = User::role('client')->orderBy('name')->get()->map(fn($u) => [
+        $clients = User::role('client')->orderBy('name')->get(['id', 'name'])->map(fn ($u) => [
             'id'   => $u->id,
             'name' => $u->name,
         ]);
 
+        // Quick stats for the calendar header
+        $stats = [
+            'todos_this_month' => $todos->count(),
+            'tasks_this_month' => $tasks->count(),
+            'busy_days'        => collect($events)->filter(
+                fn ($d) => count($d['busy_times']) > 0
+            )->count(),
+        ];
+
         return Inertia::render('Admin/Tasks/TaskCalendar', $this->sanitizeUtf8([
-            'events'  => $events,
-            'year'    => $year,
-            'month'   => $month,
-            'clients' => $clients,
-            'filters' => [
-                'client_id' => $clientId,
+            'events'     => $events,
+            'year'       => $year,
+            'month'      => $month,
+            'tz'         => $tz,
+            'clients'    => $clients,
+            'stats'      => $stats,
+            'filters'    => [
+                'client_id'  => $clientId,
+                'event_type' => $eventType ?? 'all',
             ],
         ]));
     }

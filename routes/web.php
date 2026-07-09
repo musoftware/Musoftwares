@@ -715,6 +715,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/users/{id}', [UsersController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/users/{user}/merge', [App\Http\Controllers\Admin\UserMergeController::class, 'preview'])->name('users.merge.preview');
+    Route::get('/users/{user}/merge-select', [App\Http\Controllers\Admin\UserMergeController::class, 'select'])->name('users.merge.select');
     Route::post('/users/{user}/merge/confirm', [App\Http\Controllers\Admin\UserMergeController::class, 'confirm'])->name('users.merge.confirm');
 
     // User email aliases
@@ -821,6 +822,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // Admin Tasks List (platform checklist items)
     Route::get('/tasks/as_list', [AdminTaskController::class, 'asList'])->name('tasks.as_list');
+    Route::get('/tasks/as_list/export', [AdminTaskController::class, 'exportAsList'])->name('tasks.as_list.export');
+    Route::post('/tasks/todos/bulk-complete', [AdminTaskController::class, 'bulkCompleteTodos'])->name('tasks.todos.bulk-complete');
     Route::post('/tasks/todos/{todo}/complete', [AdminTaskController::class, 'completeTodo'])->name('tasks.todos.complete');
     Route::get('/tasks/calendar', [AdminTaskController::class, 'calendar'])->name('tasks.calendar');
     Route::post('/tasks/calendar/store-and-bill', [AdminTaskController::class, 'storeAndBillCalendarTodo'])->name('tasks.calendar.store-and-bill');
