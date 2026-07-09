@@ -101,7 +101,7 @@ class PlanController extends Controller
                 });
             })
             ->limit(20)
-            ->get(['id', 'name', 'email', 'avatar_url'])
+            ->get(['id', 'name', 'email'])
             ->map(function ($user) {
                 $user->original_name = $user->name;
                 $user->name = $user->name . ' (' . $user->email . ')';

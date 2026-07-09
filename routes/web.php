@@ -1089,11 +1089,16 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::prefix('business')->group(function () {
         Route::get('/income', [BusinessController::class, 'income'])->name('income.index');
         Route::get('/costs', [BusinessController::class, 'costs'])->name('costs.index');
+        Route::get('/costs/export', [BusinessController::class, 'export_costs'])->name('costs.export');
+        Route::post('/costs/bulk-delete', [BusinessController::class, 'bulk_delete_costs'])->name('costs.bulk_delete');
         Route::get('/costs/create', [BusinessController::class, 'create_cost'])->name('costs.create');
         Route::post('/costs', [BusinessController::class, 'store_cost'])->name('costs.store');
+        Route::get('/costs/{id}', [BusinessController::class, 'show_cost'])->name('costs.show');
         Route::get('/costs/edit/{id}', [BusinessController::class, 'edit_cost'])->name('costs.edit');
         Route::put('/costs/{id}', [BusinessController::class, 'update_cost'])->name('costs.update');
         Route::delete('/costs/{id}/delete', [BusinessController::class, 'delete_cost'])->name('costs.delete');
+        Route::post('/costs/{id}/restore', [BusinessController::class, 'restore_cost'])->name('costs.restore');
+        Route::post('/costs/{id}/duplicate', [BusinessController::class, 'duplicate_cost'])->name('costs.duplicate');
 
         Route::delete('/income/{id}/delete', [BusinessController::class, 'delete_income'])->name('income.delete');
         Route::post('/income/{id}/reverse', [BusinessController::class, 'reverse_income'])->name('income.reverse');

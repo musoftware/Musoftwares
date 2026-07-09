@@ -9,7 +9,7 @@ class DestroyUserEmailRequest extends FormRequest
     public function authorize(): bool
     {
         $user = $this->user();
-        return $user !== null && $user->hasRole('admin');
+        return $user !== null && $user->isAdmin();
     }
 
     public function rules(): array

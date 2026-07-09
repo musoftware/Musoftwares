@@ -49,7 +49,7 @@ class AdminTaskController extends Controller
 
         $clients = User::role('client')
             ->orderBy('name')
-            ->get(['id', 'name', 'avatar_url'])
+            ->get(['id', 'name'])
             ->map(fn ($u) => [
                 'id'   => $u->id,
                 'name' => $u->name,

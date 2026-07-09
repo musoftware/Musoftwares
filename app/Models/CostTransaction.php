@@ -62,6 +62,11 @@ class CostTransaction extends Model
             ->withPivot([]);
     }
 
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function scopeExcludingSalaries(Builder $query): Builder
     {
         return $query->where('reason', '!=', 'salary');
@@ -70,6 +75,65 @@ class CostTransaction extends Model
     public function scopeInYearMonth(Builder $query, int $year, int $month): Builder
     {
         return $query->whereYear('created_at', $year)->whereMonth('created_at', $month);
+    }
+
+    public function scopeByCategory(Builder $query, ?string $category): Builder
+    {
+        if ($category === null || $category === '') {
+            return $query;
+        }
+        return $query->where('category', $category);
+    }
+
+    public function scopeForUser(Builder $query, $userId): Builder
+    {
+        if (empty($userId)) {
+            return $query;
+        }
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeForProject(Builder $query, $projectId): Builder
+    {
+        if (empty($projectId)) {
+            return $query;
+        }
+        return $query->where('project_id', $projectId);
+    }
+
+    public function scopeForCurrency(Builder $query, $currencyId): Builder
+    {
+        if (empty($currencyId)) {
+            return $query;
+        }
+        return $query->where('currency_id', $currencyId);
+    }
+
+    public function scopeAmountBetween(Builder $query, $min, $max): Builder
+    {
+        if ($min !== null && $min !== '') {
+            $query->where('amount', '>=', (float) $min);
+        }
+        if ($max !== null && $max !== '') {
+            $query->where('amount', '<=', (float) $max);
+        }
+        return $query;
+    }
+
+    public function scopeRecurringOnly(Builder $query, bool $value = true): Builder
+    {
+        if (! $value) {
+            return $query;
+        }
+        return $query->whereHas('recurringSources');
+    }
+
+    public function scopeWithTrashedIncluded(Builder $query, bool $value = true): Builder
+    {
+        if ($value) {
+            return $query->withTrashed();
+        }
+        return $query;
     }
 
     public function amount_str()

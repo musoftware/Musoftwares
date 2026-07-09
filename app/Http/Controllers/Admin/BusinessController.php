@@ -15,7 +15,10 @@ use App\Services\CostTransactionAuditService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BusinessController extends Controller
 {
@@ -218,6 +221,22 @@ class BusinessController extends Controller
         $year = (int) $request->query('year', $currentYear);
         $month = (int) $request->query('month', now()->month);
         $search = trim((string) $request->query('search', ''));
+        $projectId = $request->query('project_id');
+        $userId = $request->query('user_id');
+        $currencyId = $request->query('currency_id');
+        $category = $request->query('category');
+        $minAmount = $request->query('min_amount');
+        $maxAmount = $request->query('max_amount');
+        $recurringOnly = filter_var($request->query('recurring_only', false), FILTER_VALIDATE_BOOLEAN);
+        $preset = $request->query('preset');
+        $withTrashed = filter_var($request->query('with_trashed', false), FILTER_VALIDATE_BOOLEAN);
+        $sortBy = $request->query('sort_by', 'created_at');
+        $sortDir = $request->query('sort_dir', 'desc');
+        $allowedSorts = ['created_at', 'amount', 'business_amount', 'reason'];
+        if (! in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'created_at';
+        }
+        $sortDir = strtolower($sortDir) === 'asc' ? 'asc' : 'desc';
 
         $minDate = CostTransaction::min('created_at');
         $maxDate = CostTransaction::max('created_at');
@@ -232,20 +251,43 @@ class BusinessController extends Controller
         $availableYears = range($latestYear, $earliestYear);
         $availableMonths = range(1, 12);
 
-        $costsQuery = CostTransaction::with(['user', 'project', 'recurringSources'])
-            ->excludingSalaries()
-            ->inYearMonth($year, $month)
+        $baseQuery = CostTransaction::excludingSalaries();
+        if ($preset === 'all') {
+            $costsQuery = (clone $baseQuery);
+        } elseif ($preset === 'last_30') {
+            $costsQuery = (clone $baseQuery)->where('created_at', '>=', now()->subDays(30));
+        } elseif ($preset === 'last_90') {
+            $costsQuery = (clone $baseQuery)->where('created_at', '>=', now()->subDays(90));
+        } elseif ($preset === 'ytd') {
+            $costsQuery = (clone $baseQuery)->whereYear('created_at', $currentYear);
+        } else {
+            $costsQuery = (clone $baseQuery)->inYearMonth($year, $month);
+        }
+
+        $costsQuery = $costsQuery->with(['user', 'project', 'recurringSources', 'creator'])
+            ->byCategory($category)
+            ->forUser($userId)
+            ->forProject($projectId)
+            ->forCurrency($currencyId)
+            ->amountBetween($minAmount, $maxAmount)
+            ->recurringOnly($recurringOnly)
             ->when($search !== '', function ($q) use ($search) {
                 $q->where(function ($w) use ($search) {
                     $w->where('reason', 'like', "%{$search}%")
                       ->orWhere('amount', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%")
                       ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
                       ->orWhereHas('project', fn ($p) => $p->where('project_name', 'like', "%{$search}%"));
                 });
-            })
-            ->orderBy('created_at', 'desc');
+            });
 
-        $entries = $costsQuery->paginate(50)->withQueryString();
+        if ($withTrashed) {
+            $costsQuery->withTrashed();
+        }
+
+        $costsQuery->orderBy($sortBy, $sortDir);
+
+        $entries = $costsQuery->paginate(25)->withQueryString();
 
         $currencies = Currency::as_array();
 
@@ -256,41 +298,80 @@ class BusinessController extends Controller
             $currencySymbol = $currRow ? $currRow->symbol : 'e£';
 
             $isRecurring = false;
-            $categoryName = $entry->reason;
+            $categoryName = $entry->category ?: $entry->reason;
             $title = $entry->reason;
+            $recurringCostId = null;
+            $recurringCostTitle = null;
 
             $recurringSource = $entry->recurringSources->first();
             if ($recurringSource) {
                 $isRecurring = true;
-                $categoryName = $recurringSource->reason;
+                $recurringCostId = $recurringSource->id;
+                $recurringCostTitle = $recurringSource->title;
+                $categoryName = $recurringSource->reason ?: $categoryName;
                 $title = $recurringSource->title ?: $entry->reason;
             }
 
             return [
                 'id' => $entry->id,
                 'title' => ucfirst($title ?: 'Cost'),
+                'reason' => $entry->reason,
                 'amount' => $entry->amount,
                 'business_amount' => $entry->business_amount,
+                'tax_amount' => (float) ($entry->tax_amount ?? 0),
+                'tax_rate' => (float) ($entry->tax_rate ?? 0),
+                'net_amount' => $entry->net_amount,
                 'currency' => $currencyCode,
                 'currency_symbol' => $currencySymbol,
                 'currency_id' => $currId,
                 'category' => ['name' => ucfirst($categoryName ?: 'Cost')],
+                'category_slug' => Str::slug((string) ($categoryName ?? '')),
+                'category_raw' => $categoryName,
+                'payment_method' => $entry->payment_method,
+                'is_billable' => (bool) $entry->is_billable,
+                'notes' => $entry->notes,
+                'attachment_path' => $entry->attachment_path,
                 'is_recurring' => $isRecurring,
+                'recurring_cost_id' => $recurringCostId,
+                'recurring_cost_title' => $recurringCostTitle,
                 'next_due_date' => $entry->due_date,
                 'status' => $entry->status ?? 'completed',
                 'user' => $entry->user ? ['id' => $entry->user->id, 'name' => $entry->user->name, 'email' => $entry->user->email] : null,
                 'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->name] : null,
+                'creator' => $entry->creator ? ['id' => $entry->creator->id, 'name' => $entry->creator->name] : null,
                 'created_at' => $entry->created_at,
+                'updated_at' => $entry->updated_at,
+                'deleted_at' => $entry->deleted_at,
                 'type' => 'expense',
             ];
         });
 
-        $totalMonthlyCosts = CostTransaction::excludingSalaries()
-            ->inYearMonth($year, $month)
-            ->sum('business_amount');
+        // Selected-period totals (filtered) for stat cards
+        $filteredTotal = (clone $costsQuery)->sum('business_amount');
+        $filteredCount = (clone $costsQuery)->count();
+        $filteredAvg = $filteredCount > 0 ? abs($filteredTotal) / $filteredCount : 0;
+        $filteredLargest = (clone $costsQuery)->orderBy('business_amount', 'desc')->first();
 
+        // Comparison vs previous month
+        $prevMonth = Carbon::createFromDate($year, $month)->subMonth();
+        $prevTotal = CostTransaction::excludingSalaries()
+            ->inYearMonth($prevMonth->year, $prevMonth->month)
+            ->sum('business_amount') ?? 0;
+        $changePercent = 0;
+        if (abs($prevTotal) > 0) {
+            $changePercent = ((abs($filteredTotal) - abs($prevTotal)) / abs($prevTotal)) * 100;
+        } elseif (abs($filteredTotal) > 0) {
+            $changePercent = 100;
+        }
+
+        // Year-to-date
+        $ytdTotal = CostTransaction::excludingSalaries()
+            ->whereYear('created_at', $year)
+            ->sum('business_amount') ?? 0;
+
+        // Monthly chart trends (last 12 months)
         $monthlyTrends = [];
-        for ($i = 5; $i >= 0; $i--) {
+        for ($i = 11; $i >= 0; $i--) {
             $m = now()->subMonths($i);
             $mCosts = CostTransaction::excludingSalaries()
                 ->inYearMonth($m->year, $m->month)
@@ -302,7 +383,24 @@ class BusinessController extends Controller
             ];
         }
 
+        // Breakdowns
+        $categoryBreakdown = $this->buildBreakdown($costsQuery, 'category');
+        $projectBreakdown = $this->buildBreakdown($costsQuery, 'project', 'project_id');
+        $clientBreakdown = $this->buildBreakdown($costsQuery, 'user', 'user_id');
+
         $bCurrency = CurrencyHelper::getBusinessCurrency();
+        $projectsList = Project::orderBy('project_name')->select('id', 'project_name as name')->limit(200)->get();
+        $usersList = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $currenciesList = collect($currencies)->map(fn ($c) => ['id' => $c->id, 'code' => $c->currency, 'symbol' => $c->symbol])->values();
+        $categoriesList = CostTransaction::excludingSalaries()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->limit(100)
+            ->pluck('category')
+            ->map(fn ($c) => ['value' => $c, 'label' => ucfirst($c)])
+            ->values();
 
         return Inertia::render('Admin/Business/Costs', [
             'entries' => $entries,
@@ -310,31 +408,364 @@ class BusinessController extends Controller
                 'year' => $year,
                 'month' => $month,
                 'search' => $search,
+                'preset' => $preset,
+                'project_id' => $projectId,
+                'user_id' => $userId,
+                'currency_id' => $currencyId,
+                'category' => $category,
+                'min_amount' => $minAmount,
+                'max_amount' => $maxAmount,
+                'recurring_only' => $recurringOnly,
+                'with_trashed' => $withTrashed,
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir,
                 'available_years' => $availableYears,
                 'available_months' => $availableMonths,
             ],
+            'options' => [
+                'projects' => $projectsList,
+                'users' => $usersList,
+                'currencies' => $currenciesList,
+                'categories' => $categoriesList,
+                'payment_methods' => self::COST_PAYMENT_METHODS,
+            ],
             'stats' => [
-                'total_monthly_costs' => abs($totalMonthlyCosts),
+                'total_monthly_costs' => abs($filteredTotal),
+                'previous_month_costs' => abs($prevTotal),
+                'change_percent' => round($changePercent, 1),
+                'ytd_costs' => abs($ytdTotal),
+                'average_cost' => $filteredAvg,
+                'entry_count' => $filteredCount,
+                'largest_cost' => $filteredLargest ? [
+                    'id' => $filteredLargest->id,
+                    'reason' => $filteredLargest->reason,
+                    'business_amount' => abs((float) $filteredLargest->business_amount),
+                ] : null,
                 'monthly_trends' => $monthlyTrends,
+                'category_breakdown' => $categoryBreakdown,
+                'project_breakdown' => $projectBreakdown,
+                'client_breakdown' => $clientBreakdown,
                 'business_currency_code' => $bCurrency['currency'] ?? 'USD',
                 'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
             ],
         ]);
     }
 
+    private const COST_PAYMENT_METHODS = [
+        ['value' => 'cash', 'label' => 'Cash'],
+        ['value' => 'bank_transfer', 'label' => 'Bank Transfer'],
+        ['value' => 'credit_card', 'label' => 'Credit Card'],
+        ['value' => 'wallet', 'label' => 'Wallet'],
+        ['value' => 'cheque', 'label' => 'Cheque'],
+        ['value' => 'other', 'label' => 'Other'],
+    ];
+
+    private function buildBreakdown($query, string $column, ?string $foreign = null): array
+    {
+        $clone = clone $query;
+        $rows = $clone->selectRaw(
+            $foreign
+                ? "$foreign as group_key"
+                : "COALESCE(NULLIF($column, ''), 'uncategorized') as group_key",
+            []
+        )->selectRaw('SUM(ABS(business_amount)) as total', [])
+          ->selectRaw('COUNT(*) as cnt', [])
+          ->groupBy('group_key')
+          ->orderByDesc('total')
+          ->limit(8)
+          ->get();
+
+        return $rows->map(function ($row) use ($column, $foreign) {
+            $label = $row->group_key;
+            if ($foreign === 'project_id') {
+                $label = optional(Project::find($row->group_key))->project_name ?? 'Unknown';
+            } elseif ($foreign === 'user_id') {
+                $label = optional(User::find($row->group_key))->name ?? 'Unknown';
+            } elseif ($column === 'category') {
+                $label = $label === 'uncategorized' ? 'Uncategorized' : ucfirst((string) $label);
+            }
+            return [
+                'name' => (string) $label,
+                'value' => (float) $row->total,
+                'count' => (int) $row->cnt,
+            ];
+        })->values()->all();
+    }
+
+    public function show_cost($id)
+    {
+        $cost = CostTransaction::with(['user', 'project', 'recurringSources', 'creator'])
+            ->withTrashed()
+            ->findOrFail($id);
+
+        $currencies = Currency::as_array();
+        $currId = $cost->currency_id ?? $cost->currency;
+        $currRow = isset($currencies[$currId]) ? $currencies[$currId] : null;
+
+        $bCurrency = CurrencyHelper::getBusinessCurrency();
+
+        $related = CostTransaction::with(['user', 'project'])
+            ->excludingSalaries()
+            ->where('id', '!=', $cost->id)
+            ->where(function ($q) use ($cost) {
+                if ($cost->user_id) {
+                    $q->where('user_id', $cost->user_id);
+                }
+                if ($cost->project_id) {
+                    $q->orWhere('project_id', $cost->project_id);
+                }
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function ($r) use ($currencies) {
+                $cid = $r->currency_id ?? $r->currency;
+                $crow = $currencies[$cid] ?? null;
+                return [
+                    'id' => $r->id,
+                    'reason' => $r->reason,
+                    'amount' => $r->amount,
+                    'business_amount' => $r->business_amount,
+                    'currency_code' => optional($crow)->currency ?? 'USD',
+                    'created_at' => $r->created_at,
+                    'project' => $r->project?->only(['id', 'name']),
+                ];
+            })
+            ->values();
+
+        return Inertia::render('Admin/Business/CostsShow', [
+            'cost' => [
+                'id' => $cost->id,
+                'reason' => $cost->reason,
+                'title' => $cost->reason,
+                'amount' => $cost->amount,
+                'business_amount' => $cost->business_amount,
+                'tax_amount' => (float) ($cost->tax_amount ?? 0),
+                'tax_rate' => (float) ($cost->tax_rate ?? 0),
+                'net_amount' => $cost->net_amount,
+                'currency_id' => $currId,
+                'currency_code' => optional($currRow)->currency ?? 'USD',
+                'currency_symbol' => optional($currRow)->symbol ?? '',
+                'category' => $cost->category,
+                'category_label' => $cost->category ? ucfirst($cost->category) : null,
+                'payment_method' => $cost->payment_method,
+                'payment_methods' => self::COST_PAYMENT_METHODS,
+                'is_billable' => (bool) $cost->is_billable,
+                'notes' => $cost->notes,
+                'attachment_path' => $cost->attachment_path,
+                'attachment_url' => $cost->attachment_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($cost->attachment_path) : null,
+                'created_at' => $cost->created_at,
+                'updated_at' => $cost->updated_at,
+                'deleted_at' => $cost->deleted_at,
+                'user' => $cost->user ? ['id' => $cost->user->id, 'name' => $cost->user->name, 'email' => $cost->user->email] : null,
+                'project' => $cost->project ? ['id' => $cost->project->id, 'name' => $cost->project->name] : null,
+                'recurring_sources' => $cost->recurringSources->map(fn ($r) => [
+                    'id' => $r->id,
+                    'title' => $r->title,
+                ])->values(),
+                'creator' => $cost->creator ? ['id' => $cost->creator->id, 'name' => $cost->creator->name] : null,
+            ],
+            'related' => $related,
+            'business_currency_code' => $bCurrency['currency'] ?? 'USD',
+            'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
+        ]);
+    }
+
+    public function restore_cost($id)
+    {
+        $cost = CostTransaction::withTrashed()->findOrFail($id);
+
+        if (! $cost->trashed()) {
+            return redirect()->route('admin.costs.index')->with('info', __('general.no_changes_to_restore'));
+        }
+
+        DB::transaction(function () use ($cost) {
+            $cost->restore();
+            if ($cost->user_id) {
+                $user = User::find($cost->user_id);
+                if ($user) {
+                    BalancesHelper::instance()->CalcCostBalance($user);
+                }
+            }
+        });
+
+        $this->costAudit->log(
+            CostTransactionAuditService::ACTION_UPDATED,
+            $cost->id,
+            ['restored' => true]
+        );
+
+        return redirect()->route('admin.costs.show', $cost->id)->with('success', __('general.restored_successfully'));
+    }
+
+    public function duplicate_cost($id)
+    {
+        $source = CostTransaction::withTrashed()->findOrFail($id);
+
+        $clone = $source->replicate();
+        $clone->created_at = now();
+        $clone->updated_at = now();
+        $clone->deleted_at = null;
+        $clone->created_by = auth()->id();
+
+        DB::transaction(function () use ($clone, $source) {
+            $clone->save();
+
+            if ($clone->user_id) {
+                $user = User::find($clone->user_id);
+                if ($user) {
+                    BalancesHelper::instance()->CalcCostBalance($user);
+                }
+            }
+
+            foreach ($source->recurringSources as $rc) {
+                $clone->recurringSources()->attach($rc->id, []);
+            }
+        });
+
+        $this->costAudit->log(
+            CostTransactionAuditService::ACTION_CREATED,
+            $clone->id,
+            ['duplicated_from' => $source->id]
+        );
+
+        return redirect()->route('admin.costs.edit', $clone->id)->with('success', __('general.duplicated_successfully'));
+    }
+
+    public function bulk_delete_costs(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:cost_transactions,id',
+        ]);
+
+        $userIds = [];
+        $deleted = 0;
+
+        DB::transaction(function () use ($data, &$userIds, &$deleted) {
+            $costs = CostTransaction::whereIn('id', $data['ids'])->get();
+            foreach ($costs as $cost) {
+                if ($cost->user_id) {
+                    $userIds[$cost->user_id] = true;
+                }
+                $cost->delete();
+                $this->costAudit->log(
+                    CostTransactionAuditService::ACTION_DELETED,
+                    $cost->id,
+                    ['bulk' => true, 'amount' => $cost->amount, 'reason' => $cost->reason]
+                );
+                $deleted++;
+            }
+        });
+
+        foreach (array_keys($userIds) as $uid) {
+            $user = User::find($uid);
+            if ($user) {
+                BalancesHelper::instance()->CalcCostBalance($user);
+            }
+        }
+
+        return redirect()->back()->with('success', trans_choice('general.bulk_deleted', $deleted, ['count' => $deleted]));
+    }
+
+    public function export_costs(Request $request)
+    {
+        $query = CostTransaction::excludingSalaries()->with(['user', 'project']);
+
+        foreach (['year', 'month', 'project_id', 'user_id', 'currency_id', 'category'] as $f) {
+            if ($request->filled($f)) {
+                $v = $request->query($f);
+                if ($f === 'project_id') {
+                    $query->where('project_id', $v);
+                } elseif ($f === 'user_id') {
+                    $query->where('user_id', $v);
+                } elseif ($f === 'currency_id') {
+                    $query->where('currency_id', $v);
+                } elseif ($f === 'category') {
+                    $query->where('category', $v);
+                } elseif ($f === 'year') {
+                    $query->whereYear('created_at', (int) $v);
+                } elseif ($f === 'month') {
+                    $query->whereMonth('created_at', (int) $v);
+                }
+            }
+        }
+
+        if ($request->filled('search')) {
+            $term = trim((string) $request->query('search'));
+            $query->where(function ($q) use ($term) {
+                $q->where('reason', 'like', "%{$term}%")
+                  ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$term}%"))
+                  ->orWhereHas('project', fn ($p) => $p->where('project_name', 'like', "%{$term}%"));
+            });
+        }
+
+        $rows = $query->orderBy('created_at', 'desc')->limit(10000)->get();
+        $currencies = Currency::as_array();
+        $bCurrency = CurrencyHelper::getBusinessCurrency();
+
+        $filename = 'costs-' . now()->format('Ymd-His') . '.csv';
+
+        $response = new StreamedResponse(function () use ($rows, $currencies) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, [
+                'id', 'date', 'reason', 'category', 'project', 'client', 'currency',
+                'amount', 'business_amount', 'tax_amount', 'tax_rate',
+                'payment_method', 'recurring', 'notes', 'created_by',
+            ]);
+            foreach ($rows as $r) {
+                $cid = $r->currency_id ?? $r->currency;
+                $crow = $currencies[$cid] ?? null;
+                fputcsv($out, [
+                    $r->id,
+                    optional($r->created_at)->toDateTimeString(),
+                    $r->reason,
+                    $r->category,
+                    optional($r->project)->project_name,
+                    optional($r->user)->name,
+                    optional($crow)->currency,
+                    (float) $r->amount,
+                    (float) $r->business_amount,
+                    (float) $r->tax_amount,
+                    (float) $r->tax_rate,
+                    $r->payment_method,
+                    $r->recurringSources->count() > 0 ? 'yes' : 'no',
+                    $r->notes,
+                    optional($r->creator)->name,
+                ]);
+            }
+            fclose($out);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', "attachment; filename=\"{$filename}\"");
+
+        return $response;
+    }
+
     public function create_cost()
     {
-        $users = User::select('id', 'name')->get();
-        $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
+        $users = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->orderBy('project_name')->select('id', 'project_name as name', 'user_id')->limit(200)->get();
         $currencies = array_values(Currency::as_array());
-
         $businessCurrency = CurrencyHelper::getBusinessCurrency();
+        $existingCategories = CostTransaction::excludingSalaries()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->limit(100)
+            ->pluck('category')
+            ->map(fn ($c) => ['value' => $c, 'label' => ucfirst($c)])
+            ->values();
 
         return Inertia::render('Admin/Business/CostsCreate', [
             'users' => $users,
             'projects' => $projects,
             'currencies' => $currencies,
             'businessCurrency' => $businessCurrency,
+            'paymentMethods' => self::COST_PAYMENT_METHODS,
+            'categories' => $existingCategories,
         ]);
     }
 
@@ -343,16 +774,45 @@ class BusinessController extends Controller
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'currency_id' => 'required|exists:currencies,id',
-            'reason' => 'required|string|max:255',
+            'reason' => 'required|string|max:500',
             'created_at' => 'nullable|date',
             'user_id' => 'nullable|exists:users,id',
             'project_id' => 'nullable|exists:projects,id',
+            'category' => 'nullable|string|max:80',
+            'category_text' => 'nullable|string|max:80',
+            'payment_method' => ['nullable', 'string', 'max:40', Rule::in(array_column(self::COST_PAYMENT_METHODS, 'value'))],
+            'tax_amount' => 'nullable|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
+            'is_billable' => 'nullable|boolean',
+            'notes' => 'nullable|string|max:5000',
+            'attachment' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
+            'make_recurring' => 'nullable|boolean',
+            'recurring' => 'nullable|string|in:day,week,month,year',
+            'recurring_times' => 'nullable|integer|min:1',
+            'recurring_title' => 'nullable|string|max:255',
         ]);
+
+        $category = $request->input('category') === '__new__'
+            ? ($request->input('category_text') ?: null)
+            : ($request->input('category') ?: null);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('cost-attachments', 'public');
+        }
 
         $cost = new CostTransaction;
         $cost->amount = $request->amount;
         $cost->currency_id = $request->currency_id;
         $cost->reason = $request->reason;
+        $cost->category = $category;
+        $cost->payment_method = $request->input('payment_method');
+        $cost->tax_amount = (float) ($request->input('tax_amount') ?? 0);
+        $cost->tax_rate = (float) ($request->input('tax_rate') ?? 0);
+        $cost->is_billable = (bool) $request->input('is_billable');
+        $cost->attachment_path = $attachmentPath;
+        $cost->notes = $request->input('notes');
+        $cost->created_by = auth()->id();
 
         if ($request->filled('created_at')) {
             $cost->created_at = $request->created_at;
@@ -366,13 +826,34 @@ class BusinessController extends Controller
             $cost->project_id = $request->project_id;
         }
 
-        DB::transaction(function () use ($cost) {
+        $recurringId = null;
+
+        DB::transaction(function () use ($cost, $request, &$recurringId) {
             $cost->save();
             if ($cost->user_id) {
                 $user = User::find($cost->user_id);
                 if ($user) {
                     BalancesHelper::instance()->CalcCostBalance($user);
                 }
+            }
+
+            if ($request->boolean('make_recurring') && $request->filled('recurring')) {
+                $rc = new \App\Models\RecurringCost();
+                $rc->title = $request->input('recurring_title') ?: $cost->reason;
+                $rc->amount = $cost->amount;
+                $rc->currency_id = $cost->currency_id;
+                $rc->start_date = ($cost->created_at ?? now())->toDateString();
+                $rc->current_date = ($cost->created_at ?? now())->toDateString();
+                $rc->recurring = $request->input('recurring');
+                $rc->recurring_times = (int) ($request->input('recurring_times') ?? 1);
+                if ($rc->recurring === 'month') {
+                    $rc->recurring_times_month = (int) ($cost->created_at?->day ?? now()->day);
+                }
+                $rc->reason = $cost->category ?: $cost->reason;
+                $rc->is_active = true;
+                $rc->save();
+                $rc->transactions()->attach($cost->id, ['unique_id' => $rc->id . '-' . ($cost->created_at ?? now())->toDateString()]);
+                $recurringId = $rc->id;
             }
         });
 
@@ -383,23 +864,38 @@ class BusinessController extends Controller
                 'amount' => $cost->amount,
                 'currency_id' => $cost->currency_id,
                 'reason' => $cost->reason,
+                'category' => $cost->category,
+                'payment_method' => $cost->payment_method,
                 'user_id' => $cost->user_id,
                 'project_id' => $cost->project_id,
+                'recurring_id' => $recurringId,
             ]
         );
 
-        return redirect()->route('admin.costs.index')->with('success', __('general.saved_successfully'));
+        $redirect = $request->boolean('make_recurring')
+            ? redirect()->route('admin.recurring_costs.edit', $recurringId)
+            : redirect()->route('admin.costs.index');
+
+        return $redirect->with('success', __('general.saved_successfully'));
     }
 
     public function edit_cost($id)
     {
-        $cost = CostTransaction::findOrFail($id);
+        $cost = CostTransaction::withTrashed()->findOrFail($id);
 
-        $users = User::select('id', 'name')->get();
-        $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
+        $users = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->orderBy('project_name')->select('id', 'project_name as name', 'user_id')->limit(200)->get();
         $currencies = array_values(Currency::as_array());
-
         $businessCurrency = CurrencyHelper::getBusinessCurrency();
+        $existingCategories = CostTransaction::excludingSalaries()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->limit(100)
+            ->pluck('category')
+            ->map(fn ($c) => ['value' => $c, 'label' => ucfirst($c)])
+            ->values();
 
         return Inertia::render('Admin/Business/CostsEdit', [
             'cost' => $cost,
@@ -407,27 +903,70 @@ class BusinessController extends Controller
             'projects' => $projects,
             'currencies' => $currencies,
             'businessCurrency' => $businessCurrency,
+            'paymentMethods' => self::COST_PAYMENT_METHODS,
+            'categories' => $existingCategories,
+            'attachment_url' => $cost->attachment_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($cost->attachment_path) : null,
         ]);
     }
 
     public function update_cost(Request $request, $id)
     {
-        $cost = CostTransaction::findOrFail($id);
-        $before = $cost->only(['amount', 'currency_id', 'reason', 'user_id', 'project_id']);
+        $cost = CostTransaction::withTrashed()->findOrFail($id);
+        $before = $cost->only([
+            'amount', 'currency_id', 'reason', 'user_id', 'project_id',
+            'category', 'payment_method', 'tax_amount', 'tax_rate',
+            'is_billable', 'notes', 'created_at',
+        ]);
 
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'currency_id' => 'required|exists:currencies,id',
-            'reason' => 'required|string|max:255',
+            'reason' => 'required|string|max:500',
             'created_at' => 'nullable|date',
             'user_id' => 'nullable|exists:users,id',
             'project_id' => 'nullable|exists:projects,id',
+            'category' => 'nullable|string|max:80',
+            'category_text' => 'nullable|string|max:80',
+            'payment_method' => ['nullable', 'string', 'max:40', Rule::in(array_column(self::COST_PAYMENT_METHODS, 'value'))],
+            'tax_amount' => 'nullable|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
+            'is_billable' => 'nullable|boolean',
+            'notes' => 'nullable|string|max:5000',
+            'attachment' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
+            'remove_attachment' => 'nullable|boolean',
         ]);
 
-        DB::transaction(function () use ($cost, $request) {
+        $category = $request->input('category') === '__new__'
+            ? ($request->input('category_text') ?: null)
+            : ($request->input('category') ?: null);
+
+        $attachmentPath = $cost->attachment_path;
+        $attachmentDeleted = false;
+        if ($request->boolean('remove_attachment') && $attachmentPath) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($attachmentPath);
+            $attachmentPath = null;
+            $attachmentDeleted = true;
+        }
+        if ($request->hasFile('attachment')) {
+            if ($attachmentPath) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($attachmentPath);
+            }
+            $attachmentPath = $request->file('attachment')->store('cost-attachments', 'public');
+        }
+
+        $previousUserId = $cost->user_id;
+
+        DB::transaction(function () use ($cost, $request, $category, $attachmentPath, $previousUserId) {
             $cost->amount = $request->amount;
             $cost->currency_id = $request->currency_id;
             $cost->reason = $request->reason;
+            $cost->category = $category;
+            $cost->payment_method = $request->input('payment_method');
+            $cost->tax_amount = (float) ($request->input('tax_amount') ?? 0);
+            $cost->tax_rate = (float) ($request->input('tax_rate') ?? 0);
+            $cost->is_billable = (bool) $request->input('is_billable');
+            $cost->notes = $request->input('notes');
+            $cost->attachment_path = $attachmentPath;
 
             if ($request->filled('created_at')) {
                 $cost->created_at = $request->created_at;
@@ -438,16 +977,21 @@ class BusinessController extends Controller
 
             $cost->save();
 
-            if ($cost->user_id) {
-                $user = User::find($cost->user_id);
+            $usersToRecalc = array_unique(array_filter([$cost->user_id, $previousUserId]));
+            foreach ($usersToRecalc as $uid) {
+                $user = User::find($uid);
                 if ($user) {
                     BalancesHelper::instance()->CalcCostBalance($user);
                 }
             }
         });
 
-        $after = $cost->fresh()->only(['amount', 'currency_id', 'reason', 'user_id', 'project_id']);
+        $after = $cost->fresh()->only(array_keys($before));
         $changed = array_keys(array_diff_assoc($after, $before));
+        if ($attachmentDeleted) {
+            $changed[] = 'attachment_path';
+        }
+        $changed = array_values(array_unique($changed));
 
         if ($changed !== []) {
             $this->costAudit->log(
@@ -457,21 +1001,32 @@ class BusinessController extends Controller
                     'changed' => $changed,
                     'before' => array_intersect_key($before, array_flip($changed)),
                     'after' => array_intersect_key($after, array_flip($changed)),
+                    'previous_user_id' => $previousUserId !== $after['user_id'] ? $previousUserId : null,
                 ]
             );
         }
 
-        return redirect()->route('admin.costs.index')->with('success', __('general.saved_successfully'));
+        return redirect()->route('admin.costs.show', $cost->id)->with('success', __('general.saved_successfully'));
     }
 
     public function delete_cost($id)
     {
-        $cost = CostTransaction::findOrFail($id);
-        $snapshot = $cost->only(['amount', 'currency_id', 'reason', 'user_id', 'project_id']);
+        $cost = CostTransaction::withTrashed()->findOrFail($id);
+        $wasTrashed = $cost->trashed();
+        $snapshot = $cost->only([
+            'amount', 'currency_id', 'reason', 'user_id', 'project_id',
+            'category', 'payment_method', 'tax_amount', 'tax_rate',
+        ]);
+        $costId = $cost->id;
+        $userId = $cost->user_id;
+        $force = request()->boolean('force');
 
-        DB::transaction(function () use ($cost) {
-            $userId = $cost->user_id;
-            $cost->delete();
+        DB::transaction(function () use ($cost, $force, $userId) {
+            if ($force) {
+                $cost->forceDelete();
+            } else {
+                $cost->delete();
+            }
 
             if ($userId) {
                 $user = User::find($userId);
@@ -482,9 +1037,9 @@ class BusinessController extends Controller
         });
 
         $this->costAudit->log(
-            CostTransactionAuditService::ACTION_DELETED,
-            $id,
-            $snapshot
+            $wasTrashed ? 'costs.force_deleted' : CostTransactionAuditService::ACTION_DELETED,
+            $costId,
+            array_merge($snapshot, ['force' => $force && $wasTrashed])
         );
 
         return redirect()->route('admin.costs.index')->with('success', __('general.deleted_successfully'));

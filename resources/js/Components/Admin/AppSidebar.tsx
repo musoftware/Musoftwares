@@ -115,18 +115,6 @@ const items: MenuItem[] = [
     ]
   },
   { 
-    title: "Freelance", 
-    url: "/admin/freelance", 
-    icon: Briefcase,
-    subItems: [
-        { title: "Jobs", url: "/admin/freelance/jobs" },
-        { title: "Proposals", url: "/admin/freelance/proposals" },
-        { title: "Contracts", url: "/admin/freelance/contracts" },
-        { title: "Skills", url: "/admin/freelance/skills" },
-        { title: "Profiles", url: "/admin/freelance/profiles" },
-    ]
-  },
-  { 
     title: "Seller & Payout", 
     url: "/admin/seller", 
     icon: CreditCard,

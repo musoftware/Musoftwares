@@ -31,7 +31,7 @@ class InvoiceController extends Controller
                 'amount'         => round((float) $inv->total(), 2),
                 'paid_amount'    => round((float) $inv->paid, 2),
                 'remaining'      => $inv->unpaid_total(),
-                'currency'       => $inv->currency,
+                'currency'       => $inv->currency_id,
                 'status'         => $inv->status,
                 'due_date'       => $inv->schedule['start_date'] ?? null, // fallback
                 'issued_at'      => $inv->created_at?->format('Y-m-d'),
@@ -90,7 +90,7 @@ class InvoiceController extends Controller
                 'amount'         => round((float) $invoice->total(), 2),
                 'paid_amount'    => round((float) $invoice->paid, 2),
                 'remaining'      => $invoice->unpaid_total(),
-                'currency'       => $invoice->currency,
+                'currency'       => $invoice->currency_id,
                 'status'         => $invoice->status,
                 'due_date'       => $invoice->schedule['start_date'] ?? null,
                 'issued_at'      => $invoice->created_at?->format('Y-m-d'),

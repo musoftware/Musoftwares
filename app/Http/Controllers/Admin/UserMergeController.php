@@ -39,7 +39,8 @@ class UserMergeController extends Controller
                 })
                 ->orderBy('id')
                 ->limit(20)
-                ->get(['id', 'name', 'email', 'role', 'email_verified_at']);
+                ->with('roles')
+                ->get(['id', 'name', 'email', 'email_verified_at']);
         }
 
         $recentlyMerged = User::onlyTrashed()
@@ -54,7 +55,7 @@ class UserMergeController extends Controller
                 'id'                => $user->id,
                 'name'              => $user->name,
                 'email'             => $user->email,
-                'role'              => $user->role,
+                'role'              => $user->getRoleNames()->first(),
                 'email_verified_at' => $user->email_verified_at?->toIso8601String(),
                 'created_at'        => $user->created_at?->toIso8601String(),
             ],
@@ -63,7 +64,7 @@ class UserMergeController extends Controller
                 'id'                => $u->id,
                 'name'              => $u->name,
                 'email'             => $u->email,
-                'role'              => $u->role,
+                'role'              => $u->getRoleNames()->first(),
                 'email_verified'    => (bool) $u->email_verified_at,
             ])->values(),
             'recently_merged' => $recentlyMerged->map(fn (User $u) => [

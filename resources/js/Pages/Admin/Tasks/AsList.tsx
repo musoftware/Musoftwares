@@ -364,7 +364,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 </div>
 
                                 <div className="w-[150px]">
-                                    <Select value={priority} onValueChange={(v) => { setPriority(v); submit({ priority: v === ALL ? '' : v }); }}>
+                                    <Select value={priority} onValueChange={(v) => { if (v === null) return; setPriority(v); submit({ priority: v === ALL ? '' : v }); }}>
                                         <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.all_priorities')} /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value={ALL}>{__('general.all_priorities')}</SelectItem>
@@ -377,7 +377,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 </div>
 
                                 <div className="w-[130px]">
-                                    <Select value={isPaid} onValueChange={(v) => { setIsPaid(v); submit({ is_paid: v === ALL ? '' : v }); }}>
+                                    <Select value={isPaid} onValueChange={(v) => { if (v === null) return; setIsPaid(v); submit({ is_paid: v === ALL ? '' : v }); }}>
                                         <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.all_paid')} /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value={ALL}>{__('general.all_paid')}</SelectItem>
@@ -388,7 +388,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 </div>
 
                                 <div className="w-[130px]">
-                                    <Select value={paused} onValueChange={(v) => { setPaused(v); submit({ paused: v === ALL ? '' : v }); }}>
+                                    <Select value={paused} onValueChange={(v) => { if (v === null) return; setPaused(v); submit({ paused: v === ALL ? '' : v }); }}>
                                         <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.all_paused')} /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value={ALL}>{__('general.all_paused')}</SelectItem>
@@ -445,7 +445,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 )}
 
                                 <div className="ms-auto w-[170px]">
-                                    <Select value={sort} onValueChange={(v) => { setSort(v); submit({ sort: v }); }}>
+                                    <Select value={sort} onValueChange={(v) => { if (v === null) return; setSort(v); submit({ sort: v }); }}>
                                         <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.sort_by')} /></SelectTrigger>
                                         <SelectContent>
                                             {Object.entries(SORT_LABEL).map(([k, v]) => (
@@ -456,7 +456,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 </div>
 
                                 <div className="w-[100px]">
-                                    <Select value={perPage} onValueChange={(v) => { setPerPage(v); submit({ per_page: v }); }}>
+                                    <Select value={perPage} onValueChange={(v) => { if (v === null) return; setPerPage(v); submit({ per_page: v }); }}>
                                         <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="50" /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="10">10</SelectItem>

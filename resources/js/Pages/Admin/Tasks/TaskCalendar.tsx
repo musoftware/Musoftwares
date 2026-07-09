@@ -203,7 +203,8 @@ export default function TaskCalendar({ events, year, month, tz, clients, stats, 
         }, { preserveState: true, replace: true });
     };
 
-    const handleEventTypeChange = (val: string) => {
+    const handleEventTypeChange = (val: string | null) => {
+        if (val === null) return;
         setEventType(val);
         router.get(route('admin.tasks.calendar'), {
             month, year,
