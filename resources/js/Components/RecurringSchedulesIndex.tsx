@@ -68,16 +68,26 @@ function pluralize(times: number, unit: string) {
     return `Every ${times} ${unit}${times === 1 ? '' : 's'}`;
 }
 
+function toArray(value: unknown): string[] {
+    if (Array.isArray(value)) return value.map((v) => String(v));
+    if (value == null || value === '') return [];
+    if (typeof value === 'string') return value.split(',').map((v) => v.trim()).filter(Boolean);
+    return [String(value)];
+}
+
 export function formatScheduleSummary(row: RecurringScheduleRow): string {
     const unit = row.recurring ?? 'month';
     const times = row.recurring_times ?? 1;
     let str = pluralize(times, unit);
-    if (unit === 'week' && row.recurring_times_week?.length) {
-        str += ` on [${row.recurring_times_week.join(', ')}]`;
-    } else if (unit === 'month' && row.recurring_times_month?.length) {
-        str += ` on day [${row.recurring_times_month.join(', ')}]`;
-    } else if (unit === 'year' && row.recurring_times_year?.length) {
-        str += ` on [${row.recurring_times_year.join(', ')}]`;
+    const weekDays = toArray(row.recurring_times_week);
+    const monthDays = toArray(row.recurring_times_month);
+    const yearDays = toArray(row.recurring_times_year);
+    if (unit === 'week' && weekDays.length) {
+        str += ` on [${weekDays.join(', ')}]`;
+    } else if (unit === 'month' && monthDays.length) {
+        str += ` on day [${monthDays.join(', ')}]`;
+    } else if (unit === 'year' && yearDays.length) {
+        str += ` on [${yearDays.join(', ')}]`;
     }
     return str;
 }

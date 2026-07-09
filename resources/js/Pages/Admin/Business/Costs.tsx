@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, router, usePage } from '@inertiajs/react';
-import { 
-    Card, 
-    CardContent, 
-    CardHeader, 
+import {
+    Card,
+    CardContent,
+    CardHeader,
     CardTitle,
     CardDescription
 } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { 
-    ArrowDownRight, 
-    Calendar as CalendarIcon, 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/Components/ui/select';
+import {
+    ArrowDownRight,
+    Calendar as CalendarIcon,
     Search,
-    MoreHorizontal
+    MoreHorizontal,
+    Filter
 } from 'lucide-react';
-import { 
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -43,17 +51,25 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 
+const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 export default function Costs() {
     const { entries, stats, filters } = usePage<any>().props;
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
 
+    const handleFilterChange = (key: string, value: string) => {
+        router.get(route('admin.costs.index'), {
+            ...(filters || {}),
+            [key]: value,
+        }, { preserveState: true });
+    };
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(route('admin.costs.index'), {
+            ...(filters || {}),
             search: searchTerm,
-            year: filters?.year,
-            month: filters?.month,
         }, { preserveState: true });
     };
 
@@ -123,6 +139,48 @@ export default function Costs() {
                     </CardContent>
                 </Card>
             </div>
+
+            <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
+                <CardContent className="p-4">
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-2 text-slate-500">
+                            <Filter className="h-4 w-4" />
+                            <span className="text-sm font-medium">Filters:</span>
+                        </div>
+                        <Select
+                            value={String(filters?.year ?? new Date().getFullYear())}
+                            onValueChange={(val) => { if (val) handleFilterChange('year', val); }}
+                        >
+                            <SelectTrigger className="w-[120px] bg-white h-9 rounded-lg">
+                                <SelectValue placeholder="Year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {(filters?.available_years || [new Date().getFullYear()]).map((y: number) => (
+                                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select
+                            value={String(filters?.month ?? new Date().getMonth() + 1)}
+                            onValueChange={(val) => { if (val) handleFilterChange('month', val); }}
+                        >
+                            <SelectTrigger className="w-[140px] bg-white h-9 rounded-lg">
+                                <SelectValue placeholder="Month" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {(filters?.available_months || [1,2,3,4,5,6,7,8,9,10,11,12]).map((m: number) => (
+                                    <SelectItem key={m} value={String(m)}>{MONTH_NAMES[m]}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {filters?.year && filters?.month && (
+                            <span className="text-xs text-slate-500 ml-auto">
+                                Showing: <span className="font-semibold text-slate-700">{MONTH_NAMES[Number(filters.month)]} {filters.year}</span>
+                            </span>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
 
             <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
                 <CardHeader className="pb-2">

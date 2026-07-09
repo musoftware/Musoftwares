@@ -12,6 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\IsPlatformClient;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -100,6 +101,60 @@ class User extends Authenticatable
     public function tickets(): HasMany
     {
         return $this->hasMany(\App\Models\Ticket::class, 'user_id');
+    }
+
+    public function emails(): HasMany
+    {
+        return $this->hasMany(\App\Models\UserEmail::class, 'user_id');
+    }
+
+    /**
+     * Resolve a login identifier (email) to a User account.
+     * Looks up `users.email` first, then falls back to `user_emails.email`.
+     * Email comparison is case-insensitive. Returns null when no match.
+     */
+    public static function findForLogin(string $identifier): ?self
+    {
+        $needle = strtolower(trim($identifier));
+        if ($needle === '') {
+            return null;
+        }
+
+        $user = static::query()
+            ->whereRaw('LOWER(email) = ?', [$needle])
+            ->first();
+        if ($user) {
+            return $user;
+        }
+
+        $alias = DB::table('user_emails')
+            ->whereRaw('LOWER(email) = ?', [$needle])
+            ->first();
+
+        if (!$alias) {
+            return null;
+        }
+
+        return static::query()->find($alias->user_id);
+    }
+
+    /**
+     * Whether this email belongs to the user (primary OR an alias).
+     */
+    public function ownsEmail(string $identifier): bool
+    {
+        $needle = strtolower(trim($identifier));
+        if ($needle === '') {
+            return false;
+        }
+
+        if (strtolower((string) $this->email) === $needle) {
+            return true;
+        }
+
+        return $this->emails()
+            ->whereRaw('LOWER(email) = ?', [$needle])
+            ->exists();
     }
 
     public function conversationParticipations(): HasMany
@@ -507,6 +562,16 @@ class User extends Authenticatable
     public function affiliateCommissionPercent(): float
     {
         return (float) ($this->affiliate_commission_percentage ?? 1);
+    }
+
+    public function freelanceSkills()
+    {
+        return $this->belongsToMany(
+            \Modules\Freelance\Models\Skill::class,
+            'freelance_user_skills',
+            'user_id',
+            'skill_id'
+        );
     }
 
     /**

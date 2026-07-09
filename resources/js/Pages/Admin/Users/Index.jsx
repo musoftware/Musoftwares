@@ -38,6 +38,26 @@ export default function Index({ clients, filters, stats }) {
     const [selectedRole, setSelectedRole] = useState('client');
     const [resetPasswordState, setResetPasswordState] = useState({ isOpen: false, clientId: null, client: null, status: 'confirm', info: null });
 
+    const copyToClipboard = (value, label) => {
+        if (!value) return;
+        const fallback = () => {
+            const ta = document.createElement('textarea');
+            ta.value = value;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+            document.body.removeChild(ta);
+        };
+        if (navigator?.clipboard?.writeText) {
+            navigator.clipboard.writeText(value).catch(fallback);
+        } else {
+            fallback();
+        }
+        toast({ title: __('general.copied') || 'Copied', description: `${label} ${__('general.copied_to_clipboard') || 'copied to clipboard.'}` });
+    };
+
     const handleSearch = (search) => {
         router.get(
             '/admin/users',
@@ -401,7 +421,13 @@ export default function Index({ clients, filters, stats }) {
                                     onClick={() => {
                                         setResetPasswordState(prev => ({ ...prev, status: 'loading' }));
                                         axios.post(`/admin/users/${resetPasswordState.clientId}/reset-password`).then((response) => {
-                                            setResetPasswordState(prev => ({ ...prev, status: 'success', info: { message: response.data?.message, expiresInHours: response.data?.expires_in_hours ?? 24 } }));
+                                            setResetPasswordState(prev => ({ ...prev, status: 'success', info: {
+                                                message: response.data?.message,
+                                                email: response.data?.email,
+                                                name: response.data?.name,
+                                                password: response.data?.password,
+                                                loginUrl: response.data?.login_url,
+                                            } }));
                                         }).catch(() => {
                                             toast({
                                                 title: "Error",
@@ -429,20 +455,45 @@ export default function Index({ clients, filters, stats }) {
                             <DialogHeader>
                                 <DialogTitle className="text-green-600 flex items-center gap-2">
                                     <CheckCircle2 className="h-5 w-5" />
-                                    {resetPasswordState.info?.message || __('general.password_reset_success_email_sent') || 'Password reset successful and email sent!'}
+                                    {resetPasswordState.info?.message || __('general.password_reset_email_sent_with_new_password') || 'A new password has been generated and emailed to the user.'}
                                 </DialogTitle>
                                 <DialogDescription className="pt-2 text-slate-600">
-                                    {__('general.the_set_password_link_is_valid_for_n_hours_and_can_be_used_once', { n: resetPasswordState.info?.expiresInHours ?? 24 }) || `The link is valid for ${resetPasswordState.info?.expiresInHours ?? 24} hours and can be used once.`}
+                                    {__('general.share_credentials_with_user') || 'You can copy these credentials and share them with the user manually if needed.'}
                                 </DialogDescription>
                             </DialogHeader>
-                            <div className="my-6">
-                                <div className="font-mono text-sm bg-slate-50 border border-slate-200 p-4 rounded">
-                                    <pre className="whitespace-pre-wrap font-sans text-sm text-slate-700">
-{`Hello, ${resetPasswordState.client?.name},
-An administrator has issued a one-time link to set or reset the password on your account.
-Please check your email (${resetPasswordState.client?.email}) for the secure link.
-This link is valid for ${resetPasswordState.info?.expiresInHours ?? 24} hours and can be used only once.`}
-                                    </pre>
+                            <div className="my-2 space-y-3">
+                                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    {__('general.credentials_ready_to_send') || 'Credentials ready to send'}
+                                </div>
+
+                                <div className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                    <div className="min-w-0">
+                                        <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.email') || 'Email'}</div>
+                                        <div className="truncate font-mono text-sm text-slate-800">{resetPasswordState.info?.email}</div>
+                                    </div>
+                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.email, 'Email')}>
+                                        <Copy className="h-4 w-4" />
+                                    </Button>
+                                </div>
+
+                                <div className="flex items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="text-[11px] uppercase tracking-wide text-amber-700">{__('general.new_password') || 'New password'}</div>
+                                        <div className="truncate font-mono text-sm font-semibold text-amber-900">{resetPasswordState.info?.password}</div>
+                                    </div>
+                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.password, 'Password')}>
+                                        <Copy className="h-4 w-4" />
+                                    </Button>
+                                </div>
+
+                                <div className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.login_url') || 'Login URL'}</div>
+                                        <div className="truncate font-mono text-sm text-slate-800">{resetPasswordState.info?.loginUrl}</div>
+                                    </div>
+                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.loginUrl, 'Login URL')}>
+                                        <Copy className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
                             <DialogFooter>

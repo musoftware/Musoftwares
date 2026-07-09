@@ -35,6 +35,7 @@ import {
     Repeat,
     CalendarClock,
     Trash2,
+    Mail,
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
@@ -174,21 +175,18 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     <Briefcase className="h-4 w-4 me-3 text-slate-500" />{__('general.activate_membership')}</button>
 
                                 <div className="pt-3 mt-3 border-t border-slate-200" />
-                                <button
-                                    onClick={() => {
-                                        const dupId = window.prompt(__('general.merge_duplicate_user_id_prompt') || 'Duplicate user ID to merge into this account:');
-                                        if (!dupId || isNaN(Number(dupId))) return;
-                                        const id = Number(dupId);
-                                        if (id === client.id) {
-                                            alert(__('general.cannot_merge_user_into_itself') || 'Cannot merge a user into itself.');
-                                            return;
-                                        }
-                                        onClose();
-                                        router.get(`/admin/users/${client.id}/merge`, { duplicate_id: id });
-                                    }}
+                                <Link
+                                    href={`/admin/users/${client.id}/emails`}
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Mail className="h-4 w-4 me-3 text-slate-500" />{__('general.manage_email_aliases') || 'Manage email aliases & merge'}</Link>
+                                <Link
+                                    href={`/admin/users/${client.id}/merge-select`}
+                                    onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-red-50 transition-colors text-red-600 font-medium w-full text-start"
                                 >
-                                    <Trash2 className="h-4 w-4 me-3" />{__('general.merge_into_another_client')}</button>
+                                    <Trash2 className="h-4 w-4 me-3" />{__('general.merge_into_another_client')}</Link>
                             </div>
                         </div>
 

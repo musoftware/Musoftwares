@@ -336,14 +336,24 @@ export function RecurringScheduleForm({
     );
 }
 
+function toArray(value: unknown): string[] {
+    if (Array.isArray(value)) return value.map((v) => String(v));
+    if (value == null || value === '') return [];
+    if (typeof value === 'string') return value.split(',').map((v) => v.trim()).filter(Boolean);
+    return [String(value)];
+}
+
 export function formatScheduleSummary(s: RecurringScheduleValues): string {
+    const weekDays = toArray(s.recurring_times_week);
+    const monthDays = toArray(s.recurring_times_month);
+    const yearDays = toArray(s.recurring_times_year);
     let scheduleStr = `Every ${s.recurring_times} ${s.recurring}(s)`;
-    if (s.recurring === 'week' && s.recurring_times_week.length) {
-        scheduleStr += ` on [${s.recurring_times_week.join(', ')}]`;
-    } else if (s.recurring === 'month' && s.recurring_times_month.length) {
-        scheduleStr += ` on day [${s.recurring_times_month.join(', ')}]`;
-    } else if (s.recurring === 'year' && s.recurring_times_year.length) {
-        scheduleStr += ` on [${s.recurring_times_year.join(', ')}]`;
+    if (s.recurring === 'week' && weekDays.length) {
+        scheduleStr += ` on [${weekDays.join(', ')}]`;
+    } else if (s.recurring === 'month' && monthDays.length) {
+        scheduleStr += ` on day [${monthDays.join(', ')}]`;
+    } else if (s.recurring === 'year' && yearDays.length) {
+        scheduleStr += ` on [${yearDays.join(', ')}]`;
     }
     return scheduleStr;
 }

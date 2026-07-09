@@ -168,4 +168,65 @@ class UserMergeTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->service->merge($u->id, $u->id, [], 0);
     }
+
+    public function test_select_page_excludes_survivor_and_soft_deleted(): void
+    {
+        $admin    = User::factory()->create(['role' => 'admin']);
+        $survivor = User::factory()->create(['name' => 'Alice', 'email' => 'alice@example.com']);
+        $match    = User::factory()->create(['name' => 'Alicia', 'email' => 'alicia@example.com']);
+        $deleted  = User::factory()->create(['name' => 'Alick', 'email' => 'alick@example.com', 'deleted_at' => now()]);
+        $other    = User::factory()->create(['name' => 'Bob', 'email' => 'bob@example.com']);
+
+        $response = $this->actingAs($admin)->get(
+            route('admin.users.merge.select', $survivor->id, false) . '?search=ali'
+        );
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Users/MergeSelect')
+            ->where('survivor.id', $survivor->id)
+            ->where('search', 'ali')
+            ->has('suggestions', 1)
+            ->where('suggestions.0.id', $match->id)
+        );
+    }
+
+    public function test_select_page_with_no_search_returns_empty_suggestions(): void
+    {
+        $admin    = User::factory()->create(['role' => 'admin']);
+        $survivor = User::factory()->create();
+
+        $response = $this->actingAs($admin)->get(
+            route('admin.users.merge.select', $survivor->id, false)
+        );
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Users/MergeSelect')
+            ->where('search', '')
+            ->has('suggestions', 0)
+        );
+    }
+
+    public function test_select_page_includes_recently_merged(): void
+    {
+        $admin    = User::factory()->create(['role' => 'admin']);
+        $survivor = User::factory()->create();
+        $merged   = User::factory()->create([
+            'name'               => 'Old Dup',
+            'email'              => 'old@example.com',
+            'deleted_at'         => now(),
+            'merged_into_user_id'=> $survivor->id,
+        ]);
+
+        $response = $this->actingAs($admin)->get(
+            route('admin.users.merge.select', $survivor->id, false)
+        );
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->where('recently_merged.0.id', $merged->id)
+            ->where('recently_merged.0.email', 'old@example.com')
+        );
+    }
 }

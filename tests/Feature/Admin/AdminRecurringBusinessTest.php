@@ -2,13 +2,17 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\AdminSettings;
+use App\Models\CostTransaction;
+use App\Models\Currency;
 use App\Models\User;
 use App\Models\RecurringCost;
 use App\Models\RecurringIncome;
 use App\Models\RecurringSalary;
+use Database\Seeders\CurrenciesSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminRecurringBusinessTest extends TestCase
 {
@@ -16,14 +20,22 @@ class AdminRecurringBusinessTest extends TestCase
 
     protected User $admin;
     protected User $clientUser;
+    protected Currency $currency;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(CurrenciesSeeder::class);
 
-        $this->admin = User::factory()->create(['onboarding_completed' => true]);
+        $this->currency = Currency::first();
+        AdminSettings::SetValue('business_currency', (string) $this->currency->id);
+
+        $this->admin = User::factory()->create([
+            'onboarding_completed' => true,
+            'currency_id' => $this->currency->id,
+        ]);
         $this->admin->assignRole('admin');
 
         $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
@@ -123,5 +135,43 @@ class AdminRecurringBusinessTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('recurring_salaries', ['title' => 'Monthly Salary', 'user_id' => $this->clientUser->id]);
+    }
+
+    public function test_recurring_cost_view_exposes_cost_transaction_id_for_each_transaction(): void
+    {
+        $rc = new RecurringCost();
+        $rc->title = 'Server Sub';
+        $rc->amount = 50;
+        $rc->currency_id = $this->currency->id;
+        $rc->start_date = now()->toDateString();
+        $rc->current_date = now()->toDateString();
+        $rc->recurring = 'month';
+        $rc->recurring_times = 1;
+        $rc->recurring_times_month = now()->day;
+        $rc->reason = 'server';
+        $rc->save();
+
+        $cost = new CostTransaction();
+        $cost->reason = 'server';
+        $cost->amount = 50.00;
+        $cost->currency_id = $this->currency->id;
+        $cost->created_at = now();
+        $cost->updated_at = now();
+        $cost->save();
+
+        $rc->transactions()->attach($cost->id, [
+            'unique_id' => $rc->id . '-' . now()->toDateString(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.recurring_costs.view', $rc->id));
+
+        $response->assertStatus(200);
+
+        $props = $response->original->getData()['page']['props'];
+        $transactions = $props['transactions'] ?? [];
+
+        $this->assertCount(1, $transactions, 'Recurring cost view should expose generated transactions.');
+        $this->assertArrayHasKey('cost_transaction_id', $transactions[0], 'Each transaction must include cost_transaction_id.');
+        $this->assertSame($cost->id, $transactions[0]['cost_transaction_id']);
     }
 }

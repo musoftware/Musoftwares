@@ -6,9 +6,11 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class LoginRequest extends FormRequest
 {
@@ -35,6 +37,7 @@ class LoginRequest extends FormRequest
 
     /**
      * Attempt to authenticate the request's credentials.
+     * Accepts the user's primary email OR any of their `user_emails` aliases.
      *
      * @throws ValidationException
      */
@@ -42,13 +45,21 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $identifier = (string) $this->input('email');
+        $password   = (string) $this->input('password');
+        $remember   = $this->boolean('remember');
+
+        $user = User::findForLogin($identifier);
+
+        if (! $user || ! Hash::check($password, (string) $user->getAuthPassword())) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
+
+        Auth::login($user, $remember);
 
         RateLimiter::clear($this->throttleKey());
     }

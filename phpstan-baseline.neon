@@ -3317,3 +3317,27 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 2
 			path: app/Services/SupportDeskService.php
+
+		-
+			message: '#^Relation ''project'' is not found in App\\Models\\Task model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Client/ClientTasksAggregatorController.php
+
+		-
+			message: '#^Relation ''task_todo_items'' is not found in App\\Models\\Task model\.$#'
+			identifier: larastan.relationExistence
+			count: 3
+			path: app/Http/Controllers/Client/ClientTasksAggregatorController.php
+
+		-
+			message: '#^Relation ''task'' is not found in App\\Models\\Todo model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Client/ClientTasksAggregatorController.php
+
+		-
+			message: '#^Relation ''project'' is not found in App\\Models\\Todo model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Client/ClientTasksAggregatorController.php

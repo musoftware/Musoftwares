@@ -23,7 +23,8 @@ import {
     Settings, User, Users, History, Shield, CreditCard, Box, 
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
     MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download,
-    FolderKanban
+    FolderKanban,
+    ListTodo
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
@@ -187,6 +188,8 @@ function AuthenticatedContent({
                                                             <LayoutDashboard className="w-5 h-5 text-slate-400" /> {__('general.dashboard')}</Link>
                                                         <Link href={safeRoute('client.projects.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                             <FolderKanban className="w-5 h-5 text-slate-400" /> {__('general.projects')}</Link>
+                                                        <Link href={safeRoute('client.projects.all-tasks')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                            <ListTodo className="w-5 h-5 text-slate-400" /> {__('general.all_tasks')}</Link>
                                                         <Link href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                             <Building2 className="w-5 h-5 text-slate-400" /> {__('general.erp')}</Link>
                                                         <Link href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
@@ -319,6 +322,9 @@ function AuthenticatedContent({
                                         {/* CLIENT PROJECTS */}
                                         <NavLink href={safeRoute('client.projects.index')} active={isRouteActive('client.projects')}>
                                             <FolderKanban className="h-3.5 w-3.5 text-slate-400" /> {__('general.projects')}</NavLink>
+
+                                        <NavLink href={safeRoute('client.projects.all-tasks')} active={isRouteActive('client.projects.all-tasks')}>
+                                            <ListTodo className="h-3.5 w-3.5 text-slate-400" /> {__('general.all_tasks')}</NavLink>
 
                                         {/* MORE MEGA MENU */}
                                         <DropdownMenu>

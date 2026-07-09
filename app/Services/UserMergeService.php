@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AdminAuditLog;
 use App\Models\User;
+use App\Models\UserEmail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
@@ -64,55 +65,157 @@ class UserMergeService
 
     public function merge(int $survivorId, int $duplicateId, array $resolutions, int $adminId): void
     {
-        if ($survivorId === $duplicateId) {
-            throw new RuntimeException('Survivor and duplicate must be different users.');
+        $this->mergeMany($survivorId, [$duplicateId], $resolutions, $adminId);
+    }
+
+    /**
+     * Merge one or more duplicate accounts into a survivor.
+     *
+     * Wraps the entire batch in a single DB transaction. Each duplicate is
+     * sequentially reassigned, the duplicate's email is auto-promoted to a
+     * verified `user_emails` alias on the survivor (unless it conflicts with
+     * the survivor's primary email or an existing alias).
+     *
+     * @param  array<int, int>  $duplicateIds
+     * @return array<int, array{duplicate_id:int, status:string, alias_added:bool, error?:string}>
+     */
+    public function mergeMany(int $survivorId, array $duplicateIds, array $resolutions, int $adminId): array
+    {
+        $duplicateIds = array_values(array_unique(array_filter(array_map('intval', $duplicateIds), static fn ($v) => $v > 0)));
+        if ($duplicateIds === []) {
+            throw new RuntimeException('At least one duplicate user id is required.');
+        }
+        foreach ($duplicateIds as $d) {
+            if ($d === $survivorId) {
+                throw new RuntimeException("Duplicate id {$d} cannot equal survivor id {$survivorId}.");
+            }
         }
 
-        DB::transaction(function () use ($survivorId, $duplicateId, $resolutions, $adminId) {
-            $survivor  = User::withTrashed()->lockForUpdate()->find($survivorId);
-            $duplicate = User::withTrashed()->lockForUpdate()->find($duplicateId);
+        $outcomes = [];
 
+        DB::transaction(function () use ($survivorId, $duplicateIds, $resolutions, $adminId, &$outcomes) {
+            $survivor = User::withTrashed()->lockForUpdate()->find($survivorId);
             if (!$survivor || $survivor->trashed()) {
                 throw new RuntimeException("Survivor user #{$survivorId} not found or already soft-deleted.");
             }
-            if (!$duplicate || $duplicate->trashed()) {
-                throw new RuntimeException("Duplicate user #{$duplicateId} not found or already merged.");
+
+            $perDuplicateSnapshots = [];
+            $totalReassignments = [];
+            $totalTokensRevoked = 0;
+            $totalRolesDeduped  = 0;
+            $allCollisions      = [];
+
+            foreach ($duplicateIds as $duplicateId) {
+                $duplicate = User::withTrashed()->lockForUpdate()->find($duplicateId);
+                if (!$duplicate || $duplicate->trashed()) {
+                    $outcomes[] = [
+                        'duplicate_id' => $duplicateId,
+                        'status'       => 'skipped',
+                        'alias_added'  => false,
+                        'error'        => 'Duplicate not found or already merged.',
+                    ];
+                    continue;
+                }
+
+                $snapshot = [
+                    'survivor_before'  => $survivor->only(self::RESOLVABLE_FIELDS),
+                    'duplicate_before' => $duplicate->only(self::RESOLVABLE_FIELDS),
+                    'resolutions'      => $resolutions,
+                    'reassignments'    => [],
+                    'tokens_revoked'   => 0,
+                    'roles_deduped'    => 0,
+                    'collisions'       => [],
+                ];
+
+                if ((int) $duplicate->id === (int) $survivorId) {
+                    throw new RuntimeException("Cannot merge user #{$survivorId} into itself.");
+                }
+
+                $this->applyFieldResolutions($survivor, $duplicate, $resolutions);
+
+                $snapshot['reassignments']  = $this->reassignChildRows($duplicateId, $survivorId, $snapshot['collisions']);
+                $snapshot['tokens_revoked'] = $this->revokeDuplicateTokens($duplicateId);
+                $snapshot['roles_deduped']  = $this->mergeRolesAndPermissions($duplicateId, $survivorId);
+
+                $duplicate->forceFill([
+                    'merged_into_user_id' => $survivorId,
+                    'deleted_at'          => now(),
+                ])->save();
+
+                $aliasAdded = $this->promoteDuplicateEmailToAlias($duplicate, $survivor, $adminId);
+
+                $perDuplicateSnapshots[] = [
+                    'duplicate_id' => $duplicateId,
+                    'snapshot'      => $snapshot,
+                    'alias_added'   => $aliasAdded,
+                ];
+
+                $totalReassignments = array_merge($totalReassignments, $snapshot['reassignments']);
+                $totalTokensRevoked += $snapshot['tokens_revoked'];
+                $totalRolesDeduped  += $snapshot['roles_deduped'];
+                $allCollisions       = array_merge($allCollisions, $snapshot['collisions']);
+
+                $outcomes[] = [
+                    'duplicate_id' => $duplicateId,
+                    'status'       => 'merged',
+                    'alias_added'  => $aliasAdded,
+                ];
             }
 
-            $snapshot = [
-                'survivor_before'  => $survivor->only(self::RESOLVABLE_FIELDS),
-                'duplicate_before' => $duplicate->only(self::RESOLVABLE_FIELDS),
-                'resolutions'      => $resolutions,
-                'reassignments'    => [],
-                'tokens_revoked'   => 0,
-                'roles_deduped'    => 0,
-                'collisions'       => [],
-            ];
-
-            $this->applyFieldResolutions($survivor, $duplicate, $resolutions);
-
-            $snapshot['reassignments'] = $this->reassignChildRows($duplicateId, $survivorId, $snapshot['collisions']);
-            $snapshot['tokens_revoked'] = $this->revokeDuplicateTokens($duplicateId);
-            $snapshot['roles_deduped']  = $this->mergeRolesAndPermissions($duplicateId, $survivorId);
-
-            $duplicate->forceFill([
-                'merged_into_user_id' => $survivorId,
-                'deleted_at'          => now(),
-            ])->save();
-
             AdminAuditLog::create([
-                'actor_user_id'    => $adminId,
-                'action'           => 'users.merged',
-                'severity'         => AdminAuditLog::SEVERITY_WARNING,
-                'target_type'      => User::class,
-                'target_id'        => $duplicateId,
-                'meta'             => [
+                'actor_user_id' => $adminId,
+                'action'        => 'users.merged',
+                'severity'      => AdminAuditLog::SEVERITY_WARNING,
+                'target_type'   => User::class,
+                'target_id'     => $survivorId,
+                'meta'          => [
                     'survivor_id'     => $survivorId,
-                    'duplicate_id'    => $duplicateId,
-                    'snapshot'        => $snapshot,
+                    'duplicate_ids'   => $duplicateIds,
+                    'duplicate_id'    => count($duplicateIds) === 1 ? $duplicateIds[0] : null,
+                    'outcomes'        => $outcomes,
+                    'batch_snapshot'  => [
+                        'reassignments'  => $totalReassignments,
+                        'tokens_revoked' => $totalTokensRevoked,
+                        'roles_deduped'  => $totalRolesDeduped,
+                        'collisions'     => $allCollisions,
+                        'per_duplicate'  => $perDuplicateSnapshots,
+                    ],
                 ],
             ]);
         });
+
+        return $outcomes;
+    }
+
+    /**
+     * Add the duplicate's email as a verified alias on the survivor unless it
+     * collides with the survivor's primary email or an existing alias.
+     */
+    public function addAliasFromDuplicate(User $duplicate, User $survivor, ?int $adminId = null): bool
+    {
+        return $this->promoteDuplicateEmailToAlias($duplicate, $survivor, $adminId ?? 0);
+    }
+
+    private function promoteDuplicateEmailToAlias(User $duplicate, User $survivor, int $adminId): bool
+    {
+        $email = strtolower(trim((string) $duplicate->getOriginal('email')));
+        if ($email === '' || $survivor->ownsEmail($email)) {
+            return false;
+        }
+
+        try {
+            UserEmail::create([
+                'user_id'          => $survivor->id,
+                'email'            => $email,
+                'verified_at'      => now(),
+                'source'           => UserEmail::SOURCE_MERGE,
+                'added_by_user_id' => $adminId ?: null,
+            ]);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -292,7 +395,7 @@ class UserMergeService
 
         $result = [];
         foreach ($tables as $table) {
-            $tableName = is_object($table) ? ($table->name ?? $table->Tables_in_DB ?? null) : (string) $table;
+            $tableName = $this->extractTableName($table);
             if (!$tableName || $tableName === 'users') {
                 continue;
             }
@@ -312,6 +415,18 @@ class UserMergeService
         }
 
         return array_keys($result);
+    }
+
+    private function extractTableName(mixed $table): ?string
+    {
+        if (is_object($table)) {
+            $name = $table->name ?? $table->Tables_in_DB ?? null;
+        } elseif (is_array($table)) {
+            $name = $table['name'] ?? $table['Tables_in_DB'] ?? null;
+        } else {
+            $name = $table;
+        }
+        return $name !== null && $name !== '' ? (string) $name : null;
     }
 
     /**

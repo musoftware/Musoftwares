@@ -15,7 +15,7 @@ import {
   SidebarFooter
 } from '@/Components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/Components/ui/collapsible';
-import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2 } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
@@ -29,9 +29,9 @@ type MenuItem = {
 
 const items: MenuItem[] = [
   { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
-  { 
-    title: "User & Content", 
-    url: "/admin/users-content", 
+  {
+    title: "User & Content",
+    url: "/admin/users-content",
     icon: Users,
     subItems: [
         { title: "Users", url: "/admin/users" },
@@ -41,8 +41,19 @@ const items: MenuItem[] = [
         { title: "Blog Articles", url: "/admin/blog-articles" },
     ]
   },
-  { 
-    title: "Invoices", 
+  {
+    title: "Tasks",
+    url: "/admin/tasks",
+    icon: ListTodo,
+    subItems: [
+        { title: "Tasks List", url: "/admin/tasks/as_list" },
+        { title: "Task Calendar", url: "/admin/tasks/calendar" },
+        { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
+        { title: "Employee Todos", url: "/admin/employee-todos" },
+    ]
+  },
+  {
+    title: "Invoices",
     url: "/admin/invoices", 
     icon: DollarSign,
     subItems: [
@@ -81,11 +92,7 @@ const items: MenuItem[] = [
         { title: "Website Services", url: "/admin/website-services" },
         { title: "Guest Tickets", url: "/admin/guest-tickets" },
         { title: "Tickets", url: "/admin/tickets" },
-        { title: "Tasks List", url: "/admin/tasks/as_list" },
-        { title: "Task Calendar", url: "/admin/tasks/calendar" },
-        { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
         { title: "Busy Times", url: "/admin/busy-times" },
-        { title: "Employee Todos", url: "/admin/employee-todos" },
         { title: "Points Control", url: "/admin/points_controller" },
         { title: "Point Packages", url: "/admin/point-packages" },
         { title: "Charity", url: "/admin/charity-counter" },

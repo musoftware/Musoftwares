@@ -11,6 +11,7 @@ use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\CostTransactionAuditService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,9 @@ use Inertia\Inertia;
 
 class BusinessController extends Controller
 {
+    public function __construct(
+        protected CostTransactionAuditService $costAudit,
+    ) {}
     public function income(Request $request)
     {
         $currentYear = (int) now()->year;
@@ -210,9 +214,23 @@ class BusinessController extends Controller
 
     public function costs(Request $request)
     {
-        $year = (int) $request->query('year', now()->year);
+        $currentYear = (int) now()->year;
+        $year = (int) $request->query('year', $currentYear);
         $month = (int) $request->query('month', now()->month);
         $search = trim((string) $request->query('search', ''));
+
+        $minDate = CostTransaction::min('created_at');
+        $maxDate = CostTransaction::max('created_at');
+        $earliestYear = $minDate ? (int) Carbon::parse($minDate)->year : $currentYear;
+        $latestYear = $maxDate ? (int) Carbon::parse($maxDate)->year : $currentYear;
+        if ($earliestYear > $currentYear) {
+            $earliestYear = $currentYear;
+        }
+        if ($latestYear < $currentYear) {
+            $latestYear = $currentYear;
+        }
+        $availableYears = range($latestYear, $earliestYear);
+        $availableMonths = range(1, 12);
 
         $costsQuery = CostTransaction::with(['user', 'project', 'recurringSources'])
             ->excludingSalaries()
@@ -245,7 +263,7 @@ class BusinessController extends Controller
             if ($recurringSource) {
                 $isRecurring = true;
                 $categoryName = $recurringSource->reason;
-                $title = $entry->reason ?: $recurringSource->title;
+                $title = $recurringSource->title ?: $entry->reason;
             }
 
             return [
@@ -292,6 +310,8 @@ class BusinessController extends Controller
                 'year' => $year,
                 'month' => $month,
                 'search' => $search,
+                'available_years' => $availableYears,
+                'available_months' => $availableMonths,
             ],
             'stats' => [
                 'total_monthly_costs' => abs($totalMonthlyCosts),
@@ -356,6 +376,18 @@ class BusinessController extends Controller
             }
         });
 
+        $this->costAudit->log(
+            CostTransactionAuditService::ACTION_CREATED,
+            $cost->id,
+            [
+                'amount' => $cost->amount,
+                'currency_id' => $cost->currency_id,
+                'reason' => $cost->reason,
+                'user_id' => $cost->user_id,
+                'project_id' => $cost->project_id,
+            ]
+        );
+
         return redirect()->route('admin.costs.index')->with('success', __('general.saved_successfully'));
     }
 
@@ -381,6 +413,7 @@ class BusinessController extends Controller
     public function update_cost(Request $request, $id)
     {
         $cost = CostTransaction::findOrFail($id);
+        $before = $cost->only(['amount', 'currency_id', 'reason', 'user_id', 'project_id']);
 
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
@@ -413,12 +446,28 @@ class BusinessController extends Controller
             }
         });
 
+        $after = $cost->fresh()->only(['amount', 'currency_id', 'reason', 'user_id', 'project_id']);
+        $changed = array_keys(array_diff_assoc($after, $before));
+
+        if ($changed !== []) {
+            $this->costAudit->log(
+                CostTransactionAuditService::ACTION_UPDATED,
+                $cost->id,
+                [
+                    'changed' => $changed,
+                    'before' => array_intersect_key($before, array_flip($changed)),
+                    'after' => array_intersect_key($after, array_flip($changed)),
+                ]
+            );
+        }
+
         return redirect()->route('admin.costs.index')->with('success', __('general.saved_successfully'));
     }
 
     public function delete_cost($id)
     {
         $cost = CostTransaction::findOrFail($id);
+        $snapshot = $cost->only(['amount', 'currency_id', 'reason', 'user_id', 'project_id']);
 
         DB::transaction(function () use ($cost) {
             $userId = $cost->user_id;
@@ -431,6 +480,12 @@ class BusinessController extends Controller
                 }
             }
         });
+
+        $this->costAudit->log(
+            CostTransactionAuditService::ACTION_DELETED,
+            $id,
+            $snapshot
+        );
 
         return redirect()->route('admin.costs.index')->with('success', __('general.deleted_successfully'));
     }

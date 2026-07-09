@@ -5,6 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\User
+ */
 class UserResource extends JsonResource
 {
     /**
@@ -82,6 +85,16 @@ class UserResource extends JsonResource
             'user_balance'         => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (float) $this->user_balance),
             'slug'                 => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->slug),
             'referrals_count'      => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->my_ref_users()->count()),
+            'aliases_count'        => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->emails()->count()),
+            'aliases'              => $this->when(
+                $request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'),
+                fn () => $this->emails()->orderBy('email')->get(['id', 'email', 'verified_at', 'source'])->map(fn ($e) => [
+                    'id'         => $e->id,
+                    'email'      => $e->email,
+                    'verified'   => $e->verified_at !== null,
+                    'source'     => $e->source,
+                ])->all()
+            ),
         ];
     }
 }

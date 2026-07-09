@@ -659,30 +659,63 @@ class UsersController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Issue a single-use signed link instead of generating and emailing a
-        // plaintext password. The link lets the user set their own password;
-        // no plaintext ever leaves the server.
-        $setLink = SetPasswordController::issueLink($user, Auth::id());
+        $plainPassword = $this->generateSecurePassword(12);
+        $user->update([
+            'password' => Hash::make($plainPassword),
+        ]);
+
+        if (method_exists($user, 'tokens')) {
+            $user->tokens()->delete();
+        }
+
+        $loginUrl = url('/login');
 
         try {
             $messageText = "Hello {$user->name},\n\n"
-                ."An administrator has issued a one-time link to set or reset the password on your account.\n\n"
-                ."Set your password here: {$setLink}\n\n"
-                .'This link is valid for 24 hours and can be used only once. '
+                ."An administrator has generated a new password for your account.\n\n"
+                ."Email: {$user->email}\n"
+                ."Password: {$plainPassword}\n\n"
+                ."You can sign in here: {$loginUrl}\n\n"
+                .'For your security, please change your password after signing in. '
                 ."If you did not request this, please ignore this email and contact support.\n\nThank you.";
 
             Mail::raw($messageText, function ($message) use ($user) {
                 $message->to($user->email)
-                    ->subject(__('general.set_your_password') ?: 'Set your password');
+                    ->subject(__('general.your_new_account_password') ?: 'Your new account password');
             });
         } catch (\Exception $e) {
             Log::error('Failed to send password reset email: '.$e->getMessage());
         }
 
         return response()->json([
-            'message' => 'A one-time password setup link has been emailed to the user.',
-            'expires_in_hours' => 24,
+            'message' => __('general.password_reset_email_sent_with_new_password')
+                ?: 'A new password has been generated and emailed to the user.',
+            'email' => $user->email,
+            'name' => $user->name,
+            'password' => $plainPassword,
+            'login_url' => $loginUrl,
         ]);
+    }
+
+    private function generateSecurePassword(int $length = 12): string
+    {
+        $upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        $lower = 'abcdefghijkmnopqrstuvwxyz';
+        $digits = '23456789';
+        $symbols = '!@#$%&*';
+
+        $password = '';
+        $password .= $upper[random_int(0, strlen($upper) - 1)];
+        $password .= $lower[random_int(0, strlen($lower) - 1)];
+        $password .= $digits[random_int(0, strlen($digits) - 1)];
+        $password .= $symbols[random_int(0, strlen($symbols) - 1)];
+
+        $all = $upper.$lower.$digits.$symbols;
+        for ($i = 4; $i < $length; $i++) {
+            $password .= $all[random_int(0, strlen($all) - 1)];
+        }
+
+        return str_shuffle($password);
     }
 
     public function referrals($id)

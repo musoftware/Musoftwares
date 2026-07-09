@@ -67,11 +67,38 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
         try {
             const res = await window.axios.post(`/admin/users/${client.id}/generate-password`);
             setResetPasswordInfo({
-                message: res.data?.message || __('general.password_reset_success_email_sent') || 'Password reset successful and email sent!',
-                expiresInHours: res.data?.expires_in_hours ?? 24,
+                message: res.data?.message || __('general.password_reset_email_sent_with_new_password') || 'A new password has been generated and emailed to the user.',
+                email: res.data?.email,
+                name: res.data?.name,
+                password: res.data?.password,
+                loginUrl: res.data?.login_url,
             });
         } catch (e) {
             alert('Failed to reset password.');
+        }
+    };
+
+    const copyToClipboard = (value, label) => {
+        if (!value) return;
+        const fallback = () => {
+            const ta = document.createElement('textarea');
+            ta.value = value;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+            document.body.removeChild(ta);
+        };
+        if (navigator?.clipboard?.writeText) {
+            navigator.clipboard.writeText(value).catch(fallback);
+        } else {
+            fallback();
+        }
+        if (typeof window !== 'undefined' && window.toast) {
+            window.toast({ title: __('general.copied') || 'Copied', description: `${label} ${__('general.copied_to_clipboard') || 'copied to clipboard.'}` });
+        } else {
+            alert(`${label} ${__('general.copied_to_clipboard') || 'copied to clipboard.'}`);
         }
     };
 
@@ -153,11 +180,6 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
 
     const referralCode = client.slug || client.id;
     const referralLink = `${window.location.origin}/r/${referralCode}`;
-
-    const copyToClipboard = (text) => {
-        navigator.clipboard.writeText(text);
-        alert('Copied to clipboard!');
-    };
 
     return (
         <AdminSidebarLayout title={`User Profile: ${client.name}`} header="User Details">
@@ -251,20 +273,11 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                         <Briefcase className="me-2 h-4 w-4" />
                                         <span>{__('general.activate_membership')}</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            const dupId = window.prompt('Duplicate user ID to merge into this account:');
-                                            if (!dupId || isNaN(Number(dupId))) return;
-                                            const id = Number(dupId);
-                                            if (id === client.id) {
-                                                alert('Cannot merge a user into itself.');
-                                                return;
-                                            }
-                                            router.get(`/admin/users/${client.id}/merge`, { duplicate_id: id });
-                                        }}
-                                    >
-                                        <Trash2 className="me-2 h-4 w-4 text-red-600" />
-                                        <span className="text-red-600">Merge into another client…</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/merge-select`} className="w-full cursor-pointer flex items-center">
+                                            <Trash2 className="me-2 h-4 w-4 text-red-600" />
+                                            <span className="text-red-600">Merge into another client…</span>
+                                        </Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                             </div>
@@ -464,13 +477,46 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                         <DialogDescription>{__('general.are_you_sure_you_want_to_reset_this_user_s_password_a_new_secure_password_will_be_generated')}</DialogDescription>
                     </DialogHeader>
 {resetPasswordInfo ? (
-                        <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-                            <p className="text-sm text-green-800 mb-2">
-                                {resetPasswordInfo.message || __('general.password_reset_success_email_sent') || 'Password reset successful and email sent!'}
+                        <div className="p-4 bg-green-50 border border-green-200 rounded-md space-y-3">
+                            <p className="text-sm text-green-800">
+                                {resetPasswordInfo.message || __('general.password_reset_email_sent_with_new_password') || 'A new password has been generated and emailed to the user.'}
                             </p>
                             <p className="text-xs text-green-700">
-                                {__('general.the_set_password_link_is_valid_for_n_hours_and_can_be_used_once', { n: resetPasswordInfo.expiresInHours }) || `The link is valid for ${resetPasswordInfo.expiresInHours} hours and can be used once.`}
+                                {__('general.share_credentials_with_user') || 'You can copy these credentials and share them with the user manually if needed.'}
                             </p>
+                            <div className="text-[11px] font-semibold uppercase tracking-wide text-green-800">
+                                {__('general.credentials_ready_to_send') || 'Credentials ready to send'}
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 rounded-md border border-green-200 bg-white px-3 py-2">
+                                <div className="min-w-0">
+                                    <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.email') || 'Email'}</div>
+                                    <div className="truncate font-mono text-sm text-slate-800">{resetPasswordInfo.email}</div>
+                                </div>
+                                <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordInfo.email, 'Email')}>
+                                    <Copy className="h-4 w-4" />
+                                </Button>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2">
+                                <div className="min-w-0 flex-1">
+                                    <div className="text-[11px] uppercase tracking-wide text-amber-700">{__('general.new_password') || 'New password'}</div>
+                                    <div className="truncate font-mono text-sm font-semibold text-amber-900">{resetPasswordInfo.password}</div>
+                                </div>
+                                <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordInfo.password, 'Password')}>
+                                    <Copy className="h-4 w-4" />
+                                </Button>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 rounded-md border border-green-200 bg-white px-3 py-2">
+                                <div className="min-w-0 flex-1">
+                                    <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.login_url') || 'Login URL'}</div>
+                                    <div className="truncate font-mono text-sm text-slate-800">{resetPasswordInfo.loginUrl}</div>
+                                </div>
+                                <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordInfo.loginUrl, 'Login URL')}>
+                                    <Copy className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     ) : (
                         <DialogFooter>
@@ -557,7 +603,25 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                 </div>
                 <div className="flex-1">
                     <h2 className="text-2xl font-bold font-sora text-slate-900 mb-1">{client.name}</h2>
-                    <p className="text-slate-500 mb-4">{client.email}</p>
+                    <p className="text-slate-500 mb-4">
+                        {client.email}
+                        {(client.aliases_count ?? 0) > 0 && (
+                            <Link
+                                href={`/admin/users/${client.id}/emails`}
+                                className="ms-3 text-xs underline text-indigo-600"
+                            >
+                                +{client.aliases_count} email alias(es)
+                            </Link>
+                        )}
+                        {(client.aliases_count ?? 0) === 0 && (
+                            <Link
+                                href={`/admin/users/${client.id}/emails`}
+                                className="ms-3 text-xs underline text-slate-500"
+                            >
+                                Manage email aliases
+                            </Link>
+                        )}
+                    </p>
                     <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                         <span className="px-3 py-1 bg-slate-100 text-slate-800 rounded-full text-xs font-bold uppercase tracking-wide border border-slate-200">
                             ID: {client.id}
