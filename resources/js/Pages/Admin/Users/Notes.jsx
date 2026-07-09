@@ -52,6 +52,7 @@ export default function Notes({ user, notes, stats }) {
     const [selectedNote, setSelectedNote] = useState(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [copiedId, setCopiedId] = useState(null);
     const [revealAutoHideAt, setRevealAutoHideAt] = useState(null);
 
     const [filterCategory, setFilterCategory] = useState('all');
@@ -123,17 +124,46 @@ export default function Notes({ user, notes, stats }) {
 
     const handleSetPassword = (e) => {
         e.preventDefault();
-        if (!password.trim()) return;
-        sessionStorage.setItem('notes_pwd', password);
-        setIsPasswordSet(true);
+        const pwd = password.trim();
+        if (!pwd) return;
+
+        setError(null);
+        let tempCrypto;
         try {
-            setCryptoInstance(new SimpleCrypto(password));
+            tempCrypto = new SimpleCrypto(pwd);
         } catch (err) {
-            setError('Invalid encryption password.');
-            setIsPasswordSet(false);
-            setCryptoInstance(null);
-            sessionStorage.removeItem('notes_pwd');
+            setError('Invalid encryption password format.');
+            return;
         }
+
+        // Validate password against existing encrypted notes (if any)
+        const encryptedCandidate = items.find(
+            (n) =>
+                (n.title && !/\s/.test(n.title) && n.title.length >= 128) ||
+                (n.content && !/\s/.test(n.content) && n.content.length >= 128)
+        );
+
+        if (encryptedCandidate) {
+            let decryptedVal = null;
+            const targetText = (encryptedCandidate.title && !/\s/.test(encryptedCandidate.title) && encryptedCandidate.title.length >= 128)
+                ? encryptedCandidate.title
+                : encryptedCandidate.content;
+
+            try {
+                decryptedVal = tempCrypto.decrypt(targetText);
+            } catch (_) {
+                decryptedVal = null;
+            }
+
+            if (decryptedVal === null || decryptedVal === undefined || decryptedVal === '' || String(decryptedVal).startsWith('🔒')) {
+                setError(__('general.invalid_master_password_please_try_again') || 'Invalid master password. Please try again.');
+                return;
+            }
+        }
+
+        sessionStorage.setItem('notes_pwd', pwd);
+        setCryptoInstance(tempCrypto);
+        setIsPasswordSet(true);
     };
 
     const handleClearPassword = useCallback(() => {
@@ -237,7 +267,20 @@ export default function Notes({ user, notes, stats }) {
         setContent(decContent && !decContent.startsWith('🔒') ? decContent : '');
         setCategory(note.category === 'archived' ? 'notes' : note.category);
         setExpiresAt(note.expires_at ? note.expires_at.slice(0, 10) : '');
-        setShowCreateSheet(true);
+        
+        if (window.innerWidth < 1024) {
+            setShowCreateSheet(true);
+        } else {
+            const formElement = document.getElementById('category');
+            if (formElement) {
+                formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Focus the title input for editing immediate convenience
+                setTimeout(() => {
+                    const titleInput = document.getElementById('title');
+                    if (titleInput) titleInput.focus();
+                }, 300);
+            }
+        }
     };
 
     const handleArchive = (noteId, currentCategory) => {
@@ -280,6 +323,36 @@ export default function Notes({ user, notes, stats }) {
         } catch (_) {
             setError('Clipboard not available.');
         }
+    };
+
+    const handleCopyCard = async (text, id) => {
+        if (!text || (typeof text === 'string' && text.startsWith('🔒'))) return;
+        try {
+            await navigator.clipboard.writeText(String(text));
+            setCopiedId(id);
+            setTimeout(() => setCopiedId(null), 2000);
+            setTimeout(async () => {
+                try {
+                    await navigator.clipboard.writeText('');
+                } catch (clipErr) {
+                    // Clipboard unavailable or permission revoked; ignore.
+                }
+            }, CLIPBOARD_AUTOCLEAR_MS);
+        } catch (_) {
+            setError('Clipboard not available.');
+        }
+    };
+
+    const handlePageChange = (newPage) => {
+        router.get(
+            window.location.pathname,
+            {
+                page: newPage,
+                category: filterCategory !== 'all' ? filterCategory : undefined,
+                pinned: showOnlyPinned ? 1 : undefined,
+            },
+            { preserveState: true, preserveScroll: true }
+        );
     };
 
     const items = useMemo(
@@ -527,7 +600,7 @@ export default function Notes({ user, notes, stats }) {
                                             )}
                                         </div>
                                         {note.decryptedTitle && !String(note.decryptedTitle).startsWith('🔒') && (
-                                            <h3 className="text-lg font-bold text-slate-900 break-all">{note.decryptedTitle}</h3>
+                                            <h3 className="text-lg font-bold text-slate-900 break-words">{note.decryptedTitle}</h3>
                                         )}
                                         <span className="text-[11px] text-slate-400 font-medium">
                                             {new Date(note.created_at).toLocaleString()}
@@ -556,11 +629,21 @@ export default function Notes({ user, notes, stats }) {
                                         </IconButton>
                                     </div>
                                 </div>
-                                <div className="prose prose-sm max-w-none text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-between items-center">
+                                <div className="prose prose-sm max-w-none text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-between items-center gap-3">
                                     {isPasswordSet && note.decryptedContent !== null && !String(note.decryptedContent).startsWith('🔒') ? (
-                                        <span className="text-slate-500 line-clamp-1 flex-1 font-mono text-xs overflow-hidden text-ellipsis whitespace-nowrap">
-                                            {note.decryptedContent}
-                                        </span>
+                                        <div className="flex items-center justify-between flex-1 min-w-0 gap-2">
+                                            <span className="text-slate-500 line-clamp-1 font-mono text-xs overflow-hidden text-ellipsis whitespace-nowrap">
+                                                {note.decryptedContent}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                title={__('general.copy_text')}
+                                                onClick={() => handleCopyCard(note.decryptedContent, note.id)}
+                                                className={`p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 shrink-0 transition-colors ${copiedId === note.id ? 'text-green-600 hover:text-green-700' : ''}`}
+                                            >
+                                                {copiedId === note.id ? <Check size={14} /> : <Copy size={14} />}
+                                            </button>
+                                        </div>
                                     ) : (
                                         <div className="flex items-center text-slate-400 font-medium text-sm">
                                             <Key size={16} className="me-2" />
@@ -568,7 +651,7 @@ export default function Notes({ user, notes, stats }) {
                                         </div>
                                     )}
                                     {isPasswordSet && note.decryptedContent && !String(note.decryptedContent).startsWith('🔒') && (
-                                        <Button variant="outline" size="sm" className="ms-4 shrink-0 shadow-sm border-slate-200" onClick={() => handleViewNote(note)}>
+                                        <Button variant="outline" size="sm" className="ms-2 shrink-0 shadow-sm border-slate-200" onClick={() => handleViewNote(note)}>
                                             <FileText size={14} className="me-2 text-slate-400" />
                                             {__('general.view_note')}
                                         </Button>
@@ -595,6 +678,74 @@ export default function Notes({ user, notes, stats }) {
                             </div>
                         )}
                     </div>
+
+                    {notes && notes.last_page > 1 && (
+                        <div className="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3 sm:px-6 mt-6 rounded-xl shadow-sm">
+                            <div className="flex flex-1 justify-between sm:hidden">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handlePageChange(notes.current_page - 1)}
+                                    disabled={notes.current_page === 1}
+                                    className="relative inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                >
+                                    {__('general.previous') || 'Previous'}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handlePageChange(notes.current_page + 1)}
+                                    disabled={notes.current_page === notes.last_page}
+                                    className="relative ml-3 inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                >
+                                    {__('general.next') || 'Next'}
+                                </Button>
+                            </div>
+                            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                                <div>
+                                    <p className="text-sm text-slate-700">
+                                        Showing <span className="font-medium">{((notes.current_page - 1) * notes.per_page) + 1}</span> to{' '}
+                                        <span className="font-medium">{Math.min(notes.current_page * notes.per_page, notes.total)}</span> of{' '}
+                                        <span className="font-medium">{notes.total}</span> results
+                                    </p>
+                                </div>
+                                <div>
+                                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => handlePageChange(notes.current_page - 1)}
+                                            disabled={notes.current_page === 1}
+                                            className="relative inline-flex items-center rounded-l-md px-3 py-2 text-slate-400 hover:bg-slate-50 disabled:opacity-50 border-slate-200"
+                                        >
+                                            <span className="sr-only">Previous</span>
+                                            &larr;
+                                        </Button>
+                                        {Array.from({ length: notes.last_page }, (_, i) => i + 1).map((p) => (
+                                            <button
+                                                key={p}
+                                                onClick={() => handlePageChange(p)}
+                                                aria-current={p === notes.current_page ? 'page' : undefined}
+                                                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold transition-all ${
+                                                    p === notes.current_page
+                                                        ? 'z-10 bg-slate-900 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 rounded-md mx-0.5'
+                                                        : 'text-slate-900 border border-slate-200 hover:bg-slate-50 rounded-md mx-0.5'
+                                                }`}
+                                            >
+                                                {p}
+                                            </button>
+                                        ))}
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => handlePageChange(notes.current_page + 1)}
+                                            disabled={notes.current_page === notes.last_page}
+                                            className="relative inline-flex items-center rounded-r-md px-3 py-2 text-slate-400 hover:bg-slate-50 disabled:opacity-50 border-slate-200"
+                                        >
+                                            <span className="sr-only">Next</span>
+                                            &rarr;
+                                        </Button>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="lg:col-span-1 hidden lg:block">
