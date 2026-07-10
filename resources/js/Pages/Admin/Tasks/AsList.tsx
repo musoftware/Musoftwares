@@ -24,13 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/Components/ui/select';
+import { SimpleSelect } from '@/Components/ui/SimpleSelect';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 import axios from 'axios';
@@ -364,38 +358,44 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 </div>
 
                                 <div className="w-[150px]">
-                                    <Select value={priority} onValueChange={(v) => { if (v === null) return; setPriority(v); submit({ priority: v === ALL ? '' : v }); }}>
-                                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.all_priorities')} /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={ALL}>{__('general.all_priorities')}</SelectItem>
-                                            <SelectItem value="urgent">{__('general.urgent')}</SelectItem>
-                                            <SelectItem value="high">{__('general.high')}</SelectItem>
-                                            <SelectItem value="normal">{__('general.normal')}</SelectItem>
-                                            <SelectItem value="low">{__('general.low')}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <SimpleSelect
+                                        value={priority}
+                                        onChange={(v) => { setPriority(v); submit({ priority: v === ALL ? '' : v }); }}
+                                        placeholder={__('general.all_priorities')}
+                                        options={[
+                                            { value: ALL, label: __('general.all_priorities') },
+                                            { value: 'urgent', label: __('general.urgent') },
+                                            { value: 'high', label: __('general.high') },
+                                            { value: 'normal', label: __('general.normal') },
+                                            { value: 'low', label: __('general.low') },
+                                        ]}
+                                    />
                                 </div>
 
                                 <div className="w-[130px]">
-                                    <Select value={isPaid} onValueChange={(v) => { if (v === null) return; setIsPaid(v); submit({ is_paid: v === ALL ? '' : v }); }}>
-                                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.all_paid')} /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={ALL}>{__('general.all_paid')}</SelectItem>
-                                            <SelectItem value="1">{__('general.is_paid')}</SelectItem>
-                                            <SelectItem value="0">{__('general.is_unpaid')}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <SimpleSelect
+                                        value={isPaid}
+                                        onChange={(v) => { setIsPaid(v); submit({ is_paid: v === ALL ? '' : v }); }}
+                                        placeholder={__('general.all_paid')}
+                                        options={[
+                                            { value: ALL, label: __('general.all_paid') },
+                                            { value: '1', label: __('general.is_paid') },
+                                            { value: '0', label: __('general.is_unpaid') },
+                                        ]}
+                                    />
                                 </div>
 
                                 <div className="w-[130px]">
-                                    <Select value={paused} onValueChange={(v) => { if (v === null) return; setPaused(v); submit({ paused: v === ALL ? '' : v }); }}>
-                                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.all_paused')} /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={ALL}>{__('general.all_paused')}</SelectItem>
-                                            <SelectItem value="1">{__('general.paused')}</SelectItem>
-                                            <SelectItem value="0">{__('general.active')}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <SimpleSelect
+                                        value={paused}
+                                        onChange={(v) => { setPaused(v); submit({ paused: v === ALL ? '' : v }); }}
+                                        placeholder={__('general.all_paused')}
+                                        options={[
+                                            { value: ALL, label: __('general.all_paused') },
+                                            { value: '1', label: __('general.paused') },
+                                            { value: '0', label: __('general.active') },
+                                        ]}
+                                    />
                                 </div>
 
                                 <div className="flex items-center gap-1.5">
@@ -445,27 +445,30 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 )}
 
                                 <div className="ms-auto w-[170px]">
-                                    <Select value={sort} onValueChange={(v) => { if (v === null) return; setSort(v); submit({ sort: v }); }}>
-                                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={__('general.sort_by')} /></SelectTrigger>
-                                        <SelectContent>
-                                            {Object.entries(SORT_LABEL).map(([k, v]) => (
-                                                <SelectItem key={k} value={k}>{v.startsWith('general.') ? __(v) : v}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <SimpleSelect
+                                        value={sort}
+                                        onChange={(v) => { setSort(v); submit({ sort: v }); }}
+                                        placeholder={__('general.sort_by')}
+                                        options={Object.entries(SORT_LABEL).map(([k, v]) => ({
+                                            value: k,
+                                            label: v.startsWith('general.') ? __(v) : v,
+                                        }))}
+                                    />
                                 </div>
 
                                 <div className="w-[100px]">
-                                    <Select value={perPage} onValueChange={(v) => { if (v === null) return; setPerPage(v); submit({ per_page: v }); }}>
-                                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="50" /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="10">10</SelectItem>
-                                            <SelectItem value="25">25</SelectItem>
-                                            <SelectItem value="50">50</SelectItem>
-                                            <SelectItem value="100">100</SelectItem>
-                                            <SelectItem value="200">200</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <SimpleSelect
+                                        value={perPage}
+                                        onChange={(v) => { setPerPage(v); submit({ per_page: v }); }}
+                                        placeholder="50"
+                                        options={[
+                                            { value: '10', label: '10' },
+                                            { value: '25', label: '25' },
+                                            { value: '50', label: '50' },
+                                            { value: '100', label: '100' },
+                                            { value: '200', label: '200' },
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         </form>
