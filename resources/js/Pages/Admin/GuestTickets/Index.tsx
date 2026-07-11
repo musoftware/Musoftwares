@@ -57,7 +57,7 @@ export default function Index({ tickets, filters, statuses }: Props) {
                             placeholder={__('general.search_by_name_email_subject') || 'Search...'}
                             className="max-w-sm"
                         />
-                        <Select value={status || 'all'} onValueChange={(v) => { const nv = v === 'all' ? '' : v; setStatus(nv); applyFilters({ status: nv }); }}>
+                        <Select value={status || 'all'} onValueChange={(v) => { const nv = v === 'all' ? '' : (v ?? ''); setStatus(nv); applyFilters({ status: nv }); }}>
                             <SelectTrigger className="w-48">
                                 <SelectValue placeholder={__('general.status_filter_all')} />
                             </SelectTrigger>

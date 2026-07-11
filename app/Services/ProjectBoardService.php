@@ -340,6 +340,8 @@ class ProjectBoardService
             $extra['comments_count'] = (int) ($extra['comments_count'] ?? 0);
             $extra['sort'] = (int) ($placement->sort ?? 0);
             $extra['category_id'] = $placement->category_id ?? null;
+            $extra['is_ai'] = $placement ? (bool)$placement->is_ai : false;
+            $extra['is_important'] = $placement ? (bool)$placement->is_important : false;
             $extra['category'] = $placement?->category ? [
                 'id' => $placement->category->id,
                 'slug' => $placement->category->slug,

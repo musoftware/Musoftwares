@@ -5,7 +5,7 @@ import {
     Filter, StickyNote as NoteIcon, AlertCircle, ChevronDown, RotateCcw, Search, Paperclip,
     ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye,
     ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon, Tag,
-    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList
+    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList, Sparkles
 } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -67,6 +67,8 @@ export interface BoardCard {
     done?: boolean;
     completed?: boolean;
     published_at?: string;
+    period_start?: string;
+    period_end?: string;
     due_at?: string | null;
     checklist?: { id?: number; title: string; is_completed: boolean }[];
     size?: number;
@@ -76,6 +78,10 @@ export interface BoardCard {
     comments_count?: number;
     category_id?: number | null;
     category?: BoardCategoryLike | null;
+    /** Set by the server for AI-generated cards */
+    is_ai?: boolean;
+    /** Set by the server when the card is marked as the key milestone */
+    is_important?: boolean;
 }
 
 interface ProjectBoardProps {
@@ -256,6 +262,19 @@ export default function ProjectBoard({
     const [highlightedCardKey, setHighlightedCardKey] = useState<string | null>(null);
     const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    const [aiModalOpen, setAiModalOpen] = useState(false);
+    const [aiPrompt, setAiPrompt] = useState('');
+    const [aiStartDate, setAiStartDate] = useState(date);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiAllowedTypes, setAiAllowedTypes] = useState<string[]>(['note', 'task', 'todo', 'report']);
+    const [aiMaxDailyHours, setAiMaxDailyHours] = useState(8);
+    // Carbon day-of-week: 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+    const [aiSkipDays, setAiSkipDays] = useState<number[]>([5]); // skip Friday by default
+    const [aiStep, setAiStep] = useState<'prompt' | 'interview'>('prompt');
+    const [aiQuestions, setAiQuestions] = useState<string[]>([]);
+    const [aiAnswers, setAiAnswers] = useState<Record<string, string>>({});
+    const [aiAskingQuestions, setAiAskingQuestions] = useState(false);
+
     const updateCardCount = useCallback((cardKey: string, count: number) => {
         setCards((prev) => {
             const current = prev.find((c) => `${c.type}-${c.id}` === cardKey);
@@ -276,14 +295,22 @@ export default function ProjectBoard({
     useEffect(() => {
         const handler = (e: Event) => {
             const kind = (e as CustomEvent).detail?.kind;
-            if (kind) {
+            if (kind === 'ai') {
+                setAiModalOpen(true);
+                setAiPrompt('');
+                setAiStartDate(date);
+                setAiStep('prompt');
+                setAiQuestions([]);
+                setAiAnswers({});
+            } else if (kind) {
                 openCreateModal(kind);
             }
         };
         window.addEventListener('board-add-trigger', handler);
         return () => window.removeEventListener('board-add-trigger', handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [date]);
+
 
     useEffect(() => {
         const handleDismiss = () => {
@@ -658,6 +685,70 @@ export default function ProjectBoard({
         });
     };
 
+    const handleGetAiQuestions = async () => {
+        const prompt = aiPrompt.trim();
+        if (!prompt || aiAskingQuestions) return;
+        setAiAskingQuestions(true);
+        try {
+            const { data } = await axios.post(
+                route('client.projects.board.ai-questions', { project: projectId }),
+                { prompt }
+            );
+            if (data.questions && data.questions.length > 0) {
+                setAiQuestions(data.questions);
+                const initialAnswers: Record<string, string> = {};
+                data.questions.forEach((q: string) => {
+                    initialAnswers[q] = '';
+                });
+                setAiAnswers(initialAnswers);
+                setAiStep('interview');
+            } else {
+                handleSaveAiPlan();
+            }
+        } catch (err: any) {
+            toast.error(err?.response?.data?.error || 'Failed to generate questions. Generating plan directly.');
+            handleSaveAiPlan();
+        } finally {
+            setAiAskingQuestions(false);
+        }
+    };
+
+    const handleSaveAiPlan = async () => {
+        const prompt = aiPrompt.trim();
+        if (!prompt || aiLoading) return;
+        if (aiAllowedTypes.length === 0) {
+            toast.error('Please select at least one card type.');
+            return;
+        }
+        setAiLoading(true);
+
+        try {
+            const { data } = await axios.post(
+                route('client.projects.board.add-with-ai', { project: projectId }),
+                {
+                    prompt,
+                    start_date: aiStartDate,
+                    allowed_types: aiAllowedTypes,
+                    max_daily_hours: aiMaxDailyHours,
+                    skip_days: aiSkipDays,
+                    answers: aiAnswers,
+                }
+            );
+
+            if (data.ok) {
+                toast.success(__('general.plan_generated_success') || 'Project plan generated by AI successfully!');
+                setAiModalOpen(false);
+                router.reload({ preserveScroll: true } as any);
+            }
+        } catch (err: any) {
+            const message = err?.response?.data?.error || err?.response?.data?.message || 'Failed to generate plan';
+            toast.error(message);
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
+
     const handleSaveNote = () => {
         const isEdit = activeModal?.action === 'edit';
         const url = isEdit
@@ -1001,7 +1092,11 @@ export default function ProjectBoard({
                                                         'group relative flex flex-col justify-between rounded-2xl border p-4 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 ease-out cursor-pointer',
                                                         dragSnapshot.isDragging && 'shadow-2xl ring-2 ring-slate-400/40 rotate-1 scale-[1.02] z-50',
                                                         isHighlighted && 'ring-2 ring-emerald-400 ring-offset-2 animate-in zoom-in-95 fade-in duration-700',
-                                                        isNote ? cn(noteColor.bg, noteColor.border, noteColor.text) : 'border-slate-200 bg-white text-slate-900'
+                                                        card.is_important
+                                                            ? 'border-amber-400 ring-2 ring-amber-400/30 shadow-[0_0_15px_rgba(245,158,11,0.15)] bg-gradient-to-br from-amber-50/20 to-white text-slate-900'
+                                                            : isNote
+                                                                ? cn(noteColor.bg, noteColor.border, noteColor.text)
+                                                                : 'border-slate-200 bg-white text-slate-900'
                                                     )}
                                                 >
                                                     {isHighlighted && (
@@ -1032,10 +1127,24 @@ export default function ProjectBoard({
                                                                     </span>
                                                                 )
                                                             )}
-                                                            <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring)}>
-                                                                <TypeIcon className="h-2.5 w-2.5" />
-                                                                {meta.label}
-                                                            </span>
+                                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                                <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring)}>
+                                                                    <TypeIcon className="h-2.5 w-2.5" />
+                                                                    {meta.label}
+                                                                </span>
+                                                                {card.is_important && (
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm ring-1 ring-amber-400 animate-pulse">
+                                                                        <Sparkles className="h-2.5 w-2.5 fill-white" />
+                                                                        {__('general.key_milestone') || 'Key Milestone'}
+                                                                    </span>
+                                                                )}
+                                                                {card.is_ai && (
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-violet-700 ring-1 ring-violet-200">
+                                                                        <Sparkles className="h-2.5 w-2.5" />
+                                                                        AI
+                                                                    </span>
+                                                                )}
+                                                            </div>
 
                                                             <button
                                                                 type="button"
@@ -1568,6 +1677,292 @@ export default function ProjectBoard({
                         <button onClick={handleSaveTodo} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-xs font-semibold hover:bg-slate-800">
                             Save
                         </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={aiModalOpen} onOpenChange={(open) => !aiLoading && !aiAskingQuestions && setAiModalOpen(open)}>
+                <DialogContent className="w-full sm:max-w-4xl max-h-[calc(100vh-3rem)] flex flex-col gap-0 p-0 overflow-hidden">
+                    {/* Header */}
+                    <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0 bg-gradient-to-b from-violet-50/50 to-white">
+                        <DialogHeader>
+                            <DialogTitle className="text-sm font-extrabold uppercase tracking-wide flex items-center gap-1.5 text-violet-700">
+                                <Sparkles className="h-4 w-4" />
+                                {__('general.add_with_ai') || 'Add with AI'}
+                            </DialogTitle>
+                            <DialogDescription className="text-xs text-slate-400">
+                                Explain what you want to accomplish, then configure how the AI should distribute cards across days.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+
+                    {/* Body — two-column layout */}
+                    <div className="flex-1 min-h-0 overflow-y-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+
+                            {/* Left column — Prompt (Step 1) or Questions (Step 2) */}
+                            <div className="sm:col-span-3 px-6 py-5 space-y-4">
+                                {aiStep === 'prompt' ? (
+                                    <>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-bold text-slate-600">{__('general.ai_prompt') || 'AI Instructions'}</Label>
+                                            <Textarea
+                                                value={aiPrompt}
+                                                onChange={(e) => setAiPrompt(e.target.value)}
+                                                placeholder="E.g., Build a captcha solver bot. First, analyze the target captcha structure. Second, write python helper scripts. Third, implement and test locally."
+                                                rows={9}
+                                                disabled={aiLoading || aiAskingQuestions}
+                                                className="rounded-xl border-slate-200 text-xs focus:ring-violet-500/30 focus:border-violet-500 resize-none"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-bold text-slate-600">{__('general.ai_start_date') || 'Start Date'}</Label>
+                                            <Input
+                                                type="date"
+                                                value={aiStartDate}
+                                                onChange={(e) => setAiStartDate(e.target.value)}
+                                                disabled={aiLoading || aiAskingQuestions}
+                                                className="rounded-xl border-slate-200 text-xs focus:ring-violet-500/30 focus:border-violet-500 max-w-xs"
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="bg-violet-50/50 border border-violet-100 rounded-2xl p-3.5 space-y-1">
+                                            <p className="text-[11px] font-bold text-violet-700 uppercase tracking-wider flex items-center gap-1">
+                                                <Sparkles className="h-3 w-3" /> Clarification Interview
+                                            </p>
+                                            <p className="text-[10px] text-slate-500">
+                                                Please answer these questions so the AI can generate realistic, highly specific cards rather than generic placeholders.
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-4 max-h-[24rem] overflow-y-auto pr-1">
+                                            {aiQuestions.map((q, idx) => (
+                                                <div key={idx} className="space-y-1.5">
+                                                    <Label className="text-xs font-semibold text-slate-700 leading-normal">
+                                                        {idx + 1}. {q}
+                                                    </Label>
+                                                    <Input
+                                                        value={aiAnswers[q] || ''}
+                                                        onChange={(e) =>
+                                                            setAiAnswers((prev) => ({
+                                                                ...prev,
+                                                                [q]: e.target.value,
+                                                            }))
+                                                        }
+                                                        placeholder="Type your answer here..."
+                                                        disabled={aiLoading}
+                                                        className="rounded-xl border-slate-200 text-xs focus:ring-violet-500/30 focus:border-violet-500"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Right column — Plan Controls */}
+                            <div className="sm:col-span-2 px-6 py-5 space-y-5 bg-slate-50/40">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Plan Controls</p>
+
+                                {/* Card Types */}
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                                        <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-violet-100 text-violet-600">
+                                            <Sparkles className="h-2.5 w-2.5" />
+                                        </span>
+                                        Card Types
+                                    </Label>
+                                    <p className="text-[10px] text-slate-400">AI will only generate the selected card types.</p>
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        {(
+                                            [
+                                                { key: 'task',   label: 'Task',   icon: ListTodo,      color: 'text-sky-600 bg-sky-50 ring-sky-200' },
+                                                { key: 'todo',   label: 'Todo',   icon: ClipboardList,  color: 'text-violet-600 bg-violet-50 ring-violet-200' },
+                                                { key: 'note',   label: 'Note',   icon: StickyNote,     color: 'text-amber-600 bg-amber-50 ring-amber-200' },
+                                                { key: 'report', label: 'Report', icon: FileText,       color: 'text-emerald-600 bg-emerald-50 ring-emerald-200' },
+                                            ] as const
+                                        ).map(({ key, label, icon: Icon, color }) => {
+                                            const active = aiAllowedTypes.includes(key);
+                                            return (
+                                                <button
+                                                    key={key}
+                                                    type="button"
+                                                    disabled={aiLoading || aiAskingQuestions}
+                                                    onClick={() => {
+                                                        setAiAllowedTypes((prev) =>
+                                                            active
+                                                                ? prev.filter((t) => t !== key)
+                                                                : [...prev, key]
+                                                        );
+                                                    }}
+                                                    className={cn(
+                                                        'flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold border transition-all ring-1 ring-inset',
+                                                        active
+                                                            ? cn(color, 'border-transparent shadow-sm')
+                                                            : 'bg-white text-slate-400 border-slate-200 ring-slate-100 hover:bg-slate-50',
+                                                        'disabled:opacity-50 disabled:cursor-not-allowed',
+                                                    )}
+                                                >
+                                                    <Icon className="h-3.5 w-3.5 shrink-0" />
+                                                    {label}
+                                                    {active && (
+                                                        <CheckCircle2 className="h-3 w-3 ml-auto shrink-0" />
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    {aiAllowedTypes.length === 0 && (
+                                        <p className="text-[10px] text-rose-500 font-semibold">Select at least one type.</p>
+                                    )}
+                                </div>
+
+                                {/* Max Daily Hours */}
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold text-slate-600">Max Hours / Day</Label>
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="range"
+                                            min={1}
+                                            max={12}
+                                            step={1}
+                                            value={aiMaxDailyHours}
+                                            disabled={aiLoading || aiAskingQuestions}
+                                            onChange={(e) => setAiMaxDailyHours(Number(e.target.value))}
+                                            className="flex-1 accent-violet-600 disabled:opacity-50"
+                                        />
+                                        <span className="shrink-0 min-w-[2.5rem] rounded-lg bg-violet-100 px-2 py-0.5 text-center text-xs font-bold text-violet-700">
+                                            {aiMaxDailyHours}h
+                                        </span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400">Tasks will roll over to the next working day when the limit is reached.</p>
+                                </div>
+
+                                {/* Working Days */}
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold text-slate-600">Working Days</Label>
+                                    <p className="text-[10px] text-slate-400">Unchecked days will be skipped.</p>
+                                    <div className="flex flex-wrap gap-1">
+                                        {(
+                                            [
+                                                { day: 0, label: 'Sun' },
+                                                { day: 1, label: 'Mon' },
+                                                { day: 2, label: 'Tue' },
+                                                { day: 3, label: 'Wed' },
+                                                { day: 4, label: 'Thu' },
+                                                { day: 5, label: 'Fri' },
+                                                { day: 6, label: 'Sat' },
+                                            ]
+                                        ).map(({ day, label }) => {
+                                            const isSkipped = aiSkipDays.includes(day);
+                                            const isWorking = !isSkipped;
+                                            return (
+                                                <button
+                                                    key={day}
+                                                    type="button"
+                                                    disabled={aiLoading || aiAskingQuestions}
+                                                    onClick={() => {
+                                                        setAiSkipDays((prev) =>
+                                                            isSkipped
+                                                                ? prev.filter((d) => d !== day)
+                                                                : [...prev, day]
+                                                        );
+                                                    }}
+                                                    className={cn(
+                                                        'h-8 w-9 rounded-lg text-[10px] font-bold border transition-all',
+                                                        isWorking
+                                                            ? 'bg-violet-600 text-white border-violet-700 shadow-sm'
+                                                            : 'bg-white text-slate-300 border-slate-200 hover:bg-slate-50',
+                                                        'disabled:opacity-50 disabled:cursor-not-allowed',
+                                                    )}
+                                                >
+                                                    {label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
+                        {aiStep === 'prompt' ? (
+                            <>
+                                <button
+                                    onClick={() => setAiModalOpen(false)}
+                                    disabled={aiLoading || aiAskingQuestions}
+                                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <div className="flex items-center gap-2 sm:ms-auto">
+                                    <button
+                                        onClick={handleGetAiQuestions}
+                                        disabled={!aiPrompt.trim() || aiLoading || aiAskingQuestions}
+                                        className="rounded-xl bg-violet-50 text-violet-700 border border-violet-200 px-4 py-2 text-xs font-semibold hover:bg-violet-100 disabled:opacity-50 inline-flex items-center gap-1.5 shadow-sm"
+                                    >
+                                        {aiAskingQuestions ? (
+                                            <>
+                                                <span className="h-3 w-3 animate-spin rounded-full border-2 border-violet-700 border-t-transparent" />
+                                                Preparing Interview...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Sparkles className="h-3.5 w-3.5" />
+                                                Clarify with AI first
+                                            </>
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={handleSaveAiPlan}
+                                        disabled={!aiPrompt.trim() || aiLoading || aiAskingQuestions || aiAllowedTypes.length === 0}
+                                        className="rounded-xl bg-slate-900 text-white px-5 py-2 text-xs font-semibold hover:bg-slate-800 disabled:opacity-50 inline-flex items-center gap-1.5 shadow-sm"
+                                    >
+                                        {aiLoading ? (
+                                            <>
+                                                <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                Creating plan...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Generate directly
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => setAiStep('prompt')}
+                                    disabled={aiLoading}
+                                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={handleSaveAiPlan}
+                                    disabled={aiLoading || aiAllowedTypes.length === 0}
+                                    className="rounded-xl bg-violet-600 text-white px-5 py-2 text-xs font-semibold hover:bg-violet-700 disabled:opacity-50 inline-flex items-center gap-1.5 shadow-sm sm:ms-auto"
+                                >
+                                    {aiLoading ? (
+                                        <>
+                                            <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                            {__('general.ai_generating_plan') || 'Creating plan...'}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="h-3.5 w-3.5" />
+                                            Generate detailed plan
+                                        </>
+                                    )}
+                                </button>
+                            </>
+                        )}
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

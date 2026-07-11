@@ -83,6 +83,10 @@ return [
         'key' => env('OPENAI_API_KEY'),
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
     'erp' => [
         'url' => env('ERP_URL', 'http://localhost:8001'),
     ],

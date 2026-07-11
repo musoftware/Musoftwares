@@ -53,7 +53,7 @@ interface BoardTopNavProps {
     onFilterChange: (next: BoardFilter) => void;
     counts?: BoardTopNavCounts;
     date: string;
-    onAdd: (kind: 'note' | 'task' | 'todo' | 'file' | 'report') => void;
+    onAdd: (kind: 'note' | 'task' | 'todo' | 'file' | 'report' | 'ai') => void;
     activeDates?: string[];
     /** Renders a small "Manage categories" action button. Admin-only. */
     onManageCategories?: () => void;
@@ -65,7 +65,7 @@ const FILTER_META: Record<BoardFilter, { labelKey: string; icon: IconType; activ
     all: { labelKey: 'general.all', icon: FaGlobe, activeColor: 'bg-slate-900 text-white border-slate-900', baseColor: 'bg-slate-50 text-slate-700 hover:bg-slate-100/80 border-slate-200', shadowColor: 'shadow-slate-500/10' },
     backlog: { labelKey: 'general.lane_backlog', icon: FaRegStickyNote, activeColor: 'bg-indigo-600 text-white border-indigo-600', baseColor: 'bg-indigo-50/50 text-indigo-700 hover:bg-indigo-50 border-indigo-100', shadowColor: 'shadow-indigo-500/20' },
     in_progress: { labelKey: 'general.lane_in_progress', icon: FaBolt, activeColor: 'bg-amber-500 text-white border-amber-500', baseColor: 'bg-amber-50/50 text-amber-700 hover:bg-amber-50 border-amber-100', shadowColor: 'shadow-amber-500/20' },
-    review: { labelKey: 'general.lane_review', icon: FaSearch, activeColor: 'bg-purple-600 text-white border-purple-600', baseColor: 'bg-purple-50/50 text-purple-700 hover:bg-purple-50 border-purple-100', shadowColor: 'shadow-purple-500/20' },
+    review: { labelKey: 'general.lane_review', icon: FaSearch, activeColor: 'bg-purple-600 text-white border-purple-600', baseColor: 'bg-purple-50/50 text-purple-700 hover:bg-purple-50 border-indigo-100', shadowColor: 'shadow-purple-500/20' },
     done: { labelKey: 'general.lane_done', icon: FaCheckCircle, activeColor: 'bg-emerald-600 text-white border-emerald-600', baseColor: 'bg-emerald-50/50 text-emerald-700 hover:bg-emerald-50 border-emerald-100', shadowColor: 'shadow-emerald-500/20' },
     card: { labelKey: 'general.board_nav_cards', icon: FaRegClipboard, activeColor: '', baseColor: '', shadowColor: '' },
     task: { labelKey: 'general.board_nav_tasks', icon: FaRegClipboard, activeColor: '', baseColor: '', shadowColor: '' },
@@ -75,7 +75,8 @@ const FILTER_META: Record<BoardFilter, { labelKey: string; icon: IconType; activ
     file: { labelKey: 'general.board_nav_files', icon: FaRegClipboard, activeColor: '', baseColor: '', shadowColor: '' },
 };
 
-const ADD_MENU: { kind: 'note' | 'task' | 'todo' | 'file' | 'report'; labelKey: string; icon: React.ElementType; color: string }[] = [
+const ADD_MENU: { kind: 'note' | 'task' | 'todo' | 'file' | 'report' | 'ai'; labelKey: string; icon: React.ElementType; color: string }[] = [
+    { kind: 'ai', labelKey: 'general.add_with_ai', icon: Sparkles, color: 'text-violet-600' },
     { kind: 'note', labelKey: 'general.board_add_note', icon: StickyNote, color: 'text-amber-600' },
     { kind: 'task', labelKey: 'general.board_add_task', icon: ListTodo, color: 'text-sky-600' },
     { kind: 'todo', labelKey: 'general.board_add_todo', icon: ClipboardList, color: 'text-violet-600' },

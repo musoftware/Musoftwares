@@ -38,9 +38,14 @@ class ReferralController extends Controller
         // undesirable, move it behind a POST activation endpoint instead.
         $referral = $this->referralService->ensureReferralSystemActive($user);
 
+        $embedKey = \App\Models\UserEmbedKey::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->first();
+
         return Inertia::render('Client/Dashboard/Referrals/Index', [
             'referral' => $referral,
             'commission_percentage' => $user->getAffiliateCommissionPercentage(),
+            'embedKey' => $embedKey,
         ]);
     }
 
@@ -252,5 +257,28 @@ class ReferralController extends Controller
         $this->referralService->registerReferredUser(Auth::user(), $request->all());
 
         return redirect()->route('referrals.index')->with('success', __('messages.user_created_referral_success'));
+    }
+
+    public function generate_embed_key(Request $request)
+    {
+        $user = Auth::user();
+
+        $existing = \App\Models\UserEmbedKey::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->first();
+
+        if ($existing) {
+            return redirect()->route('referrals.index')->with('info', __('general.embed_key_already_exists'));
+        }
+
+        $key = bin2hex(random_bytes(32));
+
+        \App\Models\UserEmbedKey::create([
+            'user_id' => $user->id,
+            'key' => $key,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('referrals.index')->with('success', __('general.embed_key_generated_success'));
     }
 }

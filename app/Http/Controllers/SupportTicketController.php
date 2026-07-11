@@ -31,6 +31,11 @@ class SupportTicketController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Client/Support/Tickets/Create');
+    }
+
     public function store(Request $request, SupportDeskService $service)
     {
         $validated = $request->validate([
@@ -40,12 +45,29 @@ class SupportTicketController extends Controller
         ]);
 
         try {
-            $service->createTicket(Auth::user(), $validated, Auth::user()->isAdmin());
+            $ticket = $service->createTicket(Auth::user(), $validated, Auth::user()->isAdmin());
 
-            return redirect()->back()->with('success', __('general.support_ticket_opened_successfully'));
+            return redirect()->route('tickets.show', $ticket->id)->with('success', __('general.support_ticket_opened_successfully'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to create ticket: '.$e->getMessage()]);
         }
+    }
+
+    public function show($id)
+    {
+        $ticket = Ticket::with(['user', 'conversation.messages.sender'])->findOrFail($id);
+        $user = Auth::user();
+
+        // Authorize (only owner or admin)
+        $isAdmin = $user && $user->isAdmin();
+        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
+            abort(403);
+        }
+
+        return Inertia::render('Client/Support/Tickets/Show', [
+            'ticket' => $ticket,
+            'isAdmin' => $isAdmin,
+        ]);
     }
 
     public function resolve($id)

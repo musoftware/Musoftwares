@@ -218,6 +218,8 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::get('/projects/{project}/calendar/{date}', [ClientProjectCalendarController::class, 'calendarDate'])->name('calendar.date');
 
     // Board mutations (JSON) — both client and admin use these endpoints.
+    Route::post('/projects/{project}/board/ai-questions', [ClientProjectBoardController::class, 'generateAiQuestions'])->name('board.ai-questions');
+    Route::post('/projects/{project}/board/add-with-ai', [ClientProjectBoardController::class, 'addWithAi'])->name('board.add-with-ai');
     Route::post('/projects/{project}/board/notes', [ClientProjectBoardController::class, 'storeNote'])->name('board.store-note');
     Route::put('/projects/{project}/board/notes/{note}', [ClientProjectBoardController::class, 'updateNote'])->name('board.update-note');
     Route::delete('/projects/{project}/board/notes/{note}', [ClientProjectBoardController::class, 'destroyNote'])->name('board.destroy-note');
@@ -278,6 +280,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/referrals', [ReferralController::class, 'store_referral'])->name('referrals.store');
     Route::post('/referrals/update-slug', [ReferralController::class, 'update_slug'])->name('referrals.update_slug');
     Route::post('/referrals/activate', [ReferralController::class, 'activate_ref'])->name('referrals.activate');
+    Route::post('/referrals/generate-embed-key', [ReferralController::class, 'generate_embed_key'])->name('referrals.generate_embed_key');
 });
 
 // Public Referral Redirect Route
@@ -890,7 +893,9 @@ Route::post('/support/guest-tickets', [SupportTicketController::class, 'guestSto
 // Support Ticket Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tickets', [SupportTicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [SupportTicketController::class, 'create'])->name('tickets.create');
     Route::post('/tickets', [SupportTicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{id}', [SupportTicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{id}/resolve', [SupportTicketController::class, 'resolve'])->name('tickets.resolve');
 });
 

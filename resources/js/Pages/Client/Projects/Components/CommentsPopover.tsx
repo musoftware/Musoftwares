@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
-import { MessageSquareMore, RefreshCw, Send, X, UserRound, Mail } from 'lucide-react';
+import { MessageSquareMore, RefreshCw, Send, X, UserRound, Mail, Sparkles } from 'lucide-react';
+import { router } from '@inertiajs/react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
 import { Button } from '@/Components/ui/button';
 import { Textarea } from '@/Components/ui/textarea';
@@ -71,6 +72,7 @@ export default function CommentsPopover({
     const [draft, setDraft] = useState('');
     const [guestName, setGuestName] = useState('');
     const [guestEmail, setGuestEmail] = useState('');
+    const [adjustFutureAi, setAdjustFutureAi] = useState(false);
     const listRef = useRef<HTMLDivElement | null>(null);
     const onCountChangeRef = useRef<typeof onCountChange>(onCountChange);
     // null sentinel = "never reported a real count yet".
@@ -175,6 +177,7 @@ export default function CommentsPopover({
             type: card.type,
             commentable_id: card.id,
             body,
+            adjust_future_ai: adjustFutureAi,
         };
 
         if (guestMode && !guestName && !guestEmail) {
@@ -199,10 +202,11 @@ export default function CommentsPopover({
             } else {
                 url = route('client.projects.comments.store', { project: projectId });
             }
-            const { data } = await axios.post<{ ok: boolean; comment: BoardComment }>(url, payload);
+            const { data } = await axios.post<{ ok: boolean; comment: BoardComment; ai_adjusted?: boolean }>(url, payload);
             if (data?.comment) {
                 setComments((prev) => [data.comment, ...prev]);
                 setDraft('');
+                setAdjustFutureAi(false);
                 if (guestMode) {
                     try {
                         window.localStorage.setItem(GUEST_NAME_KEY, guestName.trim());
@@ -212,6 +216,10 @@ export default function CommentsPopover({
                     }
                 }
                 toast.success(__('general.comment_posted') || 'Comment posted.');
+                if (data.ai_adjusted) {
+                    toast.success(__('general.plan_adjusted_by_ai') || 'Future plan adjusted by AI based on your comment.');
+                    router.reload({ preserveScroll: true } as any);
+                }
             }
         } catch (err: any) {
             const message = err?.response?.data?.message || __('general.could_not_post_comment');
@@ -373,6 +381,24 @@ export default function CommentsPopover({
                                     />
                                 </div>
                             </div>
+                        </div>
+                    )}
+                    {card.is_ai && (
+                        <div className="flex items-center gap-2 py-1 px-0.5 border-t border-slate-100 mt-1">
+                            <input
+                                type="checkbox"
+                                id={`adjust-future-ai-${card.type}-${card.id}`}
+                                checked={adjustFutureAi}
+                                onChange={(e) => setAdjustFutureAi(e.target.checked)}
+                                className="h-3.5 w-3.5 rounded border-slate-300 text-violet-600 focus:ring-violet-500/20"
+                            />
+                            <Label
+                                htmlFor={`adjust-future-ai-${card.type}-${card.id}`}
+                                className="text-[10px] font-bold text-slate-600 cursor-pointer flex items-center gap-1"
+                            >
+                                <Sparkles className="h-3 w-3 text-violet-500" />
+                                {__('general.adjust_future_ai') || 'Update future timeline with AI'}
+                            </Label>
                         </div>
                     )}
                     <div className="flex items-end gap-2">

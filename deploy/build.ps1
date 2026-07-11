@@ -85,6 +85,7 @@ $env:PATH = $originalPath
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Error in local build! Upload aborted." -ForegroundColor Red
     exit 1
+}
 
 # 2.5 Run E2E Smoke & Console Error Tests
 Write-Host "[2.5/5] Running E2E Smoke / Console Error Tests..." -ForegroundColor Yellow

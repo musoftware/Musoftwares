@@ -91,6 +91,13 @@ function AuthenticatedContent({
     const isBookingActive = isRouteActive('booking');
     const isIntelligenceActive = isRouteActive('intelligence');
     const isToolsActive = isRouteActive('tools');
+    const isWorkspaceActive = 
+        isRouteActive('client.projects') || 
+        isRouteActive('financial') || 
+        isRouteActive('billing') || 
+        isRouteActive('referrals') || 
+        isRouteActive('tickets') || 
+        isRouteActive('messages');
     const activeModules = auth?.active_modules || { erp: true, marketplace: true, booking: true, tools: true, fbmb: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
@@ -184,41 +191,37 @@ function AuthenticatedContent({
                                                     <>
                                                         <Link href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                             <LayoutDashboard className="w-5 h-5 text-slate-400" /> {__('general.dashboard')}</Link>
-                                                        <Link href={safeRoute('client.projects.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                            <FolderKanban className="w-5 h-5 text-slate-400" /> {__('general.projects')}</Link>
-                                                        <Link href={safeRoute('client.projects.all-tasks')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                            <ListTodo className="w-5 h-5 text-slate-400" /> {__('general.all_tasks')}</Link>
                                                         <Link href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                             <Building2 className="w-5 h-5 text-slate-400" /> {__('general.erp')}</Link>
-                                                        <Link href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                            <FileText className="w-5 h-5 text-slate-400" />{__('general.my_invoices')}
-                                                        </Link>
                                                         <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50 text-emerald-700 font-medium">
                                                             <Plus className="w-5 h-5 text-emerald-500" />{__('general.add_balance')}
                                                         </Link>
-
+ 
                                                         <div className="mt-4 pt-2 border-t border-slate-100">
                                                             <Accordion className="w-full">
-                                                                <AccordionItem value="more" className="border-b-0">
+                                                                <AccordionItem value="workspace" className="border-b-0">
                                                                     <AccordionTrigger className="px-3 py-2 hover:bg-slate-50 rounded-lg text-slate-700 hover:no-underline">
                                                                         <div className="flex items-center gap-3 font-medium">
-                                                                            <Settings className="w-5 h-5 text-slate-400" /> {__('general.more')}</div>
+                                                                            <FolderKanban className="w-5 h-5 text-slate-400" /> {__('general.workspace')}</div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
+                                                                            <Link href={safeRoute('client.projects.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <FolderKanban className="w-4 h-4 text-slate-400" /> {__('general.projects')}</Link>
+                                                                            <Link href={safeRoute('client.projects.all-tasks')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <ListTodo className="w-4 h-4 text-slate-400" /> {__('general.all_tasks')}</Link>
+                                                                            <Link href={safeRoute('messages.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <MessageSquare className="w-4 h-4 text-slate-400" /> {__('general.messages')}</Link>
+                                                                            <Link href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <FileText className="w-4 h-4 text-slate-400" />{__('general.my_invoices')}</Link>
                                                                             <Link href={safeRoute('financial.transactions')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
                                                                                 <ArrowRightLeft className="w-4 h-4 text-slate-400" /> {__('general.transactions')}</Link>
                                                                             <Link href={safeRoute('financial.withdrawals')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
-                                                                                <ArrowUpRight className="w-4 h-4 text-slate-400" />{__('general.request_withdrawal')}
-                                                                            </Link>
+                                                                                <ArrowUpRight className="w-4 h-4 text-slate-400" />{__('general.request_withdrawal')}</Link>
                                                                             <Link href={safeRoute('financial.payout-methods.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
-                                                                                <CreditCard className="w-4 h-4 text-slate-400" />{__('general.payout_methods')}
-                                                                            </Link>
+                                                                                <CreditCard className="w-4 h-4 text-slate-400" />{__('general.payout_methods')}</Link>
                                                                             <Link href={safeRoute('tickets.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
-                                                                                <LifeBuoy className="w-4 h-4 text-slate-400" />{__('general.support_tickets')}
-                                                                            </Link>
-                                                                            <Link href={safeRoute('messages.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
-                                                                                <MessageSquare className="w-4 h-4 text-slate-400" /> {__('general.messages')}</Link>
+                                                                                <LifeBuoy className="w-4 h-4 text-slate-400" />{__('general.support_tickets')}</Link>
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
@@ -314,54 +317,208 @@ function AuthenticatedContent({
                                 
                                 {!auth?.team_member && (
                                     <>
-                                        {/* CLIENT PROJECTS */}
-                                        <NavLink href={safeRoute('client.projects.index')} active={isRouteActive('client.projects')}>
-                                            <FolderKanban className="h-3.5 w-3.5 text-slate-400" /> {__('general.projects')}</NavLink>
-
-                                        <NavLink href={safeRoute('client.projects.all-tasks')} active={isRouteActive('client.projects.all-tasks')}>
-                                            <ListTodo className="h-3.5 w-3.5 text-slate-400" /> {__('general.all_tasks')}</NavLink>
-
-                                        {/* MORE MEGA MENU */}
                                         <DropdownMenu>
-                                    <div className="relative inline-block">
-                                        <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-slate-500 hover:bg-slate-100/60 hover:text-slate-800 transition-colors duration-150 outline-none select-none">
-                                            {__('general.more')}<ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
-                                        </DropdownMenuTrigger>
-                                        {isTourOpen && tourStep === 5 && (
-                                            <span className="absolute top-1 end-1 flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
-                                            </span>
-                                        )}
-                                    </div>
-                                    <DropdownMenuContent align="start" className="w-[450px] p-4 grid grid-cols-2 gap-4 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
-                                        <div>
-                                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 px-2">{__('general.financial')}</h4>
-                                            <div className="space-y-0.5">
-                                                <Link href={safeRoute('financial.transactions')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <ArrowRightLeft className="w-4 h-4 text-slate-400" /> {__('general.transactions')}</Link>
-                                                <Link href={safeRoute('financial.withdrawals')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <ArrowUpRight className="w-4 h-4 text-slate-400" />{__('general.request_withdrawal')}</Link>
-                                                <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <CreditCard className="w-4 h-4 text-slate-400" />{__('general.payout_methods')}</Link>
-                                                <Link href={safeRoute('billing.invoices.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <FileText className="w-4 h-4 text-slate-400" />{__('general.my_invoices')}</Link>
-                                                <Link href={safeRoute('referrals.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-indigo-50 text-sm font-medium text-indigo-700">
-                                                    <Users className="w-4 h-4 text-indigo-400" />{__('general.referrals')} & Affiliates
-                                                </Link>
+                                            <div className="relative inline-block">
+                                                <DropdownMenuTrigger className={cn(
+                                                    "inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none transition-colors duration-150 outline-none select-none",
+                                                    isWorkspaceActive 
+                                                        ? "bg-slate-100/80 text-slate-900" 
+                                                        : "text-slate-500 hover:bg-slate-100/60 hover:text-slate-800"
+                                                )}>
+                                                    {__('general.workspace')}<ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
+                                                </DropdownMenuTrigger>
+                                                {isTourOpen && (tourStep === 2 || tourStep === 5) && (
+                                                    <span className="absolute top-1 end-1 flex h-3 w-3">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
+                                                    </span>
+                                                )}
                                             </div>
-                                        </div>
-                                        <div>
-                                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 px-2">{__('general.support_workspace')}</h4>
-                                            <div className="space-y-0.5">
-                                                <Link href={safeRoute('tickets.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <LifeBuoy className="w-4 h-4 text-slate-400" />{__('general.support_tickets')}</Link>
-                                                <Link href={safeRoute('messages.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <MessageSquare className="w-4 h-4 text-slate-400" /> {__('general.messages')}</Link>
-                                            </div>
-                                        </div>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                            <DropdownMenuContent align="start" className="w-[820px] p-4 grid grid-cols-3 gap-6 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
+                                                {/* Column 1: Projects & Collaboration */}
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.projects_and_collaboration')}</p>
+                                                    </div>
+                                                    
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
+                                                            isRouteActive('client.projects') && !route().current('client.projects.all-tasks')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('client.projects.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <FolderKanban className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.projects')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.projects_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            route().current('client.projects.all-tasks')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('client.projects.all-tasks')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <ListTodo className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.all_tasks')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.all_tasks_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            isRouteActive('messages')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('messages.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <MessageSquare className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.messages')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.messages_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                </div>
+
+                                                {/* Column 2: Financials */}
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.financials')}</p>
+                                                    </div>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
+                                                            isRouteActive('billing.invoices')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('billing.invoices.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <FileText className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.my_invoices')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.my_invoices_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            isRouteActive('financial.transactions')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('financial.transactions')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <ArrowRightLeft className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.transactions')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.transactions_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            isRouteActive('financial.withdrawals')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('financial.withdrawals')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <ArrowUpRight className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.request_withdrawal')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.request_withdrawal_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            isRouteActive('financial.payout-methods')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('financial.payout-methods.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <CreditCard className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.payout_methods')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.payout_methods_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            isRouteActive('referrals')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('referrals.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <Users className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.referrals')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.referrals_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                </div>
+
+                                                {/* Column 3: Support */}
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.support')}</p>
+                                                    </div>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
+                                                            isRouteActive('tickets')
+                                                                ? "bg-slate-50 border-slate-100" 
+                                                                : "hover:bg-slate-50 border-transparent"
+                                                        )}
+                                                        render={<Link href={safeRoute('tickets.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                                            <LifeBuoy className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-slate-900">{__('general.support_tickets')}</p>
+                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.support_tickets_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
 
                                 {/* SERVICES MEGA MENU */}
                                 <DropdownMenu>

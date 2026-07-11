@@ -50,7 +50,7 @@ export default function AdminProjectBoard({ project, date, lanes, cards, activeD
     }, []);
 
     const handleAdd = useCallback(
-        (kind: 'note' | 'task' | 'todo' | 'file' | 'report') => {
+        (kind: 'note' | 'task' | 'todo' | 'file' | 'report' | 'ai') => {
             // Handled via state trigger for modals in the child component
             const customEvent = new CustomEvent('board-add-trigger', { detail: { kind } });
             window.dispatchEvent(customEvent);

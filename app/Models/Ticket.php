@@ -130,12 +130,12 @@ class Ticket extends Model
         return in_array($this->ticket_status, ['agent_replied', 'user_replied']);
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function assignedEmployee()
+    public function assignedEmployee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_employee_id');
     }
@@ -203,7 +203,7 @@ class Ticket extends Model
     /**
      * Link to the modern Conversation model in the new architecture.
      */
-    public function conversation()
+    public function conversation(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(Conversation::class, 'conversable');
     }

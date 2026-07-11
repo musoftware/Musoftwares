@@ -13,6 +13,7 @@ use App\Models\Project;
 use App\Models\ProjectBoardItem;
 use App\Models\ProjectBoardNote;
 use App\Models\ProjectFile;
+use App\Services\AI\ProjectBoardAiService;
 use App\Models\ProjectReport;
 use App\Models\Task;
 use App\Models\Todo;
@@ -1074,7 +1075,7 @@ class ClientProjectBoardController extends Controller
             $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
             $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
         } else {
-            $apiKey = AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
+            $apiKey = AdminSettings::GetValue('gemini_api_key', config('services.gemini.key'));
             $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
         }
 
@@ -1122,6 +1123,74 @@ class ClientProjectBoardController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'AI Generation failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function generateAiQuestions(Request $request, Project $project)
+    {
+        $this->authorizeProject($project);
+
+        $data = $request->validate([
+            'prompt' => 'required|string|max:10000',
+        ]);
+
+        try {
+            $aiService = app(ProjectBoardAiService::class);
+            $questionsData = $aiService->generatePlanQuestions($project, $data['prompt']);
+
+            return response()->json([
+                'ok' => true,
+                'questions' => $questionsData['questions'] ?? [],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function addWithAi(Request $request, Project $project)
+    {
+        $this->authorizeProject($project);
+
+        $data = $request->validate([
+            'prompt'          => 'required|string|max:10000',
+            'start_date'      => 'required|date_format:Y-m-d',
+            'allowed_types'   => 'nullable|array',
+            'allowed_types.*' => 'string|in:note,task,todo,report',
+            'max_daily_hours' => 'nullable|integer|min:1|max:24',
+            'skip_days'       => 'nullable|array',
+            'skip_days.*'     => 'integer|between:0,6',
+            'answers'         => 'nullable|array', // key: question, value: answer
+        ]);
+
+        // Resolve with sensible defaults if the user didn't supply the new fields
+        $allowedTypes   = !empty($data['allowed_types']) ? $data['allowed_types'] : ['note', 'task', 'todo', 'report'];
+        $maxDailyHours  = (int) ($data['max_daily_hours'] ?? 8);
+        $skipDays       = isset($data['skip_days']) ? array_map('intval', $data['skip_days']) : [5]; // 5 = Friday
+        $answers        = $data['answers'] ?? [];
+
+        try {
+            $aiService = app(ProjectBoardAiService::class);
+            $newCards = $aiService->generatePlan(
+                $project,
+                $data['prompt'],
+                $data['start_date'],
+                $request->user()?->id ?? $project->user_id,
+                $allowedTypes,
+                $maxDailyHours,
+                $skipDays,
+                $answers
+            );
+
+            return response()->json([
+                'ok' => true,
+                'cards' => $newCards,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

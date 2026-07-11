@@ -18,6 +18,7 @@ class StoreCommentRequest extends FormRequest
             'type' => ['required', 'string', 'in:'.implode(',', ProjectBoardItem::validTypeKeys())],
             'commentable_id' => ['required', 'integer'],
             'body' => ['required', 'string', 'max:5000'],
+            'adjust_future_ai' => ['sometimes', 'boolean'],
         ];
     }
 }

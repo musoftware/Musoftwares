@@ -7,8 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\Project\StoreCommentRequest;
 use App\Models\Project;
 use App\Models\ProjectComment;
+use App\Models\ProjectBoardItem;
+use App\Services\AI\ProjectBoardAiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ClientProjectCommentController extends Controller
 {
@@ -37,7 +40,39 @@ class ClientProjectCommentController extends Controller
         ]);
         $comment->load('author');
 
-        return response()->json(['ok' => true, 'comment' => $this->serialize(collect([$comment]))[0]]);
+        $aiAdjusted = false;
+        if (!empty($data['adjust_future_ai'])) {
+            $morphClass = ProjectBoardItem::morphClassFor($data['type']);
+            $boardItem = ProjectBoardItem::where('project_id', $project->id)
+                ->where('itemable_type', $morphClass)
+                ->where('itemable_id', $data['commentable_id'])
+                ->first();
+
+            if ($boardItem && $boardItem->is_ai) {
+                try {
+                    $aiService = app(ProjectBoardAiService::class);
+                    $aiService->adjustFutureItems(
+                        $project,
+                        $data['body'],
+                        (int)$data['commentable_id'],
+                        $morphClass,
+                        $request->user()?->id ?? $project->user_id
+                    );
+                    $aiAdjusted = true;
+                } catch (\Exception $e) {
+                    Log::error('AI future adjustment failed: ' . $e->getMessage());
+                    if (app()->runningUnitTests()) {
+                        throw $e;
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'ok' => true,
+            'comment' => $this->serialize(collect([$comment]))[0],
+            'ai_adjusted' => $aiAdjusted,
+        ]);
     }
 
     /**

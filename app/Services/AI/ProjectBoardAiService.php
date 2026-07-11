@@ -18,9 +18,9 @@ use Illuminate\Support\Facades\Log;
 class ProjectBoardAiService
 {
     /**
-     * Generate a structured timeline/plan for the project based on the prompt.
+     * Generate 3-4 custom clarifying questions based on the user's initial goal/prompt.
      */
-    public function generatePlan(Project $project, string $userPrompt, string $startDate, int $userId): array
+    public function generatePlanQuestions(Project $project, string $userPrompt): array
     {
         $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
         if ($defaultProvider === 'openai') {
@@ -35,21 +35,110 @@ class ProjectBoardAiService
             throw new \Exception("AI integration is not configured. Please set your {$defaultProvider} API key in admin settings.");
         }
 
+        $systemPrompt = "You are an expert project manager. The user wants to generate a project board timeline for: '{$userPrompt}' in the project '{$project->project_name}'.\n"
+            . "To create an extremely detailed, professional, and custom plan (with specific tasks, todos, and reports rather than generic placeholders), generate exactly 3 or 4 highly relevant, brief clarifying questions to ask the user.\n"
+            . "Ask about specific technical stacks, integrations, workflows, key features, or constraints.\n"
+            . "Auto-detect the language of the prompt (Arabic or English) and output questions in the SAME language.\n"
+            . "Return ONLY a valid JSON object matching this schema. Do not include markdown wraps.\n\n"
+            . "JSON Schema:\n"
+            . "{\n"
+            . "  \"questions\": [\n"
+            . "     \"Question 1?\",\n"
+            . "     \"Question 2?\",\n"
+            . "     \"Question 3?\"\n"
+            . "  ]\n"
+            . "}";
+
+        $content = $this->callAi($defaultProvider, $apiKey, $model, $systemPrompt, $userPrompt);
+        $data = json_decode($content, true);
+
+        if (!$data || !isset($data['questions'])) {
+            Log::error('ProjectBoardAiService generatePlanQuestions: failed to parse JSON', ['content' => $content]);
+            return [
+                'questions' => [
+                    'What are the main deliverables for this plan?',
+                    'Are there specific tools or APIs to integrate?',
+                    'Are there any key constraints or deadlines?'
+                ]
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Generate a structured timeline/plan for the project based on the prompt and optional Q&A answers.
+     */
+    public function generatePlan(
+        Project $project,
+        string $userPrompt,
+        string $startDate,
+        int $userId,
+        array $allowedTypes = ['note', 'task', 'todo', 'report'],
+        int $maxDailyHours = 8,
+        array $skipDays = [5], // Carbon day-of-week integers; 5 = Friday
+        array $answers = [] // User answers to clarify details
+    ): array
+    {
+        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
+        if ($defaultProvider === 'openai') {
+            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
+        } else {
+            $apiKey = AdminSettings::GetValue('gemini_api_key', config('services.gemini.key'));
+            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
+        }
+
+        if (empty($apiKey)) {
+            throw new \Exception("AI integration is not configured. Please set your {$defaultProvider} API key in admin settings.");
+        }
+
+        // Build a human-readable list of allowed types for the AI prompt.
+        $allowedTypesStr = implode(', ', array_map(fn($t) => "'{$t}'", $allowedTypes));
+        $allowedTypeDescriptions = [];
+        if (in_array('task', $allowedTypes)) {
+            $allowedTypeDescriptions[] = "- 'task': A specific task to do. Must include 'estimated_hours' (decimal/float or integer, e.g. 2, 3.5).";
+        }
+        if (in_array('todo', $allowedTypes)) {
+            $allowedTypeDescriptions[] = "- 'todo': A checklist card. Can include 'checklist' array of string items.";
+        }
+        if (in_array('report', $allowedTypes)) {
+            $allowedTypeDescriptions[] = "- 'report': A progress report or milestone summary card.";
+        }
+        if (in_array('note', $allowedTypes)) {
+            $allowedTypeDescriptions[] = "- 'note': A general documentation or informational card.";
+        }
+        $typeDescriptionsStr = implode("\n", $allowedTypeDescriptions);
+        $allowedTypesJsonStr = implode('\" | \"', $allowedTypes);
+
+        // Format the Q&As for the AI context to enforce specificity
+        $qasStr = "";
+        if (!empty($answers)) {
+            $qasStr = "\nThe user has provided the following clarifications about their project:\n";
+            foreach ($answers as $q => $a) {
+                if (trim($a)) {
+                    $qasStr .= "- Q: {$q}\n  A: {$a}\n";
+                }
+            }
+        }
+
         $systemPrompt = "You are a professional project manager. The user wants to generate a project board timeline/plan for their project.\n"
-            . "Project name: {$project->project_name}\n\n"
-            . "Instructions:\n"
-            . "1. Divide the project into logical sequential phases.\n"
-            . "2. For each phase:\n"
+            . "Project name: {$project->project_name}\n"
+            . $qasStr . "\n"
+            . "CRITICAL Instructions:\n"
+            . "1. DO NOT WRITE GENERIC OR VAGUE TASKS/REPORTS. Avoid titles like 'Review performance', 'Identify missing features', 'Notes about analysis', 'Phase Scope: Analysing requirements', 'Add details'.\n"
+            . "2. Every card title and description must be highly operational, detailed, specific, and actionable. Write exact names of components, databases, configurations, steps, or code setups relevant to the user's project and their answers.\n"
+            . "3. Divide the project into logical sequential phases.\n"
+            . "4. For each phase:\n"
             . "   - Provide a phase name.\n"
             . "   - Provide a phase scope (a high-level summary of requirements and scope for this phase).\n"
-            . "   - Provide a list of board items. Items can be:\n"
-            . "     - 'task': A specific task to do. Must include 'estimated_hours' (decimal/float or integer, e.g. 2, 3.5).\n"
-            . "     - 'todo': A checklist card. Can include 'checklist' array of string items.\n"
-            . "     - 'report': A progress report or milestone summary card.\n"
-            . "     - 'note': A general documentation or informational card.\n"
-            . "3. Mark exactly one key/critical task or milestone in the plan as 'is_important' = true.\n"
-            . "4. Auto-detect the language of the user's prompt (usually Arabic or English) and output titles and descriptions in that SAME language.\n"
-            . "5. Return ONLY a valid JSON object matching this schema. Do not include markdown wraps or anything else.\n\n"
+            . "   - Provide a list of board items. IMPORTANT: You may ONLY use the following card types: {$allowedTypesStr}.\n"
+            . "     Do NOT generate any card type not in this list.\n"
+            . "{$typeDescriptionsStr}\n"
+            . "5. Each working day has a maximum of {$maxDailyHours} hours of tasks. Do not schedule more than {$maxDailyHours} total estimated_hours of tasks on a single day.\n"
+            . "6. Mark exactly one key/critical task or milestone in the plan as 'is_important' = true.\n"
+            . "7. Auto-detect the language of the user's prompt (usually Arabic or English) and output titles and descriptions in that SAME language.\n"
+            . "8. Return ONLY a valid JSON object matching this schema. Do not include markdown wraps or anything else.\n\n"
             . "JSON Schema:\n"
             . "{\n"
             . "  \"phases\": [\n"
@@ -58,7 +147,7 @@ class ProjectBoardAiService
             . "      \"scope\": \"Phase scope/goals summary\",\n"
             . "      \"items\": [\n"
             . "        {\n"
-            . "          \"type\": \"task\" | \"todo\" | \"report\" | \"note\",\n"
+            . "          \"type\": \"{$allowedTypesJsonStr}\",\n"
             . "          \"title\": \"Item title\",\n"
             . "          \"description\": \"Item description (markdown format)\",\n"
             . "          \"estimated_hours\": 4, // only for task, float/int\n"
@@ -70,6 +159,7 @@ class ProjectBoardAiService
             . "  ]\n"
             . "}";
 
+
         $content = $this->callAi($defaultProvider, $apiKey, $model, $systemPrompt, $userPrompt);
 
         $data = json_decode($content, true);
@@ -78,54 +168,65 @@ class ProjectBoardAiService
             throw new \Exception('AI failed to generate a valid project plan. Please try again.');
         }
 
-        return DB::transaction(function () use ($project, $data, $startDate, $userId) {
+        return DB::transaction(function () use ($project, $data, $startDate, $userId, $allowedTypes, $maxDailyHours, $skipDays) {
             $currentDate = Carbon::parse($startDate);
             $newCards = [];
 
-            foreach ($data['phases'] as $phase) {
-                // If it is Friday, skip to Saturday
-                if ($currentDate->dayOfWeek === Carbon::FRIDAY) {
+            // Helper: advance date past any skipped days
+            $advancePastSkippedDays = function () use (&$currentDate, $skipDays) {
+                $guard = 0;
+                while (in_array($currentDate->dayOfWeek, $skipDays, true) && $guard < 14) {
                     $currentDate->addDay();
+                    $guard++;
                 }
+            };
 
-                // 1. Create the Scope note at the start of the phase
-                $scopeNote = $project->boardNotes()->create([
-                    'author_id' => $userId,
-                    'for_date' => $currentDate->toDateString(),
-                    'title' => "Phase Scope: {$phase['name']}",
-                    'content' => $phase['scope'],
-                    'color' => 'indigo',
-                ]);
+            $advancePastSkippedDays();
 
-                $scopePlacement = $this->placeItem($project, $currentDate->toDateString(), ProjectBoardNote::class, $scopeNote->id, 'backlog', true, false);
-                $newCards[] = $this->serializeCard('note', $scopeNote, $scopePlacement);
+            foreach ($data['phases'] as $phase) {
+                $advancePastSkippedDays();
+
+                // 1. Create the Scope note at the start of the phase (only if 'note' is an allowed type)
+                if (in_array('note', $allowedTypes, true)) {
+                    $scopeNote = $project->boardNotes()->create([
+                        'author_id' => $userId,
+                        'for_date' => $currentDate->toDateString(),
+                        'title' => "Phase Scope: {$phase['name']}",
+                        'content' => $phase['scope'],
+                        'color' => 'indigo',
+                    ]);
+
+                    $scopePlacement = $this->placeItem($project, $currentDate->toDateString(), ProjectBoardNote::class, $scopeNote->id, 'backlog', true, false);
+                    $newCards[] = $this->serializeCard('note', $scopeNote, $scopePlacement);
+                }
 
                 $dailyHours = 0;
 
                 // 2. Add each item
                 foreach ($phase['items'] as $item) {
                     $type = $item['type'];
+
+                    // Skip types the user did not allow
+                    if (!in_array($type, $allowedTypes, true)) {
+                        continue;
+                    }
+
                     $title = $item['title'];
                     $desc = $item['description'] ?? '';
                     $isImportant = (bool)($item['is_important'] ?? false);
                     $estHours = isset($item['estimated_hours']) ? (float)$item['estimated_hours'] : 0;
 
-                    // If it is a task, check if adding it exceeds 8 hours for the current day
+                    // If it is a task, check if adding it exceeds the daily hour limit
                     if ($type === 'task') {
-                        if ($dailyHours + $estHours > 8 && $dailyHours > 0) {
+                        if ($dailyHours + $estHours > $maxDailyHours && $dailyHours > 0) {
                             $currentDate->addDay();
-                            if ($currentDate->dayOfWeek === Carbon::FRIDAY) {
-                                $currentDate->addDay();
-                            }
+                            $advancePastSkippedDays();
                             $dailyHours = 0;
                         }
                     }
 
-                    // Ensure we check Friday for notes/todos/reports as well
-                    if ($currentDate->dayOfWeek === Carbon::FRIDAY) {
-                        $currentDate->addDay();
-                        $dailyHours = 0;
-                    }
+                    // Ensure we skip restricted days for any card type
+                    $advancePastSkippedDays();
 
                     $createdItem = null;
                     $morphClass = null;
@@ -152,10 +253,15 @@ class ProjectBoardAiService
                     } elseif ($type === 'todo') {
                         $createdItem = $project->todos()->create([
                             'project_id' => $project->id,
+                            'user_id' => $userId,
                             'title' => $title,
                             'description' => $desc,
                             'inDate' => $currentDate->toDateString(),
                             'completed' => false,
+                            'priority' => 'normal',
+                            'priorityColor' => 'gray',
+                            'tags' => '[]',
+                            'paused' => false,
                         ]);
                         $morphClass = Todo::class;
 
@@ -171,6 +277,7 @@ class ProjectBoardAiService
                     } elseif ($type === 'report') {
                         $createdItem = $project->reports()->create([
                             'project_id' => $project->id,
+                            'author_id' => $userId,
                             'title' => $title,
                             'body' => $desc,
                             'published_at' => $currentDate->toDateString() . 'T12:00:00',
@@ -396,10 +503,15 @@ class ProjectBoardAiService
                     } elseif ($type === 'todo') {
                         $createdItem = $project->todos()->create([
                             'project_id' => $project->id,
+                            'user_id' => $userId,
                             'title' => $title,
                             'description' => $desc,
                             'inDate' => $currentDate->toDateString(),
                             'completed' => false,
+                            'priority' => 'normal',
+                            'priorityColor' => 'gray',
+                            'tags' => '[]',
+                            'paused' => false,
                         ]);
                         $morphClass = Todo::class;
 
@@ -414,6 +526,7 @@ class ProjectBoardAiService
                     } elseif ($type === 'report') {
                         $createdItem = $project->reports()->create([
                             'project_id' => $project->id,
+                            'author_id' => $userId,
                             'title' => $title,
                             'body' => $desc,
                             'published_at' => $currentDate->toDateString() . 'T12:00:00',
