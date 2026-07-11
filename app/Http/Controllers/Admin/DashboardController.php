@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Services\DashboardService;
 use Inertia\Inertia;
 
@@ -21,12 +20,12 @@ class DashboardController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Dashboard', [
-            'stats'             => $this->dashboardService->getCoreMetrics(),
-            'operationalStats'  => $this->dashboardService->getOperationalMetrics(),
-            'systemHealth'      => $this->dashboardService->getSystemHealth(),
-            'revenueChartData'  => $this->dashboardService->getMonthlyRevenueChart(),
-            'moduleBreakdown'   => $this->dashboardService->getModuleBreakdown(),
-            'recentActivities'  => $this->dashboardService->getRecentActivities(),
+            'stats' => $this->dashboardService->getCoreMetrics(),
+            'operationalStats' => $this->dashboardService->getOperationalMetrics(),
+            'systemHealth' => $this->dashboardService->getSystemHealth(),
+            'revenueChartData' => $this->dashboardService->getMonthlyRevenueChart(),
+            'moduleBreakdown' => $this->dashboardService->getModuleBreakdown(),
+            'recentActivities' => $this->dashboardService->getRecentActivities(),
         ]);
     }
 }

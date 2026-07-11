@@ -14,7 +14,7 @@ class ToggleBlockUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reason' => 'nullable|string|max:500'
+            'reason' => 'nullable|string|max:500',
         ];
     }
 }

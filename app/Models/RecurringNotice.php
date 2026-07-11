@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RecurringNotice extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -36,7 +36,10 @@ class RecurringNotice extends Model
         if ($this->recurring == 'day') {
             $t = Carbon::parse($this->current_date);
             $diff = $date->diffInDays($t);
-            if ($diff == 0) return true;
+            if ($diff == 0) {
+                return true;
+            }
+
             return $diff % $this->recurring_times == 0;
         }
 
@@ -65,6 +68,7 @@ class RecurringNotice extends Model
                         }
                     }
                 }
+
                 return in_array(date('d', strtotime($date)), $days);
             }
         }
@@ -83,7 +87,7 @@ class RecurringNotice extends Model
 
     public function isDueToday(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -102,10 +106,10 @@ class RecurringNotice extends Model
 
     public function scheduleLabel(): string
     {
-        $label = 'Every ' . $this->recurring_times . ' ' . $this->recurring . '(s)';
+        $label = 'Every '.$this->recurring_times.' '.$this->recurring.'(s)';
         $details = $this->details();
         if ($this->recurring !== 'day' && $details) {
-            $label .= ' on [' . $details . ']';
+            $label .= ' on ['.$details.']';
         }
 
         return $label;

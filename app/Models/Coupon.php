@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Carbon\Carbon;
 
 class Coupon extends Model
 {
@@ -55,7 +55,7 @@ class Coupon extends Model
     // Helper methods
     public function isActive(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -78,7 +78,7 @@ class Coupon extends Model
 
     public function canBeUsedByUser(User $user, $purchaseAmount = null): bool
     {
-        if (!$this->isActive()) {
+        if (! $this->isActive()) {
             return false;
         }
 
@@ -103,6 +103,7 @@ class Coupon extends Model
     {
         if ($this->type === 'percentage' && $this->discount_percentage) {
             $discount = $purchaseAmount * ($this->discount_percentage / 100);
+
             return min($discount, $purchaseAmount); // Don't exceed purchase amount
         }
 
@@ -114,4 +115,3 @@ class Coupon extends Model
         return self::where('code', strtoupper($code))->first();
     }
 }
-

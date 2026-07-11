@@ -22,8 +22,8 @@ class UserEmailController extends Controller
             ->get(['id', 'email', 'verified_at', 'source', 'created_at']);
 
         $primary = [
-            'email'        => $user->email,
-            'verified_at'  => $user->email_verified_at,
+            'email' => $user->email,
+            'verified_at' => $user->email_verified_at,
         ];
 
         $filter = trim((string) $request->query('search', ''));
@@ -34,7 +34,7 @@ class UserEmailController extends Controller
                 ->where(function ($q) use ($filter) {
                     $needle = strtolower($filter);
                     $q->whereRaw('LOWER(email) LIKE ?', ["%{$needle}%"])
-                      ->orWhereRaw('LOWER(name) LIKE ?', ["%{$needle}%"]);
+                        ->orWhereRaw('LOWER(name) LIKE ?', ["%{$needle}%"]);
                 })
                 ->orderBy('id')
                 ->limit(20)
@@ -42,40 +42,40 @@ class UserEmailController extends Controller
         }
 
         return Inertia::render('Admin/Users/UserEmails', [
-            'user'         => [
-                'id'    => $user->id,
-                'name'  => $user->name,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at,
             ],
-            'primary'      => $primary,
-            'emails'       => $emails->map(fn (UserEmail $e) => [
-                'id'         => $e->id,
-                'email'      => $e->email,
-                'verified'   => (bool) $e->isVerified(),
-                'verified_at'=> $e->verified_at?->toIso8601String(),
-                'source'     => $e->source,
+            'primary' => $primary,
+            'emails' => $emails->map(fn (UserEmail $e) => [
+                'id' => $e->id,
+                'email' => $e->email,
+                'verified' => (bool) $e->isVerified(),
+                'verified_at' => $e->verified_at?->toIso8601String(),
+                'source' => $e->source,
                 'created_at' => $e->created_at?->toIso8601String(),
             ])->values(),
-            'suggestions'  => $suggestions->map(fn (User $u) => [
-                'id'    => $u->id,
-                'name'  => $u->name,
+            'suggestions' => $suggestions->map(fn (User $u) => [
+                'id' => $u->id,
+                'name' => $u->name,
                 'email' => $u->email,
             ])->values(),
-            'search'       => $filter,
+            'search' => $filter,
         ]);
     }
 
     public function store(StoreUserEmailRequest $request, User $user): RedirectResponse
     {
-        $email      = strtolower(trim((string) $request->validated('email')));
-        $verified   = $request->boolean('verified_at');
+        $email = strtolower(trim((string) $request->validated('email')));
+        $verified = $request->boolean('verified_at');
 
         UserEmail::create([
-            'user_id'          => $user->id,
-            'email'            => $email,
-            'verified_at'      => $verified ? now() : null,
-            'source'           => UserEmail::SOURCE_ADMIN,
+            'user_id' => $user->id,
+            'email' => $email,
+            'verified_at' => $verified ? now() : null,
+            'source' => UserEmail::SOURCE_ADMIN,
             'added_by_user_id' => Auth::id(),
         ]);
 

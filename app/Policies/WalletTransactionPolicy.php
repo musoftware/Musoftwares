@@ -3,17 +3,17 @@
 namespace App\Policies;
 
 use App\Models\WalletTransaction;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User;
 
 class WalletTransactionPolicy
 {
-
     public function before(User $user, string $ability): ?bool
     {
         if ($user->isAdmin()) {
             return true;
         }
+
         return null;
     }
 

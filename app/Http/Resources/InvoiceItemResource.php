@@ -2,12 +2,14 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Currency;
+use App\Traits\ConvertsCurrency;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class InvoiceItemResource extends JsonResource
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
     /**
      * Transform the resource into an array.
@@ -22,7 +24,7 @@ class InvoiceItemResource extends JsonResource
             'item_type' => $this->item_type,
             'qty' => $this->qty,
             'amount' => $this->amount,
-            'currency' => \App\Models\Currency::find($this->invoice?->currency)?->currency,
+            'currency' => Currency::find($this->invoice?->currency)?->currency,
             'total_amount' => $this->total(),
             'created_at' => $this->created_at,
         ];

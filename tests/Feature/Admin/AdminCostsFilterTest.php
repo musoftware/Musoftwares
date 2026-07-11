@@ -33,7 +33,6 @@ class AdminCostsFilterTest extends TestCase
             \App\Http\Middleware\SecurityEnforcement::class,
             \App\Http\Middleware\RemoveSecurityHeaders::class,
             \App\Http\Middleware\SetLocale::class,
-            \App\Http\Middleware\EnforceFreelanceDomain::class,
             \App\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 

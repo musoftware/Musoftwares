@@ -14,7 +14,7 @@ class AdminPointPackageController extends Controller
         $search = $request->get('search', '');
 
         $pointPackages = PointPackage::query()
-            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->when($search, fn ($q) => $q->where('name', 'like', "%{$search}%"))
             ->orderByDesc('id')
             ->paginate(20)
             ->withQueryString();

@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserCredential extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
-    
+
     protected $fillable = [
         'user_id',
         'admin_id',
@@ -31,10 +29,10 @@ class UserCredential extends Model
     ];
 
     protected $casts = [
-        'is_pinned'         => 'boolean',
-        'rotated_at'        => 'datetime',
-        'expires_at'        => 'datetime',
-        'last_revealed_at'  => 'datetime',
+        'is_pinned' => 'boolean',
+        'rotated_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'last_revealed_at' => 'datetime',
     ];
 
     /** Valid active categories (excludes 'archived') */
@@ -73,7 +71,7 @@ class UserCredential extends Model
         }
         $this->update([
             'original_category' => $this->category,
-            'category'          => 'archived',
+            'category' => 'archived',
         ]);
     }
 
@@ -86,7 +84,7 @@ class UserCredential extends Model
             return;
         }
         $this->update([
-            'category'          => $this->original_category ?: 'notes',
+            'category' => $this->original_category ?: 'notes',
             'original_category' => null,
         ]);
     }

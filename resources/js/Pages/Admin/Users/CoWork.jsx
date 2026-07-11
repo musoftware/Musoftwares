@@ -1,25 +1,10 @@
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
-import { Users, Briefcase, Mail, Phone, ExternalLink, Clock, Tag, Search, ChevronRight } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
+import { Users, Mail, Phone, ExternalLink, Clock, Tag, Search, ChevronRight } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-const TABS = [
-    { id: 'freelancers', label: 'Freelancer System', icon: Briefcase },
-    { id: 'legacy',      label: 'Legacy Co-Workers',  icon: Users },
-];
-
 const TAG_LIMIT = 4;
-
-function SkillBadge({ name }) {
-    return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-900 border border-slate-50">
-            <Tag className="w-3 h-3" />
-            {name}
-        </span>
-    );
-}
 
 function TagList({ tags, colorClass = 'bg-green-50 text-green-700 border-green-100' }) {
     const [expanded, setExpanded] = useState(false);
@@ -45,44 +30,6 @@ function TagList({ tags, colorClass = 'bg-green-50 text-green-700 border-green-1
                     onClick={() => setExpanded(false)}
                     className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors">{__('general.show_less')}</button>
             )}
-        </div>
-    );
-}
-
-function FreelancerCard({ user }) {
-    return (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col gap-3">
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-500 to-slate-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                        {user.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
-                    </div>
-                    <div>
-                        <p className="font-semibold text-slate-900 text-sm">{user.name}</p>
-                        <p className="text-xs text-slate-500 flex items-center gap-1">
-                            <Mail className="w-3 h-3" /> {user.email}
-                        </p>
-                    </div>
-                </div>
-                <Link
-                    href={`/admin/users/${user.id}`}
-                    className="text-slate-900 hover:text-slate-900 transition-colors flex-shrink-0"
-                    title={__('general.view_profile')}
-                >
-                    <ChevronRight className="w-5 h-5" />
-                </Link>
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-                {user.skills?.length > 0
-                    ? <TagList tags={user.skills} colorClass="bg-slate-50 text-slate-900 border-slate-50" />
-                    : <span className="text-xs text-slate-400 italic">{__('general.no_skills_listed')}</span>
-                }
-            </div>
-
-            <p className="text-xs text-slate-400 mt-auto">
-                Joined {new Date(user.created_at).toLocaleDateString()}
-            </p>
         </div>
     );
 }
@@ -163,16 +110,8 @@ function LegacyCard({ worker }) {
     );
 }
 
-export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
-    const [activeTab, setActiveTab] = useState('freelancers');
-    const [search, setSearch]       = useState('');
-
-    const filteredFreelancers = freelancers.filter(u =>
-        !search ||
-        u.name?.toLowerCase().includes(search.toLowerCase()) ||
-        u.email?.toLowerCase().includes(search.toLowerCase()) ||
-        u.skills?.some(s => s.name?.toLowerCase().includes(search.toLowerCase()))
-    );
+export default function CoWork({ legacyCoWorkers = [] }) {
+    const [search, setSearch] = useState('');
 
     const filteredLegacy = legacyCoWorkers.filter(w =>
         !search ||
@@ -181,61 +120,27 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
         w.tech_tags?.some(t => t.name?.toLowerCase().includes(search.toLowerCase()))
     );
 
-    const current = activeTab === 'freelancers' ? filteredFreelancers : filteredLegacy;
-
     return (
         <AdminSidebarLayout title={__('general.co_work')} header="Private Co-Work">
             <Head title={__('general.co_work')} />
 
             {/* Stats row */}
-            <div className="mb-6 grid grid-cols-2 gap-4">
-                <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center">
-                    <span className="text-2xl font-semibold text-slate-900">{freelancers.length}</span>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Freelancers (System)</span>
-                </div>
+            <div className="mb-6">
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center">
                     <span className="text-2xl font-semibold text-green-600">{legacyCoWorkers.length}</span>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.legacy_co_workers')}</span>
                 </div>
             </div>
 
-            {/* Tab bar + search */}
+            {/* Search + list */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm mb-6 overflow-hidden">
-                <div className="flex items-center justify-between px-4 pt-4 pb-0 gap-4 border-b border-slate-100">
-                    <div className="flex gap-1">
-                        {TABS.map(tab => {
-                            const Icon = tab.icon;
-                            const isActive = activeTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    id={`cowork-tab-${tab.id}`}
-                                    onClick={() => { setActiveTab(tab.id); setSearch(''); }}
-                                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-all rounded-t-md ${
-                                        isActive
-                                            ? 'border-slate-900 text-slate-900 bg-slate-50/60'
-                                            : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                                    }`}
-                                >
-                                    <Icon className="w-4 h-4" />
-                                    {tab.label}
-                                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
-                                        isActive ? 'bg-slate-50 text-slate-900' : 'bg-slate-100 text-slate-500'
-                                    }`}>
-                                        {tab.id === 'freelancers' ? freelancers.length : legacyCoWorkers.length}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* Search */}
+                <div className="flex items-center justify-end px-4 pt-4 pb-0 gap-4 border-b border-slate-100">
                     <div className="relative mb-2">
                         <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                             id="cowork-search"
                             type="text"
-                            placeholder={activeTab === 'freelancers' ? 'Search by name, email, skill…' : 'Search by name, email, tag…'}
+                            placeholder="Search by name, email, tag…"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             className="h-9 ps-9 pe-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent w-64"
@@ -243,32 +148,17 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
                     </div>
                 </div>
 
-                {/* Tab content */}
                 <div className="p-4">
-                    {current.length === 0 ? (
+                    {filteredLegacy.length === 0 ? (
                         <div className="py-16 flex flex-col items-center text-slate-400 gap-3">
-                            {activeTab === 'freelancers'
-                                ? <Briefcase className="w-10 h-10 opacity-30" />
-                                : <Users className="w-10 h-10 opacity-30" />
-                            }
+                            <Users className="w-10 h-10 opacity-30" />
                             <p className="text-sm">
-                                {search
-                                    ? 'No results for your search.'
-                                    : activeTab === 'freelancers'
-                                        ? 'No freelancers with skills found in the system.'
-                                        : 'No legacy co-workers found.'
-                                }
+                                {search ? 'No results for your search.' : 'No legacy co-workers found.'}
                             </p>
-                            {activeTab === 'freelancers' && !search && (
-                                <p className="text-xs text-slate-400 max-w-sm text-center">{__('general.users_appear_here_once_they_add_at_least_one_skill_via_the_freelance_module')}</p>
-                            )}
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {activeTab === 'freelancers'
-                                ? filteredFreelancers.map(u => <FreelancerCard key={u.id} user={u} />)
-                                : filteredLegacy.map(w => <LegacyCard key={w.id} worker={w} />)
-                            }
+                            {filteredLegacy.map(w => <LegacyCard key={w.id} worker={w} />)}
                         </div>
                     )}
                 </div>

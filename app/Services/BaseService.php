@@ -11,10 +11,8 @@ abstract class BaseService
     /**
      * Execute a callback within a database transaction.
      *
-     * @param callable $callback
-     * @param string|null $errorMessage
-     * @param int $attempts
      * @return mixed
+     *
      * @throws Throwable
      */
     protected function executeInTransaction(callable $callback, ?string $errorMessage = null, int $attempts = 1)
@@ -35,9 +33,6 @@ abstract class BaseService
     /**
      * Handle generic service errors with logging.
      *
-     * @param Throwable $e
-     * @param string $message
-     * @return void
      * @throws Throwable
      */
     protected function handleException(Throwable $e, string $message = 'Service Error'): void
@@ -45,7 +40,7 @@ abstract class BaseService
         Log::error($message, [
             'exception' => get_class($e),
             'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+            'trace' => $e->getTraceAsString(),
         ]);
 
         throw $e;

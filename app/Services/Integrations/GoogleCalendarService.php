@@ -2,24 +2,22 @@
 
 namespace App\Services\Integrations;
 
-use App\Services\BaseService;
-
 use App\Models\User;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class GoogleCalendarService extends BaseService
 {
-
     /**
      * Create an event in the user's Google Calendar.
-     * 
+     *
      * @return string|null The Google Event ID
      */
     public function createEvent(User $user, string $title, string $description, \DateTimeInterface $start, \DateTimeInterface $end): ?string
     {
         $token = $this->getValidAccessToken($user);
-        if (!$token) {
+        if (! $token) {
             return null;
         }
 
@@ -40,6 +38,7 @@ class GoogleCalendarService extends BaseService
         }
 
         Log::error('Google Calendar Create Event Failed', ['response' => $response->body()]);
+
         return null;
     }
 
@@ -49,7 +48,7 @@ class GoogleCalendarService extends BaseService
     public function updateEvent(User $user, string $eventId, string $title, string $description, \DateTimeInterface $start, \DateTimeInterface $end): bool
     {
         $token = $this->getValidAccessToken($user);
-        if (!$token) {
+        if (! $token) {
             return false;
         }
 
@@ -70,6 +69,7 @@ class GoogleCalendarService extends BaseService
         }
 
         Log::error('Google Calendar Update Event Failed', ['response' => $response->body()]);
+
         return false;
     }
 
@@ -79,7 +79,7 @@ class GoogleCalendarService extends BaseService
     public function deleteEvent(User $user, string $eventId): bool
     {
         $token = $this->getValidAccessToken($user);
-        if (!$token) {
+        if (! $token) {
             return false;
         }
 
@@ -91,6 +91,7 @@ class GoogleCalendarService extends BaseService
         }
 
         Log::error('Google Calendar Delete Event Failed', ['response' => $response->body()]);
+
         return false;
     }
 
@@ -101,7 +102,7 @@ class GoogleCalendarService extends BaseService
     {
         $integration = $user->integrations()->where('provider', 'google_calendar')->first();
 
-        if (!$integration) {
+        if (! $integration) {
             return null;
         }
 
@@ -117,7 +118,7 @@ class GoogleCalendarService extends BaseService
      */
     protected function refreshToken($integration): ?string
     {
-        if (!$integration->refresh_token) {
+        if (! $integration->refresh_token) {
             return null;
         }
 
@@ -134,10 +135,12 @@ class GoogleCalendarService extends BaseService
                 'access_token' => $data['access_token'],
                 'expires_at' => now()->addSeconds($data['expires_in'] ?? 3600),
             ]);
+
             return $data['access_token'];
         }
 
         Log::error('Google Calendar Token Refresh Failed', ['response' => $response->body()]);
+
         return null;
     }
 }

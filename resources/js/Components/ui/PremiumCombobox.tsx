@@ -108,7 +108,7 @@ export function PremiumCombobox({
 
     const activeOptions = asyncEndpoint 
         ? asyncOptions 
-        : staticOptions.filter(o => o.label.toLowerCase().includes(searchQuery.toLowerCase()));
+        : staticOptions.filter(o => String(o.label || '').toLowerCase().includes(String(searchQuery || '').toLowerCase()));
     
     // Current display label
     let currentLabel = String(value || '');

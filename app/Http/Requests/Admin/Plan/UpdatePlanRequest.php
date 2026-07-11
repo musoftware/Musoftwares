@@ -14,11 +14,11 @@ class UpdatePlanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'module'    => 'required|string|max:50',
-            'name'      => 'required|string|max:255',
-            'price'     => 'required|numeric|min:0',
-            'billing'   => 'required|string|max:50',
-            'features'  => 'nullable|array',
+            'module' => 'required|string|max:50',
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'billing' => 'required|string|max:50',
+            'features' => 'nullable|array',
             'is_active' => 'boolean',
         ];
     }

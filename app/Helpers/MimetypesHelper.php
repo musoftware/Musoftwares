@@ -8,7 +8,6 @@ namespace App\Helpers;
  * Taken from Guzzle
  *
  * @see https://github.com/guzzle/guzzle/blob/master/src/Mimetypes.php
- *
  * @link http://svn.apache.org/repos/asf/httpd/httpd/branches/1.3.x/conf/mime.types
  */
 class MimetypesHelper
@@ -921,19 +920,20 @@ class MimetypesHelper
         'zip' => 'application/zip',
         'zir' => 'application/vnd.zul',
         'zirz' => 'application/vnd.zul',
-        'zmm' => 'application/vnd.handheld-entertainment+xml'
+        'zmm' => 'application/vnd.handheld-entertainment+xml',
     ];
 
     /**
      * Get a singleton instance of the class
      *
      * @return self
+     *
      * @codeCoverageIgnore
      */
     public static function getInstance()
     {
-        if (!self::$instance) {
-            self::$instance = new self();
+        if (! self::$instance) {
+            self::$instance = new self;
         }
 
         return self::$instance;
@@ -942,8 +942,7 @@ class MimetypesHelper
     /**
      * Get a mimetype value from a file extension
      *
-     * @param string $extension File extension
-     *
+     * @param  string  $extension  File extension
      * @return string|null
      */
     public function fromExtension($extension)
@@ -956,8 +955,7 @@ class MimetypesHelper
     /**
      * Get a mimetype from a filename
      *
-     * @param string $filename Filename to generate a mimetype from
-     *
+     * @param  string  $filename  Filename to generate a mimetype from
      * @return string|null
      */
     public function fromFilename($filename)

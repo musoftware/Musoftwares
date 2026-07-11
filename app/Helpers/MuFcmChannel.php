@@ -16,6 +16,7 @@ class MuFcmChannel
     const TOKENS_PER_REQUEST = 500;
 
     protected Dispatcher $events;
+
     protected Messaging $messaging;
 
     public function __construct(Dispatcher $events, Messaging $messaging)

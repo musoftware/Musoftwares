@@ -2,16 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use App\Models\PointPackage;
 use App\Models\PointTransaction;
-use App\Models\Currency;
-use App\Models\CurrenciesExchange;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class PointPurchaseService extends BaseService
 {
-
     // Defined tiers for volume pricing when purchasing custom points
     protected array $tiers = [
         ['min' => 1, 'max' => 999, 'price_per_point' => 1.00, 'discount_percent' => 0],
@@ -34,6 +32,7 @@ class PointPurchaseService extends BaseService
     {
         return PointPackage::all()->map(function ($pkg) {
             $fullPrice = $pkg->points * 1.00; // Base price assumption
+
             return [
                 'id' => $pkg->id,
                 'label' => $pkg->name,
@@ -67,12 +66,13 @@ class PointPurchaseService extends BaseService
                 break;
             }
         }
+
         return (float) ($points * $pricePerPoint);
     }
 
     /**
      * Process a wallet payment using user balance.
-     * 
+     *
      * @throws \Exception
      */
     public function processWalletPayment(User $user, int $points, float $costInEgp): void
@@ -121,9 +121,9 @@ class PointPurchaseService extends BaseService
     {
         $this->executeInTransaction(function () use ($user, $amountPaid, $reason, $points) {
             $user->add_balance($amountPaid, $reason, 'received');
-            
+
             // Deduct balance for points
-            $user->add_balance(-$amountPaid, 'Purchased ' . $points . ' points via Kashier', 'used');
+            $user->add_balance(-$amountPaid, 'Purchased '.$points.' points via Kashier', 'used');
 
             // Add points
             $user->points_balance = ($user->points_balance ?? 0) + $points;
@@ -142,14 +142,14 @@ class PointPurchaseService extends BaseService
         $egpCurrency = Currency::where('currency', 'EGP')->first();
         $userCurrencyId = $user->currency;
         $userCurrency = Currency::find($userCurrencyId);
-        
+
         $currencyCode = $userCurrency ? $userCurrency->currency : 'EGP';
         $rate = 1.0;
-        
+
         if ($egpCurrency && $userCurrencyId && $egpCurrency->id != $userCurrencyId) {
             $rate = CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
         }
-        
+
         return [
             'amount' => round($amountInEgp * $rate, 2),
             'currency' => $currencyCode,

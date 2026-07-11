@@ -344,7 +344,7 @@ export default function Index({
                             </p>
                         </div>
                         <div className="h-[260px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                 <AreaChart data={stats.monthly_trends || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="ci" x1="0" y1="0" x2="0" y2="1">
@@ -397,7 +397,7 @@ export default function Index({
                                             {formatMoney(categoryAllocationData.reduce((s: number, i: any) => s + i.value, 0), stats.business_currency_code)}
                                         </span>
                                     </div>
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                         <PieChart>
                                             <Pie data={categoryAllocationData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={3} dataKey="value">
                                                 {categoryAllocationData.map((_: any, idx: number) => <Cell key={idx} fill={COLORS[idx % COLORS.length]} />)}

@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\BlockedIp;
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use App\Models\BlockedIp;
 use Illuminate\Support\Facades\Cache;
+use Symfony\Component\HttpFoundation\Response;
 
 class SecurityEnforcement
 {
@@ -24,7 +24,7 @@ class SecurityEnforcement
     /**
      * Handle an incoming request.
      *
-     * @param Closure(Request): (Response) $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -34,12 +34,16 @@ class SecurityEnforcement
         $isBlocked = Cache::remember("blocked_ip:{$ip}", 3600, function () use ($ip) {
             try {
                 $block = BlockedIp::where('ip_address', $ip)->first();
-                if (!$block) return false;
+                if (! $block) {
+                    return false;
+                }
 
                 if ($block->blocked_until && now()->greaterThan($block->blocked_until)) {
                     $block->delete();
+
                     return false;
                 }
+
                 return true;
             } catch (\Exception $ex) {
                 return false;

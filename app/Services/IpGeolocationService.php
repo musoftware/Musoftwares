@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Stevebauman\Location\Facades\Location;
 
 class IpGeolocationService extends BaseService
 {
-
     /**
      * List of Arab country codes
      */
@@ -87,7 +88,7 @@ class IpGeolocationService extends BaseService
     /**
      * Get country code from IP address
      *
-     * @param string $ip
+     * @param  string  $ip
      * @return string|null
      */
     public function getCountryFromIp($ip)
@@ -96,6 +97,7 @@ class IpGeolocationService extends BaseService
             // Skip local/private IPs
             if ($this->isLocalIp($ip)) {
                 Log::info("IpGeolocationService: Local IP detected ({$ip}), defaulting to null");
+
                 return null;
             }
 
@@ -105,23 +107,25 @@ class IpGeolocationService extends BaseService
                     $location = geoip()->getLocation($ip);
                     // Check if location object has iso_code (standard for torann/geoip) or country_code
                     $code = $location->iso_code ?? $location->country_code ?? null;
-                    
+
                     if ($code) {
                         Log::info("IpGeolocationService: Detected country {$code} for IP {$ip} (torann/geoip)");
+
                         return strtoupper($code);
                     }
                 } catch (\Exception $e) {
-                    Log::warning("IpGeolocationService: Error using geoip() for IP {$ip}: " . $e->getMessage());
+                    Log::warning("IpGeolocationService: Error using geoip() for IP {$ip}: ".$e->getMessage());
                     // Create empty catch block to allow falling back to next method
                 }
             }
 
             // Try using stevebauman/location package if available
-            if (class_exists(\Stevebauman\Location\Facades\Location::class)) {
-                $location = \Stevebauman\Location\Facades\Location::get($ip);
+            if (class_exists(Location::class)) {
+                $location = Location::get($ip);
 
                 if ($location && $location->countryCode) {
                     Log::info("IpGeolocationService: Detected country {$location->countryCode} for IP {$ip}");
+
                     return strtoupper($location->countryCode);
                 }
             }
@@ -131,15 +135,18 @@ class IpGeolocationService extends BaseService
                 $countryCode = geoip_country_code_by_name($ip);
                 if ($countryCode) {
                     Log::info("IpGeolocationService: Detected country {$countryCode} for IP {$ip} (geoip)");
+
                     return strtoupper($countryCode);
                 }
             }
 
             Log::warning("IpGeolocationService: Could not detect country for IP {$ip}");
+
             return null;
 
         } catch (\Exception $e) {
-            Log::error("IpGeolocationService: Error detecting country for IP {$ip}: " . $e->getMessage());
+            Log::error("IpGeolocationService: Error detecting country for IP {$ip}: ".$e->getMessage());
+
             return null;
         }
     }
@@ -147,12 +154,12 @@ class IpGeolocationService extends BaseService
     /**
      * Check if country code is an Arab country
      *
-     * @param string|null $countryCode
+     * @param  string|null  $countryCode
      * @return bool
      */
     public function isArabCountry($countryCode)
     {
-        if (!$countryCode) {
+        if (! $countryCode) {
             return false;
         }
 
@@ -163,7 +170,7 @@ class IpGeolocationService extends BaseService
      * Get language for IP address
      * Returns 'ar' for Arab countries, 'en' otherwise
      *
-     * @param string $ip
+     * @param  string  $ip
      * @return string
      */
     public function getLanguageForIp($ip)
@@ -172,10 +179,12 @@ class IpGeolocationService extends BaseService
 
         if ($this->isArabCountry($countryCode)) {
             Log::info("IpGeolocationService: Arabic language selected for IP {$ip} (country: {$countryCode})");
+
             return 'ar';
         }
 
-        Log::info("IpGeolocationService: English language selected for IP {$ip} (country: " . ($countryCode ?? 'unknown') . ")");
+        Log::info("IpGeolocationService: English language selected for IP {$ip} (country: ".($countryCode ?? 'unknown').')');
+
         return 'en';
     }
 
@@ -183,8 +192,8 @@ class IpGeolocationService extends BaseService
      * Get language for user
      * Priority: User preference > IP detection > Default (en)
      *
-     * @param \App\Models\User $user
-     * @param string|null $ip
+     * @param  User  $user
+     * @param  string|null  $ip
      * @return string
      */
     public function getLanguageForUser($user, $ip = null)
@@ -192,6 +201,7 @@ class IpGeolocationService extends BaseService
         // Check if user has a language preference set
         if (isset($user->language) && in_array($user->language, array_keys(config('languages.supported', [])))) {
             Log::info("IpGeolocationService: Using user preference language: {$user->language} for user {$user->id}");
+
             return $user->language;
         }
 
@@ -202,13 +212,14 @@ class IpGeolocationService extends BaseService
 
         // Default to English
         Log::info("IpGeolocationService: Defaulting to English for user {$user->id}");
+
         return 'en';
     }
 
     /**
      * Check if IP is local/private
      *
-     * @param string $ip
+     * @param  string  $ip
      * @return bool
      */
     protected function isLocalIp($ip)
@@ -225,15 +236,16 @@ class IpGeolocationService extends BaseService
 
         return false;
     }
+
     /**
      * Get currency code for country
      *
-     * @param string|null $countryCode
+     * @param  string|null  $countryCode
      * @return string|null
      */
     public function getCurrencyCodeForCountry($countryCode)
     {
-        if (!$countryCode) {
+        if (! $countryCode) {
             return null;
         }
 
@@ -243,12 +255,13 @@ class IpGeolocationService extends BaseService
     /**
      * Get currency code for IP
      *
-     * @param string $ip
+     * @param  string  $ip
      * @return string|null
      */
     public function getCurrencyCodeForIp($ip)
     {
         $countryCode = $this->getCountryFromIp($ip);
+
         return $this->getCurrencyCodeForCountry($countryCode);
     }
 }

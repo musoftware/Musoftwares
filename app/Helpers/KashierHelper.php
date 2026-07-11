@@ -2,16 +2,21 @@
 
 namespace App\Helpers;
 
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\User;
+
 class KashierHelper
 {
     public static function generateHash($merchantId, $orderId, $amount, $currency, $customerReference)
     {
         $secretKey = config('services.kashier.secret_key');
-        $stringToHash = $merchantId . "." . $orderId . "." . $amount . "." . $currency;
-        $path = "/?payment=" . $stringToHash;
+        $stringToHash = $merchantId.'.'.$orderId.'.'.$amount.'.'.$currency;
+        $path = '/?payment='.$stringToHash;
         if ($customerReference) {
-            $path .= "." . $customerReference;
+            $path .= '.'.$customerReference;
         }
+
         return hash_hmac('sha256', $path, $secretKey, false);
     }
 
@@ -19,15 +24,15 @@ class KashierHelper
      * Parses the webhook amount safely into the user's currency.
      * Uses the original_amount if available, otherwise converts from EGP.
      */
-    public static function getWebhookAmountInUserCurrency(float $webhookAmount, array $metadata, \App\Models\User $user): float
+    public static function getWebhookAmountInUserCurrency(float $webhookAmount, array $metadata, User $user): float
     {
         if (isset($metadata['original_amount'])) {
             return floatval($metadata['original_amount']);
         }
 
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
         if ($egpCurrency && $user->currency != $egpCurrency->id) {
-            return \App\Models\CurrenciesExchange::RateToday($webhookAmount, $egpCurrency->id, $user->currency);
+            return CurrenciesExchange::RateToday($webhookAmount, $egpCurrency->id, $user->currency);
         }
 
         return $webhookAmount;
@@ -36,9 +41,9 @@ class KashierHelper
     public static function validatePayload($rawPayload = null, $kashierSignature = null): bool
     {
         $paymentApiKey = config('services.kashier.secret_key');
-        
+
         if ($rawPayload === null) {
-            if (!request()->isMethod('POST')) {
+            if (! request()->isMethod('POST')) {
                 return false;
             }
             $rawPayload = request()->getContent();
@@ -46,11 +51,11 @@ class KashierHelper
         }
 
         $json_data = is_array($rawPayload) ? $rawPayload : json_decode($rawPayload, true);
-        if (!$json_data || !isset($json_data['data'])) {
+        if (! $json_data || ! isset($json_data['data'])) {
             return false;
         }
         $data_obj = $json_data['data'];
-        if (!isset($data_obj['signatureKeys']) || !is_array($data_obj['signatureKeys'])) {
+        if (! isset($data_obj['signatureKeys']) || ! is_array($data_obj['signatureKeys'])) {
             return false;
         }
         sort($data_obj['signatureKeys']);
@@ -61,8 +66,9 @@ class KashierHelper
                 $data[$key] = $data_obj[$key];
             }
         }
-        $queryString = http_build_query($data, "", '&', PHP_QUERY_RFC3986);
+        $queryString = http_build_query($data, '', '&', PHP_QUERY_RFC3986);
         $signature = hash_hmac('sha256', $queryString, $paymentApiKey, false);
+
         return hash_equals($signature, (string) $kashierSignature);
     }
 }

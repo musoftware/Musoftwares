@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Admin\Contract;
 
+use App\Models\Contract;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreContractRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->can('create', \App\Models\Contract::class);
+        return $this->user() && $this->user()->can('create', Contract::class);
     }
 
     public function rules(): array

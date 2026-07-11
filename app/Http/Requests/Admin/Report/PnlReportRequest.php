@@ -15,7 +15,7 @@ class PnlReportRequest extends FormRequest
     {
         return [
             'from' => 'nullable|date',
-            'to'   => 'nullable|date|after_or_equal:from',
+            'to' => 'nullable|date|after_or_equal:from',
         ];
     }
 }

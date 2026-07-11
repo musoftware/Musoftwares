@@ -1,5 +1,5 @@
 ---
-description: Guidelines and architecture for decoupling the Contract and Proposal system into a standalone, 100% free Independent SaaS (iSAAS) for freelancers.
+description: DEPRECATED — The Freelance / freelancer iSAAS module has been removed (see EX2 history). This workflow is retained for historical reference only; new contracts/proposals live in the regular iSaaS contract surface (`app/Http/Controllers/iSaaS/ContractController.php`), not a freelancer portal.
 ---
 
 

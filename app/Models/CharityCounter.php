@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CharityCounter extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -45,7 +44,7 @@ class CharityCounter extends Model
     /**
      * إضافة مبلغ لعداد الخير
      */
-    public function addAmount(float $amount, string $description, string $referenceType = null, string $referenceId = null): CharityTransaction
+    public function addAmount(float $amount, string $description, ?string $referenceType = null, ?string $referenceId = null): CharityTransaction
     {
         $balanceBefore = $this->balance;
         $this->balance += $amount;
@@ -67,7 +66,7 @@ class CharityCounter extends Model
     /**
      * خصم مبلغ من عداد الخير
      */
-    public function subtractAmount(float $amount, string $description, string $referenceType = null, string $referenceId = null): CharityTransaction
+    public function subtractAmount(float $amount, string $description, ?string $referenceType = null, ?string $referenceId = null): CharityTransaction
     {
         if (round($this->balance, 2) < round($amount, 2)) {
             throw new \Exception('الرصيد غير كافي في عداد الخير');
@@ -112,6 +111,7 @@ class CharityCounter extends Model
     {
         $totalCredit = CharityTransaction::where('type', 'credit')->sum('amount');
         $totalDebit = CharityTransaction::where('type', 'debit')->sum('amount');
+
         return $totalCredit - $totalDebit;
     }
 
@@ -137,7 +137,7 @@ class CharityCounter extends Model
     public static function subtractFromGlobalCounter(float $amount, string $description, int $adminUserId): CharityTransaction
     {
         $globalBalance = self::getGlobalBalance();
-        
+
         if (round($globalBalance, 2) < round($amount, 2)) {
             throw new \Exception('الرصيد العام غير كافي لهذا الخصم');
         }
@@ -149,7 +149,7 @@ class CharityCounter extends Model
             'amount' => $amount,
             'description' => $description,
             'reference_type' => 'admin_subtract',
-            'reference_id' => 'admin_' . $adminUserId,
+            'reference_id' => 'admin_'.$adminUserId,
             'balance_before' => $globalBalance,
             'balance_after' => $globalBalance - $amount,
         ]);
@@ -169,7 +169,7 @@ class CharityCounter extends Model
             'amount' => $amount,
             'description' => $description,
             'reference_type' => 'admin_add',
-            'reference_id' => 'admin_' . $adminUserId,
+            'reference_id' => 'admin_'.$adminUserId,
             'balance_before' => $globalBalance,
             'balance_after' => $globalBalance + $amount,
         ]);

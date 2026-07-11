@@ -21,7 +21,7 @@ class WalletTransfer extends Model
         'converted_currency',
         'reason',
         'status',
-        'processed_at'
+        'processed_at',
     ];
 
     protected $casts = [
@@ -34,7 +34,9 @@ class WalletTransfer extends Model
 
     // Status Constants
     const STATUS_COMPLETED = 'completed';
+
     const STATUS_CANCELLED = 'cancelled';
+
     const STATUS_FAILED = 'failed';
 
     /**

@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Builders\KashierCheckoutBuilder;
+use App\Helpers\KashierHelper;
+use App\Models\Plan;
+use App\Models\Transaction;
+use App\Models\User;
+use App\Models\UserSubscription;
+use App\Services\IpGeolocationService;
+use App\Services\PricingService;
+use App\Services\SubscriptionService;
+use App\Traits\ConvertsCurrency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\Plan;
-use Modules\ERP\Models\Tenant;
-use App\Models\Transaction;
-use App\Helpers\KashierHelper;
-use App\Services\SubscriptionService;
-use Carbon\Carbon;
 use Inertia\Inertia;
 
 class SubscriptionController extends Controller
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
     protected $subscriptionService;
 
@@ -31,10 +34,9 @@ class SubscriptionController extends Controller
     public function plans(Request $request)
     {
         $data = $this->subscriptionService->getPlansPageData(Auth::user());
+
         return Inertia::render('Client/Subscriptions/Plans', $data);
     }
-
-
 
     /**
      * Subscribe to a fixed plan using wallet balance.
@@ -42,15 +44,15 @@ class SubscriptionController extends Controller
     public function subscribe(Request $request)
     {
         $request->validate([
-            'plan_id'       => 'nullable|exists:plans,id',
-            'items'         => 'nullable|array',
+            'plan_id' => 'nullable|exists:plans,id',
+            'items' => 'nullable|array',
             'billing_cycle' => 'required|string',
             'is_new_system' => 'nullable|boolean',
         ]);
 
         $user = Auth::user();
         $this->subscriptionService->validateAddonParents($request->items, $user);
-        
+
         $currencyDetails = $this->subscriptionService->getUserCurrencyDetails($user);
         $billingCycle = $request->input('billing_cycle', '1_year');
         $billing = $this->subscriptionService->getBillingCycleDetails($billingCycle);
@@ -63,7 +65,7 @@ class SubscriptionController extends Controller
 
         $plan_amount = $currencyDetails['currencyCode'] === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
         $isNewSystem = $request->input('is_new_system', true);
-        
+
         if ($user->user_balance < $plan_amount) {
             return back()->withErrors(['error' => 'Insufficient balance.']);
         }
@@ -74,18 +76,18 @@ class SubscriptionController extends Controller
             return redirect()->route('subscriptions.manage')->with('success', __('general.subscribed_to_modules_successfully'));
 
         } catch (\Exception $e) {
-            Log::error('Platform subscription failed: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'An error occurred: ' . $e->getMessage()]);
+            Log::error('Platform subscription failed: '.$e->getMessage());
+
+            return back()->withErrors(['error' => 'An error occurred: '.$e->getMessage()]);
         }
     }
-
 
     public function subscribeCustom(Request $request)
     {
         return back()->withErrors(['error' => 'Custom plans not supported in legacy system.']);
     }
 
-    public function calculateCustomPrice(Request $request, \App\Services\IpGeolocationService $geoService)
+    public function calculateCustomPrice(Request $request, IpGeolocationService $geoService)
     {
         $request->validate([
             'items' => 'nullable|array',
@@ -102,7 +104,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'toolsDiscount' => 0,
                 'annualDiscount' => 0,
-                'total' => 0
+                'total' => 0,
             ]);
         }
 
@@ -117,15 +119,15 @@ class SubscriptionController extends Controller
         return response()->json([
             'toolsDiscount' => $breakdown['tools_discount'],
             'annualDiscount' => $breakdown['annual_discount'],
-            'total' => $breakdown['total']
+            'total' => $breakdown['total'],
         ]);
     }
 
     public function checkoutKashier(Request $request)
     {
         $request->validate([
-            'plan_id'       => 'nullable|exists:plans,id',
-            'items'         => 'nullable|array',
+            'plan_id' => 'nullable|exists:plans,id',
+            'items' => 'nullable|array',
             'billing_cycle' => 'required|string',
             'is_new_system' => 'nullable|boolean',
         ]);
@@ -133,7 +135,7 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $this->subscriptionService->validateAddonParents($request->items, $user);
         $isNewSystem = $request->input('is_new_system', false);
-        
+
         $currencyDetails = $this->subscriptionService->getUserCurrencyDetails($user);
         $billingCycle = $request->input('billing_cycle', '1_year');
         $billing = $this->subscriptionService->getBillingCycleDetails($billingCycle);
@@ -146,7 +148,7 @@ class SubscriptionController extends Controller
 
         $plan_amount = $currencyDetails['currencyCode'] === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
 
-        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+        $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($plan_amount, $currencyDetails['currencyCode'])
             ->forUser($user->id, $user->name, $user->email)
             ->withSource('subscription-purchase', 'sub_')
@@ -169,9 +171,9 @@ class SubscriptionController extends Controller
 
     public function webhook(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('Subscription Kashier Webhook received:', $request->all());
+        Log::info('Subscription Kashier Webhook received:', $request->all());
 
-        if (\App\Helpers\KashierHelper::validatePayload()) {
+        if (KashierHelper::validatePayload()) {
             if ($request->input('data.status') === 'SUCCESS') {
                 $data = $request->input('data');
                 $metadata = $data['metaData'] ?? [];
@@ -186,10 +188,10 @@ class SubscriptionController extends Controller
                 $isNewSystem = $metadata['is_new_system'] ?? true;
 
                 if ($userId && $trxId && $amountPaid > 0) {
-                    $user = \App\Models\User::find($userId);
-                    
+                    $user = User::find($userId);
+
                     if ($user) {
-                        $amountPaid = \App\Helpers\KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
+                        $amountPaid = KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
 
                         // Idempotency check
                         $reason = "Subscription modules via Kashier online payment (Trx: $trxId)";
@@ -197,21 +199,24 @@ class SubscriptionController extends Controller
                             ->where('reason', $reason)
                             ->exists();
 
-                        if (!$alreadyProcessed) {
+                        if (! $alreadyProcessed) {
                             try {
                                 $this->subscriptionService->processSubscription($user, $amountPaid, $days, $metadata['items'] ?? [], $isNewSystem, $reason, 'webhook_received');
-                                \Illuminate\Support\Facades\Log::info("Kashier subscription processed successfully for User $userId");
+                                Log::info("Kashier subscription processed successfully for User $userId");
+
                                 return response()->json(['status' => 'success', 'message' => 'Subscription processed successfully']);
                             } catch (\Exception $e) {
-                                \Illuminate\Support\Facades\Log::error('Kashier subscription failed: ' . $e->getMessage());
+                                Log::error('Kashier subscription failed: '.$e->getMessage());
                             }
                         } else {
-                            \Illuminate\Support\Facades\Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
+                            Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
+
                             return response()->json(['status' => 'success', 'message' => 'Already processed']);
                         }
                     }
                 }
             }
+
             return response()->json(['status' => 'ignored']);
         }
 
@@ -234,6 +239,7 @@ class SubscriptionController extends Controller
     public function manage(Request $request)
     {
         $data = $this->subscriptionService->getManagePageData(Auth::user());
+
         return Inertia::render('Client/Subscriptions/Manage', $data);
     }
 
@@ -243,7 +249,7 @@ class SubscriptionController extends Controller
     public function cancel(Request $request)
     {
         $request->validate(['id' => 'required|exists:user_subscriptions,id']);
-        $sub = \App\Models\UserSubscription::where('id', $request->id)
+        $sub = UserSubscription::where('id', $request->id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
@@ -259,21 +265,21 @@ class SubscriptionController extends Controller
     {
         $request->validate(['id' => 'required|exists:user_subscriptions,id']);
         $user = Auth::user();
-        $sub = \App\Models\UserSubscription::where('id', $request->id)
+        $sub = UserSubscription::where('id', $request->id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 
         // get pricing
-        $pricingService = app(\App\Services\PricingService::class);
+        $pricingService = app(PricingService::class);
         $serviceItems = $pricingService->getServiceItems();
         $item = collect($serviceItems)->firstWhere('id', $sub->object);
-        if (!$item) {
+        if (! $item) {
             return back()->withErrors(['error' => 'Module no longer available.']);
         }
 
         $price = $item['monthly_price'] ?? 0;
         $userBalance = (float) $user->available_balance();
-        
+
         $proratedDays = null;
         if ($userBalance < $price) {
             if ($userBalance > 0 && $price > 0) {
@@ -294,11 +300,12 @@ class SubscriptionController extends Controller
             if ($proratedDays) {
                 return back()->with('success', "Subscription partially renewed for {$proratedDays} days.");
             }
+
             return back()->with('success', __('general.subscription_renewed_successfully'));
         } catch (\Exception $e) {
-            Log::error('Manual renewal failed: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to renew: ' . $e->getMessage()]);
+            Log::error('Manual renewal failed: '.$e->getMessage());
+
+            return back()->withErrors(['error' => 'Failed to renew: '.$e->getMessage()]);
         }
     }
 }
-

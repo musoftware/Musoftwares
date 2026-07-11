@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Helpers\FinanceHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class Plan extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $softDelete = true;
+
     protected $guarded = [];
 
     protected function current_currency()
@@ -33,6 +34,7 @@ class Plan extends Model
         if ($pct <= 0) {
             return $amount;
         }
+
         return $amount - ($amount * $pct / 100);
     }
 
@@ -40,7 +42,8 @@ class Plan extends Model
     {
         $currencyId = $this->current_currency();
         $raw = CurrenciesExchange::RateToday($this->plan_price, $this->plan_currency, $currencyId);
-        return \App\Helpers\FinanceHelper::instance()->price_fixer($raw, $currencyId);
+
+        return FinanceHelper::instance()->price_fixer($raw, $currencyId);
     }
 
     public function plan_duration_short()
@@ -52,19 +55,19 @@ class Plan extends Model
         } elseif ($this->plan_duration == 365) {
             return 'yr'; // 365 days as a year
         } elseif ($this->plan_duration % 30 == 0) {
-            return ($this->plan_duration / 30) . 'mo'; // Any multiple of 30 days as months
+            return ($this->plan_duration / 30).'mo'; // Any multiple of 30 days as months
         } elseif ($this->plan_duration % 7 == 0) {
-            return ($this->plan_duration / 7) . 'wk'; // Any multiple of 7 days as weeks
+            return ($this->plan_duration / 7).'wk'; // Any multiple of 7 days as weeks
         } elseif ($this->plan_duration % 365 == 0) {
-            return ($this->plan_duration / 365) . 'yr'; // Any multiple of 365 days as years
+            return ($this->plan_duration / 365).'yr'; // Any multiple of 365 days as years
         } else {
-            return $this->plan_duration . 'd'; // Default: remaining days
+            return $this->plan_duration.'d'; // Default: remaining days
         }
     }
 
     public function current_plan_price_str()
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_plan_price(), $this->current_currency());
+        return FinanceHelper::instance()->format_money($this->current_plan_price(), $this->current_currency());
     }
 
     public function getPlanDescriptionAttribute()

@@ -2,18 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Models\AdminSettings;
-use App\Models\Currency;
-use App\Models\User;
-use App\Services\GameArterService;
-use App\Services\GameMonetizeService;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Module\RoundnessModule;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 
 class ImageHelper
@@ -43,7 +31,7 @@ class ImageHelper
             $compressedImage = $image->encode($imageType, 70);
 
             // Get the new base64 representation of the compressed image
-            $newBase64 = 'data:image/' . $imageType . ';base64,' . base64_encode($compressedImage);
+            $newBase64 = 'data:image/'.$imageType.';base64,'.base64_encode($compressedImage);
 
             // Return the updated <img> tag with the new base64 src
             return str_replace($matches[2], base64_encode($compressedImage), $matches[0]);
@@ -52,8 +40,4 @@ class ImageHelper
         // Replace all matched <img> tags with the processed ones
         return preg_replace_callback($pattern, $callback, $htmlContent);
     }
-
-
-
-
 }

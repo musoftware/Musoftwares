@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\UpdateInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Models\AdminSettings;
+use App\Models\CostTransaction;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\GoldPrice;
@@ -22,11 +23,9 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Notifications\InvoiceCreatedNotification;
 use App\Services\InvoiceService;
-use App\Models\CostTransaction;
 use App\Services\WhatsAppNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
@@ -318,23 +317,6 @@ class InvoiceController extends Controller
                 ];
             });
 
-        // Wallet / payment ledger rows where invoice_id column matches.
-        $walletTransactions = \App\Models\WalletTransaction::query()
-            ->where('invoice_id', $invoice->id)
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(function ($w) {
-                return [
-                    'id' => $w->id,
-                    'created_at' => $w->created_at?->toIso8601String(),
-                    'amount' => (float) ($w->amount ?? 0),
-                    'currency' => $w->currency_id,
-                    'type' => $w->type,
-                    'wallet_id' => $w->wallet_id,
-                    'source' => 'WalletTransaction',
-                ];
-            });
-
         return Inertia::render('Admin/Invoices/LinkedTransactions', [
             'invoice' => [
                 'id' => $invoice->id,
@@ -360,12 +342,10 @@ class InvoiceController extends Controller
             'transactions' => $transactions,
             'costTransactions' => $costTransactions,
             'costLines' => $costLines,
-            'walletTransactions' => $walletTransactions,
             'counts' => [
                 'transactions' => $transactions->count(),
                 'cost_transactions' => $costTransactions->count(),
                 'cost_lines' => $costLines->count(),
-                'wallet_transactions' => $walletTransactions->count(),
             ],
         ]);
     }

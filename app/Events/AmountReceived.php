@@ -11,8 +11,11 @@ class AmountReceived
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $client;
+
     public $amount;
+
     public $reason;
+
     public $currencyId;
 
     /**
@@ -27,8 +30,8 @@ class AmountReceived
         $this->reason = $reason;
         $this->currencyId = $currencyId;
 
-        if (!$this->currencyId) {
-            throw new \Exception("AmountReceived event is missing currency_id.");
+        if (! $this->currencyId) {
+            throw new \Exception('AmountReceived event is missing currency_id.');
         }
     }
 }

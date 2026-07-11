@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\RecurringService;
+use Illuminate\Console\Command;
 
 class ProcessRecurringEntries extends Command
 {

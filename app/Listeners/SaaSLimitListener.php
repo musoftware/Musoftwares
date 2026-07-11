@@ -2,8 +2,7 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Notifications\SaaSLimitApproachingNotification;
 use Illuminate\Support\Facades\Log;
 
 class SaaSLimitListener
@@ -19,9 +18,9 @@ class SaaSLimitListener
             'usage_key' => $event->tenantUsage->usage_key ?? null,
             'percentage' => $event->percentageUsed ?? null,
         ]);
-        
+
         if (isset($event->tenantUsage) && isset($event->tenantUsage->user)) {
-            $event->tenantUsage->user->notify(new \App\Notifications\SaaSLimitApproachingNotification($event->tenantUsage, $event->percentageUsed));
+            $event->tenantUsage->user->notify(new SaaSLimitApproachingNotification($event->tenantUsage, $event->percentageUsed));
         }
     }
 }

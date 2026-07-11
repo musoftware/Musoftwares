@@ -2,13 +2,14 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\TenantUsage;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class SaaSResetMetersCommand extends Command
 {
     protected $signature = 'saas:reset-meters';
+
     protected $description = 'Scans tenant usages and resets those that have passed their reset_frequency interval.';
 
     public function handle()

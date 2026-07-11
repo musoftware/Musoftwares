@@ -27,13 +27,14 @@ class MigrateLegacyDatabase extends Command
     public function handle()
     {
         $this->info('Starting legacy database migration...');
-        
+
         // Test old DB connection
         try {
             DB::connection('old_mysql')->getPdo();
         } catch (\Exception $e) {
             $this->error('Could not connect to the legacy database. Please ensure DB_OLD_DATABASE is configured in .env and the database exists.');
             $this->error($e->getMessage());
+
             return 1;
         }
 
@@ -42,28 +43,29 @@ class MigrateLegacyDatabase extends Command
         if ($step === 'all' || $step === 'users') {
             $this->migrateUsers();
         }
-        
+
         if ($step === 'all' || $step === 'financials') {
             $this->migrateFinancials();
         }
-        
+
         if ($step === 'all' || $step === 'coworkers') {
             $this->migrateCoworkers();
         }
-        
+
         if ($step === 'all' || $step === 'marketplace') {
             $this->migrateMarketplace();
         }
-        
+
         if ($step === 'all' || $step === 'subscriptions') {
             $this->migrateSubscriptions();
         }
-        
+
         if ($step === 'all' || $step === 'crm') {
             $this->migrateCrm();
         }
 
         $this->info('Migration completed successfully.');
+
         return 0;
     }
 
@@ -88,7 +90,7 @@ class MigrateLegacyDatabase extends Command
             }
             // Use insertOrIgnore to prevent duplicates if run multiple times
             DB::table('users')->insertOrIgnore($newUsers);
-            $this->info("Migrated " . count($users) . " users.");
+            $this->info('Migrated '.count($users).' users.');
         });
     }
 
@@ -158,18 +160,18 @@ class MigrateLegacyDatabase extends Command
                     // Attach skill to freelancer
                     DB::table('platform_freelancer_skill')->updateOrInsert([
                         'freelancer_id' => $coworker->id,
-                        'skill_id' => $tag->id
+                        'skill_id' => $tag->id,
                     ]);
                 }
             }
-            $this->info("Migrated " . count($coworkers) . " coworkers to freelancers.");
+            $this->info('Migrated '.count($coworkers).' coworkers to freelancers.');
         });
     }
 
     protected function migrateMarketplace()
     {
         $this->info('Migrating Legacy Services to Marketplace...');
-        
+
         // 1. Migrate Categories
         $this->info('Migrating Service Categories...');
         DB::connection('old_mysql')->table('service_categories')->orderBy('id')->chunk(100, function ($categories) {
@@ -177,8 +179,8 @@ class MigrateLegacyDatabase extends Command
             foreach ($categories as $cat) {
                 $newCategories[] = [
                     'id' => $cat->id,
-                    'name' => $cat->title ?? 'Category ' . $cat->id,
-                    'slug' => $cat->slug ?? 'category-' . $cat->id,
+                    'name' => $cat->title ?? 'Category '.$cat->id,
+                    'slug' => $cat->slug ?? 'category-'.$cat->id,
                     'description' => '',
                     'created_at' => $cat->created_at,
                     'updated_at' => $cat->updated_at,
@@ -193,7 +195,9 @@ class MigrateLegacyDatabase extends Command
             foreach ($services as $service) {
                 // Ensure seller exists
                 $sellerExists = DB::table('users')->where('id', $service->user_id)->exists();
-                if (!$sellerExists) continue;
+                if (! $sellerExists) {
+                    continue;
+                }
 
                 // Insert Service
                 DB::table('marketplace_services')->insertOrIgnore([
@@ -221,7 +225,7 @@ class MigrateLegacyDatabase extends Command
                     'updated_at' => $service->updated_at,
                 ]);
             }
-            $this->info("Migrated a chunk of services.");
+            $this->info('Migrated a chunk of services.');
         });
     }
 

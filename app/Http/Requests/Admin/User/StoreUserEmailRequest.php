@@ -11,18 +11,19 @@ class StoreUserEmailRequest extends FormRequest
     public function authorize(): bool
     {
         $user = $this->user();
+
         return $user !== null && $user->isAdmin();
     }
 
     public function rules(): array
     {
         $userParam = $this->route('user');
-        $userId    = is_object($userParam) && method_exists($userParam, 'getKey')
+        $userId = is_object($userParam) && method_exists($userParam, 'getKey')
             ? (int) $userParam->getKey()
             : (int) ($userParam ?? 0);
 
         return [
-            'email'       => [
+            'email' => [
                 'required',
                 'string',
                 'email:rfc',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SsoToken;
+use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -16,7 +17,7 @@ class SsoController extends Controller
     public function redirect(Request $request, $system)
     {
         // Must be logged in
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
@@ -38,24 +39,22 @@ class SsoController extends Controller
         // Redirect based on the target system
         $targetUrl = '';
         if ($system === 'erp') {
-            $targetUrl = config('services.erp.url') . '/sso/callback';
+            $targetUrl = config('services.erp.url').'/sso/callback';
         } elseif ($system === 'crm') {
-            $targetUrl = config('services.crm.url') . '/sso/callback';
+            $targetUrl = config('services.crm.url').'/sso/callback';
         } elseif ($system === 'affsys') {
-            $targetUrl = config('services.affsys.url') . '/sso/callback';
+            $targetUrl = config('services.affsys.url').'/sso/callback';
         } elseif ($system === 'bookingsys') {
-            $targetUrl = config('services.bookingsys.url') . '/sso/callback';
-        } elseif ($system === 'freelancesys') {
-            $targetUrl = config('services.freelancesys.url') . '/sso/callback';
+            $targetUrl = config('services.bookingsys.url').'/sso/callback';
         } elseif ($system === 'goldsaversys') {
-            $targetUrl = config('services.goldsaversys.url') . '/sso/callback';
+            $targetUrl = config('services.goldsaversys.url').'/sso/callback';
         } elseif ($system === 'toolsys') {
-            $targetUrl = config('services.toolsys.url') . '/sso/callback';
+            $targetUrl = config('services.toolsys.url').'/sso/callback';
         } else {
             abort(404, 'System not found');
         }
 
-        return Inertia::location($targetUrl . '?token=' . $token);
+        return Inertia::location($targetUrl.'?token='.$token);
     }
 
     /**
@@ -68,7 +67,7 @@ class SsoController extends Controller
     {
         $tokenString = $request->input('token');
 
-        if (!$tokenString) {
+        if (! $tokenString) {
             return response()->json(['error' => 'Token is missing'], 400);
         }
 
@@ -77,39 +76,39 @@ class SsoController extends Controller
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$ssoToken) {
+        if (! $ssoToken) {
             return response()->json(['error' => 'Invalid or expired token'], 401);
         }
 
         // Mark as used
         $ssoToken->update(['used_at' => now()]);
 
-        $user     = $ssoToken->user;
-        $system   = $ssoToken->target_system;
+        $user = $ssoToken->user;
+        $system = $ssoToken->target_system;
 
         // Fetch the user's subscription for the target system (e.g. 'erp', 'goldsaversys')
         $subscriptionPrefix = config("saas.system_to_module.{$system}", $system);
 
-        $subscription = \App\Models\UserSubscription::where('user_id', $user->id)
-            ->where('object', 'like', $subscriptionPrefix . '%')
+        $subscription = UserSubscription::where('user_id', $user->id)
+            ->where('object', 'like', $subscriptionPrefix.'%')
             ->where('status', 'active')
             ->where(function ($q) {
                 $q->whereNull('expires_at')
-                  ->orWhere('expires_at', '>', now());
+                    ->orWhere('expires_at', '>', now());
             })
             ->orderBy('expires_at', 'desc')
             ->first(['object', 'status', 'expires_at']);
 
         return response()->json([
             'user' => [
-                'id'    => $user->id,
-                'name'  => $user->name,
+                'id' => $user->id,
+                'name' => $user->name,
                 'email' => $user->email,
             ],
-            'system'       => $system,
+            'system' => $system,
             'subscription' => $subscription ? [
-                'object'     => $subscription->object,
-                'status'     => $subscription->status,
+                'object' => $subscription->object,
+                'status' => $subscription->status,
                 'expires_at' => $subscription->expires_at?->toIso8601String(),
             ] : null,
         ]);

@@ -8,6 +8,7 @@ use App\Models\PointSupport;
 use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -15,10 +16,6 @@ class UnifiedPointsHelper
 {
     /**
      * Calculate unified performance score for a user
-     *
-     * @param User $user
-     * @param array $options
-     * @return array
      */
     public static function calculateUnifiedScore(User $user, array $options = []): array
     {
@@ -29,7 +26,7 @@ class UnifiedPointsHelper
             'job_success' => 50.0,
             'membership_bonus' => 0.2,
             'invoice_performance' => 10.0,
-            'payment_reliability' => 15.0
+            'payment_reliability' => 15.0,
         ], $options['weights'] ?? []);
 
         // Calculate individual components
@@ -46,6 +43,7 @@ class UnifiedPointsHelper
         $totalScore = $pointsComponent + $spendingComponent + $activityComponent + $jobComponent +
             $membershipComponent + $invoiceComponent + $paymentReliabilityComponent;
         $totalScore = max(0, round($totalScore, 0));
+
         return [
             'total_score' => $totalScore,
             'components' => [
@@ -55,7 +53,7 @@ class UnifiedPointsHelper
                 'job_success' => round($jobComponent, 2),
                 'membership' => round($membershipComponent, 2),
                 'invoice_performance' => round($invoiceComponent, 2),
-                'payment_reliability' => round($paymentReliabilityComponent, 2)
+                'payment_reliability' => round($paymentReliabilityComponent, 2),
             ],
             'breakdown' => [
                 'raw_points' => $user->total_points ?? 0,
@@ -63,8 +61,8 @@ class UnifiedPointsHelper
                 'activity_hours' => $user->total_activity_hours ?? 0,
                 'job_success_rate' => $user->job_success_rate ?? 0,
                 'invoice_metrics' => self::getInvoiceMetrics($user),
-                'payment_metrics' => self::getPaymentMetrics($user)
-            ]
+                'payment_metrics' => self::getPaymentMetrics($user),
+            ],
         ];
     }
 
@@ -73,13 +71,13 @@ class UnifiedPointsHelper
      */
     private static function calculatePointsComponent(User $user): float
     {
-        if (!isset($user->total_points)) {
+        if (! isset($user->total_points)) {
             $user->total_points = $user->actions()
                 ->where('status', 'completed')
                 ->sum('coins_reward');
         }
 
-        return (float)($user->total_points ?? 0);
+        return (float) ($user->total_points ?? 0);
     }
 
     /**
@@ -87,14 +85,14 @@ class UnifiedPointsHelper
      */
     private static function calculateSpendingComponent(User $user): float
     {
-        if (!isset($user->total_spending)) {
+        if (! isset($user->total_spending)) {
             $user->total_spending = $user->transactions()
                 ->where('type', 'used')
                 ->where('business_calculated', '1')
                 ->sum(DB::raw('ABS(business_amount)'));
         }
 
-        return (float)($user->total_spending ?? 0);
+        return (float) ($user->total_spending ?? 0);
     }
 
     /**
@@ -102,7 +100,7 @@ class UnifiedPointsHelper
      */
     private static function calculateActivityComponent(User $user): float
     {
-        if (!isset($user->total_activity_hours)) {
+        if (! isset($user->total_activity_hours)) {
             $totalSeconds = $user->user_activity()
                 ->where('activity_date', '>=', now()->subDays(30))
                 ->sum('total_seconds');
@@ -110,7 +108,7 @@ class UnifiedPointsHelper
             $user->total_activity_hours = round($totalSeconds / 3600, 1);
         }
 
-        return (float)($user->total_activity_hours ?? 0);
+        return (float) ($user->total_activity_hours ?? 0);
     }
 
     /**
@@ -118,14 +116,14 @@ class UnifiedPointsHelper
      */
     private static function calculateJobComponent(User $user): float
     {
-        if (!isset($user->job_success_rate)) {
+        if (! isset($user->job_success_rate)) {
             $completedJobs = $user->userJobs()->where('status', 'completed')->count();
             $totalJobs = $user->userJobs()->count();
 
             $user->job_success_rate = $totalJobs > 0 ? round(($completedJobs / $totalJobs) * 100, 1) : 0;
         }
 
-        return (float)($user->job_success_rate ?? 0);
+        return (float) ($user->job_success_rate ?? 0);
     }
 
     /**
@@ -167,35 +165,35 @@ class UnifiedPointsHelper
                 'tier' => 'Platinum',
                 'level' => 'Elite',
                 'badge_color' => 'warning',
-                'description' => 'Top-tier performer with exceptional metrics'
+                'description' => 'Top-tier performer with exceptional metrics',
             ];
         } elseif ($unifiedScore >= 50000) {
             return [
                 'tier' => 'Gold',
                 'level' => 'Advanced',
                 'badge_color' => 'success',
-                'description' => 'High achiever with strong performance'
+                'description' => 'High achiever with strong performance',
             ];
         } elseif ($unifiedScore >= 25000) {
             return [
                 'tier' => 'Silver',
                 'level' => 'Intermediate',
                 'badge_color' => 'info',
-                'description' => 'Above average performance across metrics'
+                'description' => 'Above average performance across metrics',
             ];
         } elseif ($unifiedScore >= 10000) {
             return [
                 'tier' => 'Bronze',
                 'level' => 'Developing',
                 'badge_color' => 'primary',
-                'description' => 'Good foundation with room for growth'
+                'description' => 'Good foundation with room for growth',
             ];
         } else {
             return [
                 'tier' => 'Starter',
                 'level' => 'Beginning',
                 'badge_color' => 'secondary',
-                'description' => 'New member building their profile'
+                'description' => 'New member building their profile',
             ];
         }
     }
@@ -211,6 +209,7 @@ class UnifiedPointsHelper
                 ->map(function ($u) {
                     $score = self::calculateUnifiedScore($u);
                     $u->unified_score = $score['total_score'];
+
                     return $u;
                 })
                 ->sortByDesc('unified_score')
@@ -231,7 +230,7 @@ class UnifiedPointsHelper
             'percentile' => $percentile,
             'is_top_10' => $rank && $rank <= 10,
             'is_top_50' => $rank && $rank <= 50,
-            'is_top_100' => $rank && $rank <= 100
+            'is_top_100' => $rank && $rank <= 100,
         ];
     }
 
@@ -240,16 +239,16 @@ class UnifiedPointsHelper
      */
     public static function calculateConversionRate(): float
     {
-        $cacheKey = 'unified_conversion_rate_' . now()->format('Y-m-d-H');
+        $cacheKey = 'unified_conversion_rate_'.now()->format('Y-m-d-H');
 
         return Cache::remember($cacheKey, 3600, function () {
             $endDate = Carbon::now();
 
             // Calculate total money from transactions
             $totalMoney = abs(Transaction::where('type', 'used')
-                    ->where('created_at', '>', Carbon::parse('2025-1-1'))
-                    ->where('created_at', '<=', $endDate)
-                    ->sum('business_amount')) / 400;
+                ->where('created_at', '>', Carbon::parse('2025-1-1'))
+                ->where('created_at', '<=', $endDate)
+                ->sum('business_amount')) / 400;
 
             // Calculate total points from actions
             $totalPoints = Action::where('status', 'completed')
@@ -267,6 +266,7 @@ class UnifiedPointsHelper
             }
 
             $conversionRate = ($totalMoney + $totalSupportMoney) / $totalPoints;
+
             return max(0.01, round($conversionRate, 15));
         });
     }
@@ -288,13 +288,13 @@ class UnifiedPointsHelper
             $insights[] = [
                 'type' => 'success',
                 'title' => 'Top Performer',
-                'message' => "You're in the top 10 members! Excellent performance across all metrics."
+                'message' => "You're in the top 10 members! Excellent performance across all metrics.",
             ];
         } elseif ($ranking['is_top_50']) {
             $insights[] = [
                 'type' => 'info',
                 'title' => 'High Achiever',
-                'message' => "You're in the top 50 members. Keep up the great work!"
+                'message' => "You're in the top 50 members. Keep up the great work!",
             ];
         }
 
@@ -306,14 +306,14 @@ class UnifiedPointsHelper
         $insights[] = [
             'type' => 'primary',
             'title' => 'Strength Area',
-            'message' => "Your strongest performance area is " . ucfirst(str_replace('_', ' ', $maxComponent))
+            'message' => 'Your strongest performance area is '.ucfirst(str_replace('_', ' ', $maxComponent)),
         ];
 
         if ($components[$minComponent] < ($unifiedData['total_score'] * 0.1)) {
             $insights[] = [
                 'type' => 'warning',
                 'title' => 'Growth Opportunity',
-                'message' => "Consider focusing on " . ucfirst(str_replace('_', ' ', $minComponent)) . " to boost your overall score"
+                'message' => 'Consider focusing on '.ucfirst(str_replace('_', ' ', $minComponent)).' to boost your overall score',
             ];
         }
 
@@ -326,7 +326,7 @@ class UnifiedPointsHelper
             $insights[] = [
                 'type' => 'info',
                 'title' => 'Business Activity',
-                'message' => 'Start generating invoices to improve your business performance score.'
+                'message' => 'Start generating invoices to improve your business performance score.',
             ];
         }
 
@@ -335,16 +335,16 @@ class UnifiedPointsHelper
             'ranking' => $ranking,
             'insights' => $insights,
             'score_breakdown' => $unifiedData,
-            'payment_behavior' => $paymentInsights
+            'payment_behavior' => $paymentInsights,
         ];
     }
 
     /**
      * Get leaderboard with unified scoring
      */
-    public static function getUnifiedLeaderboard(int $limit = 50): \Illuminate\Support\Collection
+    public static function getUnifiedLeaderboard(int $limit = 50): Collection
     {
-        $cacheKey = "unified_leaderboard_{$limit}_" . now()->format('Y-m-d-H');
+        $cacheKey = "unified_leaderboard_{$limit}_".now()->format('Y-m-d-H');
 
         return Cache::remember($cacheKey, 1800, function () use ($limit) {
             return User::with(['actions', 'transactions', 'user_activity', 'userJobs', 'memberships.membership'])
@@ -365,6 +365,7 @@ class UnifiedPointsHelper
                 ->values()
                 ->map(function ($user, $index) {
                     $user->rank = $index + 1;
+
                     return $user;
                 });
         });
@@ -436,7 +437,7 @@ class UnifiedPointsHelper
             'unpaid_invoices' => $unpaidInvoices,
             'total_invoice_value' => $totalInvoiceValue,
             'payment_completion_rate' => round($paymentCompletionRate, 2),
-            'average_invoice_value' => $totalInvoices > 0 ? round($totalInvoiceValue / $totalInvoices, 2) : 0
+            'average_invoice_value' => $totalInvoices > 0 ? round($totalInvoiceValue / $totalInvoices, 2) : 0,
         ];
     }
 
@@ -503,7 +504,7 @@ class UnifiedPointsHelper
             'unpaid_invoices_count' => $unpaidCount,
             'on_time_payment_rate' => round($onTimePaymentRate, 2),
             'payment_reliability_score' => round(max(0, $reliabilityScore), 2),
-            'average_payment_days' => self::calculateAveragePaymentDays($invoices)
+            'average_payment_days' => self::calculateAveragePaymentDays($invoices),
         ];
     }
 
@@ -543,19 +544,19 @@ class UnifiedPointsHelper
             $insights[] = [
                 'type' => 'success',
                 'title' => 'Excellent Payment Record',
-                'message' => 'You have an outstanding payment history with ' . $paymentMetrics['on_time_payment_rate'] . '% on-time payments.'
+                'message' => 'You have an outstanding payment history with '.$paymentMetrics['on_time_payment_rate'].'% on-time payments.',
             ];
         } elseif ($paymentMetrics['on_time_payment_rate'] >= 70) {
             $insights[] = [
                 'type' => 'info',
                 'title' => 'Good Payment Reliability',
-                'message' => 'Your payment record is solid. Consider improving timing for better scores.'
+                'message' => 'Your payment record is solid. Consider improving timing for better scores.',
             ];
         } else {
             $insights[] = [
                 'type' => 'warning',
                 'title' => 'Payment Improvement Needed',
-                'message' => 'Late payments are affecting your score. Focus on timely payments to improve your ranking.'
+                'message' => 'Late payments are affecting your score. Focus on timely payments to improve your ranking.',
             ];
         }
 
@@ -564,7 +565,7 @@ class UnifiedPointsHelper
             $insights[] = [
                 'type' => 'danger',
                 'title' => 'Outstanding Invoices',
-                'message' => "You have {$paymentMetrics['unpaid_invoices_count']} unpaid invoice(s). Pay them to improve your score."
+                'message' => "You have {$paymentMetrics['unpaid_invoices_count']} unpaid invoice(s). Pay them to improve your score.",
             ];
         }
 
@@ -573,7 +574,7 @@ class UnifiedPointsHelper
             $insights[] = [
                 'type' => 'success',
                 'title' => 'High Business Activity',
-                'message' => 'Your high invoice volume demonstrates strong business engagement.'
+                'message' => 'Your high invoice volume demonstrates strong business engagement.',
             ];
         }
 

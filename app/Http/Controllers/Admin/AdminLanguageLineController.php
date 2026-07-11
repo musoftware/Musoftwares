@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\LanguageLine;
-use App\Services\TranslationService;
-use App\Http\Resources\LanguageLineResource;
 use App\Http\Requests\Admin\StoreLanguageLineRequest;
 use App\Http\Requests\Admin\UpdateLanguageLineRequest;
+use App\Http\Resources\LanguageLineResource;
+use App\Models\LanguageLine;
+use App\Services\TranslationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
@@ -26,8 +27,8 @@ class AdminLanguageLineController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('key', 'like', "%{$search}%")
-                  ->orWhere('group', 'like', "%{$search}%")
-                  ->orWhere('text', 'like', "%{$search}%");
+                    ->orWhere('group', 'like', "%{$search}%")
+                    ->orWhere('text', 'like', "%{$search}%");
             });
         }
 
@@ -36,18 +37,18 @@ class AdminLanguageLineController extends Controller
         }
 
         $lines = $query->latest()
-                       ->paginate(50)
-                       ->withQueryString()
-                       ->through(fn($l) => (new LanguageLineResource($l))->resolve());
+            ->paginate(50)
+            ->withQueryString()
+            ->through(fn ($l) => (new LanguageLineResource($l))->resolve());
 
         $groups = LanguageLine::distinct()->pluck('group');
         $supportedLocales = array_keys(config('languages.supported', ['en' => []]));
 
         return Inertia::render('Admin/LanguageLines/Index', [
-            'lines'            => $lines,
-            'groups'           => $groups,
+            'lines' => $lines,
+            'groups' => $groups,
             'supportedLocales' => $supportedLocales,
-            'filters'          => $request->only(['search', 'group']),
+            'filters' => $request->only(['search', 'group']),
         ]);
     }
 
@@ -75,7 +76,7 @@ class AdminLanguageLineController extends Controller
     public function autoTranslate(Request $request)
     {
         $request->validate([
-            'text'          => 'required|string',
+            'text' => 'required|string',
             'target_locale' => 'required|string',
             'source_locale' => 'nullable|string',
         ]);
@@ -87,7 +88,7 @@ class AdminLanguageLineController extends Controller
         );
 
         return response()->json([
-            'success'    => true,
+            'success' => true,
             'translated' => $translated,
         ]);
     }
@@ -99,17 +100,19 @@ class AdminLanguageLineController extends Controller
         $langPath = app()->langPath();
 
         foreach ($locales as $locale) {
-            $jsonFile = $langPath . DIRECTORY_SEPARATOR . "{$locale}.json";
+            $jsonFile = $langPath.DIRECTORY_SEPARATOR."{$locale}.json";
             if (file_exists($jsonFile)) {
                 $translations = json_decode(file_get_contents($jsonFile), true);
                 if (is_array($translations)) {
                     foreach ($translations as $key => $value) {
-                        if (!is_string($value)) continue;
+                        if (! is_string($value)) {
+                            continue;
+                        }
 
                         $line = LanguageLine::firstOrNew(['group' => '*', 'key' => $key]);
                         $text = $line->text ?? [];
-                        
-                        if (!isset($text[$locale]) || empty($text[$locale])) {
+
+                        if (! isset($text[$locale]) || empty($text[$locale])) {
                             $text[$locale] = $value;
                             $line->text = $text;
                             $line->save();
@@ -119,26 +122,30 @@ class AdminLanguageLineController extends Controller
                 }
             }
 
-            $localeDir = $langPath . DIRECTORY_SEPARATOR . $locale;
+            $localeDir = $langPath.DIRECTORY_SEPARATOR.$locale;
             if (is_dir($localeDir)) {
-                $files = glob($localeDir . DIRECTORY_SEPARATOR . '*.php');
+                $files = glob($localeDir.DIRECTORY_SEPARATOR.'*.php');
                 foreach ($files as $file) {
                     $group = basename($file, '.php');
                     try {
-                        $translations = include($file);
+                        $translations = include $file;
                     } catch (\Exception $e) {
                         continue;
                     }
-                    
-                    if (!is_array($translations)) continue;
 
-                    foreach (\Illuminate\Support\Arr::dot($translations) as $key => $value) {
-                        if (!is_string($value)) continue;
+                    if (! is_array($translations)) {
+                        continue;
+                    }
+
+                    foreach (Arr::dot($translations) as $key => $value) {
+                        if (! is_string($value)) {
+                            continue;
+                        }
 
                         $line = LanguageLine::firstOrNew(['group' => $group, 'key' => $key]);
                         $text = $line->text ?? [];
-                        
-                        if (!isset($text[$locale]) || empty($text[$locale])) {
+
+                        if (! isset($text[$locale]) || empty($text[$locale])) {
                             $text[$locale] = $value;
                             $line->text = $text;
                             $line->save();

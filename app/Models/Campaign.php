@@ -96,7 +96,7 @@ class Campaign extends Model
     public function scopeScheduled($query)
     {
         return $query->where('status', 'scheduled')
-                     ->whereNotNull('scheduled_at');
+            ->whereNotNull('scheduled_at');
     }
 
     /**
@@ -139,6 +139,7 @@ class Campaign extends Model
         if ($this->total_recipients == 0) {
             return 0;
         }
+
         return round(($this->sent_count / $this->total_recipients) * 100, 2);
     }
 

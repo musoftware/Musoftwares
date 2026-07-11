@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 class CheckMissingTranslations extends Command
 {
@@ -37,18 +37,18 @@ class CheckMissingTranslations extends Command
         ];
 
         $extensions = ['php', 'js', 'jsx', 'ts', 'tsx', 'vue'];
-        
+
         $foundKeys = [];
 
         foreach ($directories as $directory) {
-            if (!File::isDirectory($directory)) {
+            if (! File::isDirectory($directory)) {
                 continue;
             }
 
             $files = File::allFiles($directory);
 
             foreach ($files as $file) {
-                if (!in_array($file->getExtension(), $extensions)) {
+                if (! in_array($file->getExtension(), $extensions)) {
                     continue;
                 }
 
@@ -57,7 +57,7 @@ class CheckMissingTranslations extends Command
                 // Match __('general.key') or trans('general.key') or @lang('key')
                 preg_match_all("/(?:__|trans|@lang)\(\s*['\"]([^'\"]+)['\"]\s*\)/U", $content, $matches);
 
-                if (!empty($matches[1])) {
+                if (! empty($matches[1])) {
                     foreach ($matches[1] as $key) {
                         // Skip variables or dynamic keys like 'erp.'.$section
                         if (str_contains($key, '$') || str_contains($key, '{')) {
@@ -72,7 +72,7 @@ class CheckMissingTranslations extends Command
         $foundKeys = array_keys($foundKeys);
         sort($foundKeys);
 
-        $this->info("Found " . count($foundKeys) . " unique translation keys used in the codebase.");
+        $this->info('Found '.count($foundKeys).' unique translation keys used in the codebase.');
 
         $locales = ['en', 'ar'];
         $missing = [];
@@ -87,8 +87,8 @@ class CheckMissingTranslations extends Command
                     if ($file->getExtension() === 'php') {
                         $group = str_replace('.php', '', $file->getFilename());
                         $translations = require $file->getPathname();
-                        
-                        $flattened = \Illuminate\Support\Arr::dot($translations);
+
+                        $flattened = Arr::dot($translations);
                         foreach ($flattened as $k => $v) {
                             $definedKeys["{$group}.{$k}"] = true;
                         }
@@ -109,7 +109,7 @@ class CheckMissingTranslations extends Command
 
             foreach ($foundKeys as $key) {
                 // If the key has no dot, it might be in JSON file or global
-                if (!isset($definedKeys[$key])) {
+                if (! isset($definedKeys[$key])) {
                     // Sometimes keys are just plain text without group, like __('general.hello')
                     $missing[$locale][] = $key;
                 }
@@ -129,21 +129,22 @@ class CheckMissingTranslations extends Command
             }
         }
 
-        if (!$hasMissing) {
+        if (! $hasMissing) {
             $this->info("\nAll good! No missing translations found.");
+
             return 0;
         }
 
         if ($this->option('report')) {
             $reportPath = storage_path('logs/missing_translations_report.json');
-            
+
             $reportData = [
                 'locales_checked' => $locales,
                 'total_keys_found' => count($foundKeys),
                 'missing_by_locale' => $missing,
-                'key_locations' => array_flip($foundKeys) // we need the locations
+                'key_locations' => array_flip($foundKeys), // we need the locations
             ];
-            
+
             file_put_contents($reportPath, json_encode($reportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             $this->info("\nReport generated successfully: {$reportPath}");
         }
@@ -160,13 +161,13 @@ class CheckMissingTranslations extends Command
     {
         foreach ($missing as $locale => $keys) {
             $langPath = base_path("lang/{$locale}");
-            
+
             $grouped = [];
             $jsonKeys = [];
 
             foreach ($keys as $key) {
                 // If key has spaces or doesn't have a dot, it belongs in the JSON file
-                if (str_contains($key, ' ') || !str_contains($key, '.')) {
+                if (str_contains($key, ' ') || ! str_contains($key, '.')) {
                     $jsonKeys[$key] = $key;
                 } else {
                     [$group, $item] = explode('.', $key, 2);
@@ -174,7 +175,7 @@ class CheckMissingTranslations extends Command
                 }
             }
 
-            if (!empty($jsonKeys)) {
+            if (! empty($jsonKeys)) {
                 $jsonFile = base_path("lang/{$locale}.json");
                 $existing = [];
                 if (File::exists($jsonFile)) {
@@ -191,20 +192,20 @@ class CheckMissingTranslations extends Command
                 if (File::exists($file)) {
                     $existing = require $file;
                 } else {
-                    if (!File::isDirectory($langPath)) {
+                    if (! File::isDirectory($langPath)) {
                         File::makeDirectory($langPath, 0755, true);
                     }
                 }
-                
+
                 // Expand dot notation back to nested arrays for merging
                 $expandedItems = [];
                 foreach ($items as $k => $v) {
-                    \Illuminate\Support\Arr::set($expandedItems, $k, $v);
+                    Arr::set($expandedItems, $k, $v);
                 }
 
                 $merged = array_replace_recursive($expandedItems, $existing);
-                
-                $content = "<?php\n\nreturn " . $this->varExport54($merged) . ";\n";
+
+                $content = "<?php\n\nreturn ".$this->varExport54($merged).";\n";
                 file_put_contents($file, $content);
                 $this->info("Updated lang/{$locale}/{$group}.php");
             }
@@ -214,22 +215,23 @@ class CheckMissingTranslations extends Command
     /**
      * Export array to PHP syntax string
      */
-    protected function varExport54($var, $indent = "")
+    protected function varExport54($var, $indent = '')
     {
         switch (gettype($var)) {
-            case "string":
-                return "'" . addcslashes($var, "\\\$\"\'\r\n\t\v\f") . "'";
-            case "array":
+            case 'string':
+                return "'".addcslashes($var, "\\\$\"\'\r\n\t\v\f")."'";
+            case 'array':
                 $indexed = array_keys($var) === range(0, count($var) - 1);
                 $r = [];
                 foreach ($var as $key => $value) {
                     $r[] = "$indent    "
-                        . ($indexed ? "" : $this->varExport54($key) . " => ")
-                        . $this->varExport54($value, "$indent    ");
+                        .($indexed ? '' : $this->varExport54($key).' => ')
+                        .$this->varExport54($value, "$indent    ");
                 }
-                return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
-            case "boolean":
-                return $var ? "true" : "false";
+
+                return "[\n".implode(",\n", $r)."\n".$indent.']';
+            case 'boolean':
+                return $var ? 'true' : 'false';
             default:
                 return var_export($var, true);
         }

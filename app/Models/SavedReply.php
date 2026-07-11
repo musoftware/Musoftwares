@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SavedReply extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     public function user()
     {
@@ -23,7 +22,7 @@ class SavedReply extends Model
 
     public static function add_saved_reply($user, $order_id, $title, $message, $image_file)
     {
-        $new_saved_reply = new SavedReply();
+        $new_saved_reply = new SavedReply;
         $new_saved_reply->user()->associate($user);
         $new_saved_reply->order()->associate($order_id);
         $new_saved_reply->title = $title;
@@ -32,5 +31,4 @@ class SavedReply extends Model
 
         $new_saved_reply->save();
     }
-
 }

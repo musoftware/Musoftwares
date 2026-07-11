@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserIntegration;
-use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleCalendarIntegrationController extends Controller
@@ -34,7 +33,7 @@ class GoogleCalendarIntegrationController extends Controller
                 ->stateless()
                 ->redirectUrl(config('services.google_calendar.redirect'))
                 ->user();
-            
+
             $user = auth()->user();
 
             UserIntegration::updateOrCreate(
@@ -54,7 +53,7 @@ class GoogleCalendarIntegrationController extends Controller
             );
 
             return redirect()->route('admin.settings.index')->with('success', __('admin.google_calendar_connected'));
-            
+
         } catch (\Exception $e) {
             return redirect()->route('admin.settings.index')->with('error', __('admin.google_calendar_connection_failed', ['message' => $e->getMessage()]));
         }

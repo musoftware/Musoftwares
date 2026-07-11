@@ -54,10 +54,10 @@ class ImapMessageParser
                     $bodyText = $this->decodeBody($part['body'], $ph);
                 } else {
                     $attachments[] = [
-                        'name' => $ph['content-disposition-filename'] ?? 'attachment-' . count($attachments),
+                        'name' => $ph['content-disposition-filename'] ?? 'attachment-'.count($attachments),
                         'mime' => $pct,
                         'size' => strlen($part['body']),
-                        'raw'  => $part['body'],
+                        'raw' => $part['body'],
                         'transfer-encoding' => $ph['content-transfer-encoding'] ?? '7bit',
                     ];
                 }
@@ -65,18 +65,18 @@ class ImapMessageParser
         }
 
         return [
-            'message_id'   => $parsedHeaders['message-id'] ?? null,
-            'in_reply_to'  => $parsedHeaders['in-reply-to'] ?? null,
-            'references'   => $parsedHeaders['references'] ?? null,
-            'subject'      => $parsedHeaders['subject'] ?? null,
-            'from_email'   => $parsedHeaders['from-email'] ?? null,
-            'from_name'    => $parsedHeaders['from-name'] ?? null,
-            'to_email'     => $parsedHeaders['to-email'] ?? null,
-            'date'         => $parsedHeaders['date'] ?? null,
-            'headers'      => $parsedHeaders,
-            'body_text'    => $bodyText,
-            'body_html'    => $bodyHtml,
-            'attachments'  => $attachments,
+            'message_id' => $parsedHeaders['message-id'] ?? null,
+            'in_reply_to' => $parsedHeaders['in-reply-to'] ?? null,
+            'references' => $parsedHeaders['references'] ?? null,
+            'subject' => $parsedHeaders['subject'] ?? null,
+            'from_email' => $parsedHeaders['from-email'] ?? null,
+            'from_name' => $parsedHeaders['from-name'] ?? null,
+            'to_email' => $parsedHeaders['to-email'] ?? null,
+            'date' => $parsedHeaders['date'] ?? null,
+            'headers' => $parsedHeaders,
+            'body_text' => $bodyText,
+            'body_html' => $bodyHtml,
+            'attachments' => $attachments,
         ];
     }
 
@@ -110,13 +110,13 @@ class ImapMessageParser
                 $currentKey = strtolower($m[1]);
                 $out[$currentKey] = trim($m[2]);
             } elseif ($currentKey !== null && preg_match('/^\s+(.*)$/', $line, $m)) {
-                $out[$currentKey] .= ' ' . trim($m[1]);
+                $out[$currentKey] .= ' '.trim($m[1]);
             }
         }
 
-        $out['from-email']      = $this->extractAddress($out['from'] ?? '');
-        $out['from-name']       = $this->extractName($out['from'] ?? '');
-        $out['to-email']        = $this->extractAddress($out['to'] ?? '');
+        $out['from-email'] = $this->extractAddress($out['from'] ?? '');
+        $out['from-name'] = $this->extractName($out['from'] ?? '');
+        $out['to-email'] = $this->extractAddress($out['to'] ?? '');
         if (! empty($out['content-type']) && preg_match('/boundary="?([^";]+)"?/i', $out['content-type'], $m)) {
             $out['content-type-boundary'] = $m[1];
         }
@@ -151,7 +151,7 @@ class ImapMessageParser
 
     private function splitMultipart(string $body, string $boundary): array
     {
-        $delim = '--' . $boundary;
+        $delim = '--'.$boundary;
         $parts = explode($delim, $body);
         $result = [];
         foreach (array_slice($parts, 1) as $part) {
@@ -166,7 +166,7 @@ class ImapMessageParser
         foreach ($result as &$piece) {
             [$h, $b] = $this->splitHeaderBody($piece['headers']);
             $piece['headers'] = $h;
-            $piece['body']    = $b;
+            $piece['body'] = $b;
             $final[] = $piece;
         }
 

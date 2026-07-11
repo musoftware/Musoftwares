@@ -14,11 +14,11 @@ class UpdateLanguageLineRequest extends FormRequest
     public function rules(): array
     {
         $id = $this->route('language_line')->id;
-        
+
         return [
             'group' => 'required|string|max:255',
-            'key'   => 'required|string|max:255|unique:language_lines,key,' . $id . ',id,group,' . $this->group,
-            'text'  => 'required|array',
+            'key' => 'required|string|max:255|unique:language_lines,key,'.$id.',id,group,'.$this->group,
+            'text' => 'required|array',
         ];
     }
 }

@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Helpers\FinanceHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MerchantOrder extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     public function amount_str()
     {
@@ -19,18 +18,14 @@ class MerchantOrder extends Model
 
     public function color()
     {
-        if ($this->status == 'pending'){
+        if ($this->status == 'pending') {
             return 'badge bg-primary';
         }
-        if ($this->status == 'failed'){
+        if ($this->status == 'failed') {
             return 'badge bg-danger';
         }
-        if ($this->status == 'success'){
+        if ($this->status == 'success') {
             return 'badge bg-success';
         }
     }
-
-
-
-
 }

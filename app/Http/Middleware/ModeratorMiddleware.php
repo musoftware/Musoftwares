@@ -18,11 +18,11 @@ class ModeratorMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'Admin', 'super_admin', 'superadmin', 'moderator', 'support_agent'])) {
+        if (! auth()->check() || ! auth()->user()->hasAnyRole(['admin', 'Admin', 'super_admin', 'superadmin', 'moderator', 'support_agent'])) {
             abort(403, __('general.unauthorized_access'));
         }
 

@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ticket extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -28,14 +26,14 @@ class Ticket extends Model
     public function close(): void
     {
         $this->ticket_status = 'closed';
-        $this->closed_at     = now();
+        $this->closed_at = now();
         $this->save();
     }
 
     public function reopen(): void
     {
         $this->ticket_status = 'open';
-        $this->closed_at     = null;
+        $this->closed_at = null;
         $this->save();
     }
 
@@ -152,6 +150,7 @@ class Ticket extends Model
         if ($this->isAnonymous()) {
             return $this->anonymous_name ?? 'Anonymous';
         }
+
         return $this->user->name ?? 'Unknown';
     }
 
@@ -160,6 +159,7 @@ class Ticket extends Model
         if ($this->isAnonymous()) {
             return $this->anonymous_email;
         }
+
         return $this->user->email ?? 'Unknown';
     }
 

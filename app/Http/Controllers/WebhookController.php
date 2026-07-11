@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\IncomingWebhook;
 use App\Jobs\ProcessWebhookJob;
+use App\Models\IncomingWebhook;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
@@ -17,9 +17,10 @@ class WebhookController extends Controller
         // 1. Basic validation of payload
         $payload = $request->all();
         $headers = $request->headers->all();
-        
+
         if (empty($payload)) {
             Log::warning("Received empty webhook from {$source}");
+
             return response()->json(['error' => 'Empty payload'], 400);
         }
 
@@ -38,7 +39,8 @@ class WebhookController extends Controller
 
             return response()->json(['status' => 'accepted', 'id' => $webhook->id], 202);
         } catch (\Exception $e) {
-            Log::error("Failed to store incoming webhook from {$source}: " . $e->getMessage());
+            Log::error("Failed to store incoming webhook from {$source}: ".$e->getMessage());
+
             return response()->json(['error' => 'Internal server error'], 500);
         }
     }

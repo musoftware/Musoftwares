@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCouponRequest;
+use App\Http\Requests\Admin\UpdateCouponRequest;
+use App\Http\Resources\CouponResource;
 use App\Models\Coupon;
 use App\Models\CouponRedemption;
 use App\Models\Currency;
 use App\Services\PromotionService;
-use App\Http\Resources\CouponResource;
-use App\Http\Requests\Admin\StoreCouponRequest;
-use App\Http\Requests\Admin\UpdateCouponRequest;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AdminCouponController extends Controller
@@ -22,14 +21,14 @@ class AdminCouponController extends Controller
     public function index()
     {
         $coupons = Coupon::with('currencyRelation')
-                         ->orderBy('created_at', 'desc')
-                         ->paginate(15)
-                         ->through(fn($c) => (new CouponResource($c))->resolve());
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->through(fn ($c) => (new CouponResource($c))->resolve());
 
         $currencies = Currency::select('id', 'currency')->get();
 
         return Inertia::render('Admin/Coupons/Index', [
-            'coupons'    => $coupons,
+            'coupons' => $coupons,
             'currencies' => $currencies,
         ]);
     }
@@ -44,14 +43,14 @@ class AdminCouponController extends Controller
     public function show(Coupon $coupon)
     {
         $coupon->load('currencyRelation');
-        
+
         $redemptions = CouponRedemption::where('coupon_id', $coupon->id)
-                                       ->with(['user', 'transaction'])
-                                       ->orderBy('created_at', 'desc')
-                                       ->paginate(20);
+            ->with(['user', 'transaction'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
         return Inertia::render('Admin/Coupons/Show', [
-            'coupon'      => (new CouponResource($coupon))->resolve(),
+            'coupon' => (new CouponResource($coupon))->resolve(),
             'redemptions' => $redemptions,
         ]);
     }

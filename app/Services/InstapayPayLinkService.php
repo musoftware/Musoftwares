@@ -7,7 +7,6 @@ namespace App\Services;
  */
 class InstapayPayLinkService extends BaseService
 {
-
     public static function secret(): string
     {
         $s = config('services.instapay_pay_link.secret');
@@ -36,7 +35,7 @@ class InstapayPayLinkService extends BaseService
 
     public static function verify(int $userId, string $amount, string $balanceEgp, string $youWillReceive, string $providedSig): bool
     {
-        if ($providedSig === '' || !preg_match('/^[a-f0-9]{64}$/', $providedSig)) {
+        if ($providedSig === '' || ! preg_match('/^[a-f0-9]{64}$/', $providedSig)) {
             return false;
         }
 
@@ -52,7 +51,7 @@ class InstapayPayLinkService extends BaseService
         $y = self::normAmount($youWillReceive);
         $sig = self::sign($userId, $a, $b, $y);
 
-        return route('payment.instapay') . '?' . http_build_query([
+        return route('payment.instapay').'?'.http_build_query([
             'amount' => $a,
             'balance_egp' => $b,
             'you_will_receive' => $y,

@@ -19,6 +19,7 @@ import {
     X,
     ChevronLeft,
     ChevronRight as ChevronRightIcon,
+    Edit,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
@@ -27,6 +28,9 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { SimpleSelect } from '@/Components/ui/SimpleSelect';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
+import { Textarea } from '@/Components/ui/textarea';
+import { Label } from '@/Components/ui/label';
 import axios from 'axios';
 import { __ } from '@/lib/i18n';
 import { formatMoney, formatDate } from '@/lib/utils';
@@ -34,6 +38,8 @@ import { formatMoney, formatDate } from '@/lib/utils';
 interface TodoItem {
     id: number;
     task_id: number | null;
+    project_id: number | null;
+    in_date: string | null;
     title: string;
     description: string | null;
     priority: 'low' | 'normal' | 'high' | 'urgent';
@@ -50,6 +56,7 @@ interface TodoItem {
     is_orphan: boolean;
     is_overdue: boolean;
     stale: boolean;
+    task_name?: string | null;
 }
 
 interface TaskData {
@@ -181,6 +188,47 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
     const [sort, setSort] = useState(filters.sort || 'created_desc');
     const [completedIds, setCompleted] = useState<Set<number>>(new Set());
     const [banner, setBanner] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+    const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
+    const [editForm, setEditForm] = useState({
+        title: '',
+        description: '',
+        priority: 'normal' as 'low' | 'normal' | 'high' | 'urgent',
+        paused: false,
+        start_at: '',
+        end_at: '',
+    });
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleEditStart = (todo: TodoItem) => {
+        setEditingTodo(todo);
+        setEditForm({
+            title: todo.title,
+            description: todo.description || '',
+            priority: todo.priority || 'normal',
+            paused: !!todo.paused,
+            start_at: todo.start_at ? todo.start_at.slice(0, 10) : '',
+            end_at: todo.end_at ? todo.end_at.slice(0, 10) : '',
+        });
+    };
+
+    const handleUpdateSubmit = async () => {
+        if (!editingTodo) return;
+        setIsSaving(true);
+        setBanner(null);
+        try {
+            await axios.put(route('admin.tasks.todos.update', editingTodo.id), editForm);
+            setEditingTodo(null);
+            setBanner({ type: 'success', text: __('general.task_status_updated_successfully') });
+            router.reload({ only: ['arrangedClients', 'stats'] });
+        } catch (err: any) {
+            setBanner({
+                type: 'error',
+                text: err?.response?.data?.message || 'Failed to update todo details.',
+            });
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const pageProps = usePage().props as any;
     const flashSuccess = pageProps?.flash?.success ?? null;
@@ -516,6 +564,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                 group={clientGroup}
                                 completedIds={completedIds}
                                 onComplete={handleMarkComplete}
+                                onEdit={handleEditStart}
                             />
                         ))}
                     </div>
@@ -549,6 +598,92 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                     </div>
                 )}
             </div>
+
+            <Dialog open={editingTodo !== null} onOpenChange={(open) => !open && setEditingTodo(null)}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle>{__('general.edit_todo') || 'Edit Todo'}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="edit-title">{__('general.title') || 'Title'}</Label>
+                            <Input
+                                id="edit-title"
+                                value={editForm.title}
+                                onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                            />
+                        </div>
+                        
+                        <div className="space-y-1.5">
+                            <Label htmlFor="edit-desc">{__('general.description') || 'Description'}</Label>
+                            <Textarea
+                                id="edit-desc"
+                                value={editForm.description}
+                                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                                rows={3}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="edit-priority">{__('general.priority') || 'Priority'}</Label>
+                                <SimpleSelect
+                                    value={editForm.priority}
+                                    onChange={(val: any) => setEditForm({ ...editForm, priority: val })}
+                                    options={[
+                                        { value: 'low', label: __('general.low') || 'Low' },
+                                        { value: 'normal', label: __('general.normal') || 'Normal' },
+                                        { value: 'high', label: __('general.high') || 'High' },
+                                        { value: 'urgent', label: __('general.urgent') || 'Urgent' },
+                                    ]}
+                                />
+                            </div>
+                            
+                            <div className="space-y-1.5">
+                                <Label htmlFor="edit-paused">{__('general.status') || 'Status'}</Label>
+                                <SimpleSelect
+                                    value={editForm.paused ? 'paused' : 'active'}
+                                    onChange={(val) => setEditForm({ ...editForm, paused: val === 'paused' })}
+                                    options={[
+                                        { value: 'active', label: __('general.active') || 'Active' },
+                                        { value: 'paused', label: __('general.paused') || 'Paused' },
+                                    ]}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="edit-start">{__('general.start_date') || 'Start Date'}</Label>
+                                <Input
+                                    id="edit-start"
+                                    type="date"
+                                    value={editForm.start_at}
+                                    onChange={(e) => setEditForm({ ...editForm, start_at: e.target.value })}
+                                />
+                            </div>
+                            
+                            <div className="space-y-1.5">
+                                <Label htmlFor="edit-end">{__('general.end_date') || 'End Date'}</Label>
+                                <Input
+                                    id="edit-end"
+                                    type="date"
+                                    value={editForm.end_at}
+                                    onChange={(e) => setEditForm({ ...editForm, end_at: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEditingTodo(null)}>
+                            {__('general.cancel') || 'Cancel'}
+                        </Button>
+                        <Button onClick={handleUpdateSubmit} disabled={isSaving}>
+                            {isSaving ? __('general.saving') || 'Saving...' : __('general.save_changes') || 'Save Changes'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AdminSidebarLayout>
     );
 }
@@ -599,10 +734,12 @@ function ClientGroup({
     group,
     completedIds,
     onComplete,
+    onEdit,
 }: {
     group: ClientData;
     completedIds: Set<number>;
     onComplete: (id: number) => void;
+    onEdit?: (todo: TodoItem) => void;
 }) {
     return (
         <div>
@@ -638,6 +775,7 @@ function ClientGroup({
                         clientId={group.client.id}
                         completedIds={completedIds}
                         onComplete={onComplete}
+                        onEdit={onEdit}
                     />
                 ))}
             </div>
@@ -652,11 +790,13 @@ function TaskCard({
     clientId,
     completedIds,
     onComplete,
+    onEdit,
 }: {
     task: TaskData;
     clientId: number;
     completedIds: Set<number>;
     onComplete: (id: number) => void;
+    onEdit?: (todo: TodoItem) => void;
 }) {
     return (
         <Card className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -690,6 +830,7 @@ function TaskCard({
                         todo={todo}
                         isDone={completedIds.has(todo.id)}
                         onComplete={onComplete}
+                        onEdit={onEdit}
                     />
                 ))}
             </div>
@@ -701,13 +842,15 @@ function TodoRow({
     todo,
     isDone,
     onComplete,
+    onEdit,
 }: {
     todo: TodoItem;
     isDone: boolean;
     onComplete: (id: number) => void;
+    onEdit?: (todo: TodoItem) => void;
 }) {
     const rowCls = [
-        'px-4 py-3 flex items-start gap-3 group transition-colors',
+        'px-4 py-3 flex items-start gap-3 group/row transition-colors',
         isDone ? 'opacity-50 bg-slate-50' : 'hover:bg-slate-50/60',
         todo.is_overdue && !isDone ? 'bg-red-50/30' : '',
         todo.stale && !isDone && !todo.is_overdue ? 'bg-amber-50/30' : '',
@@ -742,6 +885,12 @@ function TodoRow({
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${PRIORITY_CLS[todo.priority] || PRIORITY_CLS.low}`}>
                         {priorityLabel(todo.priority)}
                     </span>
+
+                    {todo.task_name && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-700 border border-blue-100">
+                            {todo.task_name}
+                        </span>
+                    )}
 
                     {todo.is_orphan && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-orange-100 text-orange-800 border border-orange-200">
@@ -804,6 +953,50 @@ function TodoRow({
                         </span>
                     )}
                 </div>
+            </div>
+
+            {/* Hover-action buttons container */}
+            <div className="flex items-center gap-1.5 flex-shrink-0 self-center opacity-0 group-hover/row:opacity-100 transition-opacity">
+                {todo.project_id && todo.in_date && (
+                    <>
+                        <Button
+                            asChild
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2 text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
+                            title={__('general.go_to_board') || 'Go to Board'}
+                        >
+                            <Link href={route('admin.projects.board', { project: todo.project_id, date: todo.in_date })}>
+                                <Briefcase className="h-3.5 w-3.5 text-slate-400 group-hover/row:text-slate-500" />
+                                <span className="sr-only sm:not-sr-only sm:ms-1">Board</span>
+                            </Link>
+                        </Button>
+
+                        <Button
+                            asChild
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2 text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
+                            title={__('general.go_to_card') || 'Go to Card'}
+                        >
+                            <Link href={route('admin.projects.board', { project: todo.project_id, date: todo.in_date }) + `?card_type=todo&card_id=${todo.id}`}>
+                                <ListTodo className="h-3.5 w-3.5 text-slate-400 group-hover/row:text-slate-500" />
+                                <span className="sr-only sm:not-sr-only sm:ms-1">Card</span>
+                            </Link>
+                        </Button>
+                    </>
+                )}
+
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
+                    onClick={() => onEdit?.(todo)}
+                    title={__('general.edit') || 'Edit'}
+                >
+                    <Edit className="h-3.5 w-3.5 text-slate-400 group-hover/row:text-slate-500" />
+                    <span className="sr-only sm:not-sr-only sm:ms-1">{__('general.edit') || 'Edit'}</span>
+                </Button>
             </div>
         </div>
     );

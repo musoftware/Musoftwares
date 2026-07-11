@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class PalindromeCheckerRequest extends FormRequest
 {
@@ -38,7 +38,7 @@ class PalindromeCheckerRequest extends FormRequest
                         if (strlen($value) > 100 && $this->hasExcessiveRepetition($value)) {
                             $fail('The text contains excessive repetition which may indicate spam.');
                         }
-                    }
+                    },
                 ],
                 'preserve_case' => 'boolean',
                 'include_spaces' => 'boolean',
@@ -82,7 +82,7 @@ class PalindromeCheckerRequest extends FormRequest
         // Trim whitespace from text input
         if ($this->has('text')) {
             $this->merge([
-                'text' => trim($this->text)
+                'text' => trim($this->text),
             ]);
         }
     }
@@ -114,14 +114,14 @@ class PalindromeCheckerRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      */
-    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    protected function failedValidation(Validator $validator)
     {
         // Log validation failures for monitoring
         \Log::info('Palindrome checker validation failed', [
             'user_id' => auth()->id(),
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'errors' => $validator->errors()->toArray()
+            'errors' => $validator->errors()->toArray(),
         ]);
 
         parent::failedValidation($validator);

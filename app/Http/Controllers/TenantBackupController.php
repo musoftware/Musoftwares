@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Services\TenantDataService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Inertia\Inertia;
 
 class TenantBackupController extends Controller
 {
@@ -27,11 +27,11 @@ class TenantBackupController extends Controller
         $data = $this->dataService->exportData($userId);
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
-        $filename = 'musoftware_backup_' . date('Y-m-d_H-i-s') . '.json';
+        $filename = 'musoftware_backup_'.date('Y-m-d_H-i-s').'.json';
 
         return Response::make($json, 200, [
             'Content-Type' => 'application/json',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
@@ -53,7 +53,7 @@ class TenantBackupController extends Controller
 
             return redirect()->back()->with('success', __('general.data_successfully_restored_your_crm_and_erp_records_have_been_updated'));
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Restore failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Restore failed: '.$e->getMessage());
         }
     }
 }

@@ -14,7 +14,7 @@ class ResolveMarketplaceDisputeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'action' => 'required|in:refund_buyer,release_to_seller'
+            'action' => 'required|in:refund_buyer,release_to_seller',
         ];
     }
 }

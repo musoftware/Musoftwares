@@ -22,16 +22,16 @@ class EmployeeTodoController extends Controller
 
         $query = EmployeeTodo::with('user');
 
-        if (!empty($filters['user_id'])) {
+        if (! empty($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
         }
-        if (!empty($filters['recurring'])) {
+        if (! empty($filters['recurring'])) {
             $query->where('recurring', $filters['recurring']);
         }
-        if (!empty($filters['priority'])) {
+        if (! empty($filters['priority'])) {
             $query->where('priority', $filters['priority']);
         }
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where('title', 'like', "%{$filters['search']}%");
         }
 
@@ -54,7 +54,7 @@ class EmployeeTodoController extends Controller
         ];
 
         // Fetch users (employees) - non-client users
-        $users = User::whereDoesntHave('roles', function($q) {
+        $users = User::whereDoesntHave('roles', function ($q) {
             $q->where('name', 'client');
         })->get()->map(function ($user) {
             return [

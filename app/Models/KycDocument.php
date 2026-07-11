@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class KycDocument extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -58,7 +57,7 @@ class KycDocument extends Model
      */
     public function getDocumentTypeNameAttribute()
     {
-        return match($this->document_type) {
+        return match ($this->document_type) {
             'id_front' => 'ID Front',
             'id_back' => 'ID Back',
             'selfie' => 'Selfie',
@@ -72,7 +71,7 @@ class KycDocument extends Model
      */
     public function getStatusColorAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'warning',
             'approved' => 'success',
             'rejected' => 'danger',

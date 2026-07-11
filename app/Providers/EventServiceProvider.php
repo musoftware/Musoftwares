@@ -14,7 +14,6 @@ use App\Events\InvoicePaid;
 use App\Events\MarketplaceOrderCompleted;
 use App\Events\MarketplaceOrderPlaced;
 use App\Events\MessageSent;
-use App\Events\ProposalAccepted;
 use App\Events\ReferralCommissionEarned;
 use App\Events\SaaSLimitApproaching;
 use App\Events\SaaSLimitReached;
@@ -62,9 +61,6 @@ class EventServiceProvider extends ServiceProvider
         // Marketplace
         MarketplaceOrderPlaced::class => [ActivityEventListener::class],
         MarketplaceOrderCompleted::class => [ActivityEventListener::class],
-
-        // Freelance
-        ProposalAccepted::class => [ActivityEventListener::class],
 
         // Messaging & Timer
         MessageSent::class => [ActivityEventListener::class],

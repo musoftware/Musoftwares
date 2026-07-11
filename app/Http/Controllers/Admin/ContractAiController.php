@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminSettings;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -16,22 +18,22 @@ class ContractAiController extends Controller
             'prompt' => 'required|string',
         ]);
 
-        $project = \App\Models\Project::findOrFail($request->project_id);
+        $project = Project::findOrFail($request->project_id);
 
         $user = Auth::user();
-        $defaultProvider = \App\Models\AdminSettings::GetValue('default_ai_model', 'openai');
+        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
 
         if ($defaultProvider === 'openai') {
-            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = \App\Models\AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
+            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
         } else {
-            $apiKey = \App\Models\AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
-            $model = \App\Models\AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
+            $apiKey = AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
+            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
         }
 
         if (empty($apiKey)) {
             return response()->json([
-                'error' => "Please set your {$defaultProvider} API key in admin settings."
+                'error' => "Please set your {$defaultProvider} API key in admin settings.",
             ], 400);
         }
 
@@ -70,24 +72,24 @@ class ContractAiController extends Controller
 
             if ($defaultProvider === 'openai') {
                 $response = Http::timeout(60)->withHeaders([
-                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Authorization' => 'Bearer '.$apiKey,
                     'Content-Type' => 'application/json',
-                ])->post("https://api.openai.com/v1/chat/completions", [
-                    "model" => $model,
-                    "messages" => [
-                        ["role" => "system", "content" => "You are a helpful assistant that outputs JSON."],
-                        ["role" => "user", "content" => $prompt]
+                ])->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are a helpful assistant that outputs JSON.'],
+                        ['role' => 'user', 'content' => $prompt],
                     ],
-                    "temperature" => 0.7,
+                    'temperature' => 0.7,
                 ]);
                 $content = $response->json()['choices'][0]['message']['content'] ?? '';
             } else {
                 $response = Http::timeout(60)->withHeaders([
                     'Content-Type' => 'application/json',
                 ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
-                    "contents" => [
-                        ["role" => "user", "parts" => [["text" => $prompt]]]
-                    ]
+                    'contents' => [
+                        ['role' => 'user', 'parts' => [['text' => $prompt]]],
+                    ],
                 ]);
                 $content = $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? '';
             }
@@ -98,13 +100,13 @@ class ContractAiController extends Controller
             $json = json_decode(trim($cleanContent), true);
 
             if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
-                 return response()->json($json); // Return raw JSON directly as modal expects res.data.description
+                return response()->json($json); // Return raw JSON directly as modal expects res.data.description
             } else {
                 return response()->json(['error' => 'AI response format error.'], 500);
             }
 
         } catch (\Exception $e) {
-             return response()->json(['error' => 'AI Generation Failed: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'AI Generation Failed: '.$e->getMessage()], 500);
         }
     }
 
@@ -115,21 +117,21 @@ class ContractAiController extends Controller
         ]);
 
         $user = Auth::user();
-        $defaultProvider = \App\Models\AdminSettings::GetValue('default_ai_model', 'openai');
+        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
 
         if ($defaultProvider === 'openai') {
-            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = \App\Models\AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
+            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
             $providerName = 'OpenAI';
         } else {
-            $apiKey = \App\Models\AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
-            $model = \App\Models\AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
+            $apiKey = AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
+            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
             $providerName = 'Gemini';
         }
 
         if (empty($apiKey)) {
             return response()->json([
-                'error' => "Please set your {$providerName} API key in admin settings."
+                'error' => "Please set your {$providerName} API key in admin settings.",
             ], 400);
         }
 
@@ -155,24 +157,24 @@ class ContractAiController extends Controller
 
             if ($defaultProvider === 'openai') {
                 $response = Http::timeout(120)->withHeaders([
-                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Authorization' => 'Bearer '.$apiKey,
                     'Content-Type' => 'application/json',
-                ])->post("https://api.openai.com/v1/chat/completions", [
-                    "model" => $model,
-                    "messages" => [
-                        ["role" => "system", "content" => "You are a helpful contract reviewer that outputs JSON."],
-                        ["role" => "user", "content" => $prompt]
+                ])->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are a helpful contract reviewer that outputs JSON.'],
+                        ['role' => 'user', 'content' => $prompt],
                     ],
-                    "temperature" => 0.5,
+                    'temperature' => 0.5,
                 ]);
                 $content = $response->json()['choices'][0]['message']['content'] ?? '';
             } else {
                 $response = Http::timeout(120)->withHeaders([
                     'Content-Type' => 'application/json',
                 ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
-                    "contents" => [
-                        ["role" => "user", "parts" => [["text" => $prompt]]]
-                    ]
+                    'contents' => [
+                        ['role' => 'user', 'parts' => [['text' => $prompt]]],
+                    ],
                 ]);
                 $content = $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? '';
             }
@@ -182,14 +184,14 @@ class ContractAiController extends Controller
             $cleanContent = preg_replace('/```\s*/', '', $cleanContent);
             $json = json_decode(trim($cleanContent), true);
 
-            if (json_last_error() === JSON_ERROR_NONE && !empty($json['refined_content'])) {
+            if (json_last_error() === JSON_ERROR_NONE && ! empty($json['refined_content'])) {
                 return response()->json(['data' => $json]);
             } else {
                 return response()->json(['error' => 'AI could not process the review correctly.'], 500);
             }
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'AI Review Failed: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'AI Review Failed: '.$e->getMessage()], 500);
         }
     }
 }

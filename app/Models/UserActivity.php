@@ -2,20 +2,18 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserActivity extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
-
     protected $casts = [
-        'activity_date' => 'datetime'
+        'activity_date' => 'datetime',
     ];
 
     public function user()
@@ -26,15 +24,14 @@ class UserActivity extends Model
     public function activity()
     {
         $ip = $this->ip;
-        return 'User accessed the system from ' . $this->iso_code . ' (' . $ip . ') for ' . $this->total_seconds . ' seconds.';
-    }
 
+        return 'User accessed the system from '.$this->iso_code.' ('.$ip.') for '.$this->total_seconds.' seconds.';
+    }
 
     public static function TotalSecondsOfUser($users_id)
     {
         return static::query()->whereIn('user_id', $users_id)->sum('total_seconds');
     }
-
 
     public static function TotalSecondsOfUsers()
     {
@@ -72,7 +69,7 @@ class UserActivity extends Model
                 'activity_date' => $date,
                 'total_seconds' => $time,
                 'ip' => $ip,
-                'iso_code' => $ipData->iso_code
+                'iso_code' => $ipData->iso_code,
             ]);
         } else {
             $active->ip = $ip;

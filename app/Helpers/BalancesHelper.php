@@ -3,9 +3,6 @@
 namespace App\Helpers;
 
 use App\Models\CurrenciesExchange;
-use App\Models\Currency;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class BalancesHelper
@@ -29,8 +26,9 @@ class BalancesHelper
     public static function instance(): ?BalancesHelper
     {
         if (self::$instance === null) {
-            self::$instance = new BalancesHelper();
+            self::$instance = new BalancesHelper;
         }
+
         return self::$instance;
     }
 
@@ -39,6 +37,7 @@ class BalancesHelper
         $commission_amount = $user->withdraw()->whereIn('status', ['pending', 'reviewing'])->sum('amount');
         $user->withdrawing_commission = $commission_amount;
         $user->save();
+
         return $commission_amount;
     }
 
@@ -52,6 +51,7 @@ class BalancesHelper
         }
         $user->withdrawn_commission = $amount;
         $user->save();
+
         return $amount;
     }
 
@@ -129,7 +129,6 @@ class BalancesHelper
         $user->save();
     }
 
-
-    //CalcCostBalance
+    // CalcCostBalance
 
 }

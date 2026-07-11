@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CurrenciesExchange;
 use App\Models\Voucher;
 use App\Models\VoucherRedemption;
-use App\Models\CurrenciesExchange;
-use Illuminate\Http\Request;
+use App\Traits\ConvertsCurrency;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class VoucherController extends Controller
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
     public function index()
     {
@@ -39,8 +39,8 @@ class VoucherController extends Controller
                 ? $voucher->spend_amount
                 : CurrenciesExchange::RateByDate(now(), $voucher->spend_amount, $voucher->spend_currency_id, $user->currency_id);
 
-            $baseRewardAmount = $voucher->type === 'percentage' 
-                ? ($voucher->spend_amount * ($voucher->reward_percentage / 100)) 
+            $baseRewardAmount = $voucher->type === 'percentage'
+                ? ($voucher->spend_amount * ($voucher->reward_percentage / 100))
                 : $voucher->reward_amount;
 
             $rewardAmountInUserCurrency = $voucher->reward_currency_id == $user->currency_id

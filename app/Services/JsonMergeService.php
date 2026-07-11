@@ -6,7 +6,6 @@ use Exception;
 
 class JsonMergeService extends BaseService
 {
-
     /**
      * Process JSON merge request
      */
@@ -79,7 +78,7 @@ class JsonMergeService extends BaseService
         foreach ($array2 as $key => $value) {
             if (isset($merged[$key])) {
                 // If key already exists, convert to array or append to existing array
-                if (!is_array($merged[$key]) || !isset($merged[$key][0])) {
+                if (! is_array($merged[$key]) || ! isset($merged[$key][0])) {
                     $merged[$key] = [$merged[$key]];
                 }
                 $merged[$key][] = $value;
@@ -109,7 +108,7 @@ class JsonMergeService extends BaseService
                 $keys = $matches[1];
                 $duplicateKeys = array_diff_assoc($keys, array_unique($keys));
 
-                if (!empty($duplicateKeys)) {
+                if (! empty($duplicateKeys)) {
                     // Possible duplicate keys detected, do detailed check
                     if ($this->hasDuplicateKeys($jsonInput)) {
                         // Has duplicate keys, process them
@@ -117,6 +116,7 @@ class JsonMergeService extends BaseService
 
                         // Parse the JSON objects properly - they are separated by newlines but may contain internal newlines
                         $jsonObjects = $this->parseMultipleJsonObjects($processedJson);
+
                         return $jsonObjects;
                     }
                 }
@@ -124,23 +124,26 @@ class JsonMergeService extends BaseService
 
             // No duplicate keys detected or processing not needed
             $jsonObjects[] = $decoded;
+
             return $jsonObjects;
         }
 
         // If single JSON parsing failed, try splitting by lines for multiple JSON objects
-        //$jsonLines = array_filter(explode("\n", $jsonInput));
+        // $jsonLines = array_filter(explode("\n", $jsonInput));
 
         $jsonLines = array_filter($this->extractJsonStrings($jsonInput));
 
-
         foreach ($jsonLines as $lineNumber => $line) {
             $line = trim($line);
-            if (empty($line)) continue;
+            if (empty($line)) {
+                continue;
+            }
 
             // Try to parse each line as valid JSON first
             $decoded = json_decode($line, true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $jsonObjects[] = $decoded;
+
                 continue;
             }
 
@@ -153,30 +156,32 @@ class JsonMergeService extends BaseService
 
                 foreach ($processedLines as $processedLine) {
                     $processedLine = trim($processedLine);
-                    if (empty($processedLine)) continue;
+                    if (empty($processedLine)) {
+                        continue;
+                    }
 
                     $decoded = json_decode($processedLine, true);
                     if (json_last_error() !== JSON_ERROR_NONE) {
-                        throw new Exception('Invalid JSON on line ' . ($lineNumber + 1) . ': ' . $processedLine . '. Error: ' . json_last_error_msg());
+                        throw new Exception('Invalid JSON on line '.($lineNumber + 1).': '.$processedLine.'. Error: '.json_last_error_msg());
                     }
                     $jsonObjects[] = $decoded;
                 }
             } catch (Exception $e) {
-                throw new Exception('Invalid JSON on line ' . ($lineNumber + 1) . ': ' . $line . '. Error: ' . $e->getMessage());
+                throw new Exception('Invalid JSON on line '.($lineNumber + 1).': '.$line.'. Error: '.$e->getMessage());
             }
         }
 
         return $jsonObjects;
     }
 
-    function extractJsonStrings(string $input): array
+    public function extractJsonStrings(string $input): array
     {
-        $input   = trim($input);
+        $input = trim($input);
         $results = [];
 
-        $depth    = 0;   // brace nesting level
+        $depth = 0;   // brace nesting level
         $inString = false;
-        $buffer   = '';
+        $buffer = '';
 
         $len = strlen($input);
         for ($i = 0; $i < $len; $i++) {
@@ -184,12 +189,12 @@ class JsonMergeService extends BaseService
 
             // Toggle in/out of quoted strings (ignore escaped quotes)
             if ($c === '"' && ($i === 0 || $input[$i - 1] !== '\\')) {
-                $inString = !$inString;
+                $inString = ! $inString;
             }
 
             // When we see an opening brace outside quotes,
             // start (or deepen) collection.
-            if (!$inString && $c === '{') {
+            if (! $inString && $c === '{') {
                 if ($depth === 0) {
                     $buffer = '';          // new JSON object begins
                 }
@@ -202,18 +207,17 @@ class JsonMergeService extends BaseService
             }
 
             // Closing brace outside quotes
-            if (!$inString && $c === '}') {
+            if (! $inString && $c === '}') {
                 $depth--;
                 if ($depth === 0) {        // JSON object complete
                     $results[] = trim($buffer);
-                    $buffer    = '';
+                    $buffer = '';
                 }
             }
         }
 
         return $results;
     }
-
 
     /**
      * Preprocess JSON string to handle duplicate keys by converting to array format
@@ -226,13 +230,13 @@ class JsonMergeService extends BaseService
         $testDecode = json_decode($jsonString, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             // Valid JSON - check if we actually have duplicate keys by manual inspection
-            if (!$this->hasDuplicateKeys($jsonString)) {
+            if (! $this->hasDuplicateKeys($jsonString)) {
                 return $jsonString; // No duplicate keys, return original
             }
         }
 
         // Check if it contains potential duplicate keys by looking for patterns
-        if (!preg_match('/["\']([^"\']+)["\']:\s*[^,}]+,.*["\']\\1["\']:\s*/', $jsonString)) {
+        if (! preg_match('/["\']([^"\']+)["\']:\s*[^,}]+,.*["\']\\1["\']:\s*/', $jsonString)) {
             return $jsonString; // No duplicate keys detected by regex either
         }
 
@@ -245,7 +249,7 @@ class JsonMergeService extends BaseService
      */
     private function hasDuplicateKeys(string $jsonString): bool
     {
-        if (!str_starts_with(trim($jsonString), '{')) {
+        if (! str_starts_with(trim($jsonString), '{')) {
             return false;
         }
 
@@ -260,7 +264,7 @@ class JsonMergeService extends BaseService
             $pairs = $this->extractTopLevelPairs($content);
 
             // Extract just the keys
-            $keys = array_map(function($pair) {
+            $keys = array_map(function ($pair) {
                 return $pair['key'];
             }, $pairs);
 
@@ -294,14 +298,14 @@ class JsonMergeService extends BaseService
         $keyGroups = [];
         foreach ($pairs as $pair) {
             $key = $pair['key'];
-            if (!isset($keyGroups[$key])) {
+            if (! isset($keyGroups[$key])) {
                 $keyGroups[$key] = [];
             }
             $keyGroups[$key][] = $pair['value'];
         }
 
         // Find which keys have duplicates
-        $duplicateKeys = array_filter($keyGroups, function($values) {
+        $duplicateKeys = array_filter($keyGroups, function ($values) {
             return count($values) > 1;
         });
 
@@ -315,9 +319,9 @@ class JsonMergeService extends BaseService
         // First object: all unique keys + first instance of duplicate keys
         $firstObjectPairs = [];
         foreach ($keyGroups as $key => $values) {
-            $firstObjectPairs[] = '"' . $key . '": ' . $values[0];
+            $firstObjectPairs[] = '"'.$key.'": '.$values[0];
         }
-        $objects[] = '{' . implode(', ', $firstObjectPairs) . '}';
+        $objects[] = '{'.implode(', ', $firstObjectPairs).'}';
 
         // Additional objects for duplicate instances
         $maxDuplicates = max(array_map('count', $duplicateKeys));
@@ -326,12 +330,12 @@ class JsonMergeService extends BaseService
             $objectPairs = [];
             foreach ($duplicateKeys as $key => $values) {
                 if (isset($values[$i])) {
-                    $objectPairs[] = '"' . $key . '": ' . $values[$i];
+                    $objectPairs[] = '"'.$key.'": '.$values[$i];
                 }
             }
 
-            if (!empty($objectPairs)) {
-                $objects[] = '{' . implode(', ', $objectPairs) . '}';
+            if (! empty($objectPairs)) {
+                $objects[] = '{'.implode(', ', $objectPairs).'}';
             }
         }
 
@@ -353,11 +357,14 @@ class JsonMergeService extends BaseService
                 $i++;
             }
 
-            if ($i >= $length) break;
+            if ($i >= $length) {
+                break;
+            }
 
             // Skip comma
             if ($content[$i] === ',') {
                 $i++;
+
                 continue;
             }
 
@@ -378,7 +385,9 @@ class JsonMergeService extends BaseService
                 }
             }
 
-            if ($i >= $length) break;
+            if ($i >= $length) {
+                break;
+            }
 
             $key = substr($content, $keyStart, $i - $keyStart);
             $i++; // Skip closing quote
@@ -406,7 +415,7 @@ class JsonMergeService extends BaseService
             if ($value !== null) {
                 $pairs[] = [
                     'key' => $key,
-                    'value' => $value
+                    'value' => $value,
                 ];
             }
         }
@@ -422,7 +431,9 @@ class JsonMergeService extends BaseService
         $length = strlen($content);
         $start = $i;
 
-        if ($i >= $length) return null;
+        if ($i >= $length) {
+            return null;
+        }
 
         $char = $content[$i];
 
@@ -436,7 +447,9 @@ class JsonMergeService extends BaseService
                     $i++;
                 }
             }
-            if ($i < $length) $i++; // Skip closing quote
+            if ($i < $length) {
+                $i++;
+            } // Skip closing quote
 
         } elseif ($char === '{') {
             // Object value - need to handle quotes properly
@@ -446,7 +459,7 @@ class JsonMergeService extends BaseService
             while ($i < $length) {
                 $char = $content[$i];
 
-                if (!$inString) {
+                if (! $inString) {
                     if ($char === '"') {
                         $inString = true;
                     } elseif ($char === '{') {
@@ -460,7 +473,7 @@ class JsonMergeService extends BaseService
                     }
                 } else {
                     // We're inside a string
-                    if ($char === '"' && ($i === 0 || $content[$i-1] !== '\\')) {
+                    if ($char === '"' && ($i === 0 || $content[$i - 1] !== '\\')) {
                         $inString = false;
                     }
                 }
@@ -476,7 +489,7 @@ class JsonMergeService extends BaseService
             while ($i < $length) {
                 $char = $content[$i];
 
-                if (!$inString) {
+                if (! $inString) {
                     if ($char === '"') {
                         $inString = true;
                     } elseif ($char === '[') {
@@ -490,7 +503,7 @@ class JsonMergeService extends BaseService
                     }
                 } else {
                     // We're inside a string
-                    if ($char === '"' && ($i === 0 || $content[$i-1] !== '\\')) {
+                    if ($char === '"' && ($i === 0 || $content[$i - 1] !== '\\')) {
                         $inString = false;
                     }
                 }
@@ -500,7 +513,7 @@ class JsonMergeService extends BaseService
 
         } else {
             // Primitive value (number, boolean, null)
-            while ($i < $length && !in_array($content[$i], [',', '}', ']', ' ', "\t", "\n", "\r"])) {
+            while ($i < $length && ! in_array($content[$i], [',', '}', ']', ' ', "\t", "\n", "\r"])) {
                 $i++;
             }
         }
@@ -526,8 +539,8 @@ class JsonMergeService extends BaseService
             for ($i = 0; $i < strlen($line); $i++) {
                 $char = $line[$i];
 
-                if (!$inString) {
-                    if ($char === '"' && ($i === 0 || $line[$i-1] !== '\\')) {
+                if (! $inString) {
+                    if ($char === '"' && ($i === 0 || $line[$i - 1] !== '\\')) {
                         $inString = true;
                     } elseif ($char === '{') {
                         $braceDepth++;
@@ -535,17 +548,17 @@ class JsonMergeService extends BaseService
                         $braceDepth--;
                     }
                 } else {
-                    if ($char === '"' && ($i === 0 || $line[$i-1] !== '\\')) {
+                    if ($char === '"' && ($i === 0 || $line[$i - 1] !== '\\')) {
                         $inString = false;
                     }
                 }
             }
 
             // If we've closed all braces, we have a complete JSON object
-            if ($braceDepth === 0 && !empty(trim($currentJson))) {
+            if ($braceDepth === 0 && ! empty(trim($currentJson))) {
                 $decoded = json_decode($currentJson, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new Exception('Invalid JSON after processing: ' . substr($currentJson, 0, 50) . '... | Error: ' . json_last_error_msg());
+                    throw new Exception('Invalid JSON after processing: '.substr($currentJson, 0, 50).'... | Error: '.json_last_error_msg());
                 }
                 $jsonObjects[] = $decoded;
                 $currentJson = '';
@@ -556,10 +569,10 @@ class JsonMergeService extends BaseService
         }
 
         // Handle any remaining JSON
-        if (!empty(trim($currentJson))) {
+        if (! empty(trim($currentJson))) {
             $decoded = json_decode($currentJson, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception('Invalid JSON after processing: ' . substr($currentJson, 0, 50) . '... | Error: ' . json_last_error_msg());
+                throw new Exception('Invalid JSON after processing: '.substr($currentJson, 0, 50).'... | Error: '.json_last_error_msg());
             }
             $jsonObjects[] = $decoded;
         }

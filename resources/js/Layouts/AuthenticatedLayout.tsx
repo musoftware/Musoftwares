@@ -31,7 +31,6 @@ import ProductTourModal from '@/Components/ProductTourModal';
 import BackgroundTaskStatus from '@/Components/Tools/BackgroundTaskStatus';
 
 import axios from 'axios';
-import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
 import { __ } from '@/lib/i18n';
 import { useFCM } from '@/hooks/useFCM';
@@ -88,12 +87,11 @@ function AuthenticatedContent({
 
     const isErpActive = isRouteActive('erp');
     const isCrmActive = isRouteActive('crm');
-    const isFreelanceActive = isRouteActive('freelance');
     const isMarketplaceActive = isRouteActive('marketplace');
     const isBookingActive = isRouteActive('booking');
     const isIntelligenceActive = isRouteActive('intelligence');
     const isToolsActive = isRouteActive('tools');
-    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, tools: true, fbmb: true };
+    const activeModules = auth?.active_modules || { erp: true, marketplace: true, booking: true, tools: true, fbmb: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [tourStep, setTourStep] = useState(1);
@@ -232,9 +230,6 @@ function AuthenticatedContent({
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
-                                                                            <Link href={safeRoute('sso.redirect', { system: 'freelancesys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50/50 text-slate-600 font-medium">
-                                                                                <Briefcase className="w-4 h-4 text-emerald-500" /> {__('general.freelance_hub')}
-                                                                            </Link>
                                                                             <Link href={safeRoute('marketplace.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-violet-50/50 text-slate-600 font-medium">
                                                                                 <Megaphone className="w-4 h-4 text-violet-500" /> {__('general.marketing_suite')}
                                                                             </Link>
@@ -380,29 +375,7 @@ function AuthenticatedContent({
                                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.service_hubs')}</p>
                                         </div>
                                         
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isFreelanceActive ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('sso.redirect', { system: 'freelancesys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isFreelanceActive ? "bg-emerald-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-emerald-50"
-                                            )}>
-                                                <Briefcase className={cn("w-4 h-4", isFreelanceActive ? "text-emerald-700" : "text-slate-500 group-hover/dropdown-menu-item:text-emerald-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isFreelanceActive ? "text-emerald-900" : "text-slate-900")}>{__('general.freelance_hub')}</p>
-                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">{__('general.points_based')}</span>
-                                                </div>
-                                                <p className={cn("text-xs truncate", isFreelanceActive ? "text-emerald-700/70" : "text-slate-500")}>{__('general.jobs_proposals_amp_earnings')}</p>
-                                            </div>
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem 
+                                        <DropdownMenuItem
                                             className={cn(
                                                 "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isMarketplaceActive ? "bg-violet-50/80 border-violet-100" : "hover:bg-slate-50 border-transparent"
@@ -653,11 +626,6 @@ function AuthenticatedContent({
 
                         {/* RIGHT: Financials, Tour Button & Profile */}
                         <div className="flex items-center gap-3">
-                            {isFreelanceActive && (
-                                <div className="me-1 sm:me-2">
-                                    <FreelanceModeToggle />
-                                </div>
-                            )}
                             {isMarketplaceActive && (
                                 <div className="me-1 sm:me-2">
                                     <MarketplaceModeToggle />

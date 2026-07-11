@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Currency;
 use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class AdminCurrencyExchangeController extends Controller
@@ -19,8 +20,8 @@ class AdminCurrencyExchangeController extends Controller
         $exchanges = CurrenciesExchange::query()
             ->with(['currencyFrom:id,currency,symbol', 'currencyTo:id,currency,symbol'])
             ->when($search, function ($q) use ($search) {
-                $q->whereHas('currencyFrom', fn($qq) => $qq->where('currency', 'like', "%{$search}%"))
-                  ->orWhereHas('currencyTo', fn($qq) => $qq->where('currency', 'like', "%{$search}%"));
+                $q->whereHas('currencyFrom', fn ($qq) => $qq->where('currency', 'like', "%{$search}%"))
+                    ->orWhereHas('currencyTo', fn ($qq) => $qq->where('currency', 'like', "%{$search}%"));
             })
             ->when($currencyId, function ($q) use ($currencyId) {
                 $q->where(function ($q) use ($currencyId) {
@@ -128,7 +129,7 @@ class AdminCurrencyExchangeController extends Controller
         }
 
         if ($existsQuery->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'date_string' => __('admin.exchange_already_exists_for_pair_on_date'),
             ]);
         }

@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Services\BackgroundTaskService;
 use App\Jobs\DemoLongRunningTask;
 use App\Models\User;
+use App\Services\BackgroundTaskService;
+use Illuminate\Console\Command;
 
 class DispatchDemoTask extends Command
 {
@@ -31,13 +31,14 @@ class DispatchDemoTask extends Command
         $userId = $this->argument('user_id');
         $user = User::find($userId);
 
-        if (!$user) {
+        if (! $user) {
             $this->error("User $userId not found.");
+
             return;
         }
 
         $task = BackgroundTaskService::dispatch($user->id, 'demo_task', DemoLongRunningTask::class, [
-            'steps' => 10
+            'steps' => 10,
         ]);
 
         $this->info("Dispatched demo task #{$task->id} for user {$user->name}");

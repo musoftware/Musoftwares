@@ -2,16 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\User;
-use App\Models\Currency;
-use Asantibanez\LivewireCharts\Models\ColumnChartModel;
-use Asantibanez\LivewireCharts\Models\LineChartModel;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
 class ColorHelper
 {
-
     public static function generateColorFromHash($string)
     {
         // Compute the MD5 hash of the string
@@ -22,8 +14,6 @@ class ColorHelper
         $color = substr($hash, -6);
 
         // Return the color
-        return '#' . $color . '77';
+        return '#'.$color.'77';
     }
-
-
 }

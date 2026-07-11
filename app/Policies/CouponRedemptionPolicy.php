@@ -4,16 +4,15 @@ namespace App\Policies;
 
 use App\Models\CouponRedemption;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CouponRedemptionPolicy
 {
-
     public function before(User $user, string $ability): ?bool
     {
         if ($user->isAdmin()) {
             return true;
         }
+
         return null;
     }
 

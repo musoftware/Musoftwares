@@ -22,17 +22,17 @@ class PurePhpImapClient
 
     public function __construct(array $config)
     {
-        $this->host         = (string) $config['host'];
-        $this->port         = (int) $config['port'];
-        $this->encryption   = strtolower((string) ($config['encryption'] ?? 'ssl'));
+        $this->host = (string) $config['host'];
+        $this->port = (int) $config['port'];
+        $this->encryption = strtolower((string) ($config['encryption'] ?? 'ssl'));
         $this->validateCert = (bool) ($config['validate_cert'] ?? true);
-        $this->timeout      = (int) ($config['connection_timeout'] ?? 15);
+        $this->timeout = (int) ($config['connection_timeout'] ?? 15);
     }
 
     public function connect(string $username, string $password): void
     {
         $scheme = $this->encryption === 'ssl' ? 'ssl' : 'tcp';
-        $remote = ($scheme === 'ssl' ? 'ssl://' : '') . $this->host . ':' . $this->port;
+        $remote = ($scheme === 'ssl' ? 'ssl://' : '').$this->host.':'.$this->port;
 
         $errno = 0;
         $errstr = '';
@@ -63,7 +63,7 @@ class PurePhpImapClient
 
         $this->readGreeting();
 
-        $this->command("LOGIN \"%s\" \"%s\"", $username, $password);
+        $this->command('LOGIN "%s" "%s"', $username, $password);
         $this->expectOk();
 
         $this->command('CAPABILITY');
@@ -146,15 +146,15 @@ class PurePhpImapClient
     {
         $line = fgets($this->socket);
         if (! $line || ! str_starts_with($line, '* OK')) {
-            throw new RuntimeException('IMAP greeting failed: ' . trim((string) $line));
+            throw new RuntimeException('IMAP greeting failed: '.trim((string) $line));
         }
     }
 
     private function expectOk(?string $response = null): void
     {
         $r = $response ?? $this->readUntilTagged();
-        if (! preg_match('/^' . $this->tag . ' OK/i', $r)) {
-            throw new RuntimeException('IMAP command failed: ' . trim($r));
+        if (! preg_match('/^'.$this->tag.' OK/i', $r)) {
+            throw new RuntimeException('IMAP command failed: '.trim($r));
         }
     }
 
@@ -163,7 +163,7 @@ class PurePhpImapClient
         static $n = 0;
         $n++;
 
-        return 'A' . (string) $n;
+        return 'A'.(string) $n;
     }
 
     private function quoteArgs(array $args): array
@@ -183,11 +183,11 @@ class PurePhpImapClient
             }
             $buffer .= $line;
             $trim = trim($line);
-            if (str_starts_with($trim, $this->tag . ' ')) {
+            if (str_starts_with($trim, $this->tag.' ')) {
                 return $buffer;
             }
             if (preg_match('/^\* BYE /i', $line)) {
-                throw new RuntimeException('IMAP server closed: ' . trim($line));
+                throw new RuntimeException('IMAP server closed: '.trim($line));
             }
         }
 
@@ -219,16 +219,18 @@ class PurePhpImapClient
         $literalRemaining = 0;
         foreach ($lines as $line) {
             if ($inLiteral) {
-                $body .= $line . "\n";
+                $body .= $line."\n";
                 $literalRemaining -= strlen($line) + 1;
                 if ($literalRemaining <= 0) {
                     $inLiteral = false;
                 }
+
                 continue;
             }
             if (preg_match('/\{(\d+)\}\r?$/', $line, $m)) {
                 $literalRemaining = (int) $m[1];
                 $inLiteral = true;
+
                 continue;
             }
         }

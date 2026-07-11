@@ -2,8 +2,11 @@
 
 namespace App\Traits;
 
-use App\Models\Currency;
+use App\Helpers\FinanceHelper;
 use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Global currency conversion trait for Controllers.
@@ -36,9 +39,10 @@ trait ConvertsCurrency
      */
     protected function getCurrencyModel(int $id): ?Currency
     {
-        if (!isset($this->_currencyModelCache[$id])) {
+        if (! isset($this->_currencyModelCache[$id])) {
             $this->_currencyModelCache[$id] = Currency::find($id);
         }
+
         return $this->_currencyModelCache[$id];
     }
 
@@ -47,22 +51,22 @@ trait ConvertsCurrency
      * If no user is provided, uses the authenticated user.
      * Fails loudly if the user currency is not configured or not found.
      *
-     * @param  \App\Models\User|null  $user
-     * @return Currency
+     * @param  User|null  $user
+     *
      * @throws \Exception
      */
     protected function getUserCurrencyObject($user = null): Currency
     {
         $user = $user ?? auth()->user();
-        if (!$user || !$user->currency_id) {
+        if (! $user || ! $user->currency_id) {
             throw new \Exception(__('errors.currency_configuration_missing') ?: 'User currency is not configured.');
         }
-        
+
         $currency = $this->getCurrencyModel($user->currency_id);
-        if (!$currency) {
+        if (! $currency) {
             throw new \Exception("Currency ID {$user->currency_id} not found in database.");
         }
-        
+
         return $currency;
     }
 
@@ -74,11 +78,10 @@ trait ConvertsCurrency
      * If $date is provided, uses historical rate (RateByDate).
      * If $date is null, uses the latest available rate (RateToday).
      *
-     * @param  float       $amount          The amount to convert
-     * @param  int         $fromCurrencyId  Source currency ID
-     * @param  int         $toCurrencyId    Target currency ID
-     * @param  string|null $date            Optional date for historical rate (Y-m-d or Carbon-parseable)
-     * @return float
+     * @param  float  $amount  The amount to convert
+     * @param  int  $fromCurrencyId  Source currency ID
+     * @param  int  $toCurrencyId  Target currency ID
+     * @param  string|null  $date  Optional date for historical rate (Y-m-d or Carbon-parseable)
      */
     protected function convertToUserCurrency(
         float $amount,
@@ -114,12 +117,11 @@ trait ConvertsCurrency
      *       'started_at'      // Optional: date field for historical rate per item
      *   );
      *
-     * @param  iterable    $items           Collection or array of items
-     * @param  string      $amountField     Field name for the amount on each item
-     * @param  string      $currencyField   Field name for the currency_id on each item
-     * @param  int         $toCurrencyId    Target currency ID
-     * @param  string|null $dateField       Optional: field name for the date (for RateByDate per item)
-     * @return float
+     * @param  iterable  $items  Collection or array of items
+     * @param  string  $amountField  Field name for the amount on each item
+     * @param  string  $currencyField  Field name for the currency_id on each item
+     * @param  int  $toCurrencyId  Target currency ID
+     * @param  string|null  $dateField  Optional: field name for the date (for RateByDate per item)
      */
     protected function sumInUserCurrency(
         $items,
@@ -152,21 +154,21 @@ trait ConvertsCurrency
      * Prepare a currency array to pass to the frontend (Inertia props).
      * Fails loudly if the currency is not found.
      *
-     * @param  int  $currencyId
-     * @return array  e.g. ['id' => 2, 'currency' => 'EGP', 'symbol' => '£', 'string_format' => '...']
+     * @return array e.g. ['id' => 2, 'currency' => 'EGP', 'symbol' => '£', 'string_format' => '...']
+     *
      * @throws \Exception
      */
     protected function currencyForFrontend(int $currencyId): array
     {
         $model = $this->getCurrencyModel($currencyId);
-        if (!$model) {
+        if (! $model) {
             throw new \Exception("Currency ID {$currencyId} not found in database.");
         }
 
         return [
-            'id'            => $model->id,
-            'currency'      => $model->currency,
-            'symbol'        => $model->symbol,
+            'id' => $model->id,
+            'currency' => $model->currency,
+            'symbol' => $model->symbol,
             'string_format' => $model->string_format ?? null,
         ];
     }
@@ -174,13 +176,11 @@ trait ConvertsCurrency
     /**
      * Format a given amount using a currency ID or code.
      *
-     * @param  float  $amount
-     * @param  int|string    $currencyId
-     * @return string
+     * @param  int|string  $currencyId
      */
     protected function formatAmount(float $amount, $currencyId): string
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($amount, $currencyId);
+        return FinanceHelper::instance()->format_money($amount, $currencyId);
     }
 
     // ── Inline Model Conversion Helpers ──────────────────────────
@@ -189,12 +189,12 @@ trait ConvertsCurrency
      * Convert a model's amount + currency_id to the user's currency in-place.
      * Also sets the currency relation on the model and appends a formatted string attribute.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $amountField     e.g. 'amount', 'bid_amount', 'budget'
-     * @param  string  $currencyField   e.g. 'currency_id'
-     * @param  int     $toCurrencyId    Target currency ID
-     * @param  string|null  $date       Optional date for historical rate
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  Model  $model
+     * @param  string  $amountField  e.g. 'amount', 'bid_amount', 'budget'
+     * @param  string  $currencyField  e.g. 'currency_id'
+     * @param  int  $toCurrencyId  Target currency ID
+     * @param  string|null  $date  Optional date for historical rate
+     * @return Model
      */
     protected function convertModelCurrency(
         $model,

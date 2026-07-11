@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 class SchemaExportCommand extends Command
 {
     protected $signature = 'schema:export {--raw : Output the raw base64 string without formatting} {--out= : File to write the base64 output to}';
+
     protected $description = 'Export the local database schema to a JSON structure for synchronization';
 
     public function handle()
@@ -21,7 +22,7 @@ class SchemaExportCommand extends Command
         $schema = [];
         foreach ($columns as $col) {
             $table = $col->TABLE_NAME;
-            if (!isset($schema[$table])) {
+            if (! isset($schema[$table])) {
                 $schema[$table] = [];
             }
             $schema[$table][$col->COLUMN_NAME] = [
@@ -29,7 +30,7 @@ class SchemaExportCommand extends Command
                 'nullable' => $col->IS_NULLABLE,
                 'default' => $col->COLUMN_DEFAULT,
                 'extra' => $col->EXTRA,
-                'key' => $col->COLUMN_KEY
+                'key' => $col->COLUMN_KEY,
             ];
         }
 
@@ -42,7 +43,7 @@ class SchemaExportCommand extends Command
         } elseif ($this->option('raw')) {
             $this->output->write($base64);
         } else {
-            $this->info("Schema successfully exported.");
+            $this->info('Schema successfully exported.');
             $this->line($base64);
         }
 

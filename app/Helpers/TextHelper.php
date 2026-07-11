@@ -3,21 +3,15 @@
 namespace App\Helpers;
 
 use App\Models\AdminSettings;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Module\RoundnessModule;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use Illuminate\Http\Client\Request;
+use Carbon\CarbonInterface;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class TextHelper
 {
-
     /**
      * @var TextHelper
      */
@@ -26,8 +20,9 @@ class TextHelper
     public static function instance(): ?TextHelper
     {
         if (self::$instance === null) {
-            self::$instance = new TextHelper();
+            self::$instance = new TextHelper;
         }
+
         return self::$instance;
     }
 
@@ -36,6 +31,7 @@ class TextHelper
         $host = $request->getHost();
         $domain = parse_url($host, PHP_URL_HOST); // الحصول على اسم المضيف فقط
         $domainWithoutTld = preg_replace('/\.[^.]+$/', '', $domain); // التخلص من الامتداد
+
         return $domainWithoutTld;
     }
 
@@ -51,6 +47,7 @@ class TextHelper
         if ($trimmed === '') {
             return '';
         }
+
         return nl2br(e($trimmed));
     }
 
@@ -64,69 +61,74 @@ class TextHelper
                 return false;
             }
         }
+
         return $find_all;
     }
 
-
     public static function hide_email($email)
     {
-        $em = explode("@", $email);
+        $em = explode('@', $email);
         $name = implode('@', array_slice($em, 0, count($em) - 1));
         $len = floor(strlen($name) / 2);
 
-        return substr($name, 0, $len) . str_repeat('*', $len) . "@" . end($em);
+        return substr($name, 0, $len).str_repeat('*', $len).'@'.end($em);
     }
-
 
     public static function hide_name($name)
     {
-        if (auth()->user() && Auth::user()->isAdmin()){
+        if (auth()->user() && Auth::user()->isAdmin()) {
             return $name;
         }
-        if ($name == null) return null;
+        if ($name == null) {
+            return null;
+        }
         $name = preg_replace('/\s+/', ' ', $name);
-        $name_fragments = explode(" ", $name);
+        $name_fragments = explode(' ', $name);
 
         // Loop over "John" and "Doe"
-        $result = "";
+        $result = '';
         foreach ($name_fragments as $fragment) {
             if (mb_strlen($result) !== 0) {
-                $result .= " ";
+                $result .= ' ';
             }
 
             // Add clear first letter
             $result .= mb_substr($fragment, 0, 1);
 
             // Add asterisks
-            $result .= str_repeat("*", mb_strlen($fragment) - 1);
+            $result .= str_repeat('*', mb_strlen($fragment) - 1);
         }
+
         return $result;
     }
 
     public static function hide_name_v2($name)
     {
-        if ($name == null) return null;
+        if ($name == null) {
+            return null;
+        }
 
         // Normalize spaces (remove extra spaces)
         $name = preg_replace('/\s+/', ' ', trim($name));
 
         // Split the name into fragments (e.g., "John Doe" -> ["John", "Doe"])
-        $name_fragments = explode(" ", $name);
+        $name_fragments = explode(' ', $name);
 
         // Build the result with only the first character of each fragment
-        $result = "";
+        $result = '';
         foreach ($name_fragments as $index => $fragment) {
             if (mb_strlen($result) !== 0) {
-                $result .= " "; // Add a space between fragments
+                $result .= ' '; // Add a space between fragments
             }
 
             if ($index == 0) {
-                $result .= "*****";
+                $result .= '*****';
+
                 continue;
             }
             // Keep only the first character of the fragment
             $result .= mb_substr($fragment, 0, 1);
-            $result .= "*****";
+            $result .= '*****';
         }
 
         return trim($result);
@@ -141,13 +143,14 @@ class TextHelper
         $minutes = floor(($init / 60) % 60);
         $seconds = $init % 60;
 
-        if (!empty($day)) {
-            $day = Carbon::now()->subDays($day)->diffForHumans(null, \Carbon\CarbonInterface::DIFF_ABSOLUTE);
+        if (! empty($day)) {
+            $day = Carbon::now()->subDays($day)->diffForHumans(null, CarbonInterface::DIFF_ABSOLUTE);
         } else {
             $day = '';
         }
         $sign = $isNegative ? '-' : '';
-        return $sign . (!empty($day) ? $day . ' ' : '') . sprintf("%02dh:%02dm:%02ds", $hours, $minutes, $seconds);
+
+        return $sign.(! empty($day) ? $day.' ' : '').sprintf('%02dh:%02dm:%02ds', $hours, $minutes, $seconds);
     }
 
     /**
@@ -165,13 +168,13 @@ class TextHelper
 
     public function arNum2enArray($value)
     {
-        $array = array();
+        $array = [];
         foreach ($value as $k => $v) {
             $array[$k] = $this->arNum2en($v);
         }
+
         return $array;
     }
-
 
     public static function prep_url($str = '')
     {
@@ -179,26 +182,29 @@ class TextHelper
             return '';
         }
         $url = parse_url($str);
-        if (!$url or !isset($url['scheme'])) {
-            return 'http://' . $str;
+        if (! $url or ! isset($url['scheme'])) {
+            return 'http://'.$str;
         }
+
         return $str;
     }
 
-    public static function array2csv($data, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
+    public static function array2csv($data, $delimiter = ',', $enclosure = '"', $escape_char = '\\')
     {
         $f = fopen('php://memory', 'r+');
         foreach ($data as $item) {
             fputcsv($f, $item, $delimiter, $enclosure, $escape_char);
         }
         rewind($f);
+
         return stream_get_contents($f);
     }
 
     public function fix_numbers($numbers)
     {
         $num = $this->arNum2en($numbers);
-        $res = preg_replace("/[^0-9]/", "", $num);
+        $res = preg_replace('/[^0-9]/', '', $num);
+
         return $res;
     }
 
@@ -214,6 +220,7 @@ class TextHelper
         $value = str_replace('٧', '7', $value);
         $value = str_replace('٨', '8', $value);
         $value = str_replace('٩', '9', $value);
+
         return $value;
     }
 
@@ -221,26 +228,30 @@ class TextHelper
     {
         $ex = explode(' ', $name);
         if (count($ex) == 2) {
-            return strtoupper(mb_substr($ex[0], 0, 1)) . strtoupper(mb_substr($ex[1], 0, 1));
+            return strtoupper(mb_substr($ex[0], 0, 1)).strtoupper(mb_substr($ex[1], 0, 1));
         }
         if (count($ex) == 1) {
             return strtoupper(mb_substr($ex[0], 0, 1));
         }
+
         return 'NO';
     }
 
     public static function numberToColumnName($number)
     {
-        $abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        $abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
         $len = strlen($abc);
 
-        $result = "";
+        $result = '';
         while ($number > 0) {
             $index = $number % $len;
-            $result = $abc[$index] . $result;
+            $result = $abc[$index].$result;
             $number = floor($number / $len);
         }
-        if ($result == '') return "A";
+        if ($result == '') {
+            return 'A';
+        }
+
         return $result;
     }
 
@@ -276,7 +287,8 @@ class TextHelper
 
     public function crockford_encodeC($base10)
     {
-        $key = "encryption key";
+        $key = 'encryption key';
+
         return bin2hex(openssl_encrypt($base10, 'AES-128-CBC', $key));
     }
 
@@ -319,7 +331,7 @@ class TextHelper
         while ($number > 0) {
             $remainder = $number % $base;
             $number = intdiv($number, $base);
-            $encoded = $chars[$remainder] . $encoded;
+            $encoded = $chars[$remainder].$encoded;
         }
 
         return $encoded ?: '0'; // Handle the case where $number is 0
@@ -329,7 +341,8 @@ class TextHelper
     {
         $date = date('ymd', strtotime($created_at));
         $randomPart = $this->crockford_encode2($id);
-        return $date . '-' . $randomPart;
+
+        return $date.'-'.$randomPart;
     }
 
     public function crockford_decode2($encoded)
@@ -342,7 +355,7 @@ class TextHelper
         $parts = explode('-', trim($encoded));
 
         if (count($parts) !== 2) {
-            throw new InvalidArgumentException("Invalid encoded string format.");
+            throw new InvalidArgumentException('Invalid encoded string format.');
         }
 
         $part = $parts[1];
@@ -366,58 +379,69 @@ class TextHelper
         return $decoded;
     }
 
-
     public function detect_utf_encoding($filename)
     {
-        define('UTF32_BIG_ENDIAN_BOM', chr(0x00) . chr(0x00) . chr(0xFE) . chr(0xFF));
-        define('UTF32_LITTLE_ENDIAN_BOM', chr(0xFF) . chr(0xFE) . chr(0x00) . chr(0x00));
-        define('UTF16_BIG_ENDIAN_BOM', chr(0xFE) . chr(0xFF));
-        define('UTF16_LITTLE_ENDIAN_BOM', chr(0xFF) . chr(0xFE));
-        define('UTF8_BOM', chr(0xEF) . chr(0xBB) . chr(0xBF));
+        define('UTF32_BIG_ENDIAN_BOM', chr(0x00).chr(0x00).chr(0xFE).chr(0xFF));
+        define('UTF32_LITTLE_ENDIAN_BOM', chr(0xFF).chr(0xFE).chr(0x00).chr(0x00));
+        define('UTF16_BIG_ENDIAN_BOM', chr(0xFE).chr(0xFF));
+        define('UTF16_LITTLE_ENDIAN_BOM', chr(0xFF).chr(0xFE));
+        define('UTF8_BOM', chr(0xEF).chr(0xBB).chr(0xBF));
 
         $text = file_get_contents($filename);
         $first2 = substr($text, 0, 2);
         $first3 = substr($text, 0, 3);
         $first4 = substr($text, 0, 3);
 
-        if ($first3 == UTF8_BOM) return 'UTF-8';
-        elseif ($first4 == UTF32_BIG_ENDIAN_BOM) return 'UTF-32BE';
-        elseif ($first4 == UTF32_LITTLE_ENDIAN_BOM) return 'UTF-32LE';
-        elseif ($first2 == UTF16_BIG_ENDIAN_BOM) return 'UTF-16BE';
-        elseif ($first2 == UTF16_LITTLE_ENDIAN_BOM) return 'UTF-16LE';
+        if ($first3 == UTF8_BOM) {
+            return 'UTF-8';
+        } elseif ($first4 == UTF32_BIG_ENDIAN_BOM) {
+            return 'UTF-32BE';
+        } elseif ($first4 == UTF32_LITTLE_ENDIAN_BOM) {
+            return 'UTF-32LE';
+        } elseif ($first2 == UTF16_BIG_ENDIAN_BOM) {
+            return 'UTF-16BE';
+        } elseif ($first2 == UTF16_LITTLE_ENDIAN_BOM) {
+            return 'UTF-16LE';
+        }
     }
 
     public function get_ip_address()
     {
 
         // Check for shared Internet/ISP IP
-        if (!empty($_SERVER['HTTP_CLIENT_IP']) && $this->validate_ip($_SERVER['HTTP_CLIENT_IP'])) {
+        if (! empty($_SERVER['HTTP_CLIENT_IP']) && $this->validate_ip($_SERVER['HTTP_CLIENT_IP'])) {
             return $_SERVER['HTTP_CLIENT_IP'];
         }
 
         // Check for IP addresses passing through proxies
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        if (! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 
             // Check if multiple IP addresses exist in var
             if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',') !== false) {
                 $iplist = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
                 foreach ($iplist as $ip) {
-                    if ($this->validate_ip($ip))
+                    if ($this->validate_ip($ip)) {
                         return $ip;
+                    }
                 }
             } else {
-                if ($this->validate_ip($_SERVER['HTTP_X_FORWARDED_FOR']))
+                if ($this->validate_ip($_SERVER['HTTP_X_FORWARDED_FOR'])) {
                     return $_SERVER['HTTP_X_FORWARDED_FOR'];
+                }
             }
         }
-        if (!empty($_SERVER['HTTP_X_FORWARDED']) && $this->validate_ip($_SERVER['HTTP_X_FORWARDED']))
+        if (! empty($_SERVER['HTTP_X_FORWARDED']) && $this->validate_ip($_SERVER['HTTP_X_FORWARDED'])) {
             return $_SERVER['HTTP_X_FORWARDED'];
-        if (!empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP']) && $this->validate_ip($_SERVER['HTTP_X_CLUSTER_CLIENT_IP']))
+        }
+        if (! empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP']) && $this->validate_ip($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
             return $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
-        if (!empty($_SERVER['HTTP_FORWARDED_FOR']) && $this->validate_ip($_SERVER['HTTP_FORWARDED_FOR']))
+        }
+        if (! empty($_SERVER['HTTP_FORWARDED_FOR']) && $this->validate_ip($_SERVER['HTTP_FORWARDED_FOR'])) {
             return $_SERVER['HTTP_FORWARDED_FOR'];
-        if (!empty($_SERVER['HTTP_FORWARDED']) && $this->validate_ip($_SERVER['HTTP_FORWARDED']))
+        }
+        if (! empty($_SERVER['HTTP_FORWARDED']) && $this->validate_ip($_SERVER['HTTP_FORWARDED'])) {
             return $_SERVER['HTTP_FORWARDED'];
+        }
 
         // Return unreliable IP address since all else failed
         return $_SERVER['REMOTE_ADDR'];
@@ -430,8 +454,9 @@ class TextHelper
     public function validate_ip($ip)
     {
 
-        if (strtolower($ip) === 'unknown')
+        if (strtolower($ip) === 'unknown') {
             return false;
+        }
 
         // Generate IPv4 network address
         $ip = ip2long($ip);
@@ -444,23 +469,32 @@ class TextHelper
             $ip = sprintf('%u', $ip);
 
             // Do private network range checking
-            if ($ip >= 0 && $ip <= 50331647)
+            if ($ip >= 0 && $ip <= 50331647) {
                 return false;
-            if ($ip >= 167772160 && $ip <= 184549375)
+            }
+            if ($ip >= 167772160 && $ip <= 184549375) {
                 return false;
-            if ($ip >= 2130706432 && $ip <= 2147483647)
+            }
+            if ($ip >= 2130706432 && $ip <= 2147483647) {
                 return false;
-            if ($ip >= 2851995648 && $ip <= 2852061183)
+            }
+            if ($ip >= 2851995648 && $ip <= 2852061183) {
                 return false;
-            if ($ip >= 2886729728 && $ip <= 2887778303)
+            }
+            if ($ip >= 2886729728 && $ip <= 2887778303) {
                 return false;
-            if ($ip >= 3221225984 && $ip <= 3221226239)
+            }
+            if ($ip >= 3221225984 && $ip <= 3221226239) {
                 return false;
-            if ($ip >= 3232235520 && $ip <= 3232301055)
+            }
+            if ($ip >= 3232235520 && $ip <= 3232301055) {
                 return false;
-            if ($ip >= 4294967040)
+            }
+            if ($ip >= 4294967040) {
                 return false;
+            }
         }
+
         return true;
     }
 
@@ -473,7 +507,8 @@ class TextHelper
 
         $qr_img = null;
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.invoices.download', compact('invoice', 'invoice_items', 'user', 'project', 'qr_img'));
+        $pdf = Pdf::loadView('admin.invoices.download', compact('invoice', 'invoice_items', 'user', 'project', 'qr_img'));
+
         return $pdf;
     }
 
@@ -481,11 +516,12 @@ class TextHelper
     {
         if ($invoice->currency != AdminSettings::GetValue('business_currency', '2')) {
             if ($invoice->status_str() == 'Partially_paid') {
-                $text = 'Paid ' . $invoice->business_paid_str() . ' of ' . $invoice->business_total_str();
+                $text = 'Paid '.$invoice->business_paid_str().' of '.$invoice->business_total_str();
             } else {
                 $text = $invoice->business_total_str();
             }
-            return 'data-toggle="tooltip" data-placement="top" title="' . $text . '"';
+
+            return 'data-toggle="tooltip" data-placement="top" title="'.$text.'"';
         } else {
             return '';
         }
@@ -500,13 +536,16 @@ class TextHelper
             $a = explode('/', $parseUrl['path'], 2);
             $domain = trim(array_shift($a));
         }
+
         return str_ireplace('www.', '', $domain);
     }
 
     public static function parse_link($message)
     {
         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
-        if (strlen($message) > 512) return htmlentities($message);
+        if (strlen($message) > 512) {
+            return htmlentities($message);
+        }
         $message = preg_replace("/(\r?\n){2,}/", "\n", htmlentities($message));
         if (preg_match_all($reg_exUrl, $message, $urls)) {
             foreach ($urls[0] as $url) {
@@ -514,6 +553,7 @@ class TextHelper
                 $message = str_replace($url, "<a href=\"{$url}\" target=\"_blank\">{$url}</a>", $message);
             }
         }
+
         return $message;
     }
 }

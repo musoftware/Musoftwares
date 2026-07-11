@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Currency extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     public $timestamps = false;
 
@@ -18,10 +17,11 @@ class Currency extends Model
 
     public static function as_array()
     {
-        $as_array = array();
+        $as_array = [];
         foreach (static::all() as $item) {
             $as_array[$item->id] = $item;
         }
+
         return $as_array;
     }
 

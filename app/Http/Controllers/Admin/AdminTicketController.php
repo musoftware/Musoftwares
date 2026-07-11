@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Ticket;
-use App\Services\SupportDeskService;
 use App\Http\Resources\TicketResource;
+use App\Models\Ticket;
+use App\Models\TicketCannedResponse;
+use App\Models\User;
+use App\Services\SupportDeskService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -21,15 +23,15 @@ class AdminTicketController extends Controller
         $filters = $request->only(['status', 'priority', 'search', 'sort', 'direction']);
 
         $tickets = $this->supportDeskService->getTickets($filters)
-                        ->withQueryString()
-                        ->through(fn($t) => (new TicketResource($t))->resolve());
+            ->withQueryString()
+            ->through(fn ($t) => (new TicketResource($t))->resolve());
 
         $stats = $this->supportDeskService->getTicketStats();
 
         return Inertia::render('Admin/Tickets/Index', [
             'tickets' => $tickets,
             'filters' => $filters,
-            'stats'   => $stats,
+            'stats' => $stats,
         ]);
     }
 
@@ -37,8 +39,8 @@ class AdminTicketController extends Controller
     {
         $ticket->load(['user', 'conversation.messages.sender']);
 
-        $supportAgents = \App\Models\User::role(['admin', 'moderator'])->get(['id', 'name', 'email']);
-        $cannedResponses = \App\Models\TicketCannedResponse::all();
+        $supportAgents = User::role(['admin', 'moderator'])->get(['id', 'name', 'email']);
+        $cannedResponses = TicketCannedResponse::all();
 
         return Inertia::render('Admin/Tickets/Show', [
             'ticket' => (new TicketResource($ticket))->resolve(),
@@ -133,7 +135,7 @@ class AdminTicketController extends Controller
             'body' => 'required|string',
         ]);
 
-        \App\Models\TicketCannedResponse::create([
+        TicketCannedResponse::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
             'body' => $request->body,

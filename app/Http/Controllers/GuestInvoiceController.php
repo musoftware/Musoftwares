@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
+use App\Builders\KashierCheckoutBuilder;
 use App\Helpers\KashierHelper;
 use App\Http\Resources\InvoiceResource;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
 class GuestInvoiceController extends Controller
@@ -26,7 +28,7 @@ class GuestInvoiceController extends Controller
         return Inertia::render('Guest/InvoiceShow', [
             'invoice' => (new InvoiceResource($invoice))->resolve(),
             // Pass down signed URL so the frontend can submit the payment form securely
-            'pay_url' => \Illuminate\Support\Facades\URL::signedRoute('guest.invoices.pay', ['invoice' => $invoice->id])
+            'pay_url' => URL::signedRoute('guest.invoices.pay', ['invoice' => $invoice->id]),
         ]);
     }
 
@@ -53,14 +55,14 @@ class GuestInvoiceController extends Controller
             return redirect()->back()->with('error', __('general.invoice_total_zero'));
         }
 
-        if (!$invoice->currency) {
+        if (! $invoice->currency) {
             throw new \Exception("Invoice {$invoice->id} is missing an associated currency relation.");
         }
         $currency = $invoice->currency->currency;
 
-        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+        $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($amount, $currency)
-            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'user_' . $invoice->user_id)
+            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'user_'.$invoice->user_id)
             ->withSource('guest-invoice-payment', 'inv_')
             ->withMetadata([
                 'invoice_id' => $invoice->id,
@@ -83,7 +85,7 @@ class GuestInvoiceController extends Controller
     {
         return Inertia::render('Guest/PaymentResult', [
             'status' => 'success',
-            'message' => __('general.payment_successful_thank_you')
+            'message' => __('general.payment_successful_thank_you'),
         ]);
     }
 
@@ -94,7 +96,7 @@ class GuestInvoiceController extends Controller
     {
         return Inertia::render('Guest/PaymentResult', [
             'status' => 'error',
-            'message' => __('general.payment_failed_please_try_again')
+            'message' => __('general.payment_failed_please_try_again'),
         ]);
     }
 
@@ -103,13 +105,14 @@ class GuestInvoiceController extends Controller
      */
     public function paymentWebhook(Request $request)
     {
-        if (!KashierHelper::validatePayload()) {
+        if (! KashierHelper::validatePayload()) {
             Log::warning('Guest Invoice Kashier webhook: Invalid signature.');
+
             return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 400);
         }
 
         $payload = json_decode($request->getContent(), true);
-        if (!$payload || !isset($payload['data'])) {
+        if (! $payload || ! isset($payload['data'])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid payload format'], 400);
         }
 
@@ -121,12 +124,12 @@ class GuestInvoiceController extends Controller
         }
 
         $invoiceId = $metaData['invoice_id'] ?? null;
-        if (!$invoiceId) {
+        if (! $invoiceId) {
             return response()->json(['status' => 'error', 'message' => 'Missing invoice ID'], 400);
         }
 
         $invoice = Invoice::find($invoiceId);
-        if (!$invoice) {
+        if (! $invoice) {
             return response()->json(['status' => 'error', 'message' => 'Invoice not found'], 404);
         }
 
@@ -136,12 +139,13 @@ class GuestInvoiceController extends Controller
                     $invoice->mark_as_paid();
                     Log::info("Guest Invoice payment successful for invoice #{$invoice->id}");
                 } catch (\Exception $e) {
-                    Log::error("Guest Invoice payment failed to mark as paid for invoice #{$invoice->id}: " . $e->getMessage());
+                    Log::error("Guest Invoice payment failed to mark as paid for invoice #{$invoice->id}: ".$e->getMessage());
+
                     return response()->json(['status' => 'error', 'message' => 'Failed to process payment internally'], 500);
                 }
             }
         } else {
-            Log::info("Guest Invoice payment failed for invoice #{$invoice->id}, Status: " . $data['status']);
+            Log::info("Guest Invoice payment failed for invoice #{$invoice->id}, Status: ".$data['status']);
         }
 
         return response()->json(['status' => 'success']);

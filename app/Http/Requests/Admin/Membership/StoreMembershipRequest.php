@@ -14,13 +14,13 @@ class StoreMembershipRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'                => 'required|string|max:255|unique:memberships',
-            'description'         => 'nullable|string',
-            'amount'              => 'required|numeric|min:0',
-            'currency'            => 'required|integer|exists:currencies,id',
-            'color_hue_degree'    => 'nullable|integer|min:0|max:360',
-            'is_active'           => 'boolean',
-            'software_programs'   => 'nullable|array',
+            'name' => 'required|string|max:255|unique:memberships',
+            'description' => 'nullable|string',
+            'amount' => 'required|numeric|min:0',
+            'currency' => 'required|integer|exists:currencies,id',
+            'color_hue_degree' => 'nullable|integer|min:0|max:360',
+            'is_active' => 'boolean',
+            'software_programs' => 'nullable|array',
             'software_programs.*' => 'exists:software_programs,id',
         ];
     }

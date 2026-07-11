@@ -2,16 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\User;
-use App\Models\Currency;
-use Asantibanez\LivewireCharts\Models\ColumnChartModel;
-use Asantibanez\LivewireCharts\Models\LineChartModel;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
 class CurlHelper
 {
-
     public static function fetchHtmlContent($url)
     {
         // Initialize cURL
@@ -28,7 +20,7 @@ class CurlHelper
 
         // Check for errors
         if (curl_errno($ch)) {
-            throw new Exception('cURL error: ' . curl_error($ch));
+            throw new Exception('cURL error: '.curl_error($ch));
         }
 
         // Close the cURL session
@@ -36,6 +28,4 @@ class CurlHelper
 
         return $html;
     }
-
-
 }

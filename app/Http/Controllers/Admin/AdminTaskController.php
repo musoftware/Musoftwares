@@ -2,14 +2,31 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\FinanceHelper;
 use App\Http\Controllers\Controller;
-use App\Models\Todo;
-use App\Models\Task;
-use App\Models\User;
+use App\Jobs\SyncTodoToGoogleCalendar;
+use App\Models\CurrenciesExchange;
 use App\Models\Currency;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\InvoiceItemTimer;
+use App\Models\RecurringBusyTime;
+use App\Models\Task;
+use App\Models\TenantClient;
+use App\Models\Todo;
+use App\Models\TodoChecklistItem;
+use App\Models\User;
 use App\Services\Admin\TodoListQueryService;
+use App\Services\WhatsAppNotificationService;
+use Carbon\Carbon;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -24,6 +41,7 @@ class AdminTaskController extends Controller
         if (is_string($data)) {
             // Convert to UTF-8, replacing any invalid sequences
             $cleaned = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+
             // Remove any remaining invalid UTF-8 bytes
             return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $cleaned) ?? $data;
         }
@@ -32,26 +50,27 @@ class AdminTaskController extends Controller
             return array_map(fn ($item) => $this->sanitizeUtf8($item), $data);
         }
 
-        if ($data instanceof \Illuminate\Support\Collection) {
+        if ($data instanceof Collection) {
             return $data->map(fn ($item) => $this->sanitizeUtf8($item));
         }
 
         return $data;
     }
+
     /**
      * Display a listing of active checklist items for all clients.
      */
     public function asList(Request $request, TodoListQueryService $svc): InertiaResponse
     {
-        $filters   = $svc->normalizeFilters($request->all());
+        $filters = $svc->normalizeFilters($request->all());
         $paginator = $svc->paginate($filters, $filters['per_page']);
-        $stats     = $svc->computeStats();
+        $stats = $svc->computeStats();
 
         $clients = User::role('client')
             ->orderBy('name')
             ->get(['id', 'name'])
             ->map(fn ($u) => [
-                'id'   => $u->id,
+                'id' => $u->id,
                 'name' => $u->name,
             ]);
 
@@ -59,15 +78,15 @@ class AdminTaskController extends Controller
 
         return Inertia::render('Admin/Tasks/AsList', $this->sanitizeUtf8([
             'arrangedClients' => $svc->arrange($paginator),
-            'clients'         => $clients,
-            'filters'         => $filters,
-            'pagination'      => [
+            'clients' => $clients,
+            'filters' => $filters,
+            'pagination' => [
                 'current_page' => $paginator->currentPage(),
-                'last_page'    => $paginator->lastPage(),
-                'per_page'     => $paginator->perPage(),
-                'total'        => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
             ],
-            'stats'           => $stats,
+            'stats' => $stats,
         ]));
     }
 
@@ -78,9 +97,9 @@ class AdminTaskController extends Controller
     public function bulkCompleteTodos(Request $request)
     {
         $data = $request->validate([
-            'todo_ids'   => ['required', 'array', 'min:1', 'max:500'],
+            'todo_ids' => ['required', 'array', 'min:1', 'max:500'],
             'todo_ids.*' => ['integer', 'exists:todos,id'],
-            'completed'  => ['required', 'boolean'],
+            'completed' => ['required', 'boolean'],
         ]);
 
         $now = now();
@@ -88,14 +107,14 @@ class AdminTaskController extends Controller
             ->active()
             ->whereIn('id', $data['todo_ids'])
             ->update([
-                'completed'    => (bool) $data['completed'],
+                'completed' => (bool) $data['completed'],
                 'completed_at' => $data['completed'] ? $now : null,
-                'updated_at'   => $now,
+                'updated_at' => $now,
             ]);
 
         return response()->json([
-            'status'   => 'success',
-            'message'  => __('general.task_status_updated_successfully'),
+            'status' => 'success',
+            'message' => __('general.task_status_updated_successfully'),
             'affected' => $affected,
         ]);
     }
@@ -110,16 +129,20 @@ class AdminTaskController extends Controller
     {
         $filters = $svc->normalizeFilters($request->all());
 
-        $query = $svc->baseQuery(liveOnly: false)->with(['task', 'user']);
-        if (\Illuminate\Support\Facades\Schema::hasColumn('todos', 'currency_id')) {
+        $query = $svc->baseQuery(liveOnly: false)->with([
+            'task.project.client',
+            'project.client',
+            'user',
+        ]);
+        if (Schema::hasColumn('todos', 'currency_id')) {
             $query->with('currency');
         }
         $svc->applyFilters($query, $filters);
         $svc->applySort($query, $filters['sort']);
 
-        $filename = 'active-tasks-' . now()->format('Ymd-His') . '.csv';
-        $headers  = [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
+        $filename = 'active-tasks-'.now()->format('Ymd-His').'.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
@@ -135,6 +158,7 @@ class AdminTaskController extends Controller
             ]);
             $query->chunk(500, function ($rows) use ($out) {
                 foreach ($rows as $t) {
+                    $client = $t->project?->client ?? $t->task?->project?->client ?? $t->user;
                     fputcsv($out, [
                         $t->id,
                         $t->title,
@@ -143,13 +167,13 @@ class AdminTaskController extends Controller
                         $t->paused ? '1' : '0',
                         $t->is_paid ? '1' : '0',
                         $t->cost,
-                        $t->currency?->currency ?? $t->user?->currency_name(),
+                        $t->currency?->currency ?? $client?->currency_name(),
                         $t->start_at,
                         $t->end_at,
                         $t->created_at?->toDateTimeString(),
-                        $t->user_id,
-                        $t->user?->name,
-                        $t->user?->email,
+                        $client?->id,
+                        $client?->name,
+                        $client?->email,
                         $t->task_id,
                         $t->task?->task_name,
                         $t->task ? '0' : '1',
@@ -174,29 +198,29 @@ class AdminTaskController extends Controller
         if ($request->wantsJson()) {
             return response()->json(['success' => true]);
         }
-        
+
         return redirect()->back()->with('message', __('general.task_status_updated_successfully'));
     }
 
     /**
      * Store an unpaid todo in the queue.
      */
-    public function storeUnpaidTodo(Request $request, \App\Models\TenantClient $client)
+    public function storeUnpaidTodo(Request $request, TenantClient $client)
     {
         $request->validate([
-            'title' => 'required|string|max:255'
+            'title' => 'required|string|max:255',
         ]);
 
-        $todo = new Todo();
+        $todo = new Todo;
         $todo->title = $request->title;
         $todo->user_id = $client->id;
         $todo->tenant_id = session('tenant_id');
         $todo->is_paid = false;
-        
+
         // Use client's hourly rate and currency for future calculation
         $todo->cost = $client->hourly_rate ?? 0;
         $todo->currency_id = $client->currency;
-        
+
         $todo->save();
 
         return redirect()->back()->with('message', __('general.task_added_to_the_queue'));
@@ -210,15 +234,17 @@ class AdminTaskController extends Controller
         if ($todo->is_paid) {
             return redirect()->back()->withErrors(['error' => 'Paid tasks cannot be deleted, they must be refunded.']);
         }
-        
+
         try {
-            $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
-            if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
-                \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
+            $adminUser = auth()->user() ?? User::role('super-admin')->first();
+            if ($adminUser && class_exists(SyncTodoToGoogleCalendar::class)) {
+                SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         $todo->delete();
+
         return redirect()->back()->with('message', __('general.task_removed_from_the_queue'));
     }
 
@@ -228,58 +254,58 @@ class AdminTaskController extends Controller
     public function payAndScheduleTodo(Todo $todo)
     {
         $client = $todo->user;
-        if (!$client || $todo->is_paid) {
+        if (! $client || $todo->is_paid) {
             return back()->withErrors(['error' => 'Invalid task.']);
         }
 
         $userCurrencyId = (int) $client->currency;
-        $amountInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $todo->cost, $todo->currency_id ?? 2, $userCurrencyId);
+        $amountInUserCurrency = CurrenciesExchange::RateToday((float) $todo->cost, $todo->currency_id ?? 2, $userCurrencyId);
 
         if ($client->available_balance() < $amountInUserCurrency) {
-            return back()->withErrors(['error' => 'Client has insufficient balance (' . \App\Helpers\FinanceHelper::instance()->format_money($client->available_balance(), $client->currency) . ' available).']);
+            return back()->withErrors(['error' => 'Client has insufficient balance ('.FinanceHelper::instance()->format_money($client->available_balance(), $client->currency).' available).']);
         }
 
         try {
-            return \Illuminate\Support\Facades\Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($todo, $client, $userCurrencyId, $amountInUserCurrency) {
-                
+            return Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($todo, $client, $userCurrencyId, $amountInUserCurrency) {
+
                 $todo->refresh();
                 if ($todo->is_paid) {
                     return back()->withErrors(['error' => 'Task is already paid.']);
                 }
 
                 if ($todo->start_at && $todo->end_at) {
-                    $start = \Carbon\Carbon::parse($todo->start_at, 'Africa/Cairo');
-                    $end = \Carbon\Carbon::parse($todo->end_at, 'Africa/Cairo');
+                    $start = Carbon::parse($todo->start_at, 'Africa/Cairo');
+                    $end = Carbon::parse($todo->end_at, 'Africa/Cairo');
                     if (Todo::focusCalendarSlotTaken($start, $end, $todo->id)) {
                         return back()->withErrors(['error' => 'This time slot overlaps with an existing booking.']);
                     }
                 }
 
-                \Illuminate\Support\Facades\DB::beginTransaction();
+                DB::beginTransaction();
                 try {
                     $todo->is_paid = true;
                     $todo->save();
 
-                    $invoice = new \App\Models\Invoice();
+                    $invoice = new Invoice;
                     $invoice->user_id = $client->id;
                     $invoice->currency = $userCurrencyId;
                     $invoice->project_id = $todo->task ? $todo->task->project_id : null;
                     $invoice->status = 'unpaid';
                     $invoice->schedule = [
                         'start_date' => $todo->start_at,
-                        'end_date'   => $todo->end_at,
+                        'end_date' => $todo->end_at,
                     ];
                     $client->invoices()->save($invoice);
 
-                    $item = new \App\Models\InvoiceItem();
-                    $item->item_title = \Illuminate\Support\Str::limit($todo->title, 255);
+                    $item = new InvoiceItem;
+                    $item->item_title = Str::limit($todo->title, 255);
                     $item->amount = 0;
                     $item->qty = 1;
                     $item->item_type = 'timer';
                     $invoice->items()->save($item);
 
                     if ($todo->start_at && $todo->end_at) {
-                        $timer = new \App\Models\InvoiceItemTimer();
+                        $timer = new InvoiceItemTimer;
                         $timer->invoice_item_id = $item->id;
                         $timer->user_id = $client->id;
                         $timer->project_id = $invoice->project_id;
@@ -298,30 +324,31 @@ class AdminTaskController extends Controller
                     $invoice->save();
                     $invoice->bill_invoice();
 
-                    \Illuminate\Support\Facades\DB::commit();
+                    DB::commit();
 
                     try {
                         if ($todo->start_at && $todo->end_at) {
-                            $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
-                            if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
-                                \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
+                            $adminUser = auth()->user() ?? User::role('super-admin')->first();
+                            if ($adminUser && class_exists(SyncTodoToGoogleCalendar::class)) {
+                                SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
                             }
                         }
                     } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+                        Log::warning('Google Calendar sync failed: '.$e->getMessage());
                     }
 
                     return redirect()->back()->with('message', __('general.task_scheduled_and_billed_successfully'));
 
                 } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\DB::rollBack();
+                    DB::rollBack();
                     throw $e;
                 }
             });
-        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+        } catch (LockTimeoutException $e) {
             return back()->withErrors(['error' => 'Booking system is currently busy. Please try again.']);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Admin payAndScheduleTodo failed: ' . $e->getMessage());
+            Log::error('Admin payAndScheduleTodo failed: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Failed to process payment for task.']);
         }
     }
@@ -331,7 +358,7 @@ class AdminTaskController extends Controller
      */
     public function calendar(Request $request): InertiaResponse
     {
-        $year  = (int) $request->get('year', date('Y'));
+        $year = (int) $request->get('year', date('Y'));
         $month = (int) $request->get('month', date('n'));
         $clientId = $request->get('client_id') ?? $request->get('tenant_id');
 
@@ -339,10 +366,10 @@ class AdminTaskController extends Controller
 
         // Build the visible date range pinned to the user-facing timezone so
         // server- and client-side date strings agree regardless of php.ini.
-        $startOfMonth = \Carbon\Carbon::create($year, $month, 1, 0, 0, 0, $tz)->startOfMonth();
-        $endOfMonth   = $startOfMonth->copy()->endOfMonth();
-        $startDate    = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
-        $endDate      = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
+        $startOfMonth = Carbon::create($year, $month, 1, 0, 0, 0, $tz)->startOfMonth();
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+        $startDate = $startOfMonth->copy()->startOfWeek(Carbon::MONDAY);
+        $endDate = $endOfMonth->copy()->endOfWeek(Carbon::SUNDAY);
 
         $eventType = $request->get('event_type'); // all|tasks|todos|busy
 
@@ -352,7 +379,7 @@ class AdminTaskController extends Controller
             ->whereNotNull('end_at')
             ->where(function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('start_at', [$startDate, $endDate])
-                  ->orWhereBetween('end_at', [$startDate, $endDate]);
+                    ->orWhereBetween('end_at', [$startDate, $endDate]);
             })
             ->with(['task', 'user']);
 
@@ -377,10 +404,10 @@ class AdminTaskController extends Controller
         $tasks = $tasksQuery->get();
 
         // 3. Recurring & specific busy times (cached briefly).
-        $busyTimes = \Illuminate\Support\Facades\Cache::remember(
+        $busyTimes = Cache::remember(
             'admin:calendar:active-busy-times',
             now()->addMinutes(5),
-            fn () => \App\Models\RecurringBusyTime::where('is_active', true)->get()
+            fn () => RecurringBusyTime::where('is_active', true)->get()
         );
 
         // Pre-fill the events map and expand busy times in a SINGLE pass.
@@ -393,8 +420,8 @@ class AdminTaskController extends Controller
         foreach ($period as $date) {
             $dateStr = $date->format('Y-m-d');
             $events[$dateStr] = [
-                'tasks'      => [],
-                'todos'      => [],
+                'tasks' => [],
+                'todos' => [],
                 'busy_times' => [],
             ];
 
@@ -403,16 +430,16 @@ class AdminTaskController extends Controller
                 $matches = false;
                 if ($bt->is_recurring && strcasecmp($bt->day_of_week, $dayOfWeek) === 0) {
                     $matches = true;
-                } elseif (!$bt->is_recurring && $bt->specific_date && $bt->specific_date->format('Y-m-d') === $dateStr) {
+                } elseif (! $bt->is_recurring && $bt->specific_date && $bt->specific_date->format('Y-m-d') === $dateStr) {
                     $matches = true;
                 }
-                if ($matches && (!$clientId || (int) $bt->user_id === (int) $clientId || $bt->user_id === null)) {
+                if ($matches && (! $clientId || (int) $bt->user_id === (int) $clientId || $bt->user_id === null)) {
                     $events[$dateStr]['busy_times'][] = [
-                        'id'          => 'busy-' . $bt->id,
-                        'title'       => $bt->reason ?: __('general.busy'),
+                        'id' => 'busy-'.$bt->id,
+                        'title' => $bt->reason ?: __('general.busy'),
                         'is_full_day' => (bool) $bt->is_full_day,
-                        'start_time'  => $bt->start_time ? \Carbon\Carbon::parse($bt->start_time)->format('H:i') : null,
-                        'end_time'    => $bt->end_time ? \Carbon\Carbon::parse($bt->end_time)->format('H:i') : null,
+                        'start_time' => $bt->start_time ? Carbon::parse($bt->start_time)->format('H:i') : null,
+                        'end_time' => $bt->end_time ? Carbon::parse($bt->end_time)->format('H:i') : null,
                     ];
                 }
             }
@@ -421,20 +448,20 @@ class AdminTaskController extends Controller
         // Tasks
         if ($eventType === null || $eventType === 'all' || $eventType === 'tasks') {
             foreach ($tasks as $task) {
-                $dateStr = \Carbon\Carbon::parse($task->due_date, $tz)->format('Y-m-d');
-                if (!isset($events[$dateStr])) {
+                $dateStr = Carbon::parse($task->due_date, $tz)->format('Y-m-d');
+                if (! isset($events[$dateStr])) {
                     continue;
                 }
                 $isDone = $task->all_todos_count > 0
                     ? ((int) $task->open_todos_count === 0)
                     : false;
                 $events[$dateStr]['tasks'][] = [
-                    'id'        => $task->id,
-                    'title'     => $task->task_name,
-                    'priority'  => $task->priority ?? 'normal',
+                    'id' => $task->id,
+                    'title' => $task->task_name,
+                    'priority' => $task->priority ?? 'normal',
                     'completed' => $isDone,
                     'client_id' => $task->user_id,
-                    'client'    => $task->user?->name ?? __('general.unknown'),
+                    'client' => $task->user?->name ?? __('general.unknown'),
                 ];
             }
         }
@@ -442,27 +469,27 @@ class AdminTaskController extends Controller
         // Todos
         if ($eventType === null || $eventType === 'all' || $eventType === 'todos') {
             foreach ($todos as $todo) {
-                $dateStr = \Carbon\Carbon::parse($todo->start_at, $tz)->format('Y-m-d');
-                if (!isset($events[$dateStr])) {
+                $dateStr = Carbon::parse($todo->start_at, $tz)->format('Y-m-d');
+                if (! isset($events[$dateStr])) {
                     continue;
                 }
                 $events[$dateStr]['todos'][] = [
-                    'id'             => $todo->id,
-                    'title'          => $todo->title,
-                    'priority'       => $todo->priority ?? 'normal',
+                    'id' => $todo->id,
+                    'title' => $todo->title,
+                    'priority' => $todo->priority ?? 'normal',
                     'priority_color' => $todo->priorityColor,
-                    'completed'      => (bool) $todo->completed,
-                    'task_id'        => $todo->task_id,
-                    'client_id'      => $todo->user_id,
-                    'client'         => $todo->user?->name ?? __('general.unknown'),
-                    'start_time'     => \Carbon\Carbon::parse($todo->start_at, $tz)->format('H:i'),
-                    'end_time'       => $todo->end_at ? \Carbon\Carbon::parse($todo->end_at, $tz)->format('H:i') : null,
+                    'completed' => (bool) $todo->completed,
+                    'task_id' => $todo->task_id,
+                    'client_id' => $todo->user_id,
+                    'client' => $todo->user?->name ?? __('general.unknown'),
+                    'start_time' => Carbon::parse($todo->start_at, $tz)->format('H:i'),
+                    'end_time' => $todo->end_at ? Carbon::parse($todo->end_at, $tz)->format('H:i') : null,
                 ];
             }
         }
 
         $clients = User::role('client')->orderBy('name')->get(['id', 'name'])->map(fn ($u) => [
-            'id'   => $u->id,
+            'id' => $u->id,
             'name' => $u->name,
         ]);
 
@@ -470,20 +497,20 @@ class AdminTaskController extends Controller
         $stats = [
             'todos_this_month' => $todos->count(),
             'tasks_this_month' => $tasks->count(),
-            'busy_days'        => collect($events)->filter(
+            'busy_days' => collect($events)->filter(
                 fn ($d) => count($d['busy_times']) > 0
             )->count(),
         ];
 
         return Inertia::render('Admin/Tasks/TaskCalendar', $this->sanitizeUtf8([
-            'events'     => $events,
-            'year'       => $year,
-            'month'      => $month,
-            'tz'         => $tz,
-            'clients'    => $clients,
-            'stats'      => $stats,
-            'filters'    => [
-                'client_id'  => $clientId,
+            'events' => $events,
+            'year' => $year,
+            'month' => $month,
+            'tz' => $tz,
+            'clients' => $clients,
+            'stats' => $stats,
+            'filters' => [
+                'client_id' => $clientId,
                 'event_type' => $eventType ?? 'all',
             ],
         ]));
@@ -515,11 +542,11 @@ class AdminTaskController extends Controller
                 $initials = mb_substr($initials, 0, 2, 'UTF-8');
 
                 return [
-                    'id'              => $u->id,
-                    'name'            => $u->name,
-                    'email'           => $u->email,
-                    'initials'        => $initials ?: 'C',
-                    'total_tasks'     => (int) $u->total_tasks,
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'email' => $u->email,
+                    'initials' => $initials ?: 'C',
+                    'total_tasks' => (int) $u->total_tasks,
                     'completed_tasks' => (int) $u->completed_tasks,
                 ];
             });
@@ -528,36 +555,36 @@ class AdminTaskController extends Controller
         $todos = [];
 
         if ($clientId) {
-            $clientUser = User::role('client')->findOrFail($clientId);
+            $clientUser = User::findOrFail($clientId);
             $totalTasks = Todo::where('user_id', $clientUser->id)->count();
             $completedTasks = Todo::where('user_id', $clientUser->id)->where('completed', true)->count();
             $latestTask = Task::where('user_id', $clientUser->id)->latest()->first();
 
-            $rateEgp = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
-            if ((float) $clientUser->booking_rate > 0 && ($clientUser->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(\Carbon\Carbon::parse($clientUser->booking_rate_expires_at)->startOfDay()))) {
-                $rateEgp = (float) \App\Models\CurrenciesExchange::RateToday($clientUser->booking_rate, $clientUser->booking_rate_currency ?? $clientUser->currency ?? 1, 2);
-            } else if ($clientUser->hasSubscription() && $clientUser->plan) {
+            $rateEgp = FinanceHelper::calculateOverheadHourlyRate();
+            if ((float) $clientUser->booking_rate > 0 && ($clientUser->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(Carbon::parse($clientUser->booking_rate_expires_at)->startOfDay()))) {
+                $rateEgp = (float) CurrenciesExchange::RateToday($clientUser->booking_rate, $clientUser->booking_rate_currency ?? $clientUser->currency ?? 1, 2);
+            } elseif ($clientUser->hasSubscription() && $clientUser->plan) {
                 $rateEgp = $clientUser->plan->calcDiscount((float) $rateEgp);
             }
-            $fh = \App\Helpers\FinanceHelper::instance();
+            $fh = FinanceHelper::instance();
             $baseCost = $fh->price_fixer($rateEgp, 2);
             $commission = 0;
             if ($clientUser->ref_user && $clientUser->ref_user->shouldAddCommissionToTotal()) {
                 $commission = $clientUser->ref_user->calculateCommissionAmount($baseCost, 2, $clientUser);
             }
             $finalCostEgp = $fh->price_fixer($baseCost + $commission, 2);
-            $hourlyRateInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $finalCostEgp, 2, (int)$clientUser->currency);
+            $hourlyRateInUserCurrency = CurrenciesExchange::RateToday((float) $finalCostEgp, 2, (int) $clientUser->currency);
 
             $selectedClient = [
-                'id'              => $clientUser->id,
-                'name'            => $clientUser->name,
-                'email'           => $clientUser->email,
-                'balance'         => (float) $clientUser->available_balance(),
-                'currency'        => $clientUser->currency_name(),
-                'hourly_rate'     => round($hourlyRateInUserCurrency, 2),
-                'total_tasks'     => $totalTasks,
+                'id' => $clientUser->id,
+                'name' => $clientUser->name,
+                'email' => $clientUser->email,
+                'balance' => (float) $clientUser->available_balance(),
+                'currency' => $clientUser->currency_name(),
+                'hourly_rate' => round($hourlyRateInUserCurrency, 2),
+                'total_tasks' => $totalTasks,
                 'completed_tasks' => $completedTasks,
-                'latest_task_id'  => $latestTask ? $latestTask->id : null,
+                'latest_task_id' => $latestTask ? $latestTask->id : null,
             ];
 
             $todos = Todo::where('user_id', $clientUser->id)
@@ -571,51 +598,51 @@ class AdminTaskController extends Controller
                     $userCurrencyId = (int) $clientUser->currency;
 
                     // Convert EGP cost to client's currency for displaying on refund dialogs
-                    $costInClientCurrency = (float) \App\Models\CurrenciesExchange::RateToday((float) $todo->cost, $todo->currency_id ?? 2, $userCurrencyId);
+                    $costInClientCurrency = (float) CurrenciesExchange::RateToday((float) $todo->cost, $todo->currency_id ?? 2, $userCurrencyId);
 
                     // show_refund logic
                     $invalidSlot = $todo->start_at === null || $todo->end_at === null;
-                    if (!$invalidSlot) {
-                        $start = \Carbon\Carbon::parse($todo->start_at);
-                        $end = \Carbon\Carbon::parse($todo->end_at);
-                        $invalidSlot = !$end->gt($start);
+                    if (! $invalidSlot) {
+                        $start = Carbon::parse($todo->start_at);
+                        $end = Carbon::parse($todo->end_at);
+                        $invalidSlot = ! $end->gt($start);
                     }
 
                     $showRefund = false;
-                    if ($todo->is_paid && !$todo->refunded) {
+                    if ($todo->is_paid && ! $todo->refunded) {
                         if ($invalidSlot) {
                             $showRefund = true;
-                        } elseif ($todo->end_at && \Carbon\Carbon::parse($todo->end_at, 'Africa/Cairo')->isFuture()) {
+                        } elseif ($todo->end_at && Carbon::parse($todo->end_at, 'Africa/Cairo')->isFuture()) {
                             $showRefund = true;
                         }
                     }
 
                     return [
-                        'id'                      => $todo->id,
-                        'task_id'                 => $todo->task_id,
-                        'task_name'               => $todo->task?->task_name ?? 'My Focus',
-                        'title'                   => $todo->title,
-                        'description'             => $todo->description,
-                        'completed'               => (bool)$todo->completed,
-                        'paused'                  => (bool)$todo->paused,
-                        'is_paid'                 => (bool)$todo->is_paid,
-                        'cost'                    => (float)$todo->cost,
+                        'id' => $todo->id,
+                        'task_id' => $todo->task_id,
+                        'task_name' => $todo->task?->task_name ?? 'My Focus',
+                        'title' => $todo->title,
+                        'description' => $todo->description,
+                        'completed' => (bool) $todo->completed,
+                        'paused' => (bool) $todo->paused,
+                        'is_paid' => (bool) $todo->is_paid,
+                        'cost' => (float) $todo->cost,
                         'cost_in_client_currency' => $costInClientCurrency,
-                        'client_currency'         => $clientCurrency,
-                        'start_at'                => $todo->start_at ? \Carbon\Carbon::parse($todo->start_at)->toISOString() : null,
-                        'end_at'                  => $todo->end_at ? \Carbon\Carbon::parse($todo->end_at)->toISOString() : null,
-                        'refunded'                => (bool)$todo->refunded,
-                        'refund_amount'           => (float)$todo->refund_amount,
-                        'show_refund'             => $showRefund,
+                        'client_currency' => $clientCurrency,
+                        'start_at' => $todo->start_at ? Carbon::parse($todo->start_at)->toISOString() : null,
+                        'end_at' => $todo->end_at ? Carbon::parse($todo->end_at)->toISOString() : null,
+                        'refunded' => (bool) $todo->refunded,
+                        'refund_amount' => (float) $todo->refund_amount,
+                        'show_refund' => $showRefund,
                     ];
                 });
         }
 
         return Inertia::render('Admin/Tasks/ClientTasks', $this->sanitizeUtf8([
-            'clients'        => $clients,
+            'clients' => $clients,
             'selectedClient' => $selectedClient,
-            'todos'          => $todos,
-            'filters'        => [
+            'todos' => $todos,
+            'filters' => [
                 'client_id' => $clientId,
             ],
         ]));
@@ -627,16 +654,16 @@ class AdminTaskController extends Controller
     public function refundTodo(Request $request, Todo $todo)
     {
         $user = $todo->user;
-        if (!$todo->is_paid || $todo->refunded || !$user) {
+        if (! $todo->is_paid || $todo->refunded || ! $user) {
             return redirect()->back()->withErrors(['error' => 'This item cannot be refunded.']);
         }
 
         $now = now('Africa/Cairo');
         $invalidSlot = $todo->start_at === null || $todo->end_at === null;
-        if (!$invalidSlot) {
-            $start = \Carbon\Carbon::parse($todo->start_at, 'Africa/Cairo');
-            $end = \Carbon\Carbon::parse($todo->end_at, 'Africa/Cairo');
-            $invalidSlot = !$end->gt($start);
+        if (! $invalidSlot) {
+            $start = Carbon::parse($todo->start_at, 'Africa/Cairo');
+            $end = Carbon::parse($todo->end_at, 'Africa/Cairo');
+            $invalidSlot = ! $end->gt($start);
         } else {
             $start = null;
             $end = null;
@@ -644,6 +671,7 @@ class AdminTaskController extends Controller
 
         if ($invalidSlot) {
             $this->refundInvalidSlotTodo($todo, $user);
+
             return redirect()->back()->with('message', __('general.refund_processed_successfully'));
         }
 
@@ -655,6 +683,7 @@ class AdminTaskController extends Controller
         $totalSeconds = $start->diffInSeconds($end);
         if ($totalSeconds <= 0) {
             $this->refundInvalidSlotTodo($todo, $user);
+
             return redirect()->back()->with('message', __('general.refund_processed_successfully'));
         }
 
@@ -672,11 +701,11 @@ class AdminTaskController extends Controller
         }
 
         try {
-            \Illuminate\Support\Facades\DB::beginTransaction();
+            DB::beginTransaction();
             $project = $todo->task ? $todo->task->project : null;
 
             // Refund user balance
-            $reason = 'Refund for todo: ' . \Illuminate\Support\Str::limit($todo->title, 80) . ' [todo_time_refund]';
+            $reason = 'Refund for todo: '.Str::limit($todo->title, 80).' [todo_time_refund]';
             $user->add_balance(
                 $refundAmount,
                 $reason,
@@ -686,12 +715,12 @@ class AdminTaskController extends Controller
             );
 
             // SYNC InvoiceItemTimer if it exists
-            $oldEnd = \Carbon\Carbon::parse($todo->end_at)->toDateTimeString();
+            $oldEnd = Carbon::parse($todo->end_at)->toDateTimeString();
             $timerRecord = InvoiceItemTimer::where('user_id', $user->id)
-                ->where('date_start', \Carbon\Carbon::parse($todo->start_at)->toDateTimeString())
+                ->where('date_start', Carbon::parse($todo->start_at)->toDateTimeString())
                 ->where('date_end', $oldEnd)
-                ->whereHas('invoiceItem', function($q) use ($todo) {
-                    $q->where('item_title', \Illuminate\Support\Str::limit($todo->title, 255));
+                ->whereHas('invoiceItem', function ($q) use ($todo) {
+                    $q->where('item_title', Str::limit($todo->title, 255));
                 })
                 ->first();
 
@@ -710,25 +739,26 @@ class AdminTaskController extends Controller
                 $timerRecord->save();
             }
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
-            \Illuminate\Support\Facades\Log::error('Todo refund remaining time failed: ' . $e->getMessage(), [
+            DB::rollBack();
+            Log::error('Todo refund remaining time failed: '.$e->getMessage(), [
                 'user_id' => $user->id,
                 'todo_id' => $todo->id,
             ]);
+
             return redirect()->back()->withErrors(['error' => 'Failed to process refund.']);
         }
 
         // WhatsApp notification if service exists
         try {
             if (class_exists('App\Services\WhatsAppNotificationService')) {
-                $whatsApp = app(\App\Services\WhatsAppNotificationService::class);
+                $whatsApp = app(WhatsAppNotificationService::class);
                 $message = $whatsApp->generateRefundMessage($user, $todo, $refundAmount);
                 $whatsApp->sendMessage($user, $message);
             }
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('WhatsApp refund notification failed: ' . $e->getMessage(), [
+            Log::warning('WhatsApp refund notification failed: '.$e->getMessage(), [
                 'user_id' => $user->id,
                 'todo_id' => $todo->id,
             ]);
@@ -743,10 +773,10 @@ class AdminTaskController extends Controller
     protected function refundInvalidSlotTodo(Todo $todo, $user): void
     {
         $refundAmount = round((float) $todo->cost, 2);
-        $refundReason = 'Refund for todo: ' . \Illuminate\Support\Str::limit($todo->title, 80) . ' [todo_time_refund]';
+        $refundReason = 'Refund for todo: '.Str::limit($todo->title, 80).' [todo_time_refund]';
 
         try {
-            \Illuminate\Support\Facades\DB::beginTransaction();
+            DB::beginTransaction();
             $project = $todo->task ? $todo->task->project : null;
 
             if ($refundAmount > 0) {
@@ -760,14 +790,14 @@ class AdminTaskController extends Controller
             }
 
             // Sync timer delete
-            $oldEnd = $todo->end_at ? \Carbon\Carbon::parse($todo->end_at)->toDateTimeString() : null;
-            $dateStartStr = $todo->start_at ? \Carbon\Carbon::parse($todo->start_at)->toDateTimeString() : null;
+            $oldEnd = $todo->end_at ? Carbon::parse($todo->end_at)->toDateTimeString() : null;
+            $dateStartStr = $todo->start_at ? Carbon::parse($todo->start_at)->toDateTimeString() : null;
             if ($dateStartStr !== null && $oldEnd !== null) {
                 $timerRecord = InvoiceItemTimer::where('user_id', $user->id)
                     ->where('date_start', $dateStartStr)
                     ->where('date_end', $oldEnd)
                     ->whereHas('invoiceItem', function ($q) use ($todo) {
-                        $q->where('item_title', \Illuminate\Support\Str::limit($todo->title, 255));
+                        $q->where('item_title', Str::limit($todo->title, 255));
                     })
                     ->first();
                 if ($timerRecord) {
@@ -779,20 +809,21 @@ class AdminTaskController extends Controller
             foreach ($todo->children as $child) {
                 $child->delete();
             }
-            
+
             try {
-                $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
-                if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
-                    \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
+                $adminUser = auth()->user() ?? User::role('super-admin')->first();
+                if ($adminUser && class_exists(SyncTodoToGoogleCalendar::class)) {
+                    SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
                 }
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
 
             $todo->delete();
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
-            \Illuminate\Support\Facades\Log::error('Todo refund invalid slot failed: ' . $e->getMessage(), [
+            DB::rollBack();
+            Log::error('Todo refund invalid slot failed: '.$e->getMessage(), [
                 'user_id' => $user->id,
                 'todo_id' => $todo->id,
             ]);
@@ -803,12 +834,12 @@ class AdminTaskController extends Controller
         if ($refundAmount > 0) {
             try {
                 if (class_exists('App\Services\WhatsAppNotificationService')) {
-                    $whatsApp = app(\App\Services\WhatsAppNotificationService::class);
+                    $whatsApp = app(WhatsAppNotificationService::class);
                     $message = $whatsApp->generateRefundMessage($user, $todo, $refundAmount);
                     $whatsApp->sendMessage($user, $message);
                 }
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('WhatsApp refund notification failed: ' . $e->getMessage(), [
+                Log::warning('WhatsApp refund notification failed: '.$e->getMessage(), [
                     'user_id' => $user->id,
                     'todo_id' => $todo->id,
                 ]);
@@ -824,11 +855,11 @@ class AdminTaskController extends Controller
     {
         $request->validate([
             'start_at' => 'required|date',
-            'end_at'   => 'required|date|after:start_at',
+            'end_at' => 'required|date|after:start_at',
         ]);
 
-        $start = \Carbon\Carbon::parse($request->start_at);
-        $end   = \Carbon\Carbon::parse($request->end_at);
+        $start = Carbon::parse($request->start_at);
+        $end = Carbon::parse($request->end_at);
 
         // Check for conflicting bookings (exclude this todo from the check)
         if (Todo::focusCalendarSlotTaken($start, $end, $todo->id)) {
@@ -838,7 +869,7 @@ class AdminTaskController extends Controller
         }
 
         $todo->start_at = $start->toDateTimeString();
-        $todo->end_at   = $end->toDateTimeString();
+        $todo->end_at = $end->toDateTimeString();
         $todo->save();
 
         return redirect()->back()->with('message', __('general.time_scheduled_successfully'));
@@ -850,54 +881,54 @@ class AdminTaskController extends Controller
     public function storeClientTodo(Request $request, User $client)
     {
         $request->validate([
-            'title'    => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'start_at' => 'required|date',
-            'end_at'   => 'required|date|after:start_at',
+            'end_at' => 'required|date|after:start_at',
         ]);
 
-        $start = \Carbon\Carbon::parse($request->start_at, 'Africa/Cairo');
-        $end   = \Carbon\Carbon::parse($request->end_at, 'Africa/Cairo');
+        $start = Carbon::parse($request->start_at, 'Africa/Cairo');
+        $end = Carbon::parse($request->end_at, 'Africa/Cairo');
 
         if (Todo::focusCalendarSlotTaken($start, $end)) {
             return back()->withErrors(['start_at' => 'This time slot overlaps with an existing booking.']);
         }
 
         try {
-            return \Illuminate\Support\Facades\Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($request, $client, $start, $end) {
-                
+            return Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($request, $client, $start, $end) {
+
                 if (Todo::focusCalendarSlotTaken($start, $end)) {
                     return back()->withErrors(['start_at' => 'This time slot overlaps with an existing booking.']);
                 }
 
                 $durationHours = $end->diffInMinutes($start) / 60;
-                
-                $rateEgp = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
-                if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(\Carbon\Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
-                    $rateEgp = (float) \App\Models\CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
-                } else if ($client->hasSubscription() && $client->plan) {
+
+                $rateEgp = FinanceHelper::calculateOverheadHourlyRate();
+                if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
+                    $rateEgp = (float) CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
+                } elseif ($client->hasSubscription() && $client->plan) {
                     $rateEgp = $client->plan->calcDiscount((float) $rateEgp);
                 }
-                
+
                 $cost = $durationHours * $rateEgp;
                 $cost = round($cost, 2);
-                $currencyId = 2; 
-                
-                $fh = \App\Helpers\FinanceHelper::instance();
+                $currencyId = 2;
+
+                $fh = FinanceHelper::instance();
                 $baseCost = $fh->price_fixer($cost, $currencyId);
-                
+
                 $commission = 0;
                 if ($client->ref_user && $client->ref_user->shouldAddCommissionToTotal()) {
                     $commission = $client->ref_user->calculateCommissionAmount($baseCost, $currencyId, $client);
                 }
                 $finalCost = $fh->price_fixer($baseCost + $commission, $currencyId);
 
-                $amountInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $finalCost, $currencyId, (int)$client->currency);
-                
+                $amountInUserCurrency = CurrenciesExchange::RateToday((float) $finalCost, $currencyId, (int) $client->currency);
+
                 if ($client->available_balance() < $amountInUserCurrency) {
-                    return back()->withErrors(['error' => 'Client has insufficient balance (' . \App\Helpers\FinanceHelper::instance()->format_money($client->available_balance(), $client->currency) . ' available, ' . \App\Helpers\FinanceHelper::instance()->format_money($amountInUserCurrency, $client->currency) . ' required).']);
+                    return back()->withErrors(['error' => 'Client has insufficient balance ('.FinanceHelper::instance()->format_money($client->available_balance(), $client->currency).' available, '.FinanceHelper::instance()->format_money($amountInUserCurrency, $client->currency).' required).']);
                 }
 
-                \Illuminate\Support\Facades\DB::beginTransaction();
+                DB::beginTransaction();
                 try {
                     $task = Task::firstOrCreate(
                         ['user_id' => $client->id, 'task_name' => 'My Focus'],
@@ -917,28 +948,28 @@ class AdminTaskController extends Controller
                         'is_paid' => true,
                         'priority' => 'normal',
                         'priorityColor' => '#11cdef',
-                        'tags' => '[]'
+                        'tags' => '[]',
                     ]);
 
-                    $invoice = new \App\Models\Invoice();
+                    $invoice = new Invoice;
                     $invoice->user_id = $client->id;
-                    $invoice->currency = (int)$client->currency;
+                    $invoice->currency = (int) $client->currency;
                     $invoice->project_id = $task->project_id;
                     $invoice->status = 'unpaid';
                     $invoice->schedule = [
                         'start_date' => $todo->start_at,
-                        'end_date'   => $todo->end_at,
+                        'end_date' => $todo->end_at,
                     ];
                     $client->invoices()->save($invoice);
 
-                    $item = new \App\Models\InvoiceItem();
-                    $item->item_title = \Illuminate\Support\Str::limit($todo->title, 255);
+                    $item = new InvoiceItem;
+                    $item->item_title = Str::limit($todo->title, 255);
                     $item->amount = 0;
                     $item->qty = 1;
                     $item->item_type = 'timer';
                     $invoice->items()->save($item);
 
-                    $timer = new \App\Models\InvoiceItemTimer();
+                    $timer = new InvoiceItemTimer;
                     $timer->invoice_item_id = $item->id;
                     $timer->user_id = $client->id;
                     $timer->project_id = $task->project_id;
@@ -953,31 +984,32 @@ class AdminTaskController extends Controller
 
                     $invoice->bill_invoice();
 
-                    \Illuminate\Support\Facades\DB::commit();
+                    DB::commit();
 
                     try {
-                        $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
-                        if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
-                            \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
+                        $adminUser = auth()->user() ?? User::role('super-admin')->first();
+                        if ($adminUser && class_exists(SyncTodoToGoogleCalendar::class)) {
+                            SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
                         }
                     } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+                        Log::warning('Google Calendar sync failed: '.$e->getMessage());
                     }
 
                     return redirect()->back()->with('message', __('general.scheduled_task_created_and_billed_successfully'));
 
                 } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\DB::rollBack();
+                    DB::rollBack();
                     throw $e;
                 }
 
             });
-        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+        } catch (LockTimeoutException $e) {
             return back()->withErrors(['error' => 'Booking system is currently busy. Please try again.']);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Admin storeClientTodo failed: ' . $e->getMessage(), [
+            Log::error('Admin storeClientTodo failed: '.$e->getMessage(), [
                 'user_id' => $client->id,
             ]);
+
             return back()->withErrors(['error' => 'Failed to create and bill task.']);
         }
     }
@@ -988,23 +1020,23 @@ class AdminTaskController extends Controller
     public function storeAndBillCalendarTodo(Request $request)
     {
         $request->validate([
-            'client_id'       => 'required|exists:users,id',
-            'title'           => 'required|string|max:255',
-            'date'            => 'required|date_format:Y-m-d',
-            'start_time'      => 'required|date_format:H:i',
-            'end_time'        => 'required|date_format:H:i',
+            'client_id' => 'required|exists:users,id',
+            'title' => 'required|string|max:255',
+            'date' => 'required|date_format:Y-m-d',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
             'checklist_items' => 'nullable|array',
             'checklist_items.*.title' => 'required|string|max:255',
         ]);
 
         $client = User::findOrFail($request->client_id);
-        
-        $startStr = $request->date . ' ' . $request->start_time . ':00';
-        $endStr = $request->date . ' ' . $request->end_time . ':00';
-        $start = \Carbon\Carbon::parse($startStr, 'Africa/Cairo');
-        $end = \Carbon\Carbon::parse($endStr, 'Africa/Cairo');
 
-        if (!$end->gt($start)) {
+        $startStr = $request->date.' '.$request->start_time.':00';
+        $endStr = $request->date.' '.$request->end_time.':00';
+        $start = Carbon::parse($startStr, 'Africa/Cairo');
+        $end = Carbon::parse($endStr, 'Africa/Cairo');
+
+        if (! $end->gt($start)) {
             return back()->withErrors(['error' => 'End time must be after start time.']);
         }
 
@@ -1013,13 +1045,13 @@ class AdminTaskController extends Controller
         }
 
         // Calculate rate based on client config
-        $rateEgp = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
-        if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(\Carbon\Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
-            $rateEgp = (float) \App\Models\CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
-        } else if ($client->hasSubscription() && $client->plan) {
+        $rateEgp = FinanceHelper::calculateOverheadHourlyRate();
+        if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
+            $rateEgp = (float) CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
+        } elseif ($client->hasSubscription() && $client->plan) {
             $rateEgp = $client->plan->calcDiscount((float) $rateEgp);
         }
-        $fh = \App\Helpers\FinanceHelper::instance();
+        $fh = FinanceHelper::instance();
         $baseCost = $fh->price_fixer($rateEgp, 2);
         $commission = 0;
         if ($client->ref_user && $client->ref_user->shouldAddCommissionToTotal()) {
@@ -1031,22 +1063,22 @@ class AdminTaskController extends Controller
         $totalCostEgp = $finalCostEgp * $durationHours;
 
         $userCurrencyId = (int) $client->currency;
-        $amountInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $totalCostEgp, 2, $userCurrencyId);
+        $amountInUserCurrency = CurrenciesExchange::RateToday((float) $totalCostEgp, 2, $userCurrencyId);
 
         if ($client->available_balance() < $amountInUserCurrency) {
-            return back()->withErrors(['error' => 'Client has insufficient balance (' . $fh->format_money($client->available_balance(), $client->currency) . ' available, requires ' . $fh->format_money($amountInUserCurrency, $client->currency) . ').']);
+            return back()->withErrors(['error' => 'Client has insufficient balance ('.$fh->format_money($client->available_balance(), $client->currency).' available, requires '.$fh->format_money($amountInUserCurrency, $client->currency).').']);
         }
 
         try {
-            return \Illuminate\Support\Facades\Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($request, $client, $start, $end, $userCurrencyId, $amountInUserCurrency, $totalCostEgp) {
-                
+            return Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($request, $client, $start, $end, $userCurrencyId, $amountInUserCurrency, $totalCostEgp) {
+
                 if (Todo::focusCalendarSlotTaken($start, $end)) {
                     return back()->withErrors(['error' => 'This time slot overlaps with an existing booking.']);
                 }
 
-                \Illuminate\Support\Facades\DB::beginTransaction();
+                DB::beginTransaction();
                 try {
-                    $todo = new Todo();
+                    $todo = new Todo;
                     $todo->title = $request->title;
                     $todo->user_id = $client->id;
                     $todo->tenant_id = session('tenant_id');
@@ -1057,9 +1089,9 @@ class AdminTaskController extends Controller
                     $todo->currency_id = 2; // Stored in base EGP
                     $todo->save();
 
-                    if (!empty($request->checklist_items)) {
+                    if (! empty($request->checklist_items)) {
                         foreach ($request->checklist_items as $itemData) {
-                            $checklistItem = new \App\Models\TodoChecklistItem();
+                            $checklistItem = new TodoChecklistItem;
                             $checklistItem->todo_id = $todo->id;
                             $checklistItem->title = $itemData['title'];
                             $checklistItem->is_completed = false;
@@ -1067,25 +1099,25 @@ class AdminTaskController extends Controller
                         }
                     }
 
-                    $invoice = new \App\Models\Invoice();
+                    $invoice = new Invoice;
                     $invoice->user_id = $client->id;
                     $invoice->currency = $userCurrencyId;
                     $invoice->project_id = null;
                     $invoice->status = 'unpaid';
                     $invoice->schedule = [
                         'start_date' => $start->toDateTimeString(),
-                        'end_date'   => $end->toDateTimeString(),
+                        'end_date' => $end->toDateTimeString(),
                     ];
                     $client->invoices()->save($invoice);
 
-                    $item = new \App\Models\InvoiceItem();
-                    $item->item_title = \Illuminate\Support\Str::limit($todo->title, 255);
+                    $item = new InvoiceItem;
+                    $item->item_title = Str::limit($todo->title, 255);
                     $item->amount = 0;
                     $item->qty = 1;
                     $item->item_type = 'timer';
                     $invoice->items()->save($item);
 
-                    $timer = new \App\Models\InvoiceItemTimer();
+                    $timer = new InvoiceItemTimer;
                     $timer->invoice_item_id = $item->id;
                     $timer->user_id = $client->id;
                     $timer->project_id = $invoice->project_id;
@@ -1099,32 +1131,84 @@ class AdminTaskController extends Controller
                     $invoice->save();
                     $invoice->bill_invoice();
 
-                    \Illuminate\Support\Facades\DB::commit();
+                    DB::commit();
 
                     try {
-                        $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
-                        if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
-                            \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
+                        $adminUser = auth()->user() ?? User::role('super-admin')->first();
+                        if ($adminUser && class_exists(SyncTodoToGoogleCalendar::class)) {
+                            SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
                         }
                     } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+                        Log::warning('Google Calendar sync failed: '.$e->getMessage());
                     }
 
                     return redirect()->back()->with('message', __('general.scheduled_task_created_and_billed_successfully'));
 
                 } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\DB::rollBack();
+                    DB::rollBack();
                     throw $e;
                 }
 
             });
-        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+        } catch (LockTimeoutException $e) {
             return back()->withErrors(['error' => 'Booking system is currently busy. Please try again.']);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Admin storeAndBillCalendarTodo failed: ' . $e->getMessage(), [
+            Log::error('Admin storeAndBillCalendarTodo failed: '.$e->getMessage(), [
                 'user_id' => $client->id,
             ]);
+
             return back()->withErrors(['error' => 'Failed to create and bill task.']);
         }
+    }
+
+    /**
+     * Update todo details.
+     */
+    public function updateTodo(Request $request, Todo $todo)
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'nullable|string|in:low,normal,high,urgent',
+            'paused' => 'nullable|boolean',
+            'start_at' => 'nullable|date',
+            'end_at' => 'nullable|date',
+        ]);
+
+        $todo->title = $data['title'];
+        $todo->description = $data['description'] ?? null;
+        if (array_key_exists('priority', $data)) {
+            $todo->priority = $data['priority'];
+            $colors = [
+                'urgent' => '#f56565',
+                'high' => '#dd6b20',
+                'normal' => '#11cdef',
+                'low' => '#a0aec0',
+            ];
+            if (isset($colors[$data['priority']])) {
+                $todo->priorityColor = $colors[$data['priority']];
+            }
+        }
+        if (array_key_exists('paused', $data)) {
+            $todo->paused = (bool) $data['paused'];
+        }
+        if (array_key_exists('start_at', $data)) {
+            $todo->start_at = $data['start_at'] ? Carbon::parse($data['start_at'])->toDateTimeString() : null;
+        }
+        if (array_key_exists('end_at', $data)) {
+            $todo->end_at = $data['end_at'] ? Carbon::parse($data['end_at'])->toDateTimeString() : null;
+        }
+
+        $todo->save();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => __('general.task_status_updated_successfully'),
+                'todo' => $todo,
+            ]);
+        }
+
+        return redirect()->back()->with('message', __('general.task_status_updated_successfully'));
     }
 }

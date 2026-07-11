@@ -18,13 +18,13 @@ class BlogController extends Controller
             ->paginate(12);
 
         return Inertia::render('Public/Blog/Index', [
-            'articles' => $articles
+            'articles' => $articles,
         ])->withViewData([
             'meta' => [
                 'title' => 'Blog | Musoftware',
                 'description' => 'Read the latest insights, tutorials, and updates from the Musoftware team.',
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -39,16 +39,16 @@ class BlogController extends Controller
             ->firstOrFail();
 
         return Inertia::render('Public/Blog/Show', [
-            'article' => $article
+            'article' => $article,
         ])->withViewData([
             'meta' => [
-                'title' => ($article->meta_title ?: $article->title) . ' | Musoftware',
+                'title' => ($article->meta_title ?: $article->title).' | Musoftware',
                 'description' => $article->meta_description ?: $article->excerpt,
-                'image' => $article->featured_image 
-                    ? (str_starts_with($article->featured_image, 'http') ? $article->featured_image : asset('storage/' . $article->featured_image)) 
+                'image' => $article->featured_image
+                    ? (str_starts_with($article->featured_image, 'http') ? $article->featured_image : asset('storage/'.$article->featured_image))
                     : ($article->service?->cover_image ?: asset('images/default-meta.png')),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Models\Billing;
 
+use App\Models\Currency;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use App\Models\User;
-use App\Models\Currency;
 
 class ProjectProposal extends Model
 {

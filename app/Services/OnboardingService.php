@@ -3,18 +3,15 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Database\QueryException;
 use GeoIp2\Database\Reader;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class OnboardingService extends BaseService
 {
-
     /**
      * Get the list of all countries, running the migration and seeder if necessary.
-     *
-     * @return array
      */
     public function getCountries(): array
     {
@@ -27,6 +24,7 @@ class OnboardingService extends BaseService
                 ]);
                 $countries = DB::table('countries')->pluck('name')->toArray();
             }
+
             return $countries;
         } catch (QueryException $e) {
             // If table doesn't exist, run the migration and seeder automatically
@@ -39,6 +37,7 @@ class OnboardingService extends BaseService
                     '--class' => 'Database\\Seeders\\CountrySeeder',
                     '--force' => true,
                 ]);
+
                 return DB::table('countries')->pluck('name')->toArray();
             } else {
                 throw $e;
@@ -48,15 +47,12 @@ class OnboardingService extends BaseService
 
     /**
      * Get the list of cities for a given country name, running the migration and seeder if necessary.
-     *
-     * @param string $countryName
-     * @return array
      */
     public function getCities(string $countryName): array
     {
         $country = DB::table('countries')->where('name', $countryName)->first();
 
-        if (!$country) {
+        if (! $country) {
             return [];
         }
 
@@ -66,7 +62,7 @@ class OnboardingService extends BaseService
                 ->distinct()
                 ->pluck('name')
                 ->toArray();
-                
+
             if (DB::table('cities')->count() === 0) {
                 Artisan::call('db:seed', [
                     '--class' => 'Database\\Seeders\\CitySeeder',
@@ -78,6 +74,7 @@ class OnboardingService extends BaseService
                     ->pluck('name')
                     ->toArray();
             }
+
             return $cities;
         } catch (QueryException $e) {
             if (str_contains($e->getMessage(), 'Base table or view not found')) {
@@ -89,6 +86,7 @@ class OnboardingService extends BaseService
                     '--class' => 'Database\\Seeders\\CitySeeder',
                     '--force' => true,
                 ]);
+
                 return DB::table('cities')
                     ->where('country_id', $country->id)
                     ->distinct()
@@ -102,14 +100,11 @@ class OnboardingService extends BaseService
 
     /**
      * Detect user's country using their IP address via GeoIP.
-     *
-     * @param string $ip
-     * @return string
      */
     public function detectCountryFromIp(string $ip): string
     {
         $detectedCountry = 'United States'; // Fallback
-        
+
         $geoDbPath = storage_path('app/geoip.mmdb');
         if (file_exists($geoDbPath)) {
             try {
@@ -130,11 +125,6 @@ class OnboardingService extends BaseService
 
     /**
      * Save the user's onboarding step, running migrations if columns are missing.
-     *
-     * @param User $user
-     * @param array $validatedData
-     * @param bool $isComplete
-     * @return void
      */
     public function saveOnboardingStep(User $user, array $validatedData, bool $isComplete): void
     {
@@ -161,10 +151,6 @@ class OnboardingService extends BaseService
 
     /**
      * Update the user's tour status.
-     *
-     * @param User $user
-     * @param array $validatedData
-     * @return void
      */
     public function updateTourStatus(User $user, array $validatedData): void
     {
@@ -173,6 +159,7 @@ class OnboardingService extends BaseService
             $user->tour_skipped = false;
             $user->current_tour_step = 1;
             $user->save();
+
             return;
         }
 

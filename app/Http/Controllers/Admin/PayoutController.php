@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payout;
-use App\Models\User;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class PayoutController extends Controller
 {
@@ -20,6 +20,7 @@ class PayoutController extends Controller
         if ($request->filled('project_id')) {
             $query->where('project_id', $request->project_id);
         }
+
         return $query;
     }
 
@@ -30,7 +31,7 @@ class PayoutController extends Controller
 
         $payouts = $query->paginate($request->input('per_page', 20))->withQueryString();
 
-        $projects = $request->filled('client_id') 
+        $projects = $request->filled('client_id')
             ? Project::where('user_id', $request->client_id)->get()
             : Project::all();
 
@@ -45,7 +46,7 @@ class PayoutController extends Controller
     {
         $clientId = $request->input('user') ?? $request->input('client_id');
         $client = User::find($clientId);
-        if (!$client) {
+        if (! $client) {
             return redirect()->route('admin.payouts.index')
                 ->with('error', __('admin.client_not_found'));
         }
@@ -71,9 +72,9 @@ class PayoutController extends Controller
     public function show(Payout $payout)
     {
         $payout->load(['user', 'project', 'items']);
-        
+
         return Inertia::render('Admin/Payouts/Show', [
-            'payout' => $payout
+            'payout' => $payout,
         ]);
     }
 
@@ -134,8 +135,9 @@ class PayoutController extends Controller
         if ($payout->status === 'paid') {
             return redirect()->back()->with('error', __('admin.cannot_delete_paid_payout'));
         }
-        
+
         $payout->delete();
+
         return redirect()->route('admin.payouts.index')->with('success', __('admin.payout_deleted'));
     }
 }

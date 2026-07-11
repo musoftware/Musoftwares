@@ -28,10 +28,10 @@ class GuestTicketMessage extends Model
     ];
 
     protected $casts = [
-        'headers_json'     => 'array',
+        'headers_json' => 'array',
         'attachments_json' => 'array',
-        'sent_at'          => 'datetime',
-        'received_at'      => 'datetime',
+        'sent_at' => 'datetime',
+        'received_at' => 'datetime',
     ];
 
     public function ticket(): BelongsTo

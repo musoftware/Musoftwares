@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Models\Ticket;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User;
 
 class TicketPolicy
 {
@@ -15,6 +15,7 @@ class TicketPolicy
         if ($user->isAdmin()) {
             return true;
         }
+
         return null;
     }
 

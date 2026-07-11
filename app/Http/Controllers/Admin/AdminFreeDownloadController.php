@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\FreeDownload;
-use App\Http\Resources\FreeDownloadResource;
 use App\Http\Requests\Admin\StoreFreeDownloadRequest;
 use App\Http\Requests\Admin\UpdateFreeDownloadRequest;
-use Illuminate\Http\Request;
+use App\Http\Resources\FreeDownloadResource;
+use App\Models\FreeDownload;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -17,7 +16,7 @@ class AdminFreeDownloadController extends Controller
     {
         // Using "ordered()" scope if it exists, otherwise fallback to basic ordering
         $items = FreeDownload::query();
-        
+
         if (method_exists(FreeDownload::class, 'scopeOrdered')) {
             $items = $items->ordered();
         } else {
@@ -25,7 +24,7 @@ class AdminFreeDownloadController extends Controller
         }
 
         $items = $items->paginate(15)
-                       ->through(fn($i) => clone (new FreeDownloadResource($i))->resolve());
+            ->through(fn ($i) => clone (new FreeDownloadResource($i))->resolve());
 
         return Inertia::render('Admin/FreeDownloads/Index', [
             'items' => $items,
@@ -50,14 +49,14 @@ class AdminFreeDownloadController extends Controller
         }
 
         FreeDownload::create([
-            'title'                => $validated['title'],
-            'description'          => $validated['description'] ?? null,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
             'programming_language' => $validated['programming_language'] ?: null,
-            'image'                => $imagePath,
-            'file_path'            => $filePath,
-            'original_filename'    => $originalFilename,
-            'is_active'            => $request->boolean('is_active', true),
-            'order_column'         => (int) ($validated['order_column'] ?? 0),
+            'image' => $imagePath,
+            'file_path' => $filePath,
+            'original_filename' => $originalFilename,
+            'is_active' => $request->boolean('is_active', true),
+            'order_column' => (int) ($validated['order_column'] ?? 0),
         ]);
 
         return redirect()->back()->with('success', __('general.free_download_item_created_successfully'));
@@ -68,11 +67,11 @@ class AdminFreeDownloadController extends Controller
         $validated = $request->validated();
 
         $data = [
-            'title'                => $validated['title'],
-            'description'          => $validated['description'] ?? null,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
             'programming_language' => $validated['programming_language'] ?: null,
-            'is_active'            => $request->boolean('is_active', true),
-            'order_column'         => (int) ($validated['order_column'] ?? 0),
+            'is_active' => $request->boolean('is_active', true),
+            'order_column' => (int) ($validated['order_column'] ?? 0),
         ];
 
         if ($request->hasFile('image')) {

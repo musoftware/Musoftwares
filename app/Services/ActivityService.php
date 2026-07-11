@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ActivityService extends BaseService
 {
-
     /**
      * Log user activity. Supports both legacy positional logging and new named/event-driven logging.
      */
@@ -35,17 +34,19 @@ class ActivityService extends BaseService
                     try {
                         $location = geoip()->getLocation($ip);
                         $isoCode = $location->iso_code ?? 'US';
-                    } catch (\Exception $e) {}
+                    } catch (\Exception $e) {
+                    }
                 }
-                
+
                 UserActivity::create([
                     'user_id' => $userIdVal,
                     'activity_date' => date('Y-m-d'),
                     'total_seconds' => 0,
                     'ip' => $ip,
-                    'iso_code' => $isoCode
+                    'iso_code' => $isoCode,
                 ]);
             }
+
             return;
         }
 
@@ -55,7 +56,6 @@ class ActivityService extends BaseService
         // ERP module logs its own activities internally via Modules\ERP\Services\ActivityLogger.
         // The main ActivityService does NOT write to the ERP module.
 
-
         // Always log to core UserActivity table for general usage tracking
         if (class_exists(UserActivity::class) && $userId) {
             $ip = request()->ip() ?? '127.0.0.1';
@@ -64,21 +64,22 @@ class ActivityService extends BaseService
                 try {
                     $location = geoip()->getLocation($ip);
                     $isoCode = $location->iso_code ?? 'US';
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
-            
+
             // Check if already recorded for today to prevent duplicates
             $date = date('Y-m-d');
             $exists = UserActivity::where('user_id', $userId)
                 ->where('activity_date', $date)
                 ->exists();
-            if (!$exists) {
+            if (! $exists) {
                 UserActivity::create([
                     'user_id' => $userId,
                     'activity_date' => $date,
                     'total_seconds' => 0,
                     'ip' => $ip,
-                    'iso_code' => $isoCode
+                    'iso_code' => $isoCode,
                 ]);
             }
         }

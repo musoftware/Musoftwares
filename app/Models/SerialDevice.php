@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SerialDevice extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
-    public const STATUS_ACTIVE   = 'active';
+    public const STATUS_ACTIVE = 'active';
+
     public const STATUS_INACTIVE = 'inactive';
-    public const STATUS_BLOCKED  = 'blocked';
+
+    public const STATUS_BLOCKED = 'blocked';
 
     protected $fillable = [
         'serial_software_id',
@@ -65,4 +66,3 @@ class SerialDevice extends Model
         return $this->hasOne(SerialUserDevice::class, 'device_id', 'device_id');
     }
 }
-

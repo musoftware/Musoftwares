@@ -119,21 +119,6 @@ class ModulePlanSeeder extends Seeder
         ]);
 
 
-        // 2. Freelancer Premium Plans (for extra perks, basic tier is free)
-        ModulePlan::create([
-            'module' => 'freelance',
-            'name' => 'Freelancer Premium',
-            'price' => 9.99,
-            'billing' => 'monthly',
-            'features' => [
-                'Commission Fee' => 'Reduced from 10% to 5%',
-                'Premium Badge' => 'Stripe-like calm verification badge',
-                'Monthly Connects' => '100 bidding connects included (valued at $10)',
-                'Priority Support' => 'First-in-line ticket resolution',
-            ],
-            'is_active' => true,
-        ]);
-
         // 3. Marketing Module Plans
         ModulePlan::create([
             'module' => 'marketing',

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Contract;
 use App\Models\AdminSettings;
+use App\Models\Contract;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -22,11 +22,11 @@ class AdminQuotationController extends Controller
         $logoDark = config('app.logo');
 
         return Inertia::render('Client/Contracts/Quotation', [
-            'quotation'    => $contract,
-            'printLang'    => $lang,
-            'siteName'     => $siteName,
+            'quotation' => $contract,
+            'printLang' => $lang,
+            'siteName' => $siteName,
             'contactEmail' => $contactEmail,
-            'logoDark'     => $logoDark,
+            'logoDark' => $logoDark,
         ]);
     }
 }

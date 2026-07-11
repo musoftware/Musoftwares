@@ -4,16 +4,15 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\UserPaymentMethod;
-use Illuminate\Auth\Access\Response;
 
 class UserPaymentMethodPolicy
 {
-
     public function before(User $user, string $ability): ?bool
     {
         if ($user->isAdmin()) {
             return true;
         }
+
         return null;
     }
 

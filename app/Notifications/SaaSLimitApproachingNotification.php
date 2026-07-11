@@ -12,6 +12,7 @@ class SaaSLimitApproachingNotification extends Notification implements ShouldQue
     use Queueable;
 
     public $usage;
+
     public $percentage;
 
     /**
@@ -40,15 +41,15 @@ class SaaSLimitApproachingNotification extends Notification implements ShouldQue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Warning: SaaS Limit Approaching')
-                    ->greeting('Hello!')
-                    ->line("Your SaaS limit for {$this->usage->usage_key} is approaching its threshold. You have used {$this->percentage}% of your limit.")
-                    ->action('Upgrade Plan', url('/billing/subscriptions'))
-                    ->line('Please consider upgrading your plan to avoid service interruption.');
+            ->subject('Warning: SaaS Limit Approaching')
+            ->greeting('Hello!')
+            ->line("Your SaaS limit for {$this->usage->usage_key} is approaching its threshold. You have used {$this->percentage}% of your limit.")
+            ->action('Upgrade Plan', url('/billing/subscriptions'))
+            ->line('Please consider upgrading your plan to avoid service interruption.');
     }
 }

@@ -144,6 +144,10 @@ Route::get('/test22', function () {
     Artisan::call('optimize:clear');
     Artisan::call('migrate');
 });
+
+Route::get('/test233', function () {
+    Artisan::call('schedule:run');
+});
 // Platforms
 Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
 Route::get('/platforms/crm', [HomeController::class, 'platformCrm'])->name('platforms.crm');
@@ -541,7 +545,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admi
     Route::post('tickets/{ticket}/reply', [AdminTicketController::class, 'reply'])->name('tickets.reply');
     Route::post('tickets/{ticket}/assign', [AdminTicketController::class, 'assign'])->name('tickets.assign');
     Route::post('tickets/canned-responses', [AdminTicketController::class, 'addCannedResponse'])->name('tickets.canned-responses.store');
-    Route::resource('guest-tickets', GuestTicketController::class)->only(['index', 'show']);
+    Route::resource('guest-tickets', GuestTicketController::class)->only(['index', 'show', 'update', 'destroy']);
+    Route::post('guest-tickets/{guest_ticket}/reply', [GuestTicketController::class, 'reply'])->name('guest-tickets.reply');
+    Route::post('guest-tickets/{guest_ticket}/status', [GuestTicketController::class, 'updateStatus'])->name('guest-tickets.updateStatus');
 });
 
 // Admin Routes
@@ -834,6 +840,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/tasks/todos/{todo}', [AdminTaskController::class, 'destroyTodo'])->name('tasks.todos.destroy');
     Route::post('/tasks/todos/{todo}/refund', [AdminTaskController::class, 'refundTodo'])->name('tasks.todos.refund');
     Route::post('/tasks/todos/{todo}/schedule', [AdminTaskController::class, 'scheduleTodo'])->name('tasks.todos.schedule');
+    Route::put('/tasks/todos/{todo}', [AdminTaskController::class, 'updateTodo'])->name('tasks.todos.update');
 
     Route::get('/erp/{id}/impersonate', [ImpersonateController::class, 'impersonate'])->name('erp.impersonate');
 });
@@ -862,11 +869,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/contracts/{contract}/status', [ContractController::class, 'updateStatus'])->name('contracts.update-status');
     Route::post('/contracts/ai-generate', [ContractController::class, 'aiGenerate'])->name('contracts.ai-generate');
     Route::post('/contracts/ai-review', [ContractController::class, 'aiReview'])->name('contracts.ai-review');
-
-    Route::post('/freelance/points/purchase', [PointPurchaseController::class, 'store'])->name('freelance.point-purchases.store');
-    Route::post('/freelance/points/purchase-wallet', [PointPurchaseController::class, 'storeWallet'])->name('freelance.point-purchases.store-wallet');
-    Route::get('/freelance/points/purchase-success', [PointPurchaseController::class, 'success'])->name('freelance.point-purchases.success');
-    Route::get('/freelance/points/purchase-failure', [PointPurchaseController::class, 'failure'])->name('freelance.point-purchases.failure');
 
     Route::get('/subscriptions/plans', [SubscriptionController::class, 'plans'])->name('subscriptions.plans');
     Route::post('/subscriptions/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
@@ -965,7 +967,6 @@ Route::post('/guest/invoices/payment/webhook', [GuestInvoiceController::class, '
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
-Route::post('/freelance/point-purchases/webhook', [PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
 Route::post('/subscriptions/kashier/webhook', [SubscriptionController::class, 'webhook'])->name('subscriptions.kashier.webhook');
 
 // ── Public Client Portal (No Auth Required) ──

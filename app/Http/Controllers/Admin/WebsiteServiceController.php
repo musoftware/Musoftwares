@@ -1,21 +1,21 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\WebsiteService;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class WebsiteServiceController extends Controller
 {
     public function index()
     {
         return Inertia::render('Admin/WebsiteServices/Index', [
-            'services' => WebsiteService::latest()->get()
+            'services' => WebsiteService::latest()->get(),
         ]);
     }
 
@@ -40,21 +40,21 @@ class WebsiteServiceController extends Controller
             'seo_description_en' => 'nullable|string|max:500',
             'seo_description_ar' => 'nullable|string|max:500',
             'seo_keywords_en' => 'nullable|string|max:500',
-            'seo_keywords_ar' => 'nullable|string|max:500'
+            'seo_keywords_ar' => 'nullable|string|max:500',
         ]);
 
         if ($request->hasFile('image_en')) {
             $fileEn = $request->file('image_en');
-            $filenameEn = time() . '_en_' . $fileEn->getClientOriginalName();
+            $filenameEn = time().'_en_'.$fileEn->getClientOriginalName();
             $fileEn->move(public_path('website_services'), $filenameEn);
-            $data['image_path_en'] = 'website_services/' . $filenameEn;
+            $data['image_path_en'] = 'website_services/'.$filenameEn;
         }
-        
+
         if ($request->hasFile('image_ar')) {
             $fileAr = $request->file('image_ar');
-            $filenameAr = time() . '_ar_' . $fileAr->getClientOriginalName();
+            $filenameAr = time().'_ar_'.$fileAr->getClientOriginalName();
             $fileAr->move(public_path('website_services'), $filenameAr);
-            $data['image_path_ar'] = 'website_services/' . $filenameAr;
+            $data['image_path_ar'] = 'website_services/'.$filenameAr;
         }
 
         unset($data['image_en'], $data['image_ar']);
@@ -81,13 +81,14 @@ class WebsiteServiceController extends Controller
         }
 
         WebsiteService::create($data);
+
         return redirect()->route('admin.website-services.index')->with('success', __('admin.service_created'));
     }
 
     public function edit(WebsiteService $website_service)
     {
         return Inertia::render('Admin/WebsiteServices/Edit', [
-            'service' => $website_service
+            'service' => $website_service,
         ]);
     }
 
@@ -107,7 +108,7 @@ class WebsiteServiceController extends Controller
             'seo_description_en' => 'nullable|string|max:500',
             'seo_description_ar' => 'nullable|string|max:500',
             'seo_keywords_en' => 'nullable|string|max:500',
-            'seo_keywords_ar' => 'nullable|string|max:500'
+            'seo_keywords_ar' => 'nullable|string|max:500',
         ]);
 
         if ($request->hasFile('image_en')) {
@@ -115,9 +116,9 @@ class WebsiteServiceController extends Controller
                 File::delete(public_path($website_service->image_path_en));
             }
             $fileEn = $request->file('image_en');
-            $filenameEn = time() . '_en_' . $fileEn->getClientOriginalName();
+            $filenameEn = time().'_en_'.$fileEn->getClientOriginalName();
             $fileEn->move(public_path('website_services'), $filenameEn);
-            $data['image_path_en'] = 'website_services/' . $filenameEn;
+            $data['image_path_en'] = 'website_services/'.$filenameEn;
         }
 
         if ($request->hasFile('image_ar')) {
@@ -125,11 +126,11 @@ class WebsiteServiceController extends Controller
                 File::delete(public_path($website_service->image_path_ar));
             }
             $fileAr = $request->file('image_ar');
-            $filenameAr = time() . '_ar_' . $fileAr->getClientOriginalName();
+            $filenameAr = time().'_ar_'.$fileAr->getClientOriginalName();
             $fileAr->move(public_path('website_services'), $filenameAr);
-            $data['image_path_ar'] = 'website_services/' . $filenameAr;
+            $data['image_path_ar'] = 'website_services/'.$filenameAr;
         }
-        
+
         unset($data['image_en'], $data['image_ar']);
 
         // Update slug if title changed
@@ -157,6 +158,7 @@ class WebsiteServiceController extends Controller
         }
 
         $website_service->update($data);
+
         return redirect()->route('admin.website-services.index')->with('success', __('admin.service_updated'));
     }
 
@@ -169,6 +171,7 @@ class WebsiteServiceController extends Controller
             File::delete(public_path($website_service->image_path_ar));
         }
         $website_service->delete();
+
         return redirect()->route('admin.website-services.index')->with('success', __('admin.service_deleted'));
     }
 
@@ -176,20 +179,20 @@ class WebsiteServiceController extends Controller
     {
         try {
             $apiKey = config('services.openai.key');
-            if (!$apiKey) {
+            if (! $apiKey) {
                 return Str::slug($title);
             }
 
             $response = Http::timeout(10)
                 ->withHeaders([
-                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Authorization' => 'Bearer '.$apiKey,
                     'Content-Type' => 'application/json',
                 ])
                 ->post('https://api.openai.com/v1/chat/completions', [
                     'model' => 'gpt-4o-mini',
                     'messages' => [
                         ['role' => 'system', 'content' => 'You are a URL slug generator. Return only the URL friendly slug in english (lowercase, hyphens instead of spaces) for the provided text. No explanation, no quotes.'],
-                        ['role' => 'user', 'content' => $title]
+                        ['role' => 'user', 'content' => $title],
                     ],
                     'temperature' => 0.3,
                     'max_tokens' => 50,
@@ -197,20 +200,21 @@ class WebsiteServiceController extends Controller
 
             if ($response->successful()) {
                 $slug = trim($response->json()['choices'][0]['message']['content'] ?? '');
-                if (!empty($slug)) {
+                if (! empty($slug)) {
                     // Ensure unique slug
                     $originalSlug = Str::slug($slug);
                     $finalSlug = $originalSlug;
                     $counter = 1;
                     while (WebsiteService::where('slug', $finalSlug)->exists()) {
-                        $finalSlug = $originalSlug . '-' . $counter;
+                        $finalSlug = $originalSlug.'-'.$counter;
                         $counter++;
                     }
+
                     return $finalSlug;
                 }
             }
         } catch (\Exception $e) {
-            \Log::error('AI Slug Generation failed: ' . $e->getMessage());
+            \Log::error('AI Slug Generation failed: '.$e->getMessage());
         }
 
         // Fallback to basic Str::slug
@@ -218,9 +222,10 @@ class WebsiteServiceController extends Controller
         $finalSlug = $fallback;
         $counter = 1;
         while (WebsiteService::where('slug', $finalSlug)->exists()) {
-            $finalSlug = $fallback . '-' . $counter;
+            $finalSlug = $fallback.'-'.$counter;
             $counter++;
         }
+
         return $finalSlug;
     }
 
@@ -228,22 +233,22 @@ class WebsiteServiceController extends Controller
     {
         try {
             $apiKey = config('services.openai.key');
-            if (!$apiKey) {
+            if (! $apiKey) {
                 return null;
             }
 
             $langPrompt = $language === 'ar' ? 'in Arabic' : 'in English';
-            
+
             $response = Http::timeout(15)
                 ->withHeaders([
-                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Authorization' => 'Bearer '.$apiKey,
                     'Content-Type' => 'application/json',
                 ])
                 ->post('https://api.openai.com/v1/chat/completions', [
                     'model' => 'gpt-4o-mini',
                     'messages' => [
                         ['role' => 'system', 'content' => "You are an SEO expert. Generate a JSON object containing 'seo_title' (max 60 chars), 'seo_description' (max 160 chars), and 'seo_keywords' (comma separated) for the provided service $langPrompt. Return strictly JSON."],
-                        ['role' => 'user', 'content' => "Title: $title\nDescription: $description"]
+                        ['role' => 'user', 'content' => "Title: $title\nDescription: $description"],
                     ],
                     'response_format' => ['type' => 'json_object'],
                     'temperature' => 0.3,
@@ -253,7 +258,7 @@ class WebsiteServiceController extends Controller
                 return json_decode($response->json()['choices'][0]['message']['content'] ?? '{}', true);
             }
         } catch (\Exception $e) {
-            \Log::error('AI SEO Generation failed: ' . $e->getMessage());
+            \Log::error('AI SEO Generation failed: '.$e->getMessage());
         }
 
         return null;

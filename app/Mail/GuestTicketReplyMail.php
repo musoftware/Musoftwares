@@ -21,7 +21,7 @@ class GuestTicketReplyMail extends Mailable
     public function __construct(GuestTicket $ticket, string $body)
     {
         $this->ticket = $ticket;
-        $this->body   = $body;
+        $this->body = $body;
     }
 
     public function envelope(): Envelope
@@ -32,7 +32,7 @@ class GuestTicketReplyMail extends Mailable
             from: new Address(config('mail.from.address'), config('mail.from.name')),
             to: [new Address($this->ticket->email, $this->ticket->name)],
             replyTo: [new Address($this->ticket->reply_email)],
-            subject: $this->ticket->subject_tag . ' ' . ($this->ticket->subject ?: 'Support'),
+            subject: $this->ticket->subject_tag.' '.($this->ticket->subject ?: 'Support'),
         );
     }
 

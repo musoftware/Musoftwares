@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserPaymentMethod;
 use App\Http\Resources\PaymentMethodResource;
+use App\Models\UserPaymentMethod;
+use App\Notifications\PaymentMethodStatusNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class AdminPaymentMethodController extends Controller
@@ -14,7 +16,7 @@ class AdminPaymentMethodController extends Controller
     {
         // Validate status filter against known enum values to prevent silent empty results
         $allowedStatuses = ['pending', 'active', 'declined'];
-        $statusFilter    = in_array($request->status, $allowedStatuses, true) ? $request->status : null;
+        $statusFilter = in_array($request->status, $allowedStatuses, true) ? $request->status : null;
 
         $query = UserPaymentMethod::with('user')->orderBy('id', 'desc');
 
@@ -30,32 +32,32 @@ class AdminPaymentMethodController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('bank_name', 'like', "%{$search}%")
-                  ->orWhere('bank', 'like', "%{$search}%")
-                  ->orWhere('mobile', 'like', "%{$search}%")
-                  ->orWhere('payee_email', 'like', "%{$search}%")
-                  ->orWhere('ewallet_provider', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%");
-                  });
+                    ->orWhere('bank', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('payee_email', 'like', "%{$search}%")
+                    ->orWhere('ewallet_provider', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
             });
         }
 
         $methods = $query->paginate(15)
-                         ->withQueryString()
-                         ->through(fn ($m) => (new PaymentMethodResource($m))->resolve());
+            ->withQueryString()
+            ->through(fn ($m) => (new PaymentMethodResource($m))->resolve());
 
         $stats = [
-            'total'    => UserPaymentMethod::count(),
-            'pending'  => UserPaymentMethod::where('status', 'pending')->count(),
-            'active'   => UserPaymentMethod::where('status', 'active')->count(),
+            'total' => UserPaymentMethod::count(),
+            'pending' => UserPaymentMethod::where('status', 'pending')->count(),
+            'active' => UserPaymentMethod::where('status', 'active')->count(),
             'declined' => UserPaymentMethod::where('status', 'declined')->count(),
         ];
 
         return Inertia::render('Admin/PaymentMethods/Index', [
             'methods' => $methods,
             'filters' => $request->only(['status', 'search']),
-            'stats'   => $stats,
+            'stats' => $stats,
         ]);
     }
 
@@ -93,20 +95,20 @@ class AdminPaymentMethodController extends Controller
      */
     private function sendStatusNotification(UserPaymentMethod $paymentMethod, string $status): void
     {
-        if (! class_exists(\App\Notifications\PaymentMethodStatusNotification::class)) {
+        if (! class_exists(PaymentMethodStatusNotification::class)) {
             return;
         }
 
         try {
             $paymentMethod->user->notify(
-                new \App\Notifications\PaymentMethodStatusNotification($paymentMethod, $status)
+                new PaymentMethodStatusNotification($paymentMethod, $status)
             );
         } catch (\Throwable $e) {
             // Notification failure must never break the admin action
-            \Illuminate\Support\Facades\Log::warning('PaymentMethod notification failed', [
+            Log::warning('PaymentMethod notification failed', [
                 'method_id' => $paymentMethod->id,
-                'status'    => $status,
-                'error'     => $e->getMessage(),
+                'status' => $status,
+                'error' => $e->getMessage(),
             ]);
         }
     }

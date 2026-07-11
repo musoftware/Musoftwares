@@ -14,7 +14,7 @@ class ApplyGeneratedStepsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'steps' => 'required|array'
+            'steps' => 'required|array',
         ];
     }
 }

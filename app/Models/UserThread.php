@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Trait\ChatModelTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class UserThread extends Model
 {
-    use SoftDeletes, HasFactory;
     use ChatModelTrait;
+    use HasFactory, SoftDeletes;
+
     protected $guarded = [];
 
     public function ChatName()
@@ -34,9 +34,9 @@ class UserThread extends Model
     public static function FindThreads($user1)
     {
         $threads = UserThread::query()->where('user1_id', $user1)->orWhere('user2_id', $user1)->get();
+
         return $threads;
     }
-
 
     public static function FindThread($user1, $user2)
     {
@@ -54,12 +54,14 @@ class UserThread extends Model
                 'user2_id' => $user2,
             ]);
         }
+
         return null;
     }
 
     public static function getUnreadMessages()
     {
         $user_id = Auth::user()->id;
+
         return MessageActivity::query()->where('user_id', '!=', $user_id)->whereHasMorph('thread', [UserThread::class], function ($query) use ($user_id) {
 
             $query->where('user1_id', $user_id)->orWhere('user2_id', $user_id);

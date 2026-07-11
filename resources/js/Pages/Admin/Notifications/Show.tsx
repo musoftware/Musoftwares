@@ -57,7 +57,7 @@ export default function Show({ campaign }: { campaign: any }) {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium text-slate-500">
-                                {__('freelance.views')}
+                                {__('general.views')}
                             </CardTitle>
                             <Eye className="w-4 h-4 text-slate-900" />
                         </CardHeader>

@@ -1689,6 +1689,18 @@
             }
         },
         "general": {
+            "anydesk_id": "معرف AnyDesk",
+            "anydesk_password": "كلمة مرور AnyDesk",
+            "card_view": "عرض كروت",
+            "compact_view": "عرض مصغر",
+            "hide": "إخفاء",
+            "list_view": "عرض قائمة",
+            "notes_list": "قائمة الملاحظات",
+            "parsed_credentials": "البيانات المستخرجة",
+            "select_all_notes": "تحديد الكل",
+            "select_note_to_view_details": "اختر ملاحظة لعرض التفاصيل",
+            "split_view": "عرض منقسم",
+            "url": "الرابط",
             "back_to_project": "العودة إلى المشروع",
             "budget_vs_cost": "الميزانية مقابل التكلفة",
             "business_total": "إجمالي الأعمال",
@@ -4358,6 +4370,8 @@
             "go_install_playlist": "Go Install Playlist",
             "go_to": "Go to",
             "go_to_board": "Go to Board",
+            "go_to_card": "الذهاب إلى البطاقة",
+            "edit_todo": "تعديل المهمة",
             "go_to_crm_dashboard": "Go to CRM Dashboard",
             "go_to_dashboard": "Go to Dashboard",
             "go_to_leads": "Go to Leads",
@@ -9135,7 +9149,14 @@
             "recent_same_user_or_project": "تكاليف حديثة بنفس العميل أو المشروع",
             "no_related_entries": "لا توجد عناصر ذات صلة",
             "back_to_costs": "العودة إلى التكاليف",
-            "trash": "سلة المهملات"
+            "trash": "سلة المهملات",
+            "add_direct_cost_description": "تسجيل مصروفات تشغيلية أو تجارية جديدة.",
+            "edit_direct_cost": "تعديل التكلفة المباشرة",
+            "edit_direct_cost_description": "تحديث تفاصيل المصروفات التشغيلية أو التجارية.",
+            "association_optional": "الربط (اختياري)",
+            "search_client": "البحث عن عميل...",
+            "search_project": "البحث عن مشروع...",
+            "invalid_master_password_please_try_again": "كلمة المرور الرئيسية غير صالحة. يرجى التحقق والمحاولة مرة أخرى."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -11542,6 +11563,18 @@
             }
         },
         "general": {
+            "anydesk_id": "AnyDesk ID",
+            "anydesk_password": "AnyDesk Password",
+            "card_view": "Card View",
+            "compact_view": "Compact View",
+            "hide": "Hide",
+            "list_view": "List View",
+            "notes_list": "Notes List",
+            "parsed_credentials": "Parsed Credentials",
+            "select_all_notes": "Select All Notes",
+            "select_note_to_view_details": "Select a note to view details",
+            "split_view": "Split View",
+            "url": "URL",
             "back_to_project": "back_to_project",
             "budget_vs_cost": "budget_vs_cost",
             "business_total": "business_total",
@@ -14216,6 +14249,8 @@
             "go_install_playlist": "Go Install Playlist",
             "go_to": "Go to",
             "go_to_board": "Go to Board",
+            "go_to_card": "Go to Card",
+            "edit_todo": "Edit Todo",
             "go_to_crm_dashboard": "Go to CRM Dashboard",
             "go_to_dashboard": "Go to Dashboard",
             "go_to_leads": "Go to Leads",
@@ -19020,7 +19055,8 @@
             "edit_direct_cost_description": "Update operational or business expense details.",
             "association_optional": "Association (optional)",
             "search_client": "Search client...",
-            "search_project": "Search project..."
+            "search_project": "Search project...",
+            "invalid_master_password_please_try_again": "Invalid master password. Please verify and try again."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

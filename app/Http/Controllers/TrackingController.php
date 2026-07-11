@@ -59,10 +59,11 @@ class TrackingController extends Controller
         }
 
         $imagePath = public_path('icons/pwa-192.png');
-        
-        if (!file_exists($imagePath)) {
+
+        if (! file_exists($imagePath)) {
             // Fallback to a transparent 1x1 pixel if the logo doesn't exist
             $transparentPixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+
             return response($transparentPixel, 200)
                 ->header('Content-Type', 'image/gif')
                 ->header('Cache-Control', 'no-cache, no-store, must-revalidate')

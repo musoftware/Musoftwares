@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Currency;
 use App\Models\User;
+use GeoIp2\Database\Reader;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,7 +50,7 @@ class RegisteredUserController extends Controller
         $geoDbPath = storage_path('app/geoip.mmdb');
         if (file_exists($geoDbPath)) {
             try {
-                $reader = new \GeoIp2\Database\Reader($geoDbPath);
+                $reader = new Reader($geoDbPath);
                 $ip = $request->ip();
                 if ($ip !== '127.0.0.1' && $ip !== '::1') {
                     $record = $reader->city($ip);
@@ -61,11 +63,11 @@ class RegisteredUserController extends Controller
             }
         }
 
-        $mappedCurrencyCode = config('geo_currency.mapping.' . $detectedCountry, 'USD');
-        $currency = \App\Models\Currency::where('currency', $mappedCurrencyCode)->first();
+        $mappedCurrencyCode = config('geo_currency.mapping.'.$detectedCountry, 'USD');
+        $currency = Currency::where('currency', $mappedCurrencyCode)->first();
 
-        if (!$currency) {
-            $currency = \App\Models\Currency::where('currency', 'USD')->first(); // fallback to default
+        if (! $currency) {
+            $currency = Currency::where('currency', 'USD')->first(); // fallback to default
         }
 
         if ($currency) {

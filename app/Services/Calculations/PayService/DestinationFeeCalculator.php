@@ -2,24 +2,19 @@
 
 namespace App\Services\Calculations\PayService;
 
-use App\Services\BaseService;
-
 use App\Models\CurrenciesExchange;
-use App\Models\GoldWorldPrice;
 use App\Models\GoldPrice;
+use App\Models\GoldWorldPrice;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 
 class DestinationFeeCalculator extends BaseService
 {
-
     /**
      * Applies the fee of the payment destination (e.g., CIB, Redot).
      *
-     * @param float $cost The cost after source fees are applied
-     * @param string $dest
-     * @param int $input_currency_id
-     * @param float $original_amount The original service amount before any conversions or fees
-     * @return float
+     * @param  float  $cost  The cost after source fees are applied
+     * @param  float  $original_amount  The original service amount before any conversions or fees
      */
     public function calculate(float $cost, string $dest, int $input_currency_id, float $original_amount): float
     {
@@ -28,9 +23,11 @@ class DestinationFeeCalculator extends BaseService
         if ($dest === 'cib') {
             if ($input_currency_id == $usd_currency_id) {
                 $cost = round($cost * 1.05, 2);
+
                 return round($cost / (1 - 0.02), 2);
             } else {
                 $cost = round($cost / (1 - 0.044), 2);
+
                 return round($cost / (1 - 0.05), 2);
             }
         }
@@ -50,6 +47,7 @@ class DestinationFeeCalculator extends BaseService
 
         if ($dest === 'alex') {
             $cost = round($cost / (1 - 0.044), 2);
+
             return round($cost / (1 - 0.06), 2);
         }
 
@@ -65,7 +63,7 @@ class DestinationFeeCalculator extends BaseService
                 ->groupBy(DB::raw('DATE(price_date)'))
                 ->orderBy(DB::raw('DATE(price_date)'), 'desc')
                 ->first();
-            
+
             if ($item) {
                 $usdPrice1 = CurrenciesExchange::RateByDate($item->price_date, $item->price_21k, $usd_currency_id, 1);
                 $price_21 = GoldPrice::query()
@@ -75,14 +73,15 @@ class DestinationFeeCalculator extends BaseService
                     ->first();
 
                 if ($usdPrice1 > 0 && $price_21) {
-                    $new_cost = (int)$original_amount * ($price_21->price_21k / $usdPrice1);
+                    $new_cost = (int) $original_amount * ($price_21->price_21k / $usdPrice1);
                     $new_cost = round($new_cost / (1 - 0.044), 2);
+
                     return round($new_cost / (1 - 0.035), 2);
                 }
             }
         }
 
         // 'cash', 'bank_transfer', 'paypal' passed from UI
-        return $cost; 
+        return $cost;
     }
 }

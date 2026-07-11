@@ -2,8 +2,9 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Jobs\EvaluateAutomationRuleJob;
+use App\Models\AutomationRule;
+use Illuminate\Support\Facades\Log;
 
 class AutomationEngineListener
 {
@@ -20,7 +21,7 @@ class AutomationEngineListener
      */
     public function handle(string $eventName, array $data): void
     {
-        if (!str_starts_with($eventName, 'App\\Events\\') && !str_starts_with($eventName, 'Modules\\')) {
+        if (! str_starts_with($eventName, 'App\\Events\\') && ! str_starts_with($eventName, 'Modules\\')) {
             return;
         }
 
@@ -29,23 +30,23 @@ class AutomationEngineListener
         try {
             $eventObject = $data[0] ?? null;
             $payload = [];
-            
+
             if (is_object($eventObject) && method_exists($eventObject, 'getAutomationPayload')) {
                 $payload = $eventObject->getAutomationPayload();
             } else {
                 $payload = (array) $data;
             }
 
-            $rules = \App\Models\AutomationRule::where('event_trigger', $eventName)
+            $rules = AutomationRule::where('event_trigger', $eventName)
                 ->where('is_active', true)
                 ->get();
 
             foreach ($rules as $rule) {
-                \App\Jobs\EvaluateAutomationRuleJob::dispatch($rule, $payload);
+                EvaluateAutomationRuleJob::dispatch($rule, $payload);
             }
         } catch (\Exception $e) {
             // Log or ignore if the table doesn't exist
-            \Illuminate\Support\Facades\Log::error('AutomationEngineListener Error: ' . $e->getMessage());
+            Log::error('AutomationEngineListener Error: '.$e->getMessage());
         }
     }
 }

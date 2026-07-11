@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Services\ReportService;
 use App\Http\Requests\Admin\Report\PnlReportRequest;
-use Inertia\Inertia;
-
 use App\Services\DashboardService;
+use App\Services\ReportService;
+use Inertia\Inertia;
 
 /**
  * P&L and financial reports for admin.
@@ -27,7 +25,7 @@ class ReportController extends Controller
         $to = $request->input('to', now()->endOfMonth()->toDateString());
 
         $pnlData = $this->reportService->getPnlReport($from, $to);
-        
+
         $data = [
             'pnl' => $pnlData,
             'stats' => $this->dashboardService->getCoreMetrics(),

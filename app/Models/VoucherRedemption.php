@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class VoucherRedemption extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'voucher_id',
@@ -58,4 +57,3 @@ class VoucherRedemption extends Model
         return $this->belongsTo(Currency::class, 'reward_currency');
     }
 }
-

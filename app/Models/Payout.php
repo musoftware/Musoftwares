@@ -5,11 +5,11 @@ namespace App\Models;
 use App\Helpers\FinanceHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Payout extends Model
 {
@@ -52,6 +52,7 @@ class Payout extends Model
         foreach ($this->items as $item) {
             $total += $item->total;
         }
+
         return (float) $total;
     }
 
@@ -78,15 +79,15 @@ class Payout extends Model
             }
 
             $total = $this->total();
-            
+
             if ($total > 0) {
                 $project = null;
-                if (!empty($this->project_id)) {
+                if (! empty($this->project_id)) {
                     $project = Project::find($this->project_id);
                 }
-                
-                $this->user->add_balance($total, 'Payout #' . $this->id, 'received', $this->currency_id, $project);
-                $this->user->add_balance(-1 * $total, 'Payout #' . $this->id, 'used', $this->currency_id, $project);
+
+                $this->user->add_balance($total, 'Payout #'.$this->id, 'received', $this->currency_id, $project);
+                $this->user->add_balance(-1 * $total, 'Payout #'.$this->id, 'used', $this->currency_id, $project);
             }
 
             $this->paid_amount = $total;

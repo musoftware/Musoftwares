@@ -2,15 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\TenantUsage;
-use App\Exceptions\SaaSLimitExceededException;
 use App\Events\SaaSLimitApproaching;
 use App\Events\SaaSLimitReached;
+use App\Exceptions\SaaSLimitExceededException;
+use App\Models\TenantUsage;
 use Illuminate\Support\Facades\DB;
 
 class MeteredBillingService extends BaseService
 {
-
     /**
      * Resolves the current tenant ID.
      */
@@ -28,12 +27,12 @@ class MeteredBillingService extends BaseService
             return 1;
         }
 
-        throw new \Exception("Cannot resolve tenant for SaaS metering.");
+        throw new \Exception('Cannot resolve tenant for SaaS metering.');
     }
 
     /**
      * Finds or creates a usage tracker for the tenant.
-     * In a full implementation, the limit_amount would be pulled dynamically from saas.php 
+     * In a full implementation, the limit_amount would be pulled dynamically from saas.php
      * based on the tenant's active subscriptions. For now, we allow dynamic seeding.
      */
     protected function getUsage(string $usageKey, ?int $defaultLimit = null, string $resetFrequency = 'monthly'): TenantUsage
@@ -56,7 +55,7 @@ class MeteredBillingService extends BaseService
     public function canUse(string $usageKey, int $amount = 1): bool
     {
         $usage = $this->getUsage($usageKey);
-        
+
         return $usage->hasAvailable($amount);
     }
 
@@ -65,7 +64,7 @@ class MeteredBillingService extends BaseService
      */
     public function enforce(string $usageKey, int $amount = 1): void
     {
-        if (!$this->canUse($usageKey, $amount)) {
+        if (! $this->canUse($usageKey, $amount)) {
             $usage = $this->getUsage($usageKey);
             event(new SaaSLimitReached($usage));
             throw new SaaSLimitExceededException($usageKey);
@@ -93,7 +92,7 @@ class MeteredBillingService extends BaseService
             ->first();
 
         // Check if we hit the 80% threshold for warnings
-        if (!$usage->isUnlimited()) {
+        if (! $usage->isUnlimited()) {
             $percentage = $usage->getPercentageUsed();
             if ($percentage >= 80 && $percentage < 100) {
                 // If it wasn't already >= 80 before this increment, we fire it.

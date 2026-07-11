@@ -158,7 +158,7 @@ export default function BalanceReport() {
                 </CardHeader>
                 <CardContent>
                     <div className="h-[400px] mt-4">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                             <AreaChart data={stats.monthly_trends}>
                                 <defs>
                                     <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">

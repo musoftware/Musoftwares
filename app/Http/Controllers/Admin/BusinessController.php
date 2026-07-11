@@ -9,12 +9,14 @@ use App\Models\CostTransaction;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Models\RecurringCost;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\CostTransactionAuditService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -25,6 +27,7 @@ class BusinessController extends Controller
     public function __construct(
         protected CostTransactionAuditService $costAudit,
     ) {}
+
     public function income(Request $request)
     {
         $currentYear = (int) now()->year;
@@ -274,10 +277,10 @@ class BusinessController extends Controller
             ->when($search !== '', function ($q) use ($search) {
                 $q->where(function ($w) use ($search) {
                     $w->where('reason', 'like', "%{$search}%")
-                      ->orWhere('amount', 'like', "%{$search}%")
-                      ->orWhere('category', 'like', "%{$search}%")
-                      ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
-                      ->orWhereHas('project', fn ($p) => $p->where('project_name', 'like', "%{$search}%"));
+                        ->orWhere('amount', 'like', "%{$search}%")
+                        ->orWhere('category', 'like', "%{$search}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('project', fn ($p) => $p->where('project_name', 'like', "%{$search}%"));
                 });
             });
 
@@ -469,11 +472,11 @@ class BusinessController extends Controller
                 : "COALESCE(NULLIF($column, ''), 'uncategorized') as group_key",
             []
         )->selectRaw('SUM(ABS(business_amount)) as total', [])
-          ->selectRaw('COUNT(*) as cnt', [])
-          ->groupBy('group_key')
-          ->orderByDesc('total')
-          ->limit(8)
-          ->get();
+            ->selectRaw('COUNT(*) as cnt', [])
+            ->groupBy('group_key')
+            ->orderByDesc('total')
+            ->limit(8)
+            ->get();
 
         return $rows->map(function ($row) use ($column, $foreign) {
             $label = $row->group_key;
@@ -484,6 +487,7 @@ class BusinessController extends Controller
             } elseif ($column === 'category') {
                 $label = $label === 'uncategorized' ? 'Uncategorized' : ucfirst((string) $label);
             }
+
             return [
                 'name' => (string) $label,
                 'value' => (float) $row->total,
@@ -521,6 +525,7 @@ class BusinessController extends Controller
             ->map(function ($r) use ($currencies) {
                 $cid = $r->currency_id ?? $r->currency;
                 $crow = $currencies[$cid] ?? null;
+
                 return [
                     'id' => $r->id,
                     'reason' => $r->reason,
@@ -553,7 +558,7 @@ class BusinessController extends Controller
                 'is_billable' => (bool) $cost->is_billable,
                 'notes' => $cost->notes,
                 'attachment_path' => $cost->attachment_path,
-                'attachment_url' => $cost->attachment_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($cost->attachment_path) : null,
+                'attachment_url' => $cost->attachment_path ? Storage::disk('public')->url($cost->attachment_path) : null,
                 'created_at' => $cost->created_at,
                 'updated_at' => $cost->updated_at,
                 'deleted_at' => $cost->deleted_at,
@@ -695,8 +700,8 @@ class BusinessController extends Controller
             $term = trim((string) $request->query('search'));
             $query->where(function ($q) use ($term) {
                 $q->where('reason', 'like', "%{$term}%")
-                  ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$term}%"))
-                  ->orWhereHas('project', fn ($p) => $p->where('project_name', 'like', "%{$term}%"));
+                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$term}%"))
+                    ->orWhereHas('project', fn ($p) => $p->where('project_name', 'like', "%{$term}%"));
             });
         }
 
@@ -704,7 +709,7 @@ class BusinessController extends Controller
         $currencies = Currency::as_array();
         $bCurrency = CurrencyHelper::getBusinessCurrency();
 
-        $filename = 'costs-' . now()->format('Ymd-His') . '.csv';
+        $filename = 'costs-'.now()->format('Ymd-His').'.csv';
 
         $response = new StreamedResponse(function () use ($rows, $currencies) {
             $out = fopen('php://output', 'w');
@@ -838,7 +843,7 @@ class BusinessController extends Controller
             }
 
             if ($request->boolean('make_recurring') && $request->filled('recurring')) {
-                $rc = new \App\Models\RecurringCost();
+                $rc = new RecurringCost;
                 $rc->title = $request->input('recurring_title') ?: $cost->reason;
                 $rc->amount = $cost->amount;
                 $rc->currency_id = $cost->currency_id;
@@ -852,7 +857,7 @@ class BusinessController extends Controller
                 $rc->reason = $cost->category ?: $cost->reason;
                 $rc->is_active = true;
                 $rc->save();
-                $rc->transactions()->attach($cost->id, ['unique_id' => $rc->id . '-' . ($cost->created_at ?? now())->toDateString()]);
+                $rc->transactions()->attach($cost->id, ['unique_id' => $rc->id.'-'.($cost->created_at ?? now())->toDateString()]);
                 $recurringId = $rc->id;
             }
         });
@@ -905,7 +910,7 @@ class BusinessController extends Controller
             'businessCurrency' => $businessCurrency,
             'paymentMethods' => self::COST_PAYMENT_METHODS,
             'categories' => $existingCategories,
-            'attachment_url' => $cost->attachment_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($cost->attachment_path) : null,
+            'attachment_url' => $cost->attachment_path ? Storage::disk('public')->url($cost->attachment_path) : null,
         ]);
     }
 
@@ -943,13 +948,13 @@ class BusinessController extends Controller
         $attachmentPath = $cost->attachment_path;
         $attachmentDeleted = false;
         if ($request->boolean('remove_attachment') && $attachmentPath) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($attachmentPath);
+            Storage::disk('public')->delete($attachmentPath);
             $attachmentPath = null;
             $attachmentDeleted = true;
         }
         if ($request->hasFile('attachment')) {
             if ($attachmentPath) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($attachmentPath);
+                Storage::disk('public')->delete($attachmentPath);
             }
             $attachmentPath = $request->file('attachment')->store('cost-attachments', 'public');
         }

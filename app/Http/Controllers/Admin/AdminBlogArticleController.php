@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\BlogArticle;
 use App\Http\Requests\Admin\BlogArticle\StoreBlogArticleRequest;
 use App\Http\Requests\Admin\BlogArticle\UpdateBlogArticleRequest;
+use App\Models\BlogArticle;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Marketplace\Models\Service;
@@ -21,9 +21,9 @@ class AdminBlogArticleController extends Controller
 
         if ($request->filled('q')) {
             $searchTerm = $request->q;
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', "%{$searchTerm}%")
-                  ->orWhere('content', 'like', "%{$searchTerm}%");
+                    ->orWhere('content', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -32,8 +32,8 @@ class AdminBlogArticleController extends Controller
         return Inertia::render('Admin/BlogArticles/Index', [
             'articles' => $articles,
             'filters' => [
-                'q' => $request->q
-            ]
+                'q' => $request->q,
+            ],
         ]);
     }
 
@@ -47,7 +47,7 @@ class AdminBlogArticleController extends Controller
         $services = Service::select('id', 'title')->get();
 
         return Inertia::render('Admin/BlogArticles/Create', [
-            'services' => $services
+            'services' => $services,
         ]);
     }
 
@@ -59,7 +59,7 @@ class AdminBlogArticleController extends Controller
         BlogArticle::create($request->validated());
 
         return redirect()->route('admin.blog-articles.index')
-                         ->with('success', __('admin.article_created_successfully', [], 'en'));
+            ->with('success', __('admin.article_created_successfully', [], 'en'));
     }
 
     /**
@@ -71,7 +71,7 @@ class AdminBlogArticleController extends Controller
 
         return Inertia::render('Admin/BlogArticles/Edit', [
             'article' => $blog_article,
-            'services' => $services
+            'services' => $services,
         ]);
     }
 
@@ -83,7 +83,7 @@ class AdminBlogArticleController extends Controller
         $blog_article->update($request->validated());
 
         return redirect()->route('admin.blog-articles.index')
-                         ->with('success', __('admin.article_updated_successfully', [], 'en'));
+            ->with('success', __('admin.article_updated_successfully', [], 'en'));
     }
 
     /**
@@ -94,6 +94,6 @@ class AdminBlogArticleController extends Controller
         $blog_article->delete();
 
         return redirect()->route('admin.blog-articles.index')
-                         ->with('success', __('admin.article_deleted_successfully', [], 'en'));
+            ->with('success', __('admin.article_deleted_successfully', [], 'en'));
     }
 }

@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 
 class AdminSettings extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['setting_key', 'setting_value'];
 
@@ -19,9 +18,11 @@ class AdminSettings extends Model
 
     public static function GetValue($key, $default = null)
     {
-        $cacheKey = 'admin_settings_' . $key;
+        $cacheKey = 'admin_settings_'.$key;
+
         return Cache::remember($cacheKey, self::SETTINGS_CACHE_TTL, function () use ($key, $default) {
             $find = AdminSettings::where('setting_key', $key)->first();
+
             return $find === null ? $default : $find->setting_value;
         });
     }
@@ -30,7 +31,7 @@ class AdminSettings extends Model
     {
         $find = AdminSettings::where('setting_key', $key)->first();
         if ($find == null) {
-            $new_setting = new AdminSettings();
+            $new_setting = new AdminSettings;
             $new_setting->setting_key = $key;
             $new_setting->setting_value = $value;
             $new_setting->save();
@@ -39,7 +40,7 @@ class AdminSettings extends Model
             $find->setting_value = $value;
             $find->save();
         }
-        Cache::forget('admin_settings_' . $key);
+        Cache::forget('admin_settings_'.$key);
     }
 
     public static function business_currency()
@@ -56,7 +57,6 @@ class AdminSettings extends Model
     {
         return Transaction::query()->select('currency')->groupBy('currency')->get();
     }
-
 
     public static function business_phone()
     {
@@ -121,17 +121,18 @@ class AdminSettings extends Model
             $currencyId = static::business_currency();
         }
 
-        $cacheKey = 'admin_recommended_hourly_rate_' . $currencyId;
+        $cacheKey = 'admin_recommended_hourly_rate_'.$currencyId;
+
         return (float) Cache::remember($cacheKey, 600, function () use ($currencyId) {
             // Calculate average monthly cost from last 6 months (As in ProjectPriceCalculator)
             $startDate = now()->subMonths(6)->startOfMonth();
             $endDate = now()->endOfMonth();
 
-            $costs = \App\Models\CostTransaction::whereBetween('created_at', [$startDate, $endDate])->get();
+            $costs = CostTransaction::whereBetween('created_at', [$startDate, $endDate])->get();
 
             $totalCost = 0;
             foreach ($costs as $cost) {
-                $totalCost += \App\Models\CurrenciesExchange::RateToday($cost->amount, $cost->currency, 2);
+                $totalCost += CurrenciesExchange::RateToday($cost->amount, $cost->currency, 2);
             }
 
             $avgMonthlyCost = $totalCost > 0 ? round($totalCost / 6, 2) : 0;
@@ -140,9 +141,7 @@ class AdminSettings extends Model
             $recommendedDailyRate = $dailyCostRate * ($adjustment / 100);
             $recommendedHourlyRate = $recommendedDailyRate / 8;
 
-            return round(\App\Models\CurrenciesExchange::RateToday($recommendedHourlyRate, 2, $currencyId), 2);
+            return round(CurrenciesExchange::RateToday($recommendedHourlyRate, 2, $currencyId), 2);
         });
     }
-
-
 }

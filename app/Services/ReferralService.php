@@ -2,19 +2,17 @@
 
 namespace App\Services;
 
+use App\Models\CurrenciesExchange;
+use App\Models\Earning;
 use App\Models\User;
 use App\Models\UserReferral;
-use App\Models\Earning;
-use App\Models\CurrenciesExchange;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Events\Registered;
 
 class ReferralService extends BaseService
 {
-
     /**
      * Cookie name used to dedupe referral-view increments per visitor.
      */
@@ -35,11 +33,11 @@ class ReferralService extends BaseService
 
         $referral = UserReferral::where('user_id', $user->id)->first();
 
-        if (!$referral) {
-            $referral = new UserReferral();
+        if (! $referral) {
+            $referral = new UserReferral;
             $referral->user_id = $user->id;
             $referral->title = 'Primary Campaign';
-            $referral->key = sha1(md5(uniqid() . $user->id));
+            $referral->key = sha1(md5(uniqid().$user->id));
             $referral->save();
         }
 
@@ -82,7 +80,7 @@ class ReferralService extends BaseService
     public function calculateTotalCommissionForReferrer(User $auth): float
     {
         return Cache::remember(
-            'referrer_total_commission:' . $auth->id,
+            'referrer_total_commission:'.$auth->id,
             now()->addMinutes(2),
             function () use ($auth) {
                 $total = 0;
@@ -138,7 +136,7 @@ class ReferralService extends BaseService
     public function processReferralRedirect($valueRef, ?Request $request = null): ?UserReferral
     {
         $referral = UserReferral::resolveRef($valueRef);
-        if (!$referral) {
+        if (! $referral) {
             return null;
         }
 
@@ -163,7 +161,7 @@ class ReferralService extends BaseService
 
         // Atomic increment guarded by a short cache lock to avoid double-counts
         // when the same visitor hits the redirect in parallel.
-        $lockKey = 'referral_view_lock:' . $referral->key;
+        $lockKey = 'referral_view_lock:'.$referral->key;
         Cache::lock($lockKey, 2)->block(1, function () use ($referral) {
             $referral->increment('views');
         });

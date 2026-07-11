@@ -2,8 +2,7 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Notifications\SaaSLimitReachedNotification;
 use Illuminate\Support\Facades\Log;
 
 class SaaSLimitReachedListener
@@ -18,9 +17,9 @@ class SaaSLimitReachedListener
         Log::info('SaaSLimitReached event handled.', [
             'usage_key' => $event->tenantUsage->usage_key ?? null,
         ]);
-        
+
         if (isset($event->tenantUsage) && isset($event->tenantUsage->user)) {
-            $event->tenantUsage->user->notify(new \App\Notifications\SaaSLimitReachedNotification($event->tenantUsage));
+            $event->tenantUsage->user->notify(new SaaSLimitReachedNotification($event->tenantUsage));
         }
     }
 }

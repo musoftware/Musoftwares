@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FinanceHelper;
+use App\Models\Currency;
 use App\Models\User;
 use App\Models\WalletTransfer;
 use App\Services\WalletTransferService;
+use App\Traits\ConvertsCurrency;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
-use Exception;
 
 class WalletTransferController extends Controller
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
     protected WalletTransferService $transferService;
 
@@ -30,6 +33,7 @@ class WalletTransferController extends Controller
     public function create()
     {
         $user = Auth::user();
+
         return Inertia::render('Client/Financial/WalletTransfer/Create', [
             'user' => [
                 'id' => $user->id,
@@ -38,8 +42,8 @@ class WalletTransferController extends Controller
             ],
             'wallet' => [
                 'balance' => (float) $user->user_balance,
-                'currency' => $user->currency_id ? (\App\Models\Currency::find($user->currency_id)?->currency) : null,
-            ]
+                'currency' => $user->currency_id ? (Currency::find($user->currency_id)?->currency) : null,
+            ],
         ]);
     }
 
@@ -52,10 +56,10 @@ class WalletTransferController extends Controller
             'receiver_email' => 'required|email|exists:users,email',
             'amount' => 'required|numeric|min:0.01',
             'reason' => 'nullable|string|max:500',
-            'confirm_transfer' => 'required|accepted'
+            'confirm_transfer' => 'required|accepted',
         ], [
             'receiver_email.exists' => 'The recipient email address could not be found.',
-            'confirm_transfer.accepted' => 'You must confirm the transfer details to complete the transaction.'
+            'confirm_transfer.accepted' => 'You must confirm the transfer details to complete the transaction.',
         ]);
 
         $sender = Auth::user();
@@ -79,7 +83,7 @@ class WalletTransferController extends Controller
 
             return redirect()
                 ->route('financial.transfer.show', $transfer->id)
-                ->with('success', 'Transfer completed successfully! ' . \App\Helpers\FinanceHelper::instance()->format_money($transfer->amount, $transfer->currency_id ?? $transfer->currency) . ' was sent.');
+                ->with('success', 'Transfer completed successfully! '.FinanceHelper::instance()->format_money($transfer->amount, $transfer->currency_id ?? $transfer->currency).' was sent.');
 
         } catch (ValidationException $e) {
             throw $e;
@@ -94,16 +98,17 @@ class WalletTransferController extends Controller
     public function history(Request $request)
     {
         $user = Auth::user();
-        
+
         $transfers = WalletTransfer::with(['sender', 'receiver'])
             ->where(function ($query) use ($user) {
                 $query->where('sender_id', $user->id)
-                      ->orWhere('receiver_id', $user->id);
+                    ->orWhere('receiver_id', $user->id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->through(function ($transfer) use ($user) {
                 $type = $transfer->sender_id === $user->id ? 'sent' : 'received';
+
                 return [
                     'id' => $transfer->id,
                     'type' => $type,
@@ -131,11 +136,11 @@ class WalletTransferController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        
+
         $transfer = WalletTransfer::with(['sender', 'receiver'])
             ->where(function ($query) use ($user) {
                 $query->where('sender_id', $user->id)
-                      ->orWhere('receiver_id', $user->id);
+                    ->orWhere('receiver_id', $user->id);
             })
             ->findOrFail($id);
 
@@ -158,7 +163,7 @@ class WalletTransferController extends Controller
                 'reason' => $transfer->reason,
                 'status' => $transfer->status,
                 'processed_at' => $transfer->processed_at->toISOString(),
-            ]
+            ],
         ]);
     }
 
@@ -169,13 +174,13 @@ class WalletTransferController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'receiver_email' => 'required|email|exists:users,email',
-            'amount' => 'required|numeric|min:0.01'
+            'amount' => 'required|numeric|min:0.01',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -186,7 +191,7 @@ class WalletTransferController extends Controller
             if ($sender->id === $receiver->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'You cannot transfer money to yourself.'
+                    'message' => 'You cannot transfer money to yourself.',
                 ], 422);
             }
 
@@ -197,8 +202,8 @@ class WalletTransferController extends Controller
                 (int) $sender->currency_id
             );
 
-            if (!isset($preview['currency'])) {
-                throw new \Exception(__('errors.currency_not_found'));
+            if (! isset($preview['currency'])) {
+                throw new Exception(__('errors.currency_not_found'));
             }
 
             return response()->json([
@@ -209,7 +214,7 @@ class WalletTransferController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -221,7 +226,7 @@ class WalletTransferController extends Controller
     public function searchUsers(Request $request)
     {
         $query = $request->get('q', '');
-        
+
         if (strlen($query) < 5) {
             return response()->json(['users' => []]);
         }
@@ -229,7 +234,7 @@ class WalletTransferController extends Controller
         $users = User::where('id', '!=', Auth::id())
             ->where(function ($q) use ($query) {
                 $q->where('email', 'like', "%{$query}%")
-                  ->orWhere('name', 'like', "%{$query}%");
+                    ->orWhere('name', 'like', "%{$query}%");
             })
             ->select('id', 'name', 'email')
             ->limit(8)

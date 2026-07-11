@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Contract extends Model
@@ -61,12 +63,13 @@ class Contract extends Model
     public function getCurrencyAttribute()
     {
         $currencyRow = $this->currencyRow();
+
         return $currencyRow ? $currencyRow->currency : '';
     }
 
     public function currencyRow()
     {
-        return \App\Models\Currency::find($this->currency_id);
+        return Currency::find($this->currency_id);
     }
 
     public function getTotalPriceAttribute()
@@ -81,12 +84,14 @@ class Contract extends Model
 
     public function getClientAttribute()
     {
-        if ($this->user) return $this->user;
-        
-        return (object)[
+        if ($this->user) {
+            return $this->user;
+        }
+
+        return (object) [
             'name' => $this->client_name ?? '-',
             'email' => '-',
-            'phone' => '-'
+            'phone' => '-',
         ];
     }
 
@@ -95,12 +100,12 @@ class Contract extends Model
         return $value ?? ($this->content['lang'] ?? 'ar');
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
@@ -110,12 +115,12 @@ class Contract extends Model
         return $this->belongsTo(ProjectProposal::class);
     } */
 
-    public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
     }
 
-    public function versions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function versions(): HasMany
     {
         return $this->hasMany(ContractVersion::class)->orderBy('created_at', 'desc');
     }

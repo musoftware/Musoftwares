@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Helpers\FinanceHelper;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class RecurringSalary extends Model
@@ -40,7 +40,7 @@ class RecurringSalary extends Model
 
     public function current_amount_str(): string
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
+        return FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
     }
 
     /**
@@ -63,7 +63,7 @@ class RecurringSalary extends Model
 
         $reason = trim((string) ($this->reason ?? $this->title));
         if ($reason === '') {
-            $reason = 'Recurring salary #' . $this->id;
+            $reason = 'Recurring salary #'.$this->id;
         }
 
         $tid = $user->add_balance(
@@ -88,7 +88,7 @@ class RecurringSalary extends Model
     {
         $d = $date instanceof Carbon ? $date->format('Y-m-d') : date('Y-m-d', strtotime($date));
 
-        return $this->id . '-' . $d;
+        return $this->id.'-'.$d;
     }
 
     public function createdBefore($date): bool

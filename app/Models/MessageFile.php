@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MessageFile extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
+
     public function thread()
     {
         return $this->morphTo('thread')->with('user');
@@ -19,5 +19,4 @@ class MessageFile extends Model
     {
         return $this->belongsTo(User::class);
     }
-
 }

@@ -14,7 +14,7 @@ class RenameUserFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'path'     => 'required|string',
+            'path' => 'required|string',
             'new_name' => 'required|string|max:255',
         ];
     }

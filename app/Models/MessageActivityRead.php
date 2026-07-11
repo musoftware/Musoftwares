@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class MessageActivityRead extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -46,11 +46,13 @@ class MessageActivityRead extends Model
     public static function read($activity)
     {
         $usr = Auth::user();
-        if ($activity->user_id == $usr->id) return;
+        if ($activity->user_id == $usr->id) {
+            return;
+        }
         if (
             MessageActivityRead::query()
-            ->where('message_activity_id', $activity->id)
-            ->where('user_id', $usr->id)->count() > 0
+                ->where('message_activity_id', $activity->id)
+                ->where('user_id', $usr->id)->count() > 0
         ) {
             $find = MessageActivityRead::query()->where('message_activity_id', $activity->id)->first();
             if ($find != null) {
@@ -60,7 +62,7 @@ class MessageActivityRead extends Model
                 }
             }
         } else {
-            $new_read = new MessageActivityRead();
+            $new_read = new MessageActivityRead;
 
             $new_read->thread()->associate($activity->thread);
             $new_read->message_activity_id = $activity->id;

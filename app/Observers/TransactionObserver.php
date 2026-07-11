@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\Transaction;
 use App\Models\SerialUserDevice;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Log;
 
 class TransactionObserver
@@ -15,12 +15,12 @@ class TransactionObserver
     public function created(Transaction $transaction): void
     {
         // Only reactivate serials for received or earned transactions
-        if (!in_array($transaction->type, ['received', 'earned'])) {
+        if (! in_array($transaction->type, ['received', 'earned'])) {
             return;
         }
 
         // Skip if transaction has no user
-        if (!$transaction->user_id) {
+        if (! $transaction->user_id) {
             return;
         }
 
@@ -39,10 +39,10 @@ class TransactionObserver
             foreach ($inactiveSerials as $serial) {
                 $serial->update([
                     'status' => SerialUserDevice::STATUS_ACTIVE,
-                    'notes' => ($serial->notes ? $serial->notes . ' | ' : '') .
-                        'Auto-reactivated on ' . now()->format('Y-m-d H:i:s') .
-                        ' due to transaction #' . $transaction->id .
-                        ' (' . $transaction->type . ': ' . $transaction->amount . ' ' . $transaction->currency . ')'
+                    'notes' => ($serial->notes ? $serial->notes.' | ' : '').
+                        'Auto-reactivated on '.now()->format('Y-m-d H:i:s').
+                        ' due to transaction #'.$transaction->id.
+                        ' ('.$transaction->type.': '.$transaction->amount.' '.$transaction->currency.')',
                 ]);
             }
 

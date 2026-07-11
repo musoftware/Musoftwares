@@ -5,13 +5,22 @@ import axios from 'axios';
 import { router } from '@inertiajs/react';
 
 // Mock inertia modules
-vi.mock('@inertiajs/react', () => ({
-    Head: ({ children }) => <>{children}</>,
-    Link: ({ children, href, className }) => <a href={href} className={className}>{children}</a>,
-    router: {
-        get: vi.fn(),
-    },
-}));
+vi.mock('@inertiajs/react', async () => {
+    const React = await import('react');
+    return {
+        Head: ({ children }) => <>{children}</>,
+        // eslint-disable-next-line react/display-name
+        Link: React.forwardRef(({ children, href, className, ...props }, ref) => (
+            <a ref={ref} href={href} className={className} {...props}>
+                {children}
+            </a>
+        )),
+        router: {
+            get: vi.fn(),
+            post: vi.fn(),
+        },
+    };
+});
 
 // Mock axios
 vi.mock('axios');
@@ -86,7 +95,7 @@ describe('Clients Index', () => {
         fireEvent.click(screen.getByText('John Doe'));
         
         // Check if sheet content appears (e.g. by checking for specific sheet buttons)
-        expect(await screen.findByText('All Invoices')).toBeInTheDocument();
+        expect(await screen.findByText('Invoices')).toBeInTheDocument();
     });
 
     it('calls axios for login as from dropdown', async () => {
@@ -112,8 +121,15 @@ describe('Clients Index', () => {
     });
 
     it('calls axios for reset password from dropdown when confirmed', async () => {
-        window.confirm.mockReturnValueOnce(true);
-        axios.post.mockResolvedValueOnce({ data: { new_password: 'new-password-123' } });
+        axios.post.mockResolvedValueOnce({ 
+            data: { 
+                message: 'Password reset successfully',
+                email: 'john@example.com',
+                name: 'John Doe',
+                password: 'new-password-123',
+                login_url: '/login'
+            } 
+        });
 
         render(<Index clients={mockClients} filters={{}} />);
         
@@ -125,11 +141,15 @@ describe('Clients Index', () => {
         const resetPasswordMenuItem = await screen.findByText('Reset Password');
         fireEvent.click(resetPasswordMenuItem);
         
-        expect(window.confirm).toHaveBeenCalledWith("Are you sure you want to reset this user's password?");
+        // Click Yes Reset Password button in custom dialog
+        const confirmButton = await screen.findByRole('button', { name: /Yes Reset Password/i });
+        fireEvent.click(confirmButton);
         
         await waitFor(() => {
             expect(axios.post).toHaveBeenCalledWith('/admin/users/1/reset-password');
-            expect(window.alert).toHaveBeenCalledWith("Password reset successfully.\nNew password: new-password-123");
         });
+
+        // Verify custom dialog shows success and credentials
+        expect(await screen.findByText('new-password-123')).toBeInTheDocument();
     });
 });

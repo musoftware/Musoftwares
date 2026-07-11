@@ -10,15 +10,15 @@ class MessageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'         => $this->id,
-            'body'       => $this->body,
+            'id' => $this->id,
+            'body' => $this->body,
             'attachment' => $this->attachment,
-            'is_system'  => (bool) $this->is_system,
-            'sender'     => $this->whenLoaded('sender', function () {
+            'is_system' => (bool) $this->is_system,
+            'sender' => $this->whenLoaded('sender', function () {
                 return [
-                    'id'     => $this->sender->id,
-                    'name'   => $this->sender->name,
-                    'email'  => $this->sender->email,
+                    'id' => $this->sender->id,
+                    'name' => $this->sender->name,
+                    'email' => $this->sender->email,
                     'avatar' => $this->sender->avatar ?? null,
                 ];
             }),

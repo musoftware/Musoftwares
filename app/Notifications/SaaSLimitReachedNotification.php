@@ -38,15 +38,15 @@ class SaaSLimitReachedNotification extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Alert: SaaS Limit Reached')
-                    ->greeting('Hello!')
-                    ->line("You have reached your SaaS limit for {$this->usage->usage_key}.")
-                    ->action('Upgrade Plan', url('/billing/subscriptions'))
-                    ->line('Please upgrade your plan to continue using this feature.');
+            ->subject('Alert: SaaS Limit Reached')
+            ->greeting('Hello!')
+            ->line("You have reached your SaaS limit for {$this->usage->usage_key}.")
+            ->action('Upgrade Plan', url('/billing/subscriptions'))
+            ->line('Please upgrade your plan to continue using this feature.');
     }
 }

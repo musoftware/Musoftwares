@@ -3,20 +3,23 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\Auth\ResetPasswordNotification;
+use App\Traits\IsPlatformClient;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Traits\IsPlatformClient;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, Searchable, IsPlatformClient, SoftDeletes;
+    use HasApiTokens, HasFactory, HasRoles, IsPlatformClient, Notifiable, Searchable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -42,7 +45,6 @@ class User extends Authenticatable
         'kyc_reference_id',
         'kyc_notes',
         'workspace_settings',
-        'can_add_freelance_skills',
         'max_devices',
         'temp_valid_until',
     ];
@@ -60,12 +62,13 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute()
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return asset('storage/'.$this->avatar);
         }
         if (empty($this->email)) {
             return null;
         }
         $hash = md5(strtolower(trim($this->email)));
+
         return "https://www.gravatar.com/avatar/{$hash}?s=200";
     }
 
@@ -81,7 +84,6 @@ class User extends Authenticatable
             'kyc_verified' => 'boolean',
             'kyc_verified_at' => 'datetime',
             'workspace_settings' => 'array',
-            'can_add_freelance_skills' => 'boolean',
             'max_devices' => 'integer',
         ];
     }
@@ -96,16 +98,14 @@ class User extends Authenticatable
         $this->attributes['currency_id'] = $value;
     }
 
-
-
     public function tickets(): HasMany
     {
-        return $this->hasMany(\App\Models\Ticket::class, 'user_id');
+        return $this->hasMany(Ticket::class, 'user_id');
     }
 
     public function emails(): HasMany
     {
-        return $this->hasMany(\App\Models\UserEmail::class, 'user_id');
+        return $this->hasMany(UserEmail::class, 'user_id');
     }
 
     /**
@@ -131,7 +131,7 @@ class User extends Authenticatable
             ->whereRaw('LOWER(email) = ?', [$needle])
             ->first();
 
-        if (!$alias) {
+        if (! $alias) {
             return null;
         }
 
@@ -159,42 +159,37 @@ class User extends Authenticatable
 
     public function conversationParticipations(): HasMany
     {
-        return $this->hasMany(\App\Models\ConversationParticipant::class, 'user_id');
+        return $this->hasMany(ConversationParticipant::class, 'user_id');
     }
 
     public function messages(): HasMany
     {
-        return $this->hasMany(\App\Models\Message::class, 'sender_id');
+        return $this->hasMany(Message::class, 'sender_id');
     }
-
-
 
     public function deviceTokens()
     {
-        return $this->hasMany(\App\Models\DeviceToken::class);
+        return $this->hasMany(DeviceToken::class);
     }
 
     public function invoices()
     {
-        return $this->hasMany(\App\Models\Invoice::class);
+        return $this->hasMany(Invoice::class);
     }
 
     public function projects(): HasMany
     {
-        return $this->hasMany(\App\Models\Project::class, 'user_id');
+        return $this->hasMany(Project::class, 'user_id');
     }
-
 
     public function locked_balance()
     {
         $locked = 0;
 
         // 1. Pending withdrawals
-        if (class_exists(\App\Models\UserReferralRequestWithdraw::class)) {
+        if (class_exists(UserReferralRequestWithdraw::class)) {
             $locked += $this->withdraw()->where('status', 'pending')->sum('amount');
         }
-
-
 
         // 3. Pending invoices
         $unpaidInvoices = $this->invoices()
@@ -204,15 +199,17 @@ class User extends Authenticatable
 
         foreach ($unpaidInvoices as $invoice) {
             $schedule = $invoice->getSchedule();
-            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency_id);
-            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency_id);
-            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency_id);
+            $invoiceTotal = CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency_id);
+            $invoicePaid = CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency_id);
+            $invoiceUnpaid = CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency_id);
 
             if ($schedule) {
-                $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
+                $startDate = Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
                 if (now()->gte($startDate)) {
-                    $splits = (int)($schedule['months'] ?? 1);
-                    if ($splits < 1) $splits = 1;
+                    $splits = (int) ($schedule['months'] ?? 1);
+                    if ($splits < 1) {
+                        $splits = 1;
+                    }
                     $monthsSinceStart = now()->diffInMonths($startDate);
                     $paymentsDue = min($splits, $monthsSinceStart + 1);
                     $totalDueByNow = ($invoiceTotal / $splits) * $paymentsDue;
@@ -246,15 +243,17 @@ class User extends Authenticatable
             $deductionForInvoice = 0;
 
             // Convert everything to User Currency for calculation
-            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency_id);
-            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency_id);
-            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency_id);
+            $invoiceTotal = CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency_id);
+            $invoicePaid = CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency_id);
+            $invoiceUnpaid = CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency_id);
 
             if ($schedule) {
                 // Parse schedule
-                $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
-                $splits = (int)($schedule['months'] ?? 1); // 1 or 12
-                if ($splits < 1) $splits = 1;
+                $startDate = Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
+                $splits = (int) ($schedule['months'] ?? 1); // 1 or 12
+                if ($splits < 1) {
+                    $splits = 1;
+                }
 
                 if (now()->lt($startDate)) {
                     // Future schedule: No deduction yet
@@ -264,23 +263,23 @@ class User extends Authenticatable
                     $monthsPassed = $startDate->diffInMonths(now()) + 1;
 
                     if ($splits > 1) {
-                         // Split logic
-                         $monthlyAmount = $invoiceTotal / $splits;
-                         $totalExpected = $monthlyAmount * min($splits, $monthsPassed);
+                        // Split logic
+                        $monthlyAmount = $invoiceTotal / $splits;
+                        $totalExpected = $monthlyAmount * min($splits, $monthsPassed);
 
-                         // Due is what we EXPECT to have paid minus what we actually paid
-                         $due = max(0, $totalExpected - $invoicePaid);
+                        // Due is what we EXPECT to have paid minus what we actually paid
+                        $due = max(0, $totalExpected - $invoicePaid);
 
-                         // Cannot invoke more than what is strictly unpaid on the invoice
-                         $deductionForInvoice = min($invoiceUnpaid, $due);
+                        // Cannot invoke more than what is strictly unpaid on the invoice
+                        $deductionForInvoice = min($invoiceUnpaid, $due);
                     } else {
                         // Single payment, due now
                         $deductionForInvoice = $invoiceUnpaid;
                     }
                 }
             } else {
-                 // No schedule, strictly due immediately
-                 $deductionForInvoice = $invoiceUnpaid;
+                // No schedule, strictly due immediately
+                $deductionForInvoice = $invoiceUnpaid;
             }
 
             $totalDeduction += $deductionForInvoice;
@@ -289,7 +288,7 @@ class User extends Authenticatable
         $available = round($currentBalance - $totalDeduction, 2);
 
         if ($currency && $currency != $this->currency_id) {
-            return \App\Models\CurrenciesExchange::RateToday($available, $this->currency_id, $currency);
+            return CurrenciesExchange::RateToday($available, $this->currency_id, $currency);
         }
 
         return $available;
@@ -300,15 +299,16 @@ class User extends Authenticatable
         $invoices = $this->invoices()
             ->whereIn('status', ['unpaid', 'partially_paid']);
 
-        if (!$include_pending) {
+        if (! $include_pending) {
             $invoices->whereIn('job_status', ['processing', 'done']);
         }
 
         $invoices = $invoices->get();
         $unpaid = 0;
         foreach ($invoices as $invoice) {
-            $unpaid += \App\Models\CurrenciesExchange::RateToday($invoice->unpaid_total(), $invoice->currency, $this->currency_id);
+            $unpaid += CurrenciesExchange::RateToday($invoice->unpaid_total(), $invoice->currency, $this->currency_id);
         }
+
         return $unpaid;
     }
 
@@ -319,17 +319,17 @@ class User extends Authenticatable
 
     public function actions()
     {
-        return $this->hasMany(\App\Models\Action::class);
+        return $this->hasMany(Action::class);
     }
 
     public function costTransactions()
     {
-        return $this->hasMany(\App\Models\CostTransaction::class, 'user_id');
+        return $this->hasMany(CostTransaction::class, 'user_id');
     }
 
     public function withdraw()
     {
-        return $this->hasMany(\App\Models\UserReferralRequestWithdraw::class);
+        return $this->hasMany(UserReferralRequestWithdraw::class);
     }
 
     public function my_ref_users()
@@ -339,17 +339,17 @@ class User extends Authenticatable
 
     public function referrals()
     {
-        return $this->hasMany(\App\Models\UserReferral::class, 'user_id');
+        return $this->hasMany(UserReferral::class, 'user_id');
     }
 
     public function invoice_item_timers()
     {
-        return $this->hasMany(\App\Models\InvoiceItemTimer::class);
+        return $this->hasMany(InvoiceItemTimer::class);
     }
 
     public function timer_report()
     {
-        $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+        $driver = DB::connection()->getDriverName();
         if ($driver === 'sqlite') {
             $secondsSql = 'SUM(strftime(\'%s\', date_end) - strftime(\'%s\', date_start))';
         } else {
@@ -357,17 +357,16 @@ class User extends Authenticatable
         }
 
         return $this->invoice_item_timers()
-            ->select(\Illuminate\Support\Facades\DB::raw("DATE(date_start) as ds, min(date_end) as min_date, max(date_end) as max_date, sum(amount) as sum_amount, {$secondsSql} as sum_seconds"))
-            ->groupBy(\Illuminate\Support\Facades\DB::raw('ds'));
+            ->select(DB::raw("DATE(date_start) as ds, min(date_end) as min_date, max(date_end) as max_date, sum(amount) as sum_amount, {$secondsSql} as sum_seconds"))
+            ->groupBy(DB::raw('ds'));
     }
 
     public function currency_name()
     {
-        $currency = \App\Models\Currency::query()->find($this->currency_id);
+        $currency = Currency::query()->find($this->currency_id);
+
         return $currency ? $currency->currency : '--';
     }
-
-
 
     public function client_balance()
     {
@@ -381,8 +380,7 @@ class User extends Authenticatable
                 ->where('unpaid', '>', '0')
                 ->where('unpaid', '<=', $this->user_balance)
                 ->orderBy('id')
-                ->get()
-            as $invoice
+                ->get() as $invoice
         ) {
             $client_balance = $this->user_balance;
             $invoice_total = $invoice->total();
@@ -394,7 +392,7 @@ class User extends Authenticatable
 
     public function balance($currency = null)
     {
-        return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency_id, $currency);
+        return CurrenciesExchange::RateToday($this->user_balance, $this->currency_id, $currency);
     }
 
     public function add_balance($amount, $reason, $type, $currency = null, $project = null, $createdAt = null)
@@ -403,25 +401,25 @@ class User extends Authenticatable
             return null;
         }
         if ($currency != null) {
-            $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currency, $this->currency_id);
+            $amount = CurrenciesExchange::RateToday($amount, $currency, $this->currency_id);
         }
         $currency = $this->currency_id;
 
-        $client_balance = new Transaction();
+        $client_balance = new Transaction;
         $client_balance->project_id = optional($project)->id;
         $client_balance->user_id = $this->id;
         $client_balance->amount = $amount;
         $client_balance->type = $type;
-        if (!empty($reason)) {
+        if (! empty($reason)) {
             $client_balance->reason = $reason;
         }
         $client_balance->currency_id = $currency;
         if ($createdAt) {
-            $client_balance->created_at = \Carbon\Carbon::parse($createdAt);
-            $client_balance->updated_at = \Carbon\Carbon::parse($createdAt);
+            $client_balance->created_at = Carbon::parse($createdAt);
+            $client_balance->updated_at = Carbon::parse($createdAt);
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($client_balance, $project, $amount, $type, $currency) {
+        DB::transaction(function () use ($client_balance, $project, $amount, $type) {
             $client_balance->save();
 
             if (in_array($type, ['received', 'sent', 'refunded'])) {
@@ -452,7 +450,7 @@ class User extends Authenticatable
 
     public function payoutMethods(): HasMany
     {
-        return $this->hasMany(\App\Models\PayoutMethod::class, 'user_id');
+        return $this->hasMany(PayoutMethod::class, 'user_id');
     }
 
     /**
@@ -467,17 +465,17 @@ class User extends Authenticatable
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(\App\Models\UserSubscription::class, 'user_id');
+        return $this->hasMany(UserSubscription::class, 'user_id');
     }
 
     public function loans(): HasMany
     {
-        return $this->hasMany(\App\Models\UserLoan::class, 'user_id');
+        return $this->hasMany(UserLoan::class, 'user_id');
     }
 
     public function activeSubscription()
     {
-        return $this->hasOne(\App\Models\UserSubscription::class, 'user_id')->where('status', 'active')->latest();
+        return $this->hasOne(UserSubscription::class, 'user_id')->where('status', 'active')->latest();
     }
 
     public function hasSubscription(): bool
@@ -489,7 +487,7 @@ class User extends Authenticatable
 
         // Legacy fallback
         if ($this->plan_id && $this->subscription_date) {
-            return \Carbon\Carbon::parse($this->subscription_date)->isFuture();
+            return Carbon::parse($this->subscription_date)->isFuture();
         }
 
         return false;
@@ -509,16 +507,15 @@ class User extends Authenticatable
 
     public function plan()
     {
-        return $this->belongsTo(\App\Models\Plan::class, 'plan_id');
+        return $this->belongsTo(Plan::class, 'plan_id');
     }
 
     /**
      * Get or generate AutoSMS verification secret for HMAC signing
-     * @return string
      */
     public function getAutoSmsVerificationSecret(): string
     {
-        if (!$this->autosms_verification_secret) {
+        if (! $this->autosms_verification_secret) {
             $this->autosms_verification_secret = bin2hex(random_bytes(32)); // 64 character hex string
             $this->save();
         }
@@ -528,6 +525,7 @@ class User extends Authenticatable
 
     /**
      * Regenerate AutoSMS verification secret
+     *
      * @return string The new secret
      */
     public function regenerateAutoSmsVerificationSecret(): string
@@ -553,6 +551,7 @@ class User extends Authenticatable
     public function getAffiliateCommissionPercentage()
     {
         $pct = $this->affiliateCommissionPercent();
+
         return $pct / 100.0 + 1;
     }
 
@@ -562,16 +561,6 @@ class User extends Authenticatable
     public function affiliateCommissionPercent(): float
     {
         return (float) ($this->affiliate_commission_percentage ?? 1);
-    }
-
-    public function freelanceSkills()
-    {
-        return $this->belongsToMany(
-            \Modules\Freelance\Models\Skill::class,
-            'freelance_user_skills',
-            'user_id',
-            'skill_id'
-        );
     }
 
     /**
@@ -594,10 +583,10 @@ class User extends Authenticatable
     {
         $percent = $this->affiliateCommissionPercent();
 
-        if ($referredUser instanceof User && !empty($referredUser->first_referral_payment_at)) {
+        if ($referredUser instanceof User && ! empty($referredUser->first_referral_payment_at)) {
             $boostPercent = (float) config('referrals.boost_percent', 10);
-            $boostDays   = (int)  config('referrals.boost_days', 30);
-            $windowEnd   = $referredUser->first_referral_payment_at->copy()->addDays($boostDays);
+            $boostDays = (int) config('referrals.boost_days', 30);
+            $windowEnd = $referredUser->first_referral_payment_at->copy()->addDays($boostDays);
             if (now()->lessThan($windowEnd)) {
                 $percent = max($percent, $boostPercent);
             }
@@ -607,7 +596,7 @@ class User extends Authenticatable
         $commissionAmount = $baseAmount * ($commissionMultiplier - 1);
 
         if ($currencyId && $currencyId != $this->currency_id) {
-            $commissionAmount = \App\Models\CurrenciesExchange::RateToday($commissionAmount, $this->currency_id, $currencyId);
+            $commissionAmount = CurrenciesExchange::RateToday($commissionAmount, $this->currency_id, $currencyId);
         }
 
         return round($commissionAmount, 2);
@@ -625,7 +614,7 @@ class User extends Authenticatable
     /**
      * Route notifications for the FCM channel.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  Notification  $notification
      * @return string|array|null
      */
     public function routeNotificationForFcm($notification)
@@ -643,7 +632,7 @@ class User extends Authenticatable
     /**
      * Route notifications for the SMS channel.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  Notification  $notification
      * @return string|null
      */
     public function routeNotificationForSms($notification)
@@ -654,7 +643,7 @@ class User extends Authenticatable
     /**
      * Route notifications for the WhatsApp channel.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  Notification  $notification
      * @return string|null
      */
     public function routeNotificationForWhatsapp($notification)
@@ -679,7 +668,6 @@ class User extends Authenticatable
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new \App\Notifications\Auth\ResetPasswordNotification($token));
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
-

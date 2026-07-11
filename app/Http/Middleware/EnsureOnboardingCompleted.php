@@ -16,14 +16,15 @@ class EnsureOnboardingCompleted
 
         $user = $request->user();
 
-        if ($user && !$user->onboarding_completed) {
-            if (!$request->routeIs('onboarding.*') && !$request->routeIs('logout') && !$request->routeIs('verification.*')) {
+        if ($user && ! $user->onboarding_completed) {
+            if (! $request->routeIs('onboarding.*') && ! $request->routeIs('logout') && ! $request->routeIs('verification.*')) {
                 if ($request->expectsJson() || $request->is('api/*')) {
                     return response()->json([
                         'error' => 'Onboarding required.',
-                        'redirect' => route('onboarding.wizard')
+                        'redirect' => route('onboarding.wizard'),
                     ], 403);
                 }
+
                 return redirect()->route('onboarding.wizard');
             }
         }

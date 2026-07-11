@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Conversation;
-use App\Models\ConversationParticipant;
 use App\Models\User;
-use Inertia\Inertia;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class MessagesController extends Controller
 {
@@ -16,10 +15,10 @@ class MessagesController extends Controller
         $user = $request->user();
 
         // Fetch all conversations where user is participant
-        $conversations = Conversation::with(['participants.user', 'messages' => function($q) {
-                $q->latest()->take(1);
-            }])
-            ->whereHas('participants', function($q) use ($user) {
+        $conversations = Conversation::with(['participants.user', 'messages' => function ($q) {
+            $q->latest()->take(1);
+        }])
+            ->whereHas('participants', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
             ->latest()
@@ -31,13 +30,14 @@ class MessagesController extends Controller
                     ->where('sender_id', '!=', $user->id)
                     ->where('created_at', '>', $lastRead)
                     ->count();
+
                 return $conv;
             });
 
         // Security: only expose admin/support accounts for direct chat.
         // Regular users must NOT see the full member directory.
         $users = User::where('id', '!=', $user->id)
-            ->whereHas('roles', function($q) {
+            ->whereHas('roles', function ($q) {
                 $q->whereIn('name', ['admin', 'support_agent']);
             })
             ->select('id', 'name', 'email')
@@ -47,6 +47,7 @@ class MessagesController extends Controller
             ->map(function ($u) {
                 $arr = $u->toArray();
                 $arr['role'] = $u->roles->first()?->name ?? 'user';
+
                 return $arr;
             });
 
@@ -63,9 +64,9 @@ class MessagesController extends Controller
                 'required',
                 'exists:users,id',
                 // Server-side guard: users can only direct-message admins/support
-                function ($attribute, $value, $fail) use ($request) {
+                function ($attribute, $value, $fail) {
                     $recipient = User::find($value);
-                    if ($recipient && !$recipient->roles()->whereIn('name', ['admin', 'support_agent', 'super_admin'])->exists()) {
+                    if ($recipient && ! $recipient->roles()->whereIn('name', ['admin', 'support_agent', 'super_admin'])->exists()) {
                         $fail(__('general.direct_messages_support_only'));
                     }
                 },
@@ -97,6 +98,7 @@ class MessagesController extends Controller
                         'sender_id' => $sender->id,
                         'body' => $request->message,
                     ]);
+
                     return $existing;
                 }
 
@@ -128,8 +130,7 @@ class MessagesController extends Controller
 
             return back()->with('success', __('general.message_sent_successfully'));
         } catch (\Exception $e) {
-            return back()->withErrors(['message' => 'Failed to send message: ' . $e->getMessage()]);
+            return back()->withErrors(['message' => 'Failed to send message: '.$e->getMessage()]);
         }
     }
 }
-

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Ticket;
-use App\Models\Conversation;
-use Illuminate\Support\Facades\DB;
+use App\Rules\Recaptcha;
+use App\Services\GuestTicketCreator;
+use App\Services\SupportDeskService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -15,10 +16,10 @@ class SupportTicketController extends Controller
     {
         $user = Auth::user();
         $isAdmin = $user->isAdmin();
-        
+
         $query = Ticket::with(['user', 'conversation.messages.sender']);
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $query->where('user_id', $user->id);
         }
 
@@ -30,7 +31,7 @@ class SupportTicketController extends Controller
         ]);
     }
 
-    public function store(Request $request, \App\Services\SupportDeskService $service)
+    public function store(Request $request, SupportDeskService $service)
     {
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
@@ -40,9 +41,10 @@ class SupportTicketController extends Controller
 
         try {
             $service->createTicket(Auth::user(), $validated, Auth::user()->isAdmin());
+
             return redirect()->back()->with('success', __('general.support_ticket_opened_successfully'));
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Failed to create ticket: ' . $e->getMessage()]);
+            return redirect()->back()->withErrors(['error' => 'Failed to create ticket: '.$e->getMessage()]);
         }
     }
 
@@ -53,11 +55,11 @@ class SupportTicketController extends Controller
 
         // Authorize (only owner or admin)
         $isAdmin = $user && $user->isAdmin();
-        if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
+        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
             abort(403);
         }
 
-        app(\App\Services\SupportDeskService::class)->closeTicket($ticket);
+        app(SupportDeskService::class)->closeTicket($ticket);
 
         return redirect()->back()->with('success', __('general.ticket_resolved'));
     }
@@ -68,11 +70,11 @@ class SupportTicketController extends Controller
         $user = Auth::user();
 
         $isAdmin = $user && $user->isAdmin();
-        if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
+        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
             abort(403);
         }
 
-        app(\App\Services\SupportDeskService::class)->closeTicket($ticket);
+        app(SupportDeskService::class)->closeTicket($ticket);
 
         return redirect()->back()->with('success', __('general.ticket_closed'));
     }
@@ -83,7 +85,7 @@ class SupportTicketController extends Controller
         $user = Auth::user();
 
         $isAdmin = $user && $user->isAdmin();
-        if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
+        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
             abort(403);
         }
 
@@ -92,23 +94,31 @@ class SupportTicketController extends Controller
         return redirect()->back()->with('success', __('general.ticket_deleted'));
     }
 
-    public function guestStore(Request $request, \App\Services\SupportDeskService $service)
+    public function guestStore(Request $request, GuestTicketCreator $creator)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:50',
             'description' => 'required|string',
-            'g-recaptcha-response' => ['required', new \App\Rules\Recaptcha()],
+            'subject' => 'nullable|string|max:255',
+            'g-recaptcha-response' => ['required', new Recaptcha],
         ], [
-            'g-recaptcha-response.required' => __('general.recaptcha_required') ?? 'يرجى التحقق من الكابتشا (Google reCAPTCHA).'
+            'g-recaptcha-response.required' => __('general.recaptcha_required') ?? 'يرجى التحقق من الكابتشا (Google reCAPTCHA).',
         ]);
 
         try {
-            $service->createGuestTicket($validated);
+            $creator->create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'mobile' => $validated['phone'],
+                'body' => $validated['description'],
+                'subject' => $validated['subject'] ?? null,
+            ]);
+
             return redirect()->back()->with('success', 'تم ارسال الطلب بنجاح');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Failed to create ticket: ' . $e->getMessage()]);
+            return redirect()->back()->withErrors(['error' => 'Failed to create ticket: '.$e->getMessage()]);
         }
     }
 }

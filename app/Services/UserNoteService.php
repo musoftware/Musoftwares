@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\UserCredential;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class UserNoteService extends BaseService
 {
@@ -17,13 +16,13 @@ class UserNoteService extends BaseService
     {
         return $this->executeInTransaction(function () use ($userId, $data) {
             $note = UserCredential::create([
-                'user_id'     => $userId,
-                'admin_id'    => Auth::id(),
-                'category'    => $data['category'],
-                'title'       => $data['title'],
-                'content'     => $data['content'],
-                'rotated_at'  => $data['category'] === 'password' ? now() : null,
-                'expires_at'  => $this->resolveExpiry($data),
+                'user_id' => $userId,
+                'admin_id' => Auth::id(),
+                'category' => $data['category'],
+                'title' => $data['title'],
+                'content' => $data['content'],
+                'rotated_at' => $data['category'] === 'password' ? now() : null,
+                'expires_at' => $this->resolveExpiry($data),
             ]);
 
             $this->audit->log(
@@ -44,9 +43,9 @@ class UserNoteService extends BaseService
             $before = $note->only(['category', 'title', 'is_pinned', 'rotated_at', 'expires_at']);
 
             $note->fill([
-                'title'      => $data['title'] ?? $note->title,
-                'content'    => $data['content'] ?? $note->content,
-                'category'   => $data['category'] ?? $note->category,
+                'title' => $data['title'] ?? $note->title,
+                'content' => $data['content'] ?? $note->content,
+                'category' => $data['category'] ?? $note->category,
                 'rotated_at' => ($data['category'] ?? $note->category) === 'password' ? now() : $note->rotated_at,
                 'expires_at' => array_key_exists('expires_at', $data)
                     ? ($data['expires_at'] ? Carbon::parse($data['expires_at']) : null)
@@ -58,8 +57,8 @@ class UserNoteService extends BaseService
                 $userId,
                 $note->id,
                 [
-                    'category'   => $note->category,
-                    'changed'    => array_keys(array_diff_assoc($note->only(array_keys($before)), $before)),
+                    'category' => $note->category,
+                    'changed' => array_keys(array_diff_assoc($note->only(array_keys($before)), $before)),
                 ]
             );
 
@@ -132,7 +131,7 @@ class UserNoteService extends BaseService
     {
         return $this->executeInTransaction(function () use ($userId, $noteId) {
             $note = UserCredential::where('user_id', $userId)->findOrFail($noteId);
-            $note->is_pinned = !$note->is_pinned;
+            $note->is_pinned = ! $note->is_pinned;
             $note->save();
 
             $this->audit->log(
@@ -252,25 +251,26 @@ class UserNoteService extends BaseService
             ->count();
 
         return [
-            'total'         => (clone $base)->where('category', '!=', 'archived')->count(),
-            'password'      => (clone $base)->where('category', 'password')->count(),
-            'anydesk'       => (clone $base)->where('category', 'anydesk')->count(),
-            'notes'         => (clone $base)->where('category', 'notes')->count(),
-            'archived'      => (clone $base)->where('category', 'archived')->count(),
-            'pinned'        => (clone $base)->where('is_pinned', true)->count(),
+            'total' => (clone $base)->where('category', '!=', 'archived')->count(),
+            'password' => (clone $base)->where('category', 'password')->count(),
+            'anydesk' => (clone $base)->where('category', 'anydesk')->count(),
+            'notes' => (clone $base)->where('category', 'notes')->count(),
+            'archived' => (clone $base)->where('category', 'archived')->count(),
+            'pinned' => (clone $base)->where('is_pinned', true)->count(),
             'expiring_soon' => $expiringSoon,
-            'expired'       => $expired,
+            'expired' => $expired,
         ];
     }
 
     protected function resolveExpiry(array $data, ?string $category = null): ?Carbon
     {
-        if (!empty($data['expires_at'])) {
+        if (! empty($data['expires_at'])) {
             return Carbon::parse($data['expires_at']);
         }
         if (($data['category'] ?? $category) === 'password' && config('user_notes.default_password_ttl_days')) {
             return now()->addDays((int) config('user_notes.default_password_ttl_days'));
         }
+
         return null;
     }
 }

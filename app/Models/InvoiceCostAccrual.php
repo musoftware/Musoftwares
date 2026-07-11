@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Helpers\BalancesHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceCostAccrual extends Model
@@ -101,7 +100,7 @@ class InvoiceCostAccrual extends Model
                 if ($sliceInUser <= $remaining + 0.0001) {
                     $tid = $user->add_balance(
                         (float) $accrual->amount,
-                        'Invoice #' . $accrual->invoice_id . ' cost',
+                        'Invoice #'.$accrual->invoice_id.' cost',
                         'earned',
                         (int) $accrual->currency
                     );
@@ -120,7 +119,7 @@ class InvoiceCostAccrual extends Model
                     }
                     $tid = $user->add_balance(
                         $partialAmount,
-                        'Invoice #' . $accrual->invoice_id . ' cost (partial)',
+                        'Invoice #'.$accrual->invoice_id.' cost (partial)',
                         'earned',
                         (int) $accrual->currency
                     );

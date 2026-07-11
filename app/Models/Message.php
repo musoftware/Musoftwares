@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Message extends Model
 {
@@ -26,22 +25,23 @@ class Message extends Model
 
     public function getAttachmentsAttribute(): array
     {
-        if (!$this->attachment) {
+        if (! $this->attachment) {
             return [];
         }
+
         return [
             [
                 'id' => $this->id,
                 'type' => 'image',
-                'path' => asset('storage/' . $this->attachment),
-            ]
+                'path' => asset('storage/'.$this->attachment),
+            ],
         ];
     }
 
     public function getReadAttribute(): bool
     {
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             return true;
         }
 
@@ -53,7 +53,7 @@ class Message extends Model
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$participant || !$participant->last_read_at) {
+        if (! $participant || ! $participant->last_read_at) {
             return false;
         }
 

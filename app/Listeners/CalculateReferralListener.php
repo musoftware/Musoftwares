@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use App\Models\UserReferral;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
 class CalculateReferralListener
@@ -24,7 +22,7 @@ class CalculateReferralListener
         // Resolve the referral key and increment the `registered` counter
         // here, in the listener, rather than in the event constructor.
         // Constructor side-effects broke replay and queued dispatch.
-        if (!empty($event->referral)) {
+        if (! empty($event->referral)) {
             $ref = UserReferral::resolveRef((string) $event->referral);
             if ($ref !== null) {
                 $ref->increment('registered');
@@ -39,6 +37,6 @@ class CalculateReferralListener
         //
         // When a real reward is introduced, set $rewardAmount from settings
         // and call $referrer->add_balance($rewardAmount, 'Referral Bonus ...', 'received').
-        return;
+
     }
 }

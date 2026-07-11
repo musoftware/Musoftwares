@@ -2,13 +2,24 @@
 
 namespace App\Jobs;
 
+use App\Helpers\KashierHelper;
+use App\Models\Currency;
+use App\Models\IncomingWebhook;
+use App\Models\Invoice;
+use App\Models\PaymentLink;
+use App\Models\PointTransaction;
+use App\Models\Transaction;
+use App\Models\User;
+use App\Models\UserSubscription;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\IncomingWebhook;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\Booking\Models\Booking;
 
 class ProcessWebhookJob implements ShouldQueue
 {
@@ -32,12 +43,13 @@ class ProcessWebhookJob implements ShouldQueue
         // 1. Check if already processed
         if ($this->webhook->status === 'processed') {
             Log::info("Webhook ID {$this->webhook->id} already processed. Skipping.");
+
             return;
         }
 
         try {
             // 2. Validate Security Payload (Signature validation)
-            if (!$this->validateSignature($this->webhook->source, $this->webhook->payload, $this->webhook->headers)) {
+            if (! $this->validateSignature($this->webhook->source, $this->webhook->payload, $this->webhook->headers)) {
                 throw new \Exception("Invalid webhook signature for source: {$this->webhook->source}");
             }
 
@@ -64,8 +76,8 @@ class ProcessWebhookJob implements ShouldQueue
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Failed to process webhook ID {$this->webhook->id}: " . $e->getMessage());
-            
+            Log::error("Failed to process webhook ID {$this->webhook->id}: ".$e->getMessage());
+
             $this->webhook->update([
                 'status' => 'failed',
                 'error_message' => $e->getMessage(),
@@ -84,11 +96,13 @@ class ProcessWebhookJob implements ShouldQueue
         if ($source === 'kashier') {
             if (class_exists('\App\Helpers\KashierHelper') && method_exists('\App\Helpers\KashierHelper', 'validatePayload')) {
                 $signature = $headers['x-kashier-signature'][0] ?? ($headers['X-Kashier-Signature'][0] ?? null);
-                return \App\Helpers\KashierHelper::validatePayload($payload, $signature);
+
+                return KashierHelper::validatePayload($payload, $signature);
             }
+
             return true;
         }
-        
+
         if ($source === 'whatsapp') {
             // WhatsApp signature validation (X-Hub-Signature-256)
             return true;
@@ -104,8 +118,8 @@ class ProcessWebhookJob implements ShouldQueue
 
     private function processKashier($payload)
     {
-        Log::info("Processing Kashier webhook", ['payload' => $payload]);
-        if (!isset($payload['data']) || $payload['data']['status'] !== 'SUCCESS') {
+        Log::info('Processing Kashier webhook', ['payload' => $payload]);
+        if (! isset($payload['data']) || $payload['data']['status'] !== 'SUCCESS') {
             return;
         }
 
@@ -118,20 +132,20 @@ class ProcessWebhookJob implements ShouldQueue
         $source = $metaData['source'] ?? null;
         $userId = $metaData['user_id'] ?? null;
         $trxId = $data['transactionId'] ?? null;
-        
+
         $amountPaid = floatval($metaData['original_amount'] ?? $data['amount'] ?? 0);
         $currencyCode = $metaData['original_currency'] ?? 'EGP';
 
         $currencyId = null;
         if ($currencyCode) {
-            $currencyModel = \App\Models\Currency::where('currency', strtoupper($currencyCode))->first();
+            $currencyModel = Currency::where('currency', strtoupper($currencyCode))->first();
             if ($currencyModel) {
                 $currencyId = $currencyModel->id;
             }
         }
 
-        if (!$source || !$trxId || $amountPaid <= 0) {
-            throw new \Exception("Invalid Kashier webhook payload structure.");
+        if (! $source || ! $trxId || $amountPaid <= 0) {
+            throw new \Exception('Invalid Kashier webhook payload structure.');
         }
 
         // Route to the appropriate service logic based on source
@@ -162,14 +176,16 @@ class ProcessWebhookJob implements ShouldQueue
 
     private function handleBalanceRecharge($userId, $trxId, $amountPaid, $currencyId, $metaData)
     {
-        $user = \App\Models\User::find($userId);
-        if (!$user) return;
-        
-        $reason = "Deposit via Kashier online payment (Trx: $trxId)";
-        $alreadyProcessed = \App\Models\Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
+        $user = User::find($userId);
+        if (! $user) {
+            return;
+        }
 
-        if (!$alreadyProcessed) {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId) {
+        $reason = "Deposit via Kashier online payment (Trx: $trxId)";
+        $alreadyProcessed = Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
+
+        if (! $alreadyProcessed) {
+            DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId) {
                 $user->add_balance($amountPaid, $reason, 'received', $currencyId);
             });
             Log::info("Kashier balance recharge processed successfully for User {$userId}");
@@ -178,18 +194,18 @@ class ProcessWebhookJob implements ShouldQueue
 
     private function handleSubscriptionPurchase($userId, $trxId, $amountPaid, $currencyId, $metaData)
     {
-        $user = \App\Models\User::find($userId);
-        if (!$user) return;
+        $user = User::find($userId);
+        if (! $user) {
+            return;
+        }
 
         $reason = "Subscription modules via Kashier online payment (Trx: $trxId)";
-        $alreadyProcessed = \App\Models\Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
+        $alreadyProcessed = Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
 
-        if (!$alreadyProcessed) {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId, $metaData) {
+        if (! $alreadyProcessed) {
+            DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId, $metaData) {
                 $days = $metaData['days'] ?? 365;
                 $isNewSystem = $metaData['is_new_system'] ?? true;
-                
-
 
                 $user->add_balance($amountPaid, $reason, 'received', $currencyId);
                 if (class_exists('\App\Helpers\TimerHelper') && method_exists('\App\Helpers\TimerHelper', 'instance')) {
@@ -200,20 +216,19 @@ class ProcessWebhookJob implements ShouldQueue
                 }
 
                 $items = $metaData['items'] ?? [];
-                if (is_array($items) && !empty($items)) {
+                if (is_array($items) && ! empty($items)) {
                     foreach ($items as $item) {
-                        $expiry = \Carbon\Carbon::now()->addDays((int) $days);
-                        
-                        $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
-                        if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
-                            $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays((int) $days);
+                        $expiry = Carbon::now()->addDays((int) $days);
+
+                        $existing = UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
+                        if ($existing && $existing->status === 'active' && Carbon::parse($existing->expires_at)->isFuture()) {
+                            $expiry = Carbon::parse($existing->expires_at)->addDays((int) $days);
                         }
 
-                        \App\Models\UserSubscription::updateOrCreate(
+                        UserSubscription::updateOrCreate(
                             ['user_id' => $user->id, 'object' => $item],
                             ['status' => 'active', 'started_at' => now(), 'expires_at' => $expiry, 'auto_renew' => true]
                         );
-
 
                     }
                 }
@@ -224,19 +239,21 @@ class ProcessWebhookJob implements ShouldQueue
 
     private function handlePointsPurchase($userId, $trxId, $amountPaid, $currencyId, $metaData)
     {
-        $user = \App\Models\User::find($userId);
-        if (!$user) return;
+        $user = User::find($userId);
+        if (! $user) {
+            return;
+        }
 
         $reason = "Points purchase via Kashier (Trx: $trxId)";
-        $alreadyProcessed = \App\Models\Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
+        $alreadyProcessed = Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
 
-        if (!$alreadyProcessed) {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId, $metaData) {
+        if (! $alreadyProcessed) {
+            DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId, $metaData) {
                 $points = $metaData['points'] ?? 0;
                 $user->add_balance($amountPaid, $reason, 'received', $currencyId);
                 $user->add_balance(-1 * $amountPaid, "Used for {$points} points", 'used', $currencyId);
-                
-                \App\Models\PointTransaction::create([
+
+                PointTransaction::create([
                     'user_id' => $user->id,
                     'amount' => $points,
                     'type' => 'credit',
@@ -252,7 +269,7 @@ class ProcessWebhookJob implements ShouldQueue
         // Add booking mapping
         $bookingId = $metaData['booking_id'] ?? null;
         if ($bookingId && class_exists('\Modules\Booking\Models\Booking')) {
-            $booking = \Modules\Booking\Models\Booking::find($bookingId);
+            $booking = Booking::find($bookingId);
             if ($booking && $booking->payment_status !== 'paid') {
                 $booking->payment_status = 'paid';
                 $booking->save();
@@ -265,7 +282,7 @@ class ProcessWebhookJob implements ShouldQueue
     {
         $invoiceId = $metaData['invoice_id'] ?? null;
         if ($invoiceId && class_exists('\App\Models\Invoice')) {
-            $invoice = \App\Models\Invoice::find($invoiceId);
+            $invoice = Invoice::find($invoiceId);
             if ($invoice && $invoice->status !== 'paid') {
                 $invoice->mark_as_paid();
                 Log::info("Kashier invoice payment processed successfully for Invoice {$invoiceId}");
@@ -277,7 +294,7 @@ class ProcessWebhookJob implements ShouldQueue
     {
         $paymentLinkId = $metaData['payment_link_id'] ?? null;
         if ($paymentLinkId && class_exists('\App\Models\PaymentLink')) {
-            $paymentLink = \App\Models\PaymentLink::find($paymentLinkId);
+            $paymentLink = PaymentLink::find($paymentLinkId);
             if ($paymentLink && $paymentLink->status !== 'paid') {
                 $paymentLink->status = 'paid';
                 $paymentLink->paid_at = now();
@@ -289,12 +306,12 @@ class ProcessWebhookJob implements ShouldQueue
 
     private function processWhatsApp($payload)
     {
-        Log::info("Processing WhatsApp webhook", ['payload' => $payload]);
+        Log::info('Processing WhatsApp webhook', ['payload' => $payload]);
         // Map to internal state change here
     }
 
     private function processStripe($payload)
     {
-        Log::info("Processing Stripe webhook", ['payload' => $payload]);
+        Log::info('Processing Stripe webhook', ['payload' => $payload]);
     }
 }

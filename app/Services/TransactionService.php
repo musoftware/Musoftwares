@@ -2,18 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\Transaction;
-use App\Models\CostTransaction;
-use App\Models\User;
-use App\Models\Project;
-use App\Helpers\TimerHelper;
 use App\Helpers\BalancesHelper;
+use App\Helpers\TimerHelper;
+use App\Models\CostTransaction;
+use App\Models\Project;
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TransactionService extends BaseService
 {
-
     public function getIncomeTransactions(array $filters)
     {
         $q = Transaction::with(['user', 'project']);
@@ -31,25 +29,25 @@ class TransactionService extends BaseService
         $q = CostTransaction::with(['user', 'project']);
 
         $this->applyFilters($q, $filters);
-        
+
         return $q->orderBy('created_at', 'desc')->paginate(50);
     }
 
     private function applyFilters($query, array $filters)
     {
-        if (!empty($filters['user'])) {
+        if (! empty($filters['user'])) {
             $query->where('user_id', $filters['user']);
         }
-        if (!empty($filters['project'])) {
+        if (! empty($filters['project'])) {
             $query->where('project_id', $filters['project']);
         }
-        if (!empty($filters['currency'])) {
+        if (! empty($filters['currency'])) {
             $query->where('currency_id', $filters['currency']);
         }
-        if (!empty($filters['month'])) {
+        if (! empty($filters['month'])) {
             $query->whereMonth('created_at', $filters['month']);
         }
-        if (!empty($filters['year'])) {
+        if (! empty($filters['year'])) {
             $query->whereYear('created_at', $filters['year']);
         }
     }
@@ -61,7 +59,7 @@ class TransactionService extends BaseService
         $this->executeInTransaction(function () use ($request, $user, $project, $data, $type, &$added) {
             foreach ($data as $item) {
                 $itemProject = $project;
-                if (!$itemProject && isset($item['project']) && $item['project']) {
+                if (! $itemProject && isset($item['project']) && $item['project']) {
                     $itemProject = $user->projects()->find($item['project']);
                 }
 

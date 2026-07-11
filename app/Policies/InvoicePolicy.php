@@ -4,16 +4,15 @@ namespace App\Policies;
 
 use App\Models\Invoice;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class InvoicePolicy
 {
-
     public function before(User $user, string $ability): ?bool
     {
         if ($user->isAdmin()) {
             return true;
         }
+
         return null;
     }
 

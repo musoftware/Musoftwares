@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WebsiteService;
 use App\Models\BlogArticle;
-use Illuminate\Http\Request;
+use App\Models\WebsiteService;
 
 class SitemapController extends Controller
 {
@@ -17,7 +16,7 @@ class SitemapController extends Controller
             'solutions', 'solutions.healthcare', 'solutions.education', 'solutions.ecommerce',
             'solutions.real-estate', 'solutions.finance', 'company', 'company.about',
             'company.careers', 'company.contact', 'legal.privacy', 'legal.terms', 'legal.cookies',
-            'pricing'
+            'pricing',
         ];
 
         foreach ($staticRoutes as $route) {
@@ -52,7 +51,7 @@ class SitemapController extends Controller
         }
 
         return response()->view('sitemap', [
-            'urls' => $urls
+            'urls' => $urls,
         ])->header('Content-Type', 'text/xml');
     }
 }

@@ -24,6 +24,7 @@ class MessageService extends BaseService
                     'sender_id' => $sender->id,
                     'body' => $messageBody,
                 ]);
+
                 return $existing;
             }
 

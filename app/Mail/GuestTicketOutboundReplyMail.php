@@ -21,7 +21,7 @@ class GuestTicketOutboundReplyMail extends Mailable
 
     public function __construct(GuestTicket $ticket, GuestTicketMessage $message)
     {
-        $this->ticket  = $ticket;
+        $this->ticket = $ticket;
         $this->message = $message;
     }
 
@@ -61,7 +61,7 @@ class GuestTicketOutboundReplyMail extends Mailable
     public function build()
     {
         return $this->html(
-            $this->message->body_html ?: ('<pre style="white-space:pre-wrap;font-family:inherit">' . e((string) $this->message->body_text) . '</pre>')
+            $this->message->body_html ?: ('<pre style="white-space:pre-wrap;font-family:inherit">'.e((string) $this->message->body_text).'</pre>')
         );
     }
 }

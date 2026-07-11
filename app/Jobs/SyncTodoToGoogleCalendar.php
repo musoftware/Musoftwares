@@ -17,7 +17,9 @@ class SyncTodoToGoogleCalendar implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $todo;
+
     public $user; // The platform admin
+
     public $action; // 'create', 'update', 'delete'
 
     /**
@@ -39,21 +41,22 @@ class SyncTodoToGoogleCalendar implements ShouldQueue
             if ($this->todo->google_event_id) {
                 $calendarService->deleteEvent($this->user, $this->todo->google_event_id);
             }
+
             return;
         }
 
-        if (!$this->todo->start_at || !$this->todo->end_at) {
+        if (! $this->todo->start_at || ! $this->todo->end_at) {
             return;
         }
 
         $start = Carbon::parse($this->todo->start_at);
         $end = Carbon::parse($this->todo->end_at);
-        
-        $title = "Task: " . $this->todo->title;
-        $clientName = $this->todo->user ? $this->todo->user->name : 'Unknown';
-        $description = "Client: " . $clientName . "\nDescription: " . ($this->todo->description ?? '');
 
-        if ($this->action === 'create' || !$this->todo->google_event_id) {
+        $title = 'Task: '.$this->todo->title;
+        $clientName = $this->todo->user ? $this->todo->user->name : 'Unknown';
+        $description = 'Client: '.$clientName."\nDescription: ".($this->todo->description ?? '');
+
+        if ($this->action === 'create' || ! $this->todo->google_event_id) {
             $eventId = $calendarService->createEvent($this->user, $title, $description, $start, $end);
             if ($eventId) {
                 $this->todo->updateQuietly(['google_event_id' => $eventId]);

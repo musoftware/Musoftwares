@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import FreelanceLayout from '@/Pages/Freelance/Layout';
 import { router, usePage } from '@inertiajs/react';
 import { formatMoney, formatNumber, formatDate } from '../../../lib/utils';
 import { CreditCard, Wallet, ArrowRight, CheckCircle2, History, Zap, TrendingUp, RefreshCcw, Sparkles, BadgePercent, ChevronRight, Info } from 'lucide-react';
@@ -16,9 +15,9 @@ import { PageHeader } from '@/Components/ui/PageHeader';
 import { __ } from '@/lib/i18n';
 
 export default function PointsIndex({ auth, tiers = [], quickPackages = [], transactions, egpToPreferredRate = 0.10, currency = 'USD' }) {
-    const { wallet, flash, is_lance_domain } = usePage().props;
+    const { wallet, flash } = usePage().props;
     const wallet_balance = wallet ? Number(wallet.balance) : 0;
-    const Layout = is_lance_domain ? FreelanceLayout : AuthenticatedLayout;
+    const Layout = AuthenticatedLayout;
     const [customPoints, setCustomPoints] = useState('');
     const globalCurrency = currency || wallet?.currency || auth?.user?.preferred_currency;
 

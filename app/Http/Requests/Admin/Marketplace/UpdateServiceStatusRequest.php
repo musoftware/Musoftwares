@@ -14,7 +14,7 @@ class UpdateServiceStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status'           => 'required|in:active,declined,suspended,pending,rejected',
+            'status' => 'required|in:active,declined,suspended,pending,rejected',
             'rejection_reason' => 'nullable|required_if:status,rejected|string|min:10',
         ];
     }

@@ -11,7 +11,9 @@ class InventoryAdjusted
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $product;
+
     public $quantityAdjusted;
+
     public $reason;
 
     public function __construct($product, $quantityAdjusted, $reason)

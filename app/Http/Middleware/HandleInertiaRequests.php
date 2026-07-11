@@ -2,8 +2,16 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\AdminSettings;
+use App\Models\Currency;
+use App\Models\RecurringNotice;
+use App\Models\WebsiteService;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
+use Modules\CRM\app\Core\FeatureManager;
+use Modules\CRM\app\Core\LimitManager;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -41,20 +49,22 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user ? array_merge($user->toArray(), [
                     'role' => strtolower($user->roles->first()->name ?? 'user'),
-                    'roles' => $user->roles->pluck('name')->map(fn($r) => strtolower($r))->toArray(),
+                    'roles' => $user->roles->pluck('name')->map(fn ($r) => strtolower($r))->toArray(),
                     'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
                 ]) : null,
                 'team_member' => null,
-                'crm_team_member' => \Illuminate\Support\Facades\Auth::guard('crm_team')->user(),
+                'crm_team_member' => Auth::guard('crm_team')->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
                 'has_ios_shortcut_active' => $user ? $user->last_shortcut_sync_at !== null : false,
                 'active_modules' => function () use ($user) {
-                    if (!$user) return [];
+                    if (! $user) {
+                        return [];
+                    }
                     try {
-                        $service = app(\App\Services\SubscriptionService::class);
+                        $service = app(SubscriptionService::class);
+
                         return [
                             'erp' => $service->hasActiveSubscription($user, 'erp'),
-                            'freelance' => $service->hasActiveSubscription($user, 'freelance'),
                             'booking' => $service->hasActiveSubscription($user, 'booking'),
                             'intelligence' => $service->hasActiveSubscription($user, 'intelligence'),
                             'tools' => $service->hasActiveSubscription($user, 'tools'),
@@ -63,36 +73,42 @@ class HandleInertiaRequests extends Middleware
                         ];
                     } catch (\Throwable $e) {
                         return [
-                            'erp' => true, 
-                            'freelance' => true, 
+                            'erp' => true,
                             'booking' => true,
                             'intelligence' => true,
                             'tools' => true,
                             'crm' => true,
-                            'marketplace' => true
+                            'marketplace' => true,
                         ];
                     }
                 },
                 'crm_features' => function () use ($user) {
-                    if (!$user) return [];
-                    if (class_exists(\Modules\CRM\app\Core\FeatureManager::class)) {
-                        return app(\Modules\CRM\app\Core\FeatureManager::class)->getAllForUser($user);
+                    if (! $user) {
+                        return [];
                     }
+                    if (class_exists(FeatureManager::class)) {
+                        return app(FeatureManager::class)->getAllForUser($user);
+                    }
+
                     return [];
                 },
                 'crm_limits' => function () {
-                    if (class_exists(\Modules\CRM\app\Core\LimitManager::class)) {
-                        return app(\Modules\CRM\app\Core\LimitManager::class)->getAllLimits();
+                    if (class_exists(LimitManager::class)) {
+                        return app(LimitManager::class)->getAllLimits();
                     }
+
                     return [];
                 },
                 'erp_addons' => function () use ($user) {
-                    if (!$user) return [];
+                    if (! $user) {
+                        return [];
+                    }
                     try {
                         $erpAddons = collect(config('saas.addons', []))
-                            ->filter(fn($a) => ($a['parent'] ?? '') === 'erp')
+                            ->filter(fn ($a) => ($a['parent'] ?? '') === 'erp')
                             ->keys();
-                        return $erpAddons->filter(fn($slug) => $user->hasModuleSubscription($slug))->values()->toArray();
+
+                        return $erpAddons->filter(fn ($slug) => $user->hasModuleSubscription($slug))->values()->toArray();
                     } catch (\Throwable $e) {
                         return [];
                     }
@@ -105,6 +121,7 @@ class HandleInertiaRequests extends Middleware
                         'recent' => $user->unreadNotifications()->take(5)->get(),
                     ];
                 }
+
                 return null;
             },
             'wallet' => function () use ($user) {
@@ -113,9 +130,10 @@ class HandleInertiaRequests extends Middleware
                         'id' => null,
                         'balance' => $user->user_balance,
                         'earned_balance' => 0,
-                        'currency' => $user->currency_id ? (\App\Models\Currency::find($user->currency_id)?->currency) : null,
+                        'currency' => $user->currency_id ? (Currency::find($user->currency_id)?->currency) : null,
                     ];
                 }
+
                 return null;
             },
             'tenant' => function () {
@@ -123,31 +141,32 @@ class HandleInertiaRequests extends Middleware
             },
             'settings' => [
                 'base_currency' => function () {
-                    if (class_exists(\App\Models\AdminSettings::class)) {
-                        return \App\Models\AdminSettings::business_currency_name();
+                    if (class_exists(AdminSettings::class)) {
+                        return AdminSettings::business_currency_name();
                     }
+
                     return 'USD';
                 },
                 'business_name' => function () {
-                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_name', 'musoftware') : 'musoftware';
+                    return class_exists(AdminSettings::class) ? AdminSettings::GetValue('business_name', 'musoftware') : 'musoftware';
                 },
                 'business_phone' => function () {
-                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_phone', '+20 101 521 8548') : '+20 101 521 8548';
+                    return class_exists(AdminSettings::class) ? AdminSettings::GetValue('business_phone', '+20 101 521 8548') : '+20 101 521 8548';
                 },
                 'business_address' => function () {
-                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_address', 'Suez, Egypt') : 'Suez, Egypt';
+                    return class_exists(AdminSettings::class) ? AdminSettings::GetValue('business_address', 'Suez, Egypt') : 'Suez, Egypt';
                 },
                 'business_email' => function () {
-                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_email', 'admin@musoftwares.com') : 'admin@musoftwares.com';
-                }
+                    return class_exists(AdminSettings::class) ? AdminSettings::GetValue('business_email', 'admin@musoftwares.com') : 'admin@musoftwares.com';
+                },
             ],
-            'currencies' => fn() => \App\Models\Currency::all()->map(fn($c) => [
+            'currencies' => fn () => Currency::all()->map(fn ($c) => [
                 'id' => $c->id,
                 'currency' => $c->currency,
                 'symbol' => $c->symbol,
                 'string_format' => $c->string_format,
             ])->toArray(),
-            'website_services' => fn() => class_exists(\App\Models\WebsiteService::class) ? \App\Models\WebsiteService::all()->toArray() : [],
+            'website_services' => fn () => class_exists(WebsiteService::class) ? WebsiteService::all()->toArray() : [],
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),
@@ -160,13 +179,12 @@ class HandleInertiaRequests extends Middleware
                 'ios_shortcut_token' => fn () => $request->session()->get('ios_shortcut_token'),
             ],
             'locale' => app()->getLocale(),
-            'is_lance_domain' => $request->getHost() === 'lance.musoftwares.com',
             'recurring_notices_today' => function () use ($user) {
-                if (!$user || !class_exists(\App\Models\RecurringNotice::class)) {
+                if (! $user || ! class_exists(RecurringNotice::class)) {
                     return [];
                 }
                 try {
-                    return \App\Models\RecurringNotice::dueToday()
+                    return RecurringNotice::dueToday()
                         ->map(fn ($notice) => [
                             'id' => $notice->id,
                             'title' => $notice->title,

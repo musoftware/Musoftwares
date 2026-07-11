@@ -15,8 +15,8 @@ class StoreLanguageLineRequest extends FormRequest
     {
         return [
             'group' => 'required|string|max:255',
-            'key'   => 'required|string|max:255|unique:language_lines,key,NULL,id,group,' . $this->group,
-            'text'  => 'required|array',
+            'key' => 'required|string|max:255|unique:language_lines,key,NULL,id,group,'.$this->group,
+            'text' => 'required|array',
         ];
     }
 }

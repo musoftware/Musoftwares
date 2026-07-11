@@ -2,6 +2,8 @@
 
 namespace App\Services\Admin;
 
+use App\Models\Currency;
+use App\Models\Project;
 use App\Models\Task;
 use App\Models\Todo;
 use App\Models\User;
@@ -9,6 +11,10 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Single source of truth for the admin "Active Tasks" list query.
@@ -22,11 +28,11 @@ class TodoListQueryService
     /** Allowed sort keys → list of [column, direction] tuples applied in order. */
     public const SORTS = [
         'created_desc' => [['created_at', 'desc'], ['id', 'desc']],
-        'created_asc'  => [['created_at', 'asc'],  ['id', 'asc']],
-        'priority'     => [['priority', 'asc'],   ['end_at', 'asc']],
-        'due_asc'      => [['end_at', 'asc'],     ['id', 'asc']],
-        'due_desc'     => [['end_at', 'desc'],    ['id', 'desc']],
-        'client'       => [['user_id', 'asc'],    ['id', 'asc']],
+        'created_asc' => [['created_at', 'asc'],  ['id', 'asc']],
+        'priority' => [['priority', 'asc'],   ['end_at', 'asc']],
+        'due_asc' => [['end_at', 'asc'],     ['id', 'asc']],
+        'due_desc' => [['end_at', 'desc'],    ['id', 'desc']],
+        'client' => [['user_id', 'asc'],    ['id', 'asc']],
     ];
 
     /**
@@ -44,25 +50,25 @@ class TodoListQueryService
 
         // Validate the shape, but never fail on `sort` — it's lenient by design.
         $v = validator($input, [
-            'search'    => ['nullable', 'string', 'max:120'],
+            'search' => ['nullable', 'string', 'max:120'],
             'client_id' => ['nullable', 'integer'],
             'tenant_id' => ['nullable', 'integer'],
-            'priority'  => ['nullable', 'in:low,normal,high,urgent'],
-            'is_paid'   => ['nullable', 'in:0,1'],
-            'paused'    => ['nullable', 'in:0,1'],
+            'priority' => ['nullable', 'in:low,normal,high,urgent'],
+            'is_paid' => ['nullable', 'in:0,1'],
+            'paused' => ['nullable', 'in:0,1'],
             'date_from' => ['nullable', 'date'],
-            'date_to'   => ['nullable', 'date', 'after_or_equal:date_from'],
-            'sort'      => ['nullable', 'in:' . $allowedSorts],
-            'page'      => ['nullable', 'integer', 'min:1'],
-            'per_page'  => ['nullable', 'integer', 'min:5', 'max:200'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+            'sort' => ['nullable', 'in:'.$allowedSorts],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:5', 'max:200'],
         ]);
         // Drop the `sort` key from the bag if it's the only error.
         $errors = $v->errors();
         if ($errors->has('sort') && $errors->count() === 1) {
-            $errors = new \Illuminate\Support\MessageBag();
+            $errors = new MessageBag;
         }
         if ($errors->isNotEmpty()) {
-            throw \Illuminate\Validation\ValidationException::withMessages($errors->toArray());
+            throw ValidationException::withMessages($errors->toArray());
         }
 
         $clientId = $input['client_id'] ?? $input['tenant_id'] ?? null;
@@ -70,15 +76,15 @@ class TodoListQueryService
         $blank = fn ($v) => ($v === null || $v === '' || (is_string($v) && trim($v) === '')) ? null : $v;
 
         return [
-            'search'    => $blank($input['search']    ?? null),
+            'search' => $blank($input['search'] ?? null),
             'client_id' => $blank($clientId),
-            'priority'  => $blank($input['priority']  ?? null),
-            'is_paid'   => $blank($input['is_paid']   ?? null),
-            'paused'    => $blank($input['paused']    ?? null),
+            'priority' => $blank($input['priority'] ?? null),
+            'is_paid' => $blank($input['is_paid'] ?? null),
+            'paused' => $blank($input['paused'] ?? null),
             'date_from' => $blank($input['date_from'] ?? null),
-            'date_to'   => $blank($input['date_to']   ?? null),
-            'sort'      => array_key_exists($input['sort'] ?? '', self::SORTS) ? $input['sort'] : 'created_desc',
-            'per_page'  => (int) ($input['per_page'] ?? 50),
+            'date_to' => $blank($input['date_to'] ?? null),
+            'sort' => array_key_exists($input['sort'] ?? '', self::SORTS) ? $input['sort'] : 'created_desc',
+            'per_page' => (int) ($input['per_page'] ?? 50),
         ];
     }
 
@@ -88,10 +94,20 @@ class TodoListQueryService
      */
     public function applyFilters(Builder $query, array $f): Builder
     {
-        if (!empty($f['client_id'])) {
-            $query->where('user_id', (int) $f['client_id']);
+        if (! empty($f['client_id'])) {
+            $clientId = (int) $f['client_id'];
+            $query->where(function ($q) use ($clientId) {
+                $q->where(function ($sq) use ($clientId) {
+                    $sq->whereNull('project_id')
+                        ->where('user_id', $clientId);
+                })->orWhereHas('project', function ($pq) use ($clientId) {
+                    $pq->where('user_id', $clientId);
+                })->orWhereHas('task.project', function ($tpq) use ($clientId) {
+                    $tpq->where('user_id', $clientId);
+                });
+            });
         }
-        if (!empty($f['priority'])) {
+        if (! empty($f['priority'])) {
             $query->where('priority', $f['priority']);
         }
         if ($f['is_paid'] !== null) {
@@ -100,18 +116,20 @@ class TodoListQueryService
         if ($f['paused'] !== null) {
             $query->where('paused', (bool) $f['paused']);
         }
-        if (!empty($f['date_from'])) {
+        if (! empty($f['date_from'])) {
             $query->whereDate('end_at', '>=', $f['date_from']);
         }
-        if (!empty($f['date_to'])) {
+        if (! empty($f['date_to'])) {
             $query->whereDate('end_at', '<=', $f['date_to']);
         }
-        if (!empty($f['search'])) {
-            $term = '%' . $f['search'] . '%';
+        if (! empty($f['search'])) {
+            $term = '%'.$f['search'].'%';
             $query->where(function ($q) use ($term) {
                 $q->where('title', 'like', $term)
                     ->orWhere('description', 'like', $term)
                     ->orWhereHas('user', fn ($uq) => $uq->where('name', 'like', $term)->orWhere('email', 'like', $term))
+                    ->orWhereHas('project.client', fn ($cq) => $cq->where('name', 'like', $term)->orWhere('email', 'like', $term))
+                    ->orWhereHas('task.project.client', fn ($cq) => $cq->where('name', 'like', $term)->orWhere('email', 'like', $term))
                     ->orWhereHas('task', fn ($tq) => $tq->where('task_name', 'like', $term));
             });
         }
@@ -121,11 +139,36 @@ class TodoListQueryService
 
     public function applySort(Builder $query, string $sortKey): Builder
     {
+        if ($sortKey === 'client') {
+            $query->select('todos.*')
+                ->leftJoin('projects', function ($join) {
+                    $join->on('projects.id', '=', 'todos.project_id')
+                        ->whereNull('projects.deleted_at');
+                })
+                ->leftJoin('tasks', function ($join) {
+                    $join->on('tasks.id', '=', 'todos.task_id')
+                        ->whereNull('tasks.deleted_at');
+                })
+                ->leftJoin('projects as task_projects', function ($join) {
+                    $join->on('task_projects.id', '=', 'tasks.project_id')
+                        ->whereNull('task_projects.deleted_at');
+                })
+                ->leftJoin('users as client_users', 'client_users.id', '=', DB::raw('COALESCE(projects.user_id, task_projects.user_id, todos.user_id)'))
+                ->orderByRaw('CASE WHEN client_users.name IS NULL THEN 1 ELSE 0 END ASC')
+                ->orderBy('client_users.name', 'asc')
+                ->orderByRaw('CASE WHEN COALESCE(projects.project_name, task_projects.project_name) IS NULL THEN 1 ELSE 0 END ASC')
+                ->orderBy(DB::raw('COALESCE(projects.project_name, task_projects.project_name)'), 'asc')
+                ->orderBy('todos.id', 'asc');
+
+            return $query;
+        }
+
         $sorts = self::SORTS[$sortKey] ?? self::SORTS['created_desc'];
         foreach ($sorts as [$col, $dir]) {
-            $query->orderByRaw(sprintf(self::NULLS_LAST, $col) . ' ASC');
+            $query->orderByRaw(sprintf(self::NULLS_LAST, $col).' ASC');
             $query->orderBy($col, $dir);
         }
+
         return $query;
     }
 
@@ -141,6 +184,7 @@ class TodoListQueryService
         if ($liveOnly) {
             $q->whereHas('task', fn ($t) => $t->where('archived', false));
         }
+
         return $q;
     }
 
@@ -151,19 +195,39 @@ class TodoListQueryService
      */
     public function computeStats(): array
     {
-        $all  = $this->baseQuery(liveOnly: false);
+        $all = $this->baseQuery(liveOnly: false);
         $live = $this->baseQuery(liveOnly: true);
 
+        $allProjectClients = Project::whereHas('todos', function ($q) {
+            $q->active();
+        })->distinct()->pluck('user_id');
+
+        $allTaskProjectClients = Project::whereHas('tasks.task_todo_items', function ($q) {
+            $q->active();
+        })->distinct()->pluck('user_id');
+
+        $allOrphanClients = Todo::query()->active()
+            ->whereNull('project_id')
+            ->distinct()
+            ->pluck('user_id');
+
+        $totalActiveClients = $allProjectClients
+            ->merge($allTaskProjectClients)
+            ->merge($allOrphanClients)
+            ->unique()
+            ->filter()
+            ->count();
+
         return [
-            'total_active_todos'   => (clone $all)->count(),
-            'total_in_boards'      => (clone $live)->count(),
-            'total_active_clients' => (clone $all)->distinct('user_id')->count('user_id'),
-            'total_task_boards'    => (clone $live)->distinct('task_id')->count('task_id'),
-            'overdue_count'        => (clone $all)
+            'total_active_todos' => (clone $all)->count(),
+            'total_in_boards' => (clone $live)->count(),
+            'total_active_clients' => $totalActiveClients,
+            'total_task_boards' => (clone $live)->distinct('task_id')->count('task_id'),
+            'overdue_count' => (clone $all)
                 ->whereNotNull('end_at')
                 ->where('end_at', '<', now())
                 ->count(),
-            'orphan_count'         => (clone $all)
+            'orphan_count' => (clone $all)
                 ->where(function ($q) {
                     $q->whereNull('task_id')
                         ->orWhereDoesntHave('task', fn ($t) => $t->where('archived', false));
@@ -178,11 +242,12 @@ class TodoListQueryService
     public function paginate(array $f, int $perPage): LengthAwarePaginator
     {
         $with = [
-            'task',
+            'task.project.client',
+            'project.client',
             'user',
             'children' => fn ($q) => $q->orderBy('sort_index')->orderBy('id'),
         ];
-        if (\Illuminate\Support\Facades\Schema::hasColumn('todos', 'currency_id')) {
+        if (Schema::hasColumn('todos', 'currency_id')) {
             $with['currency'] = fn ($q) => $q;
         }
 
@@ -207,44 +272,55 @@ class TodoListQueryService
         $currencies = $this->preloadCurrencies($paginator->getCollection());
 
         foreach ($paginator->getCollection() as $todo) {
-            $client = $todo->user;
-            if (!$client) {
+            $client = null;
+            if ($todo->project && $todo->project->client) {
+                $client = $todo->project->client;
+            } elseif ($todo->task && $todo->task->project && $todo->task->project->client) {
+                $client = $todo->task->project->client;
+            } else {
+                $client = $todo->user;
+            }
+
+            if (! $client) {
                 continue;
             }
 
-            $task    = $todo->task;
-            $isOrphan = !$task || (bool) $task->archived;
-            $userId  = $client->id;
+            $project = $todo->project;
+            if (! $project && $todo->task && $todo->task->project) {
+                $project = $todo->task->project;
+            }
 
-            if (!isset($data[$userId])) {
+            $userId = $client->id;
+
+            if (! isset($data[$userId])) {
                 $data[$userId] = [
                     'client' => [
-                        'id'         => $client->id,
-                        'name'       => $client->name,
-                        'email'      => $client->email,
+                        'id' => $client->id,
+                        'name' => $client->name,
+                        'email' => $client->email,
                         'avatar_url' => $client->avatar_url ?: null,
                     ],
                     'tasks' => [],
                 ];
             }
 
-            $bucketKey = $isOrphan ? 'orphan' : ('task-' . $task->id);
+            $bucketKey = $project ? ('project-'.$project->id) : 'no-project';
 
-            if (!isset($data[$userId]['tasks'][$bucketKey])) {
-                $data[$userId]['tasks'][$bucketKey] = $isOrphan
+            if (! isset($data[$userId]['tasks'][$bucketKey])) {
+                $data[$userId]['tasks'][$bucketKey] = ! $project
                     ? [
-                        'id'        => null,
+                        'id' => null,
                         'task_name' => __('general.orphaned_todos'),
-                        'status'    => 'orphaned',
+                        'status' => 'orphaned',
                         'is_orphan' => true,
-                        'todos'     => [],
+                        'todos' => [],
                     ]
                     : [
-                        'id'        => $task->id,
-                        'task_name' => $task->task_name,
-                        'status'    => $this->deriveStatus($task, $todo),
+                        'id' => $project->id,
+                        'task_name' => $project->project_name,
+                        'status' => $project->status ?? 'open',
                         'is_orphan' => false,
-                        'todos'     => [],
+                        'todos' => [],
                     ];
             }
 
@@ -262,14 +338,15 @@ class TodoListQueryService
 
     protected function preloadCurrencies(Collection $todos): array
     {
-        if (!\Illuminate\Support\Facades\Schema::hasColumn('todos', 'currency_id')) {
+        if (! Schema::hasColumn('todos', 'currency_id')) {
             return [];
         }
         $ids = $todos->pluck('currency_id')->filter()->unique()->all();
         if (empty($ids)) {
             return [];
         }
-        return \App\Models\Currency::whereIn('id', $ids)->get()->keyBy('id')->all();
+
+        return Currency::whereIn('id', $ids)->get()->keyBy('id')->all();
     }
 
     /**
@@ -291,13 +368,13 @@ class TodoListQueryService
                 : (json_decode((string) $todo->tags, true) ?? []);
         }
 
-        $currencyId = \Illuminate\Support\Facades\Schema::hasColumn('todos', 'currency_id')
+        $currencyId = Schema::hasColumn('todos', 'currency_id')
             ? $todo->currency_id
             : null;
-        $cost = \Illuminate\Support\Facades\Schema::hasColumn('todos', 'cost')
+        $cost = Schema::hasColumn('todos', 'cost')
             ? $todo->cost
             : null;
-        $isPaid = \Illuminate\Support\Facades\Schema::hasColumn('todos', 'is_paid')
+        $isPaid = Schema::hasColumn('todos', 'is_paid')
             ? (bool) $todo->is_paid
             : false;
 
@@ -305,27 +382,30 @@ class TodoListQueryService
             ? $currencies[$currencyId]
             : null;
 
-        $isOrphan = !$todo->task || (bool) $todo->task->archived;
+        $isOrphan = ! $todo->task || (bool) $todo->task->archived;
 
         return [
-            'id'                => $todo->id,
-            'task_id'           => $todo->task_id,
-            'title'             => $todo->title,
-            'description'       => $todo->description,
-            'priority'          => $todo->priority ?? 'normal',
-            'priority_color'    => $todo->priorityColor,
-            'paused'            => (bool) $todo->paused,
-            'is_paid'           => $isPaid,
-            'cost'              => $cost !== null ? (float) $cost : null,
-            'cost_currency'     => $currency?->currency ?? $client->currency_name() ?? null,
-            'cost_currency_id'  => $currencyId,
-            'start_at'          => $todo->start_at ? Carbon::parse($todo->start_at)->toISOString() : null,
-            'end_at'            => $todo->end_at ? Carbon::parse($todo->end_at)->toISOString() : null,
-            'tags'              => $tags,
-            'created_at'        => $todo->created_at?->toISOString(),
-            'is_orphan'         => $isOrphan,
-            'is_overdue'        => $todo->end_at ? Carbon::parse($todo->end_at)->lt($now) : false,
-            'stale'             => $todo->created_at ? $todo->created_at->lt($now->copy()->subDays(7)) : false,
+            'id' => $todo->id,
+            'task_id' => $todo->task_id,
+            'project_id' => $todo->project_id,
+            'in_date' => $todo->inDate ? Carbon::parse($todo->inDate)->toDateString() : null,
+            'title' => $todo->title,
+            'description' => $todo->description,
+            'priority' => $todo->priority ?? 'normal',
+            'priority_color' => $todo->priorityColor,
+            'paused' => (bool) $todo->paused,
+            'is_paid' => $isPaid,
+            'cost' => $cost !== null ? (float) $cost : null,
+            'cost_currency' => $currency?->currency ?? $client->currency_name() ?? null,
+            'cost_currency_id' => $currencyId,
+            'start_at' => $todo->start_at ? Carbon::parse($todo->start_at)->toISOString() : null,
+            'end_at' => $todo->end_at ? Carbon::parse($todo->end_at)->toISOString() : null,
+            'tags' => $tags,
+            'created_at' => $todo->created_at?->toISOString(),
+            'is_orphan' => $isOrphan,
+            'is_overdue' => $todo->end_at ? Carbon::parse($todo->end_at)->lt($now) : false,
+            'stale' => $todo->created_at ? $todo->created_at->lt($now->copy()->subDays(7)) : false,
+            'task_name' => $todo->task?->task_name,
         ];
     }
 }

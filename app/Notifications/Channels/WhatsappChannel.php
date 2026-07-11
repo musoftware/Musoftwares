@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Channels;
 
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
@@ -36,9 +37,9 @@ class WhatsappChannel
             return;
         }
 
-        if (class_exists(\App\Services\WhatsAppNotificationService::class)) {
+        if (class_exists(WhatsAppNotificationService::class)) {
             try {
-                app(\App\Services\WhatsAppNotificationService::class)
+                app(WhatsAppNotificationService::class)
                     ->send($phone, (string) $message);
 
                 return;

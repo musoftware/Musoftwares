@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SerialSoftware extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'serial_softwares';
+
     public const DEFAULT_STATUS_ACTIVE = 'active';
+
     public const DEFAULT_STATUS_INACTIVE = 'inactive';
 
     protected $fillable = [
@@ -40,4 +41,3 @@ class SerialSoftware extends Model
         return $this->hasMany(SerialDevice::class);
     }
 }
-

@@ -31,7 +31,7 @@ class CommissionController extends Controller
     public function checkStatus(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'appname'     => ['required', 'string', 'max:255'],
+            'appname' => ['required', 'string', 'max:255'],
             'packagename' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -46,7 +46,7 @@ class CommissionController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'paid'   => (bool) $paid,
+            'paid' => (bool) $paid,
         ]);
     }
 }

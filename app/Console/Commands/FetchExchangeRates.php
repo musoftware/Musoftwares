@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use App\Models\Currency;
-use App\Models\CurrenciesExchange;
 
 class FetchExchangeRates extends Command
 {
     protected $signature = 'currency:fetch-rates';
+
     protected $description = 'Fetch daily exchange rates and update currencies_exchanges table';
 
     public function handle()
@@ -18,9 +19,10 @@ class FetchExchangeRates extends Command
 
         try {
             $response = Http::timeout(10)->withoutVerifying()->get('https://open.er-api.com/v6/latest/USD');
-            
-            if (!$response->successful() || !isset($response['rates'])) {
+
+            if (! $response->successful() || ! isset($response['rates'])) {
                 $this->error('Failed to fetch exchange rates. Falling back to cached rates.');
+
                 return;
             }
 
@@ -30,7 +32,9 @@ class FetchExchangeRates extends Command
 
             foreach ($currencies as $from) {
                 foreach ($currencies as $to) {
-                    if ($from->id === $to->id) continue;
+                    if ($from->id === $to->id) {
+                        continue;
+                    }
 
                     // Calculate cross rate via USD
                     $fromRate = $rates[$from->currency] ?? null;
@@ -55,7 +59,7 @@ class FetchExchangeRates extends Command
 
             $this->info('Exchange rates updated successfully.');
         } catch (\Exception $e) {
-            $this->error('Exception fetching rates: ' . $e->getMessage());
+            $this->error('Exception fetching rates: '.$e->getMessage());
         }
     }
 }

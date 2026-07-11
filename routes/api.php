@@ -1,7 +1,6 @@
 <?php
 
 use App\Helpers\CurrencyHelper;
-use App\Http\Controllers\Api\MobileAuthController;
 use App\Http\Controllers\Api\SerialDeviceController;
 use App\Http\Controllers\Api\SubscriptionSyncController;
 use App\Http\Controllers\SsoController;
@@ -131,26 +130,6 @@ Route::get('bing-daily-images', function () {
 
 if (file_exists(base_path('Modules/CRM/routes/api.php'))) {
     require base_path('Modules/CRM/routes/api.php');
-}
-
-// ── Mobile App Auth (OTP) ──────────────────────────────────────────────────
-// Phone number + OTP flow for the React Native Freelancer mobile app.
-
-Route::prefix('auth')->group(function () {
-    Route::post('send-otp', [MobileAuthController::class, 'sendOtp']);
-    Route::post('verify-otp', [MobileAuthController::class, 'verifyOtp']);
-});
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('user', [MobileAuthController::class, 'me']);
-    Route::put('user/profile', [MobileAuthController::class, 'updateProfile']);
-});
-
-// ── Mobile Freelance API ────────────────────────────────────────────────────
-// Handled by the Freelance module's MobileApiController (already exists).
-
-if (file_exists(base_path('Modules/Freelance/routes/api.php'))) {
-    require base_path('Modules/Freelance/routes/api.php');
 }
 
 // ── Incoming Webhooks ────────────────────────────────────────────────────────

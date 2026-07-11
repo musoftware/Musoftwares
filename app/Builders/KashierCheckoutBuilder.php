@@ -3,24 +3,33 @@
 namespace App\Builders;
 
 use App\Helpers\KashierHelper;
-use Illuminate\Support\Str;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 
 class KashierCheckoutBuilder
 {
     private float $amount = 0;
+
     private string $currency = 'EGP';
+
     private string $orderIdPrefix = 'order_';
+
     private string $uniqueIdentifier = '';
-    
+
     private array $metaData = [];
+
     private array $customer = [];
+
     private string $customerReference = '';
-    
+
     private string $successUrl = '';
+
     private string $failureUrl = '';
+
     private string $webhookUrl = '';
-    
+
     private string $mode;
+
     private string $merchantId;
 
     private function __construct()
@@ -32,13 +41,14 @@ class KashierCheckoutBuilder
 
     public static function make(): self
     {
-        return new self();
+        return new self;
     }
 
     public function forAmount(float $amount, string $currency = 'EGP'): self
     {
         $this->amount = $amount;
         $this->currency = strtoupper($currency);
+
         return $this;
     }
 
@@ -47,10 +57,11 @@ class KashierCheckoutBuilder
         $this->customer = [
             'firstName' => $name,
             'email' => $email,
-            'reference' => 'user_' . $userId,
+            'reference' => 'user_'.$userId,
         ];
-        $this->customerReference = 'user_' . $userId;
+        $this->customerReference = 'user_'.$userId;
         $this->metaData['user_id'] = $userId;
+
         return $this;
     }
 
@@ -62,6 +73,7 @@ class KashierCheckoutBuilder
             'reference' => $reference,
         ];
         $this->customerReference = $reference;
+
         return $this;
     }
 
@@ -69,12 +81,14 @@ class KashierCheckoutBuilder
     {
         $this->metaData['source'] = $source;
         $this->orderIdPrefix = $orderIdPrefix;
+
         return $this;
     }
 
     public function withMetadata(array $data): self
     {
         $this->metaData = array_merge($this->metaData, $data);
+
         return $this;
     }
 
@@ -83,24 +97,25 @@ class KashierCheckoutBuilder
         $this->successUrl = urlencode($success);
         $this->failureUrl = urlencode($failure);
         $this->webhookUrl = urlencode($webhook);
+
         return $this;
     }
 
     private function prepareEgpConversion(): void
     {
         $originalCurrency = strtoupper($this->currency);
-        
+
         if ($originalCurrency !== 'EGP') {
-            $currencyModel = \App\Models\Currency::where('currency', $originalCurrency)->first();
-            $egpModel = \App\Models\Currency::where('currency', 'EGP')->first();
-            
+            $currencyModel = Currency::where('currency', $originalCurrency)->first();
+            $egpModel = Currency::where('currency', 'EGP')->first();
+
             if ($currencyModel && $egpModel) {
                 // Keep track of original values
                 $this->metaData['original_amount'] = $this->amount;
                 $this->metaData['original_currency'] = $originalCurrency;
 
                 // Convert amount to EGP using today's rate
-                $this->amount = \App\Models\CurrenciesExchange::RateToday($this->amount, $currencyModel->id, $egpModel->id);
+                $this->amount = CurrenciesExchange::RateToday($this->amount, $currencyModel->id, $egpModel->id);
             }
             $this->currency = 'EGP';
         }
@@ -110,12 +125,18 @@ class KashierCheckoutBuilder
     {
         // Allow adding a specific ID to the order prefix if provided in metadata (like invoice_id)
         $identifier = '';
-        if (isset($this->metaData['invoice_id'])) $identifier = $this->metaData['invoice_id'] . '_';
-        if (isset($this->metaData['payment_link_id'])) $identifier = $this->metaData['payment_link_id'] . '_';
-        if (isset($this->metaData['package_id'])) $identifier = $this->metaData['package_id'] . '_';
-        
+        if (isset($this->metaData['invoice_id'])) {
+            $identifier = $this->metaData['invoice_id'].'_';
+        }
+        if (isset($this->metaData['payment_link_id'])) {
+            $identifier = $this->metaData['payment_link_id'].'_';
+        }
+        if (isset($this->metaData['package_id'])) {
+            $identifier = $this->metaData['package_id'].'_';
+        }
+
         // Finalize order ID
-        $orderId = $this->orderIdPrefix . $identifier . $this->uniqueIdentifier . (isset($this->metaData['user_id']) ? '-' . $this->metaData['user_id'] : '');
+        $orderId = $this->orderIdPrefix.$identifier.$this->uniqueIdentifier.(isset($this->metaData['user_id']) ? '-'.$this->metaData['user_id'] : '');
 
         // Handle Currency Conversion to EGP
         $this->prepareEgpConversion();
@@ -153,6 +174,6 @@ class KashierCheckoutBuilder
             'metaData' => json_encode($this->metaData),
         ];
 
-        return 'https://payments.kashier.io/?' . http_build_query($params);
+        return 'https://payments.kashier.io/?'.http_build_query($params);
     }
 }

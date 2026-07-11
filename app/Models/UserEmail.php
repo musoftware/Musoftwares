@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UserEmail extends Model
 {
     public const SOURCE_ADMIN = 'admin';
+
     public const SOURCE_MERGE = 'merge';
-    public const SOURCE_SELF  = 'self';
+
+    public const SOURCE_SELF = 'self';
 
     protected $fillable = [
         'user_id',

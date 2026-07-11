@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class CurrenciesExchange extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
@@ -47,7 +46,8 @@ class CurrenciesExchange extends Model
             ->where('currency2', $currency2)
             ->where('date_string', $date)
             ->count();
-        return ($count > 0);
+
+        return $count > 0;
     }
 
     public static function Today()
@@ -63,9 +63,10 @@ class CurrenciesExchange extends Model
 
     public static function RateByMonth($m, $y, $amount, $cur1, $cur2)
     {
-        if ($cur1 == $cur2)
+        if ($cur1 == $cur2) {
             return $amount;
-        $date = $y . '-' . str_pad($m, 2, "0", STR_PAD_LEFT) . '-%';
+        }
+        $date = $y.'-'.str_pad($m, 2, '0', STR_PAD_LEFT).'-%';
         $ex = CurrenciesExchange::where('currency1', $cur1)
             ->where('currency2', $cur2)
             ->where('date_string', 'like', $date)
@@ -81,6 +82,7 @@ class CurrenciesExchange extends Model
         if (static::$business_cur == null) {
             static::$business_cur = AdminSettings::GetValue('business_currency', 2);
         }
+
         return static::$business_cur;
     }
 
@@ -94,7 +96,6 @@ class CurrenciesExchange extends Model
         return Currency::find($cur)->currency;
     }
 
-
     public static function RateToday($amount, $cur1, $cur2)
     {
         $cur1 = (string) $cur1;
@@ -103,9 +104,9 @@ class CurrenciesExchange extends Model
             return round($amount, 2);
         }
 
-        $cacheKey = 'today_' . trim($cur1) . '_' . trim($cur2);
+        $cacheKey = 'today_'.trim($cur1).'_'.trim($cur2);
 
-        if (!isset(static::$memoryCache[$cacheKey])) {
+        if (! isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
                 ->orderBy('created_at', 'desc')
@@ -119,7 +120,7 @@ class CurrenciesExchange extends Model
                     static::$memoryCache[$cacheKey] = $ex->rate;
                 }
             }
-            
+
             if ($ex == null) {
                 $reverse = CurrenciesExchange::where('currency1', trim($cur2))
                     ->where('currency2', trim($cur1))
@@ -145,9 +146,9 @@ class CurrenciesExchange extends Model
             return number_format($amount, 9, '.', '');
         }
 
-        $cacheKey = 'today_' . trim($cur1) . '_' . trim($cur2);
+        $cacheKey = 'today_'.trim($cur1).'_'.trim($cur2);
 
-        if (!isset(static::$memoryCache[$cacheKey])) {
+        if (! isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
                 ->orderBy('created_at', 'desc')
@@ -180,9 +181,9 @@ class CurrenciesExchange extends Model
             return 1 * $amount;
         }
         $date_str = date('Y-m-d', strtotime($date));
-        $cacheKey = 'date_' . $date_str . '_' . trim($cur1) . '_' . trim($cur2);
+        $cacheKey = 'date_'.$date_str.'_'.trim($cur1).'_'.trim($cur2);
 
-        if (!isset(static::$memoryCache[$cacheKey])) {
+        if (! isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
                 ->where('date_string', trim($date_str))
@@ -231,9 +232,9 @@ class CurrenciesExchange extends Model
         }
 
         $rate = static::$memoryCache[$cacheKey];
+
         return round($rate * $amount, 2);
     }
-
 
     public static function RateByDateNoRound($date, $amount, $cur1, $cur2)
     {
@@ -243,9 +244,9 @@ class CurrenciesExchange extends Model
             return 1 * $amount;
         }
         $date_str = date('Y-m-d', strtotime($date));
-        $cacheKey = 'date_' . $date_str . '_' . trim($cur1) . '_' . trim($cur2);
+        $cacheKey = 'date_'.$date_str.'_'.trim($cur1).'_'.trim($cur2);
 
-        if (!isset(static::$memoryCache[$cacheKey])) {
+        if (! isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
                 ->where('date_string', trim($date_str))
@@ -285,6 +286,7 @@ class CurrenciesExchange extends Model
         }
 
         $rate = static::$memoryCache[$cacheKey];
+
         return number_format(round($rate * $amount, 11), 11, '.', '');
     }
 
@@ -298,9 +300,9 @@ class CurrenciesExchange extends Model
             return 1;
         }
 
-        $cacheKey = 'date_rate_' . trim($date) . '_' . trim($cur1) . '_' . trim($cur2);
+        $cacheKey = 'date_rate_'.trim($date).'_'.trim($cur1).'_'.trim($cur2);
 
-        if (!isset(static::$memoryCache[$cacheKey])) {
+        if (! isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
                 ->where('date_string', trim($date))
@@ -348,6 +350,7 @@ class CurrenciesExchange extends Model
         }
 
         $real_cost = $ex_cost * 1.041 * 1.10;
+
         return $real_cost;
     }
 
@@ -359,10 +362,10 @@ class CurrenciesExchange extends Model
             $ex_cost = round($ex_cost / (1 - 0.14), 2);
         }
         $real_cost = $ex_cost;
+
         // $amount = round($real_cost * 1.25);
         return $real_cost;
     }
-
 
     public static function EgpToEgpCost($ex_cost)
     {

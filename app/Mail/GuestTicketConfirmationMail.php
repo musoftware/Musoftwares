@@ -22,8 +22,8 @@ class GuestTicketConfirmationMail extends Mailable
 
     public function __construct(GuestTicket $ticket, string $messageId, string $subject)
     {
-        $this->ticket          = $ticket;
-        $this->messageId       = $messageId;
+        $this->ticket = $ticket;
+        $this->messageId = $messageId;
         $this->message_subject = $subject;
     }
 
@@ -50,8 +50,8 @@ class GuestTicketConfirmationMail extends Mailable
     public function build()
     {
         return $this->html(
-            '<p>Hi ' . e($this->ticket->name) . ',</p>' .
-            '<p>Thanks for contacting us. Your ticket #' . $this->ticket->id . ' has been received. We will respond shortly.</p>' .
+            '<p>Hi '.e($this->ticket->name).',</p>'.
+            '<p>Thanks for contacting us. Your ticket #'.$this->ticket->id.' has been received. We will respond shortly.</p>'.
             '<p>— The Musoftwares Team</p>'
         );
     }

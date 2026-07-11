@@ -2,32 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Currency;
 use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\WebsiteService;
+use App\Services\IpGeolocationService;
+use App\Services\PricingService;
+use App\Traits\ConvertsCurrency;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class HomeController extends Controller
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request)
     {
-        if ($request->getHost() === 'lance.musoftwares.com') {
-            return Inertia::render('Freelance/Landing', [
-                'canLogin' => Route::has('login'),
-                'canRegister' => Route::has('register'),
-            ])->withViewData([
-                'meta' => [
-                    'title' => 'Musoftwares Lance',
-                    'description' => 'Find your next freelance job easily.',
-                    'image' => asset('images/freelance-meta.png'),
-                    'url' => 'https://lance.musoftwares.com',
-                ]
-            ]);
-        }
-
         return Inertia::render('Public/Home', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
@@ -37,7 +29,7 @@ class HomeController extends Controller
                 'description' => 'Comprehensive ERP and CRM solutions, business management tools, and technical consulting to scale your operations.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -52,7 +44,7 @@ class HomeController extends Controller
                 'description' => 'Explore our successful projects, case studies, and the robust applications we have built for businesses worldwide.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -64,28 +56,28 @@ class HomeController extends Controller
             'canRegister' => Route::has('register'),
         ])->withViewData([
             'meta' => [
-                'title' => ucfirst(str_replace('-', ' ', $slug)) . ' - Portfolio | Musoftware',
-                'description' => 'Discover the details and success story of ' . ucfirst(str_replace('-', ' ', $slug)) . ' developed by Musoftware.',
+                'title' => ucfirst(str_replace('-', ' ', $slug)).' - Portfolio | Musoftware',
+                'description' => 'Discover the details and success story of '.ucfirst(str_replace('-', ' ', $slug)).' developed by Musoftware.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
     public function websiteServiceShow($slug)
     {
-        $service = \App\Models\WebsiteService::where('slug', $slug)->firstOrFail();
-        
+        $service = WebsiteService::where('slug', $slug)->firstOrFail();
+
         $lang = request('lang', app()->getLocale());
-        
+
         $title = $lang === 'ar' ? ($service->seo_title_ar ?: $service->title_ar) : ($service->seo_title_en ?: $service->title_en);
         $description = $lang === 'ar' ? ($service->seo_description_ar ?: $service->subtitle_ar) : ($service->seo_description_en ?: $service->subtitle_en);
-        
+
         if (empty($description)) {
             $description = $lang === 'ar' ? strip_tags($service->description_ar) : strip_tags($service->description_en);
         }
-        $description = \Illuminate\Support\Str::limit($description, 160);
-        
+        $description = Str::limit($description, 160);
+
         $imagePath = $lang === 'ar' ? $service->primary_image_ar : $service->primary_image_en;
 
         return Inertia::render('Public/WebsiteServiceShow', [
@@ -94,11 +86,11 @@ class HomeController extends Controller
             'canRegister' => Route::has('register'),
         ])->withViewData([
             'meta' => [
-                'title' => $title . ' | Musoftware',
+                'title' => $title.' | Musoftware',
                 'description' => $description,
                 'image' => $imagePath ? asset($imagePath) : asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -113,7 +105,7 @@ class HomeController extends Controller
                 'description' => 'Discover our suite of business platforms including CRM, ERP, and Cloud solutions tailored for your business needs.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -128,7 +120,7 @@ class HomeController extends Controller
                 'description' => 'Manage your customer relationships efficiently with our powerful CRM platform.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -143,7 +135,7 @@ class HomeController extends Controller
                 'description' => 'Streamline your enterprise resources and operations with our integrated ERP platform.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -158,7 +150,7 @@ class HomeController extends Controller
                 'description' => 'Secure, scalable, and reliable cloud solutions to host and manage your applications.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -173,7 +165,7 @@ class HomeController extends Controller
                 'description' => 'Tailored software solutions for Healthcare, Education, E-commerce, Real Estate, and Finance sectors.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -188,7 +180,7 @@ class HomeController extends Controller
                 'description' => 'Advanced digital health and clinic management software solutions.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -203,7 +195,7 @@ class HomeController extends Controller
                 'description' => 'Innovative e-learning platforms and school management systems.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -218,7 +210,7 @@ class HomeController extends Controller
                 'description' => 'Scalable online stores and multi-vendor marketplace solutions.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -233,7 +225,7 @@ class HomeController extends Controller
                 'description' => 'Property management and real estate listing platforms.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -248,7 +240,7 @@ class HomeController extends Controller
                 'description' => 'Secure financial software, accounting tools, and fintech solutions.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -263,7 +255,7 @@ class HomeController extends Controller
                 'description' => 'Learn more about Musoftware, our mission, vision, and the team driving innovation.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -278,7 +270,7 @@ class HomeController extends Controller
                 'description' => 'Discover our story, values, and what makes Musoftware a leader in digital solutions.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -293,7 +285,7 @@ class HomeController extends Controller
                 'description' => 'Join our dynamic team. Explore open positions and career opportunities at Musoftware.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -308,7 +300,7 @@ class HomeController extends Controller
                 'description' => 'Get in touch with our team for inquiries, support, or to discuss your next big project.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -323,7 +315,7 @@ class HomeController extends Controller
                 'description' => 'Read our privacy policy to understand how we collect, use, and protect your data.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -338,7 +330,7 @@ class HomeController extends Controller
                 'description' => 'Review the terms and conditions governing the use of Musoftware services.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
@@ -353,20 +345,20 @@ class HomeController extends Controller
                 'description' => 'Information about how we use cookies to improve your browsing experience.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 
-    public function pricing(\Illuminate\Http\Request $request, \App\Services\IpGeolocationService $geoService)
+    public function pricing(Request $request, IpGeolocationService $geoService)
     {
         $user = Auth::user();
-        
+
         $usdCurrency = Currency::where('currency', 'USD')->first();
         $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
+
         $egpCurrency = Currency::where('currency', 'EGP')->first();
         $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
+
         $userCurrencyId = null;
         if ($user && $user->currency_id) {
             $userCurrencyId = $user->currency_id;
@@ -380,14 +372,14 @@ class HomeController extends Controller
                 }
             }
             // Fallback to USD if no IP currency match
-            if (!$userCurrencyId) {
+            if (! $userCurrencyId) {
                 $userCurrencyId = $usdCurrencyId;
             }
         }
 
         $userCurrency = Currency::find($userCurrencyId);
         $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
-        
+
         $rate = 1.0;
         if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
             $rate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
@@ -399,19 +391,18 @@ class HomeController extends Controller
         }
 
         $basePricesEGP = config('saas.modules', []);
-        $convertPrice = function($egpPrice) use ($egpRate, $rate, $currencyCode) {
+        $convertPrice = function ($egpPrice) use ($egpRate, $rate, $currencyCode) {
             if ($currencyCode === 'EGP') {
                 return round($egpPrice);
             }
             $usdPrice = $egpPrice / $egpRate;
             $converted = $usdPrice * $rate;
+
             return psychological_price($converted);
         };
 
-        $pricingService = new \App\Services\PricingService();
+        $pricingService = new PricingService;
         $serviceItems = $pricingService->getServiceItems($convertPrice);
-
-
 
         return Inertia::render('Public/Pricing', [
             'canLogin' => Route::has('login'),
@@ -424,7 +415,7 @@ class HomeController extends Controller
                 'description' => 'Transparent and flexible pricing plans for our CRM, ERP, and specialized software services.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
-            ]
+            ],
         ]);
     }
 }

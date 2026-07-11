@@ -2,19 +2,17 @@
 
 namespace App\Services;
 
+use App\Helpers\FinanceHelper;
+use App\Models\Currency;
 use App\Models\User;
 use App\Models\WalletTransfer;
-use App\Services\WalletService;
-use App\Services\ExchangeRateService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class WalletTransferService extends BaseService
 {
-
     protected ExchangeRateService $exchangeRateService;
 
     public function __construct(ExchangeRateService $exchangeRateService)
@@ -49,12 +47,12 @@ class WalletTransferService extends BaseService
             ]);
         }
 
-        $senderCurrencyModel = \App\Models\Currency::find($sender->currency_id);
-        $receiverCurrencyModel = \App\Models\Currency::find($receiver->currency_id);
-        if (!$senderCurrencyModel) {
+        $senderCurrencyModel = Currency::find($sender->currency_id);
+        $receiverCurrencyModel = Currency::find($receiver->currency_id);
+        if (! $senderCurrencyModel) {
             throw new Exception("Sender (User #{$senderId}) is missing a currency_id configuration.");
         }
-        if (!$receiverCurrencyModel) {
+        if (! $receiverCurrencyModel) {
             throw new Exception("Receiver (User #{$receiverId}) is missing a currency_id configuration.");
         }
         $senderCurrency = $senderCurrencyModel->currency;
@@ -76,7 +74,7 @@ class WalletTransferService extends BaseService
         $senderBalance = (float) $sender->available_balance();
         if ($senderBalance < $totalDebitRequired) {
             throw ValidationException::withMessages([
-                'amount' => ['Insufficient funds. You need ' . \App\Helpers\FinanceHelper::instance()->format_money($totalDebitRequired, $currencyId) . ' (including fees) but only have ' . \App\Helpers\FinanceHelper::instance()->format_money($senderBalance, $currencyId) . '.'],
+                'amount' => ['Insufficient funds. You need '.FinanceHelper::instance()->format_money($totalDebitRequired, $currencyId).' (including fees) but only have '.FinanceHelper::instance()->format_money($senderBalance, $currencyId).'.'],
             ]);
         }
 
@@ -95,7 +93,7 @@ class WalletTransferService extends BaseService
 
         if (($dailyTotal + $amount) > $dailyLimitSenderCurrency) {
             throw ValidationException::withMessages([
-                'amount' => ['Daily transfer limit exceeded. Remaining daily limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($dailyLimitSenderCurrency - $dailyTotal, $currencyId) . '.'],
+                'amount' => ['Daily transfer limit exceeded. Remaining daily limit: '.FinanceHelper::instance()->format_money($dailyLimitSenderCurrency - $dailyTotal, $currencyId).'.'],
             ]);
         }
 
@@ -107,13 +105,13 @@ class WalletTransferService extends BaseService
 
         if (($monthlyTotal + $amount) > $monthlyLimitSenderCurrency) {
             throw ValidationException::withMessages([
-                'amount' => ['Monthly transfer limit exceeded. Remaining monthly limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($monthlyLimitSenderCurrency - $monthlyTotal, $currencyId) . '.'],
+                'amount' => ['Monthly transfer limit exceeded. Remaining monthly limit: '.FinanceHelper::instance()->format_money($monthlyLimitSenderCurrency - $monthlyTotal, $currencyId).'.'],
             ]);
         }
 
         // Retrieve exchange conversion rate
         $rawExchangeRate = (float) $this->exchangeRateService->getRate($senderCurrency, $receiverCurrency);
-        
+
         // Apply 1.5% safe currency exchange rate margin on P2P transfers if cross-currency to protect ledger
         $finalExchangeRate = $rawExchangeRate;
         if ($senderCurrency !== $receiverCurrency) {
@@ -124,7 +122,7 @@ class WalletTransferService extends BaseService
 
         try {
             return $this->executeInTransaction(function () use ($sender, $receiver, $amount, $fee, $convertedAmount, $senderCurrency, $receiverCurrency, $finalExchangeRate, $reason) {
-                
+
                 // Create pending transfer record first to bind reference IDs
                 $transfer = WalletTransfer::create([
                     'sender_id' => $sender->id,
@@ -141,37 +139,37 @@ class WalletTransferService extends BaseService
                 ]);
 
                 // Debit Principal from Sender balance
-                $sender->add_balance(-1 * $amount, "P2P transfer to " . $receiver->name, 'used');
+                $sender->add_balance(-1 * $amount, 'P2P transfer to '.$receiver->name, 'used');
 
                 // Debit Fee from Sender balance (if any)
                 if ($fee > 0) {
-                    $sender->add_balance(-1 * $fee, "P2P transfer fee", 'used');
+                    $sender->add_balance(-1 * $fee, 'P2P transfer fee', 'used');
                 }
 
                 // Credit Converted Principal to Receiver balance
-                $receiver->add_balance($convertedAmount, "P2P transfer from " . $sender->name, 'received');
+                $receiver->add_balance($convertedAmount, 'P2P transfer from '.$sender->name, 'received');
 
-                Log::info("Wallet P2P Transfer completed successfully.", [
+                Log::info('Wallet P2P Transfer completed successfully.', [
                     'transfer_id' => $transfer->id,
                     'sender_id' => $sender->id,
                     'receiver_id' => $receiver->id,
-                    'sent' => $amount . ' ' . $senderCurrency,
-                    'fee' => $fee . ' ' . $senderCurrency,
-                    'received' => $convertedAmount . ' ' . $receiverCurrency,
+                    'sent' => $amount.' '.$senderCurrency,
+                    'fee' => $fee.' '.$senderCurrency,
+                    'received' => $convertedAmount.' '.$receiverCurrency,
                 ]);
 
                 return $transfer;
             });
 
         } catch (Exception $e) {
-            Log::error("Wallet P2P Transfer transaction failed.", [
+            Log::error('Wallet P2P Transfer transaction failed.', [
                 'sender_id' => $senderId,
                 'receiver_id' => $receiverId,
                 'amount' => $amount,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
-            throw new Exception("The transfer transaction failed due to system error: " . $e->getMessage());
+            throw new Exception('The transfer transaction failed due to system error: '.$e->getMessage());
         }
     }
 
@@ -189,16 +187,16 @@ class WalletTransferService extends BaseService
             ]);
         }
 
-        $senderCurrencyModel = \App\Models\Currency::find($sender->currency_id);
-        $receiverCurrencyModel = \App\Models\Currency::find($receiver->currency_id);
-        if (!$senderCurrencyModel || !$receiverCurrencyModel) {
-            throw new Exception("Sender or Receiver is missing a currency_id configuration.");
+        $senderCurrencyModel = Currency::find($sender->currency_id);
+        $receiverCurrencyModel = Currency::find($receiver->currency_id);
+        if (! $senderCurrencyModel || ! $receiverCurrencyModel) {
+            throw new Exception('Sender or Receiver is missing a currency_id configuration.');
         }
         $senderCurrency = $senderCurrencyModel->currency;
         $receiverCurrency = $receiverCurrencyModel->currency;
 
         $usdToSenderRate = (float) $this->exchangeRateService->getRate('USD', $senderCurrency);
-        
+
         // Fee preview
         $minFee = 0.50 * $usdToSenderRate;
         $maxFee = 10.00 * $usdToSenderRate;

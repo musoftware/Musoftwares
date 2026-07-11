@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\TranslationService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Services\TranslationService;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SoftwareProgram extends Model
 {
-    use SoftDeletes, HasFactory;
-
-
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -37,7 +34,7 @@ class SoftwareProgram extends Model
     /**
      * Get translation for a specific field and locale
      */
-    public function getTranslation(string $field, string $locale = null): ?string
+    public function getTranslation(string $field, ?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
 
@@ -59,7 +56,7 @@ class SoftwareProgram extends Model
         }
 
         // Don't auto-translate for unsaved models
-        if (!$this->exists || !$this->id) {
+        if (! $this->exists || ! $this->id) {
             return $this->attributes[$field] ?? null;
         }
 
@@ -92,7 +89,9 @@ class SoftwareProgram extends Model
      */
     public function getDescriptionAttribute($value)
     {
-        if (!$value) return $value;
+        if (! $value) {
+            return $value;
+        }
 
         $locale = app()->getLocale();
         $originalLocale = app(TranslationService::class)->detectLanguage($value);
@@ -110,6 +109,4 @@ class SoftwareProgram extends Model
     {
         return preg_replace("/[\r|\n]{3,}/", "\n\n", $this->description);
     }
-
 }
-

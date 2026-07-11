@@ -8,7 +8,7 @@ class SaaSLimitExceededException extends Exception
 {
     protected $usageKey;
 
-    public function __construct(string $usageKey, string $message = "")
+    public function __construct(string $usageKey, string $message = '')
     {
         $this->usageKey = $usageKey;
         if (empty($message)) {

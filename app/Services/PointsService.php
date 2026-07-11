@@ -2,14 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use Exception;
 
 class PointsService extends BaseService
 {
-
     /**
      * Get available points balance for the user.
      */
@@ -24,10 +22,10 @@ class PointsService extends BaseService
     public function debit(User $user, float $amount, string $reasonType, string $description): void
     {
         if ($this->getBalance($user) < $amount) {
-            throw new Exception("Insufficient points balance.");
+            throw new Exception('Insufficient points balance.');
         }
 
-        $this->executeInTransaction(function () use ($user, $amount, $reasonType, $description) {
+        $this->executeInTransaction(function () use ($user, $amount, $description) {
             $user->points_balance -= $amount;
             $user->save();
 
@@ -46,7 +44,7 @@ class PointsService extends BaseService
      */
     public function credit(User $user, float $amount, string $reasonType, string $description): void
     {
-        $this->executeInTransaction(function () use ($user, $amount, $reasonType, $description) {
+        $this->executeInTransaction(function () use ($user, $amount, $description) {
             $user->points_balance += $amount;
             $user->save();
 

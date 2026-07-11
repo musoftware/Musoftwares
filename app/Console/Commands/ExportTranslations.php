@@ -29,8 +29,9 @@ class ExportTranslations extends Command
         $langPath = base_path('lang');
         $outputPath = resource_path('js/translations.json');
 
-        if (!File::exists($langPath)) {
+        if (! File::exists($langPath)) {
             $this->error("Lang directory not found at {$langPath}");
+
             return 1;
         }
 
@@ -39,7 +40,7 @@ class ExportTranslations extends Command
         // 1. Process standard PHP translation files (e.g., lang/en/messages.php)
         foreach (File::directories($langPath) as $dir) {
             $locale = basename($dir);
-            if (!isset($translations[$locale])) {
+            if (! isset($translations[$locale])) {
                 $translations[$locale] = [];
             }
 
@@ -59,9 +60,9 @@ class ExportTranslations extends Command
             if ($file->getExtension() === 'json') {
                 $locale = $file->getFilenameWithoutExtension();
                 $content = json_decode(File::get($file->getPathname()), true);
-                
+
                 if (is_array($content)) {
-                    if (!isset($translations[$locale])) {
+                    if (! isset($translations[$locale])) {
                         $translations[$locale] = [];
                     }
                     // JSON files are loaded at the root of the locale
@@ -73,6 +74,7 @@ class ExportTranslations extends Command
         File::put($outputPath, json_encode($translations, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
         $this->info("Translations exported successfully to {$outputPath}");
+
         return 0;
     }
 }

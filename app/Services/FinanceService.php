@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
+use App\Helpers\FinanceHelper;
 use App\Models\Currency;
-use App\Services\ExchangeRateService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Financial service providing consistent pricing, formatting, and calculation utilities.
@@ -14,7 +13,6 @@ use Illuminate\Support\Facades\Cache;
  */
 class FinanceService extends BaseService
 {
-
     protected ExchangeRateService $exchangeRateService;
 
     public function __construct(ExchangeRateService $exchangeRateService)
@@ -30,7 +28,7 @@ class FinanceService extends BaseService
      */
     public function formatMoney(float $amount, string $currencyCode = 'USD'): string
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($amount, $currencyCode);
+        return FinanceHelper::instance()->format_money($amount, $currencyCode);
     }
 
     /**
@@ -40,11 +38,12 @@ class FinanceService extends BaseService
     public function formatMoneyCurrentUser(float $amount): string
     {
         $user = Auth::user();
-        $currencyModel = $user?->currency_id ? \App\Models\Currency::find($user->currency_id) : null;
-        if (!$currencyModel) {
+        $currencyModel = $user?->currency_id ? Currency::find($user->currency_id) : null;
+        if (! $currencyModel) {
             throw new \Exception("User {$user?->id} is missing a currency_id configuration.");
         }
         $currency = $currencyModel->currency;
+
         return $this->formatMoney($amount, $currency);
     }
 
@@ -55,6 +54,7 @@ class FinanceService extends BaseService
     public function formatMoneyBusiness(float $amount): string
     {
         $businessCurrency = config('app.business_currency', 'USD');
+
         return $this->formatMoney($amount, $businessCurrency);
     }
 
@@ -70,8 +70,8 @@ class FinanceService extends BaseService
      * - EGP: round up to nearest 5 (e.g. 157.99 → 160)
      * - Other (USD etc.): round up by magnitude — 3 digits → step 5, 4 digits → 50, 5+ → 100
      *
-     * @param float $price Raw calculated price
-     * @param string $currency Currency code (e.g. 'EGP', 'USD')
+     * @param  float  $price  Raw calculated price
+     * @param  string  $currency  Currency code (e.g. 'EGP', 'USD')
      * @return float Clean display-ready price
      */
     public function priceFixer(float $price, string $currency = 'USD'): float
@@ -110,7 +110,9 @@ class FinanceService extends BaseService
         $secs = $seconds % 60;
 
         $parts = [];
-        if ($days > 0) $parts[] = "{$days}d";
+        if ($days > 0) {
+            $parts[] = "{$days}d";
+        }
         $parts[] = "{$hours}h";
         $parts[] = "{$minutes}m";
         $parts[] = "{$secs}s";
@@ -170,6 +172,7 @@ class FinanceService extends BaseService
         }
 
         $rate = $this->exchangeRateService->getRate($from, $to, $date);
+
         return round($amount * (float) $rate, 2);
     }
 

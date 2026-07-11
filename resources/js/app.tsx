@@ -7,7 +7,6 @@ import { createRoot } from 'react-dom/client';
 import { Toaster } from '@/Components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
-import { FreelanceModeProvider } from '@/Components/Freelance/FreelanceModeContext';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
 // WebSockets disabled for main SaaS
 
@@ -66,12 +65,10 @@ createInertiaApp({
 
         root.render(
             <MarketplaceModeProvider>
-                <FreelanceModeProvider>
-                    <App {...props} />
-                    <Toaster />
-                    <SonnerToaster position="top-center" richColors />
-                    <GlobalErrorHandler />
-                </FreelanceModeProvider>
+                <App {...props} />
+                <Toaster />
+                <SonnerToaster position="top-center" richColors />
+                <GlobalErrorHandler />
             </MarketplaceModeProvider>
         );
     },

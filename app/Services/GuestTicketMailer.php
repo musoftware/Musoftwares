@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Mail\GuestTicketReplyMail;
 use App\Models\GuestTicket;
 use App\Models\GuestTicketMessage;
 use Illuminate\Support\Facades\Mail;
@@ -20,7 +19,7 @@ class GuestTicketMailer extends BaseService
                     ->from(config('mail.from.address'), config('mail.from.name'))
                     ->to($ticket->email, $ticket->name)
                     ->replyTo($ticket->reply_email)
-                    ->subject($message->subject ?: $ticket->subject_tag . ' ' . $ticket->subject)
+                    ->subject($message->subject ?: $ticket->subject_tag.' '.$ticket->subject)
                     ->html($message->body_html ?: nl2br(e($message->body_text ?? '')))
                     ->withSymfonyMessage(function ($symfony) use ($ticket, $message) {
                         $symfony->getHeaders()->addTextHeader('In-Reply-To', (string) $message->in_reply_to);
@@ -42,7 +41,7 @@ class GuestTicketMailer extends BaseService
     {
         $base = $base ?: ($ticket->subject ?: 'Support request');
 
-        return trim($ticket->subject_tag . ' ' . $base);
+        return trim($ticket->subject_tag.' '.$base);
     }
 
     private function buildReferences(GuestTicketMessage $message): string

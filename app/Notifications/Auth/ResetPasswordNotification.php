@@ -6,7 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Lang;
 
 class ResetPasswordNotification extends Notification implements ShouldQueue
 {
@@ -28,7 +27,7 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject(__('general.reset_password_notification'))
-            ->greeting(__('general.hello') . ' ' . ($notifiable->name ?? '') . ',')
+            ->greeting(__('general.hello').' '.($notifiable->name ?? '').',')
             ->line(__('general.you_are_receiving_this_email_because_we_received_a_password_reset_request_for_your_account'))
             ->action(__('general.reset_password_1'), route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()]))
             ->line(__('general.this_password_reset_link_will_expire_in_minutes', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))

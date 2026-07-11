@@ -4,7 +4,6 @@ namespace App\Http\Requests\Client\Project;
 
 use App\Models\ProjectBoardItem;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class MoveCardRequest extends FormRequest
 {

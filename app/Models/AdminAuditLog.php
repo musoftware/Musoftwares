@@ -7,18 +7,29 @@ use Illuminate\Support\Facades\Log;
 class AdminAuditLog
 {
     public const SEVERITY_INFO = 'info';
+
     public const SEVERITY_WARNING = 'warning';
+
     public const SEVERITY_CRITICAL = 'critical';
 
     public $id = null;
+
     public $actor_user_id;
+
     public $actor_ip;
+
     public $actor_user_agent;
+
     public $action;
+
     public $severity;
+
     public $target_type;
+
     public $target_id;
+
     public $meta;
+
     public $created_at;
 
     public static array $logs = [];
@@ -33,7 +44,7 @@ class AdminAuditLog
 
     public static function create(array $attributes)
     {
-        Log::info("Admin Audit [{$attributes['action']}]: " . json_encode($attributes));
+        Log::info("Admin Audit [{$attributes['action']}]: ".json_encode($attributes));
 
         $instance = new self($attributes);
         self::$logs[] = $instance;
@@ -48,7 +59,8 @@ class AdminAuditLog
             $operator = '=';
         }
 
-        return new class($column, $operator, $value) {
+        return new class($column, $operator, $value)
+        {
             protected array $filtered = [];
 
             public function __construct($column, $operator, $value)
@@ -58,6 +70,7 @@ class AdminAuditLog
                     if ($operator === '=') {
                         return $itemVal == $value;
                     }
+
                     return false;
                 });
             }

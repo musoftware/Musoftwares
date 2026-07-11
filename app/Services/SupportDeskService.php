@@ -2,42 +2,45 @@
 
 namespace App\Services;
 
-use App\Models\Ticket;
-use App\Models\Message;
 use App\Models\Conversation;
-use Illuminate\Support\Facades\DB;
+use App\Models\Message;
+use App\Models\Ticket;
+use App\Models\User;
+use App\Notifications\NewGuestTicketNotification;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+use Kreait\Firebase\Messaging\CloudMessage;
 
 class SupportDeskService extends BaseService
 {
-
     public function getTickets(array $filters, int $perPage = 15)
     {
         $query = Ticket::with('user');
 
         // Search
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('ticket_subject', 'like', "%{$search}%")
-                  ->orWhere('ticket_message', 'like', "%{$search}%")
-                  ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")
-                                                    ->orWhere('email', 'like', "%{$search}%"));
+                    ->orWhere('ticket_message', 'like', "%{$search}%")
+                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%"));
             });
         }
 
         // Status filter
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('ticket_status', $filters['status']);
         }
 
         // Priority filter
-        if (!empty($filters['priority'])) {
+        if (! empty($filters['priority'])) {
             $query->where('priority', $filters['priority']);
         }
 
         // Dynamic sort
         $allowedSorts = ['id', 'created_at', 'ticket_subject', 'priority', 'ticket_status'];
-        $sort      = in_array($filters['sort'] ?? '', $allowedSorts) ? $filters['sort'] : 'created_at';
+        $sort = in_array($filters['sort'] ?? '', $allowedSorts) ? $filters['sort'] : 'created_at';
         $direction = ($filters['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sort, $direction);
 
@@ -48,25 +51,25 @@ class SupportDeskService extends BaseService
     {
         return $this->executeInTransaction(function () use ($ticket, $adminId, $body, $attachment, $isInternal) {
             $conversation = $ticket->conversation;
-            
-            if (!$conversation) {
+
+            if (! $conversation) {
                 // If it doesn't have a conversation yet (legacy ticket), create one
                 $conversation = $ticket->conversation()->create([
                     'type' => 'support_ticket',
-                    'status' => 'open'
+                    'status' => 'open',
                 ]);
             }
 
             $message = $conversation->messages()->create([
-                'sender_id'  => $adminId,
-                'body'       => $body,
+                'sender_id' => $adminId,
+                'body' => $body,
                 'attachment' => $attachment,
-                'is_system'  => false,
-                'is_internal'=> $isInternal,
+                'is_system' => false,
+                'is_internal' => $isInternal,
             ]);
 
             // Update ticket status only if not internal note
-            if (!$isInternal) {
+            if (! $isInternal) {
                 $ticket->update([
                     'ticket_status' => 'agent_replied',
                 ]);
@@ -86,19 +89,19 @@ class SupportDeskService extends BaseService
             }
         });
     }
-    
+
     public function getTicketStats(): array
     {
         return [
-            'total'         => Ticket::count(),
-            'open'          => Ticket::where('ticket_status', 'open')->count(),
-            'waiting'       => Ticket::where('ticket_status', 'user_replied')->count(),
+            'total' => Ticket::count(),
+            'open' => Ticket::where('ticket_status', 'open')->count(),
+            'waiting' => Ticket::where('ticket_status', 'user_replied')->count(),
             'agent_replied' => Ticket::where('ticket_status', 'agent_replied')->count(),
-            'closed'        => Ticket::where('ticket_status', 'closed')->count(),
+            'closed' => Ticket::where('ticket_status', 'closed')->count(),
         ];
     }
 
-    public function createTicket(\App\Models\User $user, array $data, bool $isAdmin = false): Ticket
+    public function createTicket(User $user, array $data, bool $isAdmin = false): Ticket
     {
         return $this->executeInTransaction(function () use ($user, $data, $isAdmin) {
             $ticket = Ticket::create([
@@ -127,7 +130,7 @@ class SupportDeskService extends BaseService
                 'is_system' => false,
             ]);
 
-            $admins = \App\Models\User::role('admin')->get();
+            $admins = User::role('admin')->get();
             foreach ($admins as $admin) {
                 if ($admin->id !== $user->id) {
                     $conversation->participants()->create([
@@ -144,7 +147,7 @@ class SupportDeskService extends BaseService
     public function createGuestTicket(array $data): Ticket
     {
         return $this->executeInTransaction(function () use ($data) {
-            $message = $data['description'] . "\n\nرقم الهاتف: " . $data['phone'];
+            $message = $data['description']."\n\nرقم الهاتف: ".$data['phone'];
 
             $ticket = Ticket::create([
                 'user_id' => null,
@@ -156,28 +159,28 @@ class SupportDeskService extends BaseService
                 'priority' => 'high',
             ]);
 
-            $admins = \App\Models\User::role(['admin', 'Admin'])->get();
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewGuestTicketNotification($ticket));
+            $admins = User::role(['admin', 'Admin'])->get();
+            Notification::send($admins, new NewGuestTicketNotification($ticket));
 
             try {
                 $messaging = app('firebase.messaging');
                 $notification = \Kreait\Firebase\Messaging\Notification::create(
                     'طلب خدمة حصرية جديد',
-                    'طلب جديد من ' . $data['name']
+                    'طلب جديد من '.$data['name']
                 );
 
                 $tokens = $admins->whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
-                if (!empty($tokens)) {
-                    $messageObj = \Kreait\Firebase\Messaging\CloudMessage::new()
+                if (! empty($tokens)) {
+                    $messageObj = CloudMessage::new()
                         ->withNotification($notification)
                         ->withData([
                             'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                            'url' => route('admin.tickets.show', $ticket->id)
+                            'url' => route('admin.tickets.show', $ticket->id),
                         ]);
                     $messaging->sendMulticast($messageObj, $tokens);
                 }
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Firebase Notification Failed: ' . $e->getMessage());
+                Log::error('Firebase Notification Failed: '.$e->getMessage());
             }
 
             return $ticket;

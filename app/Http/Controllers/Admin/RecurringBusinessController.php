@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\CurrencyHelper;
+use App\Helpers\FinanceHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CostTransaction;
 use App\Models\Currency;
 use App\Models\RecurringCost;
 use App\Models\RecurringIncome;
 use App\Models\RecurringSalary;
+use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class RecurringBusinessController extends Controller
@@ -23,7 +27,8 @@ class RecurringBusinessController extends Controller
     {
         $costs = RecurringCost::latest()->paginate(50);
         $costs->getCollection()->transform(function ($cost) {
-            $cost->currency = \App\Helpers\CurrencyHelper::getFrontendCurrency($cost->currency_id);
+            $cost->currency = CurrencyHelper::getFrontendCurrency($cost->currency_id);
+
             return $cost;
         });
         $currencies = Currency::all();
@@ -32,7 +37,7 @@ class RecurringBusinessController extends Controller
         $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
         $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
 
-        $bCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+        $bCurrency = CurrencyHelper::getBusinessCurrency();
 
         $stats = [
             'monthly_total' => RecurringCost::monthly_str(),
@@ -58,7 +63,7 @@ class RecurringBusinessController extends Controller
         $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
         $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
 
-        $bCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+        $bCurrency = CurrencyHelper::getBusinessCurrency();
 
         $stats = [
             'business_currency_code' => $bCurrency['currency'] ?? 'USD',
@@ -85,7 +90,7 @@ class RecurringBusinessController extends Controller
             'recurring_times' => 'required|integer|min:1',
         ]);
 
-        $rCost = new RecurringCost();
+        $rCost = new RecurringCost;
         $rCost->title = $request->input('title');
         $rCost->amount = $request->input('amount');
         $rCost->currency_id = $request->input('currency');
@@ -201,7 +206,7 @@ class RecurringBusinessController extends Controller
                 'id' => $tx->id,
                 'created_at' => $tx->created_at,
                 'amount' => $tx->amount,
-                'currency' => \App\Helpers\CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
+                'currency' => CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
                 'reason' => $tx->reason,
             ];
         });
@@ -214,19 +219,19 @@ class RecurringBusinessController extends Controller
             $checkDate = $baseDate->copy()->addDays($i);
             if ($rCost->isToday($checkDate)) {
                 $count++;
-                $uniqueId = $rCost->id . '-' . $checkDate->toDateString();
+                $uniqueId = $rCost->id.'-'.$checkDate->toDateString();
                 $isRecorded = $rCost->createdBefore($checkDate);
 
                 // Fetch the actual transaction amount if this date was already executed
                 $actualAmountStr = null;
                 if ($isRecorded) {
-                    $pivot = \Illuminate\Support\Facades\DB::table('recurring_cost_transactions')
+                    $pivot = DB::table('recurring_cost_transactions')
                         ->where('unique_id', $uniqueId)
                         ->first();
                     if ($pivot && $pivot->cost_transaction_id) {
-                        $actualTx = \App\Models\CostTransaction::find($pivot->cost_transaction_id);
+                        $actualTx = CostTransaction::find($pivot->cost_transaction_id);
                         if ($actualTx) {
-                            $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $rCost->currency_id);
+                            $actualAmountStr = FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $rCost->currency_id);
                         }
                     }
                 }
@@ -240,7 +245,7 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = \App\Helpers\CurrencyHelper::getFrontendCurrency($rCost->currency_id);
+        $currencyModel = CurrencyHelper::getFrontendCurrency($rCost->currency_id);
 
         return Inertia::render('Admin/Business/RecurringCosts/View', [
             'cost' => [
@@ -259,8 +264,8 @@ class RecurringBusinessController extends Controller
             'upcomingSchedule' => $upcomingSchedule,
             'total_stat' => [
                 'entries_count' => $rCost->transactions()->count(),
-                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($rCost->transactions()->sum('amount'), $rCost->currency_id),
-            ]
+                'total_cost' => FinanceHelper::instance()->format_money($rCost->transactions()->sum('amount'), $rCost->currency_id),
+            ],
         ]);
     }
 
@@ -268,6 +273,7 @@ class RecurringBusinessController extends Controller
     {
         $rCost = RecurringCost::findOrFail($id);
         $rCost->delete();
+
         return redirect()->route('admin.recurring_costs.index')->with('success', __('general.recurring_cost_deleted'));
     }
 
@@ -275,14 +281,16 @@ class RecurringBusinessController extends Controller
     {
         $rCost = RecurringCost::findOrFail($id);
         $rCost->delete_with_transactions();
+
         return redirect()->route('admin.recurring_costs.index')->with('success', __('general.recurring_cost_and_generated_transactions_deleted'));
     }
 
     public function toggle_recurring_costs($id)
     {
         $rCost = RecurringCost::findOrFail($id);
-        $rCost->is_active = !$rCost->is_active;
+        $rCost->is_active = ! $rCost->is_active;
         $rCost->save();
+
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }
 
@@ -294,16 +302,17 @@ class RecurringBusinessController extends Controller
     {
         $incomes = RecurringIncome::latest()->paginate(50);
         $incomes->getCollection()->transform(function ($income) {
-            $income->currency = \App\Helpers\CurrencyHelper::getFrontendCurrency($income->currency_id);
+            $income->currency = CurrencyHelper::getFrontendCurrency($income->currency_id);
+
             return $income;
         });
         $currencies = Currency::all();
 
-        $incomeReasons = \App\Models\Transaction::whereIn('type', ['received', 'refunded', 'sent'])->select('reason')->distinct()->pluck('reason');
+        $incomeReasons = Transaction::whereIn('type', ['received', 'refunded', 'sent'])->select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringIncome::select('reason')->distinct()->pluck('reason');
         $categories = $incomeReasons->concat($recurringReasons)->unique()->filter()->values();
 
-        $bCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+        $bCurrency = CurrencyHelper::getBusinessCurrency();
 
         $stats = [
             'monthly_total' => RecurringIncome::monthly_str(),
@@ -333,7 +342,7 @@ class RecurringBusinessController extends Controller
             'recurring_times' => 'required|integer|min:1',
         ]);
 
-        $rIncome = new RecurringIncome();
+        $rIncome = new RecurringIncome;
         $rIncome->title = $request->input('title');
         $rIncome->amount = $request->input('amount');
         $rIncome->currency_id = $request->input('currency');
@@ -370,7 +379,7 @@ class RecurringBusinessController extends Controller
         $income = RecurringIncome::findOrFail($id);
         $currencies = Currency::all();
 
-        $incomeReasons = \App\Models\Transaction::whereIn('type', ['received', 'refunded', 'sent'])->select('reason')->distinct()->pluck('reason');
+        $incomeReasons = Transaction::whereIn('type', ['received', 'refunded', 'sent'])->select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringIncome::select('reason')->distinct()->pluck('reason');
         $categories = $incomeReasons->concat($recurringReasons)->unique()->filter()->values();
 
@@ -449,7 +458,7 @@ class RecurringBusinessController extends Controller
                 'id' => $tx->id,
                 'created_at' => $tx->created_at,
                 'amount' => $tx->amount,
-                'currency' => \App\Helpers\CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
+                'currency' => CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
                 'reason' => $tx->reason,
             ];
         });
@@ -462,19 +471,19 @@ class RecurringBusinessController extends Controller
             $checkDate = $baseDate->copy()->addDays($i);
             if ($rIncome->isToday($checkDate)) {
                 $count++;
-                $uniqueId = $rIncome->id . '-' . $checkDate->toDateString();
+                $uniqueId = $rIncome->id.'-'.$checkDate->toDateString();
                 $isRecorded = $rIncome->createdBefore($checkDate);
 
                 // Fetch the actual transaction amount if this date was already executed
                 $actualAmountStr = null;
                 if ($isRecorded) {
-                    $pivot = \Illuminate\Support\Facades\DB::table('recurring_income_transactions')
+                    $pivot = DB::table('recurring_income_transactions')
                         ->where('unique_id', $uniqueId)
                         ->first();
                     if ($pivot && $pivot->transaction_id) {
-                        $actualTx = \App\Models\Transaction::find($pivot->transaction_id);
+                        $actualTx = Transaction::find($pivot->transaction_id);
                         if ($actualTx) {
-                            $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $rIncome->currency_id);
+                            $actualAmountStr = FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $rIncome->currency_id);
                         }
                     }
                 }
@@ -488,7 +497,7 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = \App\Helpers\CurrencyHelper::getFrontendCurrency($rIncome->currency_id);
+        $currencyModel = CurrencyHelper::getFrontendCurrency($rIncome->currency_id);
 
         return Inertia::render('Admin/Business/RecurringIncome/View', [
             'income' => [
@@ -507,8 +516,8 @@ class RecurringBusinessController extends Controller
             'upcomingSchedule' => $upcomingSchedule,
             'total_stat' => [
                 'entries_count' => $rIncome->transactions()->count(),
-                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($rIncome->transactions()->sum('amount'), $rIncome->currency_id),
-            ]
+                'total_cost' => FinanceHelper::instance()->format_money($rIncome->transactions()->sum('amount'), $rIncome->currency_id),
+            ],
         ]);
     }
 
@@ -516,6 +525,7 @@ class RecurringBusinessController extends Controller
     {
         $rIncome = RecurringIncome::findOrFail($id);
         $rIncome->delete();
+
         return redirect()->route('admin.recurring_income.index')->with('success', __('general.recurring_income_deleted'));
     }
 
@@ -523,14 +533,16 @@ class RecurringBusinessController extends Controller
     {
         $rIncome = RecurringIncome::findOrFail($id);
         $rIncome->delete_with_transactions();
+
         return redirect()->route('admin.recurring_income.index')->with('success', __('general.recurring_income_and_generated_transactions_deleted'));
     }
 
     public function toggle_recurring_income($id)
     {
         $rIncome = RecurringIncome::findOrFail($id);
-        $rIncome->is_active = !$rIncome->is_active;
+        $rIncome->is_active = ! $rIncome->is_active;
         $rIncome->save();
+
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }
 
@@ -542,7 +554,8 @@ class RecurringBusinessController extends Controller
     {
         $salaries = RecurringSalary::with('user')->latest()->paginate(50);
         $salaries->getCollection()->transform(function ($salary) {
-            $salary->currency = \App\Helpers\CurrencyHelper::getFrontendCurrency($salary->currency_id);
+            $salary->currency = CurrencyHelper::getFrontendCurrency($salary->currency_id);
+
             return $salary;
         });
         $currencies = Currency::all();
@@ -567,7 +580,7 @@ class RecurringBusinessController extends Controller
             'currency' => 'required|exists:currencies,id',
         ]);
 
-        $salary = new RecurringSalary();
+        $salary = new RecurringSalary;
         $salary->user_id = (int) $request->input('user_id');
         $salary->title = $request->input('title');
         $salary->start_date = $request->input('start_date');
@@ -676,7 +689,7 @@ class RecurringBusinessController extends Controller
                 'id' => $tx->id,
                 'created_at' => $tx->created_at,
                 'amount' => $tx->amount,
-                'currency' => \App\Helpers\CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
+                'currency' => CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
                 'reason' => $tx->reason,
             ];
         });
@@ -689,22 +702,22 @@ class RecurringBusinessController extends Controller
             $checkDate = $baseDate->copy()->addDays($i);
             if ($salary->isToday($checkDate)) {
                 $count++;
-                $uniqueId = $salary->id . '-' . $checkDate->toDateString();
+                $uniqueId = $salary->id.'-'.$checkDate->toDateString();
                 $isRecorded = $salary->createdBefore($checkDate);
 
                 // Fetch the actual transaction amount if this date was already executed
                 $actualAmountStr = null;
                 if ($isRecorded) {
-                    $pivot = \Illuminate\Support\Facades\DB::table('recurring_salary_transactions')
+                    $pivot = DB::table('recurring_salary_transactions')
                         ->where('unique_id', $uniqueId)
                         ->first();
                     if ($pivot) {
                         // Salaries link to transactions table (via transaction_id)
                         $txId = $pivot->transaction_id ?? null;
                         if ($txId) {
-                            $actualTx = \App\Models\Transaction::find($txId);
+                            $actualTx = Transaction::find($txId);
                             if ($actualTx) {
-                                $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $salary->currency_id);
+                                $actualAmountStr = FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $salary->currency_id);
                             }
                         }
                     }
@@ -719,7 +732,7 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = \App\Helpers\CurrencyHelper::getFrontendCurrency($salary->currency_id);
+        $currencyModel = CurrencyHelper::getFrontendCurrency($salary->currency_id);
 
         return Inertia::render('Admin/Business/RecurringSalaries/View', [
             'salary' => [
@@ -739,8 +752,8 @@ class RecurringBusinessController extends Controller
             'upcomingSchedule' => $upcomingSchedule,
             'total_stat' => [
                 'entries_count' => $salary->transactions()->count(),
-                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($salary->transactions()->sum('amount'), $salary->currency_id),
-            ]
+                'total_cost' => FinanceHelper::instance()->format_money($salary->transactions()->sum('amount'), $salary->currency_id),
+            ],
         ]);
     }
 
@@ -748,14 +761,16 @@ class RecurringBusinessController extends Controller
     {
         $salary = RecurringSalary::findOrFail($id);
         $salary->delete();
+
         return redirect()->route('admin.recurring_salaries.index')->with('success', __('general.recurring_salary_deleted'));
     }
 
     public function toggle_recurring_salaries($id)
     {
         $salary = RecurringSalary::findOrFail($id);
-        $salary->is_active = !$salary->is_active;
+        $salary->is_active = ! $salary->is_active;
         $salary->save();
+
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }
 }

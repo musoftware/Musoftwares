@@ -4,26 +4,27 @@ namespace App\Services;
 
 class PricingService extends BaseService
 {
-
     /**
-     * Get all modules, addons, and tools configured for pricing, 
+     * Get all modules, addons, and tools configured for pricing,
      * converted to a uniform ServiceItem format.
      *
-     * @param callable|null $convertPrice
+     * @param  callable|null  $convertPrice
      * @return array
      */
     public function getServiceItems($convertPrice = null)
     {
         // Default converter if none provided (returns raw EGP)
-        if (!$convertPrice) {
-            $convertPrice = function($price) { return $price; };
+        if (! $convertPrice) {
+            $convertPrice = function ($price) {
+                return $price;
+            };
         }
 
         $items = [];
         $basePricesEGP = config('saas.modules', []);
 
         // Helper to find the correct icon
-        $getIcon = function($slug) {
+        $getIcon = function ($slug) {
             $map = [
                 'erp' => 'Building2',
                 'crm' => 'MessageSquare',
@@ -31,6 +32,7 @@ class PricingService extends BaseService
                 'pos' => 'Store',
                 'maintenance' => 'Wrench',
             ];
+
             return $map[$slug] ?? null;
         };
 
@@ -45,10 +47,12 @@ class PricingService extends BaseService
 
         // 1. Core Modules
         foreach ($basePricesEGP as $slug => $price) {
-            if ($slug === 'tool') continue; // Handled separately
+            if ($slug === 'tool') {
+                continue;
+            } // Handled separately
             $monthly = $price / 10;
             $meta = $moduleMetadata[$slug] ?? ['name' => ucfirst(str_replace('-', ' ', $slug)), 'description' => '', 'icon' => 'Layers'];
-            
+
             $items[] = [
                 'id' => $slug,
                 'slug' => $slug,
@@ -86,7 +90,9 @@ class PricingService extends BaseService
         $configTools = config('tools', []);
         $toolBasePrice = $basePricesEGP['tool'] ?? 1000;
         foreach ($configTools as $guid => $tool) {
-            if (!isset($tool['is_active']) || !$tool['is_active']) continue;
+            if (! isset($tool['is_active']) || ! $tool['is_active']) {
+                continue;
+            }
 
             $isFree = $tool['is_free'] ?? false;
 
@@ -104,7 +110,7 @@ class PricingService extends BaseService
             }
 
             $items[] = [
-                'id' => 'tool-' . $guid,
+                'id' => 'tool-'.$guid,
                 'slug' => $tool['slug'] ?? $guid,
                 'name' => $tool['title'] ?? 'Unknown Tool',
                 'type' => 'tool',

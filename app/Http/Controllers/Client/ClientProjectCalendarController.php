@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Client\Concerns\ResolvesClientProject;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\ProjectBoardItem;
 use App\Services\ProjectBoardService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -14,9 +15,7 @@ class ClientProjectCalendarController extends Controller
 {
     use ResolvesClientProject;
 
-    public function __construct(protected ProjectBoardService $boardService)
-    {
-    }
+    public function __construct(protected ProjectBoardService $boardService) {}
 
     public function calendarIndex(Request $request, Project $project)
     {
@@ -38,10 +37,10 @@ class ClientProjectCalendarController extends Controller
         $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
         $categories = $this->boardService->categoriesFor($project);
 
-        $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
+        $activeDates = ProjectBoardItem::where('project_id', $project->id)
             ->distinct()
             ->pluck('for_date')
-            ->map(fn($d) => is_string($d) ? $d : $d->toDateString())
+            ->map(fn ($d) => is_string($d) ? $d : $d->toDateString())
             ->toArray();
 
         return Inertia::render('Client/Projects/Calendar/Date', [

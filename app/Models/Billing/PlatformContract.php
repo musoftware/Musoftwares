@@ -2,10 +2,12 @@
 
 namespace App\Models\Billing;
 
+use App\Models\Currency;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\User;
+use Illuminate\Support\Str;
 
 class PlatformContract extends Model
 {
@@ -68,21 +70,22 @@ class PlatformContract extends Model
 
         static::creating(function ($contract) {
             if (empty($contract->uuid)) {
-                $contract->uuid = (string) \Illuminate\Support\Str::uuid();
+                $contract->uuid = (string) Str::uuid();
             }
         });
     }
 
     public function currencyRelation()
     {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 
     public function getCurrencyAttribute()
     {
-        if (!$this->currencyRelation) {
+        if (! $this->currencyRelation) {
             throw new \Exception("Contract {$this->id} is missing an associated currency relation.");
         }
+
         return $this->currencyRelation->code;
     }
 
@@ -98,12 +101,14 @@ class PlatformContract extends Model
 
     public function getClientAttribute()
     {
-        if ($this->user) return $this->user;
-        
-        return (object)[
+        if ($this->user) {
+            return $this->user;
+        }
+
+        return (object) [
             'name' => $this->client_name ?? '-',
             'email' => '-',
-            'phone' => '-'
+            'phone' => '-',
         ];
     }
 

@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\iSaaS;
 
 use App\Http\Controllers\Controller;
-use App\Models\Contract;
-use App\Services\ContractService;
-use App\Http\Requests\Admin\Contract\UpdateContractStatusRequest;
 use App\Http\Requests\Admin\Contract\StoreContractRequest;
 use App\Http\Requests\Admin\Contract\UpdateContractRequest;
+use App\Http\Requests\Admin\Contract\UpdateContractStatusRequest;
+use App\Models\Contract;
+use App\Models\Currency;
+use App\Models\User;
+use App\Services\ContractService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class ContractController extends Controller
 {
@@ -21,7 +23,7 @@ class ContractController extends Controller
     public function create()
     {
         return Inertia::render('iSaaS/Contracts/Create', [
-            'currencies' => \App\Models\Currency::all(),
+            'currencies' => Currency::all(),
         ]);
     }
 
@@ -43,10 +45,10 @@ class ContractController extends Controller
         }
 
         $contract->load('user');
-        
+
         return Inertia::render('iSaaS/Contracts/Edit', [
             'contract' => $contract,
-            'currencies' => \App\Models\Currency::all(),
+            'currencies' => Currency::all(),
         ]);
     }
 
@@ -130,7 +132,7 @@ class ContractController extends Controller
             return response()->json([]);
         }
 
-        $users = \App\Models\User::where('name', 'like', "%{$search}%")
+        $users = User::where('name', 'like', "%{$search}%")
             ->orWhere('email', 'like', "%{$search}%")
             ->limit(10)
             ->get(['id', 'name', 'email']);
@@ -155,9 +157,9 @@ class ContractController extends Controller
                 'client_name' => 'Client Name',
                 'key_features' => ['AI Feature 1', 'AI Feature 2'],
                 'pricing_items' => [
-                    ['item' => 'Development', 'description' => 'Full-stack development', 'hours' => 40, 'hourly_rate_egp' => 500]
-                ]
-            ]
+                    ['item' => 'Development', 'description' => 'Full-stack development', 'hours' => 40, 'hourly_rate_egp' => 500],
+                ],
+            ],
         ]);
     }
 
@@ -165,10 +167,10 @@ class ContractController extends Controller
     {
         return response()->json([
             'data' => [
-                'refined_content' => $request->input('description') . "\n\nReviewed and verified by AI.",
+                'refined_content' => $request->input('description')."\n\nReviewed and verified by AI.",
                 'critical_issues' => [],
-                'suggestions' => ['Looks good!']
-            ]
+                'suggestions' => ['Looks good!'],
+            ],
         ]);
     }
 }

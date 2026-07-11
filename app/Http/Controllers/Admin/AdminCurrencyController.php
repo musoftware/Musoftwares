@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class AdminCurrencyController extends Controller
@@ -14,9 +15,9 @@ class AdminCurrencyController extends Controller
         $search = $request->get('search', '');
 
         $currencies = Currency::query()
-            ->when($search, fn($q) => $q->where(function ($q) use ($search) {
+            ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
                 $q->where('currency', 'like', "%{$search}%")
-                  ->orWhere('symbol', 'like', "%{$search}%");
+                    ->orWhere('symbol', 'like', "%{$search}%");
             }))
             ->withCount(['exchangesFrom', 'exchangesTo'])
             ->orderBy('id')
@@ -84,11 +85,11 @@ class AdminCurrencyController extends Controller
     {
         $exists = Currency::withTrashed()
             ->where('currency', $validated['currency'])
-            ->when($ignoreId !== null, fn($q) => $q->where('id', '!=', $ignoreId))
+            ->when($ignoreId !== null, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->exists();
 
         if ($exists) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'currency' => __('validation.unique', ['attribute' => 'currency']),
             ]);
         }

@@ -86,7 +86,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                     <div className="bg-white p-6 rounded-xl border shadow-sm">
                         <h3 className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-4">{__('general.monthly_breakdown')}</h3>
                         <div className="h-64">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                 <PieChart>
                                     <Pie
                                         data={stats.chart_data}
@@ -115,7 +115,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                     <div className="bg-white p-6 rounded-xl border shadow-sm">
                         <h3 className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-4">{__('general.annual_breakdown')}</h3>
                         <div className="h-64">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                 <PieChart>
                                     <Pie
                                         data={stats.chart_data}

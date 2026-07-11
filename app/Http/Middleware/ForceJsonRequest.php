@@ -9,7 +9,7 @@ class ForceJsonRequest
     public function handle($request, Closure $next)
     {
         // Allow only application/json
-        if (!$request->isJson()) {
+        if (! $request->isJson()) {
             return response()->json([
                 'error' => 'Only JSON requests are allowed.',
             ], 415); // Unsupported Media Type

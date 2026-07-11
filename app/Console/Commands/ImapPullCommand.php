@@ -28,7 +28,7 @@ class ImapPullCommand extends Command
             $stats = $inbox->pull($dry);
 
             if ($dry) {
-                $this->info('Dry-run: parsed ' . $stats['fetched'] . ' message(s).');
+                $this->info('Dry-run: parsed '.$stats['fetched'].' message(s).');
 
                 return self::SUCCESS;
             }

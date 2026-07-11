@@ -99,10 +99,6 @@ return [
         'url' => env('BOOKINGSYS_URL', 'http://localhost:8004'),
     ],
 
-    'freelancesys' => [
-        'url' => env('FREELANCESYS_URL', 'http://localhost:8005'),
-    ],
-
     'goldsaversys' => [
         'url' => env('GOLDSAVERSYS_URL', 'http://localhost:8006'),
     ],

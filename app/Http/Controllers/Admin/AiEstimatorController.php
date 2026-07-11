@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminSettings;
 use App\Models\Currency;
 use App\Services\AI\GeminiEstimatorService;
 use Illuminate\Http\Request;
@@ -17,23 +18,23 @@ class AiEstimatorController extends Controller
     public function index()
     {
         $user = auth()->user();
-        
+
         $userCurrency = null;
         if ($user->hour_rate_currency_id) {
             $userCurrency = Currency::find($user->hour_rate_currency_id);
         } else {
             // Fallback to business currency if user doesn't have one set
-            $businessCurrencyId = \App\Models\AdminSettings::business_currency()->id ?? null;
+            $businessCurrencyId = AdminSettings::business_currency()->id ?? null;
             if ($businessCurrencyId) {
                 $userCurrency = Currency::find($businessCurrencyId);
             }
         }
 
         return Inertia::render('Admin/Tools/AiEstimator', [
-            'expected_monthly_income' => (float)(\App\Models\AdminSettings::GetValue('expected_monthly_income') ?? 0),
-            'work_days_per_month'     => (float)(\App\Models\AdminSettings::GetValue('work_days_per_month') ?? 0),
-            'hours_per_day'           => (float)(\App\Models\AdminSettings::GetValue('hours_per_day') ?? 0),
-            'currency'  => $userCurrency,
+            'expected_monthly_income' => (float) (AdminSettings::GetValue('expected_monthly_income') ?? 0),
+            'work_days_per_month' => (float) (AdminSettings::GetValue('work_days_per_month') ?? 0),
+            'hours_per_day' => (float) (AdminSettings::GetValue('hours_per_day') ?? 0),
+            'currency' => $userCurrency,
         ]);
     }
 

@@ -20,9 +20,9 @@ class DeviceTokenController extends Controller
 
         // Ensure the token is saved in the device_tokens table
         $user->deviceTokens()->firstOrCreate([
-            'token' => $token
+            'token' => $token,
         ]);
-        
+
         // Also update the fallback column for compatibility if needed
         $user->fcm_token = $token;
         $user->save();
@@ -32,12 +32,12 @@ class DeviceTokenController extends Controller
             $messaging = app('firebase.messaging');
             $messaging->subscribeToTopic('global', $token);
         } catch (\Exception $e) {
-            \Log::error('Failed to subscribe token to global topic: ' . $e->getMessage());
+            \Log::error('Failed to subscribe token to global topic: '.$e->getMessage());
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Token saved successfully'
+            'message' => 'Token saved successfully',
         ]);
     }
 }

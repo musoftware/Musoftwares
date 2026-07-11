@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SerialDevice;
-use App\Models\SerialUserDevice;
-use App\Models\User;
-use App\Services\SerialUserDeviceService;
 use App\Http\Requests\Admin\SerialUserDevice\StoreSerialUserDeviceRequest;
 use App\Http\Requests\Admin\SerialUserDevice\UpdateSerialUserDeviceStatusRequest;
 use App\Http\Requests\Admin\SerialUserDevice\UpdateUserSerialStatusRequest;
 use App\Http\Requests\Admin\SerialUserDevice\UpdateUserTempValidRequest;
 use App\Http\Resources\SerialUserDeviceResource;
+use App\Models\SerialDevice;
+use App\Models\SerialUserDevice;
+use App\Models\User;
+use App\Services\SerialUserDeviceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -40,10 +39,10 @@ class SerialUserDeviceController extends Controller
         $validPerPageOptions = [10, 20, 50, 100];
 
         $filters = [
-            'search'   => trim((string) $request->query('search')),
-            'user_id'  => $request->query('user_id'),
-            'status'   => $request->query('status'),
-            'sort'     => $request->query('sort', 'recent'),
+            'search' => trim((string) $request->query('search')),
+            'user_id' => $request->query('user_id'),
+            'status' => $request->query('status'),
+            'sort' => $request->query('sort', 'recent'),
             'per_page' => (int) $request->query('per_page', 20),
         ];
 
@@ -51,7 +50,7 @@ class SerialUserDeviceController extends Controller
             ? $filters['status']
             : null;
 
-        if (!in_array($filters['per_page'], $validPerPageOptions, true)) {
+        if (! in_array($filters['per_page'], $validPerPageOptions, true)) {
             $filters['per_page'] = 20;
         }
 
@@ -62,34 +61,34 @@ class SerialUserDeviceController extends Controller
             $q->where(function ($sub) use ($like) {
                 $sub->where('device_id', 'like', $like)
                     ->orWhere('notes', 'like', $like)
-                    ->orWhereHas('user', fn($u) => $u->where('name', 'like', $like)->orWhere('email', 'like', $like));
+                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', $like)->orWhere('email', 'like', $like));
             });
         });
 
-        $query->when($filters['user_id'], fn($q, $id) => $q->where('user_id', (int) $id));
-        $query->when($filters['status'], fn($q, $s) => $q->where('status', $s));
+        $query->when($filters['user_id'], fn ($q, $id) => $q->where('user_id', (int) $id));
+        $query->when($filters['status'], fn ($q, $s) => $q->where('status', $s));
 
         $query->when(true, function ($q) use ($filters) {
             match ($filters['sort']) {
                 'oldest' => $q->orderBy('created_at'),
-                'alpha'  => $q->orderBy('device_id'),
-                default  => $q->orderByDesc('created_at'),
+                'alpha' => $q->orderBy('device_id'),
+                default => $q->orderByDesc('created_at'),
             };
         });
 
-        $userDevices = $query->paginate($filters['per_page'])->withQueryString()->through(fn($d) => (new SerialUserDeviceResource($d))->resolve());
+        $userDevices = $query->paginate($filters['per_page'])->withQueryString()->through(fn ($d) => (new SerialUserDeviceResource($d))->resolve());
 
         $stats = [
-            'total'    => SerialUserDevice::count(),
-            'active'   => SerialUserDevice::where('status', SerialUserDevice::STATUS_ACTIVE)->count(),
+            'total' => SerialUserDevice::count(),
+            'active' => SerialUserDevice::where('status', SerialUserDevice::STATUS_ACTIVE)->count(),
             'inactive' => SerialUserDevice::where('status', SerialUserDevice::STATUS_INACTIVE)->count(),
         ];
 
         return Inertia::render('Admin/SerialUserDevices/Index', [
-            'userDevices'    => $userDevices,
-            'filters'        => $filters,
-            'statuses'       => SerialUserDevice::statuses(),
-            'stats'          => $stats,
+            'userDevices' => $userDevices,
+            'filters' => $filters,
+            'statuses' => SerialUserDevice::statuses(),
+            'stats' => $stats,
             'perPageOptions' => $validPerPageOptions,
         ]);
     }
@@ -102,8 +101,8 @@ class SerialUserDeviceController extends Controller
         $users = User::orderBy('name')->get(['id', 'name', 'email']);
 
         // Only show devices not already assigned to someone
-        $assignedDeviceIds  = SerialUserDevice::pluck('device_id')->toArray();
-        $availableDevices   = SerialDevice::whereNotIn('device_id', $assignedDeviceIds)
+        $assignedDeviceIds = SerialUserDevice::pluck('device_id')->toArray();
+        $availableDevices = SerialDevice::whereNotIn('device_id', $assignedDeviceIds)
             ->select('device_id', 'machine_name', 'user_name', 'serial_software_id')
             ->with('software:id,name')
             ->distinct()
@@ -111,7 +110,7 @@ class SerialUserDeviceController extends Controller
             ->get();
 
         return Inertia::render('Admin/SerialUserDevices/Assign', [
-            'users'            => $users,
+            'users' => $users,
             'availableDevices' => $availableDevices,
         ]);
     }
@@ -156,21 +155,21 @@ class SerialUserDeviceController extends Controller
     public function byUser(Request $request): Response
     {
         $filters = [
-            'search'   => trim((string) $request->query('search')),
-            'status'   => $request->query('status'),
-            'sort'     => $request->query('sort', 'recent'),
+            'search' => trim((string) $request->query('search')),
+            'status' => $request->query('status'),
+            'sort' => $request->query('sort', 'recent'),
             'per_page' => (int) $request->query('per_page', 20),
         ];
 
         $query = User::query()
             ->whereHas('serialUserDevices')
             ->withCount(['serialUserDevices as total_devices'])
-            ->withCount(['serialUserDevices as active_devices' => fn($q) => $q->where('status', SerialUserDevice::STATUS_ACTIVE)])
-            ->withCount(['serialUserDevices as inactive_devices' => fn($q) => $q->where('status', SerialUserDevice::STATUS_INACTIVE)]);
+            ->withCount(['serialUserDevices as active_devices' => fn ($q) => $q->where('status', SerialUserDevice::STATUS_ACTIVE)])
+            ->withCount(['serialUserDevices as inactive_devices' => fn ($q) => $q->where('status', SerialUserDevice::STATUS_INACTIVE)]);
 
         $query->when($filters['search'], function ($q, string $search) {
             $like = "%{$search}%";
-            $q->where(fn($sub) => $sub->where('name', 'like', $like)->orWhere('email', 'like', $like));
+            $q->where(fn ($sub) => $sub->where('name', 'like', $like)->orWhere('email', 'like', $like));
         });
 
         $filters['sort'] === 'recent'

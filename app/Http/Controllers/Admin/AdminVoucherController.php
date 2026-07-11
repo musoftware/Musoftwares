@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreVoucherRequest;
+use App\Http\Requests\Admin\UpdateVoucherRequest;
+use App\Http\Resources\VoucherResource;
 use App\Models\Voucher;
 use App\Models\VoucherRedemption;
 use App\Services\PromotionService;
-use App\Http\Resources\VoucherResource;
-use App\Http\Requests\Admin\StoreVoucherRequest;
-use App\Http\Requests\Admin\UpdateVoucherRequest;
 use Inertia\Inertia;
 
 class AdminVoucherController extends Controller
@@ -20,9 +20,9 @@ class AdminVoucherController extends Controller
     public function index()
     {
         $vouchers = Voucher::with(['spendCurrency', 'rewardCurrency'])
-                           ->orderBy('created_at', 'desc')
-                           ->paginate(15)
-                           ->through(fn($v) => (new VoucherResource($v))->resolve());
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->through(fn ($v) => (new VoucherResource($v))->resolve());
 
         return Inertia::render('Admin/Vouchers/Index', [
             'vouchers' => $vouchers,
@@ -39,14 +39,14 @@ class AdminVoucherController extends Controller
     public function show(Voucher $voucher)
     {
         $voucher->load(['spendCurrency', 'rewardCurrency']);
-        
+
         $redemptions = VoucherRedemption::where('voucher_id', $voucher->id)
-                                        ->with(['user', 'transaction', 'rewardTransaction'])
-                                        ->orderBy('created_at', 'desc')
-                                        ->paginate(20);
+            ->with(['user', 'transaction', 'rewardTransaction'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
         return Inertia::render('Admin/Vouchers/Show', [
-            'voucher'     => (new VoucherResource($voucher))->resolve(),
+            'voucher' => (new VoucherResource($voucher))->resolve(),
             'redemptions' => $redemptions, // Usually would have its own resource
         ]);
     }

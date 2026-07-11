@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\PayoutMethod;
+use App\Models\UserReferralRequestWithdraw;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 /**
@@ -25,7 +26,7 @@ class PayoutMethodController extends Controller
     /**
      * Store a new payout method with type-specific validation.
      * Recovered from old project: PayoutController::store_payment_method()
-     * 
+     *
      * Old project validated per type: bank needs account_number, wallet needs mobile, etc.
      * This version uses a JSON `details` field but applies the same strict validation rules.
      */
@@ -141,7 +142,7 @@ class PayoutMethodController extends Controller
 
         // Check if this method has pending withdrawals
         $hasPending = $payoutMethod->user_id === $request->user()->id
-            && \App\Models\UserReferralRequestWithdraw::where('user_payment_method_id', $payoutMethod->id)
+            && UserReferralRequestWithdraw::where('user_payment_method_id', $payoutMethod->id)
                 ->whereIn('status', ['pending', 'processing'])
                 ->exists();
 

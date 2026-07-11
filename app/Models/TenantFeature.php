@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TenantFeature extends Model
 {
@@ -23,7 +22,7 @@ class TenantFeature extends Model
      */
     public function isActive(): bool
     {
-        if (!$this->expires_at) {
+        if (! $this->expires_at) {
             return true; // No expiration = lifetime access
         }
 

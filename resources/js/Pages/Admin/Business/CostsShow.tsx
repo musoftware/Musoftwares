@@ -1,6 +1,6 @@
 import React from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, router, Link, usePage } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';

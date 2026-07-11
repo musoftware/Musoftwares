@@ -6,10 +6,9 @@ use App\Models\Project;
 use App\Models\ProjectBoardCategory;
 use App\Models\ProjectBoardItem;
 use App\Models\ProjectBoardPreference;
-use App\Models\Todo;
-use App\Models\ProjectFile;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -30,7 +29,7 @@ class ProjectBoardService
      * Ensure a project has the canonical set of system categories. Idempotent —
      * existing rows with the same slug are skipped, so re-running is safe.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, ProjectBoardCategory>
+     * @return Collection<int, ProjectBoardCategory>
      */
     public function ensureDefaultCategories(Project $project)
     {
@@ -88,7 +87,7 @@ class ProjectBoardService
      */
     public function getPreference(?User $user, Project $project): array
     {
-        if (!$user) {
+        if (! $user) {
             return $this->defaultPreferences();
         }
 
@@ -97,7 +96,7 @@ class ProjectBoardService
             ->where('project_id', $project->id)
             ->first();
 
-        if (!$row) {
+        if (! $row) {
             return $this->defaultPreferences();
         }
 
@@ -264,12 +263,12 @@ class ProjectBoardService
 
         $todos = $project->todos()
             ->withCount('comments')
-            ->where(function($q) use ($dateString) {
+            ->where(function ($q) use ($dateString) {
                 $q->whereDate('inDate', $dateString)
-                  ->orWhere(function($q2) use ($dateString) {
-                      $q2->whereNull('inDate')
-                         ->whereDate('created_at', $dateString);
-                  });
+                    ->orWhere(function ($q2) use ($dateString) {
+                        $q2->whereNull('inDate')
+                            ->whereDate('created_at', $dateString);
+                    });
             })
             ->get();
 
@@ -297,6 +296,7 @@ class ProjectBoardService
             if ($sa !== $sb) {
                 return $sa <=> $sb;
             }
+
             return strcmp(($a['type'] ?? '').':'.($a['id'] ?? 0), ($b['type'] ?? '').':'.($b['id'] ?? 0));
         });
 
@@ -388,15 +388,15 @@ class ProjectBoardService
         }
 
         foreach ($todos as $todo) {
-            $checklist = $todo->checklistItems()->get()->map(fn($item) => [
+            $checklist = $todo->checklistItems()->get()->map(fn ($item) => [
                 'id' => $item->id,
                 'title' => $item->title,
-                'is_completed' => (bool)$item->is_completed,
+                'is_completed' => (bool) $item->is_completed,
             ])->toArray();
 
             $addCard('todo', $todo->id, $todo->title ?: __('general.todo'), [
                 'description' => $todo->description,
-                'completed' => (bool)$todo->completed,
+                'completed' => (bool) $todo->completed,
                 'checklist' => $checklist,
                 'comments_count' => $todo->comments_count,
             ]);
@@ -421,6 +421,7 @@ class ProjectBoardService
             }
             $sa = (int) ($a['sort'] ?? 0);
             $sb = (int) ($b['sort'] ?? 0);
+
             return $sa <=> $sb ?: ($a['id'] ?? 0) <=> ($b['id'] ?? 0);
         });
 

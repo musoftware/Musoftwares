@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CoWorker extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'co_workers';
 
@@ -35,20 +34,20 @@ class CoWorker extends Model
      */
     public function getFlagPath()
     {
-        if (!$this->mobile) {
+        if (! $this->mobile) {
             return null;
         }
 
         // Extract country code from mobile number
         $mobile = preg_replace('/[^0-9+]/', '', $this->mobile);
-        
+
         // Get phone country code to ISO 3166-1 alpha-2 country code mapping
         $phoneCodeToIso = $this->getPhoneCodeMapping();
 
         // Extract country code from phone number
         $countryCode = $this->extractCountryCode($mobile);
-        
-        if (!$countryCode || !isset($phoneCodeToIso[$countryCode])) {
+
+        if (! $countryCode || ! isset($phoneCodeToIso[$countryCode])) {
             return null;
         }
 
@@ -116,7 +115,7 @@ class CoWorker extends Model
             '57' => ['iso' => 'co', 'local' => null],         // Colombia
             '58' => ['iso' => 've', 'local' => null],         // Venezuela
             '51' => ['iso' => 'pe', 'local' => null],         // Peru
-            
+
             // Europe
             '44' => ['iso' => 'gb', 'local' => 'uk'],         // UK
             '33' => ['iso' => 'fr', 'local' => 'french'],     // France
@@ -140,7 +139,7 @@ class CoWorker extends Model
             '40' => ['iso' => 'ro', 'local' => null],         // Romania
             '36' => ['iso' => 'hu', 'local' => null],        // Hungary
             '7' => ['iso' => 'ru', 'local' => null],          // Russia/Kazakhstan
-            
+
             // Asia
             '86' => ['iso' => 'cn', 'local' => 'china'],      // China
             '81' => ['iso' => 'jp', 'local' => null],         // Japan
@@ -175,11 +174,11 @@ class CoWorker extends Model
             '852' => ['iso' => 'hk', 'local' => null],        // Hong Kong
             '853' => ['iso' => 'mo', 'local' => null],       // Macau
             '886' => ['iso' => 'tw', 'local' => null],       // Taiwan
-            
+
             // Oceania
             '61' => ['iso' => 'au', 'local' => 'aus'],       // Australia
             '64' => ['iso' => 'nz', 'local' => null],        // New Zealand
-            
+
             // Africa
             '27' => ['iso' => 'za', 'local' => 's-africa'],  // South Africa
             '20' => ['iso' => 'eg', 'local' => null],        // Egypt

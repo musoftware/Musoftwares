@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
 use App\Services\UserMergeService;
 use Illuminate\Console\Command;
 use Throwable;
@@ -22,8 +21,8 @@ class MergeUsersCommand extends Command
     public function handle(UserMergeService $service): int
     {
         $survivorId = (int) $this->argument('survivor');
-        $adminId    = (int) ($this->option('admin') ?? 0);
-        $dryRun     = (bool) $this->option('dry-run');
+        $adminId = (int) ($this->option('admin') ?? 0);
+        $dryRun = (bool) $this->option('dry-run');
 
         $duplicates = $this->argument('duplicates');
         $duplicates = is_array($duplicates) ? $duplicates : [$duplicates];
@@ -40,16 +39,18 @@ class MergeUsersCommand extends Command
 
         if ($duplicateIds === []) {
             $this->error('At least one duplicate user id is required.');
+
             return self::FAILURE;
         }
 
         $allConflicts = [];
-        $allCounts    = [];
+        $allCounts = [];
         foreach ($duplicateIds as $duplicateId) {
             try {
                 $preview = $service->preview($survivorId, $duplicateId);
             } catch (Throwable $e) {
                 $this->error("Preview for duplicate #{$duplicateId} failed: {$e->getMessage()}");
+
                 return self::FAILURE;
             }
 
@@ -79,14 +80,16 @@ class MergeUsersCommand extends Command
 
         if ($dryRun) {
             $this->warn('Dry-run mode: no writes performed.');
+
             return self::SUCCESS;
         }
 
         $resolutions = $this->collectResolutions($allConflicts);
 
-        if (!$this->option('yes')) {
-            if (!$this->confirm('Proceed with merging duplicates into survivor?')) {
+        if (! $this->option('yes')) {
+            if (! $this->confirm('Proceed with merging duplicates into survivor?')) {
                 $this->warn('Aborted.');
+
                 return self::SUCCESS;
             }
         }
@@ -94,7 +97,8 @@ class MergeUsersCommand extends Command
         try {
             $outcomes = $service->mergeMany($survivorId, $duplicateIds, $resolutions, $adminId);
         } catch (Throwable $e) {
-            $this->error('Merge failed: ' . $e->getMessage());
+            $this->error('Merge failed: '.$e->getMessage());
+
             return self::FAILURE;
         }
 
@@ -102,6 +106,7 @@ class MergeUsersCommand extends Command
             $aliasNote = $o['alias_added'] ? ' (email preserved as alias)' : '';
             $this->info("Duplicate #{$o['duplicate_id']}: {$o['status']}{$aliasNote}");
         }
+
         return self::SUCCESS;
     }
 
@@ -114,8 +119,9 @@ class MergeUsersCommand extends Command
         $resolutions = [];
 
         foreach ($this->option('field') ?? [] as $entry) {
-            if (!str_contains($entry, '=')) {
+            if (! str_contains($entry, '=')) {
                 $this->warn("Skipping invalid --field entry: {$entry}");
+
                 continue;
             }
             [$field, $value] = explode('=', $entry, 2);
@@ -128,7 +134,7 @@ class MergeUsersCommand extends Command
             }
         }
 
-        if ($resolutions === [] && $conflicts !== [] && !$this->option('yes')) {
+        if ($resolutions === [] && $conflicts !== [] && ! $this->option('yes')) {
             foreach ($conflicts as $field => $vals) {
                 $choice = $this->choice(
                     "Conflict on '{$field}' — survivor={$vals['survivor']} duplicate={$vals['duplicate']}",

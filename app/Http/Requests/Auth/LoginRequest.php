@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -10,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Models\User;
 
 class LoginRequest extends FormRequest
 {
@@ -46,8 +46,8 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         $identifier = (string) $this->input('email');
-        $password   = (string) $this->input('password');
-        $remember   = $this->boolean('remember');
+        $password = (string) $this->input('password');
+        $remember = $this->boolean('remember');
 
         $user = User::findForLogin($identifier);
 

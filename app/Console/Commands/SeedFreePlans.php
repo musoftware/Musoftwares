@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ModulePlan;
 use Illuminate\Console\Command;
 
 class SeedFreePlans extends Command
@@ -25,10 +26,10 @@ class SeedFreePlans extends Command
      */
     public function handle()
     {
-        $modules = ['erp', 'freelance', 'marketing', 'marketplace', 'booking', 'intelligence'];
+        $modules = ['erp', 'marketing', 'marketplace', 'booking', 'intelligence'];
 
         foreach ($modules as $module) {
-            \App\Models\ModulePlan::firstOrCreate(
+            ModulePlan::firstOrCreate(
                 ['module' => $module, 'name' => 'Free Trial'],
                 [
                     'price' => 0.00,
@@ -39,7 +40,7 @@ class SeedFreePlans extends Command
                         'tasks' => -1,
                         'team_members' => 2,
                         'connects' => 50,
-                        'commission_rate' => 10.0
+                        'commission_rate' => 10.0,
                     ],
                     'is_active' => true,
                 ]

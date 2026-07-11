@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Models\UserLoan;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User;
 
 class UserLoanPolicy
 {
@@ -15,6 +15,7 @@ class UserLoanPolicy
         if ($user->isAdmin()) {
             return true;
         }
+
         return null;
     }
 

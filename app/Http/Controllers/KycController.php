@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\KycDocument;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,9 +17,9 @@ class KycController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         // Get user's uploaded documents
-        $documents = $user->kycDocuments()->latest()->get()->map(function($doc) {
+        $documents = $user->kycDocuments()->latest()->get()->map(function ($doc) {
             return [
                 'id' => $doc->id,
                 'document_type' => $doc->document_type,
@@ -30,12 +30,12 @@ class KycController extends Controller
                 'created_at' => $doc->created_at->diffForHumans(),
             ];
         });
-        
+
         // Check if all required documents are uploaded
         $requiredDocs = ['id_front', 'selfie'];
         $uploadedTypes = $documents->pluck('document_type')->toArray();
         $missingDocs = array_values(array_diff($requiredDocs, $uploadedTypes));
-        
+
         return Inertia::render('Client/Kyc/Index', [
             'kycStatus' => [
                 'isVerified' => (bool) $user->kyc_verified,
@@ -48,7 +48,7 @@ class KycController extends Controller
             'requiredDocs' => $requiredDocs,
         ]);
     }
-    
+
     /**
      * Upload KYC document
      */
@@ -78,7 +78,7 @@ class KycController extends Controller
 
         // Store the file
         $file = $request->file('document');
-        $filename = $user->id . '_' . $request->document_type . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filename = $user->id.'_'.$request->document_type.'_'.time().'.'.$file->getClientOriginalExtension();
         $path = $file->storeAs('kyc_documents', $filename, 'private');
 
         // Create document record
@@ -111,14 +111,14 @@ class KycController extends Controller
         $uploadedDocs = $user->kycDocuments()->pluck('document_type')->toArray();
         $missingDocs = array_diff($requiredDocs, $uploadedDocs);
 
-        if (!empty($missingDocs)) {
+        if (! empty($missingDocs)) {
             return back()->withErrors(['kyc' => 'You must upload all required documents (ID Front, Selfie) before submitting.']);
         }
 
         // Update user to indicate KYC submission
         $user->update([
             'kyc_provider' => 'Self-Hosted',
-            'kyc_notes' => 'KYC documents submitted for review on ' . now()->format('Y-m-d H:i:s'),
+            'kyc_notes' => 'KYC documents submitted for review on '.now()->format('Y-m-d H:i:s'),
         ]);
 
         return back()->with('success', __('general.kyc_application_submitted_successfully_we_will_review_it_shortly'));
@@ -130,7 +130,7 @@ class KycController extends Controller
     public function deleteDocument($id)
     {
         $document = KycDocument::findOrFail($id);
-        
+
         // Security check
         if ($document->user_id !== Auth::id()) {
             abort(403);
@@ -142,7 +142,7 @@ class KycController extends Controller
 
         // Delete file from storage
         Storage::disk('private')->delete($document->file_path);
-        
+
         // Delete record
         $document->delete();
 
@@ -157,7 +157,7 @@ class KycController extends Controller
         $document = KycDocument::findOrFail($id);
 
         // Security check (only owner or admin)
-        if ($document->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        if ($document->user_id !== Auth::id() && ! Auth::user()->isAdmin()) {
             abort(403);
         }
 

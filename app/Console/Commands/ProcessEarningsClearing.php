@@ -50,7 +50,7 @@ class ProcessEarningsClearing extends Command
 
                     // If it's a direct referred-invoice commission
                     if ($earn->referred_invoice_id) {
-                        $description = 'Referral Commission — Invoice #' . $earn->referred_invoice_id;
+                        $description = 'Referral Commission — Invoice #'.$earn->referred_invoice_id;
                     }
 
                     // Move earning to user wallet
@@ -72,7 +72,7 @@ class ProcessEarningsClearing extends Command
 
                 $processed++;
             } catch (\Throwable $e) {
-                Log::error('ProcessEarningsClearing: Failed to process earning #' . $earn->id, [
+                Log::error('ProcessEarningsClearing: Failed to process earning #'.$earn->id, [
                     'error' => $e->getMessage(),
                 ]);
             }

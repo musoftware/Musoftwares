@@ -16,7 +16,7 @@ class GenerateAICampaignRequest extends FormRequest
         return [
             'context' => 'required|string',
             'tone' => 'required|string',
-            'type' => 'required|in:email,whatsapp,mixed'
+            'type' => 'required|in:email,whatsapp,mixed',
         ];
     }
 }

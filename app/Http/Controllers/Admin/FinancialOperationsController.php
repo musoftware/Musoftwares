@@ -2,11 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\BalancesHelper;
 use App\Http\Controllers\Controller;
+use App\Models\AdminSettings;
 use App\Models\CostTransaction;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\ExpenseBudget;
+use App\Models\Invoice;
+use App\Models\Project;
+use App\Models\RecurringCost;
+use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class FinancialOperationsController extends Controller
 {
@@ -21,7 +33,7 @@ class FinancialOperationsController extends Controller
         $sortDir = $request->query('sort_dir', 'desc');
 
         $allowedSortBy = ['created_at', 'amount', 'reason', 'due_date', 'status'];
-        if (!in_array($sortBy, $allowedSortBy)) {
+        if (! in_array($sortBy, $allowedSortBy)) {
             $sortBy = 'created_at';
         }
         $sortDir = strtolower($sortDir) === 'asc' ? 'asc' : 'desc';
@@ -31,10 +43,10 @@ class FinancialOperationsController extends Controller
         $calendarEvents = [];
 
         if ($currentTab === 'calendar') {
-            $startDate = \Carbon\Carbon::create($year, $month, 1)->startOfMonth()->startOfWeek(\Carbon\Carbon::MONDAY);
-            $endDate = \Carbon\Carbon::create($year, $month, 1)->endOfMonth()->endOfWeek(\Carbon\Carbon::SUNDAY);
+            $startDate = Carbon::create($year, $month, 1)->startOfMonth()->startOfWeek(Carbon::MONDAY);
+            $endDate = Carbon::create($year, $month, 1)->endOfMonth()->endOfWeek(Carbon::SUNDAY);
 
-            $incomeList = \App\Models\Transaction::with(['user', 'project'])
+            $incomeList = Transaction::with(['user', 'project'])
                 ->whereIn('type', ['received', 'refunded', 'sent'])
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->get();
@@ -43,7 +55,7 @@ class FinancialOperationsController extends Controller
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->get();
 
-            $currencies = \App\Models\Currency::as_array();
+            $currencies = Currency::as_array();
 
             foreach ($incomeList as $entry) {
                 $dateStr = $entry->created_at->toDateString();
@@ -97,18 +109,18 @@ class FinancialOperationsController extends Controller
                 ];
             }
 
-            $entries = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 50);
+            $entries = new LengthAwarePaginator([], 0, 50);
         } else {
             if ($currentTab === 'income') {
-                $entriesQuery = \App\Models\Transaction::with(['user', 'project'])->whereIn('type', ['received', 'refunded', 'sent']);
+                $entriesQuery = Transaction::with(['user', 'project'])->whereIn('type', ['received', 'refunded', 'sent']);
             } elseif ($currentTab === 'salaries') {
                 $entriesQuery = CostTransaction::with(['user', 'project'])->where('reason', 'salary');
             } elseif ($currentTab === 'projects') {
-                $entriesQuery = \App\Models\Project::with(['client', 'client_balance' => function($q) {
+                $entriesQuery = Project::with(['client', 'client_balance' => function ($q) {
                     $q->whereIn('type', ['received', 'earned']);
                 }, 'cost_transactions']);
             } elseif ($currentTab === 'budgets') {
-                $entriesQuery = \App\Models\ExpenseBudget::with('currency');
+                $entriesQuery = ExpenseBudget::with('currency');
             } else {
                 // Default: expenses (excluding salaries)
                 $entriesQuery = CostTransaction::with(['user', 'project'])->where('reason', '!=', 'salary');
@@ -118,7 +130,7 @@ class FinancialOperationsController extends Controller
                 // Apply filters
                 if ($currentTab !== 'projects' && $currentTab !== 'budgets') {
                     if ($search) {
-                        $entriesQuery->where(function($q) use ($search) {
+                        $entriesQuery->where(function ($q) use ($search) {
                             $q->where('reason', 'like', "%{$search}%");
                         });
                     }
@@ -126,16 +138,16 @@ class FinancialOperationsController extends Controller
                         if ($currentTab === 'income') {
                             $entriesQuery->where('reason', $category);
                         } else {
-                            $entriesQuery->where(function($q) use ($category) {
+                            $entriesQuery->where(function ($q) use ($category) {
                                 $q->where('reason', $category)
-                                  ->orWhereExists(function ($sub) use ($category) {
-                                      $sub->select(\Illuminate\Support\Facades\DB::raw(1))
-                                          ->from('recurring_cost_transactions')
-                                          ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
-                                          ->whereColumn('recurring_cost_transactions.cost_transaction_id', 'cost_transactions.id')
-                                          ->where('recurring_costs.reason', $category);
-                                  });
-                              });
+                                    ->orWhereExists(function ($sub) use ($category) {
+                                        $sub->select(DB::raw(1))
+                                            ->from('recurring_cost_transactions')
+                                            ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
+                                            ->whereColumn('recurring_cost_transactions.cost_transaction_id', 'cost_transactions.id')
+                                            ->where('recurring_costs.reason', $category);
+                                    });
+                            });
                         }
                     }
                     if ($status) {
@@ -145,19 +157,23 @@ class FinancialOperationsController extends Controller
                         $entriesQuery->where('user_id', $userId);
                     }
                     $entriesQuery->orderBy($sortBy, $sortDir);
-                } else if ($currentTab === 'projects') {
-                    if ($search) { $entriesQuery->where('project_name', 'like', "%{$search}%"); }
+                } elseif ($currentTab === 'projects') {
+                    if ($search) {
+                        $entriesQuery->where('project_name', 'like', "%{$search}%");
+                    }
                     $entriesQuery->orderBy('id', 'desc');
-                } else if ($currentTab === 'budgets') {
-                    if ($search) { $entriesQuery->where('category', 'like', "%{$search}%"); }
+                } elseif ($currentTab === 'budgets') {
+                    if ($search) {
+                        $entriesQuery->where('category', 'like', "%{$search}%");
+                    }
                     $entriesQuery->orderBy('id', 'desc');
                 }
 
                 $entries = $entriesQuery->paginate(50)->withQueryString();
             }
 
-            $currencies = \App\Models\Currency::as_array();
-            
+            $currencies = Currency::as_array();
+
             if ($currentTab !== 'projects' && $currentTab !== 'budgets') {
                 $entries->getCollection()->transform(function ($entry) use ($currentTab, $currencies) {
                     $currId = $entry->currency_id ?? $entry->currency;
@@ -171,12 +187,12 @@ class FinancialOperationsController extends Controller
 
                     if ($entry instanceof CostTransaction) {
                         try {
-                            $recTx = \Illuminate\Support\Facades\DB::table('recurring_cost_transactions')
+                            $recTx = DB::table('recurring_cost_transactions')
                                 ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
                                 ->where('recurring_cost_transactions.cost_transaction_id', $entry->id)
                                 ->select('recurring_costs.title as source_title', 'recurring_costs.reason as source_reason')
                                 ->first();
-                            
+
                             if ($recTx) {
                                 $isRecurring = true;
                                 $categoryName = $recTx->source_reason;
@@ -203,14 +219,15 @@ class FinancialOperationsController extends Controller
                         'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->name] : null,
                         'created_at' => $entry->created_at,
 
-                        'type' => $entry instanceof \App\Models\Transaction ? $entry->type : ($entry->reason === 'salary' ? 'salary' : 'expense'),
+                        'type' => $entry instanceof Transaction ? $entry->type : ($entry->reason === 'salary' ? 'salary' : 'expense'),
                     ];
                 });
-            } else if ($currentTab === 'projects') {
+            } elseif ($currentTab === 'projects') {
                 $entries->getCollection()->transform(function ($project) {
                     $revenue = $project->client_balance->sum('business_amount');
                     $costs = $project->cost_transactions->sum('business_amount');
                     $margin = $revenue > 0 ? (($revenue - $costs) / $revenue) * 100 : 0;
+
                     return [
                         'id' => $project->id,
                         'name' => $project->project_name,
@@ -219,15 +236,16 @@ class FinancialOperationsController extends Controller
                         'costs' => $costs,
                         'margin' => round($margin, 2),
                         'profit' => $revenue - $costs,
-                        'type' => 'project'
+                        'type' => 'project',
                     ];
                 });
-            } else if ($currentTab === 'budgets') {
-                $entries->getCollection()->transform(function ($budget) use ($currencies) {
-                    $spent = \App\Models\CostTransaction::where('reason', $budget->category)
+            } elseif ($currentTab === 'budgets') {
+                $entries->getCollection()->transform(function ($budget) {
+                    $spent = CostTransaction::where('reason', $budget->category)
                         ->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year)
                         ->sum('amount');
+
                     return [
                         'id' => $budget->id,
                         'category' => $budget->category,
@@ -236,21 +254,21 @@ class FinancialOperationsController extends Controller
                         'period' => $budget->period,
                         'notify_on_exceed' => $budget->notify_on_exceed,
                         'currency_symbol' => $budget->currency ? $budget->currency->symbol : '$',
-                        'type' => 'budget'
+                        'type' => 'budget',
                     ];
                 });
             }
         }
 
         if ($currentTab === 'income') {
-            $categories = \App\Models\Transaction::select('reason')->distinct()->pluck('reason')->filter()->values()->map(function($item) {
+            $categories = Transaction::select('reason')->distinct()->pluck('reason')->filter()->values()->map(function ($item) {
                 return ['id' => $item, 'name' => ucfirst($item)];
             });
         } else {
             $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
-            $recurringReasons = \App\Models\RecurringCost::select('reason')->distinct()->pluck('reason');
-            
-            $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values()->map(function($item) {
+            $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
+
+            $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values()->map(function ($item) {
                 return ['id' => $item, 'name' => ucfirst($item)];
             });
         }
@@ -259,26 +277,27 @@ class FinancialOperationsController extends Controller
             'entries' => $entries,
             'categories' => $categories,
             'filters' => $request->only(['type', 'category', 'status', 'user_id', 'search', 'sort_by', 'sort_dir']),
-            'all_currencies' => \App\Models\Currency::all(),
+            'all_currencies' => Currency::all(),
             'stats' => [
                 'total_monthly_expenses' => CostTransaction::whereYear('created_at', now()->year)
                     ->whereMonth('created_at', now()->month)
                     ->where('reason', '!=', 'salary')
                     ->sum('business_amount'),
-                'total_monthly_income' => (function() {
-                    $incomeQuery = \App\Models\Transaction::whereYear('created_at', now()->year)
+                'total_monthly_income' => (function () {
+                    $incomeQuery = Transaction::whereYear('created_at', now()->year)
                         ->whereMonth('created_at', now()->month);
                     $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
                     $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
                     $sent = (clone $incomeQuery)->where('type', 'sent')->sum('business_amount') ?? 0;
+
                     return max(0, abs($received) - abs($refunded) - abs($sent));
                 })(),
                 'total_monthly_salaries' => CostTransaction::whereYear('created_at', now()->year)
                     ->whereMonth('created_at', now()->month)
                     ->where('reason', 'salary')
                     ->sum('business_amount'),
-                'total_monthly_net_profit' => (function() {
-                    $incomeQuery = \App\Models\Transaction::whereYear('created_at', now()->year)
+                'total_monthly_net_profit' => (function () {
+                    $incomeQuery = Transaction::whereYear('created_at', now()->year)
                         ->whereMonth('created_at', now()->month);
                     $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
                     $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
@@ -291,17 +310,19 @@ class FinancialOperationsController extends Controller
 
                     return $net_revenue - abs($expenses);
                 })(),
-                'business_currency_code' => (function() {
-                    $bCurrencyId = \App\Models\AdminSettings::business_currency();
-                    $bCurrency = \App\Models\Currency::find($bCurrencyId);
+                'business_currency_code' => (function () {
+                    $bCurrencyId = AdminSettings::business_currency();
+                    $bCurrency = Currency::find($bCurrencyId);
+
                     return $bCurrency ? $bCurrency->currency : 'EGP';
                 })(),
-                'business_currency_symbol' => (function() {
-                    $bCurrencyId = \App\Models\AdminSettings::business_currency();
-                    $bCurrency = \App\Models\Currency::find($bCurrencyId);
+                'business_currency_symbol' => (function () {
+                    $bCurrencyId = AdminSettings::business_currency();
+                    $bCurrency = Currency::find($bCurrencyId);
+
                     return $bCurrency ? $bCurrency->symbol : 'e£';
                 })(),
-                'monthly_trends' => (function() {
+                'monthly_trends' => (function () {
                     $trends = [];
                     for ($i = 5; $i >= 0; $i--) {
                         $date = now()->subMonths($i);
@@ -310,15 +331,15 @@ class FinancialOperationsController extends Controller
                         $monthName = $date->format('M Y');
 
                         // Income
-                        $received = \App\Models\Transaction::whereYear('created_at', $year)
+                        $received = Transaction::whereYear('created_at', $year)
                             ->whereMonth('created_at', $month)
                             ->where('type', 'received')
                             ->sum('business_amount') ?? 0;
-                        $refunded = \App\Models\Transaction::whereYear('created_at', $year)
+                        $refunded = Transaction::whereYear('created_at', $year)
                             ->whereMonth('created_at', $month)
                             ->where('type', 'refunded')
                             ->sum('business_amount') ?? 0;
-                        $sent = \App\Models\Transaction::whereYear('created_at', $year)
+                        $sent = Transaction::whereYear('created_at', $year)
                             ->whereMonth('created_at', $month)
                             ->where('type', 'sent')
                             ->sum('business_amount') ?? 0;
@@ -340,49 +361,55 @@ class FinancialOperationsController extends Controller
 
                         $trends[] = [
                             'month' => $monthName,
-                            'income' => (float)$income,
-                            'expenses' => (float)abs($expenses),
-                            'payroll' => (float)abs($salaries),
-                            'net_profit' => (float)$net_profit,
+                            'income' => (float) $income,
+                            'expenses' => (float) abs($expenses),
+                            'payroll' => (float) abs($salaries),
+                            'net_profit' => (float) $net_profit,
                         ];
                     }
+
                     return $trends;
                 })(),
-                'forecast_receivables' => (function() {
-                    $invoices = \App\Models\Invoice::whereIn('status', ['sent', 'partially_paid', 'unpaid', 'pending'])
+                'forecast_receivables' => (function () {
+                    $invoices = Invoice::whereIn('status', ['sent', 'partially_paid', 'unpaid', 'pending'])
                         ->get();
-                    
+
                     $total_outstanding = 0;
                     $thirty_days = 0;
                     $sixty_days = 0;
                     $ninety_days = 0;
-                    
+
                     foreach ($invoices as $inv) {
-                        $due = $inv->created_at ? \Carbon\Carbon::parse($inv->created_at)->addDays(30) : now()->addDays(30);
+                        $due = $inv->created_at ? Carbon::parse($inv->created_at)->addDays(30) : now()->addDays(30);
                         $amount = $inv->total ?? 0; // assuming total or unpaid
 
                         if (method_exists($inv, 'unpaidAmount')) {
                             $amount = $inv->unpaidAmount();
-                        } else if (isset($inv->unpaid)) {
+                        } elseif (isset($inv->unpaid)) {
                             $amount = $inv->unpaid;
                         }
-                        
+
                         $business_amount = $amount; // in a real scenario we convert this, but simple sum for now
                         try {
-                            $businessCurrencyId = \App\Models\AdminSettings::business_currency();
+                            $businessCurrencyId = AdminSettings::business_currency();
                             if ($inv->currency != $businessCurrencyId) {
-                                $business_amount = \App\Models\CurrenciesExchange::RateByDate(now(), $amount, $inv->currency, $businessCurrencyId);
+                                $business_amount = CurrenciesExchange::RateByDate(now(), $amount, $inv->currency, $businessCurrencyId);
                             }
-                        } catch (\Throwable $e) {}
+                        } catch (\Throwable $e) {
+                        }
 
                         $total_outstanding += $business_amount;
-                        
+
                         $days = now()->diffInDays($due, false);
-                        if ($days >= 0 && $days <= 30) $thirty_days += $business_amount;
-                        else if ($days > 30 && $days <= 60) $sixty_days += $business_amount;
-                        else if ($days > 60 && $days <= 90) $ninety_days += $business_amount;
+                        if ($days >= 0 && $days <= 30) {
+                            $thirty_days += $business_amount;
+                        } elseif ($days > 30 && $days <= 60) {
+                            $sixty_days += $business_amount;
+                        } elseif ($days > 60 && $days <= 90) {
+                            $ninety_days += $business_amount;
+                        }
                     }
-                    
+
                     return [
                         'total_outstanding' => $total_outstanding,
                         'next_30_days' => $thirty_days,
@@ -393,56 +420,57 @@ class FinancialOperationsController extends Controller
                 'expense_categories' => CostTransaction::whereYear('created_at', now()->year)
                     ->whereMonth('created_at', now()->month)
                     ->where('reason', '!=', 'salary')
-                    ->select('reason', \Illuminate\Support\Facades\DB::raw('SUM(business_amount) as total'))
+                    ->select('reason', DB::raw('SUM(business_amount) as total'))
                     ->groupBy('reason')
                     ->orderByDesc('total')
                     ->get()
-                    ->map(function($item) {
+                    ->map(function ($item) {
                         return [
                             'name' => ucfirst($item->reason ?: 'Other'),
-                            'value' => (float)$item->total
+                            'value' => (float) $item->total,
                         ];
                     })->values()->all(),
-                'income_categories' => \App\Models\Transaction::whereYear('created_at', now()->year)
+                'income_categories' => Transaction::whereYear('created_at', now()->year)
                     ->whereMonth('created_at', now()->month)
                     ->where('type', 'received')
-                    ->select('reason', \Illuminate\Support\Facades\DB::raw('SUM(business_amount) as total'))
+                    ->select('reason', DB::raw('SUM(business_amount) as total'))
                     ->groupBy('reason')
                     ->orderByDesc('total')
                     ->get()
-                    ->map(function($item) {
+                    ->map(function ($item) {
                         return [
                             'name' => ucfirst($item->reason ?: 'Other'),
-                            'value' => (float)$item->total
+                            'value' => (float) $item->total,
                         ];
                     })->values()->all(),
-                'status_distribution' => (function() use ($currentTab) {
+                'status_distribution' => (function () use ($currentTab) {
                     if ($currentTab === 'income') {
-                        return \App\Models\Transaction::whereYear('created_at', now()->year)
+                        return Transaction::whereYear('created_at', now()->year)
                             ->whereMonth('created_at', now()->month)
-                            ->select('status', \Illuminate\Support\Facades\DB::raw('COUNT(*) as count'), \Illuminate\Support\Facades\DB::raw('SUM(business_amount) as total'))
+                            ->select('status', DB::raw('COUNT(*) as count'), DB::raw('SUM(business_amount) as total'))
                             ->groupBy('status')
                             ->get()
-                            ->map(function($item) {
+                            ->map(function ($item) {
                                 return [
                                     'status' => ucfirst($item->status ?: 'completed'),
-                                    'count' => (int)$item->count,
-                                    'amount' => (float)$item->total
+                                    'count' => (int) $item->count,
+                                    'amount' => (float) $item->total,
                                 ];
                             })->values()->all();
                     } else {
                         $reasonOp = $currentTab === 'salaries' ? '=' : '!=';
+
                         return CostTransaction::whereYear('created_at', now()->year)
                             ->whereMonth('created_at', now()->month)
                             ->where('reason', $reasonOp, 'salary')
-                            ->select('status', \Illuminate\Support\Facades\DB::raw('COUNT(*) as count'), \Illuminate\Support\Facades\DB::raw('SUM(business_amount) as total'))
+                            ->select('status', DB::raw('COUNT(*) as count'), DB::raw('SUM(business_amount) as total'))
                             ->groupBy('status')
                             ->get()
-                            ->map(function($item) {
+                            ->map(function ($item) {
                                 return [
                                     'status' => ucfirst($item->status ?: 'completed'),
-                                    'count' => (int)$item->count,
-                                    'amount' => (float)$item->total
+                                    'count' => (int) $item->count,
+                                    'amount' => (float) $item->total,
                                 ];
                             })->values()->all();
                     }
@@ -478,10 +506,10 @@ class FinancialOperationsController extends Controller
         $status = $request->input('status', 'completed');
         $dueDate = $request->input('due_date');
         $userId = $request->input('user_id');
-        $transactionDate = $request->input('transaction_date') ? \Carbon\Carbon::parse($request->input('transaction_date')) : now();
+        $transactionDate = $request->input('transaction_date') ? Carbon::parse($request->input('transaction_date')) : now();
 
         if ($request->input('is_recurring') && $type !== 'income') {
-            $recurringCost = new \App\Models\RecurringCost();
+            $recurringCost = new RecurringCost;
             $recurringCost->title = $request->input('title');
             $recurringCost->amount = $request->input('amount');
             $recurringCost->currency_id = $currencyId;
@@ -501,12 +529,12 @@ class FinancialOperationsController extends Controller
                 $cost->save();
 
                 $recurringCost->transactions()->attach($cost->id, [
-                    'unique_id' => $recurringCost->id . '-' . $transactionDate->format('Y-m-d')
+                    'unique_id' => $recurringCost->id.'-'.$transactionDate->format('Y-m-d'),
                 ]);
             }
         } else {
             if ($type === 'income') {
-                $t = new \App\Models\Transaction();
+                $t = new Transaction;
                 $t->user_id = $userId;
                 $t->amount = $request->input('amount');
                 $t->reason = $request->input('title');
@@ -529,12 +557,12 @@ class FinancialOperationsController extends Controller
         }
 
         if ($userId) {
-            $user = \App\Models\User::find($userId);
+            $user = User::find($userId);
             if ($user) {
                 if ($type === 'income') {
-                    \App\Helpers\BalancesHelper::UpdateBalance($user);
+                    BalancesHelper::UpdateBalance($user);
                 } else {
-                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                    BalancesHelper::instance()->CalcCostBalance($user);
                 }
             }
         }
@@ -556,12 +584,12 @@ class FinancialOperationsController extends Controller
         $status = $request->input('status', 'completed');
         $dueDate = $request->input('due_date');
         $userId = $request->input('user_id');
-        $transactionDate = $request->input('transaction_date') ? \Carbon\Carbon::parse($request->input('transaction_date')) : now();
+        $transactionDate = $request->input('transaction_date') ? Carbon::parse($request->input('transaction_date')) : now();
 
         $oldUserId = null;
 
         if ($type === 'income') {
-            $transaction = \App\Models\Transaction::find($id);
+            $transaction = Transaction::find($id);
             if ($transaction) {
                 $oldUserId = $transaction->user_id;
                 $transaction->user_id = $userId;
@@ -589,22 +617,22 @@ class FinancialOperationsController extends Controller
         }
 
         if ($oldUserId) {
-            $oldUser = \App\Models\User::find($oldUserId);
+            $oldUser = User::find($oldUserId);
             if ($oldUser) {
                 if ($type === 'income') {
-                    \App\Helpers\BalancesHelper::UpdateBalance($oldUser);
+                    BalancesHelper::UpdateBalance($oldUser);
                 } else {
-                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($oldUser);
+                    BalancesHelper::instance()->CalcCostBalance($oldUser);
                 }
             }
         }
         if ($userId && $userId != $oldUserId) {
-            $newUser = \App\Models\User::find($userId);
+            $newUser = User::find($userId);
             if ($newUser) {
                 if ($type === 'income') {
-                    \App\Helpers\BalancesHelper::UpdateBalance($newUser);
+                    BalancesHelper::UpdateBalance($newUser);
                 } else {
-                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($newUser);
+                    BalancesHelper::instance()->CalcCostBalance($newUser);
                 }
             }
         }
@@ -618,7 +646,7 @@ class FinancialOperationsController extends Controller
         $oldUserId = null;
 
         if ($type === 'income') {
-            $transaction = \App\Models\Transaction::find($id);
+            $transaction = Transaction::find($id);
             if ($transaction) {
                 $oldUserId = $transaction->user_id;
                 if (method_exists($transaction, 'delete_with_balance')) {
@@ -636,16 +664,16 @@ class FinancialOperationsController extends Controller
         }
 
         if ($oldUserId) {
-            $user = \App\Models\User::find($oldUserId);
+            $user = User::find($oldUserId);
             if ($user) {
                 if ($type === 'income') {
-                    \App\Helpers\BalancesHelper::UpdateBalance($user);
+                    BalancesHelper::UpdateBalance($user);
                 } else {
-                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                    BalancesHelper::instance()->CalcCostBalance($user);
                 }
             }
         }
-        
+
         return redirect()->back()->with('success', __('general.ledger_entry_deleted_successfully'));
     }
 
@@ -655,7 +683,7 @@ class FinancialOperationsController extends Controller
         $userId = null;
 
         if ($type === 'income') {
-            $transaction = \App\Models\Transaction::find($id);
+            $transaction = Transaction::find($id);
             if ($transaction) {
                 $transaction->status = 'completed';
                 $transaction->save();
@@ -671,12 +699,12 @@ class FinancialOperationsController extends Controller
         }
 
         if ($userId) {
-            $user = \App\Models\User::find($userId);
+            $user = User::find($userId);
             if ($user) {
                 if ($type === 'income') {
-                    \App\Helpers\BalancesHelper::UpdateBalance($user);
+                    BalancesHelper::UpdateBalance($user);
                 } else {
-                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                    BalancesHelper::instance()->CalcCostBalance($user);
                 }
             }
         }
@@ -691,40 +719,40 @@ class FinancialOperationsController extends Controller
         $year = $request->query('year', now()->year);
 
         $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=finance_{$type}_{$year}_{$month}.csv",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=finance_{$type}_{$year}_{$month}.csv",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
-        $callback = function() use ($type, $month, $year) {
+        $callback = function () use ($type, $month, $year) {
             $file = fopen('php://output', 'w');
-            
+
             if ($type === 'pnl') {
                 fputcsv($file, ['Category', 'Type', 'Business Amount']);
-                
+
                 // Income
-                $incomeQuery = \App\Models\Transaction::whereYear('created_at', $year)
+                $incomeQuery = Transaction::whereYear('created_at', $year)
                     ->whereMonth('created_at', $month);
-                
+
                 $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
                 $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
                 $sent = (clone $incomeQuery)->where('type', 'sent')->sum('business_amount') ?? 0;
-                
+
                 $net_revenue = max(0, abs($received) - abs($refunded) - abs($sent));
 
                 fputcsv($file, ['Gross Income', 'Income', abs($received)]);
                 fputcsv($file, ['Refunds/Sent', 'Income Deduction', -(abs($refunded) + abs($sent))]);
                 fputcsv($file, ['Net Revenue', 'Income', $net_revenue]);
-                
+
                 // Expenses
-                $expenses = \App\Models\CostTransaction::whereYear('created_at', $year)
+                $expenses = CostTransaction::whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
-                    ->select('reason', \Illuminate\Support\Facades\DB::raw('SUM(business_amount) as total'))
+                    ->select('reason', DB::raw('SUM(business_amount) as total'))
                     ->groupBy('reason')
                     ->get();
-                
+
                 $total_expenses = 0;
                 foreach ($expenses as $exp) {
                     fputcsv($file, [ucfirst($exp->reason), 'Expense', -abs($exp->total)]);
@@ -734,22 +762,22 @@ class FinancialOperationsController extends Controller
                 fputcsv($file, ['Net Profit', 'Profit', $net_revenue - $total_expenses]);
             } else {
                 fputcsv($file, ['Date', 'Title', 'Type', 'Category', 'Original Amount', 'Currency', 'Business Amount']);
-                
-                $incomes = \App\Models\Transaction::with(['currency_info'])
+
+                $incomes = Transaction::with(['currency_info'])
                     ->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
                     ->whereIn('type', ['received', 'refunded', 'sent'])
                     ->get();
-                    
-                $costs = \App\Models\CostTransaction::with(['currency_info'])
+
+                $costs = CostTransaction::with(['currency_info'])
                     ->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
                     ->get();
-                    
+
                 $merged = $incomes->concat($costs)->sortByDesc('created_at')->values();
-                
+
                 foreach ($merged as $entry) {
-                    $typeStr = $entry instanceof \App\Models\Transaction ? 'Income (' . $entry->type . ')' : 'Expense';
+                    $typeStr = $entry instanceof Transaction ? 'Income ('.$entry->type.')' : 'Expense';
                     $currencyCode = $entry->currency_info ? $entry->currency_info->currency : 'SYS';
                     fputcsv($file, [
                         $entry->created_at->format('Y-m-d H:i'),
@@ -758,7 +786,7 @@ class FinancialOperationsController extends Controller
                         $entry->reason,
                         $entry->amount,
                         $currencyCode,
-                        $entry->business_amount
+                        $entry->business_amount,
                     ]);
                 }
             }

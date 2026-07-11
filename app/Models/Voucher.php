@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Carbon\Carbon;
 
 class Voucher extends Model
 {
@@ -60,7 +60,7 @@ class Voucher extends Model
     // Helper methods
     public function isActive(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -83,7 +83,7 @@ class Voucher extends Model
 
     public function canBeUsedByUser(User $user): bool
     {
-        if (!$this->isActive()) {
+        if (! $this->isActive()) {
             return false;
         }
 
@@ -109,4 +109,3 @@ class Voucher extends Model
         return (float) $this->reward_amount;
     }
 }
-

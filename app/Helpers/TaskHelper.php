@@ -2,23 +2,21 @@
 
 namespace App\Helpers;
 
-use App\Models\Freelance\Client;
-use App\Models\Freelance\Currency;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class TaskHelper
 {
     protected static $instance = null;
+
     protected static $support_obj = null;
 
     public static function instance(): ?TaskHelper
     {
         if (self::$instance === null) {
-            self::$instance = new TaskHelper();
+            self::$instance = new TaskHelper;
         }
+
         return self::$instance;
     }
 
@@ -28,9 +26,9 @@ class TaskHelper
         foreach (Task::query()->where('archived', '0')->get() as $task) {
             $tasks_count += $task->task_todo_items()->where('paused', '1')->count();
         }
+
         return $tasks_count;
     }
-
 
     public function arrange_tasks()
     {
@@ -40,10 +38,9 @@ class TaskHelper
         }
         $clients = $clients->get();
 
-        $tasks = array();
-        $sort = array();
+        $tasks = [];
+        $sort = [];
         foreach ($clients as $item) {
-
 
             $task_lists = $item->tasks()->where('archived', false)->get();
             foreach ($task_lists as $index => $container) {
@@ -55,20 +52,19 @@ class TaskHelper
         array_multisort($sort, $tasks);
         krsort($tasks);
 
-        $sort_data = array();
-        $clients = array();
+        $sort_data = [];
+        $clients = [];
 
         foreach ($tasks as $task) {
             $cl = $task->user;
             $clients[$cl->id] = $cl->name;
 
-            if (!isset($sort_data[$cl->id])) {
-                $sort_data[$cl->id] = array();
+            if (! isset($sort_data[$cl->id])) {
+                $sort_data[$cl->id] = [];
             }
             $sort_data[$cl->id][] = $task;
         }
 
         return compact('tasks', 'sort_data', 'clients');
     }
-
 }

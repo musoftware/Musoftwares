@@ -2,14 +2,17 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\ServiceProvider;
 
 abstract class BaseModuleServiceProvider extends ServiceProvider
 {
     protected string $name = '';
+
     protected string $nameLower = '';
+
     protected array $providers = [];
+
     protected array $commands = [];
 
     public function boot(): void

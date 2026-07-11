@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\AdminSettings;
 use App\Notifications\Traits\BuildsFcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,7 +28,7 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
             return $this->forceChannels;
         }
 
-        return \App\Models\AdminSettings::invoiceNotificationChannels('invoice_created');
+        return AdminSettings::invoiceNotificationChannels('invoice_created');
     }
 
     public function toMail(object $notifiable): MailMessage

@@ -2,22 +2,19 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Helpers\BalancesHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class UserReferralRequestWithdraw extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+
     protected $appends = [];
-
-
 
     public function user()
     {
@@ -38,6 +35,7 @@ class UserReferralRequestWithdraw extends Model
     {
         return $this->belongsTo(CostTransaction::class);
     }
+
     public function transaction()
     {
         return $this->belongsTo(Transaction::class);
@@ -63,7 +61,6 @@ class UserReferralRequestWithdraw extends Model
         return $this->user_payment_method ? $this->user_payment_method->type_name() : null;
     }
 
-
     public function method_details()
     {
         return $this->user_payment_method ? $this->user_payment_method->method_details() : null;
@@ -74,22 +71,21 @@ class UserReferralRequestWithdraw extends Model
         return CurrenciesExchange::RateToday($this->amount, $this->user->currency, $this->user_payment_method->currency);
     }
 
-
     public static function withdrawed_balance()
     {
         $data = static::query()->where('status', 'approved')->groupBy('currency_id')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
+
         return $amount;
     }
 
-
     public static function CreateWithdraw($payoutMethod, $amount)
     {
-        $new_withdraw = new UserReferralRequestWithdraw();
+        $new_withdraw = new UserReferralRequestWithdraw;
         $new_withdraw->user_id = $payoutMethod->user_id;
         $new_withdraw->currency = $payoutMethod->user->currency;
         $new_withdraw->payment_method = $payoutMethod->type_name();
@@ -102,7 +98,7 @@ class UserReferralRequestWithdraw extends Model
             $user = User::find($new_withdraw->user_id);
             $user->increment('withdrawing_commission', $new_withdraw->amount);
         });
-        
+
         return $new_withdraw;
     }
 
@@ -147,7 +143,9 @@ class UserReferralRequestWithdraw extends Model
 
     public static function two_field_increment($user, $field1, $field2, $old_status, $new_status, $amount)
     {
-        if ($old_status == $new_status) return;
+        if ($old_status == $new_status) {
+            return;
+        }
 
         if (($old_status == 'pending' || $old_status == 'reviewing') && $new_status == 'approved') {
             $user->increment($field1, $amount);

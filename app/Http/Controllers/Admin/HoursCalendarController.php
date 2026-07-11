@@ -13,15 +13,15 @@ class HoursCalendarController extends Controller
     public function index()
     {
         $isSqlite = DB::connection()->getDriverName() === 'sqlite';
-        $yearQuery = $isSqlite ? "strftime('%Y', date_start) as year" : "YEAR(date_start) as year";
-        
+        $yearQuery = $isSqlite ? "strftime('%Y', date_start) as year" : 'YEAR(date_start) as year';
+
         $years_lists = InvoiceItemTimer::select(DB::raw($yearQuery))
             ->whereNotNull('date_start')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
             ->toArray();
-            
+
         if (empty($years_lists)) {
             $years_lists = [date('Y')];
         }
@@ -34,19 +34,19 @@ class HoursCalendarController extends Controller
     public function getData(Request $request)
     {
         $invoice_item_timers = InvoiceItemTimer::query();
-        $selected_year = (int)$request->input('year', date('Y'));
+        $selected_year = (int) $request->input('year', date('Y'));
 
         $isSqlite = DB::connection()->getDriverName() === 'sqlite';
 
         if ($isSqlite) {
             $yearly = $invoice_item_timers->select(
-                DB::raw("CAST((julianday(invoice_item_timers.date_end) - julianday(invoice_item_timers.date_start)) * 86400 AS INTEGER) AS diff"),
+                DB::raw('CAST((julianday(invoice_item_timers.date_end) - julianday(invoice_item_timers.date_start)) * 86400 AS INTEGER) AS diff'),
                 DB::raw("strftime('%Y', invoice_item_timers.date_start) as year"),
                 DB::raw("strftime('%m', invoice_item_timers.date_start) as month"),
                 DB::raw("strftime('%d', invoice_item_timers.date_start) as day")
             )
                 ->where(DB::raw('invoice_item_timers.date_end'), '>', DB::raw('invoice_item_timers.date_start'))
-                ->where(DB::raw("strftime('%Y', invoice_item_timers.date_start)"), (string)$selected_year)
+                ->where(DB::raw("strftime('%Y', invoice_item_timers.date_start)"), (string) $selected_year)
                 ->orderBy('invoice_item_timers.id', 'desc')
                 ->get();
         } else {
@@ -64,11 +64,11 @@ class HoursCalendarController extends Controller
 
         $merge = [];
         foreach ($yearly as $w) {
-            $mm = str_pad($w['month'], 2, "0", STR_PAD_LEFT);
-            $dd = str_pad($w['day'], 2, "0", STR_PAD_LEFT);
+            $mm = str_pad($w['month'], 2, '0', STR_PAD_LEFT);
+            $dd = str_pad($w['day'], 2, '0', STR_PAD_LEFT);
             $date = "{$w['year']}-{$mm}-{$dd}";
 
-            if (!isset($merge[$date])) {
+            if (! isset($merge[$date])) {
                 $merge[$date] = 0;
             }
             $merge[$date] += round($w['diff'] / 60 / 60, 3);
@@ -77,11 +77,11 @@ class HoursCalendarController extends Controller
         $data = [];
         foreach ($merge as $date => $work_seconds) {
             $data[] = [
-                'date' => $date, 
-                'count' => round($work_seconds, 3)
+                'date' => $date,
+                'count' => round($work_seconds, 3),
             ];
         }
-        
+
         return response()->json($data);
     }
 }

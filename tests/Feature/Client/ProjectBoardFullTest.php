@@ -876,6 +876,11 @@ class ProjectBoardFullTest extends TestCase
             'user_id' => $client->id,
             'title' => 'Reschedule me',
             'inDate' => $today,
+            'completed' => false,
+            'paused' => false,
+            'priority' => 'normal',
+            'priorityColor' => 'gray',
+            'tags' => [],
         ]);
         $project->boardItems()->create([
             'for_date' => $today,

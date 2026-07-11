@@ -2,18 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Models\CurrenciesExchange;
-use App\Models\Currency;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
 class ActionHelper
 {
     public static function create_action($user, $action_name)
     {
         return $user->actions()->firstOrCreate([
-            'action_name' => $action_name
+            'action_name' => $action_name,
         ], [
 
         ]);
@@ -33,6 +27,4 @@ class ActionHelper
 
         return $action->id;
     }
-
-
 }

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectBoardCategory;
+use App\Services\ProjectBoardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 /**
  * Admin-only management for a project's board categories. Clients cannot create custom categories —
@@ -21,7 +21,7 @@ class BoardCategoryController extends Controller
     {
         $this->authorize('view', $project);
 
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         return response()->json([
             'ok' => true,

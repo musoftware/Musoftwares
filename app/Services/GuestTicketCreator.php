@@ -13,20 +13,18 @@ use Illuminate\Support\Facades\Notification;
 
 class GuestTicketCreator extends BaseService
 {
-    public function __construct(private readonly GuestTicketMailer $mailer)
-    {
-    }
+    public function __construct(private readonly GuestTicketMailer $mailer) {}
 
     public function create(array $data): GuestTicket
     {
         return $this->executeInTransaction(function () use ($data) {
             $ticket = GuestTicket::create([
-                'name'    => $data['name'],
-                'email'   => $data['email'],
-                'mobile'  => $data['mobile'] ?? $data['phone'] ?? '',
-                'subject' => $data['subject'] ?? ('Support request from ' . $data['name']),
-                'body'    => $data['body'] ?? $data['description'] ?? '',
-                'status'  => 'pending',
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'mobile' => $data['mobile'] ?? $data['phone'] ?? '',
+                'subject' => $data['subject'] ?? ('Support request from '.$data['name']),
+                'body' => $data['body'] ?? $data['description'] ?? '',
+                'status' => 'pending',
             ]);
 
             $messageId = $this->mailer->generateMessageId($ticket);
@@ -34,17 +32,17 @@ class GuestTicketCreator extends BaseService
 
             GuestTicketMessage::create([
                 'guest_ticket_id' => $ticket->id,
-                'direction'       => GuestTicket::DIRECTION_OUTBOUND,
-                'from_email'      => config('mail.from.address'),
-                'to_email'        => $ticket->email,
-                'subject'         => $subject,
-                'body_text'       => 'Thank you for reaching out. We received your request and will reply shortly.',
-                'message_id'      => $messageId,
-                'sent_at'         => now(),
+                'direction' => GuestTicket::DIRECTION_OUTBOUND,
+                'from_email' => config('mail.from.address'),
+                'to_email' => $ticket->email,
+                'subject' => $subject,
+                'body_text' => 'Thank you for reaching out. We received your request and will reply shortly.',
+                'message_id' => $messageId,
+                'sent_at' => now(),
             ]);
 
             $ticket->update([
-                'last_message_at'         => now(),
+                'last_message_at' => now(),
                 'last_message_message_id' => $messageId,
             ]);
 

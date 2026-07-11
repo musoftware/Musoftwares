@@ -1,5 +1,4 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import FreelanceLayout from '@/Pages/Freelance/Layout';
 import { PageProps } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
@@ -11,8 +10,7 @@ export default function Edit({
     mustVerifyEmail,
     status,
 }: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
-    const { is_lance_domain } = usePage().props as any;
-    const Layout = is_lance_domain ? FreelanceLayout : AuthenticatedLayout;
+    const Layout = AuthenticatedLayout;
 
     return (
         <Layout

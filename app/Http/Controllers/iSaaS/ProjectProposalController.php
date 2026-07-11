@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Isaas;
 
 use App\Http\Controllers\Controller;
-use App\Models\Billing\ProjectProposal;
 use App\Models\Billing\PlatformContract;
+use App\Models\Billing\ProjectProposal;
 use App\Services\AI\PriceCalculatorService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class ProjectProposalController extends Controller
 {
@@ -19,7 +19,7 @@ class ProjectProposalController extends Controller
             ->paginate(15);
 
         return Inertia::render('iSaaS/Proposals/Index', [
-            'proposals' => $proposals
+            'proposals' => $proposals,
         ]);
     }
 
@@ -41,7 +41,7 @@ class ProjectProposalController extends Controller
 
         $estimate = $calculator->estimate($request->requirements);
 
-        if (!$estimate) {
+        if (! $estimate) {
             return back()->withErrors(['error' => 'Failed to generate AI estimate. Please try again.']);
         }
 
@@ -64,7 +64,7 @@ class ProjectProposalController extends Controller
         $proposal = ProjectProposal::where('user_id', $request->user()->id)->findOrFail($id);
 
         return Inertia::render('iSaaS/Proposals/Show', [
-            'proposal' => $proposal
+            'proposal' => $proposal,
         ]);
     }
 
@@ -114,7 +114,8 @@ class ProjectProposalController extends Controller
             return redirect()->route('isaas.contracts.edit', $contract->id)->with('success', __('general.proposal_successfully_converted_to_contract'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to convert to contract: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Failed to convert to contract: '.$e->getMessage()]);
         }
     }
 

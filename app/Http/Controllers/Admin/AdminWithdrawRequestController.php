@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserReferralRequestWithdraw;
 use App\Http\Resources\WithdrawRequestResource;
+use App\Models\UserReferralRequestWithdraw;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -19,13 +19,13 @@ class AdminWithdrawRequestController extends Controller
         }
 
         $requests = $query->orderBy('created_at', 'desc')
-                          ->paginate(15)
-                          ->withQueryString()
-                          ->through(fn($w) => (new WithdrawRequestResource($w))->resolve());
+            ->paginate(15)
+            ->withQueryString()
+            ->through(fn ($w) => (new WithdrawRequestResource($w))->resolve());
 
         return Inertia::render('Admin/WithdrawRequests/Index', [
             'requests' => $requests,
-            'filters'  => $request->only('status'),
+            'filters' => $request->only('status'),
         ]);
     }
 

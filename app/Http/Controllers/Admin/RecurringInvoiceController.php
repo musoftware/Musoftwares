@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\CurrencyHelper;
+use App\Helpers\FinanceHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use App\Models\Invoice;
 use App\Models\RecurringInvoice;
+use App\Models\RecurringInvoiceRecord;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,10 +21,11 @@ class RecurringInvoiceController extends Controller
     {
         $invoices = RecurringInvoice::with('user')->latest()->paginate(50);
         $invoices->getCollection()->transform(function ($invoice) {
-            $invoice->currency = \App\Helpers\CurrencyHelper::getFrontendCurrency($invoice->currency_id);
+            $invoice->currency = CurrencyHelper::getFrontendCurrency($invoice->currency_id);
+
             return $invoice;
         });
-        
+
         $currencies = Currency::all();
         $users = User::select('id', 'name', 'email')->get();
 
@@ -43,7 +48,7 @@ class RecurringInvoiceController extends Controller
             'currency' => 'required|exists:currencies,id',
         ]);
 
-        $invoice = new RecurringInvoice();
+        $invoice = new RecurringInvoice;
         $invoice->user_id = (int) $request->input('user_id');
         $invoice->title = $request->input('title');
         $invoice->start_date = $request->input('start_date');
@@ -157,11 +162,12 @@ class RecurringInvoiceController extends Controller
         $invoice = RecurringInvoice::with('user')->findOrFail($id);
         $records = $invoice->records()->with('invoice')->latest()->get()->map(function ($record) {
             $actualInvoice = $record->invoice;
+
             return [
                 'id' => $record->id,
                 'created_at' => $record->created_at,
                 'amount' => $actualInvoice ? $actualInvoice->total() : null,
-                'currency' => $actualInvoice ? \App\Helpers\CurrencyHelper::getFrontendCurrency($actualInvoice->currency_id) : null,
+                'currency' => $actualInvoice ? CurrencyHelper::getFrontendCurrency($actualInvoice->currency_id) : null,
                 'status' => $actualInvoice ? $actualInvoice->status : null,
                 'invoice_id' => $actualInvoice ? $actualInvoice->id : null,
             ];
@@ -175,19 +181,19 @@ class RecurringInvoiceController extends Controller
             $checkDate = $baseDate->copy()->addDays($i);
             if ($invoice->isToday($checkDate)) {
                 $count++;
-                $uniqueId = $invoice->id . '-' . $checkDate->toDateString();
+                $uniqueId = $invoice->id.'-'.$checkDate->toDateString();
                 $isRecorded = $invoice->createdBefore($checkDate);
 
                 // Fetch actual generated invoice info if this date was already executed
                 $actualAmountStr = null;
                 if ($isRecorded) {
-                    $record = \Illuminate\Support\Facades\DB::table('recurring_invoice_records')
+                    $record = DB::table('recurring_invoice_records')
                         ->where('unique_id', $uniqueId)
                         ->first();
                     if ($record && $record->invoice_id) {
-                        $actualInv = \App\Models\Invoice::find($record->invoice_id);
+                        $actualInv = Invoice::find($record->invoice_id);
                         if ($actualInv) {
-                            $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualInv->total(), $actualInv->currency_id ?? $invoice->currency_id);
+                            $actualAmountStr = FinanceHelper::instance()->format_money($actualInv->total(), $actualInv->currency_id ?? $invoice->currency_id);
                         }
                     }
                 }
@@ -201,7 +207,7 @@ class RecurringInvoiceController extends Controller
             }
         }
 
-        $currencyModel = \App\Helpers\CurrencyHelper::getFrontendCurrency($invoice->currency_id);
+        $currencyModel = CurrencyHelper::getFrontendCurrency($invoice->currency_id);
 
         return Inertia::render('Admin/Business/RecurringInvoices/View', [
             'invoice' => [
@@ -220,7 +226,7 @@ class RecurringInvoiceController extends Controller
             'upcomingSchedule' => $upcomingSchedule,
             'total_stat' => [
                 'entries_count' => $invoice->records()->count(),
-            ]
+            ],
         ]);
     }
 
@@ -228,18 +234,20 @@ class RecurringInvoiceController extends Controller
     {
         $invoice = RecurringInvoice::findOrFail($id);
         $invoice->delete();
+
         return redirect()->route('admin.recurring_invoices.index')->with('success', __('general.recurring_invoice_deleted'));
     }
 
     public function toggle($id)
     {
         $invoice = RecurringInvoice::findOrFail($id);
-        $invoice->is_active = !$invoice->is_active;
+        $invoice->is_active = ! $invoice->is_active;
         $invoice->save();
+
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }
 
-    public function deleteRecord(Request $request, RecurringInvoice $invoice, \App\Models\RecurringInvoiceRecord $record)
+    public function deleteRecord(Request $request, RecurringInvoice $invoice, RecurringInvoiceRecord $record)
     {
         if ($record->recurring_invoice_id !== $invoice->id) {
             abort(404);
@@ -247,7 +255,7 @@ class RecurringInvoiceController extends Controller
 
         DB::transaction(function () use ($record) {
             if ($record->invoice_id) {
-                $linkedInvoice = \App\Models\Invoice::find($record->invoice_id);
+                $linkedInvoice = Invoice::find($record->invoice_id);
                 if ($linkedInvoice) {
                     $linkedInvoice->items()->delete();
                     $linkedInvoice->delete();

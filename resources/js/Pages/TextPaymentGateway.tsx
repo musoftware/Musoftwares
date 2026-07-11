@@ -144,7 +144,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
                                     <Smartphone className="w-5 h-5 text-rose-500" />{__('general.devices')}</CardTitle>
-                                <CardDescription>{__('freelance.connect_android_phone_to_read')}</CardDescription>
+                                <CardDescription>{__('general.connect_android_phone_to_read')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('sms-payment-gateway.devices'))}>{__('general.manage_devices')}<ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
@@ -200,7 +200,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
                                     <ExternalLink className="w-5 h-5 text-blue-500" />{__('general.integration_docs')}</CardTitle>
-                                <CardDescription>{__('freelance.learn_how_to_connect_your')}</CardDescription>
+                                    <CardDescription>{__('general.learn_how_to_connect_your')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50 text-blue-700" onClick={() => router.visit(route('sms-payment-gateway.documentation'))}>{__('general.integration_docs')}</Button>

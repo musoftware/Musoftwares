@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
 
 class BackfillTenantClientUserIds extends Command
 {
@@ -31,7 +31,7 @@ class BackfillTenantClientUserIds extends Command
     public function handle(): int
     {
         $dryRun = $this->option('dry-run');
-        $limit  = (int) $this->option('limit');
+        $limit = (int) $this->option('limit');
 
         $this->info($dryRun
             ? 'Dry-run: previewing matches...'
@@ -51,9 +51,9 @@ class BackfillTenantClientUserIds extends Command
 
         $this->info("Found {$clients->count()} client(s) without user_id.");
 
-        $matched   = 0;
+        $matched = 0;
         $unmatched = 0;
-        $rows      = [];
+        $rows = [];
 
         foreach ($clients as $client) {
             // Look up a user by email — exact match
@@ -65,7 +65,7 @@ class BackfillTenantClientUserIds extends Command
                 $rows[] = [$client->id, $client->email, $user, 'MATCH'];
                 $matched++;
 
-                if (!$dryRun) {
+                if (! $dryRun) {
                     DB::table('erp_tenant_clients')
                         ->where('id', $client->id)
                         ->update(['user_id' => $user]);
@@ -83,7 +83,7 @@ class BackfillTenantClientUserIds extends Command
 
         $this->info("Matched: {$matched} | Unmatched: {$unmatched}");
 
-        if (!$dryRun && $matched > 0) {
+        if (! $dryRun && $matched > 0) {
             Log::info("erp:backfill-client-user-ids: updated {$matched} tenant_client records.");
             $this->info("{$matched} record(s) updated successfully.");
         }

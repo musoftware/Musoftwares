@@ -12,18 +12,27 @@ class ProjectBoardPreference extends Model
     protected $guarded = ['id'];
 
     public const VIEW_CARDS = 'cards';
+
     public const VIEW_GRID = 'grid';
+
     public const VIEW_LINES = 'lines';
+
     public const VIEW_TABLE = 'table';
 
     public const SORT_MANUAL = 'manual';
+
     public const SORT_TITLE = 'title';
+
     public const SORT_TYPE = 'type';
+
     public const SORT_LANE = 'lane';
+
     public const SORT_PRIORITY = 'priority';
+
     public const SORT_CATEGORY = 'category';
 
     public const DIR_ASC = 'asc';
+
     public const DIR_DESC = 'desc';
 
     public const VIEWS = [

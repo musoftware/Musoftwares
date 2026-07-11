@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Project extends Model
 {
@@ -23,7 +24,7 @@ class Project extends Model
     {
         static::creating(function ($project) {
             if (empty($project->share_token)) {
-                $project->share_token = \Illuminate\Support\Str::random(32);
+                $project->share_token = Str::random(32);
             }
         });
     }
@@ -62,12 +63,12 @@ class Project extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function tasks()
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class, 'project_id');
     }
 
-    public function todos()
+    public function todos(): HasMany
     {
         return $this->hasMany(Todo::class, 'project_id');
     }

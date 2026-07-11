@@ -2,24 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Builders\KashierCheckoutBuilder;
+use App\Helpers\FinanceHelper;
+use App\Helpers\KashierHelper;
+use App\Models\CurrenciesExchange;
+use App\Models\User;
+use App\Services\BalanceService;
+use App\Traits\ConvertsCurrency;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Models\UserReferralRequestWithdraw;
-use App\Models\PayoutMethod;
-use App\Models\Transaction;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class FinancialController extends Controller
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
     public function transactions(Request $request)
     {
         $user = $request->user();
         $wallet = [
-            'id' => null, 
-            'balance' => (float)$user->user_balance, 
-            'locked_balance' => (float)$user->locked_balance(),
+            'id' => null,
+            'balance' => (float) $user->user_balance,
+            'locked_balance' => (float) $user->locked_balance(),
             'currency' => $user->currency_name(),
         ];
         $transactions = $user->transactions()->latest()->paginate(15);
@@ -50,15 +54,15 @@ class FinancialController extends Controller
     {
         $user = $request->user();
         $wallet = [
-            'id' => null, 
-            'balance' => (float)$user->user_balance, 
-            'locked_balance' => (float)$user->locked_balance(),
+            'id' => null,
+            'balance' => (float) $user->user_balance,
+            'locked_balance' => (float) $user->locked_balance(),
             'currency' => $user->currency_name(),
         ];
         $payoutMethods = $user->payoutMethods()->where('status', 'approved')->get();
         $withdrawals = $user->withdraw()->with('payoutMethod')->latest()->paginate(15);
 
-        $withdrawals->getCollection()->transform(function ($wd) use ($user) {
+        $withdrawals->getCollection()->transform(function ($wd) {
             return $wd;
         });
 
@@ -77,7 +81,7 @@ class FinancialController extends Controller
     public function requestWithdrawal(Request $request)
     {
         $user = $request->user();
-        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
+        $wallet = ['id' => null, 'balance' => (float) $user->user_balance, 'currency' => $user->currency_name()];
 
         $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -85,19 +89,20 @@ class FinancialController extends Controller
         ]);
 
         // Validate using BalanceService (recovered pattern from old BalancesHelper)
-        $balanceService = app(\App\Services\BalanceService::class);
+        $balanceService = app(BalanceService::class);
         $eligibility = $balanceService->validateWithdrawalEligibility(
             $user,
             (float) $request->amount,
             (int) $request->payout_method_id
         );
 
-        if (!$eligibility['eligible']) {
+        if (! $eligibility['eligible']) {
             return back()->withErrors(['amount' => $eligibility['reason']]);
         }
 
         try {
             $balanceService->processWithdrawalRequest($user, (float) $request->amount, (int) $request->payout_method_id);
+
             return back()->with('success', __('general.withdrawal_requested_successfully'));
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => 'An error occurred while processing your withdrawal request.']);
@@ -107,13 +112,13 @@ class FinancialController extends Controller
     public function addBalance(Request $request)
     {
         $user = $request->user();
-        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
+        $wallet = ['id' => null, 'balance' => (float) $user->user_balance, 'currency' => $user->currency_name()];
 
         $baseUSD = [50, 100, 150, 200, 400, 700, 1000];
         $presets = [];
         foreach ($baseUSD as $usd) {
-            $exchanged = \App\Models\CurrenciesExchange::RateToday($usd, 1, $user->currency);
-            $presets[] = \App\Helpers\FinanceHelper::instance()->price_fixer($exchanged, $user->currency);
+            $exchanged = CurrenciesExchange::RateToday($usd, 1, $user->currency);
+            $presets[] = FinanceHelper::instance()->price_fixer($exchanged, $user->currency);
         }
 
         return Inertia::render('Client/Financial/AddBalance', [
@@ -129,9 +134,9 @@ class FinancialController extends Controller
         ]);
 
         $user = $request->user();
-        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
+        $wallet = ['id' => null, 'balance' => (float) $user->user_balance, 'currency' => $user->currency_name()];
 
-        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+        $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount((float) $request->amount, $wallet['currency'])
             ->forUser($user->id, $user->name, $user->email)
             ->withSource('balance-recharge', 'deposit_')
@@ -157,9 +162,9 @@ class FinancialController extends Controller
 
     public function webhook(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('Kashier Webhook received:', $request->all());
+        Log::info('Kashier Webhook received:', $request->all());
 
-        if (\App\Helpers\KashierHelper::validatePayload()) {
+        if (KashierHelper::validatePayload()) {
             if ($request->input('data.status') === 'SUCCESS') {
                 $data = $request->input('data');
                 $metadata = $data['metaData'] ?? [];
@@ -172,23 +177,26 @@ class FinancialController extends Controller
                 $amountPaid = floatval($data['amount'] ?? 0);
 
                 if ($userId && $trxId && $amountPaid > 0) {
-                    $user = \App\Models\User::find($userId);
+                    $user = User::find($userId);
                     if ($user) {
-                        $amountPaid = \App\Helpers\KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
+                        $amountPaid = KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
 
-                        $balanceService = app(\App\Services\BalanceService::class);
+                        $balanceService = app(BalanceService::class);
                         $result = $balanceService->processKashierDepositWebhook($user, $amountPaid, $trxId);
 
-                        if (!$result['already_processed']) {
-                            \Illuminate\Support\Facades\Log::info("Kashier deposit processed successfully for User $userId, Amount: $amountPaid");
+                        if (! $result['already_processed']) {
+                            Log::info("Kashier deposit processed successfully for User $userId, Amount: $amountPaid");
+
                             return response()->json(['status' => 'success', 'message' => $result['message']]);
                         } else {
-                            \Illuminate\Support\Facades\Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
+                            Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
+
                             return response()->json(['status' => 'success', 'message' => $result['message']]);
                         }
                     }
                 }
             }
+
             return response()->json(['status' => 'ignored']);
         }
 

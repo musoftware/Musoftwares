@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Modules\AutoSms\Models\AutoSmsTransaction;
 
 class PaymentOrder extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected static function boot()
     {
         parent::boot();
         static::creating(function ($model) {
             if (empty($model->uuid)) {
-                $model->uuid = (string) \Illuminate\Support\Str::uuid();
+                $model->uuid = (string) Str::uuid();
             }
         });
     }
@@ -85,6 +85,6 @@ class PaymentOrder extends Model
 
     public function currency()
     {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 }

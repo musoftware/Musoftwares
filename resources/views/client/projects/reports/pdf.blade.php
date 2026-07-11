@@ -13,7 +13,7 @@
         }
 
         @page {
-            margin: 32px 36px;
+            margin: 60px 50px 80px 50px;
         }
 
         body {
@@ -106,15 +106,18 @@
 
         .body code {
             background: #f1f5f9;
-            padding: 1px 5px;
-            border-radius: 3px;
+            color: #0f172a;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
             font-family: 'DejaVu Sans Mono', monospace;
-            font-size: 11px;
+            font-size: 10.5px;
         }
 
         .body pre {
-            background: #0f172a;
-            color: #e2e8f0;
+            background: #f8fafc;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
             padding: 10px 12px;
             border-radius: 6px;
             font-family: 'DejaVu Sans Mono', monospace;
@@ -122,6 +125,15 @@
             margin: 0 0 12px;
             white-space: pre-wrap;
             word-break: break-word;
+        }
+
+        .body pre code {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            border: none;
+            color: inherit;
+            font-size: inherit;
         }
 
         .body blockquote {
@@ -158,9 +170,9 @@
 
         .footer {
             position: fixed;
-            bottom: 12px;
-            left: 36px;
-            right: 36px;
+            bottom: 24px;
+            left: 50px;
+            right: 50px;
             border-top: 1px solid #e2e8f0;
             padding-top: 8px;
             font-size: 9px;

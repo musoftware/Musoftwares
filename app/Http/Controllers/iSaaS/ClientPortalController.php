@@ -17,7 +17,7 @@ class ClientPortalController extends Controller
         $contract = PlatformContract::where('uuid', $uuid)->firstOrFail();
 
         return Inertia::render('iSaaS/ClientPortal/ContractView', [
-            'contract' => $contract
+            'contract' => $contract,
         ]);
     }
 
@@ -33,13 +33,13 @@ class ClientPortalController extends Controller
         }
 
         $request->validate([
-            'signature_name' => 'required|string|max:255'
+            'signature_name' => 'required|string|max:255',
         ]);
 
         $contract->update([
             'client_signature' => $request->signature_name,
             'signed_at' => now(),
-            'status' => 'signed'
+            'status' => 'signed',
         ]);
 
         return redirect()->back()->with('success', __('general.contract_signed_successfully'));

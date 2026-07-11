@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Models\EmployeeTodo;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use App\Models\EmployeeTodo;
 
 class EmployeeTodoAssigned extends Notification implements ShouldQueue
 {
@@ -41,7 +41,7 @@ class EmployeeTodoAssigned extends Notification implements ShouldQueue
         return [
             'type' => 'employee_todo_assigned',
             'title' => 'New Task Assigned',
-            'message' => 'You have been assigned a new task: ' . $this->todo->title,
+            'message' => 'You have been assigned a new task: '.$this->todo->title,
             'todo_id' => $this->todo->id,
             'priority' => $this->todo->priority,
             'url' => '/dashboard', // Adjust later if there is a specific page for employees

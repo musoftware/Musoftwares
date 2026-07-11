@@ -16,10 +16,10 @@ class AdminNoteController extends Controller
 
         if ($type === 'client') {
             $query->where('noteable_type', 'Modules\\ERP\\Models\\Client')
-                  ->where('noteable_id', $id);
+                ->where('noteable_id', $id);
         } else {
             $query->where('noteable_type', $type)
-                  ->where('noteable_id', $id);
+                ->where('noteable_id', $id);
         }
 
         return response()->json($query->get());
@@ -50,7 +50,7 @@ class AdminNoteController extends Controller
     public function togglePin(AdminNote $note)
     {
         $note->update([
-            'is_pinned' => !$note->is_pinned,
+            'is_pinned' => ! $note->is_pinned,
         ]);
 
         return response()->json(['success' => true]);

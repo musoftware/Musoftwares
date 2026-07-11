@@ -2,18 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\Helpers\TimerHelper;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use App\Models\Plan;
-use App\Models\UserSubscription;
 use App\Models\Service;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
+use App\Models\User;
+use App\Models\UserSubscription;
+use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
+use Modules\Tools\Models\ToolSubscription;
 
 class SubscriptionService extends BaseService
 {
-
     /**
      * Get the user's active plan (if any).
      */
@@ -22,6 +24,7 @@ class SubscriptionService extends BaseService
         if ($user->hasSubscription()) {
             return $user->plan;
         }
+
         return null;
     }
 
@@ -39,7 +42,7 @@ class SubscriptionService extends BaseService
 
         // Legacy fallback: old plan_id system gave access to everything
         if ($user->plan_id && $user->subscription_date) {
-            return \Carbon\Carbon::parse($user->subscription_date)->isFuture();
+            return Carbon::parse($user->subscription_date)->isFuture();
         }
 
         return false;
@@ -57,20 +60,20 @@ class SubscriptionService extends BaseService
         }
 
         // 2. Points-based tools are never free
-        if (in_array($toolSlug, ['freelance', 'facebook-publisher'])) {
+        if ($toolSlug === 'facebook-publisher') {
             return false;
         }
 
         // 3. Check if user specifically bought this tool (new module system)
-        if ($user->hasModuleSubscription('tool-' . $toolSlug)) {
+        if ($user->hasModuleSubscription('tool-'.$toolSlug)) {
             return true;
         }
 
-        if ($tool && $user->hasModuleSubscription('tool-' . $tool['guid'])) {
+        if ($tool && $user->hasModuleSubscription('tool-'.$tool['guid'])) {
             return true;
         }
 
-        if ($tool && $user->hasModuleSubscription('TOOL-' . strtoupper($tool['guid']))) {
+        if ($tool && $user->hasModuleSubscription('TOOL-'.strtoupper($tool['guid']))) {
             return true;
         }
 
@@ -80,8 +83,8 @@ class SubscriptionService extends BaseService
         }
 
         // 5. Fallback: old ToolSubscription model
-        if ($tool && class_exists(\Modules\Tools\Models\ToolSubscription::class)) {
-            return \Modules\Tools\Models\ToolSubscription::where('user_id', $user->id)
+        if ($tool && class_exists(ToolSubscription::class)) {
+            return ToolSubscription::where('user_id', $user->id)
                 ->where('tool_guid', $tool['guid'])
                 ->where('status', 'active')
                 ->exists();
@@ -114,14 +117,14 @@ class SubscriptionService extends BaseService
     public function calculateUpgradeProration(UserSubscription $current, float $newPrice, string $cycle): float
     {
         $now = Carbon::now();
-        if (!$current->expires_at || Carbon::parse($current->expires_at)->isPast()) {
+        if (! $current->expires_at || Carbon::parse($current->expires_at)->isPast()) {
             return 0.0;
         }
 
         $started = $current->started_at ? Carbon::parse($current->started_at) : $now;
         $expires = Carbon::parse($current->expires_at);
         $totalDays = $started->diffInDays($expires);
-        
+
         if ($totalDays <= 0) {
             return 0.0;
         }
@@ -131,11 +134,11 @@ class SubscriptionService extends BaseService
             return 0.0;
         }
 
-        // We assume the old price is roughly proportional to the new price, 
+        // We assume the old price is roughly proportional to the new price,
         // or we can just fetch the old item price if we had a PricingService instance here.
         // For now, we return the prorated percentage of the remaining days.
         $prorationPercentage = $daysRemaining / $totalDays;
-        
+
         // This is a simplified proration assuming the user pays the $newPrice and gets credit for unused days.
         // To be completely accurate we'd need the original transaction amount, but this approximates the unused portion.
         return round($newPrice * $prorationPercentage, 2);
@@ -152,23 +155,16 @@ class SubscriptionService extends BaseService
     public function getLimits(User $user, string $module): array
     {
 
-
-        if (!$user->hasSubscription()) {
-            if ($module === 'freelance') {
-                return ['connects' => 20, 'commission_rate' => 10.0];
-            }
+        if (! $user->hasSubscription()) {
             if ($module === 'erp') {
                 return ['projects' => -1, 'invoices' => -1, 'tasks' => -1, 'team_members' => -1];
             }
+
             return ['projects' => 0, 'invoices' => 0, 'tasks' => 0, 'team_members' => 0];
         }
 
         if ($module === 'erp') {
             return ['projects' => -1, 'invoices' => -1, 'tasks' => -1, 'team_members' => 10];
-        }
-
-        if ($module === 'freelance') {
-            return ['connects' => 120, 'commission_rate' => 5.0];
         }
 
         return [];
@@ -185,10 +181,9 @@ class SubscriptionService extends BaseService
     public function isWithinLimit(User $user, string $module, string $limitKey, int $currentCount): bool
     {
 
-
         $limits = $this->getLimits($user, $module);
 
-        if (!isset($limits[$limitKey])) {
+        if (! isset($limits[$limitKey])) {
             return true;
         }
 
@@ -203,28 +198,28 @@ class SubscriptionService extends BaseService
 
     public function calculateCustomPriceBackend($selectedItems, $billingCycle, $currencyId, $returnArray = false)
     {
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
+        $usdCurrency = Currency::where('currency', 'USD')->first();
         $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
         $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
+
         $rate = 1.0;
         if ($usdCurrency && $currencyId && $usdCurrency->id != $currencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
+            $rate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
         }
 
         $egpRate = 50;
         if ($usdCurrency && $egpCurrencyId) {
-            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+            $egpRate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
         }
 
         // EGP Base prices per year
         $basePricesEGP = array_merge(
             config('saas.modules', []),
-            array_map(fn($addon) => $addon['price'], config('saas.addons', []))
+            array_map(fn ($addon) => $addon['price'], config('saas.addons', []))
         );
-        
+
         $configTools = config('tools', []);
         $baseMonthlyEGP = 0;
         $toolsMonthlyEGP = [];
@@ -236,7 +231,7 @@ class SubscriptionService extends BaseService
                 $guid = preg_replace('/^tool-/', '', $item);
                 $tool = $configTools[$guid] ?? null;
                 $isFree = $tool['is_free'] ?? false;
-                if (!$isFree && $tool) {
+                if (! $isFree && $tool) {
                     $toolMonthlyPrice = 100; // Fallback
                     if (isset($tool['plans']) && is_array($tool['plans']) && count($tool['plans']) > 0) {
                         $firstPlan = reset($tool['plans']);
@@ -271,15 +266,16 @@ class SubscriptionService extends BaseService
         }
 
         $subtotalMonthlyEGP = $baseMonthlyEGP + $toolsDiscountedTotalMonthlyEGP;
-        
+
         $originalTotalEGP = ($baseMonthlyEGP + $toolsBaseTotalMonthlyEGP) * $months;
         $totalEGP = $subtotalMonthlyEGP * $multiplier;
-        
+
         $toolsDiscountEGP = ($toolsBaseTotalMonthlyEGP - $toolsDiscountedTotalMonthlyEGP) * $months;
         $annualDiscountEGP = ($subtotalMonthlyEGP * $months) - ($subtotalMonthlyEGP * $multiplier);
 
-        $toTargetCurrency = function($amountEgp) use ($egpRate, $rate) {
+        $toTargetCurrency = function ($amountEgp) use ($egpRate, $rate) {
             $usd = $amountEgp / $egpRate;
+
             return $usd * $rate;
         };
 
@@ -297,29 +293,31 @@ class SubscriptionService extends BaseService
 
     public function validateAddonParents($items, $user = null)
     {
-        if (!$items || !is_array($items)) return;
+        if (! $items || ! is_array($items)) {
+            return;
+        }
 
         $addonsConfig = config('saas.addons', []);
         foreach ($items as $item) {
             if (isset($addonsConfig[$item])) {
                 $parent = $addonsConfig[$item]['parent'];
-                
+
                 // Check if parent is in the cart
                 $inCart = in_array($parent, $items);
-                
+
                 // Check if user already owns the parent
                 $alreadyOwned = false;
-                if ($user && !$inCart) {
-                    $alreadyOwned = \App\Models\UserSubscription::where('user_id', $user->id)
+                if ($user && ! $inCart) {
+                    $alreadyOwned = UserSubscription::where('user_id', $user->id)
                         ->where('object', $parent)
                         ->where('status', 'active')
                         ->where('expires_at', '>', now())
                         ->exists();
                 }
 
-                if (!$inCart && !$alreadyOwned) {
+                if (! $inCart && ! $alreadyOwned) {
                     throw ValidationException::withMessages([
-                        'error' => "You cannot subscribe to {$addonsConfig[$item]['name']} without its parent module."
+                        'error' => "You cannot subscribe to {$addonsConfig[$item]['name']} without its parent module.",
                     ]);
                 }
             }
@@ -330,34 +328,32 @@ class SubscriptionService extends BaseService
     {
         return $this->executeInTransaction(function () use ($user, $amount, $days, $items, $reason, $action) {
 
-
             if ($action === 'webhook_received') {
                 $user->add_balance($amount, $reason, 'received');
-                \App\Helpers\TimerHelper::instance()->addUsed($user, $amount, 'Subscribe to modules');
+                TimerHelper::instance()->addUsed($user, $amount, 'Subscribe to modules');
             } elseif ($action === 'wallet_subscribe' && $amount > 0) {
                 $user->add_balance(-1 * $amount, 'Subscribe to modules', 'used');
             }
 
-            if (!empty($items) && is_array($items)) {
+            if (! empty($items) && is_array($items)) {
                 foreach ($items as $item) {
                     $expiry = Carbon::now()->addDays((int) $days);
-                    
+
                     // Check if they already own it, extend expiry
-                    $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
+                    $existing = UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
                     if ($existing && $existing->status === 'active' && Carbon::parse($existing->expires_at)->isFuture()) {
                         $expiry = Carbon::parse($existing->expires_at)->addDays((int) $days);
                     }
 
-                    \App\Models\UserSubscription::updateOrCreate(
+                    UserSubscription::updateOrCreate(
                         ['user_id' => $user->id, 'object' => $item],
                         [
                             'status' => 'active',
                             'started_at' => now(),
                             'expires_at' => $expiry,
-                            'auto_renew' => true
+                            'auto_renew' => true,
                         ]
                     );
-
 
                 }
             }
@@ -369,14 +365,14 @@ class SubscriptionService extends BaseService
         return $this->executeInTransaction(function () use ($user, $sub, $price, $item, $proratedDays) {
             if ($price > 0) {
                 $itemName = $item['name'] ?? ucfirst($sub->object);
-                $desc = $proratedDays ? "Manual Prorated Subscription Renewal for {$proratedDays} days: " : "Manual Subscription Renewal: ";
-                $user->add_balance(-1 * $price, $desc . $itemName, 'used');
+                $desc = $proratedDays ? "Manual Prorated Subscription Renewal for {$proratedDays} days: " : 'Manual Subscription Renewal: ';
+                $user->add_balance(-1 * $price, $desc.$itemName, 'used');
             }
 
-            $newExpiresAt = $sub->expires_at && Carbon::parse($sub->expires_at)->isFuture() 
+            $newExpiresAt = $sub->expires_at && Carbon::parse($sub->expires_at)->isFuture()
                 ? Carbon::parse($sub->expires_at)
                 : Carbon::now();
-            
+
             if ($proratedDays !== null) {
                 $newExpiresAt->addDays($proratedDays);
             } else {
@@ -386,50 +382,49 @@ class SubscriptionService extends BaseService
             $sub->update([
                 'status' => 'active',
                 'expires_at' => $newExpiresAt,
-                'auto_renew' => true
+                'auto_renew' => true,
             ]);
-
 
         });
     }
 
     public function getUserCurrencyDetails($user, $ip = null)
     {
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
+        $usdCurrency = Currency::where('currency', 'USD')->first();
         $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
         $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
+
         $currencyId = null;
         if ($user && $user->currency_id) {
             $currencyId = $user->currency_id;
         } elseif ($ip) {
-            $geoService = app(\App\Services\IpGeolocationService::class);
+            $geoService = app(IpGeolocationService::class);
             $ipCurrencyCode = $geoService->getCurrencyCodeForIp($ip);
             if ($ipCurrencyCode) {
-                $ipCurrency = \App\Models\Currency::where('currency', $ipCurrencyCode)->first();
+                $ipCurrency = Currency::where('currency', $ipCurrencyCode)->first();
                 if ($ipCurrency) {
                     $currencyId = $ipCurrency->id;
                 }
             }
         }
-        
-        if (!$currencyId) {
+
+        if (! $currencyId) {
             $currencyId = $user ? ($user->currency_id ?: $egpCurrencyId) : $usdCurrencyId;
         }
 
-        $userCurrency = \App\Models\Currency::find($currencyId);
+        $userCurrency = Currency::find($currencyId);
         $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
-        
+
         $rate = 1.0;
         if ($usdCurrency && $currencyId && $usdCurrency->id != $currencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
+            $rate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
         }
 
         $egpRate = 50; // Fallback
         if ($usdCurrency && $egpCurrencyId) {
-            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+            $egpRate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
         }
 
         return [
@@ -438,18 +433,19 @@ class SubscriptionService extends BaseService
             'currencyId' => $currencyId,
             'currencyCode' => $currencyCode,
             'rate' => $rate,
-            'egpRate' => $egpRate
+            'egpRate' => $egpRate,
         ];
     }
 
     public function getConvertPriceClosure($currencyDetails)
     {
-        return function($egpPrice) use ($currencyDetails) {
+        return function ($egpPrice) use ($currencyDetails) {
             if ($currencyDetails['currencyCode'] === 'EGP') {
                 return round($egpPrice);
             }
             $usdPrice = $egpPrice / $currencyDetails['egpRate'];
             $converted = $usdPrice * $currencyDetails['rate'];
+
             return psychological_price($converted);
         };
     }
@@ -468,6 +464,7 @@ class SubscriptionService extends BaseService
             $multiplier = 10;
             $days = 365;
         }
+
         return ['multiplier' => $multiplier, 'days' => $days];
     }
 
@@ -476,19 +473,19 @@ class SubscriptionService extends BaseService
         $currencyDetails = $this->getUserCurrencyDetails($user);
         $convertPrice = $this->getConvertPriceClosure($currencyDetails);
 
-        $pricingService = app(\App\Services\PricingService::class);
+        $pricingService = app(PricingService::class);
         $serviceItems = $pricingService->getServiceItems($convertPrice);
 
         $ownedFeatures = [];
-        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
+        $userSubs = UserSubscription::where('user_id', $user->id)
             ->where('status', 'active')
             ->get();
 
         foreach ($userSubs as $sub) {
             $ownedFeatures[] = [
                 'id' => $sub->object,
-                'status' => \Carbon\Carbon::parse($sub->expires_at)->isFuture() ? 'active' : 'expired',
-                'expires_at' => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y')
+                'status' => Carbon::parse($sub->expires_at)->isFuture() ? 'active' : 'expired',
+                'expires_at' => Carbon::parse($sub->expires_at)->format('M d, Y'),
             ];
         }
 
@@ -498,10 +495,10 @@ class SubscriptionService extends BaseService
         if ($hasSub) {
             $closestExpiry = $userSubs->min('expires_at');
             $activeSub = [
-                'id'            => $user->id,
-                'status'        => 'active',
-                'expires_at'    => $closestExpiry ? Carbon::parse($closestExpiry)->format('M d, Y') : '-',
-                'auto_renew'    => false,
+                'id' => $user->id,
+                'status' => 'active',
+                'expires_at' => $closestExpiry ? Carbon::parse($closestExpiry)->format('M d, Y') : '-',
+                'auto_renew' => false,
                 'owned_features' => $ownedFeatures,
             ];
         }
@@ -518,14 +515,14 @@ class SubscriptionService extends BaseService
 
     public function getManagePageData(User $user)
     {
-        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
+        $userSubs = UserSubscription::where('user_id', $user->id)
             ->whereIn('status', ['active', 'expired', 'cancelled'])
             ->get();
-            
+
         $currencyDetails = $this->getUserCurrencyDetails($user);
         $convertPrice = $this->getConvertPriceClosure($currencyDetails);
-        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems($convertPrice);
-        
+        $serviceItems = app(PricingService::class)->getServiceItems($convertPrice);
+
         $subscriptions = [];
         if ($userSubs->count() > 0) {
             foreach ($userSubs as $sub) {
@@ -533,27 +530,27 @@ class SubscriptionService extends BaseService
                 $monthlyPrice = $item['monthly_price'] ?? 0;
 
                 $subscriptions[] = [
-                    'id'            => $sub->id,
-                    'plan_name'     => $item['name'] ?? ucfirst(str_replace('-', ' ', $sub->object)),
-                    'plan_slug'     => $sub->object,
+                    'id' => $sub->id,
+                    'plan_name' => $item['name'] ?? ucfirst(str_replace('-', ' ', $sub->object)),
+                    'plan_slug' => $sub->object,
                     'billing_cycle' => 'Module',
-                    'amount'        => $monthlyPrice,
-                    'currency'      => $user->currency_name(),
-                    'status'        => $sub->status,
-                    'started_at'    => \Carbon\Carbon::parse($sub->started_at)->format('M d, Y'),
-                    'expires_at'    => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y'),
-                    'auto_renew'    => (bool) $sub->auto_renew,
-                    'custom_items'  => [$sub->object],
-                    'is_custom'     => false,
+                    'amount' => $monthlyPrice,
+                    'currency' => $user->currency_name(),
+                    'status' => $sub->status,
+                    'started_at' => Carbon::parse($sub->started_at)->format('M d, Y'),
+                    'expires_at' => Carbon::parse($sub->expires_at)->format('M d, Y'),
+                    'auto_renew' => (bool) $sub->auto_renew,
+                    'custom_items' => [$sub->object],
+                    'is_custom' => false,
                 ];
             }
         }
 
         return [
             'subscriptions' => $subscriptions,
-            'invoices'      => [],
+            'invoices' => [],
             'walletBalance' => (float) $user->user_balance,
-            'currency'      => $user->currency_name(),
+            'currency' => $user->currency_name(),
         ];
     }
 }

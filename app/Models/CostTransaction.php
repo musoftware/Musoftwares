@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class CostTransaction extends Model
@@ -20,13 +22,13 @@ class CostTransaction extends Model
     {
         static::saving(function ($costTransaction) {
             if (empty($costTransaction->currency_id)) {
-                throw new \Exception("CostTransaction is missing an associated currency relation (currency_id cannot be null).");
+                throw new \Exception('CostTransaction is missing an associated currency relation (currency_id cannot be null).');
             }
             $currency = $costTransaction->currency_id;
-            $businessCurrencyId = \App\Models\AdminSettings::business_currency();
+            $businessCurrencyId = AdminSettings::business_currency();
 
             $date = $costTransaction->created_at ?? now();
-            $costTransaction->business_amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
+            $costTransaction->business_amount = CurrenciesExchange::RateByDateNoRound(
                 $date,
                 $costTransaction->amount,
                 $currency,
@@ -82,6 +84,7 @@ class CostTransaction extends Model
         if ($category === null || $category === '') {
             return $query;
         }
+
         return $query->where('category', $category);
     }
 
@@ -90,6 +93,7 @@ class CostTransaction extends Model
         if (empty($userId)) {
             return $query;
         }
+
         return $query->where('user_id', $userId);
     }
 
@@ -98,6 +102,7 @@ class CostTransaction extends Model
         if (empty($projectId)) {
             return $query;
         }
+
         return $query->where('project_id', $projectId);
     }
 
@@ -106,6 +111,7 @@ class CostTransaction extends Model
         if (empty($currencyId)) {
             return $query;
         }
+
         return $query->where('currency_id', $currencyId);
     }
 
@@ -117,6 +123,7 @@ class CostTransaction extends Model
         if ($max !== null && $max !== '') {
             $query->where('amount', '<=', (float) $max);
         }
+
         return $query;
     }
 
@@ -125,6 +132,7 @@ class CostTransaction extends Model
         if (! $value) {
             return $query;
         }
+
         return $query->whereHas('recurringSources');
     }
 
@@ -133,6 +141,7 @@ class CostTransaction extends Model
         if ($value) {
             return $query->withTrashed();
         }
+
         return $query;
     }
 
@@ -143,7 +152,9 @@ class CostTransaction extends Model
 
     public static function add_cost_balance($user, $amount, $reason, $currency = null, $project = null, $createdAt = null)
     {
-        if ($amount == 0) return null;
+        if ($amount == 0) {
+            return null;
+        }
         $user_id = null;
         if (is_object($user)) {
             $user_id = $user->id;
@@ -152,7 +163,7 @@ class CostTransaction extends Model
             $user_id = $user->id;
         }
 
-        $c = new CostTransaction();
+        $c = new CostTransaction;
         $c->user_id = $user_id;
         if (is_numeric($project) || is_string($project)) {
             $c->project_id = $project;
@@ -163,17 +174,17 @@ class CostTransaction extends Model
         $c->reason = $reason;
         $c->currency = $currency ?? optional($user)->currency_id;
         if ($createdAt) {
-            $c->created_at = \Carbon\Carbon::parse($createdAt);
-            $c->updated_at = \Carbon\Carbon::parse($createdAt);
+            $c->created_at = Carbon::parse($createdAt);
+            $c->updated_at = Carbon::parse($createdAt);
         }
 
         DB::transaction(function () use ($c, $user) {
             $c->save();
             if ($user) {
-                \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                BalancesHelper::instance()->CalcCostBalance($user);
             }
         });
+
         return $c->id;
     }
-
 }

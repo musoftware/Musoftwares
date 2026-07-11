@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\PointPackage;
-use App\Services\PointPurchaseService;
+use App\Builders\KashierCheckoutBuilder;
+use App\Helpers\KashierHelper;
 use App\Http\Requests\StoreCustomPointPurchaseRequest;
 use App\Http\Requests\StorePackagePointPurchaseRequest;
-use App\Helpers\KashierHelper;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\PointPackage;
+use App\Models\Transaction;
+use App\Models\User;
+use App\Services\PointPurchaseService;
+use App\Traits\ConvertsCurrency;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class PointPurchaseController extends Controller
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
     protected PointPurchaseService $pointsService;
 
@@ -24,16 +31,16 @@ class PointPurchaseController extends Controller
     public function index()
     {
         $user = auth()->user();
-        
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
         $userCurrencyId = $user->currency;
-        $userCurrency = \App\Models\Currency::find($userCurrencyId);
-        
+        $userCurrency = Currency::find($userCurrencyId);
+
         $currencyCode = $userCurrency ? $userCurrency->currency : 'EGP';
         $rate = 1.0;
-        
+
         if ($egpCurrency && $userCurrencyId && $egpCurrency->id != $userCurrencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
+            $rate = CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
         }
 
         $tiers = $this->pointsService->getTiers();
@@ -68,11 +75,12 @@ class PointPurchaseController extends Controller
 
         try {
             $this->pointsService->processWalletPayment($user, $points, $costInEgp);
+
             return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
                 $paymentDetails = $this->pointsService->getUserAmountAndCurrency($user, $costInEgp);
-                $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+                $paymentUrl = KashierCheckoutBuilder::make()
                     ->forAmount($paymentDetails['amount'], $paymentDetails['currency'])
                     ->forUser($user->id, $user->name, $user->email)
                     ->withSource('points-purchase', 'pts_')
@@ -86,9 +94,10 @@ class PointPurchaseController extends Controller
                         webhook: route('points.kashier.webhook')
                     )
                     ->build();
+
                 return Inertia::location($paymentUrl);
             }
-            
+
             return back()->withErrors(['error' => 'An error occurred during payment processing.']);
         }
     }
@@ -97,14 +106,15 @@ class PointPurchaseController extends Controller
     {
         $user = auth()->user();
         $package = PointPackage::findOrFail($request->package_id);
-        
+
         try {
             $this->pointsService->processWalletPayment($user, $package->points, $package->price);
+
             return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
                 $paymentDetails = $this->pointsService->getUserAmountAndCurrency($user, $package->price);
-                $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+                $paymentUrl = KashierCheckoutBuilder::make()
                     ->forAmount($paymentDetails['amount'], $paymentDetails['currency'])
                     ->forUser($user->id, $user->name, $user->email)
                     ->withSource('points-purchase', 'pts_')
@@ -118,9 +128,10 @@ class PointPurchaseController extends Controller
                         webhook: route('points.kashier.webhook')
                     )
                     ->build();
+
                 return Inertia::location($paymentUrl);
             }
-            
+
             return back()->withErrors(['error' => 'An error occurred during payment processing.']);
         }
     }
@@ -137,9 +148,9 @@ class PointPurchaseController extends Controller
 
     public function webhook(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('Point Purchase Kashier Webhook received:', $request->all());
+        Log::info('Point Purchase Kashier Webhook received:', $request->all());
 
-        if (\App\Helpers\KashierHelper::validatePayload()) {
+        if (KashierHelper::validatePayload()) {
             if ($request->input('data.status') === 'SUCCESS') {
                 $data = $request->input('data');
                 $metadata = $data['metaData'] ?? [];
@@ -154,32 +165,35 @@ class PointPurchaseController extends Controller
                 $points = $metadata['points'] ?? 0;
 
                 if ($userId && $trxId && $amountPaid > 0 && $points > 0) {
-                    $user = \App\Models\User::find($userId);
-                    
+                    $user = User::find($userId);
+
                     if ($user) {
-                        $amountPaid = \App\Helpers\KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
+                        $amountPaid = KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
 
                         // Idempotency check
                         $reason = "Points purchase via Kashier online payment (Trx: $trxId)";
-                        $alreadyProcessed = \App\Models\Transaction::where('user_id', $user->id)
+                        $alreadyProcessed = Transaction::where('user_id', $user->id)
                             ->where('reason', $reason)
                             ->exists();
 
-                        if (!$alreadyProcessed) {
+                        if (! $alreadyProcessed) {
                             try {
                                 $this->pointsService->processWebhookPurchase($user, $amountPaid, $reason, $points, $packageId);
-                                \Illuminate\Support\Facades\Log::info("Kashier points purchase processed successfully for User $userId, Points: $points");
+                                Log::info("Kashier points purchase processed successfully for User $userId, Points: $points");
+
                                 return response()->json(['status' => 'success', 'message' => 'Points purchase processed successfully']);
                             } catch (\Exception $e) {
-                                \Illuminate\Support\Facades\Log::error('Kashier points purchase failed: ' . $e->getMessage());
+                                Log::error('Kashier points purchase failed: '.$e->getMessage());
                             }
                         } else {
-                            \Illuminate\Support\Facades\Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
+                            Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
+
                             return response()->json(['status' => 'success', 'message' => 'Already processed']);
                         }
                     }
                 }
             }
+
             return response()->json(['status' => 'ignored']);
         }
 

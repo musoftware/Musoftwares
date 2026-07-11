@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Events\Liked;
+use App\Events\Unliked;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Like extends Model
@@ -15,8 +18,8 @@ class Like extends Model
     protected $guarded = [];
 
     protected $dispatchesEvents = [
-        'created' => \App\Events\Liked::class,
-        'deleted' => \App\Events\Unliked::class,
+        'created' => Liked::class,
+        'deleted' => Unliked::class,
     ];
 
     public function __construct(array $attributes = [])
@@ -40,13 +43,13 @@ class Like extends Model
         });
     }
 
-    public function likeable(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    public function likeable(): MorphTo
     {
         return $this->morphTo();
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
@@ -56,7 +59,7 @@ class Like extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function liker()
     {
@@ -64,7 +67,7 @@ class Like extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeWithType(Builder $query, string $type)
     {

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContractPriceItem;
+use App\Models\Currency;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ContractPriceItemController extends Controller
 {
@@ -15,10 +17,11 @@ class ContractPriceItemController extends Controller
             return response()->json($items);
         }
 
-        $currencies = \App\Models\Currency::all();
-        return \Inertia\Inertia::render('Admin/Contracts/PriceList', [
+        $currencies = Currency::all();
+
+        return Inertia::render('Admin/Contracts/PriceList', [
             'items' => $items,
-            'currencies' => $currencies
+            'currencies' => $currencies,
         ]);
     }
 
@@ -61,7 +64,7 @@ class ContractPriceItemController extends Controller
     public function destroy(ContractPriceItem $contractPriceItem)
     {
         $contractPriceItem->delete();
-        
+
         if (request()->wantsJson()) {
             return response()->json(['success' => true]);
         }

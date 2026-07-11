@@ -26,7 +26,7 @@ class UploadUserFileRequest extends FormRequest
                 'required', 'file', 'max:51200',
                 function ($attr, $value, $fail) {
                     $ext = strtolower($value->getClientOriginalExtension());
-                    if (!in_array($ext, self::ALLOWED_EXTENSIONS)) {
+                    if (! in_array($ext, self::ALLOWED_EXTENSIONS)) {
                         $fail("File type .{$ext} is not allowed.");
                     }
                 },

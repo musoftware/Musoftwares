@@ -257,7 +257,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                             <TableHead>{__('general.title')}</TableHead>
                                             <TableHead>{__('admin.date')}</TableHead>
                                             <TableHead>{__('admin.type')}</TableHead>
-                                            <TableHead className="text-center">{__('freelance.views')}</TableHead>
+                                            <TableHead className="text-center">{__('general.views')}</TableHead>
                                             <TableHead>{__('general.status')}</TableHead>
                                             <TableHead className="text-end">{__('general.actions')}</TableHead>
                                         </TableRow>

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\UserCredential;
-use App\Services\UserNoteService;
 use App\Http\Requests\Admin\User\StoreUserNoteRequest;
 use App\Http\Requests\Admin\User\UpdateUserNoteRequest;
 use App\Http\Resources\UserNoteResource;
+use App\Models\User;
+use App\Models\UserCredential;
+use App\Services\UserNoteService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -34,11 +34,11 @@ class UserNoteController extends Controller
 
     public function index(Request $request, int $userId): InertiaResponse
     {
-        $user  = User::findOrFail($userId);
+        $user = User::findOrFail($userId);
         $notes = $this->fetchNotes($request, $userId);
 
         return Inertia::render('Admin/Users/Notes', [
-            'user'  => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
             'notes' => $notes,
             'stats' => $this->userNoteService->getStats($userId),
             'flash' => session()->only(['success', 'error', 'warning']),
@@ -50,7 +50,7 @@ class UserNoteController extends Controller
         User::findOrFail($userId);
 
         return response()->json([
-            'data'  => $this->fetchNotes($request, $userId),
+            'data' => $this->fetchNotes($request, $userId),
             'stats' => $this->userNoteService->getStats($userId),
         ]);
     }
@@ -104,7 +104,7 @@ class UserNoteController extends Controller
         return $this->respond(
             $request,
             $userId,
-            'Note restored to ' . ($originalCategory ?: 'notes') . '.'
+            'Note restored to '.($originalCategory ?: 'notes').'.'
         );
     }
 
@@ -131,18 +131,18 @@ class UserNoteController extends Controller
     public function bulkAction(Request $request, int $userId)
     {
         $validated = $request->validate([
-            'action'   => 'required|string|in:archive,unarchive,delete',
+            'action' => 'required|string|in:archive,unarchive,delete',
             'note_ids' => 'required|array|min:1|max:100',
             'note_ids.*' => 'integer',
         ]);
 
         $count = match ($validated['action']) {
-            'archive'   => $this->userNoteService->bulkArchive($userId, $validated['note_ids']),
+            'archive' => $this->userNoteService->bulkArchive($userId, $validated['note_ids']),
             'unarchive' => $this->userNoteService->bulkUnarchive($userId, $validated['note_ids']),
-            'delete'    => $this->userNoteService->bulkDelete($userId, $validated['note_ids']),
+            'delete' => $this->userNoteService->bulkDelete($userId, $validated['note_ids']),
         };
 
-        $message = ucfirst($validated['action']) . " applied to {$count} note(s).";
+        $message = ucfirst($validated['action'])." applied to {$count} note(s).";
 
         return $this->respond($request, $userId, $message, ['count' => $count]);
     }
@@ -175,20 +175,20 @@ class UserNoteController extends Controller
             ->all();
 
         return [
-            'items'       => $items,
-            'current_page'=> $page->currentPage(),
-            'last_page'   => $page->lastPage(),
-            'total'       => $page->total(),
-            'per_page'    => $page->perPage(),
+            'items' => $items,
+            'current_page' => $page->currentPage(),
+            'last_page' => $page->lastPage(),
+            'total' => $page->total(),
+            'per_page' => $page->perPage(),
         ];
     }
 
-    protected function respond(Request $request, int $userId, string $message, array $extra = []): JsonResponse|\Illuminate\Http\RedirectResponse
+    protected function respond(Request $request, int $userId, string $message, array $extra = []): JsonResponse|RedirectResponse
     {
         $payload = array_merge([
             'success' => true,
             'message' => $message,
-            'stats'   => $this->userNoteService->getStats($userId),
+            'stats' => $this->userNoteService->getStats($userId),
         ], $extra);
 
         if ($request->wantsJson()) {
@@ -198,19 +198,21 @@ class UserNoteController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
-    protected function respondJsonOrRedirect(Request $request, array $jsonPayload, string $redirectMessage): JsonResponse|\Illuminate\Http\RedirectResponse
+    protected function respondJsonOrRedirect(Request $request, array $jsonPayload, string $redirectMessage): JsonResponse|RedirectResponse
     {
         if ($request->wantsJson()) {
             return response()->json($jsonPayload);
         }
+
         return redirect()->back()->with('success', $redirectMessage);
     }
 
-    protected function respondError(Request $request, string $message): JsonResponse|\Illuminate\Http\RedirectResponse
+    protected function respondError(Request $request, string $message): JsonResponse|RedirectResponse
     {
         if ($request->wantsJson()) {
             return response()->json(['success' => false, 'message' => $message], 400);
         }
+
         return redirect()->back()->with('error', $message);
     }
 }

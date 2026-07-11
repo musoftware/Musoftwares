@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\OnboardingService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Redirect;
-use App\Services\OnboardingService;
 
 class OnboardingController extends Controller
 {
@@ -15,18 +14,14 @@ class OnboardingController extends Controller
     {
         $this->onboardingService = $onboardingService;
     }
+
     public function show(Request $request)
     {
         $user = $request->user();
 
         if ($user->onboarding_completed) {
-            if ($request->getHost() === 'lance.musoftwares.com') {
-                return redirect()->intended(route('freelance.dashboard', absolute: false));
-            }
             return redirect()->intended(route('dashboard', absolute: false));
         }
-
-
 
         $countries = $this->onboardingService->getCountries();
         $detectedCountry = $this->onboardingService->detectCountryFromIp($request->ip());
@@ -66,8 +61,6 @@ class OnboardingController extends Controller
             $rules['telegram_username'] = ['nullable', 'string', 'max:100'];
         }
 
-
-
         $validated = $request->validate($rules);
 
         if (isset($validated['telegram_username']) && $validated['telegram_username']) {
@@ -78,9 +71,6 @@ class OnboardingController extends Controller
         $this->onboardingService->saveOnboardingStep($user, $validated, $isComplete);
 
         if ($action === 'complete') {
-            if ($request->getHost() === 'lance.musoftwares.com') {
-                return redirect()->intended(route('freelance.dashboard', absolute: false));
-            }
             return redirect()->intended(route('dashboard', absolute: false));
         }
 

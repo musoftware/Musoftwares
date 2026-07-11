@@ -116,7 +116,7 @@ Route::middleware(['auth', 'verified', 'subscription:booking'])->group(...)
 Route::middleware(['auth', 'verified', 'subscription:erp'])->group(...)
 Route::middleware(['auth', 'verified', 'subscription:crm'])->group(...)
 Route::middleware(['auth', 'verified', 'subscription:affiliate_pos'])->group(...)
-Route::middleware(['auth', 'verified', 'subscription:freelance'])->group(...)
+Route::middleware(['auth', 'verified', 'subscription:freelance'])->group(...) // DEPRECATED: freelance module removed
 
 // ❌ WRONG — non-standard, inconsistent
 Route::middleware(['auth', 'verified', 'feature:affiliate_pos'])->group(...)
@@ -138,7 +138,7 @@ Every module owns ONE unified URL namespace. Role-based sub-sections go inside t
 /pos/merchant/*         — AffiliatePos merchant section
 /pos/vendor/*           — AffiliatePos vendor section
 /pos/affiliate/*        — AffiliatePos affiliate section
-/freelance/*            — All Freelance routes
+/freelance/*            — DEPRECATED: Freelance module removed
 
 ❌ WRONG — role names in root URL, fragmented namespaces:
 /admin/affiliate-pos/*

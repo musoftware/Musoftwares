@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserReferral extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['user_id', 'title', 'key', 'slug', 'views', 'registered'];
 
@@ -42,6 +42,7 @@ class UserReferral extends Model
         if ($user) {
             return $user->referrals()->first();
         }
+
         return null;
     }
 

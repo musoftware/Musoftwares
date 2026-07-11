@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Models\Ticket;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use App\Models\Ticket;
 
 class NewGuestTicketNotification extends Notification implements ShouldQueue
 {
@@ -41,7 +41,7 @@ class NewGuestTicketNotification extends Notification implements ShouldQueue
         return [
             'type' => 'new_guest_ticket',
             'title' => 'طلب خدمة حصرية جديد',
-            'message' => 'هناك طلب جديد للخدمة الحصرية من ' . $this->ticket->getDisplayName(),
+            'message' => 'هناك طلب جديد للخدمة الحصرية من '.$this->ticket->getDisplayName(),
             'ticket_id' => $this->ticket->id,
             'url' => route('admin.tickets.show', $this->ticket->id),
         ];

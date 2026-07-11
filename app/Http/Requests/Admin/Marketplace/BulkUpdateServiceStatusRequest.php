@@ -14,9 +14,9 @@ class BulkUpdateServiceStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ids'      => 'required|array|min:1',
-            'ids.*'    => 'integer|exists:marketplace_services,id',
-            'action'   => 'required|in:approve,decline,suspend',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:marketplace_services,id',
+            'action' => 'required|in:approve,decline,suspend',
         ];
     }
 }

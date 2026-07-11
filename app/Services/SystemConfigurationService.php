@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class SystemConfigurationService extends BaseService
 {
-
     public function updateSettings(array $settings): void
     {
         // Special case: if business currency changes, we reset calculated values
@@ -33,7 +32,7 @@ class SystemConfigurationService extends BaseService
         foreach ($supportedKeys as $key) {
             if (array_key_exists($key, $settings)) {
                 $value = $settings[$key];
-                
+
                 // Handle booleans/checkboxes correctly
                 if (in_array($key, ['ownwallet', 'payoneer_active', 'paymob_active', 'friday_work_allowed'])) {
                     $value = $value ? '1' : '0';

@@ -11,11 +11,11 @@ class TenantMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->guard('web')->check()) {
+        if (! auth()->guard('web')->check()) {
             abort(403, __('general.unauthorized_access'));
         }
 

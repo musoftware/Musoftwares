@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\FinanceHelper;
+use App\Models\User;
 use App\Models\UserReferral;
-use App\Models\Earning;
-use App\Models\CurrenciesExchange;
+use App\Services\BalanceService;
+use App\Services\ReferralService;
+use App\Traits\ConvertsCurrency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use App\Services\ReferralService;
-use App\Services\BalanceService;
 
 class ReferralController extends Controller
 {
-    use \App\Traits\ConvertsCurrency;
+    use ConvertsCurrency;
 
     protected ReferralService $referralService;
+
     protected BalanceService $balanceService;
 
     public function __construct(ReferralService $referralService, BalanceService $balanceService)
@@ -39,7 +40,7 @@ class ReferralController extends Controller
 
         return Inertia::render('Client/Dashboard/Referrals/Index', [
             'referral' => $referral,
-            'commission_percentage' => $user->getAffiliateCommissionPercentage()
+            'commission_percentage' => $user->getAffiliateCommissionPercentage(),
         ]);
     }
 
@@ -86,7 +87,7 @@ class ReferralController extends Controller
                 return redirect()->route('referrals.index')->with('info', __('messages.referral_already_exists'));
             }
 
-            $client_request = new UserReferral();
+            $client_request = new UserReferral;
             $client_request->user_id = Auth::id();
             $client_request->title = request('title');
             $client_request->key = sha1(md5(uniqid()));
@@ -102,7 +103,7 @@ class ReferralController extends Controller
     {
         $user = Auth::user();
         $referral = UserReferral::where('user_id', $user->id)->first();
-        if (!$referral) {
+        if (! $referral) {
             return redirect()->route('referrals.index')->with('error', __('messages.referral_not_found'));
         }
 
@@ -135,7 +136,7 @@ class ReferralController extends Controller
         $referral->save();
 
         return redirect()->route('referrals.index')->with('success', $referral->slug
-            ? __('messages.referral_short_link_ready', ['url' => url('r/' . $referral->slug)])
+            ? __('messages.referral_short_link_ready', ['url' => url('r/'.$referral->slug)])
             : __('messages.referral_slug_removed_default'));
     }
 
@@ -149,7 +150,7 @@ class ReferralController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->paginate(14);
         } else {
-            $referred_users = \App\Models\User::where('ref_user_id', $auth->id)
+            $referred_users = User::where('ref_user_id', $auth->id)
                 ->whereNotNull('email_verified_at')
                 ->orderBy('created_at', 'desc')
                 ->paginate(14);
@@ -180,7 +181,7 @@ class ReferralController extends Controller
 
         if ($HasRef) {
             $referral = $this->referralService->processReferralRedirect($valueRef, $request);
-            if (!$referral) {
+            if (! $referral) {
                 return abort(404, __('messages.bad_referral'));
             }
         }
@@ -193,7 +194,7 @@ class ReferralController extends Controller
             // payloads like `//evil.example.com` after ltrim('/') which became
             // `/evil.example.com` and triggered an open redirect.
             if (preg_match('#^[a-z0-9][a-z0-9\-/_]*$#i', $to) && ! str_starts_with($to, '//')) {
-                return redirect()->to('/' . $to);
+                return redirect()->to('/'.$to);
             }
         }
 
@@ -203,7 +204,7 @@ class ReferralController extends Controller
     public function activate_ref(Request $request)
     {
         RateLimiter::attempt(
-            'activate_ref:' . Auth::id(),
+            'activate_ref:'.Auth::id(),
             $perMinute = 1,
             function () {
                 $usr = Auth::user();
@@ -224,7 +225,7 @@ class ReferralController extends Controller
         // Rate-limit referrer-driven user creation so this surface can't be
         // abused to mass-register disposable accounts.
         $executed = RateLimiter::attempt(
-            'store_user_ref:' . Auth::id(),
+            'store_user_ref:'.Auth::id(),
             $perMinute = 5,
             function () {
                 return true;
@@ -238,7 +239,7 @@ class ReferralController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
-                if (!\Illuminate\Support\Str::contains($value, ' ')) {
+                if (! Str::contains($value, ' ')) {
                     $fail(__('messages.name_must_include_last_name'));
                 }
             }],

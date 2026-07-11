@@ -6,19 +6,17 @@ import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
-import { ArrowLeft, Network, ArrowDownRight, ArrowUpRight, Receipt, Wallet, Layers } from 'lucide-react';
+import { ArrowLeft, Network, ArrowDownRight, ArrowUpRight, Receipt, Layers } from 'lucide-react';
 
 interface LinkedTransactionsProps {
     invoice: any;
     transactions: any[];
     costTransactions: any[];
     costLines: any[];
-    walletTransactions: any[];
     counts: {
         transactions: number;
         cost_transactions: number;
         cost_lines: number;
-        wallet_transactions: number;
     };
 }
 
@@ -27,7 +25,6 @@ export default function LinkedTransactions({
     transactions,
     costTransactions,
     costLines,
-    walletTransactions,
     counts,
 }: LinkedTransactionsProps) {
     const businessCurrency = usePage<any>().props?.auth?.business_currency ?? invoice?.currency;
@@ -119,7 +116,7 @@ export default function LinkedTransactions({
                     </CardContent>
                 </Card>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <SummaryCard
                         label={__('admin.linked_income_transactions')}
                         value={counts.transactions}
@@ -143,16 +140,6 @@ export default function LinkedTransactions({
                             invoice.currency_id,
                         )}
                         tone="indigo"
-                    />
-                    <SummaryCard
-                        label={__('admin.linked_wallet_transactions')}
-                        value={counts.wallet_transactions}
-                        icon={<Wallet className="w-4 h-4 text-amber-500" />}
-                        total={formatMoney(
-                            (walletTransactions ?? []).reduce((s, l) => s + (Number(l.amount) || 0), 0),
-                            invoice.currency_id,
-                        )}
-                        tone="amber"
                     />
                 </div>
 
@@ -356,49 +343,7 @@ export default function LinkedTransactions({
                     />
                 </Section>
 
-                <Section
-                    icon={<Wallet className="w-4 h-4 text-amber-600" />}
-                    title={__('admin.linked_wallet_transactions')}
-                    description={__('admin.linked_wallet_transactions_desc')}
-                    count={counts.wallet_transactions}
-                >
-                    <DataBlock
-                        rows={walletTransactions}
-                        empty={__('admin.no_wallet_transactions_linked')}
-                        columns={[
-                            { key: 'id', label: __('general.id'), render: (r) => <span className="font-mono text-xs text-slate-500">#{r.id}</span> },
-                            {
-                                key: 'wallet_id',
-                                label: __('admin.wallet'),
-                                render: (r) => r.wallet_id ?? '—',
-                            },
-                            {
-                                key: 'type',
-                                label: __('general.type'),
-                                render: (r) => (
-                                    <span className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 capitalize">
-                                        {r.type ?? '—'}
-                                    </span>
-                                ),
-                            },
-                            {
-                                key: 'amount',
-                                label: __('general.amount'),
-                                render: (r) => (
-                                    <span className="font-mono font-medium text-amber-700">
-                                        {formatMoney(r.amount ?? 0, r.currency)}
-                                    </span>
-                                ),
-                            },
-                            {
-                                key: 'created_at',
-                                label: __('general.date'),
-                                render: (r) =>
-                                    r.created_at ? new Date(r.created_at).toLocaleDateString() : '—',
-                            },
-                        ]}
-                    />
-                </Section>
+
             </div>
         </AdminSidebarLayout>
     );
@@ -415,13 +360,12 @@ function SummaryCard({
     value: number;
     icon: React.ReactNode;
     total: string;
-    tone: 'emerald' | 'rose' | 'indigo' | 'amber';
+    tone: 'emerald' | 'rose' | 'indigo';
 }) {
     const tones: Record<string, string> = {
         emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
         rose: 'bg-rose-50 text-rose-700 border-rose-200',
         indigo: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-        amber: 'bg-amber-50 text-amber-700 border-amber-200',
     };
 
     return (

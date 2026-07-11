@@ -12,41 +12,41 @@ use ZipArchive;
 
 class UserFileService extends BaseService
 {
-
     private const DISK = 'uploaded_user_files';
 
     public function getFilesAndFolders(int $userId, string $folderId): array
     {
         $folderId = str_replace('folder_', '', $folderId);
-        $folderId = $folderId === '' ? null : (int)$folderId;
+        $folderId = $folderId === '' ? null : (int) $folderId;
 
         $dbFiles = File::where('user_id', $userId)->where('folder_id', $folderId)->get();
         $dbFolders = FileFolder::where('user_id', $userId)->where('folder_id', $folderId)->get();
 
         $files = $dbFiles->map(function ($file) {
             $ext = strtolower(pathinfo($file->original_filename, PATHINFO_EXTENSION));
+
             return [
-                'id'       => (string)$file->id,
-                'name'     => $file->original_filename,
-                'path'     => 'file_' . $file->id, // Prefix to avoid collision
-                'size'     => $file->size,
-                'type'     => 'file',
-                'ext'      => $ext,
+                'id' => (string) $file->id,
+                'name' => $file->original_filename,
+                'path' => 'file_'.$file->id, // Prefix to avoid collision
+                'size' => $file->size,
+                'type' => 'file',
+                'ext' => $ext,
                 'modified' => $file->updated_at->timestamp,
             ];
         });
 
         $folders = $dbFolders->map(function ($folder) {
             return [
-                'id'    => (string)$folder->id,
-                'name'  => $folder->foldername,
-                'path'  => 'folder_' . $folder->id, // Prefix to avoid collision
-                'type'  => 'folder',
+                'id' => (string) $folder->id,
+                'name' => $folder->foldername,
+                'path' => 'folder_'.$folder->id, // Prefix to avoid collision
+                'type' => 'folder',
             ];
         });
 
         return [
-            'files'   => $files->values()->toArray(),
+            'files' => $files->values()->toArray(),
             'folders' => $folders->values()->toArray(),
         ];
     }
@@ -54,9 +54,9 @@ class UserFileService extends BaseService
     public function uploadFile(int $userId, UploadedFile $file, string $folderId): array
     {
         $folderId = str_replace('folder_', '', $folderId);
-        $folderId = $folderId === '' ? null : (int)$folderId;
+        $folderId = $folderId === '' ? null : (int) $folderId;
         $ext = strtolower($file->getClientOriginalExtension());
-        $storedName = Str::uuid() . '.' . $ext;
+        $storedName = Str::uuid().'.'.$ext;
 
         // Store file physically in the legacy disk 'uploaded_user_files'
         Storage::disk(self::DISK)->putFileAs('', $file, $storedName);
@@ -73,7 +73,7 @@ class UserFileService extends BaseService
             $filetype = 'json';
         }
 
-        $dbFile = new File();
+        $dbFile = new File;
         $dbFile->user_id = $userId;
         $dbFile->folder_id = $folderId;
         $dbFile->filename = $storedName;
@@ -85,23 +85,23 @@ class UserFileService extends BaseService
 
         return [
             'original_name' => $dbFile->original_filename,
-            'stored_name'   => $dbFile->filename,
-            'path'          => 'file_' . $dbFile->id,
+            'stored_name' => $dbFile->filename,
+            'path' => 'file_'.$dbFile->id,
         ];
     }
 
     public function createFolder(int $userId, string $name, string $parentFolderId): string
     {
         $parentFolderId = str_replace('folder_', '', $parentFolderId);
-        $parentFolderId = $parentFolderId === '' ? null : (int)$parentFolderId;
+        $parentFolderId = $parentFolderId === '' ? null : (int) $parentFolderId;
 
-        $folder = new FileFolder();
+        $folder = new FileFolder;
         $folder->user_id = $userId;
         $folder->folder_id = $parentFolderId;
         $folder->foldername = $name;
         $folder->save();
 
-        return 'folder_' . $folder->id;
+        return 'folder_'.$folder->id;
     }
 
     public function rename(int $userId, string $id, string $newName): string
@@ -114,14 +114,16 @@ class UserFileService extends BaseService
             if ($file) {
                 $file->original_filename = $newName;
                 $file->save();
-                return 'file_' . $file->id;
+
+                return 'file_'.$file->id;
             }
         } else {
             $folder = FileFolder::where('user_id', $userId)->where('id', $realId)->first();
             if ($folder) {
                 $folder->foldername = $newName;
                 $folder->save();
-                return 'folder_' . $folder->id;
+
+                return 'folder_'.$folder->id;
             }
         }
 
@@ -131,7 +133,7 @@ class UserFileService extends BaseService
     public function move(int $userId, array $ids, string $destinationId): void
     {
         $destinationId = str_replace('folder_', '', $destinationId);
-        $destinationId = $destinationId === '' ? null : (int)$destinationId;
+        $destinationId = $destinationId === '' ? null : (int) $destinationId;
 
         foreach ($ids as $id) {
             $type = str_starts_with($id, 'file_') ? 'file' : 'folder';
@@ -194,7 +196,7 @@ class UserFileService extends BaseService
         $file = File::where('user_id', $userId)->where('id', $realId)->firstOrFail();
 
         Storage::disk(self::DISK)->put($file->filename, $content);
-        
+
         $file->size = Storage::disk(self::DISK)->size($file->filename);
         $file->save();
     }
@@ -210,6 +212,7 @@ class UserFileService extends BaseService
                 $file = File::where('user_id', $userId)->where('id', $realId)->first();
                 if ($file) {
                     $fullPath = Storage::disk(self::DISK)->path($file->filename);
+
                     return response()->download($fullPath, $file->original_filename);
                 }
             } else {
@@ -221,8 +224,8 @@ class UserFileService extends BaseService
             abort(404);
         }
 
-        $zipFile = tempnam(sys_get_temp_dir(), 'userfiles_') . '.zip';
-        $zip     = new ZipArchive();
+        $zipFile = tempnam(sys_get_temp_dir(), 'userfiles_').'.zip';
+        $zip = new ZipArchive;
         $zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         foreach ($ids as $id) {
@@ -249,17 +252,19 @@ class UserFileService extends BaseService
     public function buildBreadcrumbs(string $folderId): array
     {
         $folderId = str_replace('folder_', '', $folderId);
-        $folderId = $folderId === '' ? null : (int)$folderId;
+        $folderId = $folderId === '' ? null : (int) $folderId;
         $breadcrumbs = [];
         $currentId = $folderId;
 
         while ($currentId) {
             $folder = FileFolder::find($currentId);
-            if (!$folder) break;
-            
+            if (! $folder) {
+                break;
+            }
+
             array_unshift($breadcrumbs, [
                 'name' => $folder->foldername,
-                'path' => 'folder_' . $folder->id,
+                'path' => 'folder_'.$folder->id,
             ]);
             $currentId = $folder->folder_id;
         }
@@ -274,14 +279,14 @@ class UserFileService extends BaseService
 
     private function zipFolder(FileFolder $folder): BinaryFileResponse
     {
-        $zipFile = tempnam(sys_get_temp_dir(), 'userfiles_') . '.zip';
-        $zip     = new ZipArchive();
+        $zipFile = tempnam(sys_get_temp_dir(), 'userfiles_').'.zip';
+        $zip = new ZipArchive;
         $zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         $folder->init_zip($zip);
 
         $zip->close();
 
-        return response()->download($zipFile, $folder->foldername . '.zip')->deleteFileAfterSend(true);
+        return response()->download($zipFile, $folder->foldername.'.zip')->deleteFileAfterSend(true);
     }
 }

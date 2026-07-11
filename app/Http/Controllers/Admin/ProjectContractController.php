@@ -5,15 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\ContractVersion;
-use App\Models\Project;
+use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\Project;
+use App\Notifications\ContractUpdatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use App\Notifications\ContractUpdatedNotification;
 
 class ProjectContractController extends Controller
 {
@@ -23,11 +24,11 @@ class ProjectContractController extends Controller
     public function index(Project $project)
     {
         $project->load(['contracts.versions', 'client', 'contracts.invoices']);
-        
+
         return Inertia::render('Admin/Projects/Contracts', [
             'project' => $project,
             'contracts' => $project->contracts,
-            'currencies' => \App\Models\Currency::all()
+            'currencies' => Currency::all(),
         ]);
     }
 
@@ -108,7 +109,7 @@ class ProjectContractController extends Controller
             'currency_id' => 'required|integer',
             'key_features' => 'nullable|array',
             'pricing_items' => 'nullable|array',
-            'status' => 'nullable|in:draft,sent,signed,active,completed'
+            'status' => 'nullable|in:draft,sent,signed,active,completed',
         ]);
 
         $content = [
@@ -160,7 +161,7 @@ class ProjectContractController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $project, $contract) {
-            $invoice = new Invoice();
+            $invoice = new Invoice;
             $invoice->uuid = (string) Str::uuid();
             $invoice->user_id = $project->client->id; // The client
             $invoice->project_id = $project->id;
@@ -170,7 +171,7 @@ class ProjectContractController extends Controller
             $invoice->job_status = 'pending';
             $invoice->save();
 
-            $item = new InvoiceItem();
+            $item = new InvoiceItem;
             $item->invoice_id = $invoice->id;
             $item->item = $request->title;
             $item->description = $request->description;

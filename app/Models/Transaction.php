@@ -5,17 +5,19 @@ namespace App\Models;
 use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
 use App\Helpers\TextHelper;
+use App\Observers\TransactionObserver;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class Transaction extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -36,27 +38,27 @@ class Transaction extends Model
      */
     protected static function booted(): void
     {
-        static::observe(\App\Observers\TransactionObserver::class);
+        static::observe(TransactionObserver::class);
 
         static::saving(function ($transaction) {
             // Force user currency conversion if different
             if ($transaction->user_id && $transaction->user) {
-                if (!$transaction->user->currency_id) {
+                if (! $transaction->user->currency_id) {
                     throw new \Exception("User {$transaction->user_id} is missing a currency_id. Global fallback is prohibited.");
                 }
-                
+
                 $userCurrencyId = $transaction->user->currency_id;
                 $currentCurrencyId = $transaction->currency_id ?? $transaction->currency;
-                
-                if (!$currentCurrencyId) {
+
+                if (! $currentCurrencyId) {
                     // If no currency was explicitly passed for the transaction, assume it is in the user's native currency.
                     $currentCurrencyId = $userCurrencyId;
                     $transaction->currency_id = $userCurrencyId;
                 }
-                
+
                 if ($currentCurrencyId != $userCurrencyId) {
                     $date = $transaction->created_at ?? now();
-                    $transaction->amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
+                    $transaction->amount = CurrenciesExchange::RateByDateNoRound(
                         $date,
                         $transaction->amount,
                         $currentCurrencyId,
@@ -67,17 +69,17 @@ class Transaction extends Model
             }
 
             $currency = $transaction->currency_id ?? $transaction->currency;
-            if (!$currency) {
-                throw new \Exception("Transaction is missing an associated currency relation and no user fallback is available.");
+            if (! $currency) {
+                throw new \Exception('Transaction is missing an associated currency relation and no user fallback is available.');
             }
 
-            $businessCurrencyId = \App\Models\AdminSettings::business_currency();
+            $businessCurrencyId = AdminSettings::business_currency();
             if (is_object($businessCurrencyId)) {
                 $businessCurrencyId = $businessCurrencyId->id;
             }
-            
+
             $date = $transaction->created_at ?? now();
-            $transaction->business_amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
+            $transaction->business_amount = CurrenciesExchange::RateByDateNoRound(
                 $date,
                 $transaction->amount,
                 $currency,
@@ -90,9 +92,9 @@ class Transaction extends Model
     public static function get_sum_balance($date)
     {
         $sum = Transaction::query()->where('created_at', '<=', Carbon::parse($date));
+
         return $sum->sum('business_amount');
     }
-
 
     public function invoice()
     {
@@ -147,14 +149,19 @@ class Transaction extends Model
 
     public function client_view_type()
     {
-        if ($this->type == 'received')
+        if ($this->type == 'received') {
             return 'Deposit';
-        if ($this->type == 'used')
+        }
+        if ($this->type == 'used') {
             return 'Paid';
-        if ($this->type == 'sent')
+        }
+        if ($this->type == 'sent') {
             return 'Received';
-        if ($this->type == 'earn')
+        }
+        if ($this->type == 'earn') {
             return 'Earned';
+        }
+
         return $this->type;
     }
 
@@ -169,10 +176,10 @@ class Transaction extends Model
             ->where('user_id', $this->user_id)
             ->where(function ($query) {
                 $query->where('created_at', '<', $this->created_at)
-                      ->orWhere(function ($q) {
-                          $q->where('created_at', '=', $this->created_at)
+                    ->orWhere(function ($q) {
+                        $q->where('created_at', '=', $this->created_at)
                             ->where('id', '<=', $this->id);
-                      });
+                    });
             })
             ->sum('amount');
     }
@@ -236,8 +243,8 @@ class Transaction extends Model
     public function createReverse($reason = null)
     {
         // Allowed types for reversal
-        if (!in_array($this->type, ['sent', 'received', 'refunded', 'earned'])) {
-            throw new \Exception('This transaction type cannot be reversed: ' . $this->type);
+        if (! in_array($this->type, ['sent', 'received', 'refunded', 'earned'])) {
+            throw new \Exception('This transaction type cannot be reversed: '.$this->type);
         }
 
         // Check if already reversed
@@ -246,16 +253,16 @@ class Transaction extends Model
         }
 
         $user = $this->user;
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('Transaction has no associated user');
         }
 
         // Create reverse transaction with opposite amount
         $reverseAmount = -1 * $this->amount;
-        $reverseReason = $reason ?? ('Reverse transaction #' . $this->id . ($this->reason ? ' - ' . $this->reason : ''));
+        $reverseReason = $reason ?? ('Reverse transaction #'.$this->id.($this->reason ? ' - '.$this->reason : ''));
 
         // Determine reverse type based on original type
-        $reverseType = 'earned'; 
+        $reverseType = 'earned';
         if ($this->type === 'sent') {
             $reverseType = 'earned';
         } elseif ($this->type === 'received') {
@@ -266,7 +273,7 @@ class Transaction extends Model
             $reverseType = 'sent';
         }
 
-        $reverseTransaction = new Transaction();
+        $reverseTransaction = new Transaction;
         $reverseTransaction->user_id = $this->user_id;
         $reverseTransaction->amount = $reverseAmount;
         $reverseTransaction->reason = $reverseReason;
@@ -302,10 +309,11 @@ class Transaction extends Model
 
     public static function add_income_balance($amount, $reason, $currency = null)
     {
-        if ($amount == 0)
+        if ($amount == 0) {
             return null;
+        }
         $user_id = null;
-        $c = new Transaction();
+        $c = new Transaction;
         $c->user_id = $user_id;
 
         $c->type = 'received';
@@ -316,6 +324,7 @@ class Transaction extends Model
         DB::transaction(function () use ($c) {
             $c->save();
         });
+
         return $c->id;
     }
 }

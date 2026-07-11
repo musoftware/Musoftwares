@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Billing;
 
-use App\Http\Controllers\Controller;
-use App\Models\Invoice;
+use App\Builders\KashierCheckoutBuilder;
 use App\Helpers\KashierHelper;
-use App\Models\AdminSettings;
+use App\Helpers\TextHelper;
+use App\Http\Controllers\Controller;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -24,34 +27,34 @@ class InvoiceController extends Controller
             ->with(['currency'])
             ->latest()
             ->paginate(14)
-            ->through(fn($inv) => [
-                'id'             => $inv->id,
-                'uuid'           => $inv->uuid,
+            ->through(fn ($inv) => [
+                'id' => $inv->id,
+                'uuid' => $inv->uuid,
                 'invoice_number' => $inv->id, // Platform invoices might use id or enc_id(), check this
-                'amount'         => round((float) $inv->total(), 2),
-                'paid_amount'    => round((float) $inv->paid, 2),
-                'remaining'      => $inv->unpaid_total(),
-                'currency'       => $inv->currency_id,
-                'status'         => $inv->status,
-                'due_date'       => $inv->schedule['start_date'] ?? null, // fallback
-                'issued_at'      => $inv->created_at?->format('Y-m-d'),
+                'amount' => round((float) $inv->total(), 2),
+                'paid_amount' => round((float) $inv->paid, 2),
+                'remaining' => $inv->unpaid_total(),
+                'currency' => $inv->currency_id,
+                'status' => $inv->status,
+                'due_date' => $inv->schedule['start_date'] ?? null, // fallback
+                'issued_at' => $inv->created_at?->format('Y-m-d'),
             ]);
 
-        $collection      = $invoices->getCollection();
-        $unpaidInvoices  = $collection->filter(fn($i) => $i['status'] !== 'paid')->values();
-        $paidInvoices    = $collection->filter(fn($i) => $i['status'] === 'paid')->values();
+        $collection = $invoices->getCollection();
+        $unpaidInvoices = $collection->filter(fn ($i) => $i['status'] !== 'paid')->values();
+        $paidInvoices = $collection->filter(fn ($i) => $i['status'] === 'paid')->values();
 
         $walletCurrencyId = $user->currency_id;
-        if (!$walletCurrencyId) {
+        if (! $walletCurrencyId) {
             throw new \Exception("User {$user->id} is missing a currency configuration.");
         }
-        $walletCurrency = \App\Models\Currency::find($walletCurrencyId);
+        $walletCurrency = Currency::find($walletCurrencyId);
 
         return Inertia::render('Client/Billing/Invoices', [
-            'invoices'        => $invoices,
+            'invoices' => $invoices,
             'unpaid_invoices' => $unpaidInvoices,
-            'paid_invoices'   => $paidInvoices,
-            'client_balance'  => round((float) $user->balance(), 2),
+            'paid_invoices' => $paidInvoices,
+            'client_balance' => round((float) $user->balance(), 2),
             'wallet_currency' => $walletCurrency,
         ]);
     }
@@ -74,35 +77,35 @@ class InvoiceController extends Controller
         }
 
         $walletCurrencyId = $user->currency_id;
-        if (!$walletCurrencyId) {
+        if (! $walletCurrencyId) {
             throw new \Exception("User {$user->id} is missing a currency configuration.");
         }
-        $walletCurrency = \App\Models\Currency::find($walletCurrencyId);
-        
+        $walletCurrency = Currency::find($walletCurrencyId);
+
         $remaining = $invoice->unpaid_total();
-        $remainingInWalletCurrency = \App\Models\CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
+        $remainingInWalletCurrency = CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
 
         return Inertia::render('Client/Billing/InvoicePay', [
             'invoice' => [
-                'id'             => $invoice->id,
-                'uuid'           => $invoice->uuid,
+                'id' => $invoice->id,
+                'uuid' => $invoice->uuid,
                 'invoice_number' => $invoice->id,
-                'amount'         => round((float) $invoice->total(), 2),
-                'paid_amount'    => round((float) $invoice->paid, 2),
-                'remaining'      => $invoice->unpaid_total(),
-                'currency'       => $invoice->currency_id,
-                'status'         => $invoice->status,
-                'due_date'       => $invoice->schedule['start_date'] ?? null,
-                'issued_at'      => $invoice->created_at?->format('Y-m-d'),
-                'notes'          => $invoice->notes,
-                'items'          => $invoice->items->map(fn($i) => [
-                    'title'      => $i->description ?? $i->item_name,
-                    'quantity'   => $i->qty,
+                'amount' => round((float) $invoice->total(), 2),
+                'paid_amount' => round((float) $invoice->paid, 2),
+                'remaining' => $invoice->unpaid_total(),
+                'currency' => $invoice->currency_id,
+                'status' => $invoice->status,
+                'due_date' => $invoice->schedule['start_date'] ?? null,
+                'issued_at' => $invoice->created_at?->format('Y-m-d'),
+                'notes' => $invoice->notes,
+                'items' => $invoice->items->map(fn ($i) => [
+                    'title' => $i->description ?? $i->item_name,
+                    'quantity' => $i->qty,
                     'unit_price' => $i->price,
-                    'total'      => $i->total(),
+                    'total' => $i->total(),
                 ]),
             ],
-            'client_balance'  => round((float) $user->balance(), 2),
+            'client_balance' => round((float) $user->balance(), 2),
             'wallet_currency' => $walletCurrency,
             'remaining_in_wallet_currency' => round((float) $remainingInWalletCurrency, 2),
         ]);
@@ -114,7 +117,7 @@ class InvoiceController extends Controller
     public function processPayment(Request $request, $uuid)
     {
         $user = Auth::user();
-        
+
         $invoice = Invoice::where('uuid', $uuid)
             ->where('user_id', $user->id)
             ->with(['currency'])
@@ -125,26 +128,28 @@ class InvoiceController extends Controller
         }
 
         $remaining = $invoice->unpaid_total();
-        
+
         $walletCurrencyId = $user->currency_id;
-        if (!$walletCurrencyId) {
-            return response()->json(['success' => false, 'message' => "User is missing a currency configuration"], 500);
+        if (! $walletCurrencyId) {
+            return response()->json(['success' => false, 'message' => 'User is missing a currency configuration'], 500);
         }
-        
-        $remainingInWalletCurrency = \App\Models\CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
-        
+
+        $remainingInWalletCurrency = CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
+
         // If wallet balance covers the remaining amount, pay via wallet
         if ((float) $user->balance() >= $remainingInWalletCurrency) {
             try {
                 $invoice->bill_invoice();
+
                 return response()->json([
-                    'success'      => true,
-                    'message'      => __('general.payment_successful_thank_you'),
-                    'fully_paid'   => true,
+                    'success' => true,
+                    'message' => __('general.payment_successful_thank_you'),
+                    'fully_paid' => true,
                     'redirect_url' => route('billing.invoices.index'),
                 ]);
             } catch (\Exception $e) {
-                Log::error("Failed to pay platform invoice via wallet: " . $e->getMessage());
+                Log::error('Failed to pay platform invoice via wallet: '.$e->getMessage());
+
                 return response()->json([
                     'success' => false,
                     'message' => __('general.payment_failed_please_try_again'),
@@ -153,13 +158,13 @@ class InvoiceController extends Controller
         }
 
         // Balance insufficient, redirect to Kashier payment gateway
-        if (!$invoice->currency) {
-            return response()->json(['success' => false, 'message' => "Currency is missing"], 500);
+        if (! $invoice->currency) {
+            return response()->json(['success' => false, 'message' => 'Currency is missing'], 500);
         }
-        
+
         $currencyCode = $invoice->currency->currency;
 
-        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+        $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($remaining, $currencyCode)
             ->forUser($user->id, $user->name, $user->email)
             ->withSource('user-invoice-payment', 'u_inv_')
@@ -174,7 +179,7 @@ class InvoiceController extends Controller
         return response()->json([
             'success' => true,
             'redirect_url' => $paymentUrl,
-            'gateway' => true
+            'gateway' => true,
         ]);
     }
 
@@ -185,7 +190,7 @@ class InvoiceController extends Controller
     {
         return Inertia::render('Client/Billing/PaymentResult', [
             'status' => 'success',
-            'message' => __('general.payment_successful_thank_you')
+            'message' => __('general.payment_successful_thank_you'),
         ]);
     }
 
@@ -196,7 +201,7 @@ class InvoiceController extends Controller
     {
         return Inertia::render('Client/Billing/PaymentResult', [
             'status' => 'error',
-            'message' => __('general.payment_failed_please_try_again')
+            'message' => __('general.payment_failed_please_try_again'),
         ]);
     }
 
@@ -205,13 +210,14 @@ class InvoiceController extends Controller
      */
     public function paymentWebhook(Request $request)
     {
-        if (!KashierHelper::validatePayload()) {
+        if (! KashierHelper::validatePayload()) {
             Log::warning('User Invoice Kashier webhook: Invalid signature.');
+
             return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 400);
         }
 
         $payload = json_decode($request->getContent(), true);
-        if (!$payload || !isset($payload['data'])) {
+        if (! $payload || ! isset($payload['data'])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid payload format'], 400);
         }
 
@@ -223,12 +229,12 @@ class InvoiceController extends Controller
         }
 
         $invoiceId = $metaData['invoice_id'] ?? null;
-        if (!$invoiceId) {
+        if (! $invoiceId) {
             return response()->json(['status' => 'error', 'message' => 'Missing invoice ID'], 400);
         }
 
         $invoice = Invoice::find($invoiceId);
-        if (!$invoice) {
+        if (! $invoice) {
             return response()->json(['status' => 'error', 'message' => 'Invoice not found'], 404);
         }
 
@@ -238,12 +244,13 @@ class InvoiceController extends Controller
                     $invoice->mark_as_paid();
                     Log::info("User Invoice payment successful for invoice #{$invoice->id}");
                 } catch (\Exception $e) {
-                    Log::error("User Invoice payment failed to mark as paid for invoice #{$invoice->id}: " . $e->getMessage());
+                    Log::error("User Invoice payment failed to mark as paid for invoice #{$invoice->id}: ".$e->getMessage());
+
                     return response()->json(['status' => 'error', 'message' => 'Failed to process payment internally'], 500);
                 }
             }
         } else {
-            Log::info("User Invoice payment failed for invoice #{$invoice->id}, Status: " . $data['status']);
+            Log::info("User Invoice payment failed for invoice #{$invoice->id}, Status: ".$data['status']);
         }
 
         return response()->json(['status' => 'success']);
@@ -262,8 +269,9 @@ class InvoiceController extends Controller
             ->firstOrFail();
 
         $invoice->loadMissing(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
-        $pdf = \App\Helpers\TextHelper::pdfInvoice($invoice);
+        $pdf = TextHelper::pdfInvoice($invoice);
         $clientName = $invoice->user ? $invoice->user->name : 'Client';
-        return $pdf->download(str_replace(' ', '-', $clientName) . '-' . $invoice->id . '.pdf');
+
+        return $pdf->download(str_replace(' ', '-', $clientName).'-'.$invoice->id.'.pdf');
     }
 }

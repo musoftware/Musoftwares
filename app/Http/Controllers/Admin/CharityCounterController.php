@@ -22,7 +22,7 @@ class CharityCounterController extends Controller
             $search = $request->search;
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -64,7 +64,8 @@ class CharityCounterController extends Controller
             return back()->with('success', 'تم إضافة المبلغ بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+
+            return back()->with('error', 'حدث خطأ: '.$e->getMessage());
         }
     }
 
@@ -92,7 +93,8 @@ class CharityCounterController extends Controller
             return back()->with('success', 'تم خصم المبلغ بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+
+            return back()->with('error', 'حدث خطأ: '.$e->getMessage());
         }
     }
 }

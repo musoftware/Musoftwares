@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\SerialSoftware\StoreSerialSoftwareRequest;
+use App\Http\Requests\Admin\SerialSoftware\UpdateSerialSoftwareStatusRequest;
+use App\Http\Resources\SerialSoftwareResource;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
 use App\Services\SerialSoftwareService;
-use App\Http\Requests\Admin\SerialSoftware\UpdateSerialSoftwareStatusRequest;
-use App\Http\Requests\Admin\SerialSoftware\StoreSerialSoftwareRequest;
-use App\Http\Resources\SerialSoftwareResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -30,27 +30,27 @@ class SerialSoftwareController extends Controller
     public function index(Request $request): Response
     {
         $filters = [
-            'search'         => trim((string) $request->query('search')),
+            'search' => trim((string) $request->query('search')),
             'default_status' => $request->query('default_status'),
-            'sort_by'        => $request->query('sort_by', 'created_at'),
-            'direction'      => $request->query('direction', 'desc'),
-            'per_page'       => (int) $request->query('per_page', 20),
+            'sort_by' => $request->query('sort_by', 'created_at'),
+            'direction' => $request->query('direction', 'desc'),
+            'per_page' => (int) $request->query('per_page', 20),
         ];
 
         // Clamp per_page to allowed values
-        if (!in_array($filters['per_page'], [10, 20, 50, 100])) {
+        if (! in_array($filters['per_page'], [10, 20, 50, 100])) {
             $filters['per_page'] = 20;
         }
 
         $query = SerialSoftware::query()
             ->withCount(['devices as total_devices'])
-            ->withCount(['devices as active_count' => fn($q) => $q->where('status', 'active')])
-            ->withCount(['devices as inactive_count' => fn($q) => $q->where('status', 'inactive')])
-            ->withCount(['devices as blocked_count' => fn($q) => $q->where('status', 'blocked')]);
+            ->withCount(['devices as active_count' => fn ($q) => $q->where('status', 'active')])
+            ->withCount(['devices as inactive_count' => fn ($q) => $q->where('status', 'inactive')])
+            ->withCount(['devices as blocked_count' => fn ($q) => $q->where('status', 'blocked')]);
 
         // Search filter
         if ($filters['search'] !== '') {
-            $query->where('name', 'LIKE', '%' . $filters['search'] . '%');
+            $query->where('name', 'LIKE', '%'.$filters['search'].'%');
         }
 
         // Status filter
@@ -67,21 +67,21 @@ class SerialSoftwareController extends Controller
         $softwares = $query
             ->paginate($filters['per_page'])
             ->withQueryString()
-            ->through(fn($sw) => (new SerialSoftwareResource($sw))->resolve());
+            ->through(fn ($sw) => (new SerialSoftwareResource($sw))->resolve());
 
         // Aggregate stats across all softwares (unfiltered)
         $stats = [
-            'total_softwares'    => SerialSoftware::count(),
-            'total_devices_all'  => SerialDevice::count(),
+            'total_softwares' => SerialSoftware::count(),
+            'total_devices_all' => SerialDevice::count(),
             'active_devices_all' => SerialDevice::where('status', 'active')->count(),
             'inactive_devices_all' => SerialDevice::where('status', 'inactive')->count(),
-            'blocked_devices_all'  => SerialDevice::where('status', 'blocked')->count(),
+            'blocked_devices_all' => SerialDevice::where('status', 'blocked')->count(),
         ];
 
         return Inertia::render('Admin/SerialSoftwares/Index', [
             'softwares' => $softwares,
-            'filters'   => $filters,
-            'stats'     => $stats,
+            'filters' => $filters,
+            'stats' => $stats,
         ]);
     }
 
@@ -92,13 +92,13 @@ class SerialSoftwareController extends Controller
     {
         $softwares = SerialSoftware::query()
             ->withCount(['devices as total_devices'])
-            ->withCount(['devices as active_count' => fn($q) => $q->where('status', 'active')])
-            ->withCount(['devices as inactive_count' => fn($q) => $q->where('status', 'inactive')])
-            ->withCount(['devices as blocked_count' => fn($q) => $q->where('status', 'blocked')])
+            ->withCount(['devices as active_count' => fn ($q) => $q->where('status', 'active')])
+            ->withCount(['devices as inactive_count' => fn ($q) => $q->where('status', 'inactive')])
+            ->withCount(['devices as blocked_count' => fn ($q) => $q->where('status', 'blocked')])
             ->orderByDesc('created_at')
             ->get();
 
-        $filename = 'serial-softwares-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'serial-softwares-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($softwares) {
             $handle = fopen('php://output', 'w');

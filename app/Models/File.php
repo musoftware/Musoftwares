@@ -2,26 +2,25 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class File extends Model
 {
-    use SoftDeletes, HasFactory;
-
+    use HasFactory, SoftDeletes;
 
     public static function formatBytes($size, $precision = 2)
     {
         if ($size > 0) {
-            $size = (int)$size;
+            $size = (int) $size;
             $base = log($size) / log(1024);
-            $suffixes = array(' bytes', ' KB', ' MB', ' GB', ' TB');
+            $suffixes = [' bytes', ' KB', ' MB', ' GB', ' TB'];
 
-            return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+            return round(pow(1024, $base - floor($base)), $precision).$suffixes[floor($base)];
         } else {
             return $size;
         }
@@ -29,7 +28,7 @@ class File extends Model
 
     public function realPath()
     {
-        return '/uploaded_user_files/' . $this->filename;
+        return '/uploaded_user_files/'.$this->filename;
     }
 
     public static function currentFolderFiles($folder_id, $filter = null)
@@ -43,14 +42,14 @@ class File extends Model
 
     public function delete_hash()
     {
-        return sha1(sha1($this->id . '---' . $this->filetype)
-            . '---' . $this->created_at);
+        return sha1(sha1($this->id.'---'.$this->filetype)
+            .'---'.$this->created_at);
     }
 
     public function hash()
     {
-        return md5(sha1($this->id . '---' . $this->filetype)
-            . '---' . $this->created_at);
+        return md5(sha1($this->id.'---'.$this->filetype)
+            .'---'.$this->created_at);
 
     }
 
@@ -67,7 +66,8 @@ class File extends Model
     public function extension()
     {
         $arr = explode('.', $this->filename);
-        return '.' . end($arr);
+
+        return '.'.end($arr);
     }
 
     public function image()
@@ -93,21 +93,21 @@ class File extends Model
     {
         $files = [];
         foreach (Auth::user()->files()->select('filename')->get()->pluck('filename') as $item) {
-            $files[] = \Illuminate\Support\Facades\Storage::disk('uploaded_user_files')->url($item);
+            $files[] = Storage::disk('uploaded_user_files')->url($item);
         }
+
         return $files;
     }
 
-
     public function parent_folder()
     {
-        return $this->belongsTo(\App\Models\FileFolder::class, 'folder_id');
+        return $this->belongsTo(FileFolder::class, 'folder_id');
     }
 
     public function path()
     {
         if ($this->parent_folder != null) {
-            return $this->parent_folder->path() . '/' . $this->original_filename;
+            return $this->parent_folder->path().'/'.$this->original_filename;
         } else {
             return $this->original_filename;
         }
@@ -116,9 +116,16 @@ class File extends Model
     public function type_four_only()
     {
         $type = $this->type();
-        if ($type == 'audio') return 'audio';
-        if ($type == 'image') return 'image';
-        if ($type == 'video') return 'video';
+        if ($type == 'audio') {
+            return 'audio';
+        }
+        if ($type == 'image') {
+            return 'image';
+        }
+        if ($type == 'video') {
+            return 'video';
+        }
+
         return 'document';
     }
 
@@ -153,4 +160,3 @@ class File extends Model
         }
     }
 }
-

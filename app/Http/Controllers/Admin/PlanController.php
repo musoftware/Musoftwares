@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\AdminSettings;
+use App\Models\CurrenciesExchange;
 use App\Models\Currency;
+use App\Models\User;
+use App\Models\UserSubscription;
 use App\Services\PricingService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\CurrenciesExchange;
 
 class PlanController extends Controller
 {
@@ -26,11 +28,12 @@ class PlanController extends Controller
         // Since we don't know the exact EGP currency ID safely, we will just return raw from PricingService
         // But for better compatibility if the base is EGP and business is USD:
         $egpCurrency = Currency::where('currency', 'EGP')->first();
-        
-        $convertPrice = function($price) use ($egpCurrency, $businessCurrency) {
+
+        $convertPrice = function ($price) use ($egpCurrency, $businessCurrency) {
             if ($egpCurrency && $businessCurrency && $egpCurrency->id != $businessCurrency->id) {
                 return CurrenciesExchange::RateToday($price, $egpCurrency->id, $businessCurrency->id);
             }
+
             return $price;
         };
 
@@ -38,13 +41,13 @@ class PlanController extends Controller
 
         $users = User::whereHas('subscriptions', function ($q) {
             $q->where('status', 'active')
-              ->where('expires_at', '>', now());
+                ->where('expires_at', '>', now());
         })
-        ->with(['subscriptions' => function ($q) {
-            $q->where('status', 'active')
-              ->where('expires_at', '>', now());
-        }])
-        ->paginate(15);
+            ->with(['subscriptions' => function ($q) {
+                $q->where('status', 'active')
+                    ->where('expires_at', '>', now());
+            }])
+            ->paginate(15);
 
         $users->getCollection()->transform(function ($user) use ($items) {
             $firstExpireDate = null;
@@ -64,7 +67,7 @@ class PlanController extends Controller
                     ];
                 }
 
-                if (!$firstExpireDate || $sub->expires_at < $firstExpireDate) {
+                if (! $firstExpireDate || $sub->expires_at < $firstExpireDate) {
                     $firstExpireDate = $sub->expires_at;
                 }
             }
@@ -89,10 +92,10 @@ class PlanController extends Controller
     public function searchUsers(Request $request)
     {
         $search = $request->input('q');
-        
-        $users = User::with(['subscriptions' => function($q) {
-                $q->where('status', 'active')->where('expires_at', '>', now());
-            }])
+
+        $users = User::with(['subscriptions' => function ($q) {
+            $q->where('status', 'active')->where('expires_at', '>', now());
+        }])
             ->when($search, function ($query, $search) {
                 $query->where(function ($sub) use ($search) {
                     $sub->where('name', 'like', "%{$search}%")
@@ -104,17 +107,18 @@ class PlanController extends Controller
             ->get(['id', 'name', 'email'])
             ->map(function ($user) {
                 $user->original_name = $user->name;
-                $user->name = $user->name . ' (' . $user->email . ')';
+                $user->name = $user->name.' ('.$user->email.')';
+
                 return $user;
             });
-            
+
         return response()->json($users);
     }
 
     public function create()
     {
         $items = $this->pricingService->getServiceItems();
-        
+
         return Inertia::render('Admin/Plans/Create', [
             'services' => $items,
         ]);
@@ -129,19 +133,19 @@ class PlanController extends Controller
         ]);
 
         $user = User::findOrFail($request->user_id);
-        
+
         $existingSub = $user->subscriptions()
             ->where('object', $request->object)
             ->where('status', 'active')
             ->first();
 
-        $expiresAt = \Carbon\Carbon::parse($request->expires_at);
+        $expiresAt = Carbon::parse($request->expires_at);
 
         if ($existingSub) {
             $existingSub->expires_at = $expiresAt;
             $existingSub->save();
         } else {
-            \App\Models\UserSubscription::create([
+            UserSubscription::create([
                 'user_id' => $user->id,
                 'object' => $request->object,
                 'status' => 'active',

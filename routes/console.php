@@ -33,3 +33,6 @@ Schedule::command(\Modules\Fbmb\Console\ProcessPendingFbmbLookups::class)->every
 // Auto-complete delivered marketplace orders hourly
 Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
 
+// Poll IMAP every two minutes for guest ticket replies
+Schedule::command('imap:pull')->everyTwoMinutes()->withoutOverlapping(5);
+

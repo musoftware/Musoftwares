@@ -2,9 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Events\MarketplaceOrderCompleted;
+use App\Models\User;
 use Illuminate\Console\Command;
-use Modules\Marketplace\Models\ServiceOrder;
+use Illuminate\Support\Facades\DB;
 use Modules\Marketplace\Http\Controllers\ServiceOrderController;
+use Modules\Marketplace\Models\MarketplaceEscrow;
+use Modules\Marketplace\Models\ServiceOrder;
 
 class CompleteDeliveredMarketplaceOrders extends Command
 {
@@ -35,13 +39,13 @@ class CompleteDeliveredMarketplaceOrders extends Command
             ->get();
 
         $count = 0;
-        
+
         // We will mock the buyer being authenticated or manually process the logic
         // Because ServiceOrderController::complete requires auth()->id() === buyer_id
         // We shouldn't use the controller for cron jobs, we should use the service.
-        
+
         foreach ($orders as $order) {
-            \Illuminate\Support\Facades\DB::beginTransaction();
+            DB::beginTransaction();
             try {
                 $order->update([
                     'status' => 'completed',
@@ -49,13 +53,13 @@ class CompleteDeliveredMarketplaceOrders extends Command
                 ]);
 
                 // Release Escrow: Credit Seller balance
-                $seller = \App\Models\User::find($order->seller_id);
+                $seller = User::find($order->seller_id);
                 if ($seller) {
                     $sellerCredit = $order->amount - $order->commission_amount;
                     $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Auto-Released)", 'received', $order->currency_id);
 
                     // Update Escrow Record
-                    $escrow = \Modules\Marketplace\Models\MarketplaceEscrow::where('order_id', $order->id)->first();
+                    $escrow = MarketplaceEscrow::where('order_id', $order->id)->first();
                     if ($escrow) {
                         $escrow->update([
                             'status' => 'released',
@@ -65,15 +69,15 @@ class CompleteDeliveredMarketplaceOrders extends Command
                     }
                 }
 
-                \Illuminate\Support\Facades\DB::commit();
-                
-                event(new \App\Events\MarketplaceOrderCompleted($order));
-                
+                DB::commit();
+
+                event(new MarketplaceOrderCompleted($order));
+
                 $this->info("Order #{$order->id} auto-completed successfully.");
                 $count++;
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\DB::rollBack();
-                $this->error("Failed to auto-complete order #{$order->id}: " . $e->getMessage());
+                DB::rollBack();
+                $this->error("Failed to auto-complete order #{$order->id}: ".$e->getMessage());
             }
         }
 

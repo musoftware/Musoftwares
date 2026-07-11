@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\ProjectBoardItem;
 use App\Services\ProjectBoardService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,10 +31,10 @@ class PublicProjectBoardController extends Controller
         $project->loadCount(['tasks', 'reports', 'files']);
         $currency = $project->currencyRow();
 
-        $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
+        $activeDates = ProjectBoardItem::where('project_id', $project->id)
             ->distinct()
             ->pluck('for_date')
-            ->map(fn($d) => is_string($d) ? $d : $d->toDateString())
+            ->map(fn ($d) => is_string($d) ? $d : $d->toDateString())
             ->toArray();
 
         return Inertia::render('Public/SharedBoard', [

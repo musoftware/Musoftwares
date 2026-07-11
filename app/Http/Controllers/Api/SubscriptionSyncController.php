@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserSubscription;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SubscriptionSyncController extends Controller
@@ -11,8 +12,7 @@ class SubscriptionSyncController extends Controller
     /**
      * Get the subscription status for a list of users and a specific module.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function sync(Request $request)
     {
@@ -28,7 +28,7 @@ class SubscriptionSyncController extends Controller
         $subscriptionPrefix = config("saas.system_to_module.{$module}", $module);
 
         $subscriptions = UserSubscription::whereIn('user_id', $userIds)
-            ->where('object', 'like', $subscriptionPrefix . '%')
+            ->where('object', 'like', $subscriptionPrefix.'%')
             ->get(['user_id', 'object', 'status', 'expires_at'])
             ->groupBy('user_id');
 
@@ -68,7 +68,7 @@ class SubscriptionSyncController extends Controller
                     $module => [
                         'status' => 'cancelled',
                         'expires_at' => null,
-                    ]
+                    ],
                 ];
             }
         }

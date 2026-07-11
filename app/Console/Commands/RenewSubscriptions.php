@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\UserSubscription;
+use App\Notifications\SubscriptionPaymentFailedNotification;
+use App\Services\PricingService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
 class RenewSubscriptions extends Command
@@ -47,13 +49,14 @@ class RenewSubscriptions extends Command
 
         $this->info("Found {$expiringSubscriptions->count()} expiring subscriptions to process.");
 
-        $pricingService = app(\App\Services\PricingService::class);
+        $pricingService = app(PricingService::class);
         $serviceItems = $pricingService->getServiceItems();
 
         foreach ($expiringSubscriptions as $subscription) {
             $user = $subscription->user;
-            if (!$user) {
+            if (! $user) {
                 $this->warn("Subscription ID: {$subscription->id} has no associated user. Skipping.");
+
                 continue;
             }
 
@@ -70,6 +73,7 @@ class RenewSubscriptions extends Command
                     // Free plan - just renew without balance deduction
                     $this->renewSubscription($subscription);
                     $this->info("Subscription ID: {$subscription->id} renewed successfully (Free Plan).");
+
                     continue;
                 }
 
@@ -82,37 +86,36 @@ class RenewSubscriptions extends Command
                             $proratedDays = floor(($userBalance / $price) * 30);
                             if ($proratedDays >= 1) {
                                 $proratedPrice = ($proratedDays / 30) * $price;
-                                $user->add_balance(-1 * $proratedPrice, 'Prorated Subscription Renewal: ' . $itemName, 'used');
+                                $user->add_balance(-1 * $proratedPrice, 'Prorated Subscription Renewal: '.$itemName, 'used');
                                 $this->renewSubscription($subscription, $proratedDays);
                                 $this->info("Subscription ID: {$subscription->id} prorated renewed for {$proratedDays} days via balance debit of {$proratedPrice} USD.");
+
                                 continue;
                             }
                         }
-                        throw new Exception("Insufficient balance for even a 1-day proration.");
+                        throw new Exception('Insufficient balance for even a 1-day proration.');
                     }
-                    $user->add_balance(-1 * $price, 'Subscription Renewal: ' . $itemName, 'used');
+                    $user->add_balance(-1 * $price, 'Subscription Renewal: '.$itemName, 'used');
 
                     // If debit succeeded, renew subscription
                     $this->renewSubscription($subscription);
                     $this->info("Subscription ID: {$subscription->id} renewed successfully via balance debit of {$price} USD.");
                 } catch (Exception $balanceException) {
                     // Insufficient funds or error
-                    $this->warn("Failed to debit balance for Subscription ID: {$subscription->id}. Reason: " . $balanceException->getMessage());
-                    
+                    $this->warn("Failed to debit balance for Subscription ID: {$subscription->id}. Reason: ".$balanceException->getMessage());
+
                     // Mark subscription as expired
                     $subscription->update([
-                        'status' => 'expired'
+                        'status' => 'expired',
                     ]);
 
-
-
                     // Notify the user about the downgrade
-                    $user->notify(new \App\Notifications\SubscriptionPaymentFailedNotification($itemName));
+                    $user->notify(new SubscriptionPaymentFailedNotification($itemName));
 
                     $this->error("Subscription ID: {$subscription->id} has been marked as expired due to failed payment.");
                 }
             } catch (Exception $e) {
-                Log::error("Error processing subscription renewal for ID {$subscription->id}: " . $e->getMessage());
+                Log::error("Error processing subscription renewal for ID {$subscription->id}: ".$e->getMessage());
                 $this->error("Error processing subscription ID: {$subscription->id}. See logs.");
             }
         }
@@ -137,7 +140,6 @@ class RenewSubscriptions extends Command
             'status' => 'active',
             'expires_at' => $newExpiresAt,
         ]);
-
 
     }
 }

@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\RecurringNotice;
-use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class RecurringNoticeController extends Controller
 {
@@ -19,7 +18,7 @@ class RecurringNoticeController extends Controller
         return redirect()->route('admin.projects.index');
     }
 
-    private function jsonIndex(): \Illuminate\Http\JsonResponse
+    private function jsonIndex(): JsonResponse
     {
         $notices = RecurringNotice::latest()->get()->map(function (RecurringNotice $notice) {
             return [
@@ -49,7 +48,7 @@ class RecurringNoticeController extends Controller
     {
         $data = $this->validateData($request);
 
-        $notice = new RecurringNotice();
+        $notice = new RecurringNotice;
         $this->fillNotice($notice, $data);
         $notice->save();
 
@@ -120,7 +119,7 @@ class RecurringNoticeController extends Controller
     public function toggle(Request $request, $id)
     {
         $notice = RecurringNotice::findOrFail($id);
-        $notice->is_active = !$notice->is_active;
+        $notice->is_active = ! $notice->is_active;
         $notice->save();
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -168,13 +167,13 @@ class RecurringNoticeController extends Controller
         $notice->recurring_times_month = null;
         $notice->recurring_times_year = null;
 
-        if ($data['recurring'] === 'week' && !empty($data['recurring_times_week'])) {
+        if ($data['recurring'] === 'week' && ! empty($data['recurring_times_week'])) {
             $notice->recurring_times_week = implode(',', $data['recurring_times_week']);
         }
-        if ($data['recurring'] === 'month' && !empty($data['recurring_times_month'])) {
+        if ($data['recurring'] === 'month' && ! empty($data['recurring_times_month'])) {
             $notice->recurring_times_month = implode(',', $data['recurring_times_month']);
         }
-        if ($data['recurring'] === 'year' && !empty($data['recurring_times_year'])) {
+        if ($data['recurring'] === 'year' && ! empty($data['recurring_times_year'])) {
             $notice->recurring_times_year = implode(',', $data['recurring_times_year']);
         }
     }

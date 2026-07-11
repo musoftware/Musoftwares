@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Task;
 use App\Trait\ChatModelTrait;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,14 +14,15 @@ use Illuminate\Support\Facades\Storage;
 
 class Todo extends Model
 {
+    use ChatModelTrait;
     use HasFactory;
     use SoftDeletes;
-    use ChatModelTrait;
 
     public function ChatName()
     {
         return Todo::class;
     }
+
     public $fillable = [
         'title',
         'description',
@@ -43,12 +43,12 @@ class Todo extends Model
     ];
 
     protected $casts = [
-        'completed'    => 'boolean',
-        'paused'       => 'boolean',
-        'start_at'     => 'datetime',
-        'end_at'       => 'datetime',
+        'completed' => 'boolean',
+        'paused' => 'boolean',
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
         'completed_at' => 'datetime',
-        'tags'         => 'array',
+        'tags' => 'array',
     ];
 
     public static function parseItems($items)
@@ -56,18 +56,20 @@ class Todo extends Model
         foreach ($items as &$item) {
             $item = static::parseTags($item);
         }
+
         return $items;
     }
 
     public static function parseImages($images): array
     {
-        $images_urls = array();
+        $images_urls = [];
         foreach ($images as $image) {
-            $images_urls[] = array(
+            $images_urls[] = [
                 'path' => Storage::disk('todo')->url($image['filename']),
-                'id' => $image['id']
-            );
+                'id' => $image['id'],
+            ];
         }
+
         return $images_urls;
     }
 
@@ -81,8 +83,10 @@ class Todo extends Model
         if (isset($item['completed'])) {
             $item['completed'] = ($item['completed'] === '1') || ($item['completed'] === 1);
         }
+
         return $item;
     }
+
     public function task_todo_images()
     {
         return $this->hasMany(TodoImage::class);
@@ -119,12 +123,12 @@ class Todo extends Model
         $this->save();
     }
 
-
     public function resume()
     {
         $this->paused = false;
         $this->save();
     }
+
     public function task_todo_audios()
     {
         return $this->hasMany(TodoAudio::class);

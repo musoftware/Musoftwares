@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CharityTransaction extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -61,14 +60,14 @@ class CharityTransaction extends Model
     /**
      * فلترة المعاملات حسب المرجع
      */
-    public function scopeByReference($query, string $referenceType, string $referenceId = null)
+    public function scopeByReference($query, string $referenceType, ?string $referenceId = null)
     {
         $query = $query->where('reference_type', $referenceType);
-        
+
         if ($referenceId) {
             $query->where('reference_id', $referenceId);
         }
-        
+
         return $query;
     }
 

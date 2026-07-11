@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use App\Models\BackgroundTask;
 use App\Events\BackgroundTaskUpdated;
+use App\Models\BackgroundTask;
 
 trait TracksBackgroundTask
 {
@@ -23,7 +23,7 @@ trait TracksBackgroundTask
         ]);
 
         broadcast(new BackgroundTaskUpdated($this->backgroundTask));
-        
+
         return $this->backgroundTask;
     }
 
@@ -48,8 +48,8 @@ trait TracksBackgroundTask
     {
         if ($this->backgroundTask) {
             $updateData = ['progress' => $progress];
-            
-            if (!empty($partialResult)) {
+
+            if (! empty($partialResult)) {
                 $currentResult = $this->backgroundTask->result ?? [];
                 $updateData['result'] = array_merge($currentResult, $partialResult);
             }

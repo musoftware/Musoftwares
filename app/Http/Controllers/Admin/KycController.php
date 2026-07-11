@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\KycDocument;
-use App\Services\KycService;
 use App\Http\Requests\Admin\Kyc\RejectKycRequest;
 use App\Http\Resources\KycUserResource;
+use App\Models\User;
+use App\Services\KycService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,21 +15,22 @@ class KycController extends Controller
     public function __construct(
         protected KycService $kycService
     ) {}
+
     public function index()
     {
         // Get users with pending KYC documents or pending review note
-        $users = User::whereHas('kycDocuments', function($q) {
-                $q->where('status', 'pending');
-            })
-            ->orWhere(function($q) {
+        $users = User::whereHas('kycDocuments', function ($q) {
+            $q->where('status', 'pending');
+        })
+            ->orWhere(function ($q) {
                 $q->where('kyc_verified', false)
-                  ->whereNotNull('kyc_notes');
+                    ->whereNotNull('kyc_notes');
             })
-            ->with(['kycDocuments' => function($q) {
+            ->with(['kycDocuments' => function ($q) {
                 $q->latest();
             }])
             ->paginate(15)
-            ->through(fn($u) => (new KycUserResource($u))->resolve());
+            ->through(fn ($u) => (new KycUserResource($u))->resolve());
 
         return Inertia::render('Admin/Kyc/Index', [
             'users' => $users,
@@ -40,7 +40,7 @@ class KycController extends Controller
     public function approve(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
+
         $this->kycService->approveKyc($user, $request->user()->id);
 
         return back()->with('success', "User {$user->name} has been KYC verified successfully.");
@@ -49,7 +49,7 @@ class KycController extends Controller
     public function reject(RejectKycRequest $request, $id)
     {
         $user = User::findOrFail($id);
-        
+
         $this->kycService->rejectKyc($user, $request->validated('reason'));
 
         return back()->with('success', "User {$user->name} KYC has been rejected.");
@@ -57,7 +57,7 @@ class KycController extends Controller
 
     public function showUserDocuments($id)
     {
-        $user = User::with(['kycDocuments' => function($q) {
+        $user = User::with(['kycDocuments' => function ($q) {
             $q->latest();
         }])->findOrFail($id);
 

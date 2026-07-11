@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 
 class LanguageLine extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['group', 'key', 'text'];
 
@@ -49,6 +48,7 @@ class LanguageLine extends Model
                 ->get()
                 ->reduce(function ($translations, LanguageLine $languageLine) use ($locale) {
                     $translations[$languageLine->key] = $languageLine->getTranslation($locale);
+
                     return $translations;
                 }, []);
         });

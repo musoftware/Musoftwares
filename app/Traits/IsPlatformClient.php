@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Models\Ticket;
+
 /**
  * Allows the User model to act as a Client natively for Platform-level operations.
  *
@@ -19,6 +21,6 @@ trait IsPlatformClient
      */
     public function tickets()
     {
-        return $this->hasMany(\App\Models\Ticket::class, 'user_id');
+        return $this->hasMany(Ticket::class, 'user_id');
     }
 }

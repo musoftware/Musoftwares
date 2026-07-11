@@ -14,17 +14,17 @@ class TrackerController extends Controller
     {
         try {
             $data = json_decode(base64_decode($payload), true);
-            
+
             if (isset($data['u']) && isset($data['c']) && isset($data['t'])) {
                 DB::table('email_tracking_events')->insert([
-                    'user_id'     => $data['u'],
+                    'user_id' => $data['u'],
                     'campaign_id' => $data['c'],
-                    'contact_id'  => $data['t'],
-                    'ip'          => $request->ip(),
-                    'user_agent'  => substr($request->userAgent(), 0, 255),
-                    'opened_at'   => now(),
-                    'created_at'  => now(),
-                    'updated_at'  => now()
+                    'contact_id' => $data['t'],
+                    'ip' => $request->ip(),
+                    'user_agent' => substr($request->userAgent(), 0, 255),
+                    'opened_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         } catch (\Exception $e) {
@@ -44,16 +44,16 @@ class TrackerController extends Controller
 
             if (isset($data['u']) && isset($data['c']) && isset($data['t']) && $url) {
                 DB::table('email_tracking_events')->insert([
-                    'user_id'     => $data['u'],
+                    'user_id' => $data['u'],
                     'campaign_id' => $data['c'],
-                    'contact_id'  => $data['t'],
-                    'ip'          => $request->ip(),
-                    'user_agent'  => substr($request->userAgent(), 0, 255),
-                    'event_type'  => 'click',
-                    'url'         => $url,
-                    'opened_at'   => now(),
-                    'created_at'  => now(),
-                    'updated_at'  => now()
+                    'contact_id' => $data['t'],
+                    'ip' => $request->ip(),
+                    'user_agent' => substr($request->userAgent(), 0, 255),
+                    'event_type' => 'click',
+                    'url' => $url,
+                    'opened_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         } catch (\Exception $e) {
@@ -67,18 +67,18 @@ class TrackerController extends Controller
     {
         try {
             $data = json_decode(base64_decode($payload), true);
-            
+
             if (isset($data['u']) && isset($data['c']) && isset($data['t'])) {
                 DB::table('email_tracking_events')->insert([
-                    'user_id'     => $data['u'],
+                    'user_id' => $data['u'],
                     'campaign_id' => $data['c'],
-                    'contact_id'  => $data['t'],
-                    'ip'          => $request->ip(),
-                    'user_agent'  => substr($request->userAgent(), 0, 255),
-                    'event_type'  => 'unsubscribe',
-                    'opened_at'   => now(),
-                    'created_at'  => now(),
-                    'updated_at'  => now()
+                    'contact_id' => $data['t'],
+                    'ip' => $request->ip(),
+                    'user_agent' => substr($request->userAgent(), 0, 255),
+                    'event_type' => 'unsubscribe',
+                    'opened_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         } catch (\Exception $e) {
@@ -94,24 +94,24 @@ class TrackerController extends Controller
     public function sync(Request $request)
     {
         $token = $request->header('Authorization');
-        if (!$token) {
+        if (! $token) {
             return response()->json(['error' => 'Missing token'], 401);
         }
-        
+
         $userId = trim(str_replace('Bearer ', '', $token));
-        
+
         // Fast sync: read chunk and delete atomically
         $events = DB::transaction(function () use ($userId) {
             $records = DB::table('email_tracking_events')
                 ->where('user_id', $userId)
                 ->limit(1000)
                 ->get();
-            
+
             if ($records->isNotEmpty()) {
                 $ids = $records->pluck('id')->toArray();
                 DB::table('email_tracking_events')->whereIn('id', $ids)->delete();
             }
-            
+
             return $records;
         });
 

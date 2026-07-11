@@ -2,28 +2,28 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class FileFolder extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     public function files()
     {
-        return $this->hasMany(\App\Models\File::class, 'folder_id');
+        return $this->hasMany(File::class, 'folder_id');
     }
 
     public function fileFolders()
     {
-        return $this->hasMany(\App\Models\FileFolder::class, 'folder_id');
+        return $this->hasMany(FileFolder::class, 'folder_id');
     }
 
     public function parent_folder()
     {
-        return $this->belongsTo(\App\Models\FileFolder::class, 'folder_id');
+        return $this->belongsTo(FileFolder::class, 'folder_id');
     }
 
     public function delete_folder()
@@ -35,8 +35,8 @@ class FileFolder extends Model
         }
         foreach ($this->files as $file) {
             if ($file != null) {
-                if (\Illuminate\Support\Facades\Storage::disk('uploaded_user_files')->exists($file->filename)) {
-                    \Illuminate\Support\Facades\Storage::disk('uploaded_user_files')->delete($file->filename);
+                if (Storage::disk('uploaded_user_files')->exists($file->filename)) {
+                    Storage::disk('uploaded_user_files')->delete($file->filename);
                 }
                 $file->delete();
             }
@@ -44,26 +44,24 @@ class FileFolder extends Model
         $this->delete();
     }
 
-
     public function path()
     {
         if ($this->parent_folder != null) {
-            return $this->parent_folder->path() . '/' .  $this->foldername;
+            return $this->parent_folder->path().'/'.$this->foldername;
         } else {
             return $this->foldername;
         }
     }
 
-
     public function init_zip($zip)
     {
         foreach ($this->files as $file) {
-            if (\Illuminate\Support\Facades\Storage::disk('uploaded_user_files')->exists($file->filename))
-                $zip->addFromString($file->path(), \Illuminate\Support\Facades\Storage::disk('uploaded_user_files')->get($file->filename));
+            if (Storage::disk('uploaded_user_files')->exists($file->filename)) {
+                $zip->addFromString($file->path(), Storage::disk('uploaded_user_files')->get($file->filename));
+            }
         }
         foreach ($this->fileFolders as $folder) {
             $folder->init_zip($zip);
         }
     }
-
 }

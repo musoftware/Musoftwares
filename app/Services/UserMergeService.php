@@ -45,7 +45,7 @@ class UserMergeService
         foreach (self::RESOLVABLE_FIELDS as $field) {
             $s = $survivor->{$field};
             $d = $duplicate->{$field};
-            if ($s !== $d && !($s === null && $d === '')) {
+            if ($s !== $d && ! ($s === null && $d === '')) {
                 $fieldConflicts[$field] = [
                     'survivor' => $s,
                     'duplicate' => $d,
@@ -56,10 +56,10 @@ class UserMergeService
         $childCounts = $this->collectChildCounts($duplicateId);
 
         return [
-            'survivor'      => $survivor->only(['id', 'name', 'email']),
-            'duplicate'     => $duplicate->only(['id', 'name', 'email']),
+            'survivor' => $survivor->only(['id', 'name', 'email']),
+            'duplicate' => $duplicate->only(['id', 'name', 'email']),
             'field_conflicts' => $fieldConflicts,
-            'child_counts'  => $childCounts,
+            'child_counts' => $childCounts,
         ];
     }
 
@@ -95,36 +95,37 @@ class UserMergeService
 
         DB::transaction(function () use ($survivorId, $duplicateIds, $resolutions, $adminId, &$outcomes) {
             $survivor = User::withTrashed()->lockForUpdate()->find($survivorId);
-            if (!$survivor || $survivor->trashed()) {
+            if (! $survivor || $survivor->trashed()) {
                 throw new RuntimeException("Survivor user #{$survivorId} not found or already soft-deleted.");
             }
 
             $perDuplicateSnapshots = [];
             $totalReassignments = [];
             $totalTokensRevoked = 0;
-            $totalRolesDeduped  = 0;
-            $allCollisions      = [];
+            $totalRolesDeduped = 0;
+            $allCollisions = [];
 
             foreach ($duplicateIds as $duplicateId) {
                 $duplicate = User::withTrashed()->lockForUpdate()->find($duplicateId);
-                if (!$duplicate || $duplicate->trashed()) {
+                if (! $duplicate || $duplicate->trashed()) {
                     $outcomes[] = [
                         'duplicate_id' => $duplicateId,
-                        'status'       => 'skipped',
-                        'alias_added'  => false,
-                        'error'        => 'Duplicate not found or already merged.',
+                        'status' => 'skipped',
+                        'alias_added' => false,
+                        'error' => 'Duplicate not found or already merged.',
                     ];
+
                     continue;
                 }
 
                 $snapshot = [
-                    'survivor_before'  => $survivor->only(self::RESOLVABLE_FIELDS),
+                    'survivor_before' => $survivor->only(self::RESOLVABLE_FIELDS),
                     'duplicate_before' => $duplicate->only(self::RESOLVABLE_FIELDS),
-                    'resolutions'      => $resolutions,
-                    'reassignments'    => [],
-                    'tokens_revoked'   => 0,
-                    'roles_deduped'    => 0,
-                    'collisions'       => [],
+                    'resolutions' => $resolutions,
+                    'reassignments' => [],
+                    'tokens_revoked' => 0,
+                    'roles_deduped' => 0,
+                    'collisions' => [],
                 ];
 
                 if ((int) $duplicate->id === (int) $survivorId) {
@@ -133,52 +134,52 @@ class UserMergeService
 
                 $this->applyFieldResolutions($survivor, $duplicate, $resolutions);
 
-                $snapshot['reassignments']  = $this->reassignChildRows($duplicateId, $survivorId, $snapshot['collisions']);
+                $snapshot['reassignments'] = $this->reassignChildRows($duplicateId, $survivorId, $snapshot['collisions']);
                 $snapshot['tokens_revoked'] = $this->revokeDuplicateTokens($duplicateId);
-                $snapshot['roles_deduped']  = $this->mergeRolesAndPermissions($duplicateId, $survivorId);
+                $snapshot['roles_deduped'] = $this->mergeRolesAndPermissions($duplicateId, $survivorId);
 
                 $duplicate->forceFill([
                     'merged_into_user_id' => $survivorId,
-                    'deleted_at'          => now(),
+                    'deleted_at' => now(),
                 ])->save();
 
                 $aliasAdded = $this->promoteDuplicateEmailToAlias($duplicate, $survivor, $adminId);
 
                 $perDuplicateSnapshots[] = [
                     'duplicate_id' => $duplicateId,
-                    'snapshot'      => $snapshot,
-                    'alias_added'   => $aliasAdded,
+                    'snapshot' => $snapshot,
+                    'alias_added' => $aliasAdded,
                 ];
 
                 $totalReassignments = array_merge($totalReassignments, $snapshot['reassignments']);
                 $totalTokensRevoked += $snapshot['tokens_revoked'];
-                $totalRolesDeduped  += $snapshot['roles_deduped'];
-                $allCollisions       = array_merge($allCollisions, $snapshot['collisions']);
+                $totalRolesDeduped += $snapshot['roles_deduped'];
+                $allCollisions = array_merge($allCollisions, $snapshot['collisions']);
 
                 $outcomes[] = [
                     'duplicate_id' => $duplicateId,
-                    'status'       => 'merged',
-                    'alias_added'  => $aliasAdded,
+                    'status' => 'merged',
+                    'alias_added' => $aliasAdded,
                 ];
             }
 
             AdminAuditLog::create([
                 'actor_user_id' => $adminId,
-                'action'        => 'users.merged',
-                'severity'      => AdminAuditLog::SEVERITY_WARNING,
-                'target_type'   => User::class,
-                'target_id'     => $survivorId,
-                'meta'          => [
-                    'survivor_id'     => $survivorId,
-                    'duplicate_ids'   => $duplicateIds,
-                    'duplicate_id'    => count($duplicateIds) === 1 ? $duplicateIds[0] : null,
-                    'outcomes'        => $outcomes,
-                    'batch_snapshot'  => [
-                        'reassignments'  => $totalReassignments,
+                'action' => 'users.merged',
+                'severity' => AdminAuditLog::SEVERITY_WARNING,
+                'target_type' => User::class,
+                'target_id' => $survivorId,
+                'meta' => [
+                    'survivor_id' => $survivorId,
+                    'duplicate_ids' => $duplicateIds,
+                    'duplicate_id' => count($duplicateIds) === 1 ? $duplicateIds[0] : null,
+                    'outcomes' => $outcomes,
+                    'batch_snapshot' => [
+                        'reassignments' => $totalReassignments,
                         'tokens_revoked' => $totalTokensRevoked,
-                        'roles_deduped'  => $totalRolesDeduped,
-                        'collisions'     => $allCollisions,
-                        'per_duplicate'  => $perDuplicateSnapshots,
+                        'roles_deduped' => $totalRolesDeduped,
+                        'collisions' => $allCollisions,
+                        'per_duplicate' => $perDuplicateSnapshots,
                     ],
                 ],
             ]);
@@ -205,10 +206,10 @@ class UserMergeService
 
         try {
             UserEmail::create([
-                'user_id'          => $survivor->id,
-                'email'            => $email,
-                'verified_at'      => now(),
-                'source'           => UserEmail::SOURCE_MERGE,
+                'user_id' => $survivor->id,
+                'email' => $email,
+                'verified_at' => now(),
+                'source' => UserEmail::SOURCE_MERGE,
                 'added_by_user_id' => $adminId ?: null,
             ]);
         } catch (\Throwable $e) {
@@ -227,13 +228,13 @@ class UserMergeService
             throw new RuntimeException('Survivor and duplicate must be different users.');
         }
 
-        $survivor  = User::withTrashed()->find($survivorId);
+        $survivor = User::withTrashed()->find($survivorId);
         $duplicate = User::withTrashed()->find($duplicateId);
 
-        if (!$survivor || $survivor->trashed()) {
+        if (! $survivor || $survivor->trashed()) {
             throw new RuntimeException("Survivor user #{$survivorId} not found or already soft-deleted.");
         }
-        if (!$duplicate || $duplicate->trashed()) {
+        if (! $duplicate || $duplicate->trashed()) {
             throw new RuntimeException("Duplicate user #{$duplicateId} not found or already merged.");
         }
 
@@ -244,7 +245,7 @@ class UserMergeService
     {
         $updates = [];
         foreach (self::RESOLVABLE_FIELDS as $field) {
-            if (!array_key_exists($field, $resolutions)) {
+            if (! array_key_exists($field, $resolutions)) {
                 continue;
             }
             $pick = $resolutions[$field];
@@ -275,7 +276,7 @@ class UserMergeService
 
         foreach ($tables as $table) {
             foreach (self::REASSIGN_COLUMNS as $fkCol) {
-                if (!Schema::hasColumn($table, $fkCol)) {
+                if (! Schema::hasColumn($table, $fkCol)) {
                     continue;
                 }
 
@@ -285,7 +286,7 @@ class UserMergeService
                 }
 
                 $existingSurvivorPairs = $this->uniqueOtherColumnsFor($table, $fkCol, $survivorId);
-                $duplicateOtherValues  = $this->otherColumnValuesFor($table, $fkCol, $duplicateId);
+                $duplicateOtherValues = $this->otherColumnValuesFor($table, $fkCol, $duplicateId);
 
                 $skipped = 0;
                 if ($duplicateOtherValues !== []) {
@@ -310,6 +311,7 @@ class UserMergeService
                                 $otherCol,
                                 $otherVal
                             );
+
                             continue;
                         }
 
@@ -334,8 +336,8 @@ class UserMergeService
                 }
 
                 $report[] = [
-                    'table'   => $table,
-                    'column'  => $fkCol,
+                    'table' => $table,
+                    'column' => $fkCol,
                     'updated' => $totalDuplicate - $skipped,
                     'skipped' => $skipped,
                 ];
@@ -348,7 +350,7 @@ class UserMergeService
     private function revokeDuplicateTokens(int $duplicateId): int
     {
         $table = config('sanctum.personal_access_tokens_table', 'personal_access_tokens');
-        if (!Schema::hasTable($table) || !Schema::hasColumn($table, 'tokenable_id')) {
+        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, 'tokenable_id')) {
             return 0;
         }
 
@@ -362,7 +364,7 @@ class UserMergeService
     {
         $count = 0;
         foreach (['model_has_roles', 'model_has_permissions'] as $table) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 continue;
             }
             $rows = DB::table($table)
@@ -378,11 +380,11 @@ class UserMergeService
                     ->where('permission_id', $row->permission_id ?? null)
                     ->exists();
 
-                if (!$exists) {
+                if (! $exists) {
                     DB::table($table)->insert([
-                        'model_type'    => User::class,
-                        'model_id'      => $survivorId,
-                        'role_id'       => $row->role_id ?? null,
+                        'model_type' => User::class,
+                        'model_id' => $survivorId,
+                        'role_id' => $row->role_id ?? null,
                         'permission_id' => $row->permission_id ?? null,
                     ]);
                     $count++;
@@ -408,7 +410,7 @@ class UserMergeService
         $result = [];
         foreach ($tables as $table) {
             $tableName = $this->extractTableName($table);
-            if (!$tableName || $tableName === 'users') {
+            if (! $tableName || $tableName === 'users') {
                 continue;
             }
 
@@ -417,7 +419,7 @@ class UserMergeService
             }
 
             foreach (self::REASSIGN_COLUMNS as $fkCol) {
-                if (!Schema::hasColumn($tableName, $fkCol)) {
+                if (! Schema::hasColumn($tableName, $fkCol)) {
                     continue;
                 }
 
@@ -438,6 +440,7 @@ class UserMergeService
         } else {
             $name = $table;
         }
+
         return $name !== null && $name !== '' ? (string) $name : null;
     }
 
@@ -468,6 +471,7 @@ class UserMergeService
                 $pairs[$otherCol][(string) $v] = true;
             }
         }
+
         return $pairs;
     }
 
@@ -487,6 +491,7 @@ class UserMergeService
                 $rows[] = ['other_col' => $otherCol, 'other_val' => $rec->{$otherCol}];
             }
         }
+
         return $rows;
     }
 
@@ -505,6 +510,7 @@ class UserMergeService
         if ($driver === 'sqlite') {
             return $this->sqliteCompositeIndexesOn($table, $fkCol);
         }
+
         return [];
     }
 
@@ -518,24 +524,25 @@ class UserMergeService
 
         foreach ($indexes as $idx) {
             $idxName = $idx->name ?? null;
-            if (!$idxName) {
+            if (! $idxName) {
                 continue;
             }
             $colsInfo = DB::select("PRAGMA index_info(\"{$idxName}\")");
             $cols = [];
             foreach ($colsInfo as $colInfo) {
-                if (!empty($colInfo->name)) {
+                if (! empty($colInfo->name)) {
                     $cols[] = $colInfo->name;
                 }
             }
             if (in_array($fkCol, $cols, true) && count($cols) > 1) {
                 foreach ($cols as $c) {
-                    if ($c !== $fkCol && !in_array($c, self::PROTECTED_COLUMNS, true)) {
+                    if ($c !== $fkCol && ! in_array($c, self::PROTECTED_COLUMNS, true)) {
                         $result[$c] = true;
                     }
                 }
             }
         }
+
         return array_keys($result);
     }
 
@@ -558,12 +565,13 @@ class UserMergeService
             $cols = array_filter(explode(',', $idx->COLS));
             if (in_array($fkCol, $cols, true) && count($cols) > 1) {
                 foreach ($cols as $c) {
-                    if ($c !== $fkCol && !in_array($c, self::PROTECTED_COLUMNS, true)) {
+                    if ($c !== $fkCol && ! in_array($c, self::PROTECTED_COLUMNS, true)) {
                         $result[$c] = true;
                     }
                 }
             }
         }
+
         return array_keys($result);
     }
 
@@ -593,12 +601,13 @@ class UserMergeService
             $cols = $m[1] ?? [];
             if (in_array($fkCol, $cols, true) && count($cols) > 1) {
                 foreach ($cols as $c) {
-                    if ($c !== $fkCol && !in_array($c, self::PROTECTED_COLUMNS, true)) {
+                    if ($c !== $fkCol && ! in_array($c, self::PROTECTED_COLUMNS, true)) {
                         $result[$c] = true;
                     }
                 }
             }
         }
+
         return array_keys($result);
     }
 
@@ -607,7 +616,7 @@ class UserMergeService
         $counts = [];
         foreach ($this->tablesReferencingUsers() as $table) {
             foreach (self::REASSIGN_COLUMNS as $fkCol) {
-                if (!Schema::hasColumn($table, $fkCol)) {
+                if (! Schema::hasColumn($table, $fkCol)) {
                     continue;
                 }
                 $count = (int) DB::table($table)->where($fkCol, $duplicateId)->count();
@@ -616,6 +625,7 @@ class UserMergeService
                 }
             }
         }
+
         return $counts;
     }
 }

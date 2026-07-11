@@ -299,6 +299,26 @@ export default function ProjectBoard({
         setCards(initialCards);
     }, [initialCards]);
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const cardType = params.get('card_type');
+        const cardIdStr = params.get('card_id');
+        if (cardType && cardIdStr) {
+            const cardId = parseInt(cardIdStr, 10);
+            const card = cards.find(c => c.type === cardType && c.id === cardId);
+            if (card) {
+                // Scroll to and flash the card
+                flashCard(cardType as any, cardId);
+                // Open the edit modal
+                openEditModal(card);
+                
+                // Clear the query parameters from URL history quietly so refresh doesn't reopen it
+                const newUrl = window.location.pathname + window.location.hash;
+                window.history.replaceState({ path: newUrl }, '', newUrl);
+            }
+        }
+    }, [cards]);
+
     // Fall back to the four canonical system categories if the parent didn't pass any.
     // This keeps the chip + filter UI functional in non-seeded environments (e.g. tests).
     const effectiveCategories: BoardCategory[] = useMemo(() => {

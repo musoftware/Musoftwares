@@ -71,7 +71,7 @@ class PointPurchaseTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $response = $this->post(route('freelance.point-purchases.store'), [
+        $response = $this->post(route('point-purchases.store'), [
             'package_id' => $this->package->id,
         ]);
 
@@ -103,7 +103,7 @@ class PointPurchaseTest extends TestCase
         $this->user->user_balance = 1.50;
         $this->user->save();
 
-        $response = $this->post(route('freelance.point-purchases.store'), [
+        $response = $this->post(route('point-purchases.store'), [
             'package_id' => $this->package->id,
         ], ['X-Inertia' => 'true']);
 
@@ -122,7 +122,7 @@ class PointPurchaseTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $response = $this->post(route('freelance.point-purchases.store-wallet'), [
+        $response = $this->post(route('point-purchases.store-wallet'), [
             'points' => 50, // Cost should be 50 EGP * 0.02 = $1.00 USD
         ]);
 
@@ -151,7 +151,7 @@ class PointPurchaseTest extends TestCase
         $this->user->user_balance = 0.50;
         $this->user->save();
 
-        $response = $this->post(route('freelance.point-purchases.store-wallet'), [
+        $response = $this->post(route('point-purchases.store-wallet'), [
             'points' => 50, // Cost is $1.00 USD
         ], ['X-Inertia' => 'true']);
 

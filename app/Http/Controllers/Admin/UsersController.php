@@ -400,31 +400,10 @@ class UsersController extends Controller
     }
 
     /**
-     * Co-Work page — two tabs:
-     *  1. Freelancer System: users with skills from the Freelance module
-     *  2. Legacy CoWorkers: old co_workers table records
+     * Co-Work page — Legacy CoWorkers list.
      */
     public function coWork(): InertiaResponse
     {
-        // Tab 1: Users registered in the Freelance system (have at least one skill)
-        // freelanceSkills() is a belongsToMany → Skill, so items are Skill models directly.
-        $freelancers = User::query()
-            ->whereHas('freelanceSkills')
-            ->with(['roles', 'freelanceSkills'])
-            ->latest()
-            ->get()
-            ->map(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'created_at' => $user->created_at,
-                'skills' => $user->freelanceSkills->map(fn ($skill) => [
-                    'id' => $skill->id,
-                    'name' => $skill->name ?? '—',
-                ])->values(),
-            ]);
-
-        // Tab 2: Legacy CoWorkers
         $legacyCoWorkers = CoWorker::with('techTags')
             ->latest()
             ->get()
@@ -446,7 +425,6 @@ class UsersController extends Controller
             ]);
 
         return Inertia::render('Admin/Users/CoWork', [
-            'freelancers' => $freelancers,
             'legacyCoWorkers' => $legacyCoWorkers,
         ]);
     }

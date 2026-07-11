@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Helpers\FinanceHelper;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class RecurringCost extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -24,7 +24,7 @@ class RecurringCost extends Model
 
     public function current_amount_str()
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
+        return FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
     }
 
     public function transactions()
@@ -52,10 +52,10 @@ class RecurringCost extends Model
     {
         $now = Carbon::now();
         if ($this->isToday($now)) {
-            if (!$this->createdBefore($now)) {
+            if (! $this->createdBefore($now)) {
                 $c_id = CostTransaction::add_cost_balance(null, $this->amount, $this->reason, $this->currency_id, null);
                 $this->transactions()->attach($c_id, [
-                    'unique_id' => $this->unique_id($now)
+                    'unique_id' => $this->unique_id($now),
                 ]);
             }
         }
@@ -68,12 +68,14 @@ class RecurringCost extends Model
         } else {
             $d = date('Y-m-d', strtotime($date));
         }
-        return $this->id . '-' . $d;
+
+        return $this->id.'-'.$d;
     }
 
     public function createdBefore($date)
     {
         $is_exist = DB::selectOne('select count(id) as is_exist_count from recurring_cost_transactions where unique_id=?', [$this->unique_id($date)]);
+
         return $is_exist->is_exist_count == 1;
     }
 
@@ -82,7 +84,10 @@ class RecurringCost extends Model
         if ($this->recurring == 'day') {
             $t = Carbon::parse($this->current_date);
             $diff = $date->diffInDays($t);
-            if ($diff == 0) return true;
+            if ($diff == 0) {
+                return true;
+            }
+
             return $diff % $this->recurring_times == 0;
         }
 
@@ -111,6 +116,7 @@ class RecurringCost extends Model
                         }
                     }
                 }
+
                 return in_array(date('d', strtotime($date)), $days);
             }
         }
@@ -127,7 +133,6 @@ class RecurringCost extends Model
         return false;
     }
 
-
     public function delete_with_transactions()
     {
         $this->transactions()->delete();
@@ -142,13 +147,15 @@ class RecurringCost extends Model
     public static function monthly_str()
     {
         $b_currency = AdminSettings::GetValue('business_currency', '1');
-        return \App\Helpers\FinanceHelper::instance()->format_money(static::monthly(), $b_currency);
+
+        return FinanceHelper::instance()->format_money(static::monthly(), $b_currency);
     }
 
     public static function annual_str()
     {
         $b_currency = AdminSettings::GetValue('business_currency', '1');
-        return \App\Helpers\FinanceHelper::instance()->format_money(static::annual(), $b_currency);
+
+        return FinanceHelper::instance()->format_money(static::annual(), $b_currency);
     }
 
     public static function annual()
@@ -173,9 +180,10 @@ class RecurringCost extends Model
             }
 
             $business_amount = CurrenciesExchange::RateToday($rCost->amount, $rCost->currency_id, $b_currency);
-            $c_amount = $business_amount / $rCost->recurring_times * count($detail) * $times_type;;
+            $c_amount = $business_amount / $rCost->recurring_times * count($detail) * $times_type;
             $total_amount += $c_amount;
         }
+
         return $total_amount;
     }
 
@@ -202,18 +210,18 @@ class RecurringCost extends Model
             }
 
             $business_amount = CurrenciesExchange::RateToday($rCost->amount, $rCost->currency_id, $b_currency);
-            
+
             $multiplier = ($rCost->recurring == 'day') ? 1 : count($detail);
-            
+
             $c_amount = $business_amount / max(1, $rCost->recurring_times) * $multiplier * $times_type;
-            
+
             $reason = $rCost->reason ?: 'Other';
-            if (!isset($data[$reason])) {
+            if (! isset($data[$reason])) {
                 $data[$reason] = 0;
             }
             $data[$reason] += $c_amount;
         }
-        
+
         $chart = [];
         foreach ($data as $reason => $annual_amount) {
             $chart[] = [
@@ -222,13 +230,11 @@ class RecurringCost extends Model
                 'monthly' => round((float) $annual_amount / 12, 2),
             ];
         }
-        
-        usort($chart, function($a, $b) {
+
+        usort($chart, function ($a, $b) {
             return $b['annual'] <=> $a['annual'];
         });
 
         return $chart;
     }
-
 }
-

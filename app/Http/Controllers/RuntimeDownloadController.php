@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class RuntimeDownloadController extends Controller
 {
     /**
      * Display the runtime download page.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -23,6 +22,3 @@ class RuntimeDownloadController extends Controller
         ]);
     }
 }
-
-
-

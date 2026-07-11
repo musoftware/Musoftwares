@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class FreeDownload extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -75,9 +74,10 @@ class FreeDownload extends Model
      */
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image) {
+        if (! $this->image) {
             return null;
         }
+
         return Storage::url($this->image);
     }
 
@@ -86,6 +86,6 @@ class FreeDownload extends Model
      */
     public function hasFile(): bool
     {
-        return !empty($this->file_path) && Storage::disk('public')->exists($this->file_path);
+        return ! empty($this->file_path) && Storage::disk('public')->exists($this->file_path);
     }
 }

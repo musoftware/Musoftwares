@@ -16,7 +16,7 @@ class IncomingWebhooksController extends Controller
             ->paginate(15);
 
         return Inertia::render('Admin/Settings/IncomingWebhooks/Index', [
-            'webhooks' => $webhooks
+            'webhooks' => $webhooks,
         ]);
     }
 
@@ -25,7 +25,7 @@ class IncomingWebhooksController extends Controller
         $webhook = IncomingWebhook::findOrFail($id);
 
         return Inertia::render('Admin/Settings/IncomingWebhooks/Show', [
-            'webhook' => $webhook
+            'webhook' => $webhook,
         ]);
     }
 }

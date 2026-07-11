@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
+use App\Enums\GuestTicketStatus;
 use App\Models\GuestTicket;
 use App\Models\GuestTicketMessage;
 use App\Services\Imap\ImapMessageParser;
 use App\Services\Imap\PurePhpImapClient;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -16,8 +17,7 @@ class GuestTicketInbox
 {
     public function __construct(
         private readonly ImapMessageParser $parser
-    ) {
-    }
+    ) {}
 
     /**
      * Pull unseen IMAP messages and persist them as GuestTicketMessage rows.
@@ -38,7 +38,7 @@ class GuestTicketInbox
             $client->select((string) $cfg['folder']);
             $uids = $client->unseenUidsSince($sinceUnix);
         } catch (\Throwable $e) {
-            Log::error('IMAP connect failed: ' . $e->getMessage());
+            Log::error('IMAP connect failed: '.$e->getMessage());
             $stats['errors']++;
 
             return $stats;
@@ -51,6 +51,7 @@ class GuestTicketInbox
                 $stats['fetched']++;
                 if ($dryRun) {
                     Log::info('IMAP dry-run', ['uid' => $uid, 'subject' => $parsed['subject'], 'from' => $parsed['from_email']]);
+
                     continue;
                 }
                 $matched = $this->processMessage($parsed);
@@ -91,20 +92,20 @@ class GuestTicketInbox
 
         DB::transaction(function () use ($ticket, $parsed, $bodyText, $bodyHtml, $attachments) {
             GuestTicketMessage::create([
-                'guest_ticket_id'  => $ticket->id,
-                'direction'        => GuestTicket::DIRECTION_INBOUND,
-                'from_email'       => $parsed['from_email'] ?? null,
-                'to_email'         => $parsed['to_email'] ?? null,
-                'subject'          => $parsed['subject'] ?? null,
-                'body_text'        => $bodyText ?: null,
-                'body_html'        => $bodyHtml ?: null,
-                'message_id'       => $this->cleanHeaderValue($parsed['message_id'] ?? null),
-                'in_reply_to'      => $this->cleanHeaderValue($parsed['in_reply_to'] ?? null),
-                'references'       => $parsed['references'] ?? null,
-                'headers_json'     => $parsed['headers'] ?? [],
+                'guest_ticket_id' => $ticket->id,
+                'direction' => GuestTicket::DIRECTION_INBOUND,
+                'from_email' => $parsed['from_email'] ?? null,
+                'to_email' => $parsed['to_email'] ?? null,
+                'subject' => $parsed['subject'] ?? null,
+                'body_text' => $bodyText ?: null,
+                'body_html' => $bodyHtml ?: null,
+                'message_id' => $this->cleanHeaderValue($parsed['message_id'] ?? null),
+                'in_reply_to' => $this->cleanHeaderValue($parsed['in_reply_to'] ?? null),
+                'references' => $parsed['references'] ?? null,
+                'headers_json' => $parsed['headers'] ?? [],
                 'attachments_json' => $attachments,
-                'received_at'      => isset($parsed['date']) ? Carbon::parse($parsed['date']) : now(),
-                'sent_at'          => isset($parsed['date']) ? Carbon::parse($parsed['date']) : null,
+                'received_at' => isset($parsed['date']) ? Carbon::parse($parsed['date']) : now(),
+                'sent_at' => isset($parsed['date']) ? Carbon::parse($parsed['date']) : null,
             ]);
 
             $ticket->update([
@@ -184,12 +185,12 @@ class GuestTicketInbox
         }
 
         return GuestTicket::create([
-            'name'        => $name,
-            'email'       => $fromEmail,
-            'mobile'      => '',
-            'subject'     => $subject,
-            'body'        => $body,
-            'status'      => 'pending',
+            'name' => $name,
+            'email' => $fromEmail,
+            'mobile' => '',
+            'subject' => $subject,
+            'body' => $body,
+            'status' => 'pending',
         ]);
     }
 
@@ -207,9 +208,9 @@ class GuestTicketInbox
                 continue;
             }
             $decoded = $this->decodeAttachment($raw, $att['transfer-encoding'] ?? '7bit');
-            $name = (string) ($att['name'] ?? 'attachment-' . uniqid());
+            $name = (string) ($att['name'] ?? 'attachment-'.uniqid());
             $safeName = preg_replace('/[^A-Za-z0-9._-]/', '_', $name);
-            $path = $base . '/' . $safeName;
+            $path = $base.'/'.$safeName;
             $disk->put($path, $decoded);
             $stored[] = [
                 'name' => $safeName,
@@ -225,9 +226,9 @@ class GuestTicketInbox
     private function decodeAttachment(string $body, string $encoding): string
     {
         return match (strtolower($encoding)) {
-            'base64'         => base64_decode($body),
-            'quoted-printable'=> quoted_printable_decode($body),
-            default          => $body,
+            'base64' => base64_decode($body),
+            'quoted-printable' => quoted_printable_decode($body),
+            default => $body,
         };
     }
 
@@ -246,10 +247,10 @@ class GuestTicketInbox
 
     private function applyInboundStatusTransition(GuestTicket $ticket): void
     {
-        if ($ticket->status === \App\Enums\GuestTicketStatus::Closed->value) {
-            $ticket->status = \App\Enums\GuestTicketStatus::Replied->value;
-        } elseif ($ticket->status === \App\Enums\GuestTicketStatus::Pending->value) {
-            $ticket->status = \App\Enums\GuestTicketStatus::Replied->value;
+        if ($ticket->status === GuestTicketStatus::Closed->value) {
+            $ticket->status = GuestTicketStatus::Replied->value;
+        } elseif ($ticket->status === GuestTicketStatus::Pending->value) {
+            $ticket->status = GuestTicketStatus::Replied->value;
         }
         $ticket->save();
     }

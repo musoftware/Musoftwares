@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\QrCodeService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Services\QrCodeService;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class QrCode extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -64,9 +63,10 @@ class QrCode extends Model
     {
         try {
             $qrCodeService = app(QrCodeService::class);
+
             return $qrCodeService->generateQrCodePng($this->qr_data, $this->settings ?? []);
         } catch (\Exception $e) {
-            throw new \Exception('Failed to generate QR code image: ' . $e->getMessage());
+            throw new \Exception('Failed to generate QR code image: '.$e->getMessage());
         }
     }
 
@@ -94,9 +94,11 @@ class QrCode extends Model
                 return "tel:{$this->content}";
             case 'sms':
                 $parts = explode('|', $this->content);
-                return "sms:{$parts[0]}" . (isset($parts[1]) ? "?body={$parts[1]}" : '');
+
+                return "sms:{$parts[0]}".(isset($parts[1]) ? "?body={$parts[1]}" : '');
             case 'wifi':
                 $settings = json_decode($this->content, true);
+
                 return "WIFI:T:{$settings['security']};S:{$settings['ssid']};P:{$settings['password']};H:{$settings['hidden']};;";
             case 'vcard':
                 return $this->content;

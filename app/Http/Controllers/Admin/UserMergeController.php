@@ -35,7 +35,7 @@ class UserMergeController extends Controller
                         $q->where('id', (int) $filter);
                     }
                     $q->orWhereRaw('LOWER(email) LIKE ?', ["%{$needle}%"])
-                      ->orWhereRaw('LOWER(name) LIKE ?', ["%{$needle}%"]);
+                        ->orWhereRaw('LOWER(name) LIKE ?', ["%{$needle}%"]);
                 })
                 ->orderBy('id')
                 ->limit(20)
@@ -52,26 +52,26 @@ class UserMergeController extends Controller
 
         return Inertia::render('Admin/Users/MergeSelect', [
             'survivor' => [
-                'id'                => $user->id,
-                'name'              => $user->name,
-                'email'             => $user->email,
-                'role'              => $user->getRoleNames()->first(),
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->getRoleNames()->first(),
                 'email_verified_at' => $user->email_verified_at?->toIso8601String(),
-                'created_at'        => $user->created_at?->toIso8601String(),
+                'created_at' => $user->created_at?->toIso8601String(),
             ],
-            'search'         => $filter,
-            'suggestions'    => $suggestions->map(fn (User $u) => [
-                'id'                => $u->id,
-                'name'              => $u->name,
-                'email'             => $u->email,
-                'role'              => $u->getRoleNames()->first(),
-                'email_verified'    => (bool) $u->email_verified_at,
+            'search' => $filter,
+            'suggestions' => $suggestions->map(fn (User $u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'role' => $u->getRoleNames()->first(),
+                'email_verified' => (bool) $u->email_verified_at,
             ])->values(),
             'recently_merged' => $recentlyMerged->map(fn (User $u) => [
-                'id'         => $u->id,
-                'name'       => $u->name,
-                'email'      => $u->email,
-                'merged_at'  => $u->deleted_at?->toIso8601String(),
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'merged_at' => $u->deleted_at?->toIso8601String(),
             ])->values(),
         ]);
     }
@@ -79,8 +79,8 @@ class UserMergeController extends Controller
     public function preview(Request $request, User $user): InertiaResponse
     {
         $request->validate([
-            'duplicate_ids'   => ['required', 'array', 'min:1'],
-            'duplicate_ids.*' => ['integer', 'distinct', 'different:' . $user->id, 'exists:users,id'],
+            'duplicate_ids' => ['required', 'array', 'min:1'],
+            'duplicate_ids.*' => ['integer', 'distinct', 'different:'.$user->id, 'exists:users,id'],
         ]);
 
         $duplicateIds = array_values(array_unique(array_map('intval', $request->input('duplicate_ids'))));
@@ -95,21 +95,21 @@ class UserMergeController extends Controller
         }
 
         return Inertia::render('Admin/Users/Merge', [
-            'survivor'   => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'survivor' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
             'duplicates' => $duplicates->map(fn (User $d) => [
-                'id'    => $d->id,
-                'name'  => $d->name,
+                'id' => $d->id,
+                'name' => $d->name,
                 'email' => $d->email,
-                'merged'=> (bool) $d->deleted_at,
+                'merged' => (bool) $d->deleted_at,
             ])->values()->all(),
-            'reports'    => $report,
+            'reports' => $report,
         ]);
     }
 
     public function confirm(MergeUsersRequest $request, User $user): RedirectResponse|JsonResponse
     {
         $duplicateIds = $request->duplicateIds();
-        $resolutions  = (array) $request->validated('resolutions', []);
+        $resolutions = (array) $request->validated('resolutions', []);
 
         try {
             $outcomes = $this->mergeService->mergeMany(
@@ -121,12 +121,12 @@ class UserMergeController extends Controller
         } catch (Throwable $e) {
             if ($request->wantsJson()) {
                 return response()->json([
-                    'status'  => 'error',
-                    'message' => 'Merge failed: ' . $e->getMessage(),
+                    'status' => 'error',
+                    'message' => 'Merge failed: '.$e->getMessage(),
                 ], 422);
             }
 
-            return redirect()->back()->with('error', 'Merge failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Merge failed: '.$e->getMessage());
         }
 
         $aliases = UserEmail::where('user_id', $user->id)
@@ -138,14 +138,15 @@ class UserMergeController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'status'   => 'success',
-                'message'  => 'Accounts merged.',
+                'status' => 'success',
+                'message' => 'Accounts merged.',
                 'outcomes' => $outcomes,
-                'aliases'  => $aliases,
+                'aliases' => $aliases,
             ]);
         }
 
         $count = count($duplicateIds);
+
         return redirect()
             ->route('admin.users.show', $user->id)
             ->with('success', "{$count} account(s) merged into #{$user->id}.");

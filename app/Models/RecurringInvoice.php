@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Events\InvoiceCreated;
+use App\Helpers\FinanceHelper;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Events\InvoiceCreated;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -21,12 +24,12 @@ class RecurringInvoice extends Model
         'is_active' => 'boolean',
     ];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class);
     }
@@ -38,10 +41,10 @@ class RecurringInvoice extends Model
 
     public function current_amount_str()
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
+        return FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
     }
 
-    public function records(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function records(): HasMany
     {
         return $this->hasMany(RecurringInvoiceRecord::class);
     }
@@ -66,18 +69,22 @@ class RecurringInvoice extends Model
     {
         $now = Carbon::now();
         if ($this->isToday($now)) {
-            if (!$this->createdBefore($now)) {
+            if (! $this->createdBefore($now)) {
                 $user = $this->user;
-                if (!$user) return;
+                if (! $user) {
+                    return;
+                }
 
                 $userCurrencyId = $user->currency_id ?? $user->currency;
-                if (!$userCurrencyId) return;
+                if (! $userCurrencyId) {
+                    return;
+                }
 
                 // Convert amount to user's currency
                 $convertedAmount = CurrenciesExchange::RateToday($this->amount, $this->currency_id, $userCurrencyId);
 
                 DB::transaction(function () use ($user, $userCurrencyId, $convertedAmount, $now) {
-                    $invoice = new Invoice();
+                    $invoice = new Invoice;
                     $invoice->uuid = (string) Str::uuid();
                     $invoice->user_id = $user->id;
                     $invoice->currency_id = $userCurrencyId;
@@ -85,7 +92,7 @@ class RecurringInvoice extends Model
                     $invoice->job_status = 'pending';
                     $invoice->save();
 
-                    $item = new InvoiceItem();
+                    $item = new InvoiceItem;
                     $item->invoice_id = $invoice->id;
                     $item->item_title = $this->title;
                     $item->item_type = 'simple';
@@ -130,12 +137,14 @@ class RecurringInvoice extends Model
         } else {
             $d = date('Y-m-d', strtotime($date));
         }
-        return $this->id . '-' . $d;
+
+        return $this->id.'-'.$d;
     }
 
     public function createdBefore($date)
     {
         $is_exist = DB::selectOne('select count(id) as is_exist_count from recurring_invoice_records where unique_id=?', [$this->unique_id($date)]);
+
         return $is_exist->is_exist_count == 1;
     }
 
@@ -144,7 +153,10 @@ class RecurringInvoice extends Model
         if ($this->recurring == 'day') {
             $t = Carbon::parse($this->current_date);
             $diff = $date->diffInDays($t);
-            if ($diff == 0) return true;
+            if ($diff == 0) {
+                return true;
+            }
+
             return $diff % max(1, $this->recurring_times) == 0;
         }
 
@@ -171,6 +183,7 @@ class RecurringInvoice extends Model
                         }
                     }
                 }
+
                 return in_array(date('d', strtotime($date)), $days);
             }
         }

@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Models\Task;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User;
 
 class TaskPolicy
 {
@@ -19,7 +19,7 @@ class TaskPolicy
     {
         // Simple check for project access or similar. For now return true to allow access control at controller level
         // if relations exist. Assuming task visibility can be complex.
-        return true; 
+        return true;
     }
 
     public function create(User $user)

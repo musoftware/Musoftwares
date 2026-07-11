@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Services\UserFileService;
-use App\Http\Requests\Admin\User\UploadUserFileRequest;
+use App\Http\Requests\Admin\User\DeleteUserFileRequest;
+use App\Http\Requests\Admin\User\MoveUserFileRequest;
 use App\Http\Requests\Admin\User\NewUserFolderRequest;
 use App\Http\Requests\Admin\User\RenameUserFileRequest;
-use App\Http\Requests\Admin\User\MoveUserFileRequest;
-use App\Http\Requests\Admin\User\DeleteUserFileRequest;
+use App\Http\Requests\Admin\User\UploadUserFileRequest;
+use App\Models\File;
+use App\Models\User;
+use App\Services\UserFileService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -39,17 +40,17 @@ class UserFileController extends Controller
      */
     public function index(Request $request, int $userId)
     {
-        $user   = User::findOrFail($userId);
+        $user = User::findOrFail($userId);
         $folder = (string) $request->get('folder', '');
 
         $data = $this->userFileService->getFilesAndFolders($userId, $folder);
         $breadcrumbs = $this->userFileService->buildBreadcrumbs($folder);
 
         return Inertia::render('Admin/Users/Files', [
-            'user'           => ['id' => $user->id, 'name' => $user->name],
-            'files'          => $data['files'],
-            'folders'        => $data['folders'],
-            'breadcrumbs'    => $breadcrumbs,
+            'user' => ['id' => $user->id, 'name' => $user->name],
+            'files' => $data['files'],
+            'folders' => $data['folders'],
+            'breadcrumbs' => $breadcrumbs,
             'current_folder' => $folder,
         ]);
     }
@@ -139,16 +140,16 @@ class UserFileController extends Controller
     {
         $user = User::findOrFail($userId);
         $path = $request->query('path');
-        
-        if (!$path || !str_starts_with($path, 'file_')) {
+
+        if (! $path || ! str_starts_with($path, 'file_')) {
             abort(404, 'Invalid file path.');
         }
 
         $content = $this->userFileService->getFileContent($userId, $path);
-        
+
         // Find filename for the editor's language detection
         $realId = str_replace('file_', '', $path);
-        $file = \App\Models\File::where('user_id', $userId)->where('id', $realId)->firstOrFail();
+        $file = File::where('user_id', $userId)->where('id', $realId)->firstOrFail();
 
         return Inertia::render('Admin/Users/FileEditor', [
             'user' => ['id' => $user->id, 'name' => $user->name],
@@ -157,8 +158,8 @@ class UserFileController extends Controller
                 'path' => $path,
                 'name' => $file->original_filename,
                 'content' => $content,
-                'folder_id' => $file->folder_id ? 'folder_' . $file->folder_id : ''
-            ]
+                'folder_id' => $file->folder_id ? 'folder_'.$file->folder_id : '',
+            ],
         ]);
     }
 
@@ -168,7 +169,7 @@ class UserFileController extends Controller
     public function updateContent(Request $request, int $userId)
     {
         User::findOrFail($userId);
-        
+
         $request->validate([
             'path' => 'required|string',
             'content' => 'required|string',

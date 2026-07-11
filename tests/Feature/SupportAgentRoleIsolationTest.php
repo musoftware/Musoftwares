@@ -45,6 +45,32 @@ class SupportAgentRoleIsolationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_support_agent_can_post_guest_ticket_reply_and_update_status()
+    {
+        $user = User::factory()->create(['onboarding_completed' => true]);
+        $user->assignRole('support_agent');
+
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $ticket = GuestTicket::create([
+            'name' => 'Guest',
+            'email' => 'guest@example.com',
+            'mobile' => '0123456789',
+            'subject' => 'Help',
+            'body' => 'Please',
+            'status' => 'pending',
+        ]);
+
+        $replyResponse = $this->actingAs($user)
+            ->post(route('admin.guest-tickets.reply', $ticket), ['body' => 'Replying']);
+        $replyResponse->assertRedirect();
+
+        $statusResponse = $this->actingAs($user)
+            ->post(route('admin.guest-tickets.updateStatus', $ticket), ['status' => 'closed']);
+        $statusResponse->assertRedirect();
+        $this->assertSame('closed', $ticket->fresh()->status);
+    }
+
     public function test_support_agent_cannot_access_dashboard()
     {
         $user = User::factory()->create(['onboarding_completed' => true]);

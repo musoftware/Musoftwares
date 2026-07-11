@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\BlockedIp;
 use App\Models\RateLimit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Inertia\Inertia;
 
 class SecurityController extends Controller
 {
@@ -24,7 +25,7 @@ class SecurityController extends Controller
     public function unblockIp($id)
     {
         $blockedIp = BlockedIp::findOrFail($id);
-        \Illuminate\Support\Facades\Cache::forget("blocked_ip:{$blockedIp->ip_address}");
+        Cache::forget("blocked_ip:{$blockedIp->ip_address}");
         $blockedIp->delete();
 
         return redirect()->back()->with('success', 'IP address unblocked successfully.');

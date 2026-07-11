@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
-use App\Models\ContractVersion;
 use App\Models\ContractPriceItem;
+use App\Models\ContractVersion;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -21,19 +22,19 @@ class AdminContractController extends Controller
             ->paginate(20);
 
         return Inertia::render('Admin/Contracts/Index', [
-            'contracts' => $contracts
+            'contracts' => $contracts,
         ]);
     }
 
     public function create()
     {
         $priceItems = ContractPriceItem::all();
-        $currencies = \App\Models\Currency::all();
-        
+        $currencies = Currency::all();
+
         $exchangeRates = [];
         foreach ($currencies as $c1) {
             foreach ($currencies as $c2) {
-                $exchangeRates[$c1->id][$c2->id] = \App\Models\CurrenciesExchange::RateToday(1, $c1->id, $c2->id);
+                $exchangeRates[$c1->id][$c2->id] = CurrenciesExchange::RateToday(1, $c1->id, $c2->id);
             }
         }
 
@@ -41,7 +42,7 @@ class AdminContractController extends Controller
             'contract' => null,
             'priceItems' => $priceItems,
             'currencies' => $currencies,
-            'exchangeRates' => $exchangeRates
+            'exchangeRates' => $exchangeRates,
         ]);
     }
 
@@ -54,11 +55,11 @@ class AdminContractController extends Controller
             'currency_id' => 'required|integer',
             'duration' => 'nullable|integer|min:1',
             'content' => 'nullable|array',
-            'status' => 'nullable|string|in:draft,sent,signed,active,completed'
+            'status' => 'nullable|string|in:draft,sent,signed,active,completed',
         ]);
 
         $contract = DB::transaction(function () use ($validated) {
-            $contract = new Contract();
+            $contract = new Contract;
             $contract->uuid = (string) Str::uuid();
             $contract->user_id = auth()->id();
             $contract->project_name = $validated['project_name'];
@@ -88,12 +89,12 @@ class AdminContractController extends Controller
     {
         $contract->load('versions');
         $priceItems = ContractPriceItem::all();
-        $currencies = \App\Models\Currency::all();
-        
+        $currencies = Currency::all();
+
         $exchangeRates = [];
         foreach ($currencies as $c1) {
             foreach ($currencies as $c2) {
-                $exchangeRates[$c1->id][$c2->id] = \App\Models\CurrenciesExchange::RateToday(1, $c1->id, $c2->id);
+                $exchangeRates[$c1->id][$c2->id] = CurrenciesExchange::RateToday(1, $c1->id, $c2->id);
             }
         }
 
@@ -101,7 +102,7 @@ class AdminContractController extends Controller
             'contract' => $contract,
             'priceItems' => $priceItems,
             'currencies' => $currencies,
-            'exchangeRates' => $exchangeRates
+            'exchangeRates' => $exchangeRates,
         ]);
     }
 
@@ -114,7 +115,7 @@ class AdminContractController extends Controller
             'currency_id' => 'required|integer',
             'duration' => 'nullable|integer|min:1',
             'content' => 'nullable|array',
-            'status' => 'nullable|string|in:draft,sent,signed,active,completed'
+            'status' => 'nullable|string|in:draft,sent,signed,active,completed',
         ]);
 
         DB::transaction(function () use ($validated, $contract) {
@@ -143,14 +144,16 @@ class AdminContractController extends Controller
     public function show(Contract $contract)
     {
         $contract->load(['versions', 'invoices', 'user']);
+
         return Inertia::render('Admin/Contracts/Show', [
-            'contract' => $contract
+            'contract' => $contract,
         ]);
     }
 
     public function destroy(Contract $contract)
     {
         $contract->delete();
+
         return redirect()->route('admin.contracts.index')->with('success', __('general.contract_deleted_successfully'));
     }
 }

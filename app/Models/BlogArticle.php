@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Modules\Marketplace\Models\Service;
 
 class BlogArticle extends Model
 {
@@ -25,7 +27,7 @@ class BlogArticle extends Model
         'variation_group',
         'cycle_number',
         'is_published',
-        'published_at'
+        'published_at',
     ];
 
     protected $casts = [
@@ -63,15 +65,15 @@ class BlogArticle extends Model
         $count = 1;
 
         while (static::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $count++;
+            $slug = $originalSlug.'-'.$count++;
         }
 
         return $slug;
     }
 
-    public function service(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function service(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Marketplace\Models\Service::class);
+        return $this->belongsTo(Service::class);
     }
 
     public function translations()
@@ -98,9 +100,9 @@ class BlogArticle extends Model
     public function scopePublished($query)
     {
         return $query->where('is_published', true)
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNull('published_at')
-                  ->orWhere('published_at', '<=', now());
+                    ->orWhere('published_at', '<=', now());
             });
     }
 }

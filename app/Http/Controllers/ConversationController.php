@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\Message;
-use App\Events\MessageSent;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Ticket;
+use Illuminate\Http\Request;
 
 class ConversationController extends Controller
 {
@@ -18,14 +18,14 @@ class ConversationController extends Controller
     {
         $conversation = Conversation::find($id);
 
-        if (!$conversation) {
+        if (! $conversation) {
             // Fallback: Check if $id refers to the ticket ID
-            $conversation = Conversation::where('conversable_type', \App\Models\Ticket::class)
+            $conversation = Conversation::where('conversable_type', Ticket::class)
                 ->where('conversable_id', $id)
                 ->first();
         }
 
-        if (!$conversation) {
+        if (! $conversation) {
             abort(404, __('general.conversation_not_found'));
         }
 
@@ -42,7 +42,7 @@ class ConversationController extends Controller
 
         // Security check: user must be a participant or admin
         $isParticipant = $conversation->participants()->where('user_id', $user->id)->exists();
-        if (!$isParticipant && !$user->isAdmin()) {
+        if (! $isParticipant && ! $user->isAdmin()) {
             abort(403, 'Unauthorized');
         }
 
@@ -67,7 +67,7 @@ class ConversationController extends Controller
 
         // Security check: user must be a participant or admin
         $isParticipant = $conversation->participants()->where('user_id', $user->id)->exists();
-        if (!$isParticipant && !$user->isAdmin()) {
+        if (! $isParticipant && ! $user->isAdmin()) {
             abort(403, 'Unauthorized');
         }
 
@@ -76,7 +76,7 @@ class ConversationController extends Controller
             'attachment' => 'nullable|file|max:5120|mimes:jpeg,png,jpg,gif,svg,pdf,doc,docx,xls,xlsx,zip',
         ]);
 
-        if (empty($validated['body']) && !$request->hasFile('attachment')) {
+        if (empty($validated['body']) && ! $request->hasFile('attachment')) {
             return response()->json(['error' => 'Message body or attachment is required.'], 422);
         }
 

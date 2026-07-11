@@ -37,7 +37,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'moderator',
             'support_agent',
             'client',
-            'freelancer',
             'seller',
             'employee',
             'tenant_admin'

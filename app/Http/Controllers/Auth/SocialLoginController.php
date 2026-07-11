@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Currency;
 use App\Models\User;
+use GeoIp2\Database\Reader;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -14,18 +18,18 @@ class SocialLoginController extends Controller
     /**
      * Redirect the user to the Google authentication page.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function redirect()
     {
         $clientId = config('services.google.client_id');
         $redirectUri = route('social.google.callback');
-        
-        if (!$clientId) {
+
+        if (! $clientId) {
             return redirect()->route('login')->with('error', 'Google Client ID is missing. Please configure it in services.');
         }
 
-        $url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
+        $url = 'https://accounts.google.com/o/oauth2/v2/auth?'.http_build_query([
             'client_id' => $clientId,
             'redirect_uri' => $redirectUri,
             'response_type' => 'code',
@@ -40,7 +44,7 @@ class SocialLoginController extends Controller
     /**
      * Obtain the user information from Google.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function callback(Request $request)
     {
@@ -49,7 +53,7 @@ class SocialLoginController extends Controller
                 throw new \Exception($request->get('error'));
             }
 
-            if (!$request->has('code')) {
+            if (! $request->has('code')) {
                 throw new \Exception('No authorization code provided.');
             }
 
@@ -62,23 +66,23 @@ class SocialLoginController extends Controller
             ]);
 
             if ($response->failed()) {
-                throw new \Exception('Failed to get token: ' . $response->body());
+                throw new \Exception('Failed to get token: '.$response->body());
             }
 
             $tokenData = $response->json();
-            
+
             // Get user info
             $userInfoResponse = Http::withToken($tokenData['access_token'])
                 ->get('https://www.googleapis.com/oauth2/v3/userinfo');
 
             if ($userInfoResponse->failed()) {
-                throw new \Exception('Failed to get user info: ' . $userInfoResponse->body());
+                throw new \Exception('Failed to get user info: '.$userInfoResponse->body());
             }
 
             $googleUser = $userInfoResponse->json();
-            
+
             $user = User::where('email', $googleUser['email'])->first();
-            if (!$user) {
+            if (! $user) {
                 $user = User::create([
                     'name' => $googleUser['name'] ?? 'Google User',
                     'email' => $googleUser['email'],
@@ -91,7 +95,7 @@ class SocialLoginController extends Controller
                 $geoDbPath = storage_path('app/geoip.mmdb');
                 if (file_exists($geoDbPath)) {
                     try {
-                        $reader = new \GeoIp2\Database\Reader($geoDbPath);
+                        $reader = new Reader($geoDbPath);
                         $ip = $request->ip();
                         if ($ip !== '127.0.0.1' && $ip !== '::1') {
                             $record = $reader->city($ip);
@@ -104,11 +108,11 @@ class SocialLoginController extends Controller
                     }
                 }
 
-                $mappedCurrencyCode = config('geo_currency.mapping.' . $detectedCountry, 'USD');
-                $currency = \App\Models\Currency::where('currency', $mappedCurrencyCode)->first();
+                $mappedCurrencyCode = config('geo_currency.mapping.'.$detectedCountry, 'USD');
+                $currency = Currency::where('currency', $mappedCurrencyCode)->first();
 
-                if (!$currency) {
-                    $currency = \App\Models\Currency::where('currency', 'USD')->first(); // fallback to default
+                if (! $currency) {
+                    $currency = Currency::where('currency', 'USD')->first(); // fallback to default
                 }
 
                 if ($currency) {
@@ -116,13 +120,13 @@ class SocialLoginController extends Controller
                     $user->save();
                 }
 
-                event(new \Illuminate\Auth\Events\Registered($user));
+                event(new Registered($user));
             }
 
             Auth::login($user, true);
 
             return redirect()->intended(route('dashboard', absolute: false));
-            
+
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', __('general.google_login_failed', ['message' => $e->getMessage()]));
         }

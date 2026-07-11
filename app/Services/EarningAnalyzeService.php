@@ -9,7 +9,7 @@ use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\UserReferral;
 use App\Models\UserReferralRequestWithdraw;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * EarningAnalyzeService
@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\DB;
  */
 class EarningAnalyzeService extends BaseService
 {
-
     /**
      * Cached currency lookup: id => ['code' => ..., 'symbol' => ...]
      * Loaded once per request to avoid N+1 on groupBy queries.
@@ -28,8 +27,8 @@ class EarningAnalyzeService extends BaseService
 
     public function __construct()
     {
-        $this->currencyMap = Currency::all()->keyBy('id')->map(fn($c) => [
-            'code'   => $c->currency,  // e.g. "USD"
+        $this->currencyMap = Currency::all()->keyBy('id')->map(fn ($c) => [
+            'code' => $c->currency,  // e.g. "USD"
             'symbol' => $c->symbol,    // e.g. "$"
         ])->all();
     }
@@ -37,7 +36,7 @@ class EarningAnalyzeService extends BaseService
     /** Returns code string for a currency_id, fallback to "#ID" */
     private function currencyCode(?int $id): string
     {
-        return $this->currencyMap[$id]['code'] ?? ('#' . $id);
+        return $this->currencyMap[$id]['code'] ?? ('#'.$id);
     }
 
     /** Returns symbol string for a currency_id, fallback to empty */
@@ -74,7 +73,7 @@ class EarningAnalyzeService extends BaseService
     public function overdueClearing(): float
     {
         $query = Earning::query()->where('convert_to_balance_on', '<', now());
-        if (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id')) {
+        if (Schema::hasColumn('earnings', 'transaction_id')) {
             $query->whereNull('transaction_id');
         }
 
@@ -87,6 +86,7 @@ class EarningAnalyzeService extends BaseService
         foreach ($data as $row) {
             $amount += CurrenciesExchange::RateByDate($row->avg_date, $row->amount, $row->currency_id, $businessCurrency);
         }
+
         return round($amount, 2);
     }
 
@@ -96,7 +96,7 @@ class EarningAnalyzeService extends BaseService
     public function inWindowClearing(): float
     {
         $query = Earning::query()->where('convert_to_balance_on', '>=', now());
-        if (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id')) {
+        if (Schema::hasColumn('earnings', 'transaction_id')) {
             $query->whereNull('transaction_id');
         }
 
@@ -109,6 +109,7 @@ class EarningAnalyzeService extends BaseService
         foreach ($data as $row) {
             $amount += CurrenciesExchange::RateByDate($row->avg_date, $row->amount, $row->currency_id, $businessCurrency);
         }
+
         return round($amount, 2);
     }
 
@@ -126,7 +127,7 @@ class EarningAnalyzeService extends BaseService
     public function clearedEarnings(): float
     {
         $query = Earning::query();
-        if (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id')) {
+        if (Schema::hasColumn('earnings', 'transaction_id')) {
             $query->whereNotNull('transaction_id');
         }
 
@@ -139,6 +140,7 @@ class EarningAnalyzeService extends BaseService
         foreach ($data as $row) {
             $amount += CurrenciesExchange::RateByDate($row->avg_date, $row->amount, $row->currency_id, $businessCurrency);
         }
+
         return round($amount, 2);
     }
 
@@ -151,7 +153,7 @@ class EarningAnalyzeService extends BaseService
      */
     public function openingBalance(): float
     {
-        return (float) Transaction::get_sum_balance(date('Y') . '-01-01');
+        return (float) Transaction::get_sum_balance(date('Y').'-01-01');
     }
 
     /**
@@ -169,6 +171,7 @@ class EarningAnalyzeService extends BaseService
     {
         $closing = $this->closingBalance();
         $opening = $this->openingBalance();
+
         return round($closing - $opening, 2);
     }
 
@@ -178,7 +181,10 @@ class EarningAnalyzeService extends BaseService
     public function growthPercentage(): float
     {
         $opening = $this->openingBalance();
-        if ($opening <= 0) return 100.0;
+        if ($opening <= 0) {
+            return 100.0;
+        }
+
         return round(($this->netGrowth() / $opening) * 100, 2);
     }
 
@@ -236,6 +242,7 @@ class EarningAnalyzeService extends BaseService
     public function readyForWithdrawal(): float
     {
         $ready = $this->totalEarningPool() - $this->withdrawnBalance() - $this->totalPendingClearing();
+
         return round(max(0, $ready), 2);
     }
 
@@ -245,7 +252,10 @@ class EarningAnalyzeService extends BaseService
     public function payoutRatio(): float
     {
         $total = $this->totalEarningPool();
-        if ($total <= 0) return 0.0;
+        if ($total <= 0) {
+            return 0.0;
+        }
+
         return round(($this->withdrawnBalance() / $total) * 100, 2);
     }
 
@@ -256,7 +266,7 @@ class EarningAnalyzeService extends BaseService
     {
         return [
             'start' => Earning::clearing_start_date(),
-            'end'   => Earning::clearing_last_date(),
+            'end' => Earning::clearing_last_date(),
         ];
     }
 
@@ -304,7 +314,7 @@ class EarningAnalyzeService extends BaseService
             $months[$row->month] = ($months[$row->month] ?? 0) + $converted;
         }
 
-        return collect($months)->map(fn($total, $month) => [
+        return collect($months)->map(fn ($total, $month) => [
             'month' => $month,
             'total' => round((float) $total, 2),
         ])->values()->all();
@@ -334,14 +344,14 @@ class EarningAnalyzeService extends BaseService
             ->groupBy('user_id')
             ->map(function ($rows) use ($businessCurrency) {
                 $first = $rows->first();
-                $totalBusiness = $rows->sum(fn($r) =>
-                    CurrenciesExchange::RateByDate($r->avg_date, $r->total_earned, $r->currency_id, $businessCurrency)
+                $totalBusiness = $rows->sum(fn ($r) => CurrenciesExchange::RateByDate($r->avg_date, $r->total_earned, $r->currency_id, $businessCurrency)
                 );
+
                 return [
-                    'user_id'        => $first->user_id,
-                    'name'           => $first->user?->name ?? 'Deleted User',
-                    'email'          => $first->user?->email ?? '—',
-                    'total_earned'   => round((float) $totalBusiness, 2),
+                    'user_id' => $first->user_id,
+                    'name' => $first->user?->name ?? 'Deleted User',
+                    'email' => $first->user?->email ?? '—',
+                    'total_earned' => round((float) $totalBusiness, 2),
                     'referral_count' => (int) $rows->sum('referral_count'),
                 ];
             })
@@ -366,20 +376,20 @@ class EarningAnalyzeService extends BaseService
             ->latest()
             ->limit($limit)
             ->get()
-            ->map(fn($e) => [
-                'id'                    => $e->id,
-                'user_id'               => $e->user_id,
-                'user_name'             => $e->user?->name ?? 'Deleted User',
-                'user_email'            => $e->user?->email ?? '—',
-                'referred_user_id'      => $e->referred_user?->id ?? null,
-                'referred_user_name'    => $e->referred_user?->name ?? null,
-                'amount'                => (float) $e->amount,
-                'amount_business'       => round((float) CurrenciesExchange::RateToday($e->amount, $e->currency_id, $businessCurrency), 2),
-                'currency_code'         => $this->currencyCode($e->currency_id),
-                'currency_symbol'       => $this->currencySymbol($e->currency_id),
-                'status'                => (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id') && $e->transaction_id) ? 'cleared' : ($e->convert_to_balance_on && now()->isAfter($e->convert_to_balance_on) ? 'overdue' : 'pending'),
+            ->map(fn ($e) => [
+                'id' => $e->id,
+                'user_id' => $e->user_id,
+                'user_name' => $e->user?->name ?? 'Deleted User',
+                'user_email' => $e->user?->email ?? '—',
+                'referred_user_id' => $e->referred_user?->id ?? null,
+                'referred_user_name' => $e->referred_user?->name ?? null,
+                'amount' => (float) $e->amount,
+                'amount_business' => round((float) CurrenciesExchange::RateToday($e->amount, $e->currency_id, $businessCurrency), 2),
+                'currency_code' => $this->currencyCode($e->currency_id),
+                'currency_symbol' => $this->currencySymbol($e->currency_id),
+                'status' => (Schema::hasColumn('earnings', 'transaction_id') && $e->transaction_id) ? 'cleared' : ($e->convert_to_balance_on && now()->isAfter($e->convert_to_balance_on) ? 'overdue' : 'pending'),
                 'convert_to_balance_on' => $e->convert_to_balance_on,
-                'created_at'            => $e->created_at,
+                'created_at' => $e->created_at,
             ])
             ->all();
     }
@@ -393,12 +403,12 @@ class EarningAnalyzeService extends BaseService
         return Earning::selectRaw('currency_id, SUM(amount) as total, COUNT(*) as count')
             ->groupBy('currency_id')
             ->get()
-            ->map(fn($row) => [
-                'currency_id'     => $row->currency_id,
-                'currency_code'   => $this->currencyCode($row->currency_id),
+            ->map(fn ($row) => [
+                'currency_id' => $row->currency_id,
+                'currency_code' => $this->currencyCode($row->currency_id),
                 'currency_symbol' => $this->currencySymbol($row->currency_id),
-                'total'           => (float) $row->total,
-                'count'           => (int) $row->count,
+                'total' => (float) $row->total,
+                'count' => (int) $row->count,
             ])
             ->all();
     }
@@ -409,74 +419,73 @@ class EarningAnalyzeService extends BaseService
 
     public function pageData(): array
     {
-        $closingBalance   = $this->closingBalance();
-        $openingBalance   = $this->openingBalance();
-        $unpaidInvoices   = $this->unpaidInvoices();
-        $totalPool        = $this->totalEarningPool();
-        $withdrawn        = $this->withdrawnBalance();
-        $pendingClearing  = $this->totalPendingClearing();
-        $overdueClearing  = $this->overdueClearing();
-        $inWindow         = $this->inWindowClearing();
-        $cleared          = $this->clearedEarnings();
-        $dateRange        = $this->clearingDateRange();
+        $closingBalance = $this->closingBalance();
+        $openingBalance = $this->openingBalance();
+        $unpaidInvoices = $this->unpaidInvoices();
+        $totalPool = $this->totalEarningPool();
+        $withdrawn = $this->withdrawnBalance();
+        $pendingClearing = $this->totalPendingClearing();
+        $overdueClearing = $this->overdueClearing();
+        $inWindow = $this->inWindowClearing();
+        $cleared = $this->clearedEarnings();
+        $dateRange = $this->clearingDateRange();
 
         $bizCurrencyId = CurrenciesExchange::BusinessCurrency();
 
         return [
             // Business currency info (used by frontend to label all normalized amounts)
             'business_currency' => [
-                'code'   => $this->currencyCode($bizCurrencyId),
+                'code' => $this->currencyCode($bizCurrencyId),
                 'symbol' => $this->currencySymbol($bizCurrencyId),
             ],
 
             // KPIs
             'stats' => [
-                'total_earners'         => $this->totalEarners(),
-                'total_earnings'        => $this->totalEarningsBusiness(),
-                'pending_clearing'      => $pendingClearing,
-                'overdue_clearing'      => $overdueClearing,
-                'in_window_clearing'    => $inWindow,
-                'cleared_earnings'      => $cleared,
+                'total_earners' => $this->totalEarners(),
+                'total_earnings' => $this->totalEarningsBusiness(),
+                'pending_clearing' => $pendingClearing,
+                'overdue_clearing' => $overdueClearing,
+                'in_window_clearing' => $inWindow,
+                'cleared_earnings' => $cleared,
             ],
 
             // Annual performance
             'annual' => [
-                'opening_balance'   => round($openingBalance, 2),
-                'closing_balance'   => round($closingBalance, 2),
-                'net_growth'        => round($closingBalance - $openingBalance, 2),
-                'growth_pct'        => $this->growthPercentage(),
+                'opening_balance' => round($openingBalance, 2),
+                'closing_balance' => round($closingBalance, 2),
+                'net_growth' => round($closingBalance - $openingBalance, 2),
+                'growth_pct' => $this->growthPercentage(),
             ],
 
             // Liquidity
             'liquidity' => [
-                'floating_cash'       => round($closingBalance, 2),
-                'unpaid_invoices'     => round($unpaidInvoices, 2),
+                'floating_cash' => round($closingBalance, 2),
+                'unpaid_invoices' => round($unpaidInvoices, 2),
                 'available_liquidity' => round($closingBalance - $unpaidInvoices, 2),
             ],
 
             // Settlement
             'settlement' => [
-                'total_pool'           => round($totalPool, 2),
-                'withdrawn'            => round($withdrawn, 2),
-                'pending_clearing'     => round($pendingClearing, 2),
+                'total_pool' => round($totalPool, 2),
+                'withdrawn' => round($withdrawn, 2),
+                'pending_clearing' => round($pendingClearing, 2),
                 'ready_for_withdrawal' => $this->readyForWithdrawal(),
-                'payout_ratio'         => $this->payoutRatio(),
-                'clearing_start'       => $dateRange['start'],
-                'clearing_end'         => $dateRange['end'],
+                'payout_ratio' => $this->payoutRatio(),
+                'clearing_start' => $dateRange['start'],
+                'clearing_end' => $dateRange['end'],
             ],
 
             // Referral funnel
             'referral_funnel' => [
-                'total_views'     => $this->referralViews(),
+                'total_views' => $this->referralViews(),
                 'total_registers' => $this->referralRegisters(),
             ],
 
             // Charts & tables
-            'monthly_trend'      => $this->monthlyTrend(),
-            'top_earners'        => $this->topEarners(),
-            'recent_earnings'    => $this->recentEarnings(),
+            'monthly_trend' => $this->monthlyTrend(),
+            'top_earners' => $this->topEarners(),
+            'recent_earnings' => $this->recentEarnings(),
             'currency_breakdown' => $this->currencyBreakdown(),
         ];
     }
 }
-

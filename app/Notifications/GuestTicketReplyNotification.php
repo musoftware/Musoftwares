@@ -25,11 +25,11 @@ class GuestTicketReplyNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type'      => 'guest_ticket_reply',
-            'title'     => 'New reply on guest ticket #' . $this->ticket->id,
-            'message'   => $this->ticket->name . ' replied to guest ticket #' . $this->ticket->id,
+            'type' => 'guest_ticket_reply',
+            'title' => 'New reply on guest ticket #'.$this->ticket->id,
+            'message' => $this->ticket->name.' replied to guest ticket #'.$this->ticket->id,
             'ticket_id' => $this->ticket->id,
-            'url'       => route('admin.guest-tickets.show', $this->ticket->id),
+            'url' => route('admin.guest-tickets.show', $this->ticket->id),
         ];
     }
 }

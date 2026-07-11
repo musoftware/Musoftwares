@@ -10,29 +10,29 @@ use App\Http\Requests\Client\Project\RescheduleCardRequest;
 use App\Http\Requests\Client\Project\StoreBoardNoteRequest;
 use App\Http\Requests\Client\Project\UpdateBoardNoteRequest;
 use App\Models\Project;
-use App\Models\ProjectBoardCategory;
 use App\Models\ProjectBoardItem;
 use App\Models\ProjectBoardNote;
 use App\Models\ProjectFile;
 use App\Models\ProjectReport;
 use App\Models\Task;
 use App\Models\Todo;
-use App\Models\TodoChecklistItem;
+use App\Services\ProjectBoardService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ClientProjectBoardController extends Controller
 {
     use ResolvesClientProject;
 
-    private ?\App\Services\ProjectBoardService $boardService = null;
+    private ?ProjectBoardService $boardService = null;
 
-    private function boardService(): \App\Services\ProjectBoardService
+    private function boardService(): ProjectBoardService
     {
-        return $this->boardService ??= app(\App\Services\ProjectBoardService::class);
+        return $this->boardService ??= app(ProjectBoardService::class);
     }
 
     // ───────────────── Note Actions ─────────────────
@@ -173,7 +173,7 @@ class ClientProjectBoardController extends Controller
     {
         $this->authorizeProject($project);
         abort_unless($task->project_id === $project->id, 404);
-        
+
         $task->delete();
 
         return response()->json(['ok' => true]);
@@ -208,7 +208,7 @@ class ClientProjectBoardController extends Controller
             'paused' => false,
         ]);
 
-        if (!empty($data['checklist'])) {
+        if (! empty($data['checklist'])) {
             foreach ($data['checklist'] as $itemTitle) {
                 if (trim($itemTitle)) {
                     $todo->checklistItems()->create([
@@ -253,7 +253,7 @@ class ClientProjectBoardController extends Controller
             foreach ($data['checklist'] as $chk) {
                 $todo->checklistItems()->create([
                     'title' => $chk['title'],
-                    'is_completed' => (bool)($chk['is_completed'] ?? false),
+                    'is_completed' => (bool) ($chk['is_completed'] ?? false),
                 ]);
             }
         }
@@ -414,7 +414,7 @@ class ClientProjectBoardController extends Controller
 
         $filename = sprintf(
             '%s-report-%d.pdf',
-            \Illuminate\Support\Str::slug($project->project_name ?: 'project') ?: 'project',
+            Str::slug($project->project_name ?: 'project') ?: 'project',
             $report->id,
         );
 
@@ -652,7 +652,7 @@ class ClientProjectBoardController extends Controller
 
         foreach ($pastPlacements as $placement) {
             $itemable = $placement->itemable;
-            if (!$itemable) {
+            if (! $itemable) {
                 continue;
             }
 
@@ -671,9 +671,9 @@ class ClientProjectBoardController extends Controller
                 }
 
                 $todos = $itemable->task_todo_items()->get();
-                $incompleteTodos = $todos->filter(fn ($t) => !$t->completed);
+                $incompleteTodos = $todos->filter(fn ($t) => ! $t->completed);
 
-                if (($todos->isNotEmpty() && $incompleteTodos->isNotEmpty()) || ($todos->isEmpty() && !$itemable->completed())) {
+                if (($todos->isNotEmpty() && $incompleteTodos->isNotEmpty()) || ($todos->isEmpty() && ! $itemable->completed())) {
                     $newTask = $project->tasks()->create([
                         'user_id' => $itemable->user_id,
                         'task_name' => $itemable->task_name,
@@ -724,9 +724,9 @@ class ClientProjectBoardController extends Controller
                 }
 
                 $checklist = $itemable->checklistItems()->get();
-                $incompleteChecklist = $checklist->filter(fn ($chk) => !$chk->is_completed);
+                $incompleteChecklist = $checklist->filter(fn ($chk) => ! $chk->is_completed);
 
-                if (!$itemable->completed || ($checklist->isNotEmpty() && $incompleteChecklist->isNotEmpty())) {
+                if (! $itemable->completed || ($checklist->isNotEmpty() && $incompleteChecklist->isNotEmpty())) {
                     $newTodo = $project->todos()->create([
                         'user_id' => $itemable->user_id,
                         'title' => $itemable->title,
@@ -868,10 +868,10 @@ class ClientProjectBoardController extends Controller
 
     private function todoToCard(Todo $todo, ?ProjectBoardItem $placement): array
     {
-        $checklist = $todo->checklistItems()->get()->map(fn($item) => [
+        $checklist = $todo->checklistItems()->get()->map(fn ($item) => [
             'id' => $item->id,
             'title' => $item->title,
-            'is_completed' => (bool)$item->is_completed,
+            'is_completed' => (bool) $item->is_completed,
         ])->toArray();
 
         return [
@@ -883,7 +883,7 @@ class ClientProjectBoardController extends Controller
             'pos_x' => $placement->pos_x ?? 24,
             'pos_y' => $placement->pos_y ?? 24,
             'sort' => (int) ($placement->sort ?? 0),
-            'completed' => (bool)$todo->completed,
+            'completed' => (bool) $todo->completed,
             'checklist' => $checklist,
             'comments_count' => (int) $todo->comments()->count(),
         ] + $this->categoryPayload($placement);

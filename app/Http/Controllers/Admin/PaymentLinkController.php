@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\PaymentLink;
 use App\Models\Currency;
+use App\Models\PaymentLink;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class PaymentLinkController extends Controller
 {
@@ -16,7 +16,7 @@ class PaymentLinkController extends Controller
         $paymentLinks = PaymentLink::with(['currency', 'user'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
-            
+
         $currencies = Currency::all();
 
         return Inertia::render('Admin/Finance/PaymentLinks/Index', [
@@ -47,6 +47,7 @@ class PaymentLinkController extends Controller
     public function destroy(PaymentLink $paymentLink)
     {
         $paymentLink->delete();
+
         return redirect()->back()->with('success', __('erp.deleted_successfully'));
     }
 }

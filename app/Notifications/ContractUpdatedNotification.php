@@ -2,11 +2,11 @@
 
 namespace App\Notifications;
 
+use App\Models\Contract;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\Contract;
 
 class ContractUpdatedNotification extends Notification implements ShouldQueue
 {
@@ -37,14 +37,14 @@ class ContractUpdatedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $actionUrl = url('/c/' . $this->contract->uuid);
+        $actionUrl = url('/c/'.$this->contract->uuid);
 
         return (new MailMessage)
-                    ->subject(__('general.contract_update_subject', ['project' => $this->contract->project_name]))
-                    ->greeting(__('general.hello'))
-                    ->line(__('general.contract_update_message', ['project' => $this->contract->project_name]))
-                    ->action(__('general.view_contract'), $actionUrl)
-                    ->line(__('general.thank_you_for_business'));
+            ->subject(__('general.contract_update_subject', ['project' => $this->contract->project_name]))
+            ->greeting(__('general.hello'))
+            ->line(__('general.contract_update_message', ['project' => $this->contract->project_name]))
+            ->action(__('general.view_contract'), $actionUrl)
+            ->line(__('general.thank_you_for_business'));
     }
 
     /**

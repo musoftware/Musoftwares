@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Models\BackgroundTask;
 use App\Events\BackgroundTaskUpdated;
+use App\Models\BackgroundTask;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,13 +16,11 @@ abstract class BaseBackgroundTask implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $taskId;
+
     public array $payload;
 
     /**
      * Create a new job instance.
-     *
-     * @param int $taskId
-     * @param array $payload
      */
     public function __construct(int $taskId, array $payload = [])
     {
@@ -32,8 +30,6 @@ abstract class BaseBackgroundTask implements ShouldQueue
 
     /**
      * Get the associated BackgroundTask model.
-     *
-     * @return BackgroundTask|null
      */
     protected function getTask(): ?BackgroundTask
     {
@@ -42,8 +38,6 @@ abstract class BaseBackgroundTask implements ShouldQueue
 
     /**
      * Mark the task as processing.
-     *
-     * @return void
      */
     protected function markAsProcessing(): void
     {
@@ -58,17 +52,13 @@ abstract class BaseBackgroundTask implements ShouldQueue
 
     /**
      * Update the task progress.
-     *
-     * @param int $progress
-     * @param array $partialResult
-     * @return void
      */
     protected function updateProgress(int $progress, array $partialResult = []): void
     {
         if ($task = $this->getTask()) {
             $updateData = ['progress' => $progress];
-            
-            if (!empty($partialResult)) {
+
+            if (! empty($partialResult)) {
                 $currentResult = $task->result ?? [];
                 $updateData['result'] = array_merge($currentResult, $partialResult);
             }
@@ -80,9 +70,6 @@ abstract class BaseBackgroundTask implements ShouldQueue
 
     /**
      * Mark the task as completed.
-     *
-     * @param array $result
-     * @return void
      */
     protected function markAsCompleted(array $result = []): void
     {
@@ -99,9 +86,6 @@ abstract class BaseBackgroundTask implements ShouldQueue
 
     /**
      * Mark the task as failed if the job fails.
-     *
-     * @param Throwable $exception
-     * @return void
      */
     public function failed(Throwable $exception): void
     {

@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MusoftwarePayment extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'client_id',
@@ -32,15 +32,15 @@ class MusoftwarePayment extends Model
     ];
 
     protected $casts = [
-        'customer_data'     => 'array',
-        'metadata'          => 'array',
-        'amount'            => 'decimal:2',
+        'customer_data' => 'array',
+        'metadata' => 'array',
+        'amount' => 'decimal:2',
         'commission_amount' => 'decimal:2',
-        'net_amount'        => 'decimal:2',
-        'commission_rate'   => 'decimal:2',
+        'net_amount' => 'decimal:2',
+        'commission_rate' => 'decimal:2',
     ];
 
-    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function client(): BelongsTo
     {
         return $this->belongsTo(MusoftwareClient::class, 'client_id');
     }
@@ -52,6 +52,4 @@ class MusoftwarePayment extends Model
     {
         return $this->status === 'success';
     }
-
-
 }

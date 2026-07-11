@@ -16,7 +16,7 @@ class StoreSerialSoftwareRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'           => ['required', 'string', 'max:255', 'unique:serial_softwares,name'],
+            'name' => ['required', 'string', 'max:255', 'unique:serial_softwares,name'],
             'default_status' => ['required', Rule::in(SerialSoftware::statuses())],
         ];
     }

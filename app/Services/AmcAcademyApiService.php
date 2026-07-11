@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Log;
 
 class AmcAcademyApiService extends BaseService
 {
-
     /**
      * The base URL for AmcAcademy API.
      */
@@ -28,9 +27,6 @@ class AmcAcademyApiService extends BaseService
     /**
      * Search for a mobile number in AmcAcademy.
      * This will also automatically trigger the 0.0625 deduction for Employee 22 in AmcAcademy.
-     *
-     * @param string $mobile
-     * @return array|null
      */
     public function searchMobile(string $mobile): ?array
     {
@@ -46,10 +42,10 @@ class AmcAcademyApiService extends BaseService
                     return $data['data'] ?? [];
                 }
             } else {
-                Log::error('AmcAcademy API Error: ' . $response->body());
+                Log::error('AmcAcademy API Error: '.$response->body());
             }
         } catch (\Exception $e) {
-            Log::error('AmcAcademy API Exception: ' . $e->getMessage());
+            Log::error('AmcAcademy API Exception: '.$e->getMessage());
         }
 
         return null;
@@ -59,7 +55,6 @@ class AmcAcademyApiService extends BaseService
      * Search for multiple FBIDs in bulk in AmcAcademy.
      * This triggers a deduction based on the count of numbers actually found.
      *
-     * @param array $fbids
      * @return array|null Returns an associative array of [FBID => Phone] or null on failure.
      */
     public function searchFbidsBulk(array $fbids): ?array
@@ -81,19 +76,18 @@ class AmcAcademyApiService extends BaseService
                 }
             } else {
                 echo $response->body();
-                Log::error('AmcAcademy API Bulk Search Error: ' . $response->body());
+                Log::error('AmcAcademy API Bulk Search Error: '.$response->body());
             }
         } catch (\Exception $e) {
-            echo  $e->getMessage();
-            Log::error('AmcAcademy API Bulk Search Exception: ' . $e->getMessage());
+            echo $e->getMessage();
+            Log::error('AmcAcademy API Bulk Search Exception: '.$e->getMessage());
         }
+
         return null;
     }
 
     /**
      * Process monthly deductions manually via API (Trigger end-of-month cleanup).
-     *
-     * @return array
      */
     public function processMonthlyDeductions(): array
     {
@@ -106,7 +100,7 @@ class AmcAcademyApiService extends BaseService
                 return $response->json();
             }
         } catch (\Exception $e) {
-            Log::error('AmcAcademy API Monthly Process Exception: ' . $e->getMessage());
+            Log::error('AmcAcademy API Monthly Process Exception: '.$e->getMessage());
         }
 
         return ['status' => 'error', 'message' => 'Failed to process deductions'];

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 
 class ReferralHelper
 {
-
     public static function hasReferral($request)
     {
         return $request->session()->get('referral') != null;
@@ -33,7 +32,6 @@ class ReferralHelper
     {
         UserReferral::IncViewRef($referral);
     }
-
 
     public static function setRef($string, $request)
     {
@@ -72,6 +70,7 @@ class ReferralHelper
                 'ip' => $ipAddress,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }

@@ -7,7 +7,10 @@ use App\Http\Requests\Admin\Project\BulkProjectActionRequest;
 use App\Http\Requests\Admin\Project\StoreProjectRequest;
 use App\Http\Requests\Admin\Project\UpdateProjectRequest;
 use App\Http\Resources\ProjectCollection;
+use App\Models\AdminSettings;
+use App\Models\Currency;
 use App\Models\Project;
+use App\Models\ProjectBoardItem;
 use App\Models\User;
 use App\Services\ProjectBoardService;
 use App\Services\ProjectService;
@@ -16,7 +19,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response as ResponseFacade;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
+use Modules\Shortlink\Services\ShortlinkService;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProjectController extends Controller
@@ -67,7 +72,7 @@ class ProjectController extends Controller
         $statusList = is_array($statusList)
             ? array_values(array_intersect($statusList, self::VALID_STATUSES))
             : [];
-        if (!empty($statusList)) {
+        if (! empty($statusList)) {
             $query->whereIn('status', $statusList);
         } else {
             $statusFilter = $request->get('status_filter');
@@ -145,7 +150,7 @@ class ProjectController extends Controller
 
     private function normalizeDate(?string $date): ?string
     {
-        if (!$date) {
+        if (! $date) {
             return null;
         }
         try {
@@ -245,7 +250,7 @@ class ProjectController extends Controller
 
     private static function presentInput(Request $request, string $key): ?string
     {
-        if (!$request->filled($key)) {
+        if (! $request->filled($key)) {
             return null;
         }
 
@@ -410,17 +415,17 @@ class ProjectController extends Controller
 
         $currency = $project->currencyRow();
 
-        $shareUrl = \Illuminate\Support\Facades\URL::signedRoute('shared-board.show', [
+        $shareUrl = URL::signedRoute('shared-board.show', [
             'token' => $project->share_token,
             'date' => $date->toDateString(),
         ]);
 
         $shortUrl = $this->shortUrlForBoardShare($project, $shareUrl, $request->user()?->id);
 
-        $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
+        $activeDates = ProjectBoardItem::where('project_id', $project->id)
             ->distinct()
             ->pluck('for_date')
-            ->map(fn($d) => is_string($d) ? $d : $d->toDateString())
+            ->map(fn ($d) => is_string($d) ? $d : $d->toDateString())
             ->toArray();
 
         return Inertia::render('Admin/Projects/Board', [
@@ -526,7 +531,7 @@ class ProjectController extends Controller
             'reason' => $c->reason,
             'amount' => (string) $c->amount,
             'currency_id' => $c->currency_id,
-            'currency_code' => optional(\App\Models\Currency::find($c->currency_id))->currency,
+            'currency_code' => optional(Currency::find($c->currency_id))->currency,
             'business_amount' => (string) ($c->business_amount ?? 0),
             'created_at' => optional($c->created_at)->toIso8601String(),
         ])->values();
@@ -539,12 +544,12 @@ class ProjectController extends Controller
             'paid' => (string) $inv->paid,
             'unpaid' => (string) $inv->unpaid_total(),
             'currency_id' => $inv->currency_id,
-            'currency_code' => optional(\App\Models\Currency::find($inv->currency_id))->currency,
+            'currency_code' => optional(Currency::find($inv->currency_id))->currency,
             'created_at' => optional($inv->created_at)->toIso8601String(),
         ])->values();
 
-        $businessCurrency = \App\Models\AdminSettings::business_currency();
-        $businessCurrencyCode = optional(\App\Models\Currency::find($businessCurrency))->currency;
+        $businessCurrency = AdminSettings::business_currency();
+        $businessCurrencyCode = optional(Currency::find($businessCurrency))->currency;
 
         return Inertia::render('Admin/Projects/Finance', [
             'project' => [
@@ -599,16 +604,16 @@ class ProjectController extends Controller
      */
     protected function shortUrlForBoardShare(Project $project, string $shareUrl, ?int $userId): ?string
     {
-        $serviceClass = \Modules\Shortlink\Services\ShortlinkService::class;
+        $serviceClass = ShortlinkService::class;
 
-        if (!class_exists($serviceClass)) {
+        if (! class_exists($serviceClass)) {
             return null;
         }
 
         try {
             $service = app($serviceClass);
             $link = $service->findOrCreateForDestination($shareUrl, [
-                'label' => 'Project board: ' . ($project->project_name ?? 'Project'),
+                'label' => 'Project board: '.($project->project_name ?? 'Project'),
                 'created_by_user_id' => $userId,
             ], $project);
 

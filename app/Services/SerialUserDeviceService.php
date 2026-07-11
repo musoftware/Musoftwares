@@ -7,7 +7,6 @@ use App\Models\User;
 
 class SerialUserDeviceService extends BaseService
 {
-
     public function assignDevice(array $data): SerialUserDevice
     {
         return SerialUserDevice::create($data);
@@ -27,7 +26,7 @@ class SerialUserDeviceService extends BaseService
     {
         // Iterate individually so the Observer fires for each device
         $user->serialUserDevices()->get()->each(
-            fn($device) => $device->update(['status' => $status])
+            fn ($device) => $device->update(['status' => $status])
         );
     }
 

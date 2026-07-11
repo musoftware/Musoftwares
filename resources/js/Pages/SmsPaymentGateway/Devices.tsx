@@ -122,7 +122,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                     <p className="text-slate-500 mb-4">{__('general.no_android_devices_connected')}</p>
                                     <Button onClick={handleAddDevice}>
                                         <Plus className="w-4 h-4 me-2" />
-                                        {__('freelance.connect_new_device')}
+                                        {__('general.connect_new_device')}
                                     </Button>
                                 </div>
                             ) : (
@@ -162,7 +162,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                 <DialogContent className="sm:max-w-3xl">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <QrCode className="w-5 h-5 text-indigo-600" /> {__('freelance.connect_new_device')}
+                            <QrCode className="w-5 h-5 text-indigo-600" /> {__('general.connect_new_device')}
                         </DialogTitle>
                         <DialogDescription>
                             {__('general.scan_this_qr_code_from_the_musoftware_payment_gateway_android_app_to_link_your_device')}

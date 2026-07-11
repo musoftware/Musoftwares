@@ -9,9 +9,9 @@ class ContractService extends BaseService
     public function createContract(array $data): Contract
     {
         $data['content'] = [
-            'lang' => $data['lang'] ?? 'ar'
+            'lang' => $data['lang'] ?? 'ar',
         ];
-        
+
         return Contract::create($data);
     }
 
@@ -28,7 +28,7 @@ class ContractService extends BaseService
     public function updateStatus(Contract $contract, string $status): void
     {
         $contract->status = $status;
-        
+
         // If marking as signed, automatically stamp the time if not already
         if ($status === 'signed' && is_null($contract->signed_at)) {
             $contract->signed_at = now();
@@ -36,6 +36,7 @@ class ContractService extends BaseService
 
         $contract->save();
     }
+
     public function deleteContract(Contract $contract): void
     {
         $contract->delete();

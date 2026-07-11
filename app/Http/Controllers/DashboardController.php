@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DashboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -17,11 +18,9 @@ class DashboardController extends Controller
 
     private function clientDashboard($user)
     {
-        $dashboardService = app(\App\Services\DashboardService::class);
+        $dashboardService = app(DashboardService::class);
         $data = $dashboardService->getClientDashboardData($user);
 
         return Inertia::render('Client/Dashboard', $data);
     }
-
 }
-

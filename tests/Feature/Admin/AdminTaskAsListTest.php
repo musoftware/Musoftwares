@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Project;
 use App\Models\Task;
 use App\Models\Todo;
 use App\Models\User;
@@ -208,6 +209,30 @@ class AdminTaskAsListTest extends TestCase
         $this->assertSame(['Soon', 'Later', 'No deadline'], $titles);
     }
 
+    public function test_sort_by_client_orders_by_original_client_and_project_name(): void
+    {
+        $projectA2 = Project::create(['user_id' => $this->clientA->id, 'project_name' => 'Project A2', 'status' => 'open', 'archived' => 0]);
+        $projectA1 = Project::create(['user_id' => $this->clientA->id, 'project_name' => 'Project A1', 'status' => 'open', 'archived' => 0]);
+        $projectB1 = Project::create(['user_id' => $this->clientB->id, 'project_name' => 'Project B1', 'status' => 'open', 'archived' => 0]);
+
+        $this->makeTodo(['title' => 'Todo Beta', 'project_id' => $projectB1->id, 'user_id' => $this->clientC->id]);
+        $this->makeTodo(['title' => 'Todo Alpha 2', 'project_id' => $projectA2->id, 'user_id' => $this->clientB->id]);
+        $this->makeTodo(['title' => 'Todo Alpha 1', 'project_id' => $projectA1->id, 'user_id' => $this->clientA->id]);
+
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.tasks.as_list', ['sort' => 'client']));
+        $response->assertStatus(200);
+
+        $arranged = $response->viewData('page')['props']['arrangedClients'];
+
+        $this->assertCount(2, $arranged);
+        $this->assertSame('Alpha Co', $arranged[0]['client']['name']);
+        $this->assertSame('Beta Inc', $arranged[1]['client']['name']);
+
+        $alphaTodos = collect($arranged[0]['tasks'])->flatMap(fn ($t) => collect($t['todos'])->pluck('title'))->all();
+        $this->assertSame(['Todo Alpha 1', 'Todo Alpha 2'], $alphaTodos);
+    }
+
     public function test_pagination_respects_per_page(): void
     {
         for ($i = 0; $i < 12; $i++) {
@@ -309,5 +334,110 @@ class AdminTaskAsListTest extends TestCase
         $page  = $svc->paginate($svc->normalizeFilters([]), 100);
 
         $this->assertSame($stats['total_active_todos'], $page->total(), 'stat total must match list total');
+    }
+
+    public function test_todos_card_added_in_board_visible_on_board_and_in_admin_tasks_list(): void
+    {
+        // 1. Create a project belonging to clientA
+        $project = Project::create([
+            'user_id' => $this->clientA->id,
+            'project_name' => 'Board Project',
+            'status' => 'open',
+            'archived' => 0,
+        ]);
+
+        $today = now()->toDateString();
+        $todoTitle = 'Todo Added From Board';
+
+        // 2. Add a todo card on the board via the API (using the client context)
+        $response = $this->actingAs($this->clientA)->postJson(
+            route('client.projects.board.store-todo', $project),
+            [
+                'for_date' => $today,
+                'title' => $todoTitle,
+                'description' => 'Todo description',
+                'lane' => 'backlog',
+            ]
+        );
+
+        $response->assertSuccessful();
+        $todoId = $response->json('card.id');
+        $this->assertNotNull($todoId);
+
+        // Verify the database has the todo and is linked to the project
+        $this->assertDatabaseHas('todos', [
+            'id' => $todoId,
+            'project_id' => $project->id,
+            'title' => $todoTitle,
+            'inDate' => $today,
+        ]);
+
+        // 3. Verify the todo is visible in the board page (admin side)
+        $boardResponse = $this->actingAs($this->admin)->get(
+            route('admin.projects.board', ['project' => $project, 'date' => $today])
+        );
+        $boardResponse->assertStatus(200);
+
+        $boardCards = $boardResponse->viewData('page')['props']['cards'];
+        $this->assertNotEmpty($boardCards);
+
+        $todoCardInBoard = collect($boardCards)->first(fn ($c) => $c['type'] === 'todo' && $c['id'] === $todoId);
+        $this->assertNotNull($todoCardInBoard, 'Todo card should be visible in the board cards.');
+        $this->assertSame($todoTitle, $todoCardInBoard['title']);
+
+        // 4. Verify the todo is visible in admin/tasks/as_list view
+        $listResponse = $this->actingAs($this->admin)->get(route('admin.tasks.as_list'));
+        $listResponse->assertStatus(200);
+
+        $arranged = $listResponse->viewData('page')['props']['arrangedClients'];
+        $clientGroup = collect($arranged)->first(fn ($c) => $c['client']['id'] === $this->clientA->id);
+        $this->assertNotNull($clientGroup, 'Client A group should exist in arranged client tasks list.');
+
+        // Grouping under the project's card since it is a board todo linked to a project
+        $projectCard = collect($clientGroup['tasks'])->first(fn ($t) => $t['id'] === $project->id);
+        $this->assertNotNull($projectCard, 'Project card should exist under Client A.');
+
+        $todoInList = collect($projectCard['todos'])->first(fn ($todo) => $todo['id'] === $todoId);
+        $this->assertNotNull($todoInList, 'The added todo card should be visible in the admin/tasks/as_list.');
+        $this->assertSame($todoTitle, $todoInList['title']);
+    }
+
+    public function test_admin_can_update_todo_details(): void
+    {
+        $todo = $this->makeTodo([
+            'title' => 'Original Title',
+            'description' => 'Original Description',
+            'priority' => 'low',
+        ]);
+
+        $payload = [
+            'title' => 'Updated Title',
+            'description' => 'Updated Description',
+            'priority' => 'urgent',
+            'paused' => true,
+            'start_at' => now()->toDateString(),
+            'end_at' => now()->addDays(5)->toDateString(),
+        ];
+
+        // 1. Non-admin cannot update
+        $this->actingAs($this->clientA)
+            ->putJson(route('admin.tasks.todos.update', $todo->id), $payload)
+            ->assertStatus(403);
+
+        // 2. Admin can update
+        $response = $this->actingAs($this->admin)
+            ->putJson(route('admin.tasks.todos.update', $todo->id), $payload);
+
+        $response->assertSuccessful();
+        $response->assertJsonPath('status', 'success');
+
+        $fresh = $todo->fresh();
+        $this->assertSame('Updated Title', $fresh->title);
+        $this->assertSame('Updated Description', $fresh->description);
+        $this->assertSame('urgent', $fresh->priority);
+        $this->assertTrue((bool) $fresh->paused);
+        $this->assertSame('#f56565', $fresh->priorityColor);
+        $this->assertNotNull($fresh->start_at);
+        $this->assertNotNull($fresh->end_at);
     }
 }

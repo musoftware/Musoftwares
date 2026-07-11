@@ -2,24 +2,23 @@
 
 namespace App\Services;
 
+use App\Models\CurrenciesExchange;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VoucherRedemption;
-use App\Models\CurrenciesExchange;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class VoucherService extends BaseService
 {
-
     /**
      * Check and apply vouchers when user makes a transaction
      */
     public function checkAndApplyVouchers(User $user, Transaction $transaction): void
     {
         // Only check for 'used' or 'sent' transactions (spending transactions)
-        if (!in_array($transaction->type, ['used', 'sent'])) {
+        if (! in_array($transaction->type, ['used', 'sent'])) {
             return;
         }
 
@@ -37,7 +36,7 @@ class VoucherService extends BaseService
 
         foreach ($vouchers as $voucher) {
             // Check if voucher can be used by this user
-            if (!$voucher->canBeUsedByUser($user)) {
+            if (! $voucher->canBeUsedByUser($user)) {
                 continue;
             }
 
@@ -73,7 +72,7 @@ class VoucherService extends BaseService
             // Add reward to user balance
             $rewardTransactionId = $user->add_balance(
                 $userRewardAmount,
-                'Voucher Reward: ' . $voucher->name,
+                'Voucher Reward: '.$voucher->name,
                 'earned'
             );
 

@@ -14,7 +14,7 @@ class MoveUserFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'paths'       => 'required|array',
+            'paths' => 'required|array',
             'destination' => 'required|string',
         ];
     }

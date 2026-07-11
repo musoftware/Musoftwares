@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Review extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'service_id',
@@ -18,12 +17,12 @@ class Review extends Model
         'comment',
         'reply',
         'replied_at',
-        'is_approved'
+        'is_approved',
     ];
 
     protected $casts = [
         'is_approved' => 'boolean',
-        'rating' => 'integer'
+        'rating' => 'integer',
     ];
 
     /**

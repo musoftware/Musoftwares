@@ -2,28 +2,27 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class Earning extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected static function booted(): void
     {
         static::saving(function ($earning) {
             // Force user currency conversion if different
             if ($earning->user_id && $earning->user) {
-                $userCurrencyId = $earning->user->currency_id ?? \App\Models\AdminSettings::business_currency();
-                $currentCurrencyId = $earning->currency_id ?? $earning->currency ?? \App\Models\AdminSettings::business_currency();
+                $userCurrencyId = $earning->user->currency_id ?? AdminSettings::business_currency();
+                $currentCurrencyId = $earning->currency_id ?? $earning->currency ?? AdminSettings::business_currency();
 
                 if ($currentCurrencyId != $userCurrencyId) {
                     $date = $earning->created_at ?? now();
-                    $earning->amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
+                    $earning->amount = CurrenciesExchange::RateByDateNoRound(
                         $date,
                         $earning->amount,
                         $currentCurrencyId,
@@ -38,7 +37,7 @@ class Earning extends Model
             // Track the first time a referred user generated a commission.
             // This drives the boosted commission window (10% for 1 month, per
             // 2026_03_02_..._add_first_referral_payment_at_to_users_table migration).
-            if (!empty($earning->referred_user_id)) {
+            if (! empty($earning->referred_user_id)) {
                 $referred = $earning->referred_user ?? User::find($earning->referred_user_id);
                 if ($referred && empty($referred->first_referral_payment_at)) {
                     $referred->first_referral_payment_at = $earning->created_at ?? now();
@@ -72,9 +71,10 @@ class Earning extends Model
         $data = $query->groupBy('currency_id')->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->avg_date, $commission->amount, $commission->currency_id, CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
+
         return $amount;
     }
 
@@ -92,7 +92,6 @@ class Earning extends Model
         }
     }
 
-
     public static function clearing_last_date()
     {
         $query = Earning::query()->select(DB::raw('max(convert_to_balance_on) as ctb_date'));
@@ -107,22 +106,18 @@ class Earning extends Model
         }
     }
 
-
     public static function total_balance()
     {
         $data = Earning::query()->select(DB::raw('sum(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'))->groupBy('currency_id')->get();
 
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->avg_date, $commission->amount, $commission->currency_id, CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
+
         return $amount;
     }
-
-
-
-
 
     public function ref_progress_days()
     {
@@ -165,6 +160,4 @@ class Earning extends Model
 
         return min(100, round($progress_percentage, 2));
     }
-
-
 }

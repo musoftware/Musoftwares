@@ -209,7 +209,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                     </div>
                                     <div className="h-80 w-full">
                                         {historicalData && historicalData.length > 0 ? (
-                                            <ResponsiveContainer width="100%" height="100%">
+                                            <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                                 <AreaChart data={historicalData}>
                                                     <defs>
                                                         <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">

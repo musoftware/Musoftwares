@@ -133,7 +133,7 @@ export default function Dashboard({
                     <OperationalCard title={__('general.revenue_trajectory_12_months')} className="lg:col-span-3">
                         <div className="h-[300px] w-full">
                             {chartData.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
+                                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={300}>
                                     <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
@@ -153,7 +153,7 @@ export default function Dashboard({
                     <OperationalCard title={__('general.module_breakdown')} className="lg:col-span-2">
                         <div className="h-[300px] w-full">
                             {pieData.some((d: any) => d.value > 0) ? (
-                                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
+                                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={300}>
                                     <PieChart>
                                         <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={5} dataKey="value" stroke="none">
                                             {pieData.map((entry: any, index: number) => (

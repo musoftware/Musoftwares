@@ -26,7 +26,7 @@ class Sequence extends Model
     {
         return $this->hasMany(SequenceState::class);
     }
-    
+
     public function channel()
     {
         return $this->belongsTo(WhatsAppChannel::class, 'whatsapp_channel_id');

@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\UserReferralRequestWithdraw;
-use App\Services\ExchangeRateService;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Balance management service providing reconciliation and computation utilities.
@@ -15,7 +13,6 @@ use Illuminate\Support\Facades\DB;
  */
 class BalanceService extends BaseService
 {
-
     protected ExchangeRateService $exchangeRateService;
 
     public function __construct(ExchangeRateService $exchangeRateService)
@@ -78,6 +75,7 @@ class BalanceService extends BaseService
     public function availableBalance(User $user): float
     {
         $pending = $this->pendingWithdrawalAmount($user);
+
         return max(0, round((float) $user->user_balance - $pending, 2));
     }
 
@@ -87,6 +85,7 @@ class BalanceService extends BaseService
     public function availableEarnedBalance(User $user): float
     {
         $pending = $this->pendingWithdrawalAmount($user);
+
         return max(0, round((float) ($user->pending_commission ?? 0) - $pending, 2));
     }
 
@@ -124,8 +123,8 @@ class BalanceService extends BaseService
     {
         $minimumWithdrawal = (float) config('app.minimum_withdrawal', 50);
 
-        if (!$user->kyc_verified) {
-            return ['eligible' => false, 'reason' => "Identity verification (KYC) is required before requesting a withdrawal."];
+        if (! $user->kyc_verified) {
+            return ['eligible' => false, 'reason' => 'Identity verification (KYC) is required before requesting a withdrawal.'];
         }
 
         if ($amount < $minimumWithdrawal) {
@@ -138,7 +137,7 @@ class BalanceService extends BaseService
         }
 
         $payoutMethod = $user->payoutMethods()->where('id', $payoutMethodId)->first();
-        if (!$payoutMethod) {
+        if (! $payoutMethod) {
             return ['eligible' => false, 'reason' => 'Invalid payout method.'];
         }
 
@@ -157,9 +156,9 @@ class BalanceService extends BaseService
         $payoutMethod = $user->payoutMethods()->where('id', $payoutMethodId)->firstOrFail();
 
         $this->executeInTransaction(function () use ($user, $amount, $payoutMethod) {
-            $user->add_balance(-1 * $amount, 'Withdrawal request via ' . ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
+            $user->add_balance(-1 * $amount, 'Withdrawal request via '.ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
 
-            $withdrawal = new UserReferralRequestWithdraw();
+            $withdrawal = new UserReferralRequestWithdraw;
             $withdrawal->user_id = $user->id;
             $withdrawal->amount = $amount;
             $withdrawal->currency = $user->currency;
@@ -180,8 +179,9 @@ class BalanceService extends BaseService
             ->where('reason', $reason)
             ->exists();
 
-        if (!$alreadyProcessed) {
+        if (! $alreadyProcessed) {
             $user->add_balance($amountPaid, $reason, 'received');
+
             return ['status' => 'success', 'message' => 'Deposit processed successfully', 'already_processed' => false];
         }
 

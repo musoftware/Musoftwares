@@ -11,10 +11,21 @@ export function SearchInput({
 }) {
     const [localValue, setLocalValue] = useState(value || '');
     const timerRef = useRef(null);
+    const lastPropagatedValue = useRef(value || '');
 
     useEffect(() => {
-        setLocalValue(value || '');
+        const normalizedValue = value || '';
+        if (normalizedValue !== lastPropagatedValue.current) {
+            setLocalValue(normalizedValue);
+            lastPropagatedValue.current = normalizedValue;
+        }
     }, [value]);
+
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+        };
+    }, []);
 
     const handleChange = (e) => {
         const newValue = e.target.value;
@@ -22,12 +33,14 @@ export function SearchInput({
 
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
+            lastPropagatedValue.current = newValue;
             onChange(newValue);
         }, 300);
     };
 
     const handleClear = () => {
         setLocalValue('');
+        lastPropagatedValue.current = '';
         if (timerRef.current) clearTimeout(timerRef.current);
         onChange('');
     };
