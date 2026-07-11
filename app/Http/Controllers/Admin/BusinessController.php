@@ -67,7 +67,7 @@ class BusinessController extends Controller
                 'next_due_date' => $entry->due_date,
                 'status' => $entry->status ?? 'completed',
                 'user' => $entry->user ? ['id' => $entry->user->id, 'name' => $entry->user->name, 'email' => $entry->user->email] : null,
-                'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->name] : null,
+                'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->project_name] : null,
                 'created_at' => $entry->created_at,
                 'type' => $entry->type,
             ];
@@ -337,7 +337,7 @@ class BusinessController extends Controller
                 'next_due_date' => $entry->due_date,
                 'status' => $entry->status ?? 'completed',
                 'user' => $entry->user ? ['id' => $entry->user->id, 'name' => $entry->user->name, 'email' => $entry->user->email] : null,
-                'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->name] : null,
+                'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->project_name] : null,
                 'creator' => $entry->creator ? ['id' => $entry->creator->id, 'name' => $entry->creator->name] : null,
                 'created_at' => $entry->created_at,
                 'updated_at' => $entry->updated_at,
@@ -558,7 +558,7 @@ class BusinessController extends Controller
                 'updated_at' => $cost->updated_at,
                 'deleted_at' => $cost->deleted_at,
                 'user' => $cost->user ? ['id' => $cost->user->id, 'name' => $cost->user->name, 'email' => $cost->user->email] : null,
-                'project' => $cost->project ? ['id' => $cost->project->id, 'name' => $cost->project->name] : null,
+                'project' => $cost->project ? ['id' => $cost->project->id, 'name' => $cost->project->project_name] : null,
                 'recurring_sources' => $cost->recurringSources->map(fn ($r) => [
                     'id' => $r->id,
                     'title' => $r->title,

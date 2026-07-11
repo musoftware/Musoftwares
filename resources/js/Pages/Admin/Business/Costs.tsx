@@ -443,7 +443,7 @@ export default function Costs() {
                         <div className="flex items-center gap-2 mt-3 flex-wrap">
                             {activeFilterPills.map((p) => (
                                 <span key={p.key} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
-                                    <span className="text-slate-500">{p.label}:</span> {p.value}
+                                    <span className="text-slate-500">{p.label}:</span> {typeof p.value === 'object' ? JSON.stringify(p.value) : String(p.value)}
                                     <button onClick={() => clearFilter(p.key)} className="ms-1 text-slate-400 hover:text-slate-700">
                                         <X className="h-3 w-3" />
                                     </button>
@@ -465,7 +465,7 @@ export default function Costs() {
                     </CardHeader>
                     <CardContent>
                         <div className="h-[260px] mt-2">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                 <AreaChart data={stats.monthly_trends}>
                                     <defs>
                                         <linearGradient id="colorCosts" x1="0" y1="0" x2="0" y2="1">
@@ -494,7 +494,7 @@ export default function Costs() {
                     <CardContent>
                         <div className="h-[260px] mt-2">
                             {(stats.category_breakdown?.length ?? 0) > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                     <PieChart>
                                         <Pie data={stats.category_breakdown} cx="50%" cy="50%" innerRadius={45} outerRadius={80} paddingAngle={2} dataKey="value">
                                             {stats.category_breakdown.map((_: any, idx: number) => (
@@ -526,7 +526,7 @@ export default function Costs() {
                             </CardHeader>
                             <CardContent>
                                 <div className="h-[260px] mt-2">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                         <BarChart data={stats.project_breakdown} layout="vertical" margin={{ left: 60 }}>
                                             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
                                             <XAxis type="number" hide />
@@ -548,7 +548,7 @@ export default function Costs() {
                             </CardHeader>
                             <CardContent>
                                 <div className="h-[260px] mt-2">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                         <BarChart data={stats.client_breakdown} layout="vertical" margin={{ left: 60 }}>
                                             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
                                             <XAxis type="number" hide />
