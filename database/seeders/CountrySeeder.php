@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
 
 class CountrySeeder extends Seeder
 {
@@ -15,9 +15,10 @@ class CountrySeeder extends Seeder
     public function run(): void
     {
         $response = Http::withoutVerifying()->get('https://raw.githubusercontent.com/samayo/country-json/master/src/country-by-name.json');
-        
-        if (!$response->successful()) {
+
+        if (! $response->successful()) {
             $this->command->error('Failed to fetch countries from GitHub.');
+
             return;
         }
 

@@ -3,10 +3,12 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\Project;
-use App\Models\ProjectBoardItem;
 use App\Models\ProjectBoardNote;
 use App\Models\ProjectBoardPreference;
 use App\Models\User;
+use App\Services\ProjectBoardService;
+use Carbon\Carbon;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,13 +17,14 @@ class ProjectBoardPreferencesTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected Project $project;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -101,7 +104,7 @@ class ProjectBoardPreferencesTest extends TestCase
 
     public function test_apply_sort_by_title_uses_alphabetical_order(): void
     {
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         $cards = [
             $this->makeCard('note', 1, 'Banana'),
@@ -118,7 +121,7 @@ class ProjectBoardPreferencesTest extends TestCase
 
     public function test_apply_sort_by_priority_groups_urgent_first(): void
     {
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         $cards = [
             $this->makeCard('task', 1, 'B', priority: 'low'),
@@ -132,7 +135,7 @@ class ProjectBoardPreferencesTest extends TestCase
 
     public function test_apply_sort_by_lane_groups_by_status(): void
     {
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         $cards = [
             $this->makeCard('task', 1, 'A', lane: 'done'),
@@ -146,7 +149,7 @@ class ProjectBoardPreferencesTest extends TestCase
 
     public function test_apply_sort_by_category_pushes_nulls_last(): void
     {
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         $cards = [
             $this->makeCard('task', 1, 'A', categoryId: null),
@@ -164,7 +167,7 @@ class ProjectBoardPreferencesTest extends TestCase
 
     public function test_apply_sort_manual_returns_input_untouched(): void
     {
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         $cards = [
             $this->makeCard('task', 1, 'Z', sort: 99),
@@ -177,7 +180,7 @@ class ProjectBoardPreferencesTest extends TestCase
 
     public function test_cards_for_date_applies_user_sort_preference(): void
     {
-        $today = \Carbon\Carbon::parse('2026-07-01');
+        $today = Carbon::parse('2026-07-01');
 
         ProjectBoardNote::create([
             'project_id' => $this->project->id,
@@ -194,7 +197,7 @@ class ProjectBoardPreferencesTest extends TestCase
             'color' => 'yellow',
         ]);
 
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         $sorted = $service->cardsForDate($this->project, $today, applyFutureGating: false, preferences: [
             'view_mode' => 'cards',

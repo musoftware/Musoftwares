@@ -2,10 +2,9 @@
 
 namespace Tests\Feature;
 
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Spatie\Permission\Models\Role;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class RolesAndPermissionsSeederTest extends TestCase
 {
@@ -25,12 +24,12 @@ class RolesAndPermissionsSeederTest extends TestCase
             'freelancer',
             'seller',
             'employee',
-            'tenant_admin'
+            'tenant_admin',
         ];
 
         foreach ($expectedRoles as $role) {
             $this->assertDatabaseHas('roles', [
-                'name' => $role
+                'name' => $role,
             ]);
         }
     }

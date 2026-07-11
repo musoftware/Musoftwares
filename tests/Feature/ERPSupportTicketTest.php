@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\UserSubscription;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\ERP\Models\SupportTicket;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
-use Modules\ERP\Models\SupportTicket;
 use Tests\TestCase;
 
 class ERPSupportTicketTest extends TestCase
@@ -14,14 +16,16 @@ class ERPSupportTicketTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Tenant $tenant;
+
     protected TenantClient $client;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
@@ -41,7 +45,7 @@ class ERPSupportTicketTest extends TestCase
             'address' => '123 Main St, Anytown',
         ]);
 
-        \App\Models\UserSubscription::create([
+        UserSubscription::create([
             'user_id' => $this->user->id,
             'object' => 'erp-tickets',
             'status' => 'active',
@@ -61,7 +65,7 @@ class ERPSupportTicketTest extends TestCase
             ]);
 
         $response->assertStatus(302);
-        
+
         $this->assertDatabaseHas('erp_support_tickets', [
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
@@ -70,7 +74,6 @@ class ERPSupportTicketTest extends TestCase
             'priority' => 'high',
         ]);
     }
-
 
     public function test_can_resolve_and_close_and_delete_own_support_ticket(): void
     {

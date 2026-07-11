@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('value');
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->unique(['software_program_id', 'locale', 'field'], 'sp_trans_unique_index');
         });
     }

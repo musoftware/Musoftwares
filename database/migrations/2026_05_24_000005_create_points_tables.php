@@ -11,24 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('users', 'points_balance')) {
+        if (! Schema::hasColumn('users', 'points_balance')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->integer('points_balance')->default(0)->after('user_balance');
             });
         }
 
-        if (!Schema::hasTable('point_packages')) {
+        if (! Schema::hasTable('point_packages')) {
             Schema::create('point_packages', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
                 $table->integer('points');
                 $table->decimal('price', 10, 2);
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
             });
         }
 
-        if (!Schema::hasTable('point_transactions')) {
+        if (! Schema::hasTable('point_transactions')) {
             Schema::create('point_transactions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -36,7 +36,7 @@ return new class extends Migration
                 $table->integer('points');
                 $table->string('description')->nullable();
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
             });
         }
     }
@@ -48,7 +48,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('point_transactions');
         Schema::dropIfExists('point_packages');
-        
+
         if (Schema::hasColumn('users', 'points_balance')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn('points_balance');

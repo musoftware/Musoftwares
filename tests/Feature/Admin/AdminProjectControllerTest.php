@@ -3,7 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
-use App\Models\Project;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,13 +14,14 @@ class AdminProjectControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     private function createAdmin()
     {
         $admin = User::factory()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
+
         return $admin;
     }
 
@@ -28,6 +29,7 @@ class AdminProjectControllerTest extends TestCase
     {
         $client = User::factory()->create(['onboarding_completed' => true]);
         $client->assignRole('client');
+
         return $client;
     }
 
@@ -64,7 +66,7 @@ class AdminProjectControllerTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('projects', [
             'project_name' => 'New Test Project',
             'user_id' => $client->id,

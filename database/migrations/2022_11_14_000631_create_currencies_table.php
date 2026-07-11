@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -20,11 +21,11 @@ return new class extends Migration
             $table->string('string_format', 10);
             $table->softDeletes();
         });
-        \Illuminate\Support\Facades\DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [1, 'USD', '$', '$%01.2f']);
-        \Illuminate\Support\Facades\DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [2, 'EGP', 'e£', 'e£%01.2f']);
-        \Illuminate\Support\Facades\DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [3, 'EUR', '€', 'e£%01.2f']);
-        \Illuminate\Support\Facades\DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [4, 'GBP', '£', '£%01.2f']);
-        \Illuminate\Support\Facades\DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [5, 'AED', 'د.إ', '%01.2f د.إ']);
+        DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [1, 'USD', '$', '$%01.2f']);
+        DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [2, 'EGP', 'e£', 'e£%01.2f']);
+        DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [3, 'EUR', '€', 'e£%01.2f']);
+        DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [4, 'GBP', '£', '£%01.2f']);
+        DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [5, 'AED', 'د.إ', '%01.2f د.إ']);
 
     }
 

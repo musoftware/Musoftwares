@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -32,7 +32,7 @@ return new class extends Migration
         // 1. Upgrade 'permissions' table: add guard_name and make slug nullable if they exist
         if (Schema::hasTable($tableNames['permissions'])) {
             Schema::table($tableNames['permissions'], function (Blueprint $table) use ($tableNames) {
-                if (!Schema::hasColumn($tableNames['permissions'], 'guard_name')) {
+                if (! Schema::hasColumn($tableNames['permissions'], 'guard_name')) {
                     $table->string('guard_name')->default('web');
                 }
                 if (Schema::hasColumn($tableNames['permissions'], 'slug')) {
@@ -47,7 +47,7 @@ return new class extends Migration
                 $table->string('guard_name')->default('web');
                 $table->string('slug')->nullable();
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
                 $table->unique(['name', 'guard_name']);
             });
         }
@@ -55,7 +55,7 @@ return new class extends Migration
         // 2. Upgrade 'roles' table: add guard_name and make slug nullable if they exist
         if (Schema::hasTable($tableNames['roles'])) {
             Schema::table($tableNames['roles'], function (Blueprint $table) use ($tableNames) {
-                if (!Schema::hasColumn($tableNames['roles'], 'guard_name')) {
+                if (! Schema::hasColumn($tableNames['roles'], 'guard_name')) {
                     $table->string('guard_name')->default('web');
                 }
                 if (Schema::hasColumn($tableNames['roles'], 'slug')) {
@@ -74,7 +74,7 @@ return new class extends Migration
                 $table->string('guard_name')->default('web');
                 $table->string('slug')->nullable();
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
                 if ($teams) {
                     $table->unique([$columnNames['team_foreign_key'] ?? 'team_id', 'name', 'guard_name']);
                 } else {
@@ -84,7 +84,7 @@ return new class extends Migration
         }
 
         // 3. Create 'model_has_permissions' if missing
-        if (!Schema::hasTable($tableNames['model_has_permissions'])) {
+        if (! Schema::hasTable($tableNames['model_has_permissions'])) {
             Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {
                 $table->unsignedBigInteger($pivotPermission);
                 $table->string('model_type');
@@ -121,7 +121,7 @@ return new class extends Migration
         }
 
         // 4. Create 'model_has_roles' if missing
-        if (!Schema::hasTable($tableNames['model_has_roles'])) {
+        if (! Schema::hasTable($tableNames['model_has_roles'])) {
             Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames, $pivotRole, $teams) {
                 $table->unsignedBigInteger($pivotRole);
                 $table->string('model_type');
@@ -158,7 +158,7 @@ return new class extends Migration
         }
 
         // 5. Create 'role_has_permissions' if missing
-        if (!Schema::hasTable($tableNames['role_has_permissions'])) {
+        if (! Schema::hasTable($tableNames['role_has_permissions'])) {
             Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames, $pivotRole, $pivotPermission) {
                 $table->unsignedBigInteger($pivotPermission);
                 $table->unsignedBigInteger($pivotRole);
@@ -198,7 +198,7 @@ return new class extends Migration
             app('cache')
                 ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
                 ->forget(config('permission.cache.key'));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Ignore cache clearing errors during migration if cache driver is not configured
         }
     }
@@ -229,7 +229,7 @@ return new class extends Migration
             $table->unsignedBigInteger('role_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-            $table->primary(['user_id','role_id']);
+            $table->primary(['user_id', 'role_id']);
         });
 
         Schema::create('users_permissions', function (Blueprint $table) {
@@ -237,7 +237,7 @@ return new class extends Migration
             $table->unsignedBigInteger('permission_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
-            $table->primary(['user_id','permission_id']);
+            $table->primary(['user_id', 'permission_id']);
         });
 
         Schema::create('roles_permissions', function (Blueprint $table) {
@@ -245,7 +245,7 @@ return new class extends Migration
             $table->unsignedBigInteger('permission_id');
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
-            $table->primary(['role_id','permission_id']);
+            $table->primary(['role_id', 'permission_id']);
         });
 
         if (Schema::hasTable($tableNames['roles'])) {

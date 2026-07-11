@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\SerialDevice;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,13 +13,14 @@ class SerialDeviceControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -48,14 +50,14 @@ class SerialDeviceControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)->patch("/admin/serial-devices/{$device->id}/status", [
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('serial_devices', [
             'id' => $device->id,
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
     }
 
@@ -72,7 +74,7 @@ class SerialDeviceControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseMissing('serial_devices', [
-            'id' => $device->id
+            'id' => $device->id,
         ]);
     }
 
@@ -90,7 +92,7 @@ class SerialDeviceControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post('/admin/serial-devices/bulk-status', [
             'ids' => [$device1->id, $device2->id],
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
 
         $response->assertRedirect();
@@ -105,7 +107,7 @@ class SerialDeviceControllerTest extends TestCase
         $device2 = SerialDevice::factory()->create(['device_id' => 'DEV2', 'status' => 'active', 'machine_name' => 'Machine 2']);
 
         $response = $this->actingAs($this->admin)->post('/admin/serial-devices/bulk-delete', [
-            'ids' => [$device1->id, $device2->id]
+            'ids' => [$device1->id, $device2->id],
         ]);
 
         $response->assertRedirect();

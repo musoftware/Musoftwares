@@ -2,13 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Currency;
+use App\Models\User;
+use Database\Seeders\CurrenciesSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
-use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\WalletTransaction;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ERPInvoiceManualPaymentTransactionTest extends TestCase
@@ -16,7 +18,9 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Tenant $tenant;
+
     protected Currency $currency;
 
     protected function setUp(): void
@@ -25,8 +29,8 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
 
         config(['erp.platform_tenant_id' => 999]);
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $this->seed(\Database\Seeders\CurrenciesSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(CurrenciesSeeder::class);
 
         $this->currency = Currency::firstOrCreate(
             ['currency' => 'USD'],

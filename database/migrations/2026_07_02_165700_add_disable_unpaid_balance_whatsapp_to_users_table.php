@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'disable_unpaid_balance_whatsapp')) {
+            if (! Schema::hasColumn('users', 'disable_unpaid_balance_whatsapp')) {
                 $table->boolean('disable_unpaid_balance_whatsapp')
                     ->default(false)
                     ->after('whatsapp_number');

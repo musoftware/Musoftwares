@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Currency;
 use App\Models\User;
 use App\Models\Voucher;
-use App\Models\Currency;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,13 +14,15 @@ class AdminVoucherControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
+
     protected Currency $currency;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -30,7 +33,7 @@ class AdminVoucherControllerTest extends TestCase
         $this->currency = Currency::create([
             'currency' => 'USD',
             'symbol' => '$',
-            'string_format' => '%v $'
+            'string_format' => '%v $',
         ]);
     }
 

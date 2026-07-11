@@ -2,17 +2,18 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\CostTransaction;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class FinancialOperationsTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
@@ -62,7 +63,7 @@ class FinancialOperationsTest extends TestCase
 
     public function test_admin_can_update_finance_entry(): void
     {
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->reason = 'server';
         $cost->amount = 100;
         $cost->currency_id = 1;
@@ -85,13 +86,13 @@ class FinancialOperationsTest extends TestCase
             'id' => $cost->id,
             'reason' => 'Updated Server Cost',
             'amount' => 200,
-            'status' => 'completed'
+            'status' => 'completed',
         ]);
     }
 
     public function test_admin_can_delete_finance_entry(): void
     {
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->reason = 'server';
         $cost->amount = 100;
         $cost->currency_id = 1;
@@ -99,7 +100,7 @@ class FinancialOperationsTest extends TestCase
         $cost->business_amount = 100;
         $cost->save();
 
-        $response = $this->actingAs($this->admin)->delete(route('admin.finance.destroy', $cost->id) . '?type=expense');
+        $response = $this->actingAs($this->admin)->delete(route('admin.finance.destroy', $cost->id).'?type=expense');
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -108,7 +109,7 @@ class FinancialOperationsTest extends TestCase
 
     public function test_admin_can_mark_finance_entry_as_paid(): void
     {
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->reason = 'server';
         $cost->amount = 100;
         $cost->currency_id = 1;
@@ -116,14 +117,14 @@ class FinancialOperationsTest extends TestCase
         $cost->business_amount = 100;
         $cost->save();
 
-        $response = $this->actingAs($this->admin)->post(route('admin.finance.mark-paid', $cost->id) . '?type=expense');
+        $response = $this->actingAs($this->admin)->post(route('admin.finance.mark-paid', $cost->id).'?type=expense');
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('cost_transactions', [
             'id' => $cost->id,
-            'status' => 'completed'
+            'status' => 'completed',
         ]);
     }
 }

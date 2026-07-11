@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('bids')) return;
+        if (! Schema::hasTable('bids')) {
+            return;
+        }
         Schema::table('bids', function (Blueprint $table) {
             $table->string('country', 2)->nullable()->after('phone'); // ISO 3166-1 alpha-2 country code
         });

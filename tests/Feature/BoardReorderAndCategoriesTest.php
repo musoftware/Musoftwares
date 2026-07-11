@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\EnsureSubscriptionIsActive;
 use App\Models\Project;
 use App\Models\ProjectBoardCategory;
 use App\Models\ProjectBoardItem;
 use App\Models\ProjectBoardNote;
-use App\Models\Task;
-use App\Models\Todo;
 use App\Models\User;
+use App\Services\ProjectBoardService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 /**
@@ -26,13 +26,14 @@ class BoardReorderAndCategoriesTest extends TestCase
     use RefreshDatabase;
 
     protected User $clientUser;
+
     protected Project $project;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withoutMiddleware(\App\Http\Middleware\EnsureSubscriptionIsActive::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->withoutMiddleware(EnsureSubscriptionIsActive::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->clientUser = User::factory()->create([
             'onboarding_completed' => true,
@@ -76,7 +77,7 @@ class BoardReorderAndCategoriesTest extends TestCase
 
     public function test_default_categories_are_seeded_once_per_project(): void
     {
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
 
         $first = $service->categoriesFor($this->project);
         $this->assertGreaterThanOrEqual(4, $first->count());
@@ -87,7 +88,7 @@ class BoardReorderAndCategoriesTest extends TestCase
 
     public function test_card_can_be_assigned_a_category_via_move_endpoint(): void
     {
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
         $service->categoriesFor($this->project);
         $urgent = ProjectBoardCategory::where('project_id', $this->project->id)
             ->where('slug', 'urgent')
@@ -202,7 +203,7 @@ class BoardReorderAndCategoriesTest extends TestCase
         $admin = User::factory()->create(['onboarding_completed' => true, 'currency_id' => 1]);
         $admin->assignRole('admin');
 
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
         $service->categoriesFor($this->project);
         $urgent = ProjectBoardCategory::where('project_id', $this->project->id)
             ->where('slug', 'urgent')
@@ -239,7 +240,7 @@ class BoardReorderAndCategoriesTest extends TestCase
             'status' => 'open',
             'currency' => 1,
         ]);
-        $service = app(\App\Services\ProjectBoardService::class);
+        $service = app(ProjectBoardService::class);
         $service->categoriesFor($otherProject);
         $foreignCategory = ProjectBoardCategory::where('project_id', $otherProject->id)
             ->where('slug', 'urgent')

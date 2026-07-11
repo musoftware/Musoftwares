@@ -2,13 +2,14 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Currency;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceCategory;
-use Modules\Marketplace\Models\ServicePackage;
 use Modules\Marketplace\Models\ServiceOrder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Marketplace\Models\ServicePackage;
 use Tests\TestCase;
 
 class MarketplaceOrderControllerTest extends TestCase
@@ -16,17 +17,23 @@ class MarketplaceOrderControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $buyerUser;
+
     protected User $sellerUser;
+
     protected ServiceCategory $category;
+
     protected Service $service;
+
     protected ServicePackage $package;
+
     protected ServiceOrder $order;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -37,7 +44,7 @@ class MarketplaceOrderControllerTest extends TestCase
         $this->sellerUser = User::factory()->create(['onboarding_completed' => true]);
 
         $currency = Currency::first();
-        if (!$currency) {
+        if (! $currency) {
             $currency = Currency::create([
                 'name' => 'US Dollar',
                 'code' => 'USD',
@@ -48,7 +55,7 @@ class MarketplaceOrderControllerTest extends TestCase
 
         $this->category = ServiceCategory::create([
             'name' => 'Web Dev',
-            'slug' => 'web-dev'
+            'slug' => 'web-dev',
         ]);
 
         $this->service = Service::create([
@@ -104,7 +111,7 @@ class MarketplaceOrderControllerTest extends TestCase
         $this->order->update(['status' => 'disputed']);
 
         $response = $this->actingAs($this->admin)->post("/admin/marketplace/orders/{$this->order->id}/dispute", [
-            'action' => 'refund_buyer' // this should match validation in ResolveMarketplaceDisputeRequest
+            'action' => 'refund_buyer', // this should match validation in ResolveMarketplaceDisputeRequest
         ]);
 
         $response->assertRedirect();

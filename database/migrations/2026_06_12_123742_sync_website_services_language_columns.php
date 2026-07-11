@@ -24,16 +24,16 @@ return new class extends Migration
         });
 
         Schema::table('website_services', function (Blueprint $table) {
-            if (!Schema::hasColumn('website_services', 'title_ar')) {
+            if (! Schema::hasColumn('website_services', 'title_ar')) {
                 $table->string('title_ar')->nullable()->after('title_en');
             }
-            if (!Schema::hasColumn('website_services', 'slug')) {
+            if (! Schema::hasColumn('website_services', 'slug')) {
                 $table->string('slug')->unique()->nullable()->after('title_ar');
             }
-            if (!Schema::hasColumn('website_services', 'subtitle_ar')) {
+            if (! Schema::hasColumn('website_services', 'subtitle_ar')) {
                 $table->string('subtitle_ar')->nullable()->after('subtitle_en');
             }
-            if (!Schema::hasColumn('website_services', 'description_ar')) {
+            if (! Schema::hasColumn('website_services', 'description_ar')) {
                 $table->text('description_ar')->nullable()->after('description_en');
             }
         });

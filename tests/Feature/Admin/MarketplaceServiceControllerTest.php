@@ -3,9 +3,10 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceCategory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MarketplaceServiceControllerTest extends TestCase
@@ -13,14 +14,17 @@ class MarketplaceServiceControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $sellerUser;
+
     protected ServiceCategory $category;
+
     protected Service $service;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -29,7 +33,7 @@ class MarketplaceServiceControllerTest extends TestCase
 
         $this->category = ServiceCategory::create([
             'name' => 'Web Dev',
-            'slug' => 'web-dev'
+            'slug' => 'web-dev',
         ]);
 
         $this->service = Service::create([
@@ -114,9 +118,9 @@ class MarketplaceServiceControllerTest extends TestCase
                     'name' => 'Package 1',
                     'description' => 'Pack desc',
                     'price' => 10,
-                    'delivery_days' => 2
-                ]
-            ]
+                    'delivery_days' => 2,
+                ],
+            ],
         ]);
 
         $response->assertRedirect(route('admin.marketplace.services.all'));

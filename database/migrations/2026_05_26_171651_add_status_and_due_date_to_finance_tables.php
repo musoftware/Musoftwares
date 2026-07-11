@@ -1,9 +1,9 @@
 <?php
- 
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
- 
+
 return new class extends Migration
 {
     /**
@@ -12,24 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cost_transactions', function (Blueprint $table) {
-            if (!Schema::hasColumn('cost_transactions', 'status')) {
+            if (! Schema::hasColumn('cost_transactions', 'status')) {
                 $table->string('status', 30)->default('completed');
             }
-            if (!Schema::hasColumn('cost_transactions', 'due_date')) {
+            if (! Schema::hasColumn('cost_transactions', 'due_date')) {
                 $table->date('due_date')->nullable();
             }
         });
 
         Schema::table('transactions', function (Blueprint $table) {
-            if (!Schema::hasColumn('transactions', 'status')) {
+            if (! Schema::hasColumn('transactions', 'status')) {
                 $table->string('status', 30)->default('completed');
             }
-            if (!Schema::hasColumn('transactions', 'due_date')) {
+            if (! Schema::hasColumn('transactions', 'due_date')) {
                 $table->date('due_date')->nullable();
             }
         });
     }
- 
+
     /**
      * Reverse the migrations.
      */

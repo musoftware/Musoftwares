@@ -237,6 +237,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::put('/projects/{project}/board/reports/{report}', [ClientProjectBoardController::class, 'updateReport'])->name('board.update-report');
     Route::delete('/projects/{project}/board/reports/{report}', [ClientProjectBoardController::class, 'destroyReport'])->name('board.destroy-report');
     Route::get('/projects/{project}/board/reports/{report}/export-pdf', [ClientProjectBoardController::class, 'exportReportPdf'])->name('board.export-report-pdf');
+    Route::post('/projects/{project}/board/reports/generate-draft', [ClientProjectBoardController::class, 'generateReportDraft'])->name('board.reports.generate-draft');
 
     Route::post('/projects/{project}/board/move', [ClientProjectBoardController::class, 'moveCard'])->name('board.move-card');
     Route::post('/projects/{project}/board/reorder', [ClientProjectBoardController::class, 'reorderCards'])->name('board.reorder-cards');

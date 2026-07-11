@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\Currency;
 use App\Models\ModulePlan;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -28,19 +29,21 @@ class UserEditAuditTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $target;
+
     protected int $targetId = 350;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create([
             'onboarding_completed' => true,
-            'name'                 => 'Audit Admin',
-            'email'                => 'admin-audit@example.com',
+            'name' => 'Audit Admin',
+            'email' => 'admin-audit@example.com',
         ]);
         $this->admin->assignRole('admin');
 
@@ -53,9 +56,9 @@ class UserEditAuditTest extends TestCase
         }
 
         $this->target = User::factory()->create([
-            'id'                   => $this->targetId,
-            'name'                 => 'Target Subject',
-            'email'                => 'target-350@example.com',
+            'id' => $this->targetId,
+            'name' => 'Target Subject',
+            'email' => 'target-350@example.com',
             'onboarding_completed' => true,
         ]);
         $this->target->assignRole('client');
@@ -145,7 +148,7 @@ class UserEditAuditTest extends TestCase
 
         $response->assertStatus(403);
         $this->assertDatabaseHas('users', [
-            'id'   => $this->targetId,
+            'id' => $this->targetId,
             'name' => 'Target Subject', // untouched
         ]);
     }
@@ -155,9 +158,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Renamed Subject',
-                'email'          => 'renamed-350@example.com',
-                'role'           => 'client',
+                'name' => 'Renamed Subject',
+                'email' => 'renamed-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
             ]
         );
@@ -166,8 +169,8 @@ class UserEditAuditTest extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('users', [
-            'id'    => $this->targetId,
-            'name'  => 'Renamed Subject',
+            'id' => $this->targetId,
+            'name' => 'Renamed Subject',
             'email' => 'renamed-350@example.com',
         ]);
     }
@@ -177,9 +180,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com', // unchanged but re-submitted
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com', // unchanged but re-submitted
+                'role' => 'client',
                 'account_status' => 'active',
             ]
         );
@@ -191,23 +194,23 @@ class UserEditAuditTest extends TestCase
     public function test_update_rejects_email_taken_by_another_user(): void
     {
         $other = User::factory()->create([
-            'email'                => 'taken@example.com',
+            'email' => 'taken@example.com',
             'onboarding_completed' => true,
         ]);
 
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'taken@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'taken@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
             ]
         );
 
         $response->assertSessionHasErrors('email');
         $this->assertDatabaseHas('users', [
-            'id'    => $this->targetId,
+            'id' => $this->targetId,
             'email' => 'target-350@example.com', // unchanged
         ]);
     }
@@ -218,7 +221,7 @@ class UserEditAuditTest extends TestCase
             "/admin/users/{$this->targetId}",
             [
                 'email' => 'still-350@example.com',
-                'role'  => 'client',
+                'role' => 'client',
             ]
         );
 
@@ -243,9 +246,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'not-an-email',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'not-an-email',
+                'role' => 'client',
                 'account_status' => 'active',
             ]
         );
@@ -258,9 +261,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'super-mega-admin',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'super-mega-admin',
                 'account_status' => 'active',
             ]
         );
@@ -287,52 +290,52 @@ class UserEditAuditTest extends TestCase
         $plan = ModulePlan::firstOrCreate(
             ['module' => 'erp', 'name' => 'Audit Plan'],
             [
-                'price'  => 99,
+                'price' => 99,
                 'is_active' => true,
             ]
         );
 
         $payload = [
-            'name'                                => 'Full Rename',
-            'full_name'                           => 'Full Rename Jr',
-            'email'                               => 'full-350@example.com',
-            'password'                            => 'newSecret123',
-            'facebook'                            => 'fb.me/full',
-            'skype'                               => 'live:full.skype',
-            'phone_number'                        => '+201111111111',
-            'phone_number2'                       => '+201122222222',
-            'whatsapp_number'                     => '+201133333333',
-            'disable_unpaid_balance_whatsapp'     => true,
-            'job'                                 => 'Engineer',
-            'address'                             => '12 Audit St',
-            'hour_rate_currency'                  => 1,
-            'hour_rate'                           => 12.5,
-            'booking_rate_currency'               => 2,
-            'booking_rate'                        => 9.75,
-            'booking_rate_expires_at'             => now()->addDays(10)->format('Y-m-d'),
-            'salary'                              => 5000,
-            'usd_type'                            => 'mix_usd',
-            'currency'                            => 1,
-            'subscription_date'                   => now()->format('Y-m-d'),
-            'subscription_plan'                   => $plan->id,
-            'postpaid_limit'                      => 250,
-            'subscription_force'                  => true,
-            'client_taxable'                      => true,
-            'invoice_taxable'                     => true,
-            'timer_taxable'                       => false,
-            'allow_referral_system'               => true,
-            'allow_view_times'                    => false,
-            'allow_postpaid'                      => true,
-            'kyc_verified'                        => true,
-            'kyc_notes'                           => 'manual audit verify',
-            'affiliate_commission_percentage'     => 2.5,
-            'add_commission_to_total'             => true,
-            'ref_user_id'                         => '',
-            'slug'                                => 'audit-slug-350',
-            'role'                                => 'employee',
-            'account_status'                      => 'blocked',
-            'block_reason'                        => 'audit hold',
-            'max_devices'                         => 3,
+            'name' => 'Full Rename',
+            'full_name' => 'Full Rename Jr',
+            'email' => 'full-350@example.com',
+            'password' => 'newSecret123',
+            'facebook' => 'fb.me/full',
+            'skype' => 'live:full.skype',
+            'phone_number' => '+201111111111',
+            'phone_number2' => '+201122222222',
+            'whatsapp_number' => '+201133333333',
+            'disable_unpaid_balance_whatsapp' => true,
+            'job' => 'Engineer',
+            'address' => '12 Audit St',
+            'hour_rate_currency' => 1,
+            'hour_rate' => 12.5,
+            'booking_rate_currency' => 2,
+            'booking_rate' => 9.75,
+            'booking_rate_expires_at' => now()->addDays(10)->format('Y-m-d'),
+            'salary' => 5000,
+            'usd_type' => 'mix_usd',
+            'currency' => 1,
+            'subscription_date' => now()->format('Y-m-d'),
+            'subscription_plan' => $plan->id,
+            'postpaid_limit' => 250,
+            'subscription_force' => true,
+            'client_taxable' => true,
+            'invoice_taxable' => true,
+            'timer_taxable' => false,
+            'allow_referral_system' => true,
+            'allow_view_times' => false,
+            'allow_postpaid' => true,
+            'kyc_verified' => true,
+            'kyc_notes' => 'manual audit verify',
+            'affiliate_commission_percentage' => 2.5,
+            'add_commission_to_total' => true,
+            'ref_user_id' => '',
+            'slug' => 'audit-slug-350',
+            'role' => 'employee',
+            'account_status' => 'blocked',
+            'block_reason' => 'audit hold',
+            'max_devices' => 3,
         ];
         unset($payload['subscription_plan']); // plan_id FK points to legacy plans table, not module_plans
 
@@ -346,39 +349,39 @@ class UserEditAuditTest extends TestCase
 
         $user = User::with('roles')->findOrFail($this->targetId);
 
-        $this->assertSame('Full Rename',                $user->name);
-        $this->assertSame('Full Rename Jr',             $user->full_name);
-        $this->assertSame('full-350@example.com',       $user->email);
-        $this->assertSame('fb.me/full',                 $user->facebook);
-        $this->assertSame('live:full.skype',            $user->skype);
-        $this->assertSame('+201111111111',              $user->phone_number);
-        $this->assertSame('+201122222222',              $user->phone_number2);
-        $this->assertSame('+201133333333',              $user->whatsapp_number);
+        $this->assertSame('Full Rename', $user->name);
+        $this->assertSame('Full Rename Jr', $user->full_name);
+        $this->assertSame('full-350@example.com', $user->email);
+        $this->assertSame('fb.me/full', $user->facebook);
+        $this->assertSame('live:full.skype', $user->skype);
+        $this->assertSame('+201111111111', $user->phone_number);
+        $this->assertSame('+201122222222', $user->phone_number2);
+        $this->assertSame('+201133333333', $user->whatsapp_number);
         $this->assertTrue((bool) $user->disable_unpaid_balance_whatsapp);
-        $this->assertSame('Engineer',                   $user->job);
-        $this->assertSame('12 Audit St',                $user->address);
-        $this->assertSame(1,    (int) $user->hour_rate_currency_id);
+        $this->assertSame('Engineer', $user->job);
+        $this->assertSame('12 Audit St', $user->address);
+        $this->assertSame(1, (int) $user->hour_rate_currency_id);
         $this->assertSame('12.5', (string) $user->hour_rate);
-        $this->assertSame(2,    (int) $user->booking_rate_currency_id);
+        $this->assertSame(2, (int) $user->booking_rate_currency_id);
         $this->assertSame('9.75', (string) $user->booking_rate);
-        $this->assertSame(5000,  (int) $user->salary);
-        $this->assertSame('mix_usd',                    $user->usd_type);
-        $this->assertSame(1,    (int) $user->currency_id);
+        $this->assertSame(5000, (int) $user->salary);
+        $this->assertSame('mix_usd', $user->usd_type);
+        $this->assertSame(1, (int) $user->currency_id);
         // plan_id intentionally not asserted: FK to legacy plans table.
         $this->assertTrue((bool) $user->subscription_force);
         $this->assertTrue((bool) $user->client_taxable);
         $this->assertTrue((bool) $user->invoice_taxable);
-        $this->assertFalse((bool)$user->timer_taxable);
+        $this->assertFalse((bool) $user->timer_taxable);
         $this->assertTrue((bool) $user->allow_referral_system);
-        $this->assertFalse((bool)$user->allow_view_times);
+        $this->assertFalse((bool) $user->allow_view_times);
         $this->assertTrue((bool) $user->allow_postpaid);
         $this->assertTrue((bool) $user->kyc_verified);
-        $this->assertSame('manual audit verify',        $user->kyc_notes);
+        $this->assertSame('manual audit verify', $user->kyc_notes);
         $this->assertSame('2.5', (string) $user->affiliate_commission_percentage);
         $this->assertTrue((bool) $user->add_commission_to_total);
-        $this->assertSame('audit-slug-350',             $user->slug);
-        $this->assertSame('blocked',                    $user->account_status);
-        $this->assertSame('audit hold',                 $user->block_reason);
+        $this->assertSame('audit-slug-350', $user->slug);
+        $this->assertSame('blocked', $user->account_status);
+        $this->assertSame('audit hold', $user->block_reason);
         $this->assertSame(3, (int) $user->max_devices);
         // plan_id intentionally not asserted: it has a FK to the legacy
         // `plans` table (see test_subscription_plan_is_stored_as_plan_id).
@@ -399,9 +402,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
                 // no 'password' field
             ]
@@ -418,11 +421,11 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
-                'password'       => '',
+                'password' => '',
             ]
         );
 
@@ -435,11 +438,11 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
-                'password'       => '123', // too short
+                'password' => '123', // too short
             ]
         );
 
@@ -450,7 +453,7 @@ class UserEditAuditTest extends TestCase
     {
         // First mark as verified
         $this->target->update([
-            'kyc_verified'    => true,
+            'kyc_verified' => true,
             'kyc_verified_at' => now(),
             'kyc_verified_by' => $this->admin->id,
         ]);
@@ -458,11 +461,11 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
-                'kyc_verified'   => false,
+                'kyc_verified' => false,
             ]
         );
 
@@ -478,11 +481,11 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'blocked',
-                'block_reason'   => 'audit blocked',
+                'block_reason' => 'audit blocked',
             ]
         );
 
@@ -497,9 +500,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'vaporized', // not in: active,blocked
             ]
         );
@@ -512,11 +515,11 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
-                'slug'           => 'Has-Caps',
+                'slug' => 'Has-Caps',
             ]
         );
 
@@ -536,7 +539,7 @@ class UserEditAuditTest extends TestCase
         $plan = ModulePlan::firstOrCreate(
             ['module' => 'erp', 'name' => 'Plan ID Check'],
             [
-                'price'  => 50,
+                'price' => 50,
                 'is_active' => true,
             ]
         );
@@ -544,11 +547,11 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'             => 'Target Subject',
-                'email'            => 'target-350@example.com',
-                'role'             => 'client',
-                'account_status'   => 'active',
-                'subscription_plan'=> $plan->id,
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
+                'account_status' => 'active',
+                'subscription_plan' => $plan->id,
             ]
         );
 
@@ -564,9 +567,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'manager',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'manager',
                 'account_status' => 'active',
             ]
         );
@@ -585,8 +588,8 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
                 // role deliberately omitted
                 'account_status' => 'active',
             ]
@@ -603,9 +606,9 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
                 'postpaid_limit' => null, // service should set 100
             ]
@@ -621,11 +624,11 @@ class UserEditAuditTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",
             [
-                'name'           => 'Target Subject',
-                'email'          => 'target-350@example.com',
-                'role'           => 'client',
+                'name' => 'Target Subject',
+                'email' => 'target-350@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
-                'currency'       => 2,
+                'currency' => 2,
             ]
         );
 

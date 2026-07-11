@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\BookingSmartSlots;
 
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class BookingSmartSlotsFlowTest extends TestCase
 {

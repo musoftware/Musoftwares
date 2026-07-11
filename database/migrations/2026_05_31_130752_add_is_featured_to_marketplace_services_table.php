@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if (Schema::hasTable('marketplace_services')) {
             Schema::table('marketplace_services', function (Blueprint $table) {
-                if (!Schema::hasColumn('marketplace_services', 'is_featured')) {
+                if (! Schema::hasColumn('marketplace_services', 'is_featured')) {
                     $table->boolean('is_featured')->default(false)->after('status');
                 }
             });

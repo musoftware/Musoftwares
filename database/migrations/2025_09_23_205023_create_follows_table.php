@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('follows')) {
+        if (! Schema::hasTable('follows')) {
             Schema::create('follows', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('follower_id')->constrained('users')->onDelete('cascade');
                 $table->foreignId('following_id')->constrained('users')->onDelete('cascade');
                 $table->timestamps();
-            $table->softDeletes();
-                
+                $table->softDeletes();
+
                 // Ensure a user cannot follow themselves
                 $table->unique(['follower_id', 'following_id']);
-                
+
                 // Add indexes for better performance
                 $table->index('follower_id');
                 $table->index('following_id');

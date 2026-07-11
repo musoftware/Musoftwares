@@ -2,13 +2,15 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
 use App\Models\UserSubscription;
-use App\Services\SubscriptionService;
 use App\Services\PricingService;
+use App\Services\SubscriptionService;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
+use Modules\CRM\app\Core\FeatureManager;
+use Tests\TestCase;
 
 class SubscriptionModuleTest extends TestCase
 {
@@ -204,7 +206,7 @@ class SubscriptionModuleTest extends TestCase
             'auto_renew' => true,
         ]);
 
-        $fm = app(\Modules\CRM\app\Core\FeatureManager::class);
+        $fm = app(FeatureManager::class);
         $features = $fm->getAllForUser($user);
 
         $this->assertContains('erp', $features);
@@ -226,7 +228,7 @@ class SubscriptionModuleTest extends TestCase
             'auto_renew' => true,
         ]);
 
-        $fm = app(\Modules\CRM\app\Core\FeatureManager::class);
+        $fm = app(FeatureManager::class);
         // Prime the cache with this user's features
         $fm->getAllForUser($user);
 
@@ -238,7 +240,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $fm = app(\Modules\CRM\app\Core\FeatureManager::class);
+        $fm = app(FeatureManager::class);
         $fm->getAllForUser($user);
 
         $this->assertFalse($fm->has('erp-backup'));
@@ -257,7 +259,7 @@ class SubscriptionModuleTest extends TestCase
             'auto_renew' => false,
         ]);
 
-        $fm = app(\Modules\CRM\app\Core\FeatureManager::class);
+        $fm = app(FeatureManager::class);
         $features = $fm->getAllForUser($user);
 
         $this->assertNotContains('erp-backup', $features);
@@ -270,7 +272,7 @@ class SubscriptionModuleTest extends TestCase
 
     public function test_pricing_service_returns_erp_module()
     {
-        $service = new PricingService();
+        $service = new PricingService;
         $items = $service->getServiceItems();
 
         $erp = collect($items)->firstWhere('id', 'erp');
@@ -284,7 +286,7 @@ class SubscriptionModuleTest extends TestCase
 
     public function test_pricing_service_returns_erp_backup_addon()
     {
-        $service = new PricingService();
+        $service = new PricingService;
         $items = $service->getServiceItems();
 
         $backup = collect($items)->firstWhere('id', 'erp-backup');
@@ -297,7 +299,7 @@ class SubscriptionModuleTest extends TestCase
 
     public function test_pricing_service_monthly_price_is_yearly_divided_by_10()
     {
-        $service = new PricingService();
+        $service = new PricingService;
         $items = $service->getServiceItems();
 
         $erp = collect($items)->firstWhere('id', 'erp');
@@ -476,17 +478,16 @@ class SubscriptionModuleTest extends TestCase
         $response->assertStatus(200);
 
         // Check inertia props contain correct subscription data
-        $response->assertInertia(fn ($page) =>
-            $page->component('Client/Subscriptions/Manage')
-                 ->has('subscriptions', 1)
-                 ->where('subscriptions.0.plan_slug', 'erp')
-                 ->where('subscriptions.0.status', 'active')
-                 ->where('subscriptions.0.amount', 499.99) // Due to missing EGP currency in test, rate is 1, and psychological_price applies
+        $response->assertInertia(fn ($page) => $page->component('Client/Subscriptions/Manage')
+            ->has('subscriptions', 1)
+            ->where('subscriptions.0.plan_slug', 'erp')
+            ->where('subscriptions.0.status', 'active')
+            ->where('subscriptions.0.amount', 499.99) // Due to missing EGP currency in test, rate is 1, and psychological_price applies
         );
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  11. Plans Page: Shows owned features  
+    //  11. Plans Page: Shows owned features
     // ─────────────────────────────────────────────────────────────
 
     public function test_plans_page_shows_owned_features()
@@ -514,11 +515,10 @@ class SubscriptionModuleTest extends TestCase
         $response = $this->actingAs($user)->get(route('subscriptions.plans'));
         $response->assertStatus(200);
 
-        $response->assertInertia(fn ($page) =>
-            $page->component('Client/Subscriptions/Plans')
-                 ->has('activeSubscription')
-                 ->where('activeSubscription.status', 'active')
-                 ->has('activeSubscription.owned_features', 2)
+        $response->assertInertia(fn ($page) => $page->component('Client/Subscriptions/Plans')
+            ->has('activeSubscription')
+            ->where('activeSubscription.status', 'active')
+            ->has('activeSubscription.owned_features', 2)
         );
     }
 
@@ -540,7 +540,7 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         // Test FeatureManager directly (this is what crm_features shared prop calls)
-        $fm = app(\Modules\CRM\app\Core\FeatureManager::class);
+        $fm = app(FeatureManager::class);
         $features = $fm->getAllForUser($user);
 
         $this->assertIsArray($features);
@@ -561,7 +561,7 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         // Test FeatureManager directly
-        $fm = app(\Modules\CRM\app\Core\FeatureManager::class);
+        $fm = app(FeatureManager::class);
         $features = $fm->getAllForUser($user);
 
         $this->assertIsArray($features);
@@ -589,8 +589,7 @@ class SubscriptionModuleTest extends TestCase
         $response = $this->actingAs($user)->get(route('subscriptions.manage'));
         $response->assertStatus(200);
 
-        $response->assertInertia(fn ($page) =>
-            $page->where('auth.active_modules.erp', true)
+        $response->assertInertia(fn ($page) => $page->where('auth.active_modules.erp', true)
         );
     }
 
@@ -601,8 +600,7 @@ class SubscriptionModuleTest extends TestCase
         $response = $this->actingAs($user)->get(route('subscriptions.manage'));
         $response->assertStatus(200);
 
-        $response->assertInertia(fn ($page) =>
-            $page->where('auth.active_modules.erp', false)
+        $response->assertInertia(fn ($page) => $page->where('auth.active_modules.erp', false)
         );
     }
 
@@ -612,13 +610,13 @@ class SubscriptionModuleTest extends TestCase
 
     public function test_user_subscription_uses_correct_table()
     {
-        $sub = new UserSubscription();
+        $sub = new UserSubscription;
         $this->assertEquals('user_subscriptions', $sub->getTable());
     }
 
     public function test_user_subscription_has_no_plan_id_column()
     {
-        $columns = \Illuminate\Support\Facades\Schema::getColumnListing('user_subscriptions');
+        $columns = Schema::getColumnListing('user_subscriptions');
         $this->assertNotContains('plan_id', $columns);
         $this->assertContains('object', $columns);
         $this->assertContains('user_id', $columns);
@@ -739,7 +737,7 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         $response->assertSessionHas('success');
-        
+
         $this->assertDatabaseHas('user_subscriptions', [
             'user_id' => $user->id,
             'object' => 'tool-paid-1',

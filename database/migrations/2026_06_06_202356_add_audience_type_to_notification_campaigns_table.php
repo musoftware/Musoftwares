@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('notification_campaigns', function (Blueprint $table) {
-            if (!Schema::hasColumn('notification_campaigns', 'audience_type')) {
+            if (! Schema::hasColumn('notification_campaigns', 'audience_type')) {
                 $table->enum('audience_type', ['global', 'personal'])->default('global')->after('body');
             }
         });

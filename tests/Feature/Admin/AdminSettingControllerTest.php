@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\AdminSettings;
 use App\Models\Currency;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,20 +14,21 @@ class AdminSettingControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
 
         $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
         $this->clientUser->assignRole('client');
-        
+
         // Ensure standard currencies are seeded or exist
         if (Currency::count() === 0) {
             Currency::create([

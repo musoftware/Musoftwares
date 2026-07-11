@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -34,17 +35,17 @@ return new class extends Migration
 
     private function addIndexIfNotExists(string $table, $columns, string $indexName): void
     {
-        if (!\Illuminate\Support\Facades\Schema::hasTable($table)) {
+        if (! Schema::hasTable($table)) {
             return;
         }
-        
-        $sm = \Illuminate\Support\Facades\Schema::getConnection()->getSchemaBuilder();
-        if (!$sm->hasIndex($table, $indexName)) {
+
+        $sm = Schema::getConnection()->getSchemaBuilder();
+        if (! $sm->hasIndex($table, $indexName)) {
             try {
-                \Illuminate\Support\Facades\Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
+                Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
                     $t->index($columns, $indexName);
                 });
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
                 // Error 1061 is Duplicate key name
                 if ($e->errorInfo[1] !== 1061) {
                     throw $e;

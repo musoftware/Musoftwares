@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\AdminAuditLog;
+use App\Http\Resources\UserNoteResource;
 use App\Models\User;
 use App\Models\UserCredential;
 use App\Services\UserNoteAuditService;
+use App\Services\UserNoteService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class UserNoteControllerTest extends TestCase
@@ -15,15 +16,18 @@ class UserNoteControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $otherAdmin;
+
     protected User $accountant;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -77,11 +81,11 @@ class UserNoteControllerTest extends TestCase
     {
         for ($i = 0; $i < 30; $i++) {
             UserCredential::create([
-                'user_id'  => $this->clientUser->id,
+                'user_id' => $this->clientUser->id,
                 'admin_id' => $this->admin->id,
                 'category' => 'notes',
-                'title'    => "Note $i",
-                'content'  => "Content $i",
+                'title' => "Note $i",
+                'content' => "Content $i",
             ]);
         }
         $res = $this->actingAs($this->admin)
@@ -96,22 +100,22 @@ class UserNoteControllerTest extends TestCase
     public function test_admin_can_store_user_note(): void
     {
         $res = $this->actingAs($this->admin)->postJson("/admin/users/{$this->clientUser->id}/notes", [
-            'title'      => 'Database password',
-            'content'    => str_repeat('a', 300), // mimic a SimpleCrypto cipher blob
-            'category'   => 'password',
+            'title' => 'Database password',
+            'content' => str_repeat('a', 300), // mimic a SimpleCrypto cipher blob
+            'category' => 'password',
             'expires_at' => now()->addDays(10)->toDateString(),
         ]);
 
         $res->assertStatus(200)->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('user_credentials', [
-            'user_id'  => $this->clientUser->id,
+            'user_id' => $this->clientUser->id,
             'category' => 'password',
         ]);
         $this->assertNotNull(UserCredential::first()->expires_at);
 
         $this->assertDatabaseHas('admin_audit_logs', [
-            'action'    => UserNoteAuditService::ACTION_CREATED,
+            'action' => UserNoteAuditService::ACTION_CREATED,
             'actor_user_id' => $this->admin->id,
             'target_id' => $this->clientUser->id,
         ]);
@@ -120,8 +124,8 @@ class UserNoteControllerTest extends TestCase
     public function test_invalid_category_is_rejected(): void
     {
         $this->actingAs($this->admin)->postJson("/admin/users/{$this->clientUser->id}/notes", [
-            'title'    => 'Title',
-            'content'  => 'Body',
+            'title' => 'Title',
+            'content' => 'Body',
             'category' => 'archived', // forbidden in create
         ])->assertStatus(422)->assertJsonValidationErrors(['category']);
     }
@@ -129,7 +133,7 @@ class UserNoteControllerTest extends TestCase
     public function test_missing_content_is_rejected(): void
     {
         $this->actingAs($this->admin)->postJson("/admin/users/{$this->clientUser->id}/notes", [
-            'title'    => 'Title',
+            'title' => 'Title',
             'category' => 'notes',
         ])->assertStatus(422)->assertJsonValidationErrors(['content']);
     }
@@ -137,25 +141,25 @@ class UserNoteControllerTest extends TestCase
     public function test_admin_can_update_note(): void
     {
         $note = UserCredential::create([
-            'user_id'  => $this->clientUser->id,
+            'user_id' => $this->clientUser->id,
             'admin_id' => $this->admin->id,
             'category' => 'notes',
-            'title'    => 'Old',
-            'content'  => 'Old content',
+            'title' => 'Old',
+            'content' => 'Old content',
         ]);
 
         $res = $this->actingAs($this->admin)->putJson(
             "/admin/users/{$this->clientUser->id}/notes/{$note->id}",
             [
-                'title'    => 'New title',
-                'content'  => 'New body',
+                'title' => 'New title',
+                'content' => 'New body',
                 'category' => 'password',
             ]
         );
 
         $res->assertStatus(200)->assertJson(['success' => true]);
         $this->assertDatabaseHas('user_credentials', [
-            'id'       => $note->id,
+            'id' => $note->id,
             'category' => 'password',
         ]);
         $this->assertDatabaseHas('admin_audit_logs', [
@@ -166,11 +170,11 @@ class UserNoteControllerTest extends TestCase
     public function test_update_records_rotated_at_for_password_category(): void
     {
         $note = UserCredential::create([
-            'user_id'  => $this->clientUser->id,
+            'user_id' => $this->clientUser->id,
             'admin_id' => $this->admin->id,
             'category' => 'notes',
-            'title'    => 'T',
-            'content'  => 'C',
+            'title' => 'T',
+            'content' => 'C',
         ]);
 
         $this->actingAs($this->admin)->putJson(
@@ -295,7 +299,7 @@ class UserNoteControllerTest extends TestCase
 
         $this->actingAs($this->admin)
             ->postJson("/admin/users/{$this->clientUser->id}/notes/bulk", [
-                'action'   => 'archive',
+                'action' => 'archive',
                 'note_ids' => $ids,
             ])->assertStatus(200)->assertJson(['success' => true]);
 
@@ -315,7 +319,7 @@ class UserNoteControllerTest extends TestCase
 
         $this->actingAs($this->admin)
             ->postJson("/admin/users/{$this->clientUser->id}/notes/bulk", [
-                'action'   => 'delete',
+                'action' => 'delete',
                 'note_ids' => $ids,
             ])->assertStatus(200);
 
@@ -331,7 +335,7 @@ class UserNoteControllerTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->postJson("/admin/users/{$this->clientUser->id}/notes/bulk", [
-                'action'   => 'nuke',
+                'action' => 'nuke',
                 'note_ids' => [1],
             ])->assertStatus(422)->assertJsonValidationErrors(['action']);
     }
@@ -340,7 +344,7 @@ class UserNoteControllerTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->postJson("/admin/users/{$this->clientUser->id}/notes/bulk", [
-                'action'   => 'archive',
+                'action' => 'archive',
                 'note_ids' => [],
             ])->assertStatus(422)->assertJsonValidationErrors(['note_ids']);
     }
@@ -360,7 +364,7 @@ class UserNoteControllerTest extends TestCase
             'title' => 'Active', 'content' => 'x', 'expires_at' => now()->addDays(60),
         ]);
 
-        $stats = (new \App\Services\UserNoteService(new UserNoteAuditService()))->getStats($this->clientUser->id);
+        $stats = (new UserNoteService(new UserNoteAuditService))->getStats($this->clientUser->id);
 
         $this->assertSame(1, $stats['expired']);
         $this->assertSame(1, $stats['expiring_soon']);
@@ -374,7 +378,7 @@ class UserNoteControllerTest extends TestCase
             'category' => 'notes', 'title' => 'T', 'content' => 'C',
         ]);
 
-        $payload = (new \App\Http\Resources\UserNoteResource($note))->resolve();
+        $payload = (new UserNoteResource($note))->resolve();
 
         $this->assertArrayNotHasKey('admin_id', $payload);
         $this->assertArrayHasKey('author', $payload);
@@ -404,7 +408,7 @@ class UserNoteControllerTest extends TestCase
     public function test_unauthorized_admin_cannot_modify_other_admins_notes_through_bulk(): void
     {
         $note = UserCredential::create([
-            'user_id'  => $this->clientUser->id,
+            'user_id' => $this->clientUser->id,
             'admin_id' => $this->otherAdmin->id,
             'category' => 'notes', 'title' => 'T', 'content' => 'C',
         ]);
@@ -412,12 +416,12 @@ class UserNoteControllerTest extends TestCase
         // Bulk delete should still succeed (audit logs the actor); this is admin-only.
         $this->actingAs($this->admin)
             ->postJson("/admin/users/{$this->clientUser->id}/notes/bulk", [
-                'action'   => 'delete',
+                'action' => 'delete',
                 'note_ids' => [$note->id],
             ])->assertStatus(200);
 
         $this->assertDatabaseHas('admin_audit_logs', [
-            'action'        => UserNoteAuditService::ACTION_BULK_DELETED,
+            'action' => UserNoteAuditService::ACTION_BULK_DELETED,
             'actor_user_id' => $this->admin->id,
         ]);
     }

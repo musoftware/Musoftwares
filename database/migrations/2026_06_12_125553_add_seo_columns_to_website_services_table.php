@@ -30,7 +30,7 @@ return new class extends Migration
             $table->dropColumn([
                 'seo_title_en', 'seo_title_ar',
                 'seo_description_en', 'seo_description_ar',
-                'seo_keywords_en', 'seo_keywords_ar'
+                'seo_keywords_en', 'seo_keywords_ar',
             ]);
         });
     }

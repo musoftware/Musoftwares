@@ -16,8 +16,8 @@ class ProjectReport extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
-        'period_start' => 'date',
-        'period_end' => 'date',
+        'period_start' => 'datetime',
+        'period_end' => 'datetime',
         'notify_client' => 'boolean',
     ];
 

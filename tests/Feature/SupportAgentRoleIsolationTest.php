@@ -2,14 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use App\Models\SupportTicket;
 use App\Models\GuestTicket;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class SupportAgentRoleIsolationTest extends TestCase
 {
@@ -18,7 +16,7 @@ class SupportAgentRoleIsolationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Ensure roles exist
         Role::firstOrCreate(['name' => 'admin']);
         Role::firstOrCreate(['name' => 'moderator']);
@@ -50,7 +48,7 @@ class SupportAgentRoleIsolationTest extends TestCase
         $user = User::factory()->create(['onboarding_completed' => true]);
         $user->assignRole('support_agent');
 
-        \Illuminate\Support\Facades\Mail::fake();
+        Mail::fake();
 
         $ticket = GuestTicket::create([
             'name' => 'Guest',
@@ -80,7 +78,7 @@ class SupportAgentRoleIsolationTest extends TestCase
 
         $response->assertStatus(403);
     }
-    
+
     public function test_support_agent_cannot_access_website_services()
     {
         $user = User::factory()->create(['onboarding_completed' => true]);
@@ -99,7 +97,7 @@ class SupportAgentRoleIsolationTest extends TestCase
 
         $response->assertStatus(403);
     }
-    
+
     public function test_regular_user_cannot_access_guest_tickets()
     {
         $user = User::factory()->create(['onboarding_completed' => true]);

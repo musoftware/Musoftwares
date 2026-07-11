@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\TenantUsage;
-use App\Services\MeteredBillingService;
-use App\Exceptions\SaaSLimitExceededException;
 use App\Events\SaaSLimitApproaching;
 use App\Events\SaaSLimitReached;
+use App\Exceptions\SaaSLimitExceededException;
+use App\Models\TenantUsage;
+use App\Models\User;
+use App\Services\MeteredBillingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Tests\TestCase;
 
 class SaaSMeteringTest extends TestCase
 {
@@ -19,12 +19,12 @@ class SaaSMeteringTest extends TestCase
     public function test_it_allows_unlimited_usage()
     {
         $user = User::forceCreate([
-            'name' => 'Admin', 
-            'email' => 'admin@test.com', 
+            'name' => 'Admin',
+            'email' => 'admin@test.com',
             'password' => 'test',
         ]);
         $this->actingAs($user);
-        app()->instance('currentTenant', (object)['id' => 1]);
+        app()->instance('currentTenant', (object) ['id' => 1]);
 
         TenantUsage::create([
             'tenant_id' => 1,
@@ -33,11 +33,11 @@ class SaaSMeteringTest extends TestCase
             'limit_amount' => null, // Unlimited
         ]);
 
-        $service = new MeteredBillingService();
+        $service = new MeteredBillingService;
         $this->assertTrue($service->canUse('unlimited_key'));
-        
+
         $service->incrementUsage('unlimited_key', 500);
-        
+
         $usage = TenantUsage::where('usage_key', 'unlimited_key')->first();
         $this->assertEquals(5500, $usage->used_amount);
     }
@@ -45,12 +45,12 @@ class SaaSMeteringTest extends TestCase
     public function test_it_enforces_limits_and_throws_exception()
     {
         $user = User::forceCreate([
-            'name' => 'Admin', 
-            'email' => 'admin@test.com', 
+            'name' => 'Admin',
+            'email' => 'admin@test.com',
             'password' => 'test',
         ]);
         $this->actingAs($user);
-        app()->instance('currentTenant', (object)['id' => 1]);
+        app()->instance('currentTenant', (object) ['id' => 1]);
 
         TenantUsage::create([
             'tenant_id' => 1,
@@ -59,7 +59,7 @@ class SaaSMeteringTest extends TestCase
             'limit_amount' => 100,
         ]);
 
-        $service = new MeteredBillingService();
+        $service = new MeteredBillingService;
         $this->assertTrue($service->canUse('limited_key', 1));
         $this->assertFalse($service->canUse('limited_key', 2));
 
@@ -74,12 +74,12 @@ class SaaSMeteringTest extends TestCase
         Event::fake();
 
         $user = User::forceCreate([
-            'name' => 'Admin', 
-            'email' => 'admin@test.com', 
+            'name' => 'Admin',
+            'email' => 'admin@test.com',
             'password' => 'test',
         ]);
         $this->actingAs($user);
-        app()->instance('currentTenant', (object)['id' => 1]);
+        app()->instance('currentTenant', (object) ['id' => 1]);
 
         TenantUsage::create([
             'tenant_id' => 1,
@@ -88,8 +88,8 @@ class SaaSMeteringTest extends TestCase
             'limit_amount' => 100,
         ]);
 
-        $service = new MeteredBillingService();
-        
+        $service = new MeteredBillingService;
+
         // Push it to 85%
         $service->incrementUsage('alert_key', 10);
         Event::assertDispatched(SaaSLimitApproaching::class);

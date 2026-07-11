@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'openai_api_key')) {
+            if (! Schema::hasColumn('users', 'openai_api_key')) {
                 $table->string('openai_api_key')->nullable()->after('remember_token');
             }
         });
@@ -30,4 +30,3 @@ return new class extends Migration
         });
     }
 };
-

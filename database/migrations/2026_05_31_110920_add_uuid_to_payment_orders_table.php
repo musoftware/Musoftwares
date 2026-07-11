@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\PaymentOrder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -11,13 +13,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('payment_orders', 'uuid')) {
+        if (! Schema::hasColumn('payment_orders', 'uuid')) {
             Schema::table('payment_orders', function (Blueprint $table) {
                 $table->uuid('uuid')->nullable()->after('id');
             });
 
-            foreach (\App\Models\PaymentOrder::all() as $order) {
-                $order->uuid = (string) \Illuminate\Support\Str::uuid();
+            foreach (PaymentOrder::all() as $order) {
+                $order->uuid = (string) Str::uuid();
                 $order->save();
             }
 

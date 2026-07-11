@@ -3,16 +3,18 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use App\Models\UserPaymentMethod;
 use App\Models\UserReferralRequestWithdraw;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminWithdrawRequestTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
@@ -42,14 +44,14 @@ class AdminWithdrawRequestTest extends TestCase
 
     public function test_admin_can_view_withdraw_request_show(): void
     {
-        $paymentMethod = new \App\Models\UserPaymentMethod();
+        $paymentMethod = new UserPaymentMethod;
         $paymentMethod->user_id = $this->clientUser->id;
         $paymentMethod->status = 'active';
         $paymentMethod->type = 'bank';
         $paymentMethod->currency_id = 1;
         $paymentMethod->save();
 
-        $withdrawRequest = new UserReferralRequestWithdraw();
+        $withdrawRequest = new UserReferralRequestWithdraw;
         $withdrawRequest->user_id = $this->clientUser->id;
         $withdrawRequest->status = 'pending';
         $withdrawRequest->amount = 100;
@@ -59,21 +61,21 @@ class AdminWithdrawRequestTest extends TestCase
         $withdrawRequest->save();
 
         $response = $this->actingAs($this->admin)->get(route('admin.withdraw-requests.show', $withdrawRequest));
-        
+
         $response->assertStatus(200);
         $this->assertEquals('reviewing', $withdrawRequest->fresh()->status);
     }
 
     public function test_admin_can_update_withdraw_request_status(): void
     {
-        $paymentMethod = new \App\Models\UserPaymentMethod();
+        $paymentMethod = new UserPaymentMethod;
         $paymentMethod->user_id = $this->clientUser->id;
         $paymentMethod->status = 'active';
         $paymentMethod->type = 'bank';
         $paymentMethod->currency_id = 1;
         $paymentMethod->save();
 
-        $withdrawRequest = new UserReferralRequestWithdraw();
+        $withdrawRequest = new UserReferralRequestWithdraw;
         $withdrawRequest->user_id = $this->clientUser->id;
         $withdrawRequest->status = 'pending';
         $withdrawRequest->amount = 100;
@@ -83,7 +85,7 @@ class AdminWithdrawRequestTest extends TestCase
         $withdrawRequest->save();
 
         $response = $this->actingAs($this->admin)->put(route('admin.withdraw-requests.update', $withdrawRequest), [
-            'status' => 'approved'
+            'status' => 'approved',
         ]);
 
         $response->assertRedirect(route('admin.withdraw-requests.index'));

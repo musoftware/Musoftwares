@@ -74,7 +74,7 @@ return new class extends Migration
             if (Schema::hasTable($table)) {
                 Schema::table($table, function (Blueprint $t) use ($table, $columns) {
                     foreach ($columns as $old => $new) {
-                        if (Schema::hasColumn($table, $old) && !Schema::hasColumn($table, $new)) {
+                        if (Schema::hasColumn($table, $old) && ! Schema::hasColumn($table, $new)) {
                             // Safely rename column. In modern Laravel this usually works even with foreign keys,
                             // but if it fails due to FK constraints, we would need to drop and recreate the FKs.
                             $t->renameColumn($old, $new);
@@ -94,7 +94,7 @@ return new class extends Migration
             if (Schema::hasTable($table)) {
                 Schema::table($table, function (Blueprint $t) use ($table, $columns) {
                     foreach ($columns as $old => $new) {
-                        if (Schema::hasColumn($table, $new) && !Schema::hasColumn($table, $old)) {
+                        if (Schema::hasColumn($table, $new) && ! Schema::hasColumn($table, $old)) {
                             $t->renameColumn($new, $old);
                         }
                     }

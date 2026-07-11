@@ -31,7 +31,7 @@ return new class extends Migration
                 'show_copy',
                 'show_chrome',
                 'show_firefox',
-                'show_default_browser'
+                'show_default_browser',
             ]);
         });
     }

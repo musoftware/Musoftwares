@@ -20,7 +20,7 @@ return new class extends Migration
             $table->json('text');
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->unique(['group', 'key']);
         });
     }

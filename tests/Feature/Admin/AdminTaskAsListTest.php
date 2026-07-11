@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\Todo;
 use App\Models\User;
 use App\Services\Admin\TodoListQueryService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -16,17 +17,22 @@ class AdminTaskAsListTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientA;
+
     protected User $clientB;
+
     protected User $clientC;
+
     protected Task $activeTask;
+
     protected Task $archivedTask;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -43,29 +49,29 @@ class AdminTaskAsListTest extends TestCase
         $this->activeTask = Task::create([
             'user_id' => $this->clientA->id,
             'task_name' => 'Onboarding',
-            'archived'  => false,
+            'archived' => false,
         ]);
         $this->archivedTask = Task::create([
             'user_id' => $this->clientB->id,
             'task_name' => 'Old Work',
-            'archived'  => true,
+            'archived' => true,
         ]);
     }
 
     private function makeTodo(array $overrides = []): Todo
     {
         return Todo::create(array_merge([
-            'user_id'        => $this->clientA->id,
-            'title'          => 'Sample todo',
-            'description'    => null,
-            'completed'      => false,
-            'paused'         => false,
-            'inDate'         => date('Y-m-d'),
-            'priority'       => 'normal',
-            'priorityColor'  => '#11cdef',
-            'tags'           => json_encode([]),
-            'start_at'       => null,
-            'end_at'         => null,
+            'user_id' => $this->clientA->id,
+            'title' => 'Sample todo',
+            'description' => null,
+            'completed' => false,
+            'paused' => false,
+            'inDate' => date('Y-m-d'),
+            'priority' => 'normal',
+            'priorityColor' => '#11cdef',
+            'tags' => json_encode([]),
+            'start_at' => null,
+            'end_at' => null,
         ], $overrides));
     }
 
@@ -98,7 +104,7 @@ class AdminTaskAsListTest extends TestCase
         $this->makeTodo([
             'user_id' => $this->clientB->id,
             'task_id' => $this->archivedTask->id,
-            'title'   => 'Archived',
+            'title' => 'Archived',
         ]);
         // 1 completed todo → must not appear
         $this->makeTodo(['completed' => true, 'title' => 'Done']);
@@ -168,18 +174,18 @@ class AdminTaskAsListTest extends TestCase
             ->flatMap(fn ($c) => collect($c['tasks'])->flatMap(fn ($t) => collect($t['todos'])->pluck('title')))
             ->all();
 
-        $this->assertContains('TOKEN_title_hit',    $titles, 'title match');
-        $this->assertContains('plain title',        $titles, 'description match');
-        $this->assertContains('On task',            $titles, 'task name match');
-        $this->assertContains('email hit',          $titles, 'email match');
-        $this->assertNotContains('plain no match',  $titles, 'no false positives');
+        $this->assertContains('TOKEN_title_hit', $titles, 'title match');
+        $this->assertContains('plain title', $titles, 'description match');
+        $this->assertContains('On task', $titles, 'task name match');
+        $this->assertContains('email hit', $titles, 'email match');
+        $this->assertNotContains('plain no match', $titles, 'no false positives');
     }
 
     public function test_priority_paused_filters(): void
     {
         $this->makeTodo(['title' => 'High active', 'priority' => 'high',   'paused' => false]);
         $this->makeTodo(['title' => 'Low active',  'priority' => 'low',    'paused' => false]);
-        $this->makeTodo(['title' => 'Normal paused','priority' => 'normal','paused' => true]);
+        $this->makeTodo(['title' => 'Normal paused', 'priority' => 'normal', 'paused' => true]);
 
         $response = $this->actingAs($this->admin)
             ->get(route('admin.tasks.as_list', ['priority' => 'high']));
@@ -259,7 +265,7 @@ class AdminTaskAsListTest extends TestCase
 
         $response = $this->actingAs($this->admin)
             ->postJson(route('admin.tasks.todos.bulk-complete'), [
-                'todo_ids'  => [$a->id, $b->id, $completed->id, $paused->id],
+                'todo_ids' => [$a->id, $b->id, $completed->id, $paused->id],
                 'completed' => true,
             ]);
         $response->assertOk();
@@ -275,14 +281,14 @@ class AdminTaskAsListTest extends TestCase
     {
         $this->actingAs($this->admin)
             ->postJson(route('admin.tasks.todos.bulk-complete'), [
-                'todo_ids'  => [],
+                'todo_ids' => [],
                 'completed' => true,
             ])->assertStatus(422);
 
         $ids = range(1, 501);
         $this->actingAs($this->admin)
             ->postJson(route('admin.tasks.todos.bulk-complete'), [
-                'todo_ids'  => $ids,
+                'todo_ids' => $ids,
                 'completed' => true,
             ])->assertStatus(422);
     }
@@ -307,11 +313,11 @@ class AdminTaskAsListTest extends TestCase
     {
         $svc = app(TodoListQueryService::class);
         $out = $svc->normalizeFilters([
-            'search'    => '',
-            'is_paid'   => '',
-            'paused'    => '',
-            'priority'  => null,
-            'sort'      => 'bogus',
+            'search' => '',
+            'is_paid' => '',
+            'paused' => '',
+            'priority' => null,
+            'sort' => 'bogus',
         ]);
         $this->assertNull($out['search']);
         $this->assertNull($out['is_paid']);
@@ -331,7 +337,7 @@ class AdminTaskAsListTest extends TestCase
 
         $svc = app(TodoListQueryService::class);
         $stats = $svc->computeStats();
-        $page  = $svc->paginate($svc->normalizeFilters([]), 100);
+        $page = $svc->paginate($svc->normalizeFilters([]), 100);
 
         $this->assertSame($stats['total_active_todos'], $page->total(), 'stat total must match list total');
     }

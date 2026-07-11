@@ -25,7 +25,6 @@ return new class extends Migration
             $table->integer('time_from')->nullable();
             $table->integer('time_to')->nullable();
 
-
             $table->timestamps();
             $table->softDeletes();
         });

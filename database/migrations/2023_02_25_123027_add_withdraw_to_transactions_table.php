@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::table('transactions', function (Blueprint $table) {
 
-//            $table->bigInteger('referred_user_id')->unsigned()->nullable();
-//            $table->foreign('referred_user_id')->references('id')->on('users')->onDelete('cascade');
-//
-//            $table->bigInteger('referred_invoice_id')->unsigned()->nullable();
-//            $table->foreign('referred_invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+            //            $table->bigInteger('referred_user_id')->unsigned()->nullable();
+            //            $table->foreign('referred_user_id')->references('id')->on('users')->onDelete('cascade');
+            //
+            //            $table->bigInteger('referred_invoice_id')->unsigned()->nullable();
+            //            $table->foreign('referred_invoice_id')->references('id')->on('invoices')->onDelete('cascade');
 
         });
     }

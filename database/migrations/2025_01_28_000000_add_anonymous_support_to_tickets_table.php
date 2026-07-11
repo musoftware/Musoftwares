@@ -14,13 +14,13 @@ return new class extends Migration
     public function up()
     {
         // Only run if the columns don't already exist
-        if (!Schema::hasColumn('tickets', 'anonymous_name') || !Schema::hasColumn('tickets', 'anonymous_email')) {
+        if (! Schema::hasColumn('tickets', 'anonymous_name') || ! Schema::hasColumn('tickets', 'anonymous_email')) {
             Schema::table('tickets', function (Blueprint $table) {
                 // Add anonymous user fields only if they don't exist
-                if (!Schema::hasColumn('tickets', 'anonymous_name')) {
+                if (! Schema::hasColumn('tickets', 'anonymous_name')) {
                     $table->string('anonymous_name')->nullable()->after('user_id');
                 }
-                if (!Schema::hasColumn('tickets', 'anonymous_email')) {
+                if (! Schema::hasColumn('tickets', 'anonymous_email')) {
                     $table->string('anonymous_email')->nullable();
                 }
             });

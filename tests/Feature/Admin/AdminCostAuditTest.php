@@ -18,6 +18,7 @@ class AdminCostAuditTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected Currency $currency;
 
     protected function setUp(): void
@@ -51,11 +52,11 @@ class AdminCostAuditTest extends TestCase
         $this->assertNotNull($cost);
 
         $this->assertDatabaseHas('admin_audit_logs', [
-            'action'        => CostTransactionAuditService::ACTION_CREATED,
+            'action' => CostTransactionAuditService::ACTION_CREATED,
             'actor_user_id' => $this->admin->id,
-            'target_id'     => $cost->id,
-            'target_type'   => CostTransaction::class,
-            'severity'      => AdminAuditLog::SEVERITY_INFO,
+            'target_id' => $cost->id,
+            'target_type' => CostTransaction::class,
+            'severity' => AdminAuditLog::SEVERITY_INFO,
         ]);
 
         $log = collect(AdminAuditLog::$logs)
@@ -69,7 +70,7 @@ class AdminCostAuditTest extends TestCase
 
     public function test_update_cost_writes_updated_audit_log_with_changes(): void
     {
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->amount = 100;
         $cost->currency_id = $this->currency->id;
         $cost->reason = 'Old reason';
@@ -84,9 +85,9 @@ class AdminCostAuditTest extends TestCase
         $response->assertRedirect(route('admin.costs.index'));
 
         $this->assertDatabaseHas('admin_audit_logs', [
-            'action'        => CostTransactionAuditService::ACTION_UPDATED,
+            'action' => CostTransactionAuditService::ACTION_UPDATED,
             'actor_user_id' => $this->admin->id,
-            'target_id'     => $cost->id,
+            'target_id' => $cost->id,
         ]);
 
         $log = collect(AdminAuditLog::$logs)
@@ -102,7 +103,7 @@ class AdminCostAuditTest extends TestCase
 
     public function test_update_cost_with_no_changes_does_not_write_audit_log(): void
     {
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->amount = 100;
         $cost->currency_id = $this->currency->id;
         $cost->reason = 'Stable reason';
@@ -123,7 +124,7 @@ class AdminCostAuditTest extends TestCase
 
     public function test_delete_cost_writes_deleted_audit_log_with_snapshot(): void
     {
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->amount = 75;
         $cost->currency_id = $this->currency->id;
         $cost->reason = 'Office supplies';
@@ -134,9 +135,9 @@ class AdminCostAuditTest extends TestCase
         $response->assertRedirect(route('admin.costs.index'));
 
         $this->assertDatabaseHas('admin_audit_logs', [
-            'action'        => CostTransactionAuditService::ACTION_DELETED,
+            'action' => CostTransactionAuditService::ACTION_DELETED,
             'actor_user_id' => $this->admin->id,
-            'target_id'     => $cost->id,
+            'target_id' => $cost->id,
         ]);
 
         $log = collect(AdminAuditLog::$logs)

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,7 +18,7 @@ class SerialDeviceControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
         $this->admin = User::factory()->create([
             'onboarding_completed' => true,
         ]);
@@ -178,7 +179,7 @@ class SerialDeviceControllerTest extends TestCase
 
         $response->assertOk();
         // Count data rows (header + 3 active devices = 4 lines, excluding trailing newline)
-        $lines = array_filter(explode("\n", $response->streamedContent()), fn($l) => trim($l) !== '');
+        $lines = array_filter(explode("\n", $response->streamedContent()), fn ($l) => trim($l) !== '');
         $this->assertCount(4, $lines); // header + 3 data rows
     }
 

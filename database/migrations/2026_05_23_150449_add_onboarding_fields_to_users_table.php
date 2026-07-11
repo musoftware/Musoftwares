@@ -12,25 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'country')) {
+            if (! Schema::hasColumn('users', 'country')) {
                 $table->string('country')->nullable();
             }
-            if (!Schema::hasColumn('users', 'city')) {
+            if (! Schema::hasColumn('users', 'city')) {
                 $table->string('city')->nullable();
             }
-            if (!Schema::hasColumn('users', 'mobile_1')) {
+            if (! Schema::hasColumn('users', 'mobile_1')) {
                 $table->string('mobile_1')->nullable();
             }
-            if (!Schema::hasColumn('users', 'mobile_2')) {
+            if (! Schema::hasColumn('users', 'mobile_2')) {
                 $table->string('mobile_2')->nullable();
             }
-            if (!Schema::hasColumn('users', 'telegram_username')) {
+            if (! Schema::hasColumn('users', 'telegram_username')) {
                 $table->string('telegram_username')->nullable();
             }
-            if (!Schema::hasColumn('users', 'whatsapp_number')) {
+            if (! Schema::hasColumn('users', 'whatsapp_number')) {
                 $table->string('whatsapp_number')->nullable();
             }
-            if (!Schema::hasColumn('users', 'onboarding_completed')) {
+            if (! Schema::hasColumn('users', 'onboarding_completed')) {
                 $table->boolean('onboarding_completed')->default(false);
             }
         });
@@ -49,7 +49,7 @@ return new class extends Migration
                 'mobile_2',
                 'telegram_username',
                 'whatsapp_number',
-                'onboarding_completed'
+                'onboarding_completed',
             ]);
         });
     }

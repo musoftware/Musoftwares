@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('notification_campaigns')) {
+        if (! Schema::hasTable('notification_campaigns')) {
             Schema::create('notification_campaigns', function (Blueprint $table) {
                 $table->id();
                 $table->string('title');
@@ -21,7 +21,7 @@ return new class extends Migration
                 $table->unsignedInteger('clicks_count')->default(0);
                 $table->string('status')->default('sent');
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
             });
         }
     }

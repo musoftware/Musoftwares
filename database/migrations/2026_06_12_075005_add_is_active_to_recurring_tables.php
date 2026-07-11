@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::table('recurring_costs', function (Blueprint $table) {
             $table->boolean('is_active')->default(true)->after('id');
         });
-        
+
         Schema::table('recurring_incomes', function (Blueprint $table) {
             $table->boolean('is_active')->default(true)->after('id');
         });
-        
+
         Schema::table('recurring_salaries', function (Blueprint $table) {
             $table->boolean('is_active')->default(true)->after('id');
         });
@@ -32,11 +32,11 @@ return new class extends Migration
         Schema::table('recurring_costs', function (Blueprint $table) {
             $table->dropColumn('is_active');
         });
-        
+
         Schema::table('recurring_incomes', function (Blueprint $table) {
             $table->dropColumn('is_active');
         });
-        
+
         Schema::table('recurring_salaries', function (Blueprint $table) {
             $table->dropColumn('is_active');
         });

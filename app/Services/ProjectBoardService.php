@@ -383,6 +383,8 @@ class ProjectBoardService
                 'description' => $report->body,
                 'body' => $report->body,
                 'published_at' => optional($report->published_at)->toIso8601String(),
+                'period_start' => $report->period_start ? $report->period_start->toIso8601String() : null,
+                'period_end' => $report->period_end ? $report->period_end->toIso8601String() : null,
                 'comments_count' => $report->comments_count,
             ]);
         }

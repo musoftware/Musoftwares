@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\File;
 use App\Models\FileFolder;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,24 +16,26 @@ class UserFileControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
+
     protected User $otherClientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
 
         $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
         $this->clientUser->assignRole('client');
-        
+
         $this->otherClientUser = User::factory()->create(['onboarding_completed' => true]);
         $this->otherClientUser->assignRole('client');
-        
+
         Storage::fake('uploaded_user_files');
     }
 
@@ -51,12 +54,12 @@ class UserFileControllerTest extends TestCase
 
     public function test_admin_can_view_user_files_inside_child_folder()
     {
-        $folder = new FileFolder();
+        $folder = new FileFolder;
         $folder->user_id = $this->clientUser->id;
         $folder->foldername = 'ParentFolder';
         $folder->save();
 
-        $childFolder = new FileFolder();
+        $childFolder = new FileFolder;
         $childFolder->user_id = $this->clientUser->id;
         $childFolder->folder_id = $folder->id;
         $childFolder->foldername = 'ChildFolder';
@@ -81,7 +84,7 @@ class UserFileControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/upload", [
             'file' => $file,
-            'folder' => ''
+            'folder' => '',
         ]);
 
         $response->assertRedirect();
@@ -92,14 +95,14 @@ class UserFileControllerTest extends TestCase
             'folder_id' => null,
             'original_filename' => 'document.pdf',
         ]);
-        
+
         $fileModel = File::where('original_filename', 'document.pdf')->first();
         Storage::disk('uploaded_user_files')->assertExists($fileModel->filename);
     }
 
     public function test_admin_can_upload_file_to_child_folder()
     {
-        $folder = new FileFolder();
+        $folder = new FileFolder;
         $folder->user_id = $this->clientUser->id;
         $folder->foldername = 'MyDocs';
         $folder->save();
@@ -108,7 +111,7 @@ class UserFileControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/upload", [
             'file' => $file,
-            'folder' => 'folder_' . $folder->id
+            'folder' => 'folder_'.$folder->id,
         ]);
 
         $response->assertRedirect();
@@ -125,7 +128,7 @@ class UserFileControllerTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/folder", [
             'name' => 'RootFolder',
-            'parent' => ''
+            'parent' => '',
         ]);
 
         $response->assertRedirect();
@@ -140,14 +143,14 @@ class UserFileControllerTest extends TestCase
 
     public function test_admin_can_create_new_child_folder_inside_parent_folder()
     {
-        $folder = new FileFolder();
+        $folder = new FileFolder;
         $folder->user_id = $this->clientUser->id;
         $folder->foldername = 'Parent';
         $folder->save();
 
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/folder", [
             'name' => 'ChildFolder',
-            'parent' => 'folder_' . $folder->id
+            'parent' => 'folder_'.$folder->id,
         ]);
 
         $response->assertRedirect();
@@ -163,7 +166,7 @@ class UserFileControllerTest extends TestCase
     public function test_admin_can_rename_file_and_folder()
     {
         // Setup file
-        $file = new File();
+        $file = new File;
         $file->user_id = $this->clientUser->id;
         $file->filename = 'test.pdf';
         $file->original_filename = 'old.pdf';
@@ -172,23 +175,23 @@ class UserFileControllerTest extends TestCase
         $file->save();
 
         // Setup folder
-        $folder = new FileFolder();
+        $folder = new FileFolder;
         $folder->user_id = $this->clientUser->id;
         $folder->foldername = 'OldFolder';
         $folder->save();
 
         // Rename file
         $response1 = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/rename", [
-            'path' => 'file_' . $file->id,
-            'new_name' => 'new.pdf'
+            'path' => 'file_'.$file->id,
+            'new_name' => 'new.pdf',
         ]);
         $response1->assertRedirect();
         $response1->assertSessionHas('success');
 
         // Rename folder
         $response2 = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/rename", [
-            'path' => 'folder_' . $folder->id,
-            'new_name' => 'NewFolder'
+            'path' => 'folder_'.$folder->id,
+            'new_name' => 'NewFolder',
         ]);
         $response2->assertRedirect();
         $response2->assertSessionHas('success');
@@ -205,7 +208,7 @@ class UserFileControllerTest extends TestCase
 
     public function test_admin_can_move_file_and_folder_to_child_folder()
     {
-        $file = new File();
+        $file = new File;
         $file->user_id = $this->clientUser->id;
         $file->filename = 'test.pdf';
         $file->original_filename = 'file.pdf';
@@ -213,19 +216,19 @@ class UserFileControllerTest extends TestCase
         $file->url = 'test.url';
         $file->save();
 
-        $subFolderToMove = new FileFolder();
+        $subFolderToMove = new FileFolder;
         $subFolderToMove->user_id = $this->clientUser->id;
         $subFolderToMove->foldername = 'SubFolder';
         $subFolderToMove->save();
 
-        $destinationFolder = new FileFolder();
+        $destinationFolder = new FileFolder;
         $destinationFolder->user_id = $this->clientUser->id;
         $destinationFolder->foldername = 'DestFolder';
         $destinationFolder->save();
 
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/move", [
-            'paths' => ['file_' . $file->id, 'folder_' . $subFolderToMove->id],
-            'destination' => 'folder_' . $destinationFolder->id
+            'paths' => ['file_'.$file->id, 'folder_'.$subFolderToMove->id],
+            'destination' => 'folder_'.$destinationFolder->id,
         ]);
 
         $response->assertRedirect();
@@ -244,7 +247,7 @@ class UserFileControllerTest extends TestCase
     public function test_admin_can_delete_file_and_folder()
     {
         // File
-        $file = new File();
+        $file = new File;
         $file->user_id = $this->clientUser->id;
         $file->filename = 'test_delete.pdf';
         $file->original_filename = 'delete.pdf';
@@ -254,12 +257,12 @@ class UserFileControllerTest extends TestCase
         Storage::disk('uploaded_user_files')->put('test_delete.pdf', 'content');
 
         // Folder with child
-        $folder = new FileFolder();
+        $folder = new FileFolder;
         $folder->user_id = $this->clientUser->id;
         $folder->foldername = 'DeleteMe';
         $folder->save();
 
-        $childFile = new File();
+        $childFile = new File;
         $childFile->user_id = $this->clientUser->id;
         $childFile->folder_id = $folder->id;
         $childFile->filename = 'child_delete.pdf';
@@ -270,7 +273,7 @@ class UserFileControllerTest extends TestCase
         Storage::disk('uploaded_user_files')->put('child_delete.pdf', 'content');
 
         $response = $this->actingAs($this->admin)->delete("/admin/users/{$this->clientUser->id}/files", [
-            'paths' => ['file_' . $file->id, 'folder_' . $folder->id]
+            'paths' => ['file_'.$file->id, 'folder_'.$folder->id],
         ]);
 
         $response->assertRedirect();
@@ -286,7 +289,7 @@ class UserFileControllerTest extends TestCase
 
     public function test_admin_can_download_single_file()
     {
-        $file = new File();
+        $file = new File;
         $file->user_id = $this->clientUser->id;
         $file->filename = 'test_download.pdf';
         $file->original_filename = 'download.pdf';
@@ -304,10 +307,10 @@ class UserFileControllerTest extends TestCase
 
     public function test_admin_can_download_multiple_files_and_folders_as_zip()
     {
-        if (!class_exists('ZipArchive')) {
+        if (! class_exists('ZipArchive')) {
             $this->markTestSkipped('ZipArchive extension is not enabled.');
         }
-        $file = new File();
+        $file = new File;
         $file->user_id = $this->clientUser->id;
         $file->filename = 'test_download_1.pdf';
         $file->original_filename = 'doc1.pdf';
@@ -316,12 +319,12 @@ class UserFileControllerTest extends TestCase
         $file->save();
         Storage::disk('uploaded_user_files')->put('test_download_1.pdf', 'file 1 content');
 
-        $folder = new FileFolder();
+        $folder = new FileFolder;
         $folder->user_id = $this->clientUser->id;
         $folder->foldername = 'Archive';
         $folder->save();
 
-        $childFile = new File();
+        $childFile = new File;
         $childFile->user_id = $this->clientUser->id;
         $childFile->folder_id = $folder->id;
         $childFile->filename = 'test_download_2.pdf';
@@ -340,7 +343,7 @@ class UserFileControllerTest extends TestCase
     public function test_admin_cannot_manipulate_files_belonging_to_other_users()
     {
         // Try to access otherClientUser's file while hitting clientUser's endpoint
-        $file = new File();
+        $file = new File;
         $file->user_id = $this->otherClientUser->id;
         $file->filename = 'other_user_file.pdf';
         $file->original_filename = 'secret.pdf';
@@ -352,18 +355,18 @@ class UserFileControllerTest extends TestCase
         $response1 = $this->actingAs($this->admin)->get("/admin/users/{$this->clientUser->id}/files/download?paths[]=file_{$file->id}");
         $response1->assertStatus(404);
         // It returns a zip, but it will be empty because File::where('user_id', $userId) fails
-        
+
         // Delete Attempt
         $response2 = $this->actingAs($this->admin)->delete("/admin/users/{$this->clientUser->id}/files", [
-            'paths' => ['file_' . $file->id]
+            'paths' => ['file_'.$file->id],
         ]);
         $response2->assertRedirect();
         $this->assertDatabaseHas('files', ['id' => $file->id]); // file should still exist!
 
         // Rename Attempt
         $response3 = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/rename", [
-            'path' => 'file_' . $file->id,
-            'new_name' => 'hacked.pdf'
+            'path' => 'file_'.$file->id,
+            'new_name' => 'hacked.pdf',
         ]);
         $response3->assertStatus(404);
         $this->assertDatabaseHas('files', ['id' => $file->id, 'original_filename' => 'secret.pdf']);

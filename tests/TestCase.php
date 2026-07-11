@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Models\AdminAuditLog;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Artisan;
 
@@ -17,7 +18,7 @@ abstract class TestCase extends BaseTestCase
         Artisan::call('module:migrate', ['--force' => true, '--no-interaction' => true]);
 
         // Reset virtual audit logs between tests
-        \App\Models\AdminAuditLog::$logs = [];
+        AdminAuditLog::$logs = [];
     }
 
     /**
@@ -27,7 +28,7 @@ abstract class TestCase extends BaseTestCase
     {
         if ($table === 'admin_audit_logs') {
             $found = false;
-            foreach (\App\Models\AdminAuditLog::$logs as $log) {
+            foreach (AdminAuditLog::$logs as $log) {
                 $match = true;
                 foreach ($data as $key => $value) {
                     if (($log->{$key} ?? null) != $value) {
@@ -40,7 +41,8 @@ abstract class TestCase extends BaseTestCase
                     break;
                 }
             }
-            $this->assertTrue($found, "Failed asserting that virtual admin_audit_logs has matching record: " . json_encode($data));
+            $this->assertTrue($found, 'Failed asserting that virtual admin_audit_logs has matching record: '.json_encode($data));
+
             return $this;
         }
 

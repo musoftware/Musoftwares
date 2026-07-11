@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,7 +15,7 @@ class AdminAuthSecurityTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     public function test_guest_cannot_access_admin_dashboard(): void
@@ -45,7 +46,7 @@ class AdminAuthSecurityTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/admin/dashboard');
 
-        // Note: It might return 200 (Inertia response) or redirect depending on setup, 
+        // Note: It might return 200 (Inertia response) or redirect depending on setup,
         // but it should NOT return 403 or redirect to login.
         $response->assertSuccessful();
     }

@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\RecurringBusyTime;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,13 +13,14 @@ class AdminBusyTimesControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -35,7 +37,7 @@ class AdminBusyTimesControllerTest extends TestCase
 
     public function test_admin_can_filter_busy_times_index(): void
     {
-        $response = $this->actingAs($this->admin)->get('/admin/busy-times?user_id=' . $this->clientUser->id . '&is_active=1&is_recurring=1&day_of_week=1');
+        $response = $this->actingAs($this->admin)->get('/admin/busy-times?user_id='.$this->clientUser->id.'&is_active=1&is_recurring=1&day_of_week=1');
         $response->assertStatus(200);
     }
 

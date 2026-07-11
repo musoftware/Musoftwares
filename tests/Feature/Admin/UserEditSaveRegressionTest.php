@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -29,18 +30,19 @@ class UserEditSaveRegressionTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $target;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create([
             'onboarding_completed' => true,
-            'name'                 => 'Regression Admin',
-            'email'                => 'regression-admin@example.com',
+            'name' => 'Regression Admin',
+            'email' => 'regression-admin@example.com',
         ]);
         $this->admin->assignRole('admin');
 
@@ -48,17 +50,17 @@ class UserEditSaveRegressionTest extends TestCase
         // have loaded. These are the values the admin *expects* to survive
         // any partial save.
         $this->target = User::factory()->create([
-            'name'                 => 'Original Name',
-            'full_name'            => 'Original Full Name',
-            'email'                => 'regression-target@example.com',
-            'mobile_1'             => '+201001112233',
-            'mobile_2'             => '+201001112244',
-            'whatsapp_number'      => '+201001112255',
-            'telegram_username'    => '@original_tg',
-            'country'              => 'EG',
-            'city'                 => 'Cairo',
-            'max_devices'          => 5,
-            'currency_id'          => 2,
+            'name' => 'Original Name',
+            'full_name' => 'Original Full Name',
+            'email' => 'regression-target@example.com',
+            'mobile_1' => '+201001112233',
+            'mobile_2' => '+201001112244',
+            'whatsapp_number' => '+201001112255',
+            'telegram_username' => '@original_tg',
+            'country' => 'EG',
+            'city' => 'Cairo',
+            'max_devices' => 5,
+            'currency_id' => 2,
             'onboarding_completed' => true,
         ]);
         $this->target->assignRole('client');
@@ -74,16 +76,16 @@ class UserEditSaveRegressionTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => 'Renamed',
-                'email'          => 'renamed-target@example.com',
-                'role'           => 'client',
+                'name' => 'Renamed',
+                'email' => 'renamed-target@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
-                'mobile_1'       => '+201009990001',
-                'whatsapp_number'=> '+201009990002',
+                'mobile_1' => '+201009990001',
+                'whatsapp_number' => '+201009990002',
                 'telegram_username' => '@new_tg',
-                'country'        => 'SA',
-                'city'           => 'Riyadh',
-                'max_devices'    => 2,
+                'country' => 'SA',
+                'city' => 'Riyadh',
+                'max_devices' => 2,
             ]
         );
 
@@ -94,9 +96,9 @@ class UserEditSaveRegressionTest extends TestCase
         $this->assertSame('Renamed', $fresh->name);
         $this->assertSame('+201009990001', $fresh->mobile_1);
         $this->assertSame('+201009990002', $fresh->whatsapp_number);
-        $this->assertSame('@new_tg',       $fresh->telegram_username);
-        $this->assertSame('SA',            $fresh->country);
-        $this->assertSame('Riyadh',        $fresh->city);
+        $this->assertSame('@new_tg', $fresh->telegram_username);
+        $this->assertSame('SA', $fresh->country);
+        $this->assertSame('Riyadh', $fresh->city);
         $this->assertSame(2, (int) $fresh->max_devices);
     }
 
@@ -114,9 +116,9 @@ class UserEditSaveRegressionTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => 'Just Renamed',
-                'email'          => 'regression-target@example.com',
-                'role'           => 'client',
+                'name' => 'Just Renamed',
+                'email' => 'regression-target@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
                 // mobile_1, mobile_2, whatsapp_number, telegram_username,
                 // country, city, max_devices are deliberately OMITTED
@@ -150,8 +152,8 @@ class UserEditSaveRegressionTest extends TestCase
             $fresh->telegram_username,
             'telegram_username was wiped to NULL because the Edit form omitted it.'
         );
-        $this->assertSame('EG',    $fresh->country, 'country was wiped to NULL.');
-        $this->assertSame('Cairo', $fresh->city,    'city was wiped to NULL.');
+        $this->assertSame('EG', $fresh->country, 'country was wiped to NULL.');
+        $this->assertSame('Cairo', $fresh->city, 'city was wiped to NULL.');
         $this->assertSame(
             5,
             (int) $fresh->max_devices,
@@ -168,17 +170,17 @@ class UserEditSaveRegressionTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'              => 'Just Renamed',
-                'email'             => 'regression-target@example.com',
-                'role'              => 'client',
-                'account_status'    => 'active',
-                'mobile_1'          => '',
-                'mobile_2'          => '',
-                'whatsapp_number'   => '',
+                'name' => 'Just Renamed',
+                'email' => 'regression-target@example.com',
+                'role' => 'client',
+                'account_status' => 'active',
+                'mobile_1' => '',
+                'mobile_2' => '',
+                'whatsapp_number' => '',
                 'telegram_username' => '',
-                'country'           => '',
-                'city'              => '',
-                'max_devices'       => '',
+                'country' => '',
+                'city' => '',
+                'max_devices' => '',
             ]
         );
 
@@ -200,8 +202,8 @@ class UserEditSaveRegressionTest extends TestCase
             $fresh->telegram_username,
             'telegram_username was wiped to empty string instead of being preserved.'
         );
-        $this->assertSame('EG',    $fresh->country, 'country was wiped to empty string.');
-        $this->assertSame('Cairo', $fresh->city,    'city was wiped to empty string.');
+        $this->assertSame('EG', $fresh->country, 'country was wiped to empty string.');
+        $this->assertSame('Cairo', $fresh->city, 'city was wiped to empty string.');
         $this->assertSame(
             5,
             (int) $fresh->max_devices,
@@ -225,9 +227,9 @@ class UserEditSaveRegressionTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => $before['name'],
-                'email'          => 'only-email-changed@example.com',
-                'role'           => 'client',
+                'name' => $before['name'],
+                'email' => 'only-email-changed@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
             ]
         );
@@ -248,8 +250,8 @@ class UserEditSaveRegressionTest extends TestCase
                 $expected,
                 $actual,
                 "Column [{$column}] was unexpectedly modified by the save. "
-                ."Expected: " . var_export($expected, true)
-                ."  Got: "      . var_export($actual, true)
+                .'Expected: '.var_export($expected, true)
+                .'  Got: '.var_export($actual, true)
             );
         }
     }
@@ -267,9 +269,9 @@ class UserEditSaveRegressionTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => 'Just Renamed',
-                'email'          => 'regression-target@example.com',
-                'role'           => 'client',
+                'name' => 'Just Renamed',
+                'email' => 'regression-target@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
                 // telegram_username omitted
             ]
@@ -291,9 +293,9 @@ class UserEditSaveRegressionTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => 'Just Renamed',
-                'email'          => 'regression-target@example.com',
-                'role'           => 'client',
+                'name' => 'Just Renamed',
+                'email' => 'regression-target@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
                 // max_devices omitted
             ]
@@ -322,9 +324,9 @@ class UserEditSaveRegressionTest extends TestCase
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => 'Just Renamed',
-                'email'          => 'regression-target@example.com',
-                'role'           => 'client',
+                'name' => 'Just Renamed',
+                'email' => 'regression-target@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
                 // currency omitted
             ]
@@ -343,9 +345,9 @@ class UserEditSaveRegressionTest extends TestCase
         $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => 'Just Renamed',
-                'email'          => 'regression-target@example.com',
-                'role'           => 'client',
+                'name' => 'Just Renamed',
+                'email' => 'regression-target@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
             ]
         )->assertSessionHasNoErrors();
@@ -366,9 +368,9 @@ class UserEditSaveRegressionTest extends TestCase
         $this->actingAs($this->admin)->put(
             "/admin/users/{$this->target->id}",
             [
-                'name'           => 'Just Renamed',
-                'email'          => 'regression-target@example.com',
-                'role'           => 'client',
+                'name' => 'Just Renamed',
+                'email' => 'regression-target@example.com',
+                'role' => 'client',
                 'account_status' => 'active',
             ]
         )->assertSessionHasNoErrors();

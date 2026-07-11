@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\App\Services;
 
-use Tests\TestCase;
 use App\Services\RecurringService;
-use App\Models\RecurringCost;
+use Exception;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
+use Illuminate\Support\Facades\Schema;
 use Mockery;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class RecurringServiceTest extends TestCase
 {
@@ -20,7 +20,7 @@ class RecurringServiceTest extends TestCase
         $currencyId = DB::table('currencies')->insertGetId([
             'currency' => 'USD',
             'symbol' => '$',
-            'string_format' => '$%01.2f'
+            'string_format' => '$%01.2f',
         ]);
 
         $costId = DB::table('recurring_costs')->insertGetId([
@@ -38,17 +38,17 @@ class RecurringServiceTest extends TestCase
         ]);
 
         Log::shouldReceive('error')
-           ->once()
-           ->withArgs(function ($message) use ($costId) {
-               return str_contains($message, "Failed to process recurring cost {$costId}:");
-           });
+            ->once()
+            ->withArgs(function ($message) use ($costId) {
+                return str_contains($message, "Failed to process recurring cost {$costId}:");
+            });
 
         // Drop the table to cause CostTransaction::add_cost_balance to throw an exception
-        \Illuminate\Support\Facades\Schema::dropIfExists('cost_transactions');
+        Schema::dropIfExists('cost_transactions');
 
-        $service = new RecurringService();
+        $service = new RecurringService;
         $service->processDueEntries();
-        
+
         $this->assertTrue(true); // Verification is handled by Mockery
     }
 }

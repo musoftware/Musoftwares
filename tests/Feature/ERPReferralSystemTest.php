@@ -2,15 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SubscriptionMiddleware;
+use App\Models\Currency;
 use App\Models\User;
 use App\Models\UserSubscription;
-use App\Models\Currency;
+use Database\Seeders\CurrenciesSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\WalletTransaction;
-use Modules\ERP\Models\Invoice;
-use Modules\ERP\Models\ReferralEarning;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ERPReferralSystemTest extends TestCase
@@ -18,7 +20,9 @@ class ERPReferralSystemTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Tenant $tenant;
+
     protected Currency $currency;
 
     protected function setUp(): void
@@ -28,8 +32,8 @@ class ERPReferralSystemTest extends TestCase
         config(['erp.platform_tenant_id' => 999]);
 
         // Seed necessary roles/permissions and currencies
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $this->seed(\Database\Seeders\CurrenciesSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(CurrenciesSeeder::class);
 
         $this->currency = Currency::firstOrCreate(
             ['currency' => 'USD'],
@@ -67,7 +71,7 @@ class ERPReferralSystemTest extends TestCase
     {
         // 1. Without subscription, access should be forbidden (403)
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->get(route('erp.referrals.index'));
 
@@ -84,7 +88,7 @@ class ERPReferralSystemTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->get(route('erp.referrals.index'));
 
@@ -116,15 +120,14 @@ class ERPReferralSystemTest extends TestCase
 
         // Access invoice details without active addon
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->get(route('erp.invoices.show', $invoice->id));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('ERP/Invoices/Show')
-                 ->has('referral_earnings')
-                 ->where('referral_earnings', [])
+        $response->assertInertia(fn ($page) => $page->component('ERP/Invoices/Show')
+            ->has('referral_earnings')
+            ->where('referral_earnings', [])
         );
     }
 
@@ -137,8 +140,6 @@ class ERPReferralSystemTest extends TestCase
             'email' => 'referrer@example.com',
             'currency_id' => $this->currency->id,
         ]);
-
-
 
         // 2. Create Referee client referred by Referrer
         $referee = TenantClient::create([

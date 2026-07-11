@@ -2,14 +2,12 @@
 
 namespace Tests\Feature\Booking\WhiteLabel;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelAsset;
-use Modules\Booking\app\Features\WhiteLabel\Http\Middleware\EnforceWhiteLabelLimits;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Models\User;
-use App\Models\Tenant;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Modules\Booking\app\Features\WhiteLabel\Http\Middleware\EnforceWhiteLabelLimits;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Tests\TestCase;
 
 class TenantIsolationWhiteLabelTest extends TestCase
 {
@@ -26,8 +24,8 @@ class TenantIsolationWhiteLabelTest extends TestCase
         });
 
         // Mock feature() to return false
-        config(['saas.addons.booking-white-label' => null]); 
-        
+        config(['saas.addons.booking-white-label' => null]);
+
         $middleware = app(EnforceWhiteLabelLimits::class);
 
         $this->expectException(HttpException::class);

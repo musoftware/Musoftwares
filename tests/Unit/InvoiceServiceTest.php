@@ -18,7 +18,7 @@ class InvoiceServiceTest extends TestCase
     {
         // 1. Setup Data
         $user = User::factory()->create();
-        
+
         $invoice = Invoice::create([
             'user_id' => $user->id,
             'status' => 'unpaid',
@@ -31,7 +31,7 @@ class InvoiceServiceTest extends TestCase
             'item_type' => 'timer',
             'amount' => 10,
             'qty' => 1,
-            'currency' => 'USD'
+            'currency' => 'USD',
         ]);
 
         $item2 = InvoiceItem::create([
@@ -40,7 +40,7 @@ class InvoiceServiceTest extends TestCase
             'item_type' => 'timer',
             'amount' => 15,
             'qty' => 1,
-            'currency' => 'USD'
+            'currency' => 'USD',
         ]);
 
         $timer1 = InvoiceItemTimer::create([
@@ -62,8 +62,8 @@ class InvoiceServiceTest extends TestCase
         ]);
 
         // 2. Perform the Merge via InvoiceService
-        $service = new InvoiceService();
-        
+        $service = new InvoiceService;
+
         $data = [
             'deleted_items' => [$item1->id, $item2->id],
             'items' => [
@@ -73,7 +73,7 @@ class InvoiceServiceTest extends TestCase
                     'qty' => 1,
                     'item_type' => 'timer',
                     'merged_from' => [$item1->id, $item2->id],
-                ]
+                ],
             ],
             'cost_lines' => [],
             'deleted_cost_lines' => [],
@@ -82,7 +82,7 @@ class InvoiceServiceTest extends TestCase
         $service->updateInvoice($invoice, $data);
 
         // 3. Assertions
-        
+
         // Old items should be deleted (soft deleted)
         $this->assertSoftDeleted('invoice_items', ['id' => $item1->id]);
         $this->assertSoftDeleted('invoice_items', ['id' => $item2->id]);

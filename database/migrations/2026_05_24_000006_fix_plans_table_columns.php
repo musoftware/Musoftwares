@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('plans', function (Blueprint $table) {
-            if (Schema::hasColumn('plans', 'plan_currency_id') && !Schema::hasColumn('plans', 'plan_currency')) {
+            if (Schema::hasColumn('plans', 'plan_currency_id') && ! Schema::hasColumn('plans', 'plan_currency')) {
                 $table->renameColumn('plan_currency_id', 'plan_currency');
             }
-            if (!Schema::hasColumn('plans', 'plan_description')) {
+            if (! Schema::hasColumn('plans', 'plan_description')) {
                 $table->text('plan_description')->nullable();
             }
         });
@@ -27,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('plans', function (Blueprint $table) {
-            if (Schema::hasColumn('plans', 'plan_currency') && !Schema::hasColumn('plans', 'plan_currency_id')) {
+            if (Schema::hasColumn('plans', 'plan_currency') && ! Schema::hasColumn('plans', 'plan_currency_id')) {
                 $table->renameColumn('plan_currency', 'plan_currency_id');
             }
             if (Schema::hasColumn('plans', 'plan_description')) {

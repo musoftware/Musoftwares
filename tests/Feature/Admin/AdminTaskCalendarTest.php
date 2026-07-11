@@ -6,6 +6,7 @@ use App\Models\RecurringBusyTime;
 use App\Models\Task;
 use App\Models\Todo;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -15,13 +16,15 @@ class AdminTaskCalendarTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientA;
+
     protected User $clientB;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -48,14 +51,14 @@ class AdminTaskCalendarTest extends TestCase
     public function test_recurring_busy_time_expands_to_every_matching_day(): void
     {
         RecurringBusyTime::create([
-            'user_id'     => $this->admin->id,
+            'user_id' => $this->admin->id,
             'is_recurring' => true,
-            'day_of_week'  => 'Monday',
-            'is_full_day'  => false,
-            'start_time'   => '09:00',
-            'end_time'     => '10:00',
-            'reason'       => 'Team standup',
-            'is_active'    => true,
+            'day_of_week' => 'Monday',
+            'is_full_day' => false,
+            'start_time' => '09:00',
+            'end_time' => '10:00',
+            'reason' => 'Team standup',
+            'is_active' => true,
         ]);
 
         $response = $this->actingAs($this->admin)
@@ -74,12 +77,12 @@ class AdminTaskCalendarTest extends TestCase
     public function test_specific_busy_date_only_appears_once(): void
     {
         RecurringBusyTime::create([
-            'user_id'       => $this->admin->id,
-            'is_recurring'  => false,
+            'user_id' => $this->admin->id,
+            'is_recurring' => false,
             'specific_date' => '2026-07-15',
-            'is_full_day'   => true,
-            'reason'        => 'Off',
-            'is_active'     => true,
+            'is_full_day' => true,
+            'reason' => 'Off',
+            'is_active' => true,
         ]);
 
         $response = $this->actingAs($this->admin)
@@ -90,7 +93,9 @@ class AdminTaskCalendarTest extends TestCase
         $hits = 0;
         foreach ($events as $date => $day) {
             foreach ($day['busy_times'] as $bt) {
-                if ($bt['title'] === 'Off') $hits++;
+                if ($bt['title'] === 'Off') {
+                    $hits++;
+                }
             }
         }
         $this->assertSame(1, $hits, 'Specific-date busy time must appear exactly once');
@@ -103,7 +108,7 @@ class AdminTaskCalendarTest extends TestCase
             'user_id' => $this->clientA->id, 'task_id' => $task->id,
             'title' => 'X', 'completed' => false, 'paused' => false,
             'inDate' => '2026-07-15', 'priority' => 'normal', 'priorityColor' => '#fff',
-            'tags'   => '[]',
+            'tags' => '[]',
             'start_at' => '2026-07-15 09:00:00', 'end_at' => '2026-07-15 10:00:00',
         ]);
 
@@ -155,17 +160,17 @@ class AdminTaskCalendarTest extends TestCase
     public function test_create_and_bill_validates_slot_and_balance(): void
     {
         $start = Carbon::now('Africa/Cairo')->addDay()->startOfHour();
-        $end   = $start->copy()->addHour();
+        $end = $start->copy()->addHour();
 
         // End before start
         $response = $this->actingAs($this->admin)
             ->from(route('admin.tasks.calendar'))
             ->post(route('admin.tasks.calendar.store-and-bill'), [
-                'client_id'  => $this->clientA->id,
-                'title'      => 'Bad slot',
-                'date'       => $start->format('Y-m-d'),
+                'client_id' => $this->clientA->id,
+                'title' => 'Bad slot',
+                'date' => $start->format('Y-m-d'),
                 'start_time' => $end->format('H:i'),
-                'end_time'   => $start->format('H:i'),
+                'end_time' => $start->format('H:i'),
             ]);
 
         $response->assertSessionHasErrors();

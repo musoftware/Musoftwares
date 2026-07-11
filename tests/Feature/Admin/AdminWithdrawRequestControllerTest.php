@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Currency;
 use App\Models\User;
-use App\Models\UserReferralRequestWithdraw;
 use App\Models\UserPaymentMethod;
+use App\Models\UserReferralRequestWithdraw;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,13 +17,14 @@ class AdminWithdrawRequestControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     private function createAdmin()
     {
         $admin = User::factory()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
+
         return $admin;
     }
 
@@ -29,6 +32,7 @@ class AdminWithdrawRequestControllerTest extends TestCase
     {
         $client = User::factory()->create(['onboarding_completed' => true]);
         $client->assignRole('client');
+
         return $client;
     }
 
@@ -62,7 +66,7 @@ class AdminWithdrawRequestControllerTest extends TestCase
             'bank_name' => 'Test Bank',
             'type' => 'bank',
             'bank_number' => '123456789',
-            'currency_id' => \App\Models\Currency::first()->id ?? 1
+            'currency_id' => Currency::first()->id ?? 1,
         ]);
 
         $withdrawRequest = UserReferralRequestWithdraw::forceCreate([
@@ -70,9 +74,9 @@ class AdminWithdrawRequestControllerTest extends TestCase
             'user_payment_method_id' => $paymentMethod->id,
             'amount' => 50,
             'status' => 'pending',
-            'currency_id' => \App\Models\Currency::first()->id ?? 1,
+            'currency_id' => Currency::first()->id ?? 1,
             'payment_method' => 'Bank',
-            'payment_info' => 'Test info'
+            'payment_info' => 'Test info',
         ]);
 
         $response = $this->actingAs($admin)->get(route('admin.withdraw-requests.show', $withdrawRequest->id));
@@ -97,7 +101,7 @@ class AdminWithdrawRequestControllerTest extends TestCase
             'bank_name' => 'Test Bank',
             'type' => 'bank',
             'bank_number' => '123456789',
-            'currency_id' => \App\Models\Currency::first()->id ?? 1
+            'currency_id' => Currency::first()->id ?? 1,
         ]);
 
         $withdrawRequest = UserReferralRequestWithdraw::forceCreate([
@@ -105,9 +109,9 @@ class AdminWithdrawRequestControllerTest extends TestCase
             'user_payment_method_id' => $paymentMethod->id,
             'amount' => 50,
             'status' => 'pending',
-            'currency_id' => \App\Models\Currency::first()->id ?? 1,
+            'currency_id' => Currency::first()->id ?? 1,
             'payment_method' => 'Bank',
-            'payment_info' => 'Test info'
+            'payment_info' => 'Test info',
         ]);
 
         $response = $this->actingAs($admin)->put(route('admin.withdraw-requests.update', $withdrawRequest->id), [

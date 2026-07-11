@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'account_status')) {
+            if (! Schema::hasColumn('users', 'account_status')) {
                 $table->string('account_status', 20)->default('active')->after('deleted_at')->index();
             }
-            if (!Schema::hasColumn('users', 'block_reason')) {
+            if (! Schema::hasColumn('users', 'block_reason')) {
                 $table->text('block_reason')->nullable()->after('account_status');
             }
         });

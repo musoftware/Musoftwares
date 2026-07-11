@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use App\Models\MessageActivity;
 use App\Models\Conversation;
+use App\Models\MessageActivity;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -17,18 +15,18 @@ return new class extends Migration
         DB::transaction(function () {
             // Group message activities by thread_type and thread_id
             $activities = MessageActivity::with(['activity'])->orderBy('created_at', 'asc')->get();
-            
+
             $conversationsMap = [];
-            
+
             foreach ($activities as $activity) {
-                $key = $activity->thread_type . '_' . $activity->thread_id;
-                
-                if (!isset($conversationsMap[$key])) {
+                $key = $activity->thread_type.'_'.$activity->thread_id;
+
+                if (! isset($conversationsMap[$key])) {
                     $conversation = Conversation::where('conversable_type', $activity->thread_type)
-                                                ->where('conversable_id', $activity->thread_id)
-                                                ->first();
-                    
-                    if (!$conversation) {
+                        ->where('conversable_id', $activity->thread_id)
+                        ->first();
+
+                    if (! $conversation) {
                         $type = 'chat';
                         if ($activity->thread_type === 'App\Models\Ticket') {
                             $type = 'support_ticket';
@@ -38,21 +36,21 @@ return new class extends Migration
 
                         $conversation = Conversation::create([
                             'conversable_type' => $activity->thread_type,
-                            'conversable_id'   => $activity->thread_id,
-                            'type'             => $type,
-                            'status'           => 'open',
-                            'created_at'       => $activity->created_at,
-                            'updated_at'       => $activity->created_at,
+                            'conversable_id' => $activity->thread_id,
+                            'type' => $type,
+                            'status' => 'open',
+                            'created_at' => $activity->created_at,
+                            'updated_at' => $activity->created_at,
                         ]);
                     }
                     $conversationsMap[$key] = $conversation;
                 }
-                
+
                 $conversation = $conversationsMap[$key];
-                
+
                 $body = '';
                 $attachment = null;
-                
+
                 if ($activity->activity) {
                     if ($activity->activity_type === 'App\Models\MessageMessage') {
                         $body = $activity->activity->message;
@@ -67,28 +65,28 @@ return new class extends Migration
                         $attachment = $activity->activity->audio_file;
                     }
                 }
-                
-                if (!$activity->activity && empty($body)) {
+
+                if (! $activity->activity && empty($body)) {
                     continue;
                 }
-                
+
                 $conversation->messages()->create([
-                    'sender_id'  => $activity->user_id,
-                    'body'       => $body ?? '',
+                    'sender_id' => $activity->user_id,
+                    'body' => $body ?? '',
                     'attachment' => $attachment,
-                    'is_system'  => false,
+                    'is_system' => false,
                     'created_at' => $activity->created_at,
                     'updated_at' => $activity->updated_at,
                 ]);
-                
+
                 // Add the sender as participant if not already added
                 $participantExists = $conversation->participants()
-                                                  ->where('user_id', $activity->user_id)
-                                                  ->exists();
-                if (!$participantExists) {
+                    ->where('user_id', $activity->user_id)
+                    ->exists();
+                if (! $participantExists) {
                     $conversation->participants()->create([
                         'user_id' => $activity->user_id,
-                        'role'    => 'participant'
+                        'role' => 'participant',
                     ]);
                 }
             }
@@ -100,6 +98,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // 
+        //
     }
 };

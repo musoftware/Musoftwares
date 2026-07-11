@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('recurring_busy_times', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            
+
             $table->boolean('is_recurring')->default(false);
             $table->string('day_of_week')->nullable(); // e.g. "Saturday", "Sunday"
             $table->date('specific_date')->nullable(); // For non-recurring, special dates
-            
+
             $table->boolean('is_full_day')->default(false);
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
-            
+
             $table->text('reason')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

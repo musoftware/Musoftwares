@@ -4,15 +4,16 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\UserPaymentMethod;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminPaymentMethodTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
@@ -42,7 +43,7 @@ class AdminPaymentMethodTest extends TestCase
 
     public function test_admin_can_view_payment_method_show(): void
     {
-        $paymentMethod = new UserPaymentMethod();
+        $paymentMethod = new UserPaymentMethod;
         $paymentMethod->user_id = $this->clientUser->id;
         $paymentMethod->status = 'pending';
         $paymentMethod->type = 'bank';
@@ -55,7 +56,7 @@ class AdminPaymentMethodTest extends TestCase
 
     public function test_admin_can_update_payment_method_status(): void
     {
-        $paymentMethod = new UserPaymentMethod();
+        $paymentMethod = new UserPaymentMethod;
         $paymentMethod->user_id = $this->clientUser->id;
         $paymentMethod->status = 'pending';
         $paymentMethod->type = 'bank';
@@ -63,7 +64,7 @@ class AdminPaymentMethodTest extends TestCase
         $paymentMethod->save();
 
         $response = $this->actingAs($this->admin)->put(route('admin.payment-methods.update', $paymentMethod), [
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $response->assertRedirect();

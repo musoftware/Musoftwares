@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\SubscriptionService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,7 +18,7 @@ class ModuleSubscriptionSecurityTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create([
             'onboarding_completed' => true,
@@ -32,9 +33,9 @@ class ModuleSubscriptionSecurityTest extends TestCase
     //             ->with(\Mockery::any(), 'marketplace')
     //             ->andReturn(false);
     //     });
-    // 
+    //
     //     $response = $this->actingAs($this->user)->get('/marketplace/dashboard');
-    // 
+    //
     //     $response->assertRedirect(route('subscriptions.plans', ['module' => 'marketplace']));
     // }
 
@@ -60,9 +61,9 @@ class ModuleSubscriptionSecurityTest extends TestCase
     //             ->with(\Mockery::any(), 'intelligence')
     //             ->andReturn(false);
     //     });
-    // 
+    //
     //     $response = $this->actingAs($this->user)->get('/intelligence');
-    // 
+    //
     //     $response->assertRedirect(route('subscriptions.plans', ['module' => 'intelligence']));
     // }
 }

@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Models\Invoice;
 use App\Models\Currency;
+use App\Models\Invoice;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,13 +16,14 @@ class AdminInvoiceControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     private function createAdmin()
     {
         $admin = User::factory()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
+
         return $admin;
     }
 
@@ -29,6 +31,7 @@ class AdminInvoiceControllerTest extends TestCase
     {
         $client = User::factory()->create(['onboarding_completed' => true]);
         $client->assignRole('client');
+
         return $client;
     }
 

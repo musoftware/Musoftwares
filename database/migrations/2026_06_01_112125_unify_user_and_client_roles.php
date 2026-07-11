@@ -16,7 +16,7 @@ return new class extends Migration
             ->where('guard_name', 'web')
             ->first();
 
-        if (!$clientRole) {
+        if (! $clientRole) {
             $clientRoleId = DB::table('roles')->insertGetId([
                 'name' => 'client',
                 'guard_name' => 'web',
@@ -50,7 +50,7 @@ return new class extends Migration
                         ->where('model_type', $assignment->model_type)
                         ->exists();
 
-                    if (!$hasClientRole) {
+                    if (! $hasClientRole) {
                         // Assign 'client' role
                         DB::table('model_has_roles')->insert([
                             'role_id' => $clientRoleId,

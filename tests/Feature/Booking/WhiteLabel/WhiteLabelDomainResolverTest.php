@@ -3,11 +3,9 @@
 namespace Tests\Feature\Booking\WhiteLabel;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Modules\Booking\app\Features\WhiteLabel\Services\WhiteLabelDomainResolver;
 use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelDomain;
-use Modules\Booking\app\Features\WhiteLabel\Jobs\VerifyDomainDnsJob;
-use Illuminate\Support\Facades\Queue;
+use Modules\Booking\app\Features\WhiteLabel\Services\WhiteLabelDomainResolver;
+use Tests\TestCase;
 
 class WhiteLabelDomainResolverTest extends TestCase
 {

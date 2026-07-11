@@ -15,10 +15,10 @@ return new class extends Migration
     {
         if (Schema::hasColumn('earnings', 'transaction_id')) {
             Schema::table('earnings', function (Blueprint $table) {
-                $foreignExists = collect(\DB::select("SHOW CREATE TABLE earnings"))->first();
+                $foreignExists = collect(DB::select('SHOW CREATE TABLE earnings'))->first();
                 if ($foreignExists && strpos($foreignExists->{'Create Table'} ?? '', 'transaction_id') !== false) {
-                    $indexExists = collect(\DB::select("SHOW INDEX FROM earnings WHERE Column_name = 'transaction_id'"))->isNotEmpty();
-                    if (!$indexExists || strpos($foreignExists->{'Create Table'} ?? '', 'transactions') === false) {
+                    $indexExists = collect(DB::select("SHOW INDEX FROM earnings WHERE Column_name = 'transaction_id'"))->isNotEmpty();
+                    if (! $indexExists || strpos($foreignExists->{'Create Table'} ?? '', 'transactions') === false) {
                         $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('set null');
                     }
                 }
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasColumn('earnings', 'transaction_id')) {
+        if (! Schema::hasColumn('earnings', 'transaction_id')) {
             return;
         }
         Schema::table('earnings', function (Blueprint $table) {

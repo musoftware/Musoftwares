@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class GoldWalletFactory extends Factory
 {
     protected $model = \Modules\GoldSavers\Models\GoldWallet::class;
+
     /**
      * Define the model's default state.
      *

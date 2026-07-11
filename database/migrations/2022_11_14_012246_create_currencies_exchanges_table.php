@@ -26,7 +26,7 @@ return new class extends Migration
 
             $table->float('rate', 13, 6);
 
-            $table->unique(array('date_string', 'currency1', 'currency2'));
+            $table->unique(['date_string', 'currency1', 'currency2']);
 
             $table->timestamps();
             $table->softDeletes();

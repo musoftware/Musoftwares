@@ -3,9 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\Invoice;
-use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class BalanceSheetTest extends TestCase
@@ -13,6 +12,7 @@ class BalanceSheetTest extends TestCase
     use RefreshDatabase;
 
     protected $admin;
+
     protected $clientUser;
 
     protected function setUp(): void
@@ -80,7 +80,7 @@ class BalanceSheetTest extends TestCase
     public function test_frontend_links_point_to_correct_route()
     {
         // Verify the route generates the correct URL
-        $expectedPath = '/admin/users/' . $this->clientUser->id . '/balance-sheet';
+        $expectedPath = '/admin/users/'.$this->clientUser->id.'/balance-sheet';
         $actualUrl = route('admin.users.balance-sheet', $this->clientUser->id, false);
 
         $this->assertEquals($expectedPath, $actualUrl);

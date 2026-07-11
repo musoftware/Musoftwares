@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\PointTransaction;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,12 +13,13 @@ class AdminPointsControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -85,7 +87,7 @@ class AdminPointsControllerTest extends TestCase
             'user_id' => $this->clientUser->id,
             'type' => 'earned',
             'points' => 10,
-            'description' => 'Test Transaction'
+            'description' => 'Test Transaction',
         ]);
 
         $response = $this->actingAs($this->admin)->get(route('admin.points.history', $this->clientUser->id));

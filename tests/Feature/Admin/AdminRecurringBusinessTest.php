@@ -5,10 +5,8 @@ namespace Tests\Feature\Admin;
 use App\Models\AdminSettings;
 use App\Models\CostTransaction;
 use App\Models\Currency;
-use App\Models\User;
 use App\Models\RecurringCost;
-use App\Models\RecurringIncome;
-use App\Models\RecurringSalary;
+use App\Models\User;
 use Database\Seeders\CurrenciesSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +17,9 @@ class AdminRecurringBusinessTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
+
     protected Currency $currency;
 
     protected function setUp(): void
@@ -70,7 +70,7 @@ class AdminRecurringBusinessTest extends TestCase
 
     public function test_admin_can_delete_recurring_cost(): void
     {
-        $rCost = new RecurringCost();
+        $rCost = new RecurringCost;
         $rCost->title = 'Server Sub';
         $rCost->amount = 50;
         $rCost->currency_id = 1;
@@ -139,7 +139,7 @@ class AdminRecurringBusinessTest extends TestCase
 
     public function test_recurring_cost_view_exposes_cost_transaction_id_for_each_transaction(): void
     {
-        $rc = new RecurringCost();
+        $rc = new RecurringCost;
         $rc->title = 'Server Sub';
         $rc->amount = 50;
         $rc->currency_id = $this->currency->id;
@@ -151,7 +151,7 @@ class AdminRecurringBusinessTest extends TestCase
         $rc->reason = 'server';
         $rc->save();
 
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->reason = 'server';
         $cost->amount = 50.00;
         $cost->currency_id = $this->currency->id;
@@ -160,7 +160,7 @@ class AdminRecurringBusinessTest extends TestCase
         $cost->save();
 
         $rc->transactions()->attach($cost->id, [
-            'unique_id' => $rc->id . '-' . now()->toDateString(),
+            'unique_id' => $rc->id.'-'.now()->toDateString(),
         ]);
 
         $response = $this->actingAs($this->admin)->get(route('admin.recurring_costs.view', $rc->id));

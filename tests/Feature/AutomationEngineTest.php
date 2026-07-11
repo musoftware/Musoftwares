@@ -2,17 +2,18 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\AutomationRule;
-use Modules\CRM\Models\Lead;
 use App\Events\LeadStageChanged;
+use App\Jobs\EvaluateAutomationRuleJob;
 use App\Jobs\ExecuteAutomationActionJob;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Mail;
+use App\Models\AutomationRule;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
+use Modules\CRM\Models\Lead;
+use Tests\TestCase;
 
 class AutomationEngineTest extends TestCase
 {
@@ -32,7 +33,7 @@ class AutomationEngineTest extends TestCase
             'conditions' => ['new_stage' => 'WON'],
             'actions' => [
                 ['type' => 'update_tag', 'target' => 'Winner'],
-                ['type' => 'send_email', 'target' => '', 'template' => 'You won!']
+                ['type' => 'send_email', 'target' => '', 'template' => 'You won!'],
             ],
             'is_active' => true,
         ]);
@@ -40,7 +41,7 @@ class AutomationEngineTest extends TestCase
         $event = new LeadStageChanged($lead, 'NEW', 'WON');
         event($event);
 
-        Queue::assertPushed(\App\Jobs\EvaluateAutomationRuleJob::class, function ($job) use ($rule) {
+        Queue::assertPushed(EvaluateAutomationRuleJob::class, function ($job) use ($rule) {
             return $job->rule->id === $rule->id;
         });
     }
@@ -77,7 +78,7 @@ class AutomationEngineTest extends TestCase
         $jobWebhook = new ExecuteAutomationActionJob($rule, ['type' => 'webhook', 'target' => 'https://example.com/hook'], $eventData);
         $jobWebhook->handle();
 
-        Http::assertSent(function (\Illuminate\Http\Client\Request $request) {
+        Http::assertSent(function (Request $request) {
             return $request->url() == 'https://example.com/hook';
         });
     }

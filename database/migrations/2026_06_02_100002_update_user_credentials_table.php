@@ -16,10 +16,10 @@ return new class extends Migration
 
         // Add missing columns to user_credentials
         Schema::table('user_credentials', function (Blueprint $table) {
-            if (!Schema::hasColumn('user_credentials', 'admin_id')) {
+            if (! Schema::hasColumn('user_credentials', 'admin_id')) {
                 $table->foreignId('admin_id')->nullable()->after('user_id')->constrained('users')->nullOnDelete();
             }
-            if (!Schema::hasColumn('user_credentials', 'is_pinned')) {
+            if (! Schema::hasColumn('user_credentials', 'is_pinned')) {
                 $table->boolean('is_pinned')->default(false)->after('note');
             }
         });

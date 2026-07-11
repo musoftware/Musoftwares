@@ -13,7 +13,7 @@ class CreateMerchantOrdersTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('merchant_orders')) {
+        if (! Schema::hasTable('merchant_orders')) {
             Schema::create('merchant_orders', function (Blueprint $table) {
                 $table->id();
 
@@ -30,7 +30,7 @@ class CreateMerchantOrdersTable extends Migration
                 $table->text('error')->nullable();
 
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
             });
         }
     }

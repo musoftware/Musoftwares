@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\CostTransaction;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,13 +15,14 @@ class AdminFinancialOperationsControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     private function createAdmin()
     {
         $admin = User::factory()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
+
         return $admin;
     }
 
@@ -28,6 +30,7 @@ class AdminFinancialOperationsControllerTest extends TestCase
     {
         $client = User::factory()->create(['onboarding_completed' => true]);
         $client->assignRole('client');
+
         return $client;
     }
 
@@ -76,12 +79,12 @@ class AdminFinancialOperationsControllerTest extends TestCase
     public function test_admin_can_delete_cost_transaction()
     {
         $admin = $this->createAdmin();
-        
+
         $cost = CostTransaction::forceCreate([
             'reason' => 'Test',
             'amount' => 100,
             'currency_id' => 1,
-            'business_amount' => 100
+            'business_amount' => 100,
         ]);
 
         $response = $this->actingAs($admin)->delete(route('admin.finance.destroy', ['entry' => $cost->id, 'type' => 'expense']));

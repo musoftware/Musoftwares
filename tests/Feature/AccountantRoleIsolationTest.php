@@ -14,7 +14,7 @@ class AccountantRoleIsolationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Ensure roles exist
         Role::firstOrCreate(['name' => 'admin']);
         Role::firstOrCreate(['name' => 'accountant']);

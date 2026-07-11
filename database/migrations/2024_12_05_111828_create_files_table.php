@@ -25,7 +25,6 @@ return new class extends Migration
             $table->string('url', 255);
             $table->bigInteger('size', false, true);
 
-
             $table->timestamps();
             $table->softDeletes();
         });

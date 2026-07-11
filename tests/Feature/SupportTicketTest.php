@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Ticket;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\Ticket;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class SupportTicketTest extends TestCase
@@ -14,14 +16,15 @@ class SupportTicketTest extends TestCase
     use RefreshDatabase;
 
     protected User $client;
+
     protected User $admin;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        $this->seed(RolesAndPermissionsSeeder::class);
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $this->client = User::factory()->create();
         $this->client->assignRole('client');
@@ -120,4 +123,3 @@ class SupportTicketTest extends TestCase
         $this->assertEquals('closed', $conversation->fresh()->status);
     }
 }
-

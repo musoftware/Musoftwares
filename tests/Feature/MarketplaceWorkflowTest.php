@@ -2,13 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\EnsureSubscriptionIsActive;
+use App\Models\Currency;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Marketplace\Models\ServiceCategory;
-use Modules\Marketplace\Models\Service;
-use Modules\Marketplace\Models\ServicePackage;
-use Modules\Marketplace\Models\ServiceOrder;
+use Modules\Marketplace\Enums\EscrowStatus;
+use Modules\Marketplace\Enums\ServiceOrderStatus;
 use Modules\Marketplace\Models\MarketplaceEscrow;
+use Modules\Marketplace\Models\Service;
+use Modules\Marketplace\Models\ServiceCategory;
+use Modules\Marketplace\Models\ServiceOrder;
+use Modules\Marketplace\Models\ServicePackage;
 use Tests\TestCase;
 
 class MarketplaceWorkflowTest extends TestCase
@@ -16,19 +22,22 @@ class MarketplaceWorkflowTest extends TestCase
     use RefreshDatabase;
 
     protected User $buyer;
+
     protected User $seller;
+
     protected User $admin;
+
     protected ServiceCategory $category;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withoutMiddleware(\App\Http\Middleware\EnsureSubscriptionIsActive::class);
-        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+        $this->withoutMiddleware(EnsureSubscriptionIsActive::class);
+        $this->withoutMiddleware(VerifyCsrfToken::class);
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
-        $usdCurrency = \App\Models\Currency::firstOrCreate(
+        $usdCurrency = Currency::firstOrCreate(
             ['currency' => 'USD'],
             ['symbol' => '$', 'string_format' => '$%01.2f']
         );
@@ -71,12 +80,12 @@ class MarketplaceWorkflowTest extends TestCase
                         'price' => 100.00,
                         'currency_id' => 1,
                         'delivery_days' => 5,
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
         if ($response->status() === 302) {
-            dump("REDIRECTED TO: " . $response->headers->get('Location'));
+            dump('REDIRECTED TO: '.$response->headers->get('Location'));
         }
 
         $this->assertDatabaseHas('marketplace_services', [
@@ -128,7 +137,9 @@ class MarketplaceWorkflowTest extends TestCase
 
         if ($response->status() !== 302 || session()->has('error') || session()->has('errors')) {
             dump(session()->all());
-            if (isset($response->exception)) dump($response->exception->getMessage());
+            if (isset($response->exception)) {
+                dump($response->exception->getMessage());
+            }
         }
         $response->assertStatus(302);
 
@@ -148,10 +159,10 @@ class MarketplaceWorkflowTest extends TestCase
         // Verification: Wallet deductions and escrow
         $this->assertEquals(500.00, $this->buyer->fresh()->user_balance);
         $this->assertEquals(100.00, $this->seller->fresh()->user_balance); // Seller gets nothing until complete
-        
+
         $escrow = MarketplaceEscrow::where('order_id', $order->id)->first();
         $this->assertNotNull($escrow);
-        $this->assertEquals(\Modules\Marketplace\Enums\EscrowStatus::HELD->value, is_object($escrow->status) ? $escrow->status->value : $escrow->status);
+        $this->assertEquals(EscrowStatus::HELD->value, is_object($escrow->status) ? $escrow->status->value : $escrow->status);
 
         // Verification: Conversation created
         $this->assertDatabaseHas('conversations', [
@@ -165,7 +176,7 @@ class MarketplaceWorkflowTest extends TestCase
             ->post(route('marketplace.orders.deliver', $order->id));
 
         $response->assertStatus(302);
-        $this->assertEquals(\Modules\Marketplace\Enums\ServiceOrderStatus::DELIVERED->value, is_object($order->fresh()->status) ? $order->fresh()->status->value : $order->fresh()->status);
+        $this->assertEquals(ServiceOrderStatus::DELIVERED->value, is_object($order->fresh()->status) ? $order->fresh()->status->value : $order->fresh()->status);
         $this->assertNotNull($order->fresh()->delivered_at);
 
         // 5. Buyer completes the service order
@@ -173,9 +184,9 @@ class MarketplaceWorkflowTest extends TestCase
             ->post(route('marketplace.orders.complete', $order->id));
 
         $response->assertStatus(302);
-        $this->assertEquals(\Modules\Marketplace\Enums\ServiceOrderStatus::COMPLETED->value, is_object($order->fresh()->status) ? $order->fresh()->status->value : $order->fresh()->status);
+        $this->assertEquals(ServiceOrderStatus::COMPLETED->value, is_object($order->fresh()->status) ? $order->fresh()->status->value : $order->fresh()->status);
         $this->assertNotNull($order->fresh()->completed_at);
-        
+
         // After completion, seller gets funds (price - 10% commission = 450)
         $this->assertEquals(550.00, $this->seller->fresh()->user_balance);
     }

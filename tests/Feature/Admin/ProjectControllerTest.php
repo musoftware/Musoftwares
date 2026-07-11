@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Project;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,13 +13,14 @@ class ProjectControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -103,7 +105,7 @@ class ProjectControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertTrue((bool)$project->fresh()->archived);
+        $this->assertTrue((bool) $project->fresh()->archived);
     }
 
     public function test_admin_can_restore_project(): void
@@ -119,7 +121,7 @@ class ProjectControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertFalse((bool)$project->fresh()->archived);
+        $this->assertFalse((bool) $project->fresh()->archived);
     }
 
     public function test_admin_can_delete_project(): void

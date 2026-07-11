@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('module_plans')) {
+        if (! Schema::hasTable('module_plans')) {
             Schema::create('module_plans', function (Blueprint $table) {
                 $table->id();
                 $table->string('module');          // erp, freelance, marketing, booking, etc.
@@ -18,14 +18,14 @@ return new class extends Migration
                 $table->json('features')->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
 
                 $table->index('module');
                 $table->index('is_active');
             });
         }
 
-        if (!Schema::hasTable('user_subscriptions')) {
+        if (! Schema::hasTable('user_subscriptions')) {
             Schema::create('user_subscriptions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
@@ -35,7 +35,7 @@ return new class extends Migration
                 $table->timestamp('expires_at')->nullable();
                 $table->boolean('auto_renew')->default(true);
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
 
                 $table->index(['user_id', 'status']);
                 $table->index('object');

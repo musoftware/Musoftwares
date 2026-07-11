@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class GoldMarketSourceFactory extends Factory
 {
     protected $model = \Modules\GoldSavers\app\Features\LivePrices\Models\GoldMarketSource::class;
+
     /**
      * Define the model's default state.
      *

@@ -9,8 +9,8 @@ use App\Models\ProjectFile;
 use App\Models\ProjectReport;
 use App\Models\Task;
 use App\Models\Todo;
-use App\Models\TodoChecklistItem;
 use App\Models\User;
+use App\Services\ProjectBoardService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -892,7 +892,7 @@ class ProjectBoardFullTest extends TestCase
         ]);
 
         $todayCards = collect(
-            app(\App\Services\ProjectBoardService::class)->cardsForDate($project, now(), applyFutureGating: false),
+            app(ProjectBoardService::class)->cardsForDate($project, now(), applyFutureGating: false),
         );
         $this->assertTrue(
             $todayCards->contains(fn ($c) => $c['type'] === 'todo' && $c['id'] === $todo->id),
@@ -911,7 +911,7 @@ class ProjectBoardFullTest extends TestCase
         );
 
         $todayCardsAfter = collect(
-            app(\App\Services\ProjectBoardService::class)->cardsForDate($project, now(), applyFutureGating: false),
+            app(ProjectBoardService::class)->cardsForDate($project, now(), applyFutureGating: false),
         );
         $this->assertFalse(
             $todayCardsAfter->contains(fn ($c) => $c['type'] === 'todo' && $c['id'] === $todo->id),
@@ -919,7 +919,7 @@ class ProjectBoardFullTest extends TestCase
         );
 
         $tomorrowCards = collect(
-            app(\App\Services\ProjectBoardService::class)->cardsForDate($project, now()->addDay(), applyFutureGating: false),
+            app(ProjectBoardService::class)->cardsForDate($project, now()->addDay(), applyFutureGating: false),
         );
         $this->assertTrue(
             $tomorrowCards->contains(fn ($c) => $c['type'] === 'todo' && $c['id'] === $todo->id),

@@ -3,6 +3,9 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use App\Models\UserSubscription;
+use App\Services\PricingService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,13 +14,14 @@ class UsersTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -83,7 +87,7 @@ class UsersTest extends TestCase
             'name' => 'Jane Doe',
             'email' => 'jane.doe@example.com',
             'role' => 'client',
-            'account_status' => 'active'
+            'account_status' => 'active',
         ]);
 
         $response->assertRedirect(route('admin.users.show', $this->clientUser->id));
@@ -138,6 +142,7 @@ class UsersTest extends TestCase
         $this->assertEquals($this->clientUser->id, auth()->id());
         $this->assertEquals($this->admin->id, session('impersonator_id'));
     }
+
     public function test_admin_can_view_create_subscription_page(): void
     {
         $response = $this->actingAs($this->admin)->get("/admin/users/{$this->clientUser->id}/subscriptions/create");
@@ -146,9 +151,9 @@ class UsersTest extends TestCase
 
     public function test_admin_can_activate_membership(): void
     {
-        $this->mock(\App\Services\PricingService::class, function ($mock) {
+        $this->mock(PricingService::class, function ($mock) {
             $mock->shouldReceive('getServiceItems')->andReturn([
-                ['id' => 'erp', 'name' => 'ERP']
+                ['id' => 'erp', 'name' => 'ERP'],
             ]);
         });
 
@@ -169,7 +174,7 @@ class UsersTest extends TestCase
 
     public function test_admin_can_update_membership(): void
     {
-        $subscription = \App\Models\UserSubscription::create([
+        $subscription = UserSubscription::create([
             'user_id' => $this->clientUser->id,
             'object' => 'erp',
             'status' => 'active',
@@ -194,7 +199,7 @@ class UsersTest extends TestCase
 
     public function test_admin_can_delete_membership(): void
     {
-        $subscription = \App\Models\UserSubscription::create([
+        $subscription = UserSubscription::create([
             'user_id' => $this->clientUser->id,
             'object' => 'erp',
             'status' => 'active',

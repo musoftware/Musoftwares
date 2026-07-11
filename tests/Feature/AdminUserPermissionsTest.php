@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class AdminUserPermissionsTest extends TestCase
@@ -11,14 +13,15 @@ class AdminUserPermissionsTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -35,9 +38,9 @@ class AdminUserPermissionsTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
         $freshUser = $this->clientUser->fresh();
-        
+
         $this->assertTrue($freshUser->hasRole('Admin') || $freshUser->hasRole('admin'));
         $this->assertFalse($freshUser->hasRole('Client') && $freshUser->hasRole('client'));
     }
@@ -61,8 +64,8 @@ class AdminUserPermissionsTest extends TestCase
             ]);
 
         $response->assertSessionHasErrors('role');
-        
-        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+        app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
         $freshAdmin = $this->admin->fresh();
         $this->assertTrue($freshAdmin->hasRole('Admin') || $freshAdmin->hasRole('admin'));
     }

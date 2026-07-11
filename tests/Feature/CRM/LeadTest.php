@@ -2,12 +2,14 @@
 
 namespace Tests\Feature\CRM;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
+use Illuminate\Support\Facades\Schema;
+use Inertia\Testing\AssertableInertia;
 use Modules\CRM\Models\Lead;
 use Modules\CRM\Models\Workspace;
+use Tests\TestCase;
 
 class LeadTest extends TestCase
 {
@@ -45,8 +47,8 @@ class LeadTest extends TestCase
         ]);
 
         // Create dummy whatsapp_channels table if missing to prevent SQLite foreign key constraint compile issues
-        if (!\Illuminate\Support\Facades\Schema::hasTable('whatsapp_channels')) {
-            \Illuminate\Support\Facades\Schema::create('whatsapp_channels', function ($table) {
+        if (! Schema::hasTable('whatsapp_channels')) {
+            Schema::create('whatsapp_channels', function ($table) {
                 $table->id();
                 $table->timestamps();
             });
@@ -61,9 +63,9 @@ class LeadTest extends TestCase
 
         Lead::factory()->create([
             'workspace_id' => $workspace->id,
-            'name' => 'John Doe'
+            'name' => 'John Doe',
         ]);
-        
+
         $this->actingAs($user)
             ->get(route('crm.leads.index'))
             ->assertStatus(200)
@@ -74,15 +76,15 @@ class LeadTest extends TestCase
     {
         [$user1, $workspace1] = $this->createUserWithWorkspaceAndSubscription();
         [$user2, $workspace2] = $this->createUserWithWorkspaceAndSubscription();
-        
+
         Lead::factory()->create(['workspace_id' => $workspace1->id, 'name' => 'Tenant 1 Lead']);
         Lead::factory()->create(['workspace_id' => $workspace2->id, 'name' => 'Tenant 2 Lead']);
-        
+
         $response = $this->actingAs($user1)
             ->get(route('crm.leads.index'))
             ->assertStatus(200);
-            
-        $response->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('CRM/Leads/Index')
             ->has('leads.data', 1)
             ->where('leads.data.0.name', 'Tenant 1 Lead')
@@ -94,7 +96,7 @@ class LeadTest extends TestCase
         [$user, $workspace] = $this->createUserWithWorkspaceAndSubscription();
 
         $lead = Lead::factory()->create(['workspace_id' => $workspace->id]);
-        
+
         $sequenceId = \DB::table('sequences')->insertGetId([
             'name' => 'Test Sequence',
             'trigger_type' => 'on_lead_creation',
@@ -111,15 +113,15 @@ class LeadTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        
+
         $this->assertDatabaseHas('sequence_states', ['assignable_id' => $lead->id]);
-        
+
         $lead->delete(); // Triggers the deleting event we added
-        
+
         $this->assertDatabaseMissing('sequence_states', [
             'assignable_type' => Lead::class,
             'assignable_id' => $lead->id,
-            'deleted_at' => null // Depending on softDeletes
+            'deleted_at' => null, // Depending on softDeletes
         ]);
     }
 }

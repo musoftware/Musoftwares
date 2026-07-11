@@ -24,7 +24,6 @@ class CreateNoteTagsTable extends Migration
 
             $table->string('value')->index();
 
-
             $table->timestamps();
             $table->softDeletes();
         });

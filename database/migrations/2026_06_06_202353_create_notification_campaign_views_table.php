@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('notification_campaign_views')) {
+        if (! Schema::hasTable('notification_campaign_views')) {
             Schema::create('notification_campaign_views', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('notification_campaign_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
                 $table->enum('type', ['view', 'click'])->default('view');
                 $table->timestamps();
-            $table->softDeletes();
+                $table->softDeletes();
             });
         }
     }

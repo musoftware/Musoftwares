@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,7 +21,7 @@ class DatabaseSeeder extends Seeder
             // PlatformPlanSeeder::class,
         ]);
 
-        $client = \App\Models\User::firstOrCreate(
+        $client = User::firstOrCreate(
             ['email' => 'client@example.com'],
             [
                 'name' => 'Client User',

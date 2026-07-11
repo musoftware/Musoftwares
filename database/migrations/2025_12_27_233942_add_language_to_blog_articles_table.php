@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('blog_articles', function (Blueprint $table) {
-            if (!Schema::hasColumn('blog_articles', 'language')) {
+            if (! Schema::hasColumn('blog_articles', 'language')) {
                 $table->string('language', 5)->default('en');
             }
-            if (!Schema::hasColumn('blog_articles', 'group_id')) {
+            if (! Schema::hasColumn('blog_articles', 'group_id')) {
                 $table->uuid('group_id')->nullable()->after('language'); // To group translations together
                 $table->index(['language', 'group_id']);
             }
@@ -35,7 +35,7 @@ return new class extends Migration
             if (Schema::hasColumn('blog_articles', 'group_id')) {
                 $columns[] = 'group_id';
             }
-            if (!empty($columns)) {
+            if (! empty($columns)) {
                 $table->dropColumn($columns);
             }
         });

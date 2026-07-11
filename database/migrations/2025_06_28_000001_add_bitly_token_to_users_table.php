@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'bitly_token')) {
+            if (! Schema::hasColumn('users', 'bitly_token')) {
                 $table->string('bitly_token')->nullable()->after('remember_token');
             }
         });

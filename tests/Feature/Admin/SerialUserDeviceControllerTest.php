@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\SerialDevice;
 use App\Models\SerialUserDevice;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,13 +14,14 @@ class SerialUserDeviceControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -54,7 +56,7 @@ class SerialUserDeviceControllerTest extends TestCase
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
             'status' => 'active',
-            'notes' => 'Test assignment'
+            'notes' => 'Test assignment',
         ]);
 
         $response->assertRedirect();
@@ -62,7 +64,7 @@ class SerialUserDeviceControllerTest extends TestCase
         $this->assertDatabaseHas('serial_user_devices', [
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
-            'notes' => 'Test assignment'
+            'notes' => 'Test assignment',
         ]);
     }
 
@@ -72,18 +74,18 @@ class SerialUserDeviceControllerTest extends TestCase
         $assignment = SerialUserDevice::create([
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $response = $this->actingAs($this->admin)->patch("/admin/serial-user-devices/{$assignment->id}/status", [
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('serial_user_devices', [
             'id' => $assignment->id,
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
     }
 
@@ -93,7 +95,7 @@ class SerialUserDeviceControllerTest extends TestCase
         $assignment = SerialUserDevice::create([
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $response = $this->actingAs($this->admin)->delete("/admin/serial-user-devices/{$assignment->id}");
@@ -101,7 +103,7 @@ class SerialUserDeviceControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseMissing('serial_user_devices', [
-            'id' => $assignment->id
+            'id' => $assignment->id,
         ]);
     }
 
@@ -117,34 +119,34 @@ class SerialUserDeviceControllerTest extends TestCase
         $assignment = SerialUserDevice::create([
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $response = $this->actingAs($this->admin)->patch("/admin/serial-user-devices/users/{$this->clientUser->id}/status", [
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('serial_user_devices', [
             'id' => $assignment->id,
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
     }
 
     public function test_admin_can_update_user_temp_valid()
     {
         $date = now()->addDays(7)->format('Y-m-d H:i:s');
-        
+
         $response = $this->actingAs($this->admin)->patch("/admin/serial-user-devices/users/{$this->clientUser->id}/temp-valid", [
-            'temp_valid_until' => $date
+            'temp_valid_until' => $date,
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('users', [
             'id' => $this->clientUser->id,
-            'temp_valid_until' => $date
+            'temp_valid_until' => $date,
         ]);
     }
 }

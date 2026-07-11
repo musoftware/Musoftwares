@@ -47,11 +47,11 @@ class OnboardingTest extends TestCase
 
         $response->assertSessionHasNoErrors();
         $response->assertRedirect();
-        
+
         $user->refresh();
         $this->assertEquals('United States', $user->country);
         $this->assertEquals('New York', $user->city);
-        $this->assertFalse((bool)$user->onboarding_completed);
+        $this->assertFalse((bool) $user->onboarding_completed);
     }
 
     public function test_user_can_complete_onboarding(): void
@@ -72,7 +72,7 @@ class OnboardingTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
 
         $user->refresh();
-        $this->assertTrue((bool)$user->onboarding_completed);
+        $this->assertTrue((bool) $user->onboarding_completed);
         $this->assertEquals('United States', $user->country);
         $this->assertEquals('New York', $user->city);
         $this->assertEquals('+15550000000', $user->mobile_1);

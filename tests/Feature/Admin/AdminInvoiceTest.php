@@ -2,18 +2,19 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
+use App\Models\Currency;
 use App\Models\Invoice;
-use App\Models\Project;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminInvoiceTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
@@ -25,7 +26,7 @@ class AdminInvoiceTest extends TestCase
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
 
-        $currency = \App\Models\Currency::first() ?? \App\Models\Currency::factory()->create();
+        $currency = Currency::first() ?? Currency::factory()->create();
         $this->clientUser = User::factory()->create([
             'onboarding_completed' => true,
             'currency_id' => $currency->id,
@@ -80,7 +81,7 @@ class AdminInvoiceTest extends TestCase
         $invoice = Invoice::createInvoice($this->clientUser, null, null);
 
         $response = $this->actingAs($this->admin)->post(route('admin.invoices.change-status', $invoice->id), [
-            'status' => 'partially_paid'
+            'status' => 'partially_paid',
         ]);
 
         $response->assertRedirect();

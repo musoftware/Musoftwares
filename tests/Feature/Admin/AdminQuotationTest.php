@@ -2,17 +2,18 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Contract;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminQuotationTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
@@ -30,7 +31,7 @@ class AdminQuotationTest extends TestCase
 
     public function test_admin_can_view_quotation_print(): void
     {
-        $contract = new Contract();
+        $contract = new Contract;
         $contract->user_id = $this->clientUser->id;
         $contract->total_amount = 100;
         $contract->currency_id = 1;
@@ -44,7 +45,7 @@ class AdminQuotationTest extends TestCase
 
     public function test_non_admin_cannot_view_quotation_print(): void
     {
-        $contract = new Contract();
+        $contract = new Contract;
         $contract->user_id = $this->clientUser->id;
         $contract->total_amount = 100;
         $contract->currency_id = 1;

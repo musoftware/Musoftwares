@@ -243,7 +243,14 @@ export default function ProjectBoard({
     const [todoForm, setTodoForm] = useState({ title: '', description: '', completed: false, checklist: [] as { id?: number; title: string; is_completed: boolean }[] });
     const [newCheckItem, setNewCheckItem] = useState('');
     const [fileForm, setFileForm] = useState<File | null>(null);
-    const [reportForm, setReportForm] = useState({ title: '', body: '', published_at: '' });
+    const [reportForm, setReportForm] = useState({
+        title: '',
+        body: '',
+        published_at: '',
+        period_start: '',
+        period_end: '',
+    });
+    const [generatingReportDraft, setGeneratingReportDraft] = useState(false);
     const [viewingCard, setViewingCard] = useState<BoardCard | null>(null);
     const [uploading, setUploading] = useState(false);
     const [highlightedCardKey, setHighlightedCardKey] = useState<string | null>(null);
@@ -605,7 +612,14 @@ export default function ProjectBoard({
         setTaskForm({ task_name: '', task_description: '', priority: 'normal' });
         setTodoForm({ title: '', description: '', completed: false, checklist: [] });
         setFileForm(null);
-        setReportForm({ title: '', body: '', published_at: date });
+        const currentLocalTimeStr = new Date().toTimeString().slice(0, 5); // "13:46"
+        setReportForm({
+            title: '',
+            body: '',
+            published_at: `${date}T${currentLocalTimeStr}`,
+            period_start: `${date}T09:00`,
+            period_end: `${date}T17:00`
+        });
         setActiveModal({ type, action: 'create' });
     };
 
@@ -617,7 +631,13 @@ export default function ProjectBoard({
         } else if (card.type === 'todo') {
             setTodoForm({ title: card.title, description: card.description || '', completed: !!card.completed, checklist: card.checklist || [] });
         } else if (card.type === 'report') {
-            setReportForm({ title: card.title, body: card.description || '', published_at: card.published_at ? card.published_at.slice(0, 10) : date });
+            setReportForm({
+                title: card.title,
+                body: card.body || card.description || '',
+                published_at: card.published_at ? card.published_at.slice(0, 16) : `${date}T12:00`,
+                period_start: card.period_start ? card.period_start.slice(0, 16) : '',
+                period_end: card.period_end ? card.period_end.slice(0, 16) : '',
+            });
         }
         setActiveModal({ type: card.type as any, action: 'edit', cardId: card.id });
     };
@@ -756,6 +776,35 @@ export default function ProjectBoard({
                 toast.success(isEdit ? __('general.report_updated') : __('general.report_added'));
             })
             .catch(() => toast.error(__('general.error') || 'Failed to save report.'));
+    };
+
+    const handleAiGenerateReport = () => {
+        if (!reportForm.period_start || !reportForm.period_end) {
+            toast.error('Please specify Period Start and Period End times.');
+            return;
+        }
+        setGeneratingReportDraft(true);
+        axios.post(route('board.reports.generate-draft', { project: projectId }), {
+            period_start: reportForm.period_start,
+            period_end: reportForm.period_end,
+        })
+        .then(({ data }) => {
+            if (data.draft) {
+                setReportForm(prev => ({
+                    ...prev,
+                    body: data.draft,
+                    title: prev.title || data.suggested_title || ''
+                }));
+                toast.success('Report draft generated successfully with AI!');
+            }
+        })
+        .catch((err) => {
+            const msg = err.response?.data?.error || 'Failed to generate report draft.';
+            toast.error(msg);
+        })
+        .finally(() => {
+            setGeneratingReportDraft(false);
+        });
     };
 
     const handleDeleteCard = (card: BoardCard) => {
@@ -1581,6 +1630,43 @@ export default function ProjectBoard({
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600">Period Start (Date & Time)</Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={reportForm.period_start}
+                                    onChange={(e) => setReportForm({ ...reportForm, period_start: e.target.value })}
+                                    className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600">Period End (Date & Time)</Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={reportForm.period_end}
+                                    onChange={(e) => setReportForm({ ...reportForm, period_end: e.target.value })}
+                                    className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between bg-slate-50/50 border border-slate-100 rounded-xl p-3">
+                            <div className="text-[11px] text-slate-500 max-w-md">
+                                Provide a custom date & time range above to automatically summarize project tasks, todos, notes, and file updates with AI.
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleAiGenerateReport}
+                                disabled={generatingReportDraft || !reportForm.period_start || !reportForm.period_end}
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                            >
+                                <Sparkles className="h-3.5 w-3.5" />
+                                {generatingReportDraft ? 'Generating...' : 'Draft with AI'}
+                            </button>
+                        </div>
+
                         <div className="space-y-1">
                             <Label className="text-xs font-bold text-slate-600">Report Body (Markdown Supported)</Label>
                             <Textarea
@@ -1631,6 +1717,19 @@ export default function ProjectBoard({
                                             <p className="mt-1 text-xs text-slate-400">
                                                 {viewingCard.published_at && new Date(viewingCard.published_at).toLocaleString()}
                                             </p>
+                                        )}
+                                        {viewingCard.type === 'report' && (viewingCard.period_start || viewingCard.period_end) && (
+                                            <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 font-semibold bg-slate-50/80 border border-slate-100 rounded-lg px-2.5 py-1 w-fit">
+                                                <CalendarDays className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                                                <span>Report Period:</span>
+                                                <span className="font-mono text-slate-700">
+                                                    {viewingCard.period_start ? new Date(viewingCard.period_start).toLocaleString() : 'N/A'}
+                                                </span>
+                                                <span className="text-slate-300">→</span>
+                                                <span className="font-mono text-slate-700">
+                                                    {viewingCard.period_end ? new Date(viewingCard.period_end).toLocaleString() : 'N/A'}
+                                                </span>
+                                            </div>
                                         )}
                                     </DialogHeader>
                                 </div>

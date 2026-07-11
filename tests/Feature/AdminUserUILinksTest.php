@@ -3,8 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AdminUserUILinksTest extends TestCase
@@ -12,6 +13,7 @@ class AdminUserUILinksTest extends TestCase
     use RefreshDatabase;
 
     protected $admin;
+
     protected $clientUser;
 
     protected function setUp(): void
@@ -45,9 +47,9 @@ class AdminUserUILinksTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.users.index', [
             'page' => 1,
-            'search' => 'dina'
+            'search' => 'dina',
         ]));
-        
+
         $response->assertStatus(200);
     }
 
@@ -115,7 +117,7 @@ class AdminUserUILinksTest extends TestCase
 
     public function test_admin_can_view_earning_analyze_page()
     {
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
+        if (DB::getDriverName() === 'sqlite') {
             $this->markTestSkipped('Earning analyze uses UNIX_TIMESTAMP which is not supported by sqlite.');
         }
 
@@ -138,25 +140,25 @@ class AdminUserUILinksTest extends TestCase
 
     public function test_admin_can_view_invoice_create_for_user()
     {
-        $response = $this->actingAs($this->admin)->get('/admin/invoices/create?user=' . $this->clientUser->id);
+        $response = $this->actingAs($this->admin)->get('/admin/invoices/create?user='.$this->clientUser->id);
         $response->assertRedirect();
     }
 
     public function test_admin_can_view_transaction_create_for_user()
     {
-        $response = $this->actingAs($this->admin)->get('/admin/transactions/create?user=' . $this->clientUser->id . '&type=receive');
+        $response = $this->actingAs($this->admin)->get('/admin/transactions/create?user='.$this->clientUser->id.'&type=receive');
         $response->assertStatus(200);
     }
 
     public function test_admin_can_view_user_invoices()
     {
-        $response = $this->actingAs($this->admin)->get('/admin/invoices?client_id=' . $this->clientUser->id);
+        $response = $this->actingAs($this->admin)->get('/admin/invoices?client_id='.$this->clientUser->id);
         $response->assertStatus(200);
     }
 
     public function test_admin_can_view_user_transactions()
     {
-        $response = $this->actingAs($this->admin)->get('/admin/transactions?user=' . $this->clientUser->id);
+        $response = $this->actingAs($this->admin)->get('/admin/transactions?user='.$this->clientUser->id);
         $response->assertStatus(200);
     }
 }

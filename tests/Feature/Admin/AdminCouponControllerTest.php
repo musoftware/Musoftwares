@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Coupon;
 use App\Models\Currency;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,13 +14,15 @@ class AdminCouponControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
+
     protected Currency $currency;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -30,7 +33,7 @@ class AdminCouponControllerTest extends TestCase
         $this->currency = Currency::create([
             'currency' => 'USD',
             'symbol' => '$',
-            'string_format' => '%v $'
+            'string_format' => '%v $',
         ]);
     }
 
@@ -81,7 +84,7 @@ class AdminCouponControllerTest extends TestCase
     {
         $coupon = Coupon::create([
             'name' => 'Test',
-            'code' => 'TEST' . rand(100,999),
+            'code' => 'TEST'.rand(100, 999),
             'type' => 'fixed',
             'discount_amount' => 5,
             'currency_id' => $this->currency->id,
@@ -95,7 +98,7 @@ class AdminCouponControllerTest extends TestCase
     {
         $coupon = Coupon::create([
             'name' => 'Old Name',
-            'code' => 'OLD_CODE_' . rand(100, 999),
+            'code' => 'OLD_CODE_'.rand(100, 999),
             'type' => 'fixed',
             'discount_amount' => 5,
             'currency_id' => $this->currency->id,
@@ -103,7 +106,7 @@ class AdminCouponControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->put(route('admin.coupons.update', $coupon->id), [
             'name' => 'New Name',
-            'code' => 'NEW_CODE_' . rand(100, 999),
+            'code' => 'NEW_CODE_'.rand(100, 999),
             'type' => 'fixed',
             'discount_amount' => 10,
             'currency' => $this->currency->id,
@@ -123,7 +126,7 @@ class AdminCouponControllerTest extends TestCase
     {
         $coupon = Coupon::create([
             'name' => 'To Delete',
-            'code' => 'DELETE_CODE_' . rand(100, 999),
+            'code' => 'DELETE_CODE_'.rand(100, 999),
             'type' => 'fixed',
             'currency_id' => $this->currency->id,
         ]);

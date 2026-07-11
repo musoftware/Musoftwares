@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\GuestTicket;
-use App\Models\GuestTicketMessage;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -24,7 +24,7 @@ class GuestTicketSubmissionEmailTest extends TestCase
 
     public function test_public_submission_sends_confirmation_and_notification(): void
     {
-        $admin = \App\Models\User::factory()->create();
+        $admin = User::factory()->create();
         $admin->assignRole('admin');
 
         $response = $this->post(route('guest-tickets.submit'), [

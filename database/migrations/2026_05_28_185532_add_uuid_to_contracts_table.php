@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('contracts', 'uuid')) {
+        if (! Schema::hasColumn('contracts', 'uuid')) {
             Schema::table('contracts', function (Blueprint $table) {
                 $table->uuid('uuid')->nullable()->after('id')->unique();
             });

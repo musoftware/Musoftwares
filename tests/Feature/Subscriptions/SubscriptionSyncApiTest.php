@@ -40,9 +40,9 @@ class SubscriptionSyncApiTest extends TestCase
         $response->assertStatus(200);
 
         $data = $response->json('data');
-        
+
         $this->assertArrayHasKey($user->id, $data);
-        
+
         // Assert that the active gold-saver subscription is prioritized and returned
         $this->assertEquals('active', $data[$user->id]['gold-saver']['status'] ?? 'cancelled', 'Failed: expected the active subscription to be prioritized over the cancelled one.');
     }

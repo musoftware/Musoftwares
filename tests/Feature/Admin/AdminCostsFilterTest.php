@@ -2,10 +2,14 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RemoveSecurityHeaders;
+use App\Http\Middleware\SecurityEnforcement;
+use App\Http\Middleware\SetLocale;
 use App\Models\AdminSettings;
 use App\Models\CostTransaction;
 use App\Models\Currency;
-use App\Models\Project;
 use App\Models\RecurringCost;
 use App\Models\User;
 use Database\Seeders\CurrenciesSeeder;
@@ -29,11 +33,11 @@ class AdminCostsFilterTest extends TestCase
 
         $this->withoutMiddleware([
             VerifyCsrfToken::class,
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \App\Http\Middleware\SecurityEnforcement::class,
-            \App\Http\Middleware\RemoveSecurityHeaders::class,
-            \App\Http\Middleware\SetLocale::class,
-            \App\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            HandleInertiaRequests::class,
+            SecurityEnforcement::class,
+            RemoveSecurityHeaders::class,
+            SetLocale::class,
+            AddLinkHeadersForPreloadedAssets::class,
         ]);
 
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -51,7 +55,7 @@ class AdminCostsFilterTest extends TestCase
 
     private function makeCost(string $reason, float $amount, $createdAt): CostTransaction
     {
-        $c = new CostTransaction();
+        $c = new CostTransaction;
         $c->reason = $reason;
         $c->amount = $amount;
         $c->currency_id = $this->currency->id;
@@ -121,7 +125,7 @@ class AdminCostsFilterTest extends TestCase
 
     public function test_recurring_cost_generated_transactions_appear_on_costs_page_with_recurring_flag(): void
     {
-        $rc = new RecurringCost();
+        $rc = new RecurringCost;
         $rc->title = 'Server Sub';
         $rc->amount = 50;
         $rc->currency_id = $this->currency->id;
@@ -134,7 +138,7 @@ class AdminCostsFilterTest extends TestCase
         $rc->save();
 
         $cost = $this->makeCost('server', 50.00, now());
-        $rc->transactions()->attach($cost->id, ['unique_id' => $rc->id . '-' . now()->toDateString()]);
+        $rc->transactions()->attach($cost->id, ['unique_id' => $rc->id.'-'.now()->toDateString()]);
 
         $response = $this->actingAs($this->admin)->get(route('admin.costs.index', [
             'year' => now()->year,

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,11 +13,13 @@ return new class extends Migration
     public function up(): void
     {
         try {
-            \Illuminate\Support\Facades\DB::statement('ALTER TABLE tasks DROP FOREIGN KEY tasks_swimlane_id_foreign');
-        } catch (\Exception $e) {}
+            DB::statement('ALTER TABLE tasks DROP FOREIGN KEY tasks_swimlane_id_foreign');
+        } catch (Exception $e) {
+        }
         try {
-            \Illuminate\Support\Facades\DB::statement('ALTER TABLE tasks DROP FOREIGN KEY tasks_swinlane_id_foreign');
-        } catch (\Exception $e) {}
+            DB::statement('ALTER TABLE tasks DROP FOREIGN KEY tasks_swinlane_id_foreign');
+        } catch (Exception $e) {
+        }
 
         if (Schema::hasColumn('tasks', 'swimlane_id')) {
             Schema::table('tasks', function (Blueprint $table) {

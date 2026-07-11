@@ -3,11 +3,11 @@
 namespace Tests\Feature\Booking\WhiteLabel;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Modules\Booking\app\Features\WhiteLabel\Services\BookingWhiteLabelService;
-use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelSetting;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Cache;
+use Modules\Booking\app\Features\WhiteLabel\Events\WhiteLabelThemeUpdated;
+use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelSetting;
+use Modules\Booking\app\Features\WhiteLabel\Services\BookingWhiteLabelService;
+use Tests\TestCase;
 
 class BookingWhiteLabelServiceTest extends TestCase
 {
@@ -36,7 +36,7 @@ class BookingWhiteLabelServiceTest extends TestCase
     public function test_it_updates_settings_and_flushes_cache()
     {
         Event::fake();
-        
+
         $tenantId = 1;
         $this->service->getSettings($tenantId);
 
@@ -50,6 +50,6 @@ class BookingWhiteLabelServiceTest extends TestCase
         $this->assertEquals('#ff0000', $settings->primary_color);
         $this->assertTrue($settings->is_active);
 
-        Event::assertDispatched(\Modules\Booking\app\Features\WhiteLabel\Events\WhiteLabelThemeUpdated::class);
+        Event::assertDispatched(WhiteLabelThemeUpdated::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class TenantClientUserIdBackfillTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     public function test_backfill_matches_clients_by_email(): void
@@ -25,17 +26,17 @@ class TenantClientUserIdBackfillTest extends TestCase
 
         $tenant = Tenant::create([
             'user_id' => $user->id,
-            'name'    => 'Test Tenant',
-            'status'  => 'active',
+            'name' => 'Test Tenant',
+            'status' => 'active',
         ]);
 
         // Insert a tenant_client with same email but no user_id
         $clientId = DB::table('erp_tenant_clients')->insertGetId([
-            'tenant_id'  => $tenant->id,
-            'name'       => 'Matched Client',
-            'email'      => 'match@example.com',
-            'currency_id'=> 1,
-            'user_id'    => null,
+            'tenant_id' => $tenant->id,
+            'name' => 'Matched Client',
+            'email' => 'match@example.com',
+            'currency_id' => 1,
+            'user_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -46,7 +47,7 @@ class TenantClientUserIdBackfillTest extends TestCase
 
         // user_id should now be populated
         $this->assertDatabaseHas('erp_tenant_clients', [
-            'id'      => $clientId,
+            'id' => $clientId,
             'user_id' => $user->id,
         ]);
     }
@@ -57,16 +58,16 @@ class TenantClientUserIdBackfillTest extends TestCase
 
         $tenant = Tenant::create([
             'user_id' => $user->id,
-            'name'    => 'Orphan Tenant',
-            'status'  => 'active',
+            'name' => 'Orphan Tenant',
+            'status' => 'active',
         ]);
 
         $clientId = DB::table('erp_tenant_clients')->insertGetId([
-            'tenant_id'  => $tenant->id,
-            'name'       => 'Orphan Client',
-            'email'      => 'nobody@nonexistent.com', // no user with this email
-            'currency_id'=> 1,
-            'user_id'    => null,
+            'tenant_id' => $tenant->id,
+            'name' => 'Orphan Client',
+            'email' => 'nobody@nonexistent.com', // no user with this email
+            'currency_id' => 1,
+            'user_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -75,7 +76,7 @@ class TenantClientUserIdBackfillTest extends TestCase
 
         // user_id should still be null
         $this->assertDatabaseHas('erp_tenant_clients', [
-            'id'      => $clientId,
+            'id' => $clientId,
             'user_id' => null,
         ]);
     }
@@ -86,16 +87,16 @@ class TenantClientUserIdBackfillTest extends TestCase
 
         $tenant = Tenant::create([
             'user_id' => $user->id,
-            'name'    => 'Dry Tenant',
-            'status'  => 'active',
+            'name' => 'Dry Tenant',
+            'status' => 'active',
         ]);
 
         $clientId = DB::table('erp_tenant_clients')->insertGetId([
-            'tenant_id'  => $tenant->id,
-            'name'       => 'Dry Client',
-            'email'      => 'dryrun@example.com',
-            'currency_id'=> 1,
-            'user_id'    => null,
+            'tenant_id' => $tenant->id,
+            'name' => 'Dry Client',
+            'email' => 'dryrun@example.com',
+            'currency_id' => 1,
+            'user_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -104,7 +105,7 @@ class TenantClientUserIdBackfillTest extends TestCase
 
         // user_id must remain null in dry-run mode
         $this->assertDatabaseHas('erp_tenant_clients', [
-            'id'      => $clientId,
+            'id' => $clientId,
             'user_id' => null,
         ]);
     }
@@ -115,17 +116,17 @@ class TenantClientUserIdBackfillTest extends TestCase
 
         $tenant = Tenant::create([
             'user_id' => $user->id,
-            'name'    => 'Already Linked',
-            'status'  => 'active',
+            'name' => 'Already Linked',
+            'status' => 'active',
         ]);
 
         // Client already has user_id set
         DB::table('erp_tenant_clients')->insertGetId([
-            'tenant_id'  => $tenant->id,
-            'name'       => 'Already Linked Client',
-            'email'      => 'already@example.com',
-            'currency_id'=> 1,
-            'user_id'    => $user->id, // already set
+            'tenant_id' => $tenant->id,
+            'name' => 'Already Linked Client',
+            'email' => 'already@example.com',
+            'currency_id' => 1,
+            'user_id' => $user->id, // already set
             'created_at' => now(),
             'updated_at' => now(),
         ]);

@@ -19,23 +19,23 @@ class GuestTicketInboxTest extends TestCase
             'MIME-Version: 1.0',
             'Content-Type: text/plain; charset=UTF-8',
             'Content-Transfer-Encoding: quoted-printable',
-            'Date: ' . date('r'),
-            'From: ' . $from,
+            'Date: '.date('r'),
+            'From: '.$from,
             'To: admin@musoftwares.com',
-            'Subject: ' . $subject,
+            'Subject: '.$subject,
         ];
 
         if ($inReplyTo) {
-            $headers[] = 'In-Reply-To: ' . $inReplyTo;
+            $headers[] = 'In-Reply-To: '.$inReplyTo;
         }
         if ($references) {
-            $headers[] = 'References: ' . $references;
+            $headers[] = 'References: '.$references;
         }
-        $headers[] = 'Message-ID: <test-' . uniqid() . '@example.com>';
+        $headers[] = 'Message-ID: <test-'.uniqid().'@example.com>';
 
         $encodedBody = quoted_printable_encode($body);
 
-        return implode("\r\n", $headers) . "\r\n\r\n" . $encodedBody;
+        return implode("\r\n", $headers)."\r\n\r\n".$encodedBody;
     }
 
     public function test_matches_by_in_reply_to_header(): void
@@ -94,7 +94,7 @@ class GuestTicketInboxTest extends TestCase
 
         $raw = $this->buildRfc822(
             'Guest <guest2@example.com>',
-            '[GuestTicket#' . $ticket->id . '] Help',
+            '[GuestTicket#'.$ticket->id.'] Help',
             'Tag-match me'
         );
 

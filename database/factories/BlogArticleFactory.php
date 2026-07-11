@@ -13,7 +13,7 @@ class BlogArticleFactory extends Factory
     public function definition(): array
     {
         $title = $this->faker->sentence();
-        
+
         return [
             'service_id' => null, // or a service factory if needed
             'language' => $this->faker->randomElement(['en', 'ar']),

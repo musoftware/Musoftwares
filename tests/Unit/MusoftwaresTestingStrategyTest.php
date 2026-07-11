@@ -2,14 +2,14 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
 class MusoftwaresTestingStrategyTest extends TestCase
 {
     /**
      * Test the basic environment setup as per Musoftwares Testing Strategy.
-     * The strategy requires tests to be run in 'testing' environment 
+     * The strategy requires tests to be run in 'testing' environment
      * using an in-memory SQLite database.
      */
     public function test_testing_strategy_environment_is_correct()

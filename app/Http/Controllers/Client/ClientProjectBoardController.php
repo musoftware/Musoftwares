@@ -23,6 +23,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\AdminSettings;
+use Illuminate\Support\Facades\Http;
 
 class ClientProjectBoardController extends Controller
 {
@@ -341,6 +343,8 @@ class ClientProjectBoardController extends Controller
             'published_at' => 'nullable|date',
             'lane' => 'nullable|string',
             'category_id' => 'nullable|integer|exists:project_board_categories,id',
+            'period_start' => 'nullable|date',
+            'period_end' => 'nullable|date|after_or_equal:period_start',
         ]);
 
         $date = $data['for_date'];
@@ -350,6 +354,8 @@ class ClientProjectBoardController extends Controller
             'title' => $data['title'],
             'body' => $data['body'],
             'published_at' => $data['published_at'] ?? now(),
+            'period_start' => $data['period_start'] ?? null,
+            'period_end' => $data['period_end'] ?? null,
         ]);
 
         $categoryId = $this->resolveCategoryId($project, $request->input('category_id'));
@@ -371,12 +377,16 @@ class ClientProjectBoardController extends Controller
             'title' => 'required|string|max:255',
             'body' => 'required|string',
             'published_at' => 'nullable|date',
+            'period_start' => 'nullable|date',
+            'period_end' => 'nullable|date|after_or_equal:period_start',
         ]);
 
         $report->update([
             'title' => $data['title'],
             'body' => $data['body'],
             'published_at' => $data['published_at'] ?? $report->published_at,
+            'period_start' => $data['period_start'] ?? null,
+            'period_end' => $data['period_end'] ?? null,
         ]);
 
         $placement = ProjectBoardItem::where('project_id', $project->id)
@@ -920,6 +930,8 @@ class ClientProjectBoardController extends Controller
             'pos_y' => $placement->pos_y ?? 24,
             'sort' => (int) ($placement->sort ?? 0),
             'published_at' => optional($report->published_at)->toIso8601String(),
+            'period_start' => $report->period_start ? $report->period_start->toIso8601String() : null,
+            'period_end' => $report->period_end ? $report->period_end->toIso8601String() : null,
             'comments_count' => (int) $report->comments()->count(),
         ] + $this->categoryPayload($placement);
     }
@@ -965,5 +977,152 @@ class ClientProjectBoardController extends Controller
         abort_unless($exists, 422, __('general.invalid_board_category'));
 
         return $id;
+    }
+
+    public function generateReportDraft(Request $request, Project $project)
+    {
+        $this->authorizeProject($project);
+
+        $request->validate([
+            'period_start' => 'required|date',
+            'period_end' => 'required|date|after_or_equal:period_start',
+        ]);
+
+        $start = Carbon::parse($request->input('period_start'));
+        $end = Carbon::parse($request->input('period_end'));
+
+        // Query project activities modified/created in range
+        $tasks = $project->tasks()
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])
+                      ->orWhereBetween('updated_at', [$start, $end]);
+            })
+            ->get();
+
+        $todos = $project->todos()
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])
+                      ->orWhereBetween('updated_at', [$start, $end]);
+            })
+            ->get();
+
+        $notes = $project->boardNotes()
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])
+                      ->orWhereBetween('updated_at', [$start, $end]);
+            })
+            ->get();
+
+        $files = $project->files()
+            ->whereBetween('created_at', [$start, $end])
+            ->get();
+
+        if ($tasks->isEmpty() && $todos->isEmpty() && $notes->isEmpty() && $files->isEmpty()) {
+            return response()->json([
+                'suggested_title' => 'Progress Report (' . $start->format('M d, Y') . ')',
+                'draft' => "## Progress Summary\nNo tasks, todos, or updates were recorded on the board in the specified timeframe (" . $start->toDayDateTimeString() . " to " . $end->toDayDateTimeString() . ").",
+            ]);
+        }
+
+        // Build the prompt for AI
+        $prompt = "You are a professional project manager. Summarize the following activities for the project '{$project->project_name}' that occurred between {$start} and {$end} into a professional progress report.\n\nActivities:\n";
+
+        if ($tasks->isNotEmpty()) {
+            $prompt .= "\n### Tasks Updated or Created:\n";
+            foreach ($tasks as $t) {
+                $prompt .= "- Name: {$t->task_name} (Priority: {$t->priority})\n";
+                if ($t->task_description) {
+                    $prompt .= "  Description: {$t->task_description}\n";
+                }
+            }
+        }
+
+        if ($todos->isNotEmpty()) {
+            $prompt .= "\n### Todos / Milestones:\n";
+            foreach ($todos as $todo) {
+                $status = $todo->completed ? 'Completed' : 'Pending';
+                $prompt .= "- [{$status}] Title: {$todo->title}\n";
+                if ($todo->description) {
+                    $prompt .= "  Description: {$todo->description}\n";
+                }
+            }
+        }
+
+        if ($notes->isNotEmpty()) {
+            $prompt .= "\n### Sticky Notes / Quick Updates:\n";
+            foreach ($notes as $note) {
+                $titleText = $note->title ? $note->title : 'Note';
+                $prompt .= "- {$titleText}: {$note->body}\n";
+            }
+        }
+
+        if ($files->isNotEmpty()) {
+            $prompt .= "\n### Uploaded Files:\n";
+            foreach ($files as $file) {
+                $prompt .= "- File: {$file->original_name} (Mime: {$file->mime})\n";
+            }
+        }
+
+        $prompt .= "\nGuidelines:
+- Format the response professionally using markdown syntax (e.g., clear headers like ## Accomplishments, ## Status of Milestones, ## Notes, bullet points, checklists).
+- Write the text in the same language as the input activities (usually Arabic or English) and use a professional, clear, corporate tone suitable for a client report.
+- Do not output JSON, html tags, backticks, or any markdown code blocks (e.g. do not wrap the response in ```markdown). Output ONLY the raw markdown content for the report.";
+
+        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
+
+        if ($defaultProvider === 'openai') {
+            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
+        } else {
+            $apiKey = AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
+            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
+        }
+
+        if (empty($apiKey)) {
+            return response()->json([
+                'error' => "AI integration is not configured. Please set your {$defaultProvider} API key in admin settings.",
+            ], 400);
+        }
+
+        try {
+            if ($defaultProvider === 'openai') {
+                $response = Http::timeout(60)->withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json',
+                ])->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are a helpful project manager assistant.'],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => 0.7,
+                ]);
+                $draft = $response->json()['choices'][0]['message']['content'] ?? '';
+            } else {
+                $response = Http::timeout(60)->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
+                    'contents' => [
+                        ['role' => 'user', 'parts' => [['text' => $prompt]]],
+                    ],
+                ]);
+                $draft = $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            }
+
+            // Cleanup any wrapped markdown code blocks if the AI model outputted them despite instructions
+            $draft = preg_replace('/^```markdown\s*/i', '', $draft);
+            $draft = preg_replace('/^```\s*/i', '', $draft);
+            $draft = preg_replace('/```$/', '', $draft);
+            $draft = trim($draft);
+
+            return response()->json([
+                'suggested_title' => 'Progress Report (' . $start->format('M d, Y') . ')',
+                'draft' => $draft,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'AI Generation failed: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\DeviceToken;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         // Move existing valid tokens from users table to device_tokens
-        $users = \App\Models\User::whereNotNull('fcm_token')->where('fcm_token', '!=', '')->get();
-        
+        $users = User::whereNotNull('fcm_token')->where('fcm_token', '!=', '')->get();
+
         foreach ($users as $user) {
-            \App\Models\DeviceToken::firstOrCreate([
+            DeviceToken::firstOrCreate([
                 'user_id' => $user->id,
                 'token' => $user->fcm_token,
             ]);

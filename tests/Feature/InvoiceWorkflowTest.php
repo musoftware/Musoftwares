@@ -2,12 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SubscriptionMiddleware;
+use App\Models\Currency;
 use App\Models\User;
+use Database\Seeders\CurrenciesSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\ERP\Models\Invoice;
+use Modules\ERP\Models\Project;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
-use Modules\ERP\Models\Invoice;
-use App\Models\Currency;
+use Modules\ERP\Models\WalletTransaction;
 use Tests\TestCase;
 
 class InvoiceWorkflowTest extends TestCase
@@ -15,10 +20,14 @@ class InvoiceWorkflowTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Tenant $tenant;
+
     protected TenantClient $client;
+
     protected Currency $currency;
-    protected \Modules\ERP\Models\Project $project;
+
+    protected Project $project;
 
     protected function setUp(): void
     {
@@ -27,8 +36,8 @@ class InvoiceWorkflowTest extends TestCase
         config(['erp.platform_tenant_id' => 999]);
 
         // Re-run permission seeding and currency seeding
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $this->seed(\Database\Seeders\CurrenciesSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(CurrenciesSeeder::class);
 
         $this->currency = Currency::firstOrCreate(
             ['currency' => 'USD'],
@@ -59,7 +68,7 @@ class InvoiceWorkflowTest extends TestCase
             'address' => '123 Main St, Anytown',
         ]);
 
-        $this->project = \Modules\ERP\Models\Project::create([
+        $this->project = Project::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
             'name' => 'Acme Website Redesign',
@@ -73,7 +82,7 @@ class InvoiceWorkflowTest extends TestCase
     public function test_can_view_invoices_index(): void
     {
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->get(route('erp.invoices.index'));
 
@@ -105,25 +114,25 @@ class InvoiceWorkflowTest extends TestCase
                     'description' => 'Laravel REST API integration',
                     'unit_price' => 150.00,
                     'quantity' => 4,
-                ]
+                ],
             ],
             'costs' => [
                 [
                     'title' => 'Domain Purchase',
                     'amount' => 15.00,
-                ]
-            ]
+                ],
+            ],
         ];
 
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->post(route('erp.invoices.store'), $postData);
         if ($response->status() !== 201 && $response->status() !== 302 && $response->status() !== 200) {
             @mkdir('scratch');
             file_put_contents('scratch/error.html', $response->getContent());
-            echo "Response Status: " . $response->status() . "\n";
-            echo "Errors: " . json_encode(session('errors')?->all()) . "\n";
+            echo 'Response Status: '.$response->status()."\n";
+            echo 'Errors: '.json_encode(session('errors')?->all())."\n";
             echo "Content written to scratch/error.html\n";
         }
 
@@ -161,7 +170,7 @@ class InvoiceWorkflowTest extends TestCase
 
     public function test_can_send_and_mark_paid_invoice(): void
     {
-        \Modules\ERP\Models\WalletTransaction::create([
+        WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
             'type' => 'received',
@@ -191,7 +200,7 @@ class InvoiceWorkflowTest extends TestCase
 
         // Send invoice
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->post(route('erp.invoices.send', $invoice->id));
 
@@ -199,18 +208,18 @@ class InvoiceWorkflowTest extends TestCase
 
         // Mark paid
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->post(route('erp.invoices.mark-paid', $invoice->id));
 
-        echo "markPaid Response Status: " . $response->status() . "\n";
+        echo 'markPaid Response Status: '.$response->status()."\n";
         if ($response->status() === 500) {
             @mkdir('scratch');
             file_put_contents('scratch/error.html', $response->getContent());
             echo "markPaid 500 error saved to scratch/error.html\n";
         }
         if (session('errors')) {
-            echo "markPaid Session Errors: " . json_encode(session('errors')->all()) . "\n";
+            echo 'markPaid Session Errors: '.json_encode(session('errors')->all())."\n";
         }
         $response->assertSessionHasNoErrors();
         $this->assertEquals('paid', $invoice->fresh()->status);
@@ -247,19 +256,19 @@ class InvoiceWorkflowTest extends TestCase
                     'title' => 'Updated Web Design',
                     'unit_price' => 1200.00,
                     'quantity' => 1,
-                ]
+                ],
             ],
-            'costs' => []
+            'costs' => [],
         ];
 
         $response = $this->actingAs($this->user)
-            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withoutMiddleware(SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->put(route('erp.invoices.update', $invoice->id), $updateData);
 
         if ($response->status() !== 302) {
-            echo "Update response status: " . $response->status() . "\n";
-            echo "Errors: " . json_encode(session('errors')?->all()) . "\n";
+            echo 'Update response status: '.$response->status()."\n";
+            echo 'Errors: '.json_encode(session('errors')?->all())."\n";
         }
 
         $response->assertRedirect(route('erp.invoices.show', $invoice->id));
@@ -270,4 +279,3 @@ class InvoiceWorkflowTest extends TestCase
         ]);
     }
 }
-

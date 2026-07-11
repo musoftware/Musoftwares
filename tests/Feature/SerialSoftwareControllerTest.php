@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,7 +19,7 @@ class SerialSoftwareControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create([
             'onboarding_completed' => true,
@@ -35,11 +36,10 @@ class SerialSoftwareControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.serial-softwares.index'));
 
         $response->assertSuccessful();
-        $response->assertInertia(fn($page) =>
-            $page->component('Admin/SerialSoftwares/Index')
-                ->has('softwares.data', 3)
-                ->has('filters')
-                ->has('stats')
+        $response->assertInertia(fn ($page) => $page->component('Admin/SerialSoftwares/Index')
+            ->has('softwares.data', 3)
+            ->has('filters')
+            ->has('stats')
         );
     }
 
@@ -52,12 +52,11 @@ class SerialSoftwareControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->get(route('admin.serial-softwares.index'));
 
-        $response->assertInertia(fn($page) =>
-            $page->where('stats.total_softwares', 1)
-                ->where('stats.total_devices_all', 6)
-                ->where('stats.active_devices_all', 3)
-                ->where('stats.inactive_devices_all', 2)
-                ->where('stats.blocked_devices_all', 1)
+        $response->assertInertia(fn ($page) => $page->where('stats.total_softwares', 1)
+            ->where('stats.total_devices_all', 6)
+            ->where('stats.active_devices_all', 3)
+            ->where('stats.inactive_devices_all', 2)
+            ->where('stats.blocked_devices_all', 1)
         );
     }
 
@@ -69,9 +68,8 @@ class SerialSoftwareControllerTest extends TestCase
         $response = $this->actingAs($this->admin)
             ->get(route('admin.serial-softwares.index', ['search' => 'MyApp']));
 
-        $response->assertInertia(fn($page) =>
-            $page->has('softwares.data', 1)
-                ->where('softwares.data.0.name', 'MyApp.exe')
+        $response->assertInertia(fn ($page) => $page->has('softwares.data', 1)
+            ->where('softwares.data.0.name', 'MyApp.exe')
         );
     }
 
@@ -84,9 +82,8 @@ class SerialSoftwareControllerTest extends TestCase
         $response = $this->actingAs($this->admin)
             ->get(route('admin.serial-softwares.index', ['default_status' => 'inactive']));
 
-        $response->assertInertia(fn($page) =>
-            $page->has('softwares.data', 1)
-                ->where('softwares.data.0.default_status', 'inactive')
+        $response->assertInertia(fn ($page) => $page->has('softwares.data', 1)
+            ->where('softwares.data.0.default_status', 'inactive')
         );
     }
 
@@ -98,9 +95,8 @@ class SerialSoftwareControllerTest extends TestCase
         $response = $this->actingAs($this->admin)
             ->get(route('admin.serial-softwares.index', ['sort_by' => 'name', 'direction' => 'asc']));
 
-        $response->assertInertia(fn($page) =>
-            $page->where('softwares.data.0.name', 'Alpha.exe')
-                ->where('softwares.data.1.name', 'Zebra.exe')
+        $response->assertInertia(fn ($page) => $page->where('softwares.data.0.name', 'Alpha.exe')
+            ->where('softwares.data.1.name', 'Zebra.exe')
         );
     }
 
@@ -111,8 +107,7 @@ class SerialSoftwareControllerTest extends TestCase
         $response = $this->actingAs($this->admin)
             ->get(route('admin.serial-softwares.index', ['per_page' => 10]));
 
-        $response->assertInertia(fn($page) =>
-            $page->has('softwares.data', 10)
+        $response->assertInertia(fn ($page) => $page->has('softwares.data', 10)
         );
     }
 
@@ -124,11 +119,10 @@ class SerialSoftwareControllerTest extends TestCase
 
         $response = $this->actingAs($this->admin)->get(route('admin.serial-softwares.index'));
 
-        $response->assertInertia(fn($page) =>
-            $page->where('softwares.data.0.total_devices', 3)
-                ->where('softwares.data.0.active_count', 2)
-                ->where('softwares.data.0.blocked_count', 1)
-                ->where('softwares.data.0.inactive_count', 0)
+        $response->assertInertia(fn ($page) => $page->where('softwares.data.0.total_devices', 3)
+            ->where('softwares.data.0.active_count', 2)
+            ->where('softwares.data.0.blocked_count', 1)
+            ->where('softwares.data.0.inactive_count', 0)
         );
     }
 

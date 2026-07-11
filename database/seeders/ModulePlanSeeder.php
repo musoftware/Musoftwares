@@ -2,17 +2,18 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\ModulePlan;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ModulePlanSeeder extends Seeder
 {
     public function run()
     {
         // Clear existing plans with foreign key checks disabled
-        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        Schema::disableForeignKeyConstraints();
         ModulePlan::truncate();
-        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+        Schema::enableForeignKeyConstraints();
 
         // 1. Core ERP Plans (Based on Core Packages)
         ModulePlan::create([
@@ -118,7 +119,6 @@ class ModulePlanSeeder extends Seeder
             'is_active' => true,
         ]);
 
-
         // 3. Marketing Module Plans
         ModulePlan::create([
             'module' => 'marketing',
@@ -133,7 +133,7 @@ class ModulePlanSeeder extends Seeder
             ],
             'is_active' => true,
         ]);
-        
+
         ModulePlan::create([
             'module' => 'marketing',
             'name' => 'Marketing Pro',

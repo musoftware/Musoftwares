@@ -2,25 +2,25 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Ticket;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class AdminTicketControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -102,7 +102,7 @@ class AdminTicketControllerTest extends TestCase
             'ticket_status' => 'open',
             'priority' => 'low',
         ]);
-        
+
         $ticket->conversation()->create(['type' => 'ticket']);
 
         $response = $this->actingAs($this->admin)->post(route('admin.tickets.reply', $ticket->id), [

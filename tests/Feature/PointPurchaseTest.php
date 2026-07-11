@@ -2,26 +2,27 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use App\Models\PointPackage;
-use App\Models\PointTransaction;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Illuminate\Support\Facades\DB;
-use App\Helpers\KashierHelper;
 
 class PointPurchaseTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $user;
+
     protected PointPackage $package;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
@@ -31,18 +32,18 @@ class PointPurchaseTest extends TestCase
 
         // Seed EGP to USD exchange rate (1 EGP = 0.02 USD)
         // Also need to create Currency model for EGP and attach to user if user_balance expects it.
-        $egpCurrency = \App\Models\Currency::firstOrCreate(
+        $egpCurrency = Currency::firstOrCreate(
             ['currency' => 'EGP'],
             ['symbol' => 'e£', 'string_format' => 'e£%01.2f']
         );
-        $usdCurrency = \App\Models\Currency::firstOrCreate(
+        $usdCurrency = Currency::firstOrCreate(
             ['currency' => 'USD'],
             ['symbol' => '$', 'string_format' => '$%01.2f']
         );
         $this->user->currency_id = $usdCurrency->id;
         $this->user->save();
 
-        \App\Models\CurrenciesExchange::updateOrCreate([
+        CurrenciesExchange::updateOrCreate([
             'currency1' => $egpCurrency->id,
             'currency2' => $usdCurrency->id,
             'date_string' => now()->toDateString(),
@@ -50,7 +51,7 @@ class PointPurchaseTest extends TestCase
             'rate' => 0.02,
         ]);
 
-        \App\Models\CurrenciesExchange::updateOrCreate([
+        CurrenciesExchange::updateOrCreate([
             'currency1' => $usdCurrency->id,
             'currency2' => $egpCurrency->id,
             'date_string' => now()->toDateString(),
@@ -75,7 +76,7 @@ class PointPurchaseTest extends TestCase
             'package_id' => $this->package->id,
         ]);
 
-        if (!session()->has('success')) {
+        if (! session()->has('success')) {
             $response->dumpSession();
         }
         $response->assertStatus(302);
@@ -110,7 +111,7 @@ class PointPurchaseTest extends TestCase
         // It should perform an Inertia external redirect
         $response->assertStatus(409); // Conflict status code for Inertia::location
         $response->assertHeader('X-Inertia-Location');
-        
+
         $location = $response->headers->get('X-Inertia-Location');
         $this->assertStringContainsString('payments.kashier.io', $location);
 

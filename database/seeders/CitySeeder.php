@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
 
 class CitySeeder extends Seeder
 {
@@ -16,9 +16,10 @@ class CitySeeder extends Seeder
     {
         // GitHub JSON where format is { "Country Name": ["City 1", "City 2"] }
         $response = Http::withoutVerifying()->timeout(30)->get('https://raw.githubusercontent.com/russ666/all-countries-and-cities-json/master/countries.json');
-        
-        if (!$response->successful()) {
+
+        if (! $response->successful()) {
             $this->command->error('Failed to fetch cities from GitHub.');
+
             return;
         }
 
@@ -31,7 +32,7 @@ class CitySeeder extends Seeder
         foreach ($data as $countryName => $cities) {
             if (isset($countries[$countryName])) {
                 $countryId = $countries[$countryName];
-                
+
                 $insertData = [];
                 foreach ($cities as $city) {
                     $insertData[] = [
@@ -47,7 +48,7 @@ class CitySeeder extends Seeder
                         $insertData = [];
                     }
                 }
-                
+
                 if (count($insertData) > 0) {
                     DB::table('cities')->insertOrIgnore($insertData);
                 }

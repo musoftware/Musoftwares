@@ -3,17 +3,16 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
-use App\Models\Transaction;
-use App\Models\Project;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminTransactionTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
@@ -59,8 +58,8 @@ class AdminTransactionTest extends TestCase
             'user' => $this->clientUser->id,
             'type' => 'earned',
             'data' => [
-                ['amount' => 100, 'fee' => 0, 'date' => now()->toDateString(), 'reason' => 'Test Reason', 'currency' => 1]
-            ]
+                ['amount' => 100, 'fee' => 0, 'date' => now()->toDateString(), 'reason' => 'Test Reason', 'currency' => 1],
+            ],
         ]);
 
         $response->assertRedirect();
@@ -84,9 +83,9 @@ class AdminTransactionTest extends TestCase
                     'fee' => 10,
                     'reason' => 'Custom Date Test',
                     'currency' => $this->clientUser->currency_id,
-                    'created_at' => $customDate
-                ]
-            ]
+                    'created_at' => $customDate,
+                ],
+            ],
         ]);
 
         $response->assertRedirect();

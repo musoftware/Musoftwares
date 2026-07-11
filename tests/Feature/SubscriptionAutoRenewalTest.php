@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\UserSubscription;
+use App\Services\PricingService;
+use Carbon\Carbon;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
-use App\Models\ModulePlan;
-use App\Models\UserSubscription;
 use Tests\TestCase;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class SubscriptionAutoRenewalTest extends TestCase
 {
@@ -22,7 +22,7 @@ class SubscriptionAutoRenewalTest extends TestCase
         parent::setUp();
 
         // Seed roles & permissions
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         // Create standard client user
         $this->user = User::factory()->create(['onboarding_completed' => true, 'currency_id' => 1]);
@@ -41,7 +41,7 @@ class SubscriptionAutoRenewalTest extends TestCase
             'expires_at' => $expiryTime,
             'auto_renew' => true,
         ]);
-        
+
         // Since marketplace is not in saas config, it defaults to price 0
 
         // Run auto-renewal artisan command
@@ -60,7 +60,7 @@ class SubscriptionAutoRenewalTest extends TestCase
 
     public function test_paid_subscription_auto_renew_with_sufficient_balance(): void
     {
-        $pricingService = app(\App\Services\PricingService::class);
+        $pricingService = app(PricingService::class);
         $serviceItems = $pricingService->getServiceItems();
         $item = collect($serviceItems)->firstWhere('id', 'erp');
         $expectedPrice = $item['monthly_price'] ?? 499.99;
@@ -88,7 +88,7 @@ class SubscriptionAutoRenewalTest extends TestCase
         $subscription = $subscription->fresh();
 
         $this->assertEquals('active', $subscription->status);
-        
+
         $expectedNewExpiry = Carbon::parse($expiryTime)->addMonth()->toDateTimeString();
         $this->assertEquals($expectedNewExpiry, $subscription->expires_at->toDateTimeString());
 
@@ -104,7 +104,7 @@ class SubscriptionAutoRenewalTest extends TestCase
 
     public function test_paid_subscription_auto_renew_fails_with_insufficient_balance(): void
     {
-        $pricingService = app(\App\Services\PricingService::class);
+        $pricingService = app(PricingService::class);
         $serviceItems = $pricingService->getServiceItems();
         $item = collect($serviceItems)->firstWhere('id', 'erp');
         $expectedPrice = $item['monthly_price'] ?? 499.99;
@@ -193,4 +193,3 @@ class SubscriptionAutoRenewalTest extends TestCase
         $this->assertEquals($expiryTime->toDateTimeString(), $subscription->expires_at->toDateTimeString());
     }
 }
-

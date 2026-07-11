@@ -8,6 +8,7 @@ use App\Models\ProjectFile;
 use App\Models\ProjectReport;
 use App\Models\Task;
 use App\Models\Todo;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -229,7 +230,7 @@ class PublicProjectCommentTest extends TestCase
             'published_at' => now()->subDay(),
         ]);
 
-        $user = \App\Models\User::find($userId);
+        $user = User::find($userId);
         $this->actingAs($user)->postJson(route('public.comments.store', [
             'token' => $project->share_token,
         ]), [

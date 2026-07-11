@@ -3,14 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Modules\ERP\Models\PaymentMethod;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
-use Modules\ERP\Models\PaymentMethod;
+use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\Withdrawal;
-use Modules\ERP\Models\ClientWallet;
 use Tests\TestCase;
 
 class WithdrawalWorkflowTest extends TestCase
@@ -18,16 +19,20 @@ class WithdrawalWorkflowTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected User $admin;
+
     protected Tenant $tenant;
+
     protected TenantClient $client;
+
     protected PaymentMethod $paymentMethod;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
@@ -53,7 +58,7 @@ class WithdrawalWorkflowTest extends TestCase
             'address' => '456 West Ave',
         ]);
 
-        \Modules\ERP\Models\WalletTransaction::create([
+        WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
             'type' => 'received',

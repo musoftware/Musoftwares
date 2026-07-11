@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Booking\WhiteLabel;
 
-use Tests\TestCase;
-use Modules\Booking\app\Features\WhiteLabel\Services\WhiteLabelThemeManager;
 use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelSetting;
+use Modules\Booking\app\Features\WhiteLabel\Services\WhiteLabelThemeManager;
+use Tests\TestCase;
 
 class WhiteLabelThemeManagerTest extends TestCase
 {

@@ -80,14 +80,16 @@ class BusinessController extends Controller
         $received = (clone $iq)->where('type', 'received')->sum('business_amount') ?? 0;
         $refunded = (clone $iq)->where('type', 'refunded')->sum('business_amount') ?? 0;
         $sent = (clone $iq)->where('type', 'sent')->sum('business_amount') ?? 0;
-        $netIncome = max(0, abs($received) - abs($refunded) - abs($sent));
+        $costs = CostTransaction::whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('business_amount') ?? 0;
+        $netIncome = max(0, abs($received) - abs($refunded) - abs($sent)) - abs($costs);
 
         $prevMonth = Carbon::createFromDate($year, $month)->subMonth();
         $prevIq = Transaction::whereYear('created_at', $prevMonth->year)->whereMonth('created_at', $prevMonth->month);
         $prevReceived = (clone $prevIq)->where('type', 'received')->sum('business_amount') ?? 0;
         $prevRefunded = (clone $prevIq)->where('type', 'refunded')->sum('business_amount') ?? 0;
         $prevSent = (clone $prevIq)->where('type', 'sent')->sum('business_amount') ?? 0;
-        $prevNetIncome = max(0, abs($prevReceived) - abs($prevRefunded) - abs($prevSent));
+        $prevCosts = CostTransaction::whereYear('created_at', $prevMonth->year)->whereMonth('created_at', $prevMonth->month)->sum('business_amount') ?? 0;
+        $prevNetIncome = max(0, abs($prevReceived) - abs($prevRefunded) - abs($prevSent)) - abs($prevCosts);
 
         $incomeChange = 0;
         if ($prevNetIncome > 0) {

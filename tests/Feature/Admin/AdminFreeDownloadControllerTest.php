@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\FreeDownload;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -14,14 +17,15 @@ class AdminFreeDownloadControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
-        if (!\Illuminate\Support\Facades\Schema::hasTable('free_downloads')) {
-            \Illuminate\Support\Facades\Schema::create('free_downloads', function (\Illuminate\Database\Schema\Blueprint $table) {
+
+        if (! Schema::hasTable('free_downloads')) {
+            Schema::create('free_downloads', function (Blueprint $table) {
                 $table->id();
                 $table->string('title');
                 $table->text('description')->nullable();
@@ -34,15 +38,15 @@ class AdminFreeDownloadControllerTest extends TestCase
                 $table->timestamps();
             });
         }
-        
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
 
         $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
         $this->clientUser->assignRole('client');
-        
+
         Storage::fake('public');
     }
 
@@ -77,7 +81,7 @@ class AdminFreeDownloadControllerTest extends TestCase
             'programming_language' => 'PHP',
             'original_filename' => 'document.pdf',
         ]);
-        
+
         $download = FreeDownload::where('title', 'Test Download')->first();
         Storage::disk('public')->assertExists($download->file_path);
     }
@@ -118,7 +122,7 @@ class AdminFreeDownloadControllerTest extends TestCase
     {
         $download = FreeDownload::create([
             'title' => 'To Delete',
-            'file_path' => 'free_downloads/files/test.pdf'
+            'file_path' => 'free_downloads/files/test.pdf',
         ]);
 
         $response = $this->actingAs($this->admin)->delete(route('admin.free-downloads.destroy', $download->id));

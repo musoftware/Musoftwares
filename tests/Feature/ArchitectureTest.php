@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Helpers\FinanceHelper;
+use Tests\TestCase;
 
 class ArchitectureTest extends TestCase
 {

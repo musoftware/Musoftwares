@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\SerialSoftware;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,13 +13,14 @@ class SerialSoftwareControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -43,14 +45,14 @@ class SerialSoftwareControllerTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->post('/admin/serial-softwares', [
             'name' => 'New Software',
-            'default_status' => 'active'
+            'default_status' => 'active',
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('serial_softwares', [
             'name' => 'New Software',
-            'default_status' => 'active'
+            'default_status' => 'active',
         ]);
     }
 
@@ -58,21 +60,21 @@ class SerialSoftwareControllerTest extends TestCase
     {
         $software = SerialSoftware::create([
             'name' => 'Test Software',
-            'default_status' => 'active'
+            'default_status' => 'active',
         ]);
 
         // Assuming route is put/patch to /admin/serial-softwares/{id} or /admin/serial-softwares/{id}/status
         // I'll test the method via the typical route convention, if the route varies we'll fix it. Let me try standard resourceful update.
         // wait, the method is updateStatus. Usually it's mapped to PUT /admin/serial-softwares/{serialSoftware}
         $response = $this->actingAs($this->admin)->patch("/admin/serial-softwares/{$software->id}/status", [
-            'status' => 'inactive'
+            'status' => 'inactive',
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('serial_softwares', [
             'id' => $software->id,
-            'default_status' => 'inactive'
+            'default_status' => 'inactive',
         ]);
     }
 
@@ -80,7 +82,7 @@ class SerialSoftwareControllerTest extends TestCase
     {
         $software = SerialSoftware::create([
             'name' => 'Test Software',
-            'default_status' => 'active'
+            'default_status' => 'active',
         ]);
 
         $response = $this->actingAs($this->admin)->delete("/admin/serial-softwares/{$software->id}");
@@ -88,7 +90,7 @@ class SerialSoftwareControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
         $this->assertDatabaseMissing('serial_softwares', [
-            'id' => $software->id
+            'id' => $software->id,
         ]);
     }
 

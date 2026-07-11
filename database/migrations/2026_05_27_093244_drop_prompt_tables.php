@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $driver = \Illuminate\Support\Facades\DB::getDriverName();
+        $driver = DB::getDriverName();
         if ($driver === 'mysql') {
-            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         } elseif ($driver === 'sqlite') {
-            \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF');
+            DB::statement('PRAGMA foreign_keys = OFF');
         }
 
         Schema::dropIfExists('prompt_correct_history_inlines');
@@ -24,9 +24,9 @@ return new class extends Migration
         Schema::dropIfExists('prompt_generations');
 
         if ($driver === 'mysql') {
-            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         } elseif ($driver === 'sqlite') {
-            \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = ON');
+            DB::statement('PRAGMA foreign_keys = ON');
         }
     }
 

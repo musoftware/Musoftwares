@@ -24,7 +24,6 @@ class CreateNotesTable extends Migration
             $table->longText('body')->nullable();
             $table->longText('lb_content')->nullable();
 
-
             $table->timestamps();
             $table->softDeletes();
         });

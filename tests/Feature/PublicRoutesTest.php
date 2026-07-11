@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\BlogArticle;
 use App\Models\WebsiteService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
 class PublicRoutesTest extends TestCase
 {
-    use \Illuminate\Foundation\Testing\RefreshDatabase;
+    use RefreshDatabase;
 
     public function test_home_page_returns_a_successful_response()
     {
@@ -66,7 +68,7 @@ class PublicRoutesTest extends TestCase
 
     public function test_blog_show_returns_successful_response()
     {
-        $article = clone(new BlogArticle());
+        $article = clone new BlogArticle;
         $article->title = 'Test Article';
         $article->slug = 'test-article';
         $article->content = 'This is a test article.';
@@ -79,7 +81,7 @@ class PublicRoutesTest extends TestCase
 
     public function test_website_service_show_returns_successful_response()
     {
-        $service = new WebsiteService();
+        $service = new WebsiteService;
         $service->title_en = 'Test Service';
         $service->title_ar = 'Test Service AR';
         $service->slug = 'test-service';

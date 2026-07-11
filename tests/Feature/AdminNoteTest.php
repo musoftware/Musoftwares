@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\ERP\Models\Tenant;
-use Modules\ERP\Models\Client;
 use App\Models\AdminNote;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\ERP\Models\Client;
+use Modules\ERP\Models\Tenant;
 use Tests\TestCase;
 
 class AdminNoteTest extends TestCase
@@ -14,14 +15,16 @@ class AdminNoteTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected Tenant $tenant;
+
     protected Client $client;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
@@ -138,4 +141,3 @@ class AdminNoteTest extends TestCase
         ]);
     }
 }
-

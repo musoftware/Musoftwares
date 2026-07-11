@@ -2,12 +2,11 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Currency;
 use App\Models\User;
-use App\Models\Transaction;
-use App\Models\Project;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\Currency;
 
 class AdminTransactionControllerTest extends TestCase
 {
@@ -16,13 +15,14 @@ class AdminTransactionControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     private function createAdmin()
     {
         $admin = User::factory()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
+
         return $admin;
     }
 
@@ -30,6 +30,7 @@ class AdminTransactionControllerTest extends TestCase
     {
         $client = User::factory()->create(['onboarding_completed' => true]);
         $client->assignRole('client');
+
         return $client;
     }
 
@@ -85,7 +86,7 @@ class AdminTransactionControllerTest extends TestCase
                     'currency_id' => Currency::first()->id ?? 1,
                     'transaction_date' => now()->toDateString(),
                     'reason' => 'Test Transaction',
-                ]
+                ],
             ],
         ];
 
@@ -99,5 +100,4 @@ class AdminTransactionControllerTest extends TestCase
             'amount' => 100,
         ]);
     }
-
 }

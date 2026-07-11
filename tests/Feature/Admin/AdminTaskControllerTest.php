@@ -2,10 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Models\Task;
 use App\Models\Todo;
-use App\Models\Project;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,13 +13,14 @@ class AdminTaskControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $clientUser;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
@@ -61,7 +61,7 @@ class AdminTaskControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('message');
 
-        $this->assertTrue((bool)$todo->fresh()->completed);
+        $this->assertTrue((bool) $todo->fresh()->completed);
     }
 
     public function test_admin_can_access_calendar(): void
@@ -106,6 +106,4 @@ class AdminTaskControllerTest extends TestCase
         $this->assertNotNull($todo->start_at);
         $this->assertNotNull($todo->end_at);
     }
-
-
 }

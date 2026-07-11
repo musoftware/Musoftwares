@@ -25,11 +25,11 @@ return new class extends Migration
             $table->foreignId('mail_sequence_id')->constrained()->cascadeOnDelete();
             $table->integer('delay')->default(0); // number of units after previous step
             $table->string('unit')->default('day'); // minute, hour, day
-            
+
             // Changed to JSON to support {"en": "Subject", "ar": "العنوان"}
             $table->json('subject');
             $table->json('content');
-            
+
             $table->integer('order')->default(1);
             $table->timestamps();
             $table->softDeletes();
@@ -39,7 +39,7 @@ return new class extends Migration
         Schema::create('mail_sequence_states', function (Blueprint $table) {
             $table->id();
             // Polymorphic relation: assignable_id, assignable_type
-            $table->morphs('assignable'); 
+            $table->morphs('assignable');
             $table->foreignId('mail_sequence_id')->constrained()->cascadeOnDelete();
             $table->integer('current_step_order')->default(0);
             $table->timestamp('last_email_sent_at')->nullable();
