@@ -23,7 +23,7 @@ class ClientProjectCalendarController extends Controller
 
         return redirect()->route('client.projects.calendar.date', [
             'project' => $project->id,
-            'date' => Carbon::today()->toDateString(),
+            'date' => Carbon::today('Africa/Cairo')->toDateString(),
         ]);
     }
 
@@ -31,7 +31,7 @@ class ClientProjectCalendarController extends Controller
     {
         $this->authorizeProject($project);
 
-        $dateCarbon = $this->parseDate($date) ?? Carbon::today();
+        $dateCarbon = $this->parseDate($date) ?? Carbon::today('Africa/Cairo');
         $isAdmin = $request->user()?->isAdmin() === true;
 
         $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
@@ -67,7 +67,7 @@ class ClientProjectCalendarController extends Controller
     private function parseDate(string $date): ?Carbon
     {
         try {
-            return Carbon::createFromFormat('!Y-m-d', $date);
+            return Carbon::createFromFormat('!Y-m-d', $date, 'Africa/Cairo');
         } catch (\Throwable $e) {
             return null;
         }

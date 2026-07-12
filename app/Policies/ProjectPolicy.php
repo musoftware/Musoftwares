@@ -31,7 +31,8 @@ class ProjectPolicy
 
     public function view(User $user, Project $project): Response
     {
-        return ($project->user_id === $user->id || session()->get("shared_project_access.{$project->id}"))
+        $isShared = $project->shares()->where('user_id', $user->id)->exists();
+        return ($project->user_id === $user->id || $isShared || session()->get("shared_project_access.{$project->id}"))
             ? Response::allow()
             : Response::denyWithStatus(403);
     }
@@ -44,7 +45,8 @@ class ProjectPolicy
 
     public function update(User $user, Project $project): Response
     {
-        return ($project->user_id === $user->id || session()->get("shared_project_access.{$project->id}"))
+        $isShared = $project->shares()->where('user_id', $user->id)->exists();
+        return ($project->user_id === $user->id || $isShared || session()->get("shared_project_access.{$project->id}"))
             ? Response::allow()
             : Response::denyWithStatus(403);
     }

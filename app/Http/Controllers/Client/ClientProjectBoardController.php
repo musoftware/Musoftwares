@@ -45,6 +45,9 @@ class ClientProjectBoardController extends Controller
         $this->authorizeProject($project);
 
         $data = $request->validated();
+        if (array_key_exists('published_at', $data)) {
+            $data['published_at'] = $this->cairoToUtc($data['published_at']);
+        }
         $date = $data['for_date'];
         $isAdmin = $request->user()?->isAdmin() === true;
 
@@ -53,7 +56,7 @@ class ClientProjectBoardController extends Controller
         }
 
         $note = $project->boardNotes()->create([
-            'author_id' => $request->user()->id,
+            'author_id' => $request->user()?->id ?? $project->user_id,
             'for_date' => $date,
             'title' => $data['title'] ?? null,
             'content' => $data['content'] ?? null,
@@ -101,7 +104,7 @@ class ClientProjectBoardController extends Controller
 
         $placement = $owned->boardItems()->first();
         if ($placement && array_key_exists('published_at', $data)) {
-            $placement->published_at = $data['published_at'];
+            $placement->published_at = $this->cairoToUtc($data['published_at']);
             $placement->save();
         }
 
@@ -132,6 +135,10 @@ class ClientProjectBoardController extends Controller
             'category_id' => 'nullable|integer|exists:project_board_categories,id',
             'published_at' => 'nullable|date',
         ]);
+
+        if (array_key_exists('published_at', $data)) {
+            $data['published_at'] = $this->cairoToUtc($data['published_at']);
+        }
 
         $date = $data['for_date'];
 
@@ -189,7 +196,7 @@ class ClientProjectBoardController extends Controller
             ->first();
 
         if ($placement && array_key_exists('published_at', $data)) {
-            $placement->published_at = $data['published_at'];
+            $placement->published_at = $this->cairoToUtc($data['published_at']);
             $placement->save();
         }
 
@@ -225,10 +232,14 @@ class ClientProjectBoardController extends Controller
             'published_at' => 'nullable|date',
         ]);
 
+        if (array_key_exists('published_at', $data)) {
+            $data['published_at'] = $this->cairoToUtc($data['published_at']);
+        }
+
         $date = $data['for_date'];
 
         $todo = $project->todos()->create([
-            'user_id' => $request->user()->id,
+            'user_id' => $request->user()?->id ?? $project->user_id,
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
             'completed' => false,
@@ -308,7 +319,7 @@ class ClientProjectBoardController extends Controller
             ->first();
 
         if ($placement && array_key_exists('published_at', $data)) {
-            $placement->published_at = $data['published_at'];
+            $placement->published_at = $this->cairoToUtc($data['published_at']);
             $placement->save();
         }
 
@@ -347,7 +358,7 @@ class ClientProjectBoardController extends Controller
         $path = $upload->store("project-files/{$project->id}", $disk);
 
         $file = $project->files()->create([
-            'uploaded_by' => $request->user()->id,
+            'uploaded_by' => $request->user()?->id ?? $project->user_id,
             'disk_path' => $path,
             'original_name' => $upload->getClientOriginalName(),
             'mime' => $upload->getMimeType(),
@@ -356,7 +367,7 @@ class ClientProjectBoardController extends Controller
 
         $date = $request->input('for_date');
         $categoryId = $this->resolveCategoryId($project, $request->input('category_id'));
-        $appearanceTime = $request->input('published_at');
+        $appearanceTime = $this->cairoToUtc($request->input('published_at'));
         $placement = $this->place(
             $project,
             $date,
@@ -408,13 +419,23 @@ class ClientProjectBoardController extends Controller
             'period_end' => 'nullable|date|after_or_equal:period_start',
         ]);
 
+        if (!empty($data['published_at'])) {
+            $data['published_at'] = Carbon::parse($data['published_at'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString();
+        }
+        if (!empty($data['period_start'])) {
+            $data['period_start'] = Carbon::parse($data['period_start'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString();
+        }
+        if (!empty($data['period_end'])) {
+            $data['period_end'] = Carbon::parse($data['period_end'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString();
+        }
+
         $date = $data['for_date'];
 
         $report = $project->reports()->create([
-            'author_id' => $request->user()->id,
+            'author_id' => $request->user()?->id ?? $project->user_id,
             'title' => $data['title'],
             'body' => $data['body'],
-            'published_at' => $data['published_at'] ?? now(),
+            'published_at' => $data['published_at'] ?? now()->toDateTimeString(),
             'period_start' => $data['period_start'] ?? null,
             'period_end' => $data['period_end'] ?? null,
         ]);
@@ -453,6 +474,16 @@ class ClientProjectBoardController extends Controller
             'period_start' => 'nullable|date',
             'period_end' => 'nullable|date|after_or_equal:period_start',
         ]);
+
+        if (array_key_exists('published_at', $data)) {
+            $data['published_at'] = $data['published_at'] ? Carbon::parse($data['published_at'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
+        }
+        if (array_key_exists('period_start', $data)) {
+            $data['period_start'] = $data['period_start'] ? Carbon::parse($data['period_start'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
+        }
+        if (array_key_exists('period_end', $data)) {
+            $data['period_end'] = $data['period_end'] ? Carbon::parse($data['period_end'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
+        }
 
         $report->update([
             'title' => $data['title'],
@@ -531,7 +562,7 @@ class ClientProjectBoardController extends Controller
         $boardPublishedAt = null;
         $updatePublishedAt = false;
         if ($isAdmin && array_key_exists('published_at', $data)) {
-            $boardPublishedAt = $data['published_at'];
+            $boardPublishedAt = $data['published_at'] ? Carbon::parse($data['published_at'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
             $updatePublishedAt = true;
         }
 
@@ -1024,9 +1055,9 @@ class ClientProjectBoardController extends Controller
             'pos_x' => $placement->pos_x ?? 24,
             'pos_y' => $placement->pos_y ?? 24,
             'sort' => (int) ($placement->sort ?? 0),
-            'published_at' => optional($report->published_at)->toIso8601String(),
-            'period_start' => $report->period_start ? $report->period_start->toIso8601String() : null,
-            'period_end' => $report->period_end ? $report->period_end->toIso8601String() : null,
+            'published_at' => $report->published_at ? $report->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
+            'period_start' => $report->period_start ? $report->period_start->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
+            'period_end' => $report->period_end ? $report->period_end->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
             'comments_count' => (int) $report->comments()->count(),
         ] + $this->categoryPayload($placement);
     }
@@ -1050,6 +1081,8 @@ class ClientProjectBoardController extends Controller
                 'color' => $category->color,
                 'text_color' => $category->text_color,
             ] : null,
+            'published_at' => $placement?->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
+            'board_published_at' => $placement?->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
         ];
     }
 
@@ -1287,5 +1320,10 @@ class ClientProjectBoardController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    private function cairoToUtc(?string $datetime): ?string
+    {
+        return $datetime ? Carbon::parse($datetime, 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
     }
 }

@@ -7221,6 +7221,8 @@ return [
     'share_link_copied' => 'Link copied to clipboard!',
     'share_project_board' => 'Share Project Board',
     'share_project_board_desc' => 'Anyone with this link can view the read-only project board for this specific date.',
+    'share_project_board_desc_view' => 'Anyone with this link can view the read-only project board for this specific date.',
+    'share_project_board_desc_edit' => 'Anyone with this link can view, add, edit, and move items on the project board exactly like a client.',
     'task_added' => 'Task added.',
     'todo_added' => 'Todo added.',
     'todo_updated' => 'Todo updated.',

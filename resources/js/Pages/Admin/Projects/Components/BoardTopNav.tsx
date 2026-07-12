@@ -3,7 +3,8 @@ import { Link, router } from '@inertiajs/react';
 import {
     ChevronLeft, ChevronRight, CalendarDays, LayoutDashboard,
     StickyNote, ListTodo, FileText, Paperclip, ClipboardList, Plus,
-    ChevronDown, ArrowLeft, Wallet, Share2, Calendar as LucideCalendar, Sparkles, Tag, Bell
+    ChevronDown, ArrowLeft, Wallet, Share2, Calendar as LucideCalendar, Sparkles, Tag, Bell,
+    X, Trash2
 } from 'lucide-react';
 import {
     FaRegStickyNote, FaBolt, FaSearch, FaCheckCircle, FaGlobe, FaRegClipboard
@@ -47,6 +48,8 @@ interface BoardTopNavProps {
         archived?: boolean;
         share_url?: string;
         short_url?: string;
+        share_url_edit?: string;
+        short_url_edit?: string;
         client_name?: string;
     };
     activeFilter: BoardFilter;
@@ -97,8 +100,90 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
     const [showShareModal, setShowShareModal] = React.useState(false);
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [bringingUndone, setBringingUndone] = useState(false);
-    const shareUrl = project.share_url || '';
-    const shortUrl = project.short_url || '';
+    const [shareMode, setShareMode] = useState<'view' | 'edit'>('view');
+
+    const shareUrl = shareMode === 'edit' ? (project.share_url_edit || '') : (project.share_url || '');
+    const shortUrl = shareMode === 'edit' ? (project.short_url_edit || '') : (project.short_url || '');
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [updatingClient, setUpdatingClient] = useState(false);
+
+    const [collaborators, setCollaborators] = useState<any[]>([]);
+    const [loadingCollaborators, setLoadingCollaborators] = useState(false);
+
+    const loadCollaborators = async () => {
+        setLoadingCollaborators(true);
+        try {
+            const { data } = await axios.get(route('admin.projects.shares.index', { project: project.id }));
+            setCollaborators(data);
+        } catch (e) {
+            console.error('Failed to load collaborators:', e);
+        } finally {
+            setLoadingCollaborators(false);
+        }
+    };
+
+    React.useEffect(() => {
+        if (showShareModal) {
+            loadCollaborators();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showShareModal]);
+
+    const handleSearchUser = async (val: string) => {
+        setSearchQuery(val);
+        if (val.trim().length < 2) {
+            setSuggestions([]);
+            return;
+        }
+
+        try {
+            const { data } = await axios.get(route('admin.projects.search-clients'), {
+                params: { q: val }
+            });
+            setSuggestions(data);
+        } catch (e) {
+            console.error('Failed to search clients:', e);
+        }
+    };
+
+    const handleSelectUser = async (user: any) => {
+        setSearchQuery('');
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setUpdatingClient(true);
+
+        try {
+            const { data } = await axios.post(route('admin.projects.shares.store', { project: project.id }), {
+                user_id: user.id
+            });
+            if (data.ok) {
+                toast.success(__('general.project_updated_successfully') || 'Collaborator added successfully!');
+                setCollaborators(prev => {
+                    if (prev.some(c => c.user_id === user.id)) return prev;
+                    return [...prev, data.share];
+                });
+            }
+        } catch (e) {
+            toast.error(__('general.error') || 'Failed to add collaborator.');
+        } finally {
+            setUpdatingClient(false);
+        }
+    };
+
+    const handleRemoveCollaborator = async (shareId: number) => {
+        try {
+            const { data } = await axios.delete(route('admin.projects.shares.destroy', { project: project.id, share: shareId }));
+            if (data.ok) {
+                toast.success(__('general.project_updated_successfully') || 'Collaborator removed successfully!');
+                setCollaborators(prev => prev.filter(c => c.id !== shareId));
+            }
+        } catch (e) {
+            toast.error(__('general.error') || 'Failed to remove collaborator.');
+        }
+    };
 
     const handleCopyLink = (url: string) => {
         if (!url) return;
@@ -381,16 +466,113 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                             {__('general.share_project_board') || 'Share Project Board'}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 mt-1">
-                            {__('general.share_project_board_desc') || 'Anyone with this link can view the read-only project board for this specific date.'}
+                            {shareMode === 'view'
+                                ? __('general.share_project_board_desc_view') || 'Anyone with this link can view the read-only project board for this specific date.'
+                                : __('general.share_project_board_desc_edit') || 'Anyone with this link can view, add, edit, and move items on the project board exactly like a client.'
+                            }
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="mt-4 space-y-3">
+
+                    {/* Mode Toggle Tabs */}
+                    <div className="mt-4 flex rounded-lg bg-slate-100 p-0.5">
+                        <button
+                            type="button"
+                            onClick={() => setShareMode('view')}
+                            className={cn(
+                                'flex-1 rounded-md py-1.5 text-center text-xs font-semibold transition-all',
+                                shareMode === 'view'
+                                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40'
+                                    : 'text-slate-600 hover:text-slate-900'
+                            )}
+                        >
+                            Read-Only
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShareMode('edit')}
+                            className={cn(
+                                'flex-1 rounded-md py-1.5 text-center text-xs font-semibold transition-all',
+                                shareMode === 'edit'
+                                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40'
+                                    : 'text-slate-600 hover:text-slate-900'
+                            )}
+                        >
+                            Collaborative (Add &amp; Edit)
+                        </button>
+                    </div>
+
+                    <div className="mt-3 space-y-3">
                         {project.client_name && (
                             <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 border border-slate-100 flex items-center justify-between">
                                 <span>{__('general.board_client') || 'Client'}</span>
                                 <span className="font-semibold text-slate-800">{project.client_name}</span>
                             </div>
                         )}
+
+                        <div className="space-y-2 pt-2 border-t border-slate-100">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                                Collaborators
+                            </span>
+                            {loadingCollaborators ? (
+                                <div className="text-[11px] text-slate-400 py-1">Loading collaborators...</div>
+                            ) : collaborators.length === 0 ? (
+                                <div className="text-[11px] text-slate-400 py-1 italic">No collaborators added yet.</div>
+                            ) : (
+                                <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                                    {collaborators.map((c) => (
+                                        <div key={c.id} className="flex items-center justify-between p-2 rounded-md bg-slate-50 border border-slate-100/50">
+                                            <div className="flex flex-col min-w-0">
+                                                <span className="text-xs font-semibold text-slate-800 truncate">{c.name}</span>
+                                                <span className="text-[10px] text-slate-500 truncate">{c.email}</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveCollaborator(c.id)}
+                                                className="p-1 hover:bg-slate-100 rounded-md text-red-500 hover:text-red-700 transition-colors"
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-1 relative pt-2 border-t border-slate-100">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                                Add Collaborator
+                            </span>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search user to share with..."
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearchUser(e.target.value)}
+                                    onFocus={() => setShowSuggestions(true)}
+                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                    disabled={updatingClient}
+                                    className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-xs text-slate-900 focus:outline-none focus:border-slate-400 placeholder:text-slate-400 disabled:opacity-50"
+                                />
+                                <div className="absolute right-3 top-3 flex items-center pointer-events-none">
+                                    <ChevronDown className="h-4 w-4 text-slate-400" />
+                                </div>
+                                {showSuggestions && suggestions.length > 0 && (
+                                    <div className="absolute left-0 right-0 top-11 z-50 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                                        {suggestions.map((u: any) => (
+                                            <button
+                                                key={u.id}
+                                                type="button"
+                                                onClick={() => handleSelectUser(u)}
+                                                className="w-full px-3 py-2 text-left text-xs hover:bg-slate-100 flex flex-col"
+                                            >
+                                                <span className="font-semibold text-slate-800">{u.name}</span>
+                                                <span className="text-[10px] text-slate-500">{u.email}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         {shortUrl ? (
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">

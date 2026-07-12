@@ -21,11 +21,12 @@ interface Props {
     lanes: string[];
     cards: BoardCard[];
     activeDates: string[];
+    hasEditAccess?: boolean;
 }
 
 type FilterKey = 'all' | 'note' | 'task' | 'report';
 
-export default function SharedBoard({ project, date, lanes, cards, activeDates = [] }: Props) {
+export default function SharedBoard({ project, date, lanes, cards, activeDates = [], hasEditAccess = false }: Props) {
     const day = parseISO(date);
     const [filter, setFilter] = useState<FilterKey>('all');
     const [calendarOpen, setCalendarOpen] = useState(false);
@@ -150,8 +151,8 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                     lanes={lanes}
                     initialCards={cards}
                     hideFuture={false}
-                    readOnly={true}
-                    hideToolbar={true}
+                    readOnly={!hasEditAccess}
+                    hideToolbar={!hasEditAccess}
                     externalFilter={filter}
                     guestMode={true}
                     shareToken={project.share_token}

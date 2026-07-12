@@ -241,7 +241,8 @@ class ProjectBoardService
     public function cardsForDate(Project $project, Carbon $date, bool $applyFutureGating, ?array $preferences = null): array
     {
         // Clients with the flag enabled never see a board for a future date.
-        if ($applyFutureGating && $project->hide_future_tasks && $date->isAfter(Carbon::today())) {
+        $cairoDate = $date->copy()->setTimezone('Africa/Cairo')->startOfDay();
+        if ($applyFutureGating && $project->hide_future_tasks && $cairoDate->isAfter(Carbon::today('Africa/Cairo'))) {
             return [];
         }
 
@@ -351,8 +352,8 @@ class ProjectBoardService
             $extra['category_id'] = $placement->category_id ?? null;
             $extra['is_ai'] = $placement ? (bool)$placement->is_ai : false;
             $extra['is_important'] = $placement ? (bool)$placement->is_important : false;
-            $extra['published_at'] = $placement?->published_at?->toIso8601String(); // alias 'board_published_at' is sent to frontend
-            $extra['board_published_at'] = $placement?->published_at?->toIso8601String();
+            $extra['published_at'] = $placement?->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null;
+            $extra['board_published_at'] = $placement?->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null;
             $extra['category'] = $placement?->category ? [
                 'id' => $placement->category->id,
                 'slug' => $placement->category->slug,
@@ -395,9 +396,9 @@ class ProjectBoardService
             $addCard('report', $report->id, $report->title, [
                 'description' => $report->body,
                 'body' => $report->body,
-                'published_at' => optional($report->published_at)->toIso8601String(),
-                'period_start' => $report->period_start ? $report->period_start->toIso8601String() : null,
-                'period_end' => $report->period_end ? $report->period_end->toIso8601String() : null,
+                'published_at' => $report->published_at ? $report->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
+                'period_start' => $report->period_start ? $report->period_start->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
+                'period_end' => $report->period_end ? $report->period_end->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
                 'comments_count' => $report->comments_count,
             ]);
         }

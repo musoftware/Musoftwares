@@ -216,8 +216,10 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::get('/projects/{project}/files/{file}/download', [ClientProjectFileController::class, 'download'])->name('files.download');
     Route::get('/projects/{project}/calendar', [ClientProjectCalendarController::class, 'calendarIndex'])->name('calendar.index');
     Route::get('/projects/{project}/calendar/{date}', [ClientProjectCalendarController::class, 'calendarDate'])->name('calendar.date');
+});
 
-    // Board mutations (JSON) — both client and admin use these endpoints.
+// Board mutations (JSON) — both client and admin and guest with write-access use these endpoints.
+Route::middleware([\App\Http\Middleware\VerifyBoardAccess::class])->name('client.projects.')->group(function () {
     Route::post('/projects/{project}/board/ai-questions', [ClientProjectBoardController::class, 'generateAiQuestions'])->name('board.ai-questions');
     Route::post('/projects/{project}/board/add-with-ai', [ClientProjectBoardController::class, 'addWithAi'])->name('board.add-with-ai');
     Route::post('/projects/{project}/board/notes', [ClientProjectBoardController::class, 'storeNote'])->name('board.store-note');
@@ -598,6 +600,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Admin Projects ──────────────────────────────────────────────
     Route::get('/projects/search-clients', [ProjectController::class, 'searchClients'])->name('projects.search-clients');
+    Route::get('/projects/{project}/shares', [ProjectController::class, 'listShares'])->name('projects.shares.index');
+    Route::post('/projects/{project}/shares', [ProjectController::class, 'addShare'])->name('projects.shares.store');
+    Route::delete('/projects/{project}/shares/{share}', [ProjectController::class, 'removeShare'])->name('projects.shares.destroy');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::get('/projects/{project}/edit', [ProjectController::class, 'boardIndex'])->name('projects.edit');
     Route::resource('/projects', ProjectController::class)->except(['create', 'edit', 'show']);

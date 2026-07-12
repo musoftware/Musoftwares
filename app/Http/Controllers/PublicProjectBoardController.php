@@ -19,17 +19,27 @@ class PublicProjectBoardController extends Controller
     {
         $project = Project::where('share_token', $token)->firstOrFail();
 
-        if ($request->user()) {
-            session()->put("shared_project_access.{$project->id}", true);
+        if ($request->input('mode') === 'edit') {
+            session()->put("shared_project_write_access.{$project->id}", true);
         }
+
+        if ($request->user()) {
+            $isShared = $project->shares()->where('user_id', $request->user()->id)->exists();
+            if ($isShared || $request->user()->isAdmin() || $project->user_id === $request->user()->id) {
+                session()->put("shared_project_access.{$project->id}", true);
+                session()->put("shared_project_write_access.{$project->id}", true);
+            }
+        }
+
+        $hasEditAccess = (bool) session()->get("shared_project_write_access.{$project->id}");
 
         try {
-            $dateCarbon = Carbon::createFromFormat('!Y-m-d', $date);
+            $dateCarbon = Carbon::createFromFormat('!Y-m-d', $date, 'Africa/Cairo');
         } catch (\Throwable $e) {
-            $dateCarbon = Carbon::today();
+            $dateCarbon = Carbon::today('Africa/Cairo');
         }
 
-        $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
+        $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: !$hasEditAccess);
         $categories = $this->boardService->categoriesFor($project);
 
         $project->loadCount(['tasks', 'reports', 'files']);
@@ -69,6 +79,7 @@ class PublicProjectBoardController extends Controller
                 'is_system' => (bool) $c->is_system,
             ])->values(),
             'activeDates' => $activeDates,
+            'hasEditAccess' => $hasEditAccess,
         ]);
     }
 }

@@ -63,6 +63,11 @@ class Project extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function shares(): HasMany
+    {
+        return $this->hasMany(ProjectShare::class);
+    }
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class, 'project_id');

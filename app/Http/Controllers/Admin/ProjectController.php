@@ -10,6 +10,7 @@ use App\Http\Resources\ProjectCollection;
 use App\Models\AdminSettings;
 use App\Models\Currency;
 use App\Models\Project;
+use App\Models\ProjectShare;
 use App\Models\ProjectBoardItem;
 use App\Models\User;
 use App\Services\ProjectBoardService;
@@ -396,7 +397,7 @@ class ProjectController extends Controller
 
         return redirect()->route('admin.projects.board', [
             'project' => $project,
-            'date' => Carbon::today()->toDateString(),
+            'date' => Carbon::today('Africa/Cairo')->toDateString(),
         ]);
     }
 
@@ -422,6 +423,14 @@ class ProjectController extends Controller
 
         $shortUrl = $this->shortUrlForBoardShare($project, $shareUrl, $request->user()?->id);
 
+        $shareUrlEdit = URL::signedRoute('shared-board.show', [
+            'token' => $project->share_token,
+            'date' => $date->toDateString(),
+            'mode' => 'edit',
+        ]);
+
+        $shortUrlEdit = $this->shortUrlForBoardShare($project, $shareUrlEdit, $request->user()?->id);
+
         $activeDates = ProjectBoardItem::where('project_id', $project->id)
             ->distinct()
             ->pluck('for_date')
@@ -437,6 +446,8 @@ class ProjectController extends Controller
                 'share_token' => $project->share_token,
                 'share_url' => $shareUrl,
                 'short_url' => $shortUrl,
+                'share_url_edit' => $shareUrlEdit,
+                'short_url_edit' => $shortUrlEdit,
                 'archived' => (bool) $project->archived,
                 'budget' => (string) ($project->budget ?? 0),
                 'cost' => (string) $project->costAmount(),
@@ -585,13 +596,13 @@ class ProjectController extends Controller
     {
         if ($date) {
             try {
-                return Carbon::createFromFormat('!Y-m-d', $date);
+                return Carbon::createFromFormat('!Y-m-d', $date, 'Africa/Cairo');
             } catch (\Throwable $e) {
                 // fall through
             }
         }
 
-        return Carbon::today();
+        return Carbon::today('Africa/Cairo');
     }
 
     /**
@@ -646,5 +657,59 @@ class ProjectController extends Controller
             ->get();
 
         return response()->json($clients);
+    }
+
+    public function listShares(Project $project): JsonResponse
+    {
+        $this->authorize('update', $project);
+
+        $shares = $project->shares()->with('user:id,name,email')->get()->map(fn ($share) => [
+            'id' => $share->id,
+            'user_id' => $share->user_id,
+            'name' => $share->user?->name,
+            'email' => $share->user?->email,
+            'can_edit' => $share->can_edit,
+        ]);
+
+        return response()->json($shares);
+    }
+
+    public function addShare(Request $request, Project $project): JsonResponse
+    {
+        $this->authorize('update', $project);
+
+        $data = $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
+
+        $share = $project->shares()->updateOrCreate([
+            'user_id' => $data['user_id']
+        ], [
+            'can_edit' => true
+        ]);
+
+        $share->load('user:id,name,email');
+
+        return response()->json([
+            'ok' => true,
+            'share' => [
+                'id' => $share->id,
+                'user_id' => $share->user_id,
+                'name' => $share->user?->name,
+                'email' => $share->user?->email,
+                'can_edit' => $share->can_edit,
+            ]
+        ]);
+    }
+
+    public function removeShare(Project $project, ProjectShare $share): JsonResponse
+    {
+        $this->authorize('update', $project);
+
+        abort_unless($share->project_id === $project->id, 404);
+
+        $share->delete();
+
+        return response()->json(['ok' => true]);
     }
 }

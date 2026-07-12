@@ -14,6 +14,10 @@ trait ResolvesClientProject
 {
     protected function authorizeProject(Project $project): void
     {
+        if (session()->get("shared_project_write_access.{$project->id}")) {
+            return;
+        }
+
         $this->authorize('view', $project);
 
         $user = auth()->user();
@@ -25,8 +29,8 @@ trait ResolvesClientProject
 
             if ($date) {
                 try {
-                    $dateCarbon = is_string($date) ? Carbon::createFromFormat('!Y-m-d', $date) : $date;
-                    if ($dateCarbon->isAfter(Carbon::today())) {
+                    $dateCarbon = is_string($date) ? Carbon::createFromFormat('!Y-m-d', $date, 'Africa/Cairo') : $date->copy()->setTimezone('Africa/Cairo');
+                    if ($dateCarbon->startOfDay()->isAfter(Carbon::today('Africa/Cairo'))) {
                         abort(403, 'Access to future dates is restricted on shared boards.');
                     }
                 } catch (\Throwable $e) {
@@ -46,7 +50,8 @@ trait ResolvesClientProject
             return false;
         }
 
-        return $date->isAfter(Carbon::today());
+        $cairoDate = Carbon::parse($date)->setTimezone('Africa/Cairo')->startOfDay();
+        return $cairoDate->isAfter(Carbon::today('Africa/Cairo'));
     }
 
     /**

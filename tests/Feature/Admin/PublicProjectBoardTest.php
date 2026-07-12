@@ -193,5 +193,87 @@ class PublicProjectBoardTest extends TestCase
             $this->assertNotContains($unpublishedReport->id, $cardIds, 'Unpublished report should be hidden');
         });
     }
+
+    public function test_collaborative_link_allows_guest_to_create_board_note(): void
+    {
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        $signedUrl = URL::signedRoute('shared-board.show', [
+            'token' => $this->project->share_token,
+            'date' => $today,
+            'mode' => 'edit',
+        ]);
+
+        $this->get($signedUrl)->assertStatus(200);
+
+        $response = $this->postJson(route('client.projects.board.store-note', $this->project->id), [
+            'for_date' => $today,
+            'title' => 'Guest Shared Note',
+            'content' => 'Created via collaborative link!',
+            'color' => 'yellow',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('project_board_notes', [
+            'project_id' => $this->project->id,
+            'title' => 'Guest Shared Note',
+            'content' => 'Created via collaborative link!',
+        ]);
+    }
+
+    public function test_read_only_link_does_not_allow_guest_to_create_board_note(): void
+    {
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        $signedUrl = URL::signedRoute('shared-board.show', [
+            'token' => $this->project->share_token,
+            'date' => $today,
+        ]);
+
+        $this->get($signedUrl)->assertStatus(200);
+
+        $response = $this->postJson(route('client.projects.board.store-note', $this->project->id), [
+            'for_date' => $today,
+            'title' => 'Sneaky Note',
+            'content' => 'Should fail',
+            'color' => 'yellow',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_shared_user_can_access_and_write_to_board(): void
+    {
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        $collaborator = User::factory()->create(['onboarding_completed' => true]);
+
+        $this->project->shares()->create([
+            'user_id' => $collaborator->id,
+            'can_edit' => true,
+        ]);
+
+        $unsignedUrl = route('shared-board.show', [
+            'token' => $this->project->share_token,
+            'date' => $today,
+        ]);
+
+        $response = $this->actingAs($collaborator)->get($unsignedUrl);
+
+        $response->assertStatus(200);
+
+        $writeResponse = $this->actingAs($collaborator)->postJson(route('client.projects.board.store-note', $this->project->id), [
+            'for_date' => $today,
+            'title' => 'Collaborator Note',
+            'content' => 'Created by a collaborator!',
+            'color' => 'blue',
+        ]);
+
+        $writeResponse->assertStatus(200);
+        $this->assertDatabaseHas('project_board_notes', [
+            'project_id' => $this->project->id,
+            'title' => 'Collaborator Note',
+        ]);
+    }
 }
 

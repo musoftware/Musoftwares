@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\ProjectReport;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class ProjectReportController extends Controller
 {
@@ -21,12 +22,12 @@ class ProjectReportController extends Controller
             'priority' => $r->priority,
             'summary' => $r->summary,
             'body' => $r->body,
-            'published_at' => $r->published_at ? $r->published_at->toDateTimeString() : null,
+            'published_at' => $r->published_at ? $r->published_at->copy()->setTimezone('Africa/Cairo')->toDateTimeString() : null,
             'is_published' => $r->isPublished(),
             'notify_client' => (bool) $r->notify_client,
-            'period_start' => $r->period_start?->toDateString(),
-            'period_end' => $r->period_end?->toDateString(),
-            'created_at' => $r->created_at?->toDateTimeString(),
+            'period_start' => $r->period_start ? $r->period_start->copy()->setTimezone('Africa/Cairo')->toDateString() : null,
+            'period_end' => $r->period_end ? $r->period_end->copy()->setTimezone('Africa/Cairo')->toDateString() : null,
+            'created_at' => $r->created_at ? $r->created_at->copy()->setTimezone('Africa/Cairo')->toDateTimeString() : null,
         ]);
 
         return Inertia::render('Admin/Projects/Reports/Index', [
@@ -46,7 +47,18 @@ class ProjectReportController extends Controller
 
     public function store(StoreReportRequest $request, Project $project)
     {
-        $project->reports()->create(array_merge($request->validated(), [
+        $data = $request->validated();
+        if (!empty($data['published_at'])) {
+            $data['published_at'] = Carbon::parse($data['published_at'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString();
+        }
+        if (!empty($data['period_start'])) {
+            $data['period_start'] = Carbon::parse($data['period_start'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString();
+        }
+        if (!empty($data['period_end'])) {
+            $data['period_end'] = Carbon::parse($data['period_end'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString();
+        }
+
+        $project->reports()->create(array_merge($data, [
             'author_id' => $request->user()->id,
         ]));
 
@@ -68,9 +80,9 @@ class ProjectReportController extends Controller
                 'priority' => $report->priority,
                 'summary' => $report->summary,
                 'body' => $report->body,
-                'period_start' => $report->period_start?->toDateString(),
-                'period_end' => $report->period_end?->toDateString(),
-                'published_at' => $report->published_at ? $report->published_at->format('Y-m-d\TH:i') : '',
+                'period_start' => $report->period_start ? $report->period_start->copy()->setTimezone('Africa/Cairo')->toDateString() : null,
+                'period_end' => $report->period_end ? $report->period_end->copy()->setTimezone('Africa/Cairo')->toDateString() : null,
+                'published_at' => $report->published_at ? $report->published_at->copy()->setTimezone('Africa/Cairo')->format('Y-m-d\TH:i') : '',
                 'notify_client' => (bool) $report->notify_client,
             ],
             'types' => ProjectReport::TYPES,
@@ -81,7 +93,18 @@ class ProjectReportController extends Controller
     public function update(UpdateReportRequest $request, Project $project, ProjectReport $report)
     {
         abort_unless($report->project_id === $project->id, 404);
-        $report->update($request->validated());
+        $data = $request->validated();
+        if (array_key_exists('published_at', $data)) {
+            $data['published_at'] = $data['published_at'] ? Carbon::parse($data['published_at'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
+        }
+        if (array_key_exists('period_start', $data)) {
+            $data['period_start'] = $data['period_start'] ? Carbon::parse($data['period_start'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
+        }
+        if (array_key_exists('period_end', $data)) {
+            $data['period_end'] = $data['period_end'] ? Carbon::parse($data['period_end'], 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;
+        }
+
+        $report->update($data);
 
         return redirect()
             ->route('admin.projects.reports.index', $project->id)
