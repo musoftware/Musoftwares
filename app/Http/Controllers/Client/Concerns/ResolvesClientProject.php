@@ -15,6 +15,25 @@ trait ResolvesClientProject
     protected function authorizeProject(Project $project): void
     {
         $this->authorize('view', $project);
+
+        $user = auth()->user();
+        if ($user && $user->id !== $project->user_id && !$user->isAdmin()) {
+            $date = request()->route('date')
+                ?? request()->input('for_date')
+                ?? request()->input('date')
+                ?? request()->input('inDate');
+
+            if ($date) {
+                try {
+                    $dateCarbon = is_string($date) ? Carbon::createFromFormat('!Y-m-d', $date) : $date;
+                    if ($dateCarbon->isAfter(Carbon::today())) {
+                        abort(403, 'Access to future dates is restricted on shared boards.');
+                    }
+                } catch (\Throwable $e) {
+                    // Fail-safe: if date parsing fails, let the controller handle validation.
+                }
+            }
+        }
     }
 
     /**

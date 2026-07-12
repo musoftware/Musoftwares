@@ -38,7 +38,7 @@ class ClientProjectBoardController extends Controller
         return $this->boardService ??= app(ProjectBoardService::class);
     }
 
-    // ───────────────── Note Actions ─────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Note Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function storeNote(StoreBoardNoteRequest $request, Project $project)
     {
@@ -72,6 +72,8 @@ class ClientProjectBoardController extends Controller
             null,
             null,
             $categoryId,
+            $data['published_at'] ?? null,
+            array_key_exists('published_at', $data),
         );
 
         return response()->json([
@@ -97,7 +99,13 @@ class ClientProjectBoardController extends Controller
         }
         $owned->save();
 
-        return response()->json(['ok' => true, 'card' => $this->noteToCard($owned, $owned->boardItems()->first())]);
+        $placement = $owned->boardItems()->first();
+        if ($placement && array_key_exists('published_at', $data)) {
+            $placement->published_at = $data['published_at'];
+            $placement->save();
+        }
+
+        return response()->json(['ok' => true, 'card' => $this->noteToCard($owned, $placement)]);
     }
 
     public function destroyNote(Request $request, Project $project, ProjectBoardNote $note)
@@ -109,7 +117,7 @@ class ClientProjectBoardController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    // ───────────────── Task Actions ─────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Task Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function storeTask(Request $request, Project $project)
     {
@@ -122,6 +130,7 @@ class ClientProjectBoardController extends Controller
             'priority' => 'nullable|string|in:low,normal,high,urgent',
             'lane' => 'nullable|string',
             'category_id' => 'nullable|integer|exists:project_board_categories,id',
+            'published_at' => 'nullable|date',
         ]);
 
         $date = $data['for_date'];
@@ -136,7 +145,19 @@ class ClientProjectBoardController extends Controller
 
         $categoryId = $this->resolveCategoryId($project, $request->input('category_id'));
 
-        $placement = $this->place($project, $date, null, $data['lane'] ?? 'backlog', 24, 24, Task::class, $task->id, $categoryId);
+        $placement = $this->place(
+            $project,
+            $date,
+            null,
+            $data['lane'] ?? 'backlog',
+            24,
+            24,
+            Task::class,
+            $task->id,
+            $categoryId,
+            $data['published_at'] ?? null,
+            array_key_exists('published_at', $data),
+        );
 
         return response()->json([
             'ok' => true,
@@ -153,6 +174,7 @@ class ClientProjectBoardController extends Controller
             'task_name' => 'required|string|max:255',
             'task_description' => 'nullable|string',
             'priority' => 'nullable|string|in:low,normal,high,urgent',
+            'published_at' => 'nullable|date',
         ]);
 
         $task->update([
@@ -165,6 +187,11 @@ class ClientProjectBoardController extends Controller
             ->where('itemable_type', Task::class)
             ->where('itemable_id', $task->id)
             ->first();
+
+        if ($placement && array_key_exists('published_at', $data)) {
+            $placement->published_at = $data['published_at'];
+            $placement->save();
+        }
 
         return response()->json([
             'ok' => true,
@@ -182,7 +209,7 @@ class ClientProjectBoardController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    // ───────────────── Todo Actions ─────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Todo Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function storeTodo(Request $request, Project $project)
     {
@@ -195,6 +222,7 @@ class ClientProjectBoardController extends Controller
             'checklist' => 'nullable|array',
             'lane' => 'nullable|string',
             'category_id' => 'nullable|integer|exists:project_board_categories,id',
+            'published_at' => 'nullable|date',
         ]);
 
         $date = $data['for_date'];
@@ -224,7 +252,19 @@ class ClientProjectBoardController extends Controller
 
         $categoryId = $this->resolveCategoryId($project, $request->input('category_id'));
 
-        $placement = $this->place($project, $date, null, $data['lane'] ?? 'backlog', 24, 24, Todo::class, $todo->id, $categoryId);
+        $placement = $this->place(
+            $project,
+            $date,
+            null,
+            $data['lane'] ?? 'backlog',
+            24,
+            24,
+            Todo::class,
+            $todo->id,
+            $categoryId,
+            $data['published_at'] ?? null,
+            array_key_exists('published_at', $data),
+        );
 
         return response()->json([
             'ok' => true,
@@ -242,6 +282,7 @@ class ClientProjectBoardController extends Controller
             'description' => 'nullable|string',
             'completed' => 'nullable|boolean',
             'checklist' => 'nullable|array',
+            'published_at' => 'nullable|date',
         ]);
 
         $todo->update([
@@ -266,6 +307,11 @@ class ClientProjectBoardController extends Controller
             ->where('itemable_id', $todo->id)
             ->first();
 
+        if ($placement && array_key_exists('published_at', $data)) {
+            $placement->published_at = $data['published_at'];
+            $placement->save();
+        }
+
         return response()->json([
             'ok' => true,
             'card' => $this->todoToCard($todo, $placement),
@@ -283,7 +329,7 @@ class ClientProjectBoardController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    // ───────────────── File Actions ─────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ File Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function storeFile(Request $request, Project $project)
     {
@@ -293,6 +339,7 @@ class ClientProjectBoardController extends Controller
             'file' => 'required|file|max:20480', // 20MB max
             'for_date' => 'required|date_format:Y-m-d',
             'lane' => 'nullable|string',
+            'published_at' => 'nullable|date',
         ]);
 
         $disk = config('filesystems.default');
@@ -309,7 +356,20 @@ class ClientProjectBoardController extends Controller
 
         $date = $request->input('for_date');
         $categoryId = $this->resolveCategoryId($project, $request->input('category_id'));
-        $placement = $this->place($project, $date, null, $request->input('lane', 'backlog'), 24, 24, ProjectFile::class, $file->id, $categoryId);
+        $appearanceTime = $request->input('published_at');
+        $placement = $this->place(
+            $project,
+            $date,
+            null,
+            $request->input('lane', 'backlog'),
+            24,
+            24,
+            ProjectFile::class,
+            $file->id,
+            $categoryId,
+            $appearanceTime,
+            $request->has('published_at'),
+        );
 
         return response()->json([
             'ok' => true,
@@ -331,7 +391,7 @@ class ClientProjectBoardController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    // ───────────────── Report Actions ─────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Report Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function storeReport(Request $request, Project $project)
     {
@@ -361,7 +421,19 @@ class ClientProjectBoardController extends Controller
 
         $categoryId = $this->resolveCategoryId($project, $request->input('category_id'));
 
-        $placement = $this->place($project, $date, null, $data['lane'] ?? 'backlog', 24, 24, ProjectReport::class, $report->id, $categoryId);
+        $placement = $this->place(
+            $project,
+            $date,
+            null,
+            $data['lane'] ?? 'backlog',
+            24,
+            24,
+            ProjectReport::class,
+            $report->id,
+            $categoryId,
+            $data['published_at'] ?? null,
+            array_key_exists('published_at', $data),
+        );
 
         return response()->json([
             'ok' => true,
@@ -394,6 +466,11 @@ class ClientProjectBoardController extends Controller
             ->where('itemable_type', ProjectReport::class)
             ->where('itemable_id', $report->id)
             ->first();
+
+        if ($placement && array_key_exists('published_at', $data)) {
+            $placement->published_at = $data['published_at'];
+            $placement->save();
+        }
 
         return response()->json([
             'ok' => true,
@@ -432,7 +509,7 @@ class ClientProjectBoardController extends Controller
         return $pdf->download($filename);
     }
 
-    // ───────────────── Move Action ─────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Move Action â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function moveCard(MoveCardRequest $request, Project $project)
     {
@@ -451,6 +528,13 @@ class ClientProjectBoardController extends Controller
         // The referenced card must belong to this project (guard against forged IDs).
         $this->resolveOwnedItemable($project, $data['type'], (int) $data['id']);
 
+        $boardPublishedAt = null;
+        $updatePublishedAt = false;
+        if ($isAdmin && array_key_exists('published_at', $data)) {
+            $boardPublishedAt = $data['published_at'];
+            $updatePublishedAt = true;
+        }
+
         $placement = $this->place(
             $project,
             $data['for_date'],
@@ -461,6 +545,8 @@ class ClientProjectBoardController extends Controller
             $morphClass,
             (int) $data['id'],
             $this->resolveCategoryId($project, array_key_exists('category_id', $data) ? $data['category_id'] : null),
+            $boardPublishedAt,
+            $updatePublishedAt,
         );
 
         // Optional explicit sort: re-spaces the card inside the target lane. Done
@@ -478,6 +564,7 @@ class ClientProjectBoardController extends Controller
             'pos_y' => $placement->pos_y,
             'sort' => (int) $placement->sort,
             'category_id' => $placement->category_id,
+            'published_at' => $placement->published_at?->toIso8601String(),
         ]);
     }
 
@@ -601,7 +688,7 @@ class ClientProjectBoardController extends Controller
         $id = (int) $data['id'];
         $newDate = $data['for_date'];
 
-        // Guard against forged IDs — the card must belong to this project.
+        // Guard against forged IDs â€” the card must belong to this project.
         $this->resolveOwnedItemable($project, $type, $id);
 
         $morphClass = ProjectBoardItem::morphClassFor($type);
@@ -787,6 +874,8 @@ class ClientProjectBoardController extends Controller
         ?string $morphClass = null,
         ?int $morphId = null,
         ?int $categoryId = null,
+        mixed $boardPublishedAt = null,
+        bool $updatePublishedAt = false,
     ): ProjectBoardItem {
         $morphClass = $morphClass ?? ProjectBoardNote::class;
         $morphId = $morphId ?? $note?->id;
@@ -824,6 +913,11 @@ class ClientProjectBoardController extends Controller
             $placement->save();
         }
 
+        if ($updatePublishedAt) {
+            $placement->published_at = $boardPublishedAt;
+            $placement->save();
+        }
+
         return $placement;
     }
 
@@ -844,7 +938,7 @@ class ClientProjectBoardController extends Controller
 
     private function noteToCard(ProjectBoardNote $note, ?ProjectBoardItem $placement): array
     {
-        $title = $note->title ?: ($note->content ? mb_strimwidth($note->content, 0, 80, '…') : __('general.sticky_note'));
+        $title = $note->title ?: ($note->content ? mb_strimwidth($note->content, 0, 80, 'â€¦') : __('general.sticky_note'));
 
         return [
             'type' => 'note',
@@ -961,7 +1055,7 @@ class ClientProjectBoardController extends Controller
 
     /**
      * Tenant-safe category lookup: returns the int id only if the row belongs to this project.
-     * Treats `null` and "0" identically — null means "no category", which clears the chip.
+     * Treats `null` and "0" identically â€” null means "no category", which clears the chip.
      */
     private function resolveCategoryId(Project $project, mixed $raw): ?int
     {

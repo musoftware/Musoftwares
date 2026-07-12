@@ -26,6 +26,9 @@ class MoveCardRequest extends FormRequest
             'sort' => ['nullable', 'integer', 'min:0'],
             // Optional: change the card's category in the same call. null clears it.
             'category_id' => ['nullable', 'integer', 'exists:project_board_categories,id'],
+            // Optional: card-level publish gate. When set and in the future, the card is
+            // hidden from guests/clients until the moment arrives. Null clears the gate.
+            'published_at' => ['nullable', 'date'],
         ];
     }
 

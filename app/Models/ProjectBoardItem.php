@@ -43,6 +43,7 @@ class ProjectBoardItem extends Model
         'pos_y' => 'integer',
         'sort' => 'integer',
         'category_id' => 'integer',
+        'published_at' => 'datetime',
     ];
 
     public function project(): BelongsTo

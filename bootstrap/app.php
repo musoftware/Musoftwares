@@ -15,6 +15,7 @@ use App\Http\Middleware\SubscriptionMiddleware;
 use App\Http\Middleware\TenantMiddleware;
 use App\Http\Middleware\VerifyEmbedKey;
 use App\Http\Middleware\VerifySerialDeviceHmac;
+use App\Http\Middleware\VerifySharedBoardAccess;
 use App\Models\BlockedIp;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
@@ -74,6 +75,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'force.json' => ForceJsonRequest::class,
             'embed' => VerifyEmbedKey::class,
             'serial.device.hmac' => VerifySerialDeviceHmac::class,
+            'shared_board_access' => VerifySharedBoardAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

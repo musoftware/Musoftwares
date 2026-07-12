@@ -337,11 +337,22 @@ class ProjectBoardService
             /** @var ProjectBoardItem|null $placement */
             $placement = $placements->get("{$morph}:{$id}");
 
+            // Gating by published_at for non-admins:
+            // A card whose placement has a future published_at is invisible to guests/clients.
+            $isAdmin = auth()->user()?->isAdmin() === true;
+            if ($placement && !$isAdmin && $placement->published_at) {
+                if ($placement->published_at->isFuture()) {
+                    return; // Card not yet published — skip for guests/clients
+                }
+            }
+
             $extra['comments_count'] = (int) ($extra['comments_count'] ?? 0);
             $extra['sort'] = (int) ($placement->sort ?? 0);
             $extra['category_id'] = $placement->category_id ?? null;
             $extra['is_ai'] = $placement ? (bool)$placement->is_ai : false;
             $extra['is_important'] = $placement ? (bool)$placement->is_important : false;
+            $extra['published_at'] = $placement?->published_at?->toIso8601String(); // alias 'board_published_at' is sent to frontend
+            $extra['board_published_at'] = $placement?->published_at?->toIso8601String();
             $extra['category'] = $placement?->category ? [
                 'id' => $placement->category->id,
                 'slug' => $placement->category->slug,

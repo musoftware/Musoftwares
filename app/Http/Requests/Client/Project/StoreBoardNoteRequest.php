@@ -21,6 +21,7 @@ class StoreBoardNoteRequest extends FormRequest
             'lane' => ['nullable', 'string', 'max:50'],
             'pos_x' => ['nullable', 'integer', 'min:0'],
             'pos_y' => ['nullable', 'integer', 'min:0'],
+            'published_at' => ['nullable', 'date'],
         ];
     }
 }

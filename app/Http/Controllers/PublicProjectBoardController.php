@@ -19,13 +19,17 @@ class PublicProjectBoardController extends Controller
     {
         $project = Project::where('share_token', $token)->firstOrFail();
 
+        if ($request->user()) {
+            session()->put("shared_project_access.{$project->id}", true);
+        }
+
         try {
             $dateCarbon = Carbon::createFromFormat('!Y-m-d', $date);
         } catch (\Throwable $e) {
             $dateCarbon = Carbon::today();
         }
 
-        $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: false);
+        $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
         $categories = $this->boardService->categoriesFor($project);
 
         $project->loadCount(['tasks', 'reports', 'files']);

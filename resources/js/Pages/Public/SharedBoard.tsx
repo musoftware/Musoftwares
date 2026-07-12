@@ -69,14 +69,16 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
 
                         {/* Action buttons (Calendar, Login CTA, or Control Panel) */}
                         <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setCalendarOpen(true)}
-                                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                            >
-                                <LucideCalendar className="h-3.5 w-3.5 text-indigo-500" />
-                                <span>{__('general.calendar') || 'Calendar'}</span>
-                            </button>
+                            {user && (
+                                <button
+                                    type="button"
+                                    onClick={() => setCalendarOpen(true)}
+                                    className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                                >
+                                    <LucideCalendar className="h-3.5 w-3.5 text-indigo-500" />
+                                    <span>{__('general.calendar') || 'Calendar'}</span>
+                                </button>
+                            )}
 
                             {user ? (
                                 <Link
@@ -162,6 +164,7 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                 onOpenChange={setCalendarOpen}
                 activeDates={activeDates}
                 selectedDate={date}
+                maxDate={format(new Date(), 'yyyy-MM-dd')}
                 onSelectDate={(targetDate) => {
                     router.visit(route('shared-board.show', { token: project.share_token, date: targetDate }));
                 }}

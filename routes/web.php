@@ -185,7 +185,7 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 // Shared project board (public guest view)
 Route::get('/shared-board/{token}/{date}', [\App\Http\Controllers\PublicProjectBoardController::class, 'show'])
     ->name('shared-board.show')
-    ->middleware('signed');
+    ->middleware('shared_board_access');
 
 // Guest comments on shared-board cards (notes, tasks, todos, reports, files).
 // Auth is the unguessable share_token — guests do not need to register.

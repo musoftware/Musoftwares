@@ -104,4 +104,94 @@ class PublicProjectBoardTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_non_guest_can_access_today_board_without_signature(): void
+    {
+        $unsignedUrl = route('shared-board.show', [
+            'token' => $this->project->share_token,
+            'date' => \Carbon\Carbon::today()->toDateString(),
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->get($unsignedUrl);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_non_guest_can_access_past_board_without_signature(): void
+    {
+        $unsignedUrl = route('shared-board.show', [
+            'token' => $this->project->share_token,
+            'date' => \Carbon\Carbon::yesterday()->toDateString(),
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->get($unsignedUrl);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_non_guest_cannot_access_future_board_without_signature(): void
+    {
+        $unsignedUrl = route('shared-board.show', [
+            'token' => $this->project->share_token,
+            'date' => \Carbon\Carbon::tomorrow()->toDateString(),
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->get($unsignedUrl);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_guest_cannot_see_unpublished_or_future_reports(): void
+    {
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        // 1. Past published report (should be visible)
+        $pastReport = \App\Models\ProjectReport::create([
+            'project_id' => $this->project->id,
+            'author_id' => $this->admin->id,
+            'title' => 'Past Published Report',
+            'body' => 'Should see this',
+            'published_at' => \Carbon\Carbon::now()->subMinutes(10),
+        ]);
+
+        // 2. Future published report (should be hidden)
+        $futureReport = \App\Models\ProjectReport::create([
+            'project_id' => $this->project->id,
+            'author_id' => $this->admin->id,
+            'title' => 'Future Published Report',
+            'body' => 'Should NOT see this',
+            'published_at' => \Carbon\Carbon::now()->addMinutes(10),
+        ]);
+
+        // 3. Unpublished report (should be hidden)
+        $unpublishedReport = \App\Models\ProjectReport::create([
+            'project_id' => $this->project->id,
+            'author_id' => $this->admin->id,
+            'title' => 'Unpublished Report',
+            'body' => 'Should NOT see this',
+            'published_at' => null,
+        ]);
+
+        $signedUrl = URL::signedRoute('shared-board.show', [
+            'token' => $this->project->share_token,
+            'date' => $today,
+        ]);
+
+        $response = $this->get($signedUrl);
+
+        $response->assertStatus(200);
+
+        $response->assertInertia(function ($page) use ($pastReport, $futureReport, $unpublishedReport) {
+            $cards = $page->toArray()['props']['cards'] ?? [];
+            $cardIds = collect($cards)->where('type', 'report')->pluck('id')->all();
+
+            $this->assertContains($pastReport->id, $cardIds, 'Past published report should be visible');
+            $this->assertNotContains($futureReport->id, $cardIds, 'Future scheduled report should be hidden');
+            $this->assertNotContains($unpublishedReport->id, $cardIds, 'Unpublished report should be hidden');
+        });
+    }
 }
+

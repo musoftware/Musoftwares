@@ -184,6 +184,7 @@ class ProjectBoardPreferencesTest extends TestCase
 
         ProjectBoardNote::create([
             'project_id' => $this->project->id,
+            'author_id' => $this->admin->id,
             'title' => 'Banana',
             'content' => null,
             'for_date' => $today->toDateString(),
@@ -191,6 +192,7 @@ class ProjectBoardPreferencesTest extends TestCase
         ]);
         ProjectBoardNote::create([
             'project_id' => $this->project->id,
+            'author_id' => $this->admin->id,
             'title' => 'Apple',
             'content' => null,
             'for_date' => $today->toDateString(),

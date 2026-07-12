@@ -5,7 +5,7 @@ import {
     Filter, StickyNote as NoteIcon, AlertCircle, ChevronDown, RotateCcw, Search, Paperclip,
     ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye,
     ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon, Tag,
-    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList, Sparkles
+    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList, Sparkles, Clock
 } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -82,6 +82,8 @@ export interface BoardCard {
     is_ai?: boolean;
     /** Set by the server when the card is marked as the key milestone */
     is_important?: boolean;
+    /** When set and in the future, the card is hidden from guests/clients (admin-only) */
+    board_published_at?: string | null;
 }
 
 interface ProjectBoardProps {
@@ -244,11 +246,12 @@ export default function ProjectBoard({
         cardId?: number;
     } | null>(null);
 
-    const [noteForm, setNoteForm] = useState({ title: '', content: '', color: 'yellow' });
-    const [taskForm, setTaskForm] = useState({ task_name: '', task_description: '', priority: 'normal' });
-    const [todoForm, setTodoForm] = useState({ title: '', description: '', completed: false, checklist: [] as { id?: number; title: string; is_completed: boolean }[] });
+    const [noteForm, setNoteForm] = useState({ title: '', content: '', color: 'yellow', board_published_at: '' });
+    const [taskForm, setTaskForm] = useState({ task_name: '', task_description: '', priority: 'normal', board_published_at: '' });
+    const [todoForm, setTodoForm] = useState({ title: '', description: '', completed: false, checklist: [] as { id?: number; title: string; is_completed: boolean }[], board_published_at: '' });
     const [newCheckItem, setNewCheckItem] = useState('');
     const [fileForm, setFileForm] = useState<File | null>(null);
+    const [fileBoardPublishedAt, setFileBoardPublishedAt] = useState('');
     const [reportForm, setReportForm] = useState({
         title: '',
         body: '',
@@ -624,6 +627,7 @@ export default function ProjectBoard({
         void performReschedule(card, target);
     }, [date, performReschedule]);
 
+
     const reportHtml = useMemo(() => {
         if (!viewingCard) return '';
         const source = viewingCard.type === 'report'
@@ -635,10 +639,11 @@ export default function ProjectBoard({
     }, [viewingCard]);
 
     const openCreateModal = (type: 'note' | 'task' | 'todo' | 'file' | 'report') => {
-        setNoteForm({ title: '', content: '', color: 'yellow' });
-        setTaskForm({ task_name: '', task_description: '', priority: 'normal' });
-        setTodoForm({ title: '', description: '', completed: false, checklist: [] });
+        setNoteForm({ title: '', content: '', color: 'yellow', board_published_at: '' });
+        setTaskForm({ task_name: '', task_description: '', priority: 'normal', board_published_at: '' });
+        setTodoForm({ title: '', description: '', completed: false, checklist: [], board_published_at: '' });
         setFileForm(null);
+        setFileBoardPublishedAt('');
         const currentLocalTimeStr = new Date().toTimeString().slice(0, 5); // "13:46"
         setReportForm({
             title: '',
@@ -651,12 +656,13 @@ export default function ProjectBoard({
     };
 
     const openEditModal = (card: BoardCard) => {
+        const bpa = card.board_published_at ? card.board_published_at.slice(0, 16) : '';
         if (card.type === 'note') {
-            setNoteForm({ title: card.title ?? '', content: card.content ?? '', color: card.color || 'yellow' });
+            setNoteForm({ title: card.title ?? '', content: card.content ?? '', color: card.color || 'yellow', board_published_at: bpa });
         } else if (card.type === 'task') {
-            setTaskForm({ task_name: card.title, task_description: card.description || '', priority: card.priority || 'normal' });
+            setTaskForm({ task_name: card.title, task_description: card.description || '', priority: card.priority || 'normal', board_published_at: bpa });
         } else if (card.type === 'todo') {
-            setTodoForm({ title: card.title, description: card.description || '', completed: !!card.completed, checklist: card.checklist || [] });
+            setTodoForm({ title: card.title, description: card.description || '', completed: !!card.completed, checklist: card.checklist || [], board_published_at: bpa });
         } else if (card.type === 'report') {
             setReportForm({
                 title: card.title,
@@ -665,6 +671,8 @@ export default function ProjectBoard({
                 period_start: card.period_start ? card.period_start.slice(0, 16) : '',
                 period_end: card.period_end ? card.period_end.slice(0, 16) : '',
             });
+        } else if (card.type === 'file') {
+            setFileBoardPublishedAt(bpa);
         }
         setActiveModal({ type: card.type as any, action: 'edit', cardId: card.id });
     };
@@ -756,8 +764,8 @@ export default function ProjectBoard({
             : route('client.projects.board.store-note', { project: projectId });
 
         const payload = isEdit
-            ? { title: noteForm.title, content: noteForm.content, color: noteForm.color }
-            : { for_date: date, title: noteForm.title, content: noteForm.content, color: noteForm.color, lane: 'backlog' };
+            ? { title: noteForm.title, content: noteForm.content, color: noteForm.color, published_at: noteForm.board_published_at || null }
+            : { for_date: date, title: noteForm.title, content: noteForm.content, color: noteForm.color, lane: 'backlog', published_at: noteForm.board_published_at || null };
 
         axios({ method: isEdit ? 'put' : 'post', url, data: payload })
             .then(({ data }) => {
@@ -780,8 +788,8 @@ export default function ProjectBoard({
             : route('client.projects.board.store-task', { project: projectId });
 
         const payload = isEdit 
-            ? taskForm
-            : { ...taskForm, for_date: date, lane: 'backlog' };
+            ? { ...taskForm, published_at: taskForm.board_published_at || null }
+            : { ...taskForm, for_date: date, lane: 'backlog', published_at: taskForm.board_published_at || null };
 
         axios({ method: isEdit ? 'put' : 'post', url, data: payload })
             .then(({ data }) => {
@@ -804,8 +812,8 @@ export default function ProjectBoard({
             : route('client.projects.board.store-todo', { project: projectId });
 
         const payload = isEdit 
-            ? todoForm
-            : { ...todoForm, for_date: date, checklist: todoForm.checklist.map(c => c.title), lane: 'backlog' };
+            ? { ...todoForm, published_at: todoForm.board_published_at || null }
+            : { ...todoForm, for_date: date, checklist: todoForm.checklist.map(c => c.title), lane: 'backlog', published_at: todoForm.board_published_at || null };
 
         axios({ method: isEdit ? 'put' : 'post', url, data: payload })
             .then(({ data }) => {
@@ -828,6 +836,7 @@ export default function ProjectBoard({
         formData.append('file', fileForm);
         formData.append('for_date', date);
         formData.append('lane', 'done');
+        if (fileBoardPublishedAt) formData.append('published_at', fileBoardPublishedAt);
 
         axios.post(route('client.projects.board.store-file', { project: projectId }), formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -1144,6 +1153,12 @@ export default function ProjectBoard({
                                                                         AI
                                                                     </span>
                                                                 )}
+                                                                {card.board_published_at && (
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-indigo-700 ring-1 ring-indigo-200" title="Scheduled to publish">
+                                                                        <Clock className="h-2.5 w-2.5 text-indigo-500" />
+                                                                        {new Date(card.board_published_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                                    </span>
+                                                                )}
                                                             </div>
 
                                                             <button
@@ -1359,6 +1374,19 @@ export default function ProjectBoard({
                         <Trash2 className="h-3.5 w-3.5" />
                         <span>Delete</span>
                     </button>
+                    {isAdmin && (
+                        <button
+                            onClick={() => {
+                                const c = contextMenu.card;
+                                setContextMenu(null);
+                                openEditModal(c);
+                            }}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                            <Clock className="h-3.5 w-3.5 text-indigo-500" />
+                            <span>Set Publish Date</span>
+                        </button>
+                    )}
                     <div className="border-t border-slate-100 my-1" />
                     <div className="px-3 py-1 text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Move Status</div>
                     {Object.entries(LANE_META).map(([laneKey, meta]) => {
@@ -1484,6 +1512,8 @@ export default function ProjectBoard({
                 </DialogContent>
             </Dialog>
 
+
+
             <Dialog open={activeModal?.type === 'note'} onOpenChange={() => setActiveModal(null)}>
                 <DialogContent className="w-full sm:max-w-3xl max-h-[calc(100vh-3rem)] flex flex-col gap-0 p-0 overflow-hidden">
                     <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
@@ -1533,6 +1563,21 @@ export default function ProjectBoard({
                                 ))}
                             </div>
                         </div>
+                        {isAdmin && (
+                            <div className="space-y-1 border-t border-slate-100 pt-3">
+                                <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                                    <Clock className="h-3 w-3 text-indigo-500" />
+                                    Publish Date &amp; Time
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                </Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={noteForm.board_published_at}
+                                    onChange={(e) => setNoteForm({ ...noteForm, board_published_at: e.target.value })}
+                                    className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                />
+                            </div>
+                        )}
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
@@ -1587,6 +1632,21 @@ export default function ProjectBoard({
                                 <option value="urgent">Urgent</option>
                             </select>
                         </div>
+                        {isAdmin && (
+                            <div className="space-y-1 border-t border-slate-100 pt-3">
+                                <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                                    <Clock className="h-3 w-3 text-indigo-500" />
+                                    Publish Date &amp; Time
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                </Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={taskForm.board_published_at}
+                                    onChange={(e) => setTaskForm({ ...taskForm, board_published_at: e.target.value })}
+                                    className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                />
+                            </div>
+                        )}
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
@@ -1669,6 +1729,21 @@ export default function ProjectBoard({
                                 </button>
                             </div>
                         </div>
+                        {isAdmin && (
+                            <div className="space-y-1 border-t border-slate-100 pt-3">
+                                <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                                    <Clock className="h-3 w-3 text-indigo-500" />
+                                    Publish Date &amp; Time
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                </Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={todoForm.board_published_at}
+                                    onChange={(e) => setTodoForm({ ...todoForm, board_published_at: e.target.value })}
+                                    className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                />
+                            </div>
+                        )}
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
@@ -1994,6 +2069,21 @@ export default function ProjectBoard({
                                 </div>
                             )}
                         </div>
+                        {isAdmin && (
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                                    <Clock className="h-3 w-3 text-indigo-500" />
+                                    Publish Date &amp; Time
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                </Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={fileBoardPublishedAt}
+                                    onChange={(e) => setFileBoardPublishedAt(e.target.value)}
+                                    className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                />
+                            </div>
+                        )}
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50" disabled={uploading}>
@@ -2046,6 +2136,22 @@ export default function ProjectBoard({
                                 />
                             </div>
                         </div>
+
+                        {isAdmin && (
+                            <div className="space-y-1 border-t border-slate-100 pt-3">
+                                <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                                    <Clock className="h-3 w-3 text-indigo-500" />
+                                    Publish Date &amp; Time
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Specify when the report should become visible to guests/clients</span>
+                                </Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={reportForm.published_at}
+                                    onChange={(e) => setReportForm({ ...reportForm, published_at: e.target.value })}
+                                    className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
+                                />
+                            </div>
+                        )}
 
                         <div className="flex items-center justify-between bg-slate-50/50 border border-slate-100 rounded-xl p-3">
                             <div className="text-[11px] text-slate-500 max-w-md">

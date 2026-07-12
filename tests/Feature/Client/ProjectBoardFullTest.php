@@ -926,4 +926,49 @@ class ProjectBoardFullTest extends TestCase
             'Todo should appear on tomorrow\'s board after reschedule.',
         );
     }
+
+    public function test_card_published_at_future_gating(): void
+    {
+        $client = $this->makeClient();
+        $admin = $this->makeAdmin();
+        $project = $this->makeProject($client);
+        $today = now();
+
+        // Create a sticky note card placed today but published tomorrow (future)
+        $note = ProjectBoardNote::create([
+            'project_id' => $project->id,
+            'author_id' => $admin->id,
+            'title' => 'Future Card Note',
+            'content' => 'Gated content',
+            'for_date' => $today->toDateString(),
+            'color' => 'yellow',
+        ]);
+
+        $placement = $project->boardItems()->create([
+            'for_date' => $today->toDateString(),
+            'itemable_type' => ProjectBoardNote::class,
+            'itemable_id' => $note->id,
+            'lane' => 'backlog',
+            'pos_x' => 10,
+            'pos_y' => 10,
+            'published_at' => now()->addDay(), // future published date
+        ]);
+
+        // For guest/client (applyFutureGating = true)
+        $cardsForClient = app(ProjectBoardService::class)->cardsForDate($project, $today, applyFutureGating: true);
+        $clientCardsCol = collect($cardsForClient);
+        $this->assertFalse(
+            $clientCardsCol->contains(fn ($c) => $c['type'] === 'note' && $c['id'] === $note->id),
+            'Sticky note published in the future should be hidden from client/guest.'
+        );
+
+        // For admin (auth as admin, applyFutureGating = false or isAdmin check in buildCards)
+        $this->actingAs($admin);
+        $cardsForAdmin = app(ProjectBoardService::class)->cardsForDate($project, $today, applyFutureGating: false);
+        $adminCardsCol = collect($cardsForAdmin);
+        $this->assertTrue(
+            $adminCardsCol->contains(fn ($c) => $c['type'] === 'note' && $c['id'] === $note->id),
+            'Sticky note published in the future should be visible to admin.'
+        );
+    }
 }

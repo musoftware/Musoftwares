@@ -26,6 +26,7 @@ interface CalendarSelectorProps {
     activeDates: string[]; // ['YYYY-MM-DD', ...]
     selectedDate: string;  // 'YYYY-MM-DD'
     onSelectDate: (date: string) => void;
+    maxDate?: string;      // 'YYYY-MM-DD'
 }
 
 export default function CalendarSelector({
@@ -34,6 +35,7 @@ export default function CalendarSelector({
     activeDates = [],
     selectedDate,
     onSelectDate,
+    maxDate,
 }: CalendarSelectorProps) {
     const [currentMonth, setCurrentMonth] = useState<Date>(
         selectedDate ? parseISO(selectedDate) : new Date()
@@ -122,17 +124,21 @@ export default function CalendarSelector({
                             const isSelected = dateStr === selectedDate;
                             const isToday = isSameDay(dateObj, new Date());
                             const hasWork = activeDates.includes(dateStr);
+                            const isDayDisabled = maxDate ? dateStr > maxDate : false;
 
                             return (
                                 <button
                                     key={dateStr}
                                     type="button"
-                                    onClick={() => handleDayClick(dateObj)}
+                                    disabled={isDayDisabled}
+                                    onClick={() => !isDayDisabled && handleDayClick(dateObj)}
                                     className={cn(
                                         'group relative flex flex-col items-center justify-center py-2.5 rounded-xl transition-all duration-200 select-none active:scale-95',
                                         isSelected 
                                             ? 'bg-slate-900 text-white font-extrabold shadow shadow-slate-900/30' 
-                                            : 'hover:bg-slate-100/80 text-slate-700 font-semibold',
+                                            : isDayDisabled
+                                                ? 'text-slate-300 cursor-not-allowed opacity-40'
+                                                : 'hover:bg-slate-100/80 text-slate-700 font-semibold',
                                         isToday && !isSelected && 'ring-2 ring-indigo-500/30 text-indigo-700 font-bold'
                                     )}
                                 >
