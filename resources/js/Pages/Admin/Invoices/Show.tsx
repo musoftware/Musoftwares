@@ -464,10 +464,40 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <span className="font-medium text-gray-900">{invoice.user.phone_number}</span>
                                 </div>
                             )}
-                            {invoice.project && (
-                                <div className="inline-flex items-center rounded bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-900 mt-2">
-                                    <Folder className="w-3 h-3 me-1" /> {invoice.project.project_name}
+                            {invoice.project ? (
+                                <div className="flex items-center gap-2 mt-2">
+                                    <div className="inline-flex items-center rounded bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-900">
+                                        <Folder className="w-3 h-3 me-1 text-slate-500" /> {invoice.project.project_name}
+                                    </div>
+                                    {invoice.user?.id && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setTransferProjectId(invoice.project?.id || null);
+                                                setTransferModal(true);
+                                            }}
+                                            className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-0.5"
+                                        >
+                                            <Edit2 className="w-3 h-3" /> {__('general.change') || 'Change'}
+                                        </button>
+                                    )}
                                 </div>
+                            ) : (
+                                invoice.user?.id && (
+                                    <div className="mt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setTransferProjectId(null);
+                                                setTransferModal(true);
+                                            }}
+                                            className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-slate-300 hover:border-slate-400 bg-slate-50 hover:bg-slate-100/50 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors"
+                                        >
+                                            <Folder className="w-3.5 h-3.5 text-slate-400" />
+                                            {__('admin.assign_to_project') || 'Assign to Project'}
+                                        </button>
+                                    </div>
+                                )
                             )}
                         </div>
                     </CardContent>
