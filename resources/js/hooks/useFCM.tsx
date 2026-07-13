@@ -95,6 +95,8 @@ export function useFCM() {
         
         if (currentPermission === 'granted') {
             registerFCMToken();
+            // Clear the dismissed flag so we don't need it any more
+            try { localStorage.removeItem('notif_banner_dismissed'); } catch { /* ignore */ }
             toast({
                 title: __('general.success'),
                 description: __('general.notifications_enabled_successfully')

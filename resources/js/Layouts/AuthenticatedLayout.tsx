@@ -57,6 +57,7 @@ function AuthenticatedContent({
     const displayEmail = activeUser?.email || 'user@example.com';
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [isIOS, setIsIOS] = useState(false);
+    const [notifBannerDismissed, setNotifBannerDismissed] = useState(false);
 
     useEffect(() => {
         setIsIOS(
@@ -64,7 +65,18 @@ function AuthenticatedContent({
             /iPad|iPhone|iPod/.test(navigator.userAgent) &&
             !(window as any).MSStream
         );
+        // Restore dismissed state from localStorage
+        try {
+            if (localStorage.getItem('notif_banner_dismissed') === '1') {
+                setNotifBannerDismissed(true);
+            }
+        } catch { /* ignore */ }
     }, []);
+
+    const dismissNotifBanner = () => {
+        setNotifBannerDismissed(true);
+        try { localStorage.setItem('notif_banner_dismissed', '1'); } catch { /* ignore */ }
+    };
 
     // Safety checks for route existence
     const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
@@ -141,7 +153,14 @@ function AuthenticatedContent({
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
             {isImpersonating && (
-                <div className="bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0" style={{ height: '36px' }}>
+                <div
+                    className="bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0"
+                    style={{
+                        /* Push content below iOS status bar on PWA standalone mode */
+                        paddingTop: 'env(safe-area-inset-top, 0px)',
+                        height: 'calc(36px + env(safe-area-inset-top, 0px))'
+                    }}
+                >
                     <div className="flex items-center gap-2 min-w-0">
                         <Shield className="h-4 w-4 text-amber-100 animate-pulse shrink-0" />
                         <span className="truncate">
@@ -159,7 +178,14 @@ function AuthenticatedContent({
             )}
 
             {/* Top Navigation */}
-            <header className={cn("sticky z-40 w-full bg-white border-b border-slate-200", isImpersonating ? "top-[36px]" : "top-0")} style={{ height: '68px' }}>
+            <header
+                className={cn("sticky z-40 w-full bg-white border-b border-slate-200", isImpersonating ? "top-[36px]" : "top-0")}
+                style={{
+                    /* Shift content below iOS notch/dynamic island when running as installed PWA */
+                    paddingTop: 'env(safe-area-inset-top, 0px)',
+                    height: 'calc(68px + env(safe-area-inset-top, 0px))'
+                }}
+            >
                 <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 h-full">
                     <div className="flex h-full items-center justify-between">
                         {/* LEFT: Logo & Nav */}
@@ -992,8 +1018,8 @@ function AuthenticatedContent({
                 </div>
             </header>
 
-            {/* Notification Permission Banner */}
-            {permission !== 'granted' && !auth?.has_ios_shortcut_active && (
+            {/* Notification Permission Banner — hidden once dismissed or permission already granted */}
+            {permission !== 'granted' && !auth?.has_ios_shortcut_active && !notifBannerDismissed && (
                 <div className="bg-indigo-600 px-4 py-3 text-white sm:px-6 lg:px-8">
                     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                         <p className="text-sm leading-6">
@@ -1005,18 +1031,28 @@ function AuthenticatedContent({
                             {isIOS ? (
                                 <Link
                                     href={safeRoute('freelance.settings.notifications') || '#'}
-                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
+                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
                                 >
                                     {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
                                 </Link>
                             ) : (
                                 <button
                                     onClick={requestPermission}
-                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
+                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
                                 >
                                     {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
                                 </button>
                             )}
+                            {/* Dismiss: hides the banner permanently via localStorage */}
+                            <button
+                                onClick={dismissNotifBanner}
+                                aria-label="Dismiss notification banner"
+                                className="rounded-full p-1 hover:bg-indigo-500 transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 6 6 18M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>

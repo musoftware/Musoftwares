@@ -226,8 +226,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
     const safeCounts: BoardTopNavCounts = counts ?? {};
 
     return (
-        <div
+        <header
             className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm"
+            style={{
+                paddingTop: 'env(safe-area-inset-top, 0px)'
+            }}
             aria-label={__('general.board_layout_aria')}
         >
             <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
@@ -632,6 +635,6 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                 selectedDate={date}
                 onSelectDate={goToDate}
             />
-        </div>
+        </header>
     );
 }

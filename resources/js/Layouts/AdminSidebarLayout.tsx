@@ -30,7 +30,13 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
             {title && <Head title={title} />}
             <AppSidebar />
             <main className="flex-1 flex flex-col min-h-screen bg-slate-50 w-full overflow-hidden">
-                <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b bg-white px-4 shadow-sm">
+                <header
+                    className="sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b bg-white px-4 shadow-sm"
+                    style={{
+                        paddingTop: 'env(safe-area-inset-top, 0px)',
+                        height: 'calc(64px + env(safe-area-inset-top, 0px))'
+                    }}
+                >
                     <SidebarTrigger className="-ms-1" />
                     <div className="flex-1">
                         {header && typeof header === 'string' ? (
