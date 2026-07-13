@@ -22,6 +22,7 @@ use App\Notifications\SerialUserDeviceStatusChangedNotification;
 use App\Notifications\SubscriptionPaymentFailedNotification;
 use App\Notifications\WithdrawalApprovedNotification;
 use App\Notifications\WithdrawalRequestedNotification;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -31,6 +32,8 @@ use Tests\TestCase;
 
 class FcmNotificationsTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();

@@ -34,8 +34,21 @@ class AdminUserService extends BaseService
         if ($request->filled('password')) {
             $user->password = Hash::make($request->input('password'));
         }
+
+        $oldCurrencyId = $user->getOriginal('currency_id');
+
         $this->applyFields($user, $request);
         $this->applyRoles($user, $request);
+
+        $user->save();
+
+        if ($user->wasChanged('currency_id')) {
+            $oldId = (int) $oldCurrencyId;
+            $newId = (int) $user->currency_id;
+            if ($oldId > 0 && $oldId !== $newId) {
+                app(ClientCurrencyConverterService::class)->convert($user, $oldId, $newId);
+            }
+        }
     }
 
     /**
@@ -43,40 +56,60 @@ class AdminUserService extends BaseService
      */
     private function applyFields(User $user, Request $request): void
     {
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->mobile_1 = $request->input('mobile_1');
-        $user->mobile_2 = $request->input('mobile_2');
-        $user->whatsapp_number = $request->input('whatsapp_number');
-        $user->telegram_username = $request->input('telegram_username');
-        $user->country = $request->input('country');
-        $user->city = $request->input('city');
-        $user->currency_id = $request->input('currency') ?? $user->currency_id ?? 2;
-        $user->max_devices = $request->input('max_devices');
+        if ($request->filled('name')) {
+            $user->name = $request->input('name');
+        }
+        if ($request->filled('email')) {
+            $user->email = $request->input('email');
+        }
+        if ($request->filled('mobile_1')) {
+            $user->mobile_1 = $request->input('mobile_1');
+        }
+        if ($request->filled('mobile_2')) {
+            $user->mobile_2 = $request->input('mobile_2');
+        }
+        if ($request->filled('whatsapp_number')) {
+            $user->whatsapp_number = $request->input('whatsapp_number');
+        }
+        if ($request->filled('telegram_username')) {
+            $user->telegram_username = $request->input('telegram_username');
+        }
+        if ($request->filled('country')) {
+            $user->country = $request->input('country');
+        }
+        if ($request->filled('city')) {
+            $user->city = $request->input('city');
+        }
+        if ($request->filled('currency')) {
+            $user->currency_id = $request->input('currency') ?? $user->currency_id ?? 2;
+        }
+        if ($request->filled('max_devices')) {
+            $user->max_devices = $request->input('max_devices');
+        }
 
         // Expanded Fields from Edit.jsx
-        if ($request->has('full_name')) {
+        if ($request->filled('full_name')) {
             $user->full_name = $request->input('full_name');
         }
-        if ($request->has('facebook')) {
+        if ($request->filled('facebook')) {
             $user->facebook = $request->input('facebook');
         }
-        if ($request->has('skype')) {
+        if ($request->filled('skype')) {
             $user->skype = $request->input('skype');
         }
-        if ($request->has('phone_number')) {
+        if ($request->filled('phone_number')) {
             $user->phone_number = $request->input('phone_number');
         }
-        if ($request->has('phone_number2')) {
+        if ($request->filled('phone_number2')) {
             $user->phone_number2 = $request->input('phone_number2');
         }
         if ($request->has('disable_unpaid_balance_whatsapp')) {
             $user->disable_unpaid_balance_whatsapp = $request->boolean('disable_unpaid_balance_whatsapp');
         }
-        if ($request->has('job')) {
+        if ($request->filled('job')) {
             $user->job = $request->input('job');
         }
-        if ($request->has('address')) {
+        if ($request->filled('address')) {
             $user->address = $request->input('address');
         }
 
@@ -84,7 +117,7 @@ class AdminUserService extends BaseService
             $val = $request->input('hour_rate_currency');
             $user->hour_rate_currency_id = $val ?: ($user->currency_id ?? 1);
         }
-        if ($request->has('hour_rate')) {
+        if ($request->filled('hour_rate')) {
             $user->hour_rate = $request->input('hour_rate');
         }
 
@@ -92,20 +125,20 @@ class AdminUserService extends BaseService
             $val2 = $request->input('booking_rate_currency');
             $user->booking_rate_currency_id = $val2 ?: null;
         }
-        if ($request->has('booking_rate')) {
+        if ($request->filled('booking_rate')) {
             $user->booking_rate = $request->input('booking_rate');
         }
-        if ($request->has('booking_rate_expires_at')) {
+        if ($request->filled('booking_rate_expires_at')) {
             $user->booking_rate_expires_at = $request->input('booking_rate_expires_at');
         }
-        if ($request->has('salary')) {
+        if ($request->filled('salary')) {
             $user->salary = $request->input('salary');
         }
-        if ($request->has('usd_type')) {
+        if ($request->filled('usd_type')) {
             $user->usd_type = $request->input('usd_type');
         }
 
-        if ($request->has('subscription_date')) {
+        if ($request->filled('subscription_date')) {
             $user->subscription_date = $request->input('subscription_date');
         }
         if ($request->has('subscription_plan')) {
@@ -140,7 +173,7 @@ class AdminUserService extends BaseService
         }
 
         // Referral configuration fields
-        if ($request->has('affiliate_commission_percentage')) {
+        if ($request->filled('affiliate_commission_percentage')) {
             $user->affiliate_commission_percentage = $request->input('affiliate_commission_percentage');
         }
         if ($request->has('add_commission_to_total')) {
@@ -149,7 +182,7 @@ class AdminUserService extends BaseService
         if ($request->has('ref_user_id')) {
             $user->ref_user_id = $request->input('ref_user_id');
         }
-        if ($request->has('slug')) {
+        if ($request->filled('slug')) {
             $user->slug = $request->input('slug');
         }
 
@@ -174,23 +207,8 @@ class AdminUserService extends BaseService
             $user->kyc_verified_by = null;
         }
 
-        if ($request->has('kyc_notes')) {
+        if ($request->filled('kyc_notes')) {
             $user->kyc_notes = $request->input('kyc_notes');
-        }
-
-        // Capture the pre-save currency BEFORE save(): Model::save() syncs the
-        // original attributes to the current ones, so getOriginal() afterwards
-        // would return the new value and the change would go undetected.
-        $oldCurrencyId = $user->getOriginal('currency_id');
-
-        $user->save();
-
-        if ($user->wasChanged('currency_id')) {
-            $oldId = (int) $oldCurrencyId;
-            $newId = (int) $user->currency_id;
-            if ($oldId > 0 && $oldId !== $newId) {
-                app(ClientCurrencyConverterService::class)->convert($user, $oldId, $newId);
-            }
         }
     }
 
