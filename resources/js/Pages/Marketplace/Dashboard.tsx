@@ -27,7 +27,8 @@ import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeCont
 import { __ } from '@/lib/i18n';
 
 export default function MarketplaceDashboard({
-    stats: initialStats,
+    sellerStats,
+    buyerStats,
     activePurchases: initialPurchases,
     activeSales: initialSales,
     listedGigs: initialGigs,
@@ -39,12 +40,9 @@ export default function MarketplaceDashboard({
     const mode = marketplaceModeContext?.mode || 'client';
     const isClient = mode === 'client';
 
-    const stats = initialStats || {
-        lockedEscrow: 0,
-        activeOrders: 0,
-        servicesListed: 0,
-        totalSales: 0
-    };
+    const stats = isClient 
+        ? (buyerStats || { lockedEscrow: 0, activeOrders: 0, servicesListed: 0, totalSales: 0 })
+        : (sellerStats || { lockedEscrow: 0, activeOrders: 0, servicesListed: 0, totalSales: 0 });
 
     const activePurchases = initialPurchases || [];
     const activeSales = initialSales || [];
@@ -86,17 +84,17 @@ export default function MarketplaceDashboard({
                         icon={Lock}
                     />
                     <MetricCard 
-                        label={__('general.active_orders')}
+                        label={isClient ? __('general.active_purchases') : __('general.active_orders')}
                         value={stats.activeOrders}
                         icon={Clock}
                     />
                     <MetricCard 
-                        label={__('general.catalog_gigs')}
+                        label={isClient ? __('general.gigs_purchased') : __('general.catalog_gigs')}
                         value={stats.servicesListed}
                         icon={Layers}
                     />
                     <MetricCard 
-                        label={__('general.total_sales')}
+                        label={isClient ? __('general.total_spent') : __('general.total_sales')}
                         value={formatMoney(stats.totalSales, 'USD')}
                         icon={DollarSign}
                     />

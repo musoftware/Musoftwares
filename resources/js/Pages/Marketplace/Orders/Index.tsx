@@ -5,7 +5,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
 import { __ } from '@/lib/i18n';
-import { formatMoney as formatCurrency } from '@/lib/utils';
+import { formatMoney as formatCurrency, formatDate } from '@/lib/utils';
 
 export default function Index({ orders, tab }: any) {
     const { mode, setMode } = useMarketplaceMode();
@@ -199,7 +199,7 @@ export default function Index({ orders, tab }: any) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">
-                                                            {deadlineDate ? deadlineDate.toLocaleDateString() : __('general.tbd')}
+                                                            {deadlineDate ? formatDate(deadlineDate) : __('general.tbd')}
                                                         </div>
                                                         {deliveryDays && (
                                                             <div className="text-xs text-gray-500">
@@ -215,7 +215,7 @@ export default function Index({ orders, tab }: any) {
                                                             )}
                                                             className="inline-flex items-center rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
                                                         >
-                                                            View Order{' '}
+                                                            {__('general.view_order')}{' '}
                                                             <span
                                                                 aria-hidden="true"
                                                                 className="ms-1"
@@ -247,10 +247,10 @@ export default function Index({ orders, tab }: any) {
                                 </svg>
                                 <h3 className="mt-2 text-sm font-medium text-gray-900">{__('general.no_orders_found_1')}</h3>
                                 <p className="mt-1 text-sm text-gray-500">
-                                    You don't have any{' '}
-                                    {tab === 'sales' ? 'sales' : 'purchases'}{' '}
-                                    yet.
-                                </p>
+                                     {tab === 'sales'
+                                         ? __('general.no_sales_yet')
+                                         : __('general.no_purchases_yet')}
+                                 </p>
                                 {(!tab || tab === 'purchases') && (
                                     <div className="mt-6">
                                         <Link

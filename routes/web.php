@@ -867,6 +867,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/points', [PointPurchaseController::class, 'index'])->name('points.index');
     Route::post('/points/purchase', [PointPurchaseController::class, 'store'])->name('point-purchases.store');
     Route::post('/points/purchase-wallet', [PointPurchaseController::class, 'storeWallet'])->name('point-purchases.store-wallet');
+    Route::get('/points/kashier/success', [PointPurchaseController::class, 'success'])->name('points.kashier.success');
+    Route::get('/points/kashier/failure', [PointPurchaseController::class, 'failure'])->name('points.kashier.failure');
 
     // Contracts (Generated from Proposals or Wizard)
     Route::get('/contracts', [ContractController::class, 'index'])->name('contracts.index');
@@ -979,6 +981,7 @@ Route::post('/guest/invoices/payment/webhook', [GuestInvoiceController::class, '
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
 Route::post('/subscriptions/kashier/webhook', [SubscriptionController::class, 'webhook'])->name('subscriptions.kashier.webhook');
+Route::post('/points/kashier/webhook', [PointPurchaseController::class, 'webhook'])->name('points.kashier.webhook');
 
 // ── Public Client Portal (No Auth Required) ──
 Route::prefix('c')->name('client-portal.')->group(function () {

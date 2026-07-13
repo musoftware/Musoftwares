@@ -6,22 +6,23 @@ import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
+import { __ } from '@/lib/i18n';
 
 export default function SellerProducts({ products }: any) {
     return (
         <MarketplaceLayout>
-            <Head title="My Products" />
+            <Head title={__('general.my_products')} />
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <ModulePageHeader 
-                    title="My Products"
-                    description="Manage your marketplace listings and services."
+                    title={__('general.my_products')}
+                    description={__('general.manage_your_marketplace_listings')}
                     actions={
                         <Link
                             href="/marketplace/services/create"
                             className="inline-flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs h-9 px-3.5 rounded-lg transition-colors shadow-sm"
                         >
                             <Plus className="h-3.5 w-3.5 mr-1.5" />
-                            Create Product
+                            {__('general.create_product')}
                         </Link>
                     }
                 />
@@ -37,31 +38,31 @@ export default function SellerProducts({ products }: any) {
                                         {product.title}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs text-slate-500">
-                                        <span>Category: {product.category?.name || 'Uncategorized'}</span>
+                                        <span>{__('general.category')}: {product.category?.name || __('general.uncategorized')}</span>
                                         <span>•</span>
-                                        <span>Created: {formatDate(product.created_at)}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <StatusBadge status={product.status || 'pending'} size="sm" />
-                                    <Link
-                                        href={`/marketplace/services/${product.id}/edit`}
-                                        className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
-                                    >
-                                        Edit
-                                    </Link>
-                                    <Link
-                                        href={`/marketplace/services/${product.id}`}
-                                        className="text-slate-600 hover:text-slate-800 text-xs font-medium"
-                                    >
-                                        Preview
-                                    </Link>
-                                </div>
-                            </div>
+                                        <span>{__('general.created')}: {formatDate(product.created_at)}</span>
+                                     </div>
+                                 </div>
+                                 <div className="flex items-center gap-3">
+                                     <StatusBadge status={product.status || 'pending'} size="sm" />
+                                     <Link
+                                         href={`/marketplace/services/${product.id}/edit`}
+                                         className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                                     >
+                                         {__('general.edit')}
+                                     </Link>
+                                     <Link
+                                         href={`/marketplace/services/${product.id}`}
+                                         className="text-slate-600 hover:text-slate-800 text-xs font-medium"
+                                     >
+                                         {__('general.preview')}
+                                     </Link>
+                                 </div>
+                             </div>
                         ))}
                         {products.data.length === 0 && (
                             <div className="p-8 text-center text-slate-500">
-                                You haven't listed any products yet.
+                                {__('general.no_services_found_1')}
                             </div>
                         )}
                     </div>

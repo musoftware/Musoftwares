@@ -92,6 +92,6 @@ class Service extends Model
         if (!empty($this->gallery) && is_array($this->gallery) && isset($this->gallery[0])) {
             return asset('storage/' . $this->gallery[0]);
         }
-        return null;
+        return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80';
     }
 }

@@ -6,21 +6,22 @@ import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
+import { __ } from '@/lib/i18n';
 
 export default function SellerPayouts({ escrows }: any) {
     return (
         <MarketplaceLayout>
-            <Head title="Escrow & Payouts" />
+            <Head title={__('general.payouts_escrow')} />
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <ModulePageHeader 
-                    title="Escrow & Payouts"
-                    description="View funds currently held in escrow and your released payouts."
+                    title={__('general.payouts_escrow')}
+                    description={__('general.view_funds_escrow')}
                     actions={
                         <Link
                             href="/financial/withdrawals"
                             className="inline-flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs h-9 px-3.5 rounded-lg transition-colors shadow-sm"
                         >
-                            <DollarSign className="w-3.5 h-3.5 me-1.5" /> Request Withdrawal
+                            <DollarSign className="w-3.5 h-3.5 me-1.5" /> {__('general.request_withdrawal')}
                         </Link>
                     }
                 />
@@ -36,9 +37,9 @@ export default function SellerPayouts({ escrows }: any) {
                                         Escrow #{escrow.id} - Order #{escrow.order_id}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs text-slate-500">
-                                        <span>Service: {escrow.order?.package?.service?.title || 'Unknown'}</span>
+                                        <span>{__('general.service')}: {escrow.order?.package?.service?.title || 'Unknown'}</span>
                                         <span>•</span>
-                                        <span>Date: {formatDate(escrow.created_at)}</span>
+                                        <span>{__('general.created')}: {formatDate(escrow.created_at)}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -51,7 +52,7 @@ export default function SellerPayouts({ escrows }: any) {
                         ))}
                         {escrows.data.length === 0 && (
                             <div className="p-8 text-center text-slate-500">
-                                No escrow records found.
+                                {__('general.no_escrows_found')}
                             </div>
                         )}
                     </div>

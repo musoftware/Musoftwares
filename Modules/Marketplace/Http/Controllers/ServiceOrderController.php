@@ -61,6 +61,11 @@ class ServiceOrderController extends Controller
         ]);
 
         $package = ServicePackage::with('service')->findOrFail($validated['package_id']);
+
+        if (!$package->service || $package->service->status !== 'active') {
+            return redirect()->back()->withErrors(['error' => 'This service is currently unavailable.']);
+        }
+
         $buyer = auth()->user();
         $seller_id = $package->service->seller_id;
 

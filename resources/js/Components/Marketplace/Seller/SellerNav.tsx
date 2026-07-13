@@ -2,14 +2,15 @@ import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutDashboard, Package, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export function SellerNav() {
     const { url } = usePage();
 
     const tabs = [
-        { name: 'Dashboard', href: '/seller/dashboard', icon: LayoutDashboard },
-        { name: 'Products', href: '/seller/products', icon: Package },
-        { name: 'Payouts', href: '/seller/payouts', icon: Wallet },
+        { name: __('general.dashboard'), href: '/seller/dashboard', icon: LayoutDashboard },
+        { name: __('general.my_products'), href: '/seller/products', icon: Package },
+        { name: __('general.my_payouts'), href: '/seller/payouts', icon: Wallet },
     ];
 
     return (

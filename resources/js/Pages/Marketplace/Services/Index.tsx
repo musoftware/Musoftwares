@@ -46,8 +46,8 @@ export default function Index({ services }: any) {
                                             {service.title}
                                         </h4>
                                         <p className="mt-1 text-sm text-gray-500">
-                                            by{' '}
-                                            {service.seller?.name || 'Unknown'}
+                                            {__('general.by')}{' '}
+                                            {service.seller?.name || __('general.unknown')}
                                         </p>
                                         <div className="mt-4 flex items-center justify-between">
                                             <span className="font-medium text-indigo-600">

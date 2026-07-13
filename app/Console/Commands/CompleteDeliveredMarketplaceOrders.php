@@ -35,7 +35,7 @@ class CompleteDeliveredMarketplaceOrders extends Command
     {
         $orders = ServiceOrder::where('status', 'delivered')
             ->whereNotNull('auto_complete_at')
-            ->where('auto_complete_at', '<=', now())
+            ->where('auto_complete_at', '<=', \Carbon\Carbon::now('Africa/Cairo'))
             ->get();
 
         $count = 0;

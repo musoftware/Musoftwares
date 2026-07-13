@@ -14,7 +14,20 @@ export default function Show({ service }: any) {
 
     // Sort packages Basic, Standard, Premium if names match, otherwise just take what's given.
     const packages = service.packages || [];
-    const sortedPackages = packages.sort((a: any, b: any) => a.price - b.price);
+    const sortedPackages = packages.length > 0
+        ? [...packages].sort((a: any, b: any) => a.price - b.price)
+        : [
+              {
+                  id: 0,
+                  name: __('general.standard') || 'Standard',
+                  description: service.description || __('general.no_description_available') || 'No description available.',
+                  price: service.is_free ? 0 : 5,
+                  currency: 'USD',
+                  delivery_days: 3,
+                  revisions: 2,
+                  is_mock: true
+              }
+          ];
     const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
         sortedPackages.length > 0 ? sortedPackages[0].id : null,
     );
@@ -187,7 +200,7 @@ export default function Show({ service }: any) {
                                                     service.seller?.created_at,
                                                 ).getFullYear()}
                                             </p>
-                                            <button className="rounded-md border border-indigo-600 px-6 py-2 font-medium text-indigo-600 transition hover:bg-indigo-50">{__('general.contact_me')}</button>
+                                            <Link href="/messages" className="inline-block rounded-md border border-indigo-600 px-6 py-2 font-medium text-indigo-600 transition hover:bg-indigo-50">{__('general.contact_me')}</Link>
                                         </div>
                                     </div>
                                 </div>
@@ -293,7 +306,17 @@ export default function Show({ service }: any) {
                                                     </span>
                                                 </div>
 
-                                                {displayBalance >= selectedPackage.price ? (
+                                                {selectedPackage.is_mock ? (
+                                                    <Link
+                                                        href="/messages"
+                                                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 hover:bg-slate-900 px-4 py-3 font-bold text-white transition shadow-sm"
+                                                    >
+                                                        {__('general.contact_seller') || 'Contact Seller'}
+                                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                                        </svg>
+                                                    </Link>
+                                                ) : displayBalance >= selectedPackage.price ? (
                                                     <button
                                                         onClick={() => handleBuyNow(selectedPackage.id)}
                                                         disabled={processing}

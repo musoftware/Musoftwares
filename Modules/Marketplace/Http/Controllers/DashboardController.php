@@ -31,7 +31,7 @@ class DashboardController extends Controller
                     'sellerName' => $order->seller->name ?? 'Unknown Seller',
                     'amount' => $order->amount ?? 0,
                     'status' => $order->status,
-                    'deliveryDate' => $order->created_at->addDays($order->package->delivery_days ?? 3)->format('Y-m-d'),
+                    'deliveryDate' => $order->created_at->setTimezone('Africa/Cairo')->addDays($order->package->delivery_days ?? 3)->format('Y-m-d'),
                 ];
             });
 
@@ -49,7 +49,7 @@ class DashboardController extends Controller
                     'buyerName' => $order->buyer->name ?? 'Unknown Buyer',
                     'amount' => $order->amount ?? 0,
                     'status' => $order->status,
-                    'deliveryDate' => $order->created_at->addDays($order->package->delivery_days ?? 3)->format('Y-m-d'),
+                    'deliveryDate' => $order->created_at->setTimezone('Africa/Cairo')->addDays($order->package->delivery_days ?? 3)->format('Y-m-d'),
                 ];
             });
 
@@ -63,28 +63,50 @@ class DashboardController extends Controller
                 return [
                     'id' => $service->id,
                     'title' => $service->title,
-                    'price' => $service->packages_min_price ?? 0,
-                    'reviews' => 0, // Placeholder until reviews module is built
-                    'rating' => 0.0,
+                    'price' => $service->packages_min_price ?? ($service->is_free ? 0 : 5),
+                    'reviews' => $service->review_count,
+                    'rating' => (float) $service->avg_rating,
                 ];
             });
 
-        // 4. Compute Real Stats
-        $ordersStats = ServiceOrder::where('seller_id', $user->id)
+        // 4. Compute Real Stats (Seller Perspective)
+        $sellerOrdersStats = ServiceOrder::where('seller_id', $user->id)
             ->select(
-                DB::raw("SUM(CASE WHEN status = 'processing' THEN amount ELSE 0 END) as locked_escrow"),
-                DB::raw("SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) as active_orders"),
-                DB::raw("SUM(CASE WHEN status = 'completed' THEN amount ELSE 0 END) as total_sales")
+                DB::raw("SUM(CASE WHEN status = '" . ServiceOrderStatus::PROCESSING->value . "' THEN amount ELSE 0 END) as locked_escrow"),
+                DB::raw("SUM(CASE WHEN status = '" . ServiceOrderStatus::PROCESSING->value . "' THEN 1 ELSE 0 END) as active_orders"),
+                DB::raw("SUM(CASE WHEN status = '" . ServiceOrderStatus::COMPLETED->value . "' THEN amount ELSE 0 END) as total_sales")
             )->first();
 
-        $stats = [
-            'lockedEscrow' => $ordersStats->locked_escrow ?? 0,
-            'activeOrders' => (int) ($ordersStats->active_orders ?? 0),
+        $sellerStats = [
+            'lockedEscrow' => $sellerOrdersStats->locked_escrow ?? 0,
+            'activeOrders' => (int) ($sellerOrdersStats->active_orders ?? 0),
             'servicesListed' => Service::where('seller_id', $user->id)->count(),
-            'totalSales' => $ordersStats->total_sales ?? 0,
+            'totalSales' => $sellerOrdersStats->total_sales ?? 0,
         ];
 
-        // 5. Fetch Service Categories for Publish Modal
+        // 5. Compute Real Stats (Buyer/Client Perspective)
+        $buyerOrdersStats = ServiceOrder::where('buyer_id', $user->id)
+            ->select(
+                DB::raw("SUM(CASE WHEN status = '" . ServiceOrderStatus::PROCESSING->value . "' THEN amount ELSE 0 END) as locked_escrow"),
+                DB::raw("SUM(CASE WHEN status = '" . ServiceOrderStatus::PROCESSING->value . "' THEN 1 ELSE 0 END) as active_orders"),
+                DB::raw("SUM(CASE WHEN status = '" . ServiceOrderStatus::COMPLETED->value . "' THEN amount ELSE 0 END) as total_spent")
+            )->first();
+
+        // Count unique services purchased (where status is completed)
+        $distinctGigsCount = ServiceOrder::where('buyer_id', $user->id)
+            ->where('status', ServiceOrderStatus::COMPLETED)
+            ->join('marketplace_packages', 'marketplace_orders.package_id', '=', 'marketplace_packages.id')
+            ->distinct('marketplace_packages.service_id')
+            ->count('marketplace_packages.service_id');
+
+        $buyerStats = [
+            'lockedEscrow' => $buyerOrdersStats->locked_escrow ?? 0,
+            'activeOrders' => (int) ($buyerOrdersStats->active_orders ?? 0),
+            'servicesListed' => $distinctGigsCount,
+            'totalSales' => $buyerOrdersStats->total_spent ?? 0,
+        ];
+
+        // 6. Fetch Service Categories
         $categories = ServiceCategory::all()->map(function($category) {
             return [
                 'id' => $category->id,
@@ -96,7 +118,8 @@ class DashboardController extends Controller
             'activePurchases' => $activePurchases,
             'activeSales' => $activeSales,
             'listedGigs' => $listedGigs,
-            'stats' => $stats,
+            'sellerStats' => $sellerStats,
+            'buyerStats' => $buyerStats,
             'categories' => $categories
         ]);
     }

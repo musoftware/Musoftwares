@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { __ } from '@/lib/i18n';
-import { formatMoney as formatCurrency } from '@/lib/utils';
+import { formatMoney as formatCurrency, formatDate } from '@/lib/utils';
 
 export default function Show({ order, conversation }: any) {
     const { auth } = usePage().props as any;
@@ -15,7 +15,7 @@ export default function Show({ order, conversation }: any) {
     const handleDeliver = (e: React.FormEvent) => {
         e.preventDefault();
         if (
-            confirm('Are you sure you want to submit delivery for this order?')
+            confirm(__('general.confirm_submit_delivery'))
         ) {
             router.post(route('marketplace.orders.deliver', order.id), {
                 message: deliveryNote,
@@ -27,7 +27,7 @@ export default function Show({ order, conversation }: any) {
     const handleAcceptDelivery = () => {
         if (
             confirm(
-                'Are you sure you want to accept this delivery and complete the order?',
+                __('general.confirm_accept_delivery'),
             )
         ) {
             router.post(route('marketplace.orders.complete', order.id));
@@ -35,7 +35,7 @@ export default function Show({ order, conversation }: any) {
     };
 
     const handleRequestRevision = () => {
-        if (confirm('Are you sure you want to request a revision?')) {
+        if (confirm(__('general.confirm_request_revision'))) {
             // Ideally an endpoint for revision, falling back to dispute for now or just a specific action
             router.post(route('marketplace.orders.dispute', order.id));
         }
@@ -61,6 +61,15 @@ export default function Show({ order, conversation }: any) {
         order.status !== 'completed' &&
         order.status !== 'delivered';
 
+    // Calculate dynamic countdown text (e.g. "3d 12h")
+    const diffMs = deadlineDate.getTime() - now.getTime();
+    let timeLeftStr = '—';
+    if (diffMs > 0) {
+        const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+        const diffHours = Math.floor((diffMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        timeLeftStr = `${diffDays}d ${diffHours}h`;
+    }
+
     // Use actual commission from the backend
     const fee = parseFloat(order.commission_amount) || 0;
     const sellerEarnings = parseFloat(order.amount) - fee;
@@ -85,8 +94,8 @@ export default function Show({ order, conversation }: any) {
                                     {order.package?.service?.title}
                                 </h3>
                                 <p className="text-sm text-gray-500">
-                                    Order placed on{' '}
-                                    {orderDate.toLocaleDateString()}
+                                    {__('general.order_placed_on')}{' '}
+                                    {formatDate(order.created_at)}
                                 </p>
                             </div>
                             <div className="mt-4 sm:mt-0">
@@ -477,7 +486,7 @@ export default function Show({ order, conversation }: any) {
                                                     </div>
                                                     <div className="flex justify-between text-red-500">
                                                         <span>
-                                                            Platform Fee (10%)
+                                                            {__('general.platform_fee_label')}
                                                         </span>
                                                         <span>
                                                             -{formatCurrency(order.commission_amount, order.currency)}
@@ -511,22 +520,22 @@ export default function Show({ order, conversation }: any) {
                                                         className={`text-sm font-bold ${isOverdue ? 'text-red-700' : 'text-amber-800'}`}
                                                     >
                                                         {isOverdue
-                                                            ? 'Delivery Overdue'
-                                                            : 'Time Left to Deliver'}
+                                                            ? __('general.delivery_overdue')
+                                                            : __('general.time_left_to_deliver')}
                                                     </h5>
                                                     <p
                                                         className={`text-xs ${isOverdue ? 'text-red-600' : 'text-amber-700'}`}
                                                     >
-                                                        Deadline:{' '}
-                                                        {deadlineDate.toLocaleDateString()}
+                                                        {__('general.deadline_label')}{' '}
+                                                        {formatDate(deadlineDate)}
                                                     </p>
                                                 </div>
                                                 <div
                                                     className={`font-mono text-xl font-bold ${isOverdue ? 'text-red-600' : 'text-amber-600'}`}
                                                 >
                                                     {isOverdue
-                                                        ? 'LATE'
-                                                        : '3d 12h'}
+                                                        ? __('general.late')
+                                                        : timeLeftStr}
                                                 </div>
                                             </div>
                                         )}
@@ -573,9 +582,9 @@ export default function Show({ order, conversation }: any) {
                                                         ></textarea>
                                                     </div>
                                                     <div className="mb-6">
-                                                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                                                            Delivery Links (Google Drive, Figma, etc.)
-                                                        </label>
+                                                         <label className="mb-2 block text-sm font-medium text-gray-700">
+                                                             {__('general.delivery_links_sub')}
+                                                         </label>
                                                         <input
                                                             type="url"
                                                             className="w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
