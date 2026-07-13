@@ -1,170 +1,270 @@
 /**
- * Musoftware Service Worker
- * ==========================
- * Caches tool pages so they work offline.
- * Even without internet, the user can open the tool UI and the local agent
- * (127.0.0.1:18400 / :18401) handles execution.
- *
- * Strategy:
- *   - App shell (HTML, JS, CSS) → Cache First
- *   - API calls to platform → Network First, fallback to cache
- *   - Local agent calls (127.0.0.1) → Network Only (always fresh)
+ * Musoftware Production-Grade Service Worker
+ * ===========================================
+ * Orchestrates offline functionality, static resource precaching,
+ * and high-fidelity runtime caching policies for Laravel + React Inertia.
  */
 
-const CACHE_NAME    = 'musoftware-v2';
-const OFFLINE_PAGE  = '/offline.html';
+const CACHE_VERSION = 'musoftware-v3';
+const CACHE_NAME = `musoftware-cache-${CACHE_VERSION}`;
+const OFFLINE_PAGE = '/offline.html';
 
-// Resources to pre-cache on install (app shell)
-const PRECACHE = [
+// Resources to pre-cache on install (App Shell)
+const PRECACHE_ASSETS = [
     '/',
-    '/tools',
     '/dashboard',
+    '/tools',
     OFFLINE_PAGE,
+    '/favicon.svg',
+    '/favicon-16x16.png',
+    '/favicon-32x32.png',
+    '/favicon-48x48.png',
+    '/icons/pwa-192.png',
+    '/icons/pwa-512.png',
+    '/icons/apple-touch-icon.png',
+    '/icons/maskable-192.png',
+    '/icons/maskable-512.png'
 ];
 
-// ── Install: pre-cache app shell ────────────────────────────────────────────
+// Cache Limits Config
+const MAX_IMAGE_CACHE_ITEMS = 50;
+const MAX_API_CACHE_ITEMS = 100;
+
+// Helper: Limit cache size to prevent browser storage overflow
+async function trimCache(cacheName, maxItems) {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    if (keys.length > maxItems) {
+        // Delete oldest entries
+        for (let i = 0; i < keys.length - maxItems; i++) {
+            await cache.delete(keys[i]);
+        }
+    }
+}
+
+// ── 1. INSTALL: Pre-cache App Shell ──────────────────────────────────────────
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll(PRECACHE).catch(err => {
-                console.warn('[SW] Pre-cache error (non-fatal):', err);
-            });
-        }).then(() => self.skipWaiting())
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.debug('[SW] Pre-caching core App Shell');
+                return cache.addAll(PRECACHE_ASSETS).catch(err => {
+                    console.warn('[SW] Pre-caching encountered non-fatal issues:', err);
+                });
+            })
+            .then(() => self.skipWaiting())
     );
 });
 
-// ── Activate: clean old caches ──────────────────────────────────────────────
+// ── 2. ACTIVATE: Claim clients and clean old cache instances ─────────────────
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
-                keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-            )
-        ).then(() => self.clients.claim())
+        caches.keys()
+            .then(keys => {
+                return Promise.all(
+                    keys.map(key => {
+                        if (key !== CACHE_NAME) {
+                            console.debug('[SW] Removing deprecated cache instance:', key);
+                            return caches.delete(key);
+                        }
+                    })
+                );
+            })
+            .then(() => self.clients.claim())
     );
 });
 
-// ── Fetch: routing strategy ─────────────────────────────────────────────────
+// ── 3. FETCH: Intercept requests and apply custom caching models ──────────────
 self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
+    const { request } = event;
+    const url = new URL(request.url);
 
-    // 0. Skip non-cacheable schemes (chrome-extension://, data:, blob:, etc.)
+    // Skip non-HTTP schemes (chrome-extension://, data:, blob:, etc.)
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
         return;
     }
 
-    // 1. Local agent calls → ALWAYS network only (never cache)
-    if (url.hostname === '127.0.0.1') {
-        return; // let browser handle it natively
-    }
-
-    // 2. Non-GET → network only
-    if (event.request.method !== 'GET') {
+    // Skip local automation agents (always let requests pass natively)
+    if (url.hostname === '127.0.0.1' || url.port === '18400' || url.port === '18401') {
         return;
     }
 
-    // 3. Vite HMR / websocket → skip
-    if (url.pathname.startsWith('/@') || url.pathname.includes('hot-update')) {
+    // Skip Vite Hot Module Replacement (HMR) and web-sockets
+    if (url.pathname.startsWith('/@') || url.pathname.includes('hot-update') || request.headers.get('Upgrade') === 'websocket') {
         return;
     }
 
-    // 4. API calls → Network First, fallback to cache
+    // Skip non-GET requests
+    if (request.method !== 'GET') {
+        return;
+    }
+
+    // A. API Calls (/api/*) -> Network First with cache fallback
     if (url.pathname.startsWith('/api/')) {
-        event.respondWith(networkFirst(event.request));
+        event.respondWith(
+            networkFirst(request, MAX_API_CACHE_ITEMS)
+        );
         return;
     }
 
-    // 5. Static assets (JS, CSS, images) → Cache First
-    if (/\.(js|css|png|jpg|jpeg|svg|ico|woff2?|ttf)(\?.*)?$/.test(url.pathname)) {
-        event.respondWith(cacheFirst(event.request));
+    // B. Static Assets (CSS, JS, WebFonts, Images) -> Stale-While-Revalidate
+    const isStaticAsset = /\.(js|css|png|jpg|jpeg|webp|gif|svg|ico|woff2?|ttf|otf|mp3|mp4)(\?.*)?$/.test(url.pathname);
+    if (isStaticAsset) {
+        event.respondWith(
+            staleWhileRevalidate(request, isStaticAsset && /\.(png|jpg|jpeg|webp|gif)$/.test(url.pathname) ? MAX_IMAGE_CACHE_ITEMS : 200)
+        );
         return;
     }
 
-    // 6. HTML navigation → Network First, fallback to cached page or offline
-    event.respondWith(navigationHandler(event.request));
+    // C. HTML Navigation Documents -> Network First falling back to App Shell or Offline page
+    if (request.mode === 'navigate') {
+        event.respondWith(
+            navigationHandler(request)
+        );
+    }
 });
 
-// ── Strategies ───────────────────────────────────────────────────────────────
+// ── 4. STRATEGIES ────────────────────────────────────────────────────────────
 
-async function cacheFirst(request) {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-
+// Strategy: Network First (falls back to cached copy, otherwise returns error response)
+async function networkFirst(request, maxItems) {
     try {
-        const response = await fetch(request);
-        // Only cache complete, successful responses.
-        // A partial response (e.g. from a mid-deploy race condition) must NOT be cached.
-        if (response.ok && response.status === 200) {
-            const contentLength = response.headers.get('content-length');
-            // Clone to read body for length check if needed, but primarily rely on status
+        const networkResponse = await fetch(request);
+        if (networkResponse.ok && networkResponse.status === 200) {
             const cache = await caches.open(CACHE_NAME);
-            // Only store if content-length header is absent (chunked) or non-zero
-            if (!contentLength || parseInt(contentLength, 10) > 0) {
-                cache.put(request, response.clone());
+            cache.put(request, networkResponse.clone());
+            if (maxItems) {
+                trimCache(CACHE_NAME, maxItems);
             }
         }
-        return response;
-    } catch {
-        return new Response('Asset unavailable offline', { status: 503 });
+        return networkResponse;
+    } catch (error) {
+        console.debug('[SW] Fetch failed; retrieving from cache:', request.url);
+        const cachedResponse = await caches.match(request);
+        if (cachedResponse) {
+            return cachedResponse;
+        }
+        // If it's a JSON request, send offline fallback json
+        if (request.headers.get('Accept')?.includes('application/json')) {
+            return new Response(
+                JSON.stringify({ error: 'offline', message: 'You are currently offline. Please check your connection.' }),
+                { status: 503, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
+        throw error;
     }
 }
 
-async function networkFirst(request) {
-    try {
-        const response = await fetch(request);
-        if (response.ok) {
-            const cache = await caches.open(CACHE_NAME);
-            cache.put(request, response.clone());
+// Strategy: Stale-While-Revalidate (returns cache instantly, updates cache in background)
+async function staleWhileRevalidate(request, maxItems) {
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(request);
+
+    const fetchPromise = fetch(request).then(async networkResponse => {
+        if (networkResponse.ok && networkResponse.status === 200) {
+            await cache.put(request, networkResponse.clone());
+            if (maxItems) {
+                trimCache(CACHE_NAME, maxItems);
+            }
         }
-        return response;
-    } catch {
-        const cached = await caches.match(request);
-        return cached ?? new Response(
-            JSON.stringify({ error: 'offline', cached: false }),
-            { status: 503, headers: { 'Content-Type': 'application/json' } }
+        return networkResponse;
+    }).catch(err => {
+        console.debug('[SW] Background fetch failed for stale-while-revalidate:', request.url, err);
+    });
+
+    return cachedResponse || fetchPromise;
+}
+
+// Strategy: Navigation Handler (Network first, falls back to specific HTML pages or offline.html)
+async function navigationHandler(request) {
+    try {
+        // Always try fetching latest version from network first
+        return await fetch(request);
+    } catch (error) {
+        console.debug('[SW] Navigation fetch failed, initiating offline fallback routing', error);
+        
+        // 1. Check exact match in cache
+        const exactCached = await caches.match(request);
+        if (exactCached) return exactCached;
+
+        // 2. Check general Dashboard fallback if dashboard sub-url
+        const url = new URL(request.url);
+        if (url.pathname.startsWith('/dashboard')) {
+            const cachedDashboard = await caches.match('/dashboard');
+            if (cachedDashboard) return cachedDashboard;
+        }
+
+        // 3. Fall back to Offline Shell page
+        const offlineShell = await caches.match(OFFLINE_PAGE);
+        if (offlineShell) return offlineShell;
+
+        // 4. Raw response if nothing works
+        return new Response(
+            '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title></head><body><h1>Offline</h1><p>Check your internet connection.</p></body></html>',
+            { headers: { 'Content-Type': 'text/html' } }
         );
     }
 }
 
-async function navigationHandler(request) {
-    try {
-        const response = await fetch(request);
-        if (response.ok) {
-            const cache = await caches.open(CACHE_NAME);
-            cache.put(request, response.clone());
-        }
-        return response;
-    } catch {
-        // Try exact URL cache
-        const cached = await caches.match(request);
-        if (cached) return cached;
-
-        // Try the base tools page cached version
-        const toolsPage = await caches.match('/tools');
-        if (toolsPage) return toolsPage;
-
-        // Last resort: offline page
-        const offlinePage = await caches.match(OFFLINE_PAGE);
-        return offlinePage ?? new Response('<h1>Offline</h1>', {
-            headers: { 'Content-Type': 'text/html' }
-        });
-    }
-}
-
-// ── Push Notifications (future) ──────────────────────────────────────────────
+// ── 5. PUSH NOTIFICATIONS ───────────────────────────────────────────────────
 self.addEventListener('push', event => {
-    const data = event.data?.json() ?? {};
+    if (!event.data) return;
+    
+    let payload = {};
+    try {
+        payload = event.data.json();
+    } catch {
+        payload = { title: 'Musoftware', body: event.data.text() };
+    }
+
+    const options = {
+        body: payload.body || '',
+        icon: payload.icon || '/icons/pwa-192.png',
+        badge: payload.badge || '/icons/pwa-72.png',
+        vibrate: [100, 50, 100],
+        data: {
+            url: payload.url || '/dashboard'
+        },
+        actions: payload.actions || []
+    };
+
     event.waitUntil(
-        self.registration.showNotification(data.title ?? 'Musoftware', {
-            body: data.body ?? '',
-            icon: '/icons/pwa-192.png',
-            badge: '/icons/badge-72.png',
-            data: { url: data.url ?? '/tools' },
-        })
+        self.registration.showNotification(payload.title || 'Musoftware', options)
     );
 });
 
 self.addEventListener('notificationclick', event => {
     event.notification.close();
-    event.waitUntil(clients.openWindow(event.notification.data?.url ?? '/tools'));
+    
+    const clickActionPromise = self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then(windowClients => {
+            const targetUrl = event.notification.data?.url || '/dashboard';
+            // If tab already exists, focus it
+            for (let i = 0; i < windowClients.length; i++) {
+                const client = windowClients[i];
+                if (client.url.includes(targetUrl) && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // Otherwise open a new window/tab
+            if (self.clients.openWindow) {
+                return self.clients.openWindow(targetUrl);
+            }
+        });
+
+    event.waitUntil(clickActionPromise);
 });
+
+// ── 6. BACKGROUND SYNC ──────────────────────────────────────────────────────
+self.addEventListener('sync', event => {
+    if (event.tag === 'sync-platform-data') {
+        console.debug('[SW] Background syncing platform data...');
+        event.waitUntil(performBackgroundSync());
+    }
+});
+
+async function performBackgroundSync() {
+    // In-app sync logic: fetch offline queues and dispatch to server
+    // Future extension hook point
+    return Promise.resolve();
+}

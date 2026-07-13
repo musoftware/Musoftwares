@@ -14,6 +14,7 @@ import {
     CalendarCheck,
     ListTodo,
     ChevronRight,
+    ChevronLeft,
     RotateCcw,
     ShieldCheck,
     Trash2,
@@ -71,11 +72,17 @@ interface Props {
     clients: Client[];
     selectedClient: SelectedClient | null;
     todos: TodoItem[];
-    filters: { client_id?: string };
+    filters: { client_id?: string; search?: string; direction?: string };
+    pagination: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    } | null;
 }
 
-export default function ClientTasks({ clients, selectedClient, todos, filters }: Props) {
-    const [search, setSearch] = useState('');
+export default function ClientTasks({ clients, selectedClient, todos, filters, pagination }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
     const [refundingId, setRefundingId] = useState<number | null>(null);
     const [newTodoTitle, setNewTodoTitle] = useState('');
 
@@ -139,12 +146,22 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
         setSearch(e.target.value);
     };
 
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(route('admin.tasks.client-tasks'), { search }, { preserveState: true });
+    };
+
+    const handleClearSearch = () => {
+        setSearch('');
+        router.get(route('admin.tasks.client-tasks'), { search: '' });
+    };
+
     const handleSelectClient = (clientId: number) => {
         router.get(route('admin.tasks.client-tasks'), { client_id: clientId });
     };
 
     const handleBackToSelection = () => {
-        router.get(route('admin.tasks.client-tasks'));
+        router.get(route('admin.tasks.client-tasks'), { search: '', client_id: '' });
     };
 
     const handleRefund = (todoId: number) => {
@@ -204,11 +221,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
         });
     };
 
-    const filteredClients = clients.filter(c => 
-        (c.name?.toLowerCase() || '').includes(search.toLowerCase()) ||
-        (c.email?.toLowerCase() || '').includes(search.toLowerCase()) ||
-        c.id.toString() === search.trim()
-    );
+    const filteredClients = clients;
 
     return (
         <AdminSidebarLayout title={__('general.client_tasks')} header="Client Tasks">
@@ -244,17 +257,32 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                     <div className="space-y-4">
                         <Card className="rounded-xl border border-slate-200 bg-white shadow-sm max-w-md">
                             <CardContent className="p-4">
-                                <div className="relative">
-                                    <Search className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                    <Input
-                                        type="text"
-                                        placeholder={__('general.search_client_by_name_or_email')}
-                                        value={search}
-                                        onChange={handleSearchChange}
-                                        className="ps-9 h-10 border-slate-200 focus-visible:ring-slate-900"
-                                        autoComplete="off"
-                                    />
-                                </div>
+                                <form onSubmit={handleSearchSubmit} className="relative flex gap-2">
+                                    <div className="relative flex-grow">
+                                        <Search className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Input
+                                            type="text"
+                                            placeholder={__('general.search_client_by_name_or_email')}
+                                            value={search}
+                                            onChange={handleSearchChange}
+                                            className="ps-9 h-10 border-slate-200 focus-visible:ring-slate-900"
+                                            autoComplete="off"
+                                        />
+                                    </div>
+                                    <Button type="submit" variant="outline" className="h-10 text-slate-800 hover:text-black">
+                                        {__('general.search') || 'Search'}
+                                    </Button>
+                                    {filters.search && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={handleClearSearch}
+                                            className="h-10 text-slate-500 hover:text-slate-900"
+                                        >
+                                            {__('general.clear') || 'Clear'}
+                                        </Button>
+                                    )}
+                                </form>
                             </CardContent>
                         </Card>
 
@@ -272,44 +300,74 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                     </p>
                                     {search && (
                                         <button
-                                            onClick={() => setSearch('')}
+                                            onClick={handleClearSearch}
                                             className="mt-3 text-xs font-semibold text-slate-900 hover:text-slate-900 underline"
                                         >{__('general.clear_search')}</button>
                                     )}
                                 </CardContent>
                             </Card>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {filteredClients.map((client) => (
-                                    <Card key={client.id} className="rounded-xl border border-slate-200 bg-white hover:shadow-md transition-shadow duration-200 overflow-hidden">
-                                        <CardContent className="p-6 space-y-4">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-full bg-slate-50 text-slate-900 flex items-center justify-center font-bold text-base">
-                                                    {client.initials}
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {filteredClients.map((client) => (
+                                        <Card key={client.id} className="rounded-xl border border-slate-200 bg-white hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                                            <CardContent className="p-6 space-y-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-12 w-12 rounded-full bg-slate-50 text-slate-900 flex items-center justify-center font-bold text-base">
+                                                        {client.initials}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <h3 className="font-bold text-slate-900 truncate" title={client.name}>{client.name}</h3>
+                                                        <p className="text-xs text-slate-500 truncate" title={client.email}>{client.email}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <h3 className="font-bold text-slate-900 truncate" title={client.name}>{client.name}</h3>
-                                                    <p className="text-xs text-slate-500 truncate" title={client.email}>{client.email}</p>
+
+                                                <div className="flex items-center justify-end gap-4 text-xs pt-2 border-t border-slate-100">
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-semibold bg-slate-50 text-slate-900">
+                                                        <ListTodo className="h-3 w-3" /> {client.total_tasks} Tasks
+                                                    </span>
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-semibold bg-green-50 text-slate-900">
+                                                        <CheckCircle2 className="h-3 w-3" /> {client.completed_tasks} Completed
+                                                    </span>
                                                 </div>
-                                            </div>
 
-                                            <div className="flex items-center justify-end gap-4 text-xs pt-2 border-t border-slate-100">
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-semibold bg-slate-50 text-slate-900">
-                                                    <ListTodo className="h-3 w-3" /> {client.total_tasks} Tasks
-                                                </span>
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-semibold bg-green-50 text-slate-900">
-                                                    <CheckCircle2 className="h-3 w-3" /> {client.completed_tasks} Completed
-                                                </span>
-                                            </div>
+                                                <Button 
+                                                    onClick={() => handleSelectClient(client.id)}
+                                                    className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-9 rounded-lg"
+                                                >{__('general.view_focus_board')}<ChevronRight className="h-3.5 w-3.5 ms-1" />
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
 
-                                            <Button 
-                                                onClick={() => handleSelectClient(client.id)}
-                                                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-9 rounded-lg"
-                                            >{__('general.view_focus_board')}<ChevronRight className="h-3.5 w-3.5 ms-1" />
+                                {pagination && pagination.last_page > 1 && (
+                                    <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                                        <p className="text-xs text-slate-500">
+                                            {__('general.n_results', { count: pagination.total })} · {__('general.page_of', { current: pagination.current_page, last: pagination.last_page })}
+                                        </p>
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={pagination.current_page <= 1}
+                                                onClick={() => router.get(route('admin.tasks.client-tasks'), { search, page: pagination.current_page - 1 }, { preserveState: true })}
+                                                aria-label="Previous Page"
+                                            >
+                                                <ChevronLeft className="h-4 w-4 text-slate-800" />
                                             </Button>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={pagination.current_page >= pagination.last_page}
+                                                onClick={() => router.get(route('admin.tasks.client-tasks'), { search, page: pagination.current_page + 1 }, { preserveState: true })}
+                                                aria-label="Next Page"
+                                            >
+                                                <ChevronRight className="h-4 w-4 text-slate-800" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

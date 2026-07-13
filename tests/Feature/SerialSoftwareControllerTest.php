@@ -174,7 +174,7 @@ class SerialSoftwareControllerTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('serial_softwares', ['id' => $sw->id]);
+        $this->assertSoftDeleted('serial_softwares', ['id' => $sw->id]);
     }
 
     // ─── EXPORT ───────────────────────────────────────────────────────

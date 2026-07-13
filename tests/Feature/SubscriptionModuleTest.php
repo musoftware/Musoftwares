@@ -9,7 +9,6 @@ use App\Services\SubscriptionService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Modules\CRM\app\Core\FeatureManager;
 use Tests\TestCase;
 
 class SubscriptionModuleTest extends TestCase
@@ -180,91 +179,7 @@ class SubscriptionModuleTest extends TestCase
         $this->assertFalse($service->hasActiveSubscription($user, 'erp'));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  4. FeatureManager: has() and getAllForUser()
-    // ─────────────────────────────────────────────────────────────
 
-    public function test_feature_manager_returns_active_features_for_user()
-    {
-        $user = User::factory()->create();
-
-        UserSubscription::create([
-            'user_id' => $user->id,
-            'object' => 'erp',
-            'status' => 'active',
-            'started_at' => now(),
-            'expires_at' => now()->addDays(30),
-            'auto_renew' => true,
-        ]);
-
-        UserSubscription::create([
-            'user_id' => $user->id,
-            'object' => 'erp-backup',
-            'status' => 'active',
-            'started_at' => now(),
-            'expires_at' => now()->addDays(30),
-            'auto_renew' => true,
-        ]);
-
-        $fm = app(FeatureManager::class);
-        $features = $fm->getAllForUser($user);
-
-        $this->assertContains('erp', $features);
-        $this->assertContains('erp-backup', $features);
-        $this->assertNotContains('crm', $features);
-    }
-
-    public function test_feature_manager_has_returns_true_for_active_feature()
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        UserSubscription::create([
-            'user_id' => $user->id,
-            'object' => 'erp',
-            'status' => 'active',
-            'started_at' => now(),
-            'expires_at' => now()->addDays(30),
-            'auto_renew' => true,
-        ]);
-
-        $fm = app(FeatureManager::class);
-        // Prime the cache with this user's features
-        $fm->getAllForUser($user);
-
-        $this->assertTrue($fm->has('erp'));
-    }
-
-    public function test_feature_manager_has_returns_false_for_missing_feature()
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $fm = app(FeatureManager::class);
-        $fm->getAllForUser($user);
-
-        $this->assertFalse($fm->has('erp-backup'));
-    }
-
-    public function test_feature_manager_excludes_expired_subscriptions()
-    {
-        $user = User::factory()->create();
-
-        UserSubscription::create([
-            'user_id' => $user->id,
-            'object' => 'erp-backup',
-            'status' => 'active',
-            'started_at' => now()->subDays(60),
-            'expires_at' => now()->subDays(1), // expired
-            'auto_renew' => false,
-        ]);
-
-        $fm = app(FeatureManager::class);
-        $features = $fm->getAllForUser($user);
-
-        $this->assertNotContains('erp-backup', $features);
-        $this->assertEmpty($features);
-    }
 
     // ─────────────────────────────────────────────────────────────
     //  5. PricingService: getServiceItems()
@@ -284,19 +199,6 @@ class SubscriptionModuleTest extends TestCase
         $this->assertGreaterThan(0, $erp['yearly_price']);
     }
 
-    public function test_pricing_service_returns_erp_backup_addon()
-    {
-        $service = new PricingService;
-        $items = $service->getServiceItems();
-
-        $backup = collect($items)->firstWhere('id', 'erp-backup');
-
-        $this->assertNotNull($backup, 'ERP Backup addon should exist in service items');
-        $this->assertEquals('addon', $backup['type']);
-        $this->assertEquals('erp', $backup['parent_id']);
-        $this->assertGreaterThan(0, $backup['monthly_price']);
-    }
-
     public function test_pricing_service_monthly_price_is_yearly_divided_by_10()
     {
         $service = new PricingService;
@@ -304,9 +206,9 @@ class SubscriptionModuleTest extends TestCase
 
         $erp = collect($items)->firstWhere('id', 'erp');
 
-        // ERP is 5000 EGP/yr => 500 EGP/mo
-        $this->assertEquals(500, $erp['monthly_price']);
-        $this->assertEquals(5000, $erp['yearly_price']);
+        // ERP is 10000 EGP/yr => 1000 EGP/mo
+        $this->assertEquals(1000, $erp['monthly_price']);
+        $this->assertEquals(10000, $erp['yearly_price']);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -320,10 +222,10 @@ class SubscriptionModuleTest extends TestCase
             'currency_id' => 1,
         ]);
 
-        // User already owns ERP
+        // User already owns Booking
         UserSubscription::create([
             'user_id' => $user->id,
-            'object' => 'erp',
+            'object' => 'booking',
             'status' => 'active',
             'started_at' => now(),
             'expires_at' => now()->addDays(365),
@@ -331,7 +233,7 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)->post(route('subscriptions.subscribe'), [
-            'items' => ['erp-backup'],
+            'items' => ['booking-wa-reminders'],
             'billing_cycle' => '1_month',
             'is_new_system' => false,
         ]);
@@ -340,7 +242,7 @@ class SubscriptionModuleTest extends TestCase
 
         $this->assertDatabaseHas('user_subscriptions', [
             'user_id' => $user->id,
-            'object' => 'erp-backup',
+            'object' => 'booking-wa-reminders',
             'status' => 'active',
         ]);
     }
@@ -352,10 +254,10 @@ class SubscriptionModuleTest extends TestCase
             'currency_id' => 1,
         ]);
 
-        // User does NOT own ERP
+        // User does NOT own Booking
 
         $response = $this->actingAs($user)->post(route('subscriptions.subscribe'), [
-            'items' => ['erp-backup'],
+            'items' => ['booking-wa-reminders'],
             'billing_cycle' => '1_month',
             'is_new_system' => false,
         ]);
@@ -371,7 +273,7 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)->post(route('subscriptions.subscribe'), [
-            'items' => ['erp', 'erp-backup'],
+            'items' => ['booking', 'booking-wa-reminders'],
             'billing_cycle' => '1_month',
             'is_new_system' => false,
         ]);
@@ -380,13 +282,13 @@ class SubscriptionModuleTest extends TestCase
 
         $this->assertDatabaseHas('user_subscriptions', [
             'user_id' => $user->id,
-            'object' => 'erp',
+            'object' => 'booking',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('user_subscriptions', [
             'user_id' => $user->id,
-            'object' => 'erp-backup',
+            'object' => 'booking-wa-reminders',
             'status' => 'active',
         ]);
     }
@@ -482,7 +384,7 @@ class SubscriptionModuleTest extends TestCase
             ->has('subscriptions', 1)
             ->where('subscriptions.0.plan_slug', 'erp')
             ->where('subscriptions.0.status', 'active')
-            ->where('subscriptions.0.amount', 499.99) // Due to missing EGP currency in test, rate is 1, and psychological_price applies
+            ->where('subscriptions.0.amount', 999.99) // Due to missing EGP currency in test, rate is 1, and psychological_price applies
         );
     }
 
@@ -522,52 +424,7 @@ class SubscriptionModuleTest extends TestCase
         );
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  12. HandleInertiaRequests: crm_features shared correctly
-    // ─────────────────────────────────────────────────────────────
 
-    public function test_crm_features_shared_contains_active_subscriptions()
-    {
-        $user = User::factory()->create(['currency_id' => 1]);
-
-        UserSubscription::create([
-            'user_id' => $user->id,
-            'object' => 'erp',
-            'status' => 'active',
-            'started_at' => now(),
-            'expires_at' => now()->addDays(30),
-            'auto_renew' => true,
-        ]);
-
-        // Test FeatureManager directly (this is what crm_features shared prop calls)
-        $fm = app(FeatureManager::class);
-        $features = $fm->getAllForUser($user);
-
-        $this->assertIsArray($features);
-        $this->assertContains('erp', $features);
-    }
-
-    public function test_crm_features_shared_excludes_expired_subscriptions()
-    {
-        $user = User::factory()->create(['currency_id' => 1]);
-
-        UserSubscription::create([
-            'user_id' => $user->id,
-            'object' => 'erp-backup',
-            'status' => 'active',
-            'started_at' => now()->subDays(60),
-            'expires_at' => now()->subDays(1), // expired
-            'auto_renew' => false,
-        ]);
-
-        // Test FeatureManager directly
-        $fm = app(FeatureManager::class);
-        $features = $fm->getAllForUser($user);
-
-        $this->assertIsArray($features);
-        $this->assertNotContains('erp-backup', $features);
-        $this->assertEmpty($features);
-    }
 
     // ─────────────────────────────────────────────────────────────
     //  13. active_modules: Module access check

@@ -64,7 +64,6 @@ class PointPurchaseTest extends TestCase
             'name' => 'Starter Pack',
             'points' => 100,
             'price' => 100.00,
-            'currency_id' => 2,
         ]);
     }
 

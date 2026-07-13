@@ -153,7 +153,7 @@ class SerialDeviceControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->delete(route('admin.serial-devices.destroy', $device));
 
         $response->assertRedirect();
-        $this->assertDatabaseMissing('serial_devices', ['id' => $device->id]);
+        $this->assertSoftDeleted('serial_devices', ['id' => $device->id]);
     }
 
     /* ─── Export ──────────────────────────────────────────────────── */
@@ -213,7 +213,7 @@ class SerialDeviceControllerTest extends TestCase
 
         $response->assertRedirect();
         foreach ($devices as $device) {
-            $this->assertDatabaseMissing('serial_devices', ['id' => $device->id]);
+            $this->assertSoftDeleted('serial_devices', ['id' => $device->id]);
         }
     }
 

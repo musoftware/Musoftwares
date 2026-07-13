@@ -56,6 +56,12 @@ class Invoice extends Model
         $this->attributes['currency_id'] = $value;
     }
 
+    public function getAmountAttribute()
+    {
+        return $this->total();
+    }
+
+
     public function transactions()
     {
         return $this->belongsToMany(Transaction::class);

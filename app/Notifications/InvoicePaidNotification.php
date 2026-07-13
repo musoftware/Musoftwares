@@ -30,13 +30,13 @@ class InvoicePaidNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Payment Received: '.($this->invoice->invoice_number ?? 'Invoice'))
             ->greeting('Hello '.($notifiable->name ?? 'Customer').',')
-            ->line('We have successfully received your payment of '.FinanceHelper::instance()->format_money($this->invoice->amount ?? 0, $this->invoice->currency_id ?? null).'.')
+            ->line('We have successfully received your payment of '.FinanceHelper::instance()->format_money($this->invoice->amount ?? $this->invoice->total ?? 0, $this->invoice->currency_id ?? null).'.')
             ->line(__('general.thank_you_for_your_business'));
     }
 
     public function toFcm(object $notifiable)
     {
-        $formatted = FinanceHelper::instance()->format_money($this->invoice->amount ?? 0, $this->invoice->currency_id ?? null);
+        $formatted = FinanceHelper::instance()->format_money($this->invoice->amount ?? $this->invoice->total ?? 0, $this->invoice->currency_id ?? null);
 
         return $this->fcmMessage(
             __('general.notif_invoice_paid_title'),
@@ -53,7 +53,7 @@ class InvoicePaidNotification extends Notification implements ShouldQueue
     {
         return [
             'invoice_id' => $this->invoice->id ?? null,
-            'amount' => $this->invoice->amount ?? null,
+            'amount' => $this->invoice->amount ?? $this->invoice->total ?? null,
             'currency' => $this->invoice->currency?->currency ?? null,
             'message' => 'Invoice '.($this->invoice->invoice_number ?? '').' has been marked as paid.',
         ];

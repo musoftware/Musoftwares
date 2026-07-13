@@ -3,6 +3,9 @@ import { Head, Link } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { Download, X } from 'lucide-react';
 
 // Schema Data
 const schemaData = {
@@ -53,6 +56,15 @@ export default function Welcome({
     laravelVersion,
     phpVersion,
 }: PageProps<{ laravelVersion: string; phpVersion: string }>) {
+    const { isInstallable, isStandalone, install } = usePWAInstall();
+    const [showBanner, setShowBanner] = useState(true);
+    const [isIOS, setIsIOS] = useState(false);
+
+    useEffect(() => {
+        const checkIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+        setIsIOS(checkIOS);
+    }, []);
+
     return (
         <>
             <Head>
@@ -342,6 +354,41 @@ export default function Welcome({
                     </footer>
                 </div>
             </div>
+
+            {/* PWA Floating Install Banner */}
+            {showBanner && !isStandalone && (isInstallable || isIOS) && (
+                <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 z-50 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <img src="/favicon-48x48.png" className="w-10 h-10 object-contain rounded-xl flex-shrink-0" alt="Musoftware Logo" />
+                    <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Install Musoftware</h4>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">
+                            {isIOS 
+                                ? "Add Musoftware to your Home Screen for the best experience on iOS."
+                                : "Install our app for offline support, instant access, and a clean standalone interface."
+                            }
+                        </p>
+                        <div className="flex items-center gap-2 mt-3">
+                            {isIOS ? (
+                                <Link href="/install-app">
+                                    <Button size="sm" className="h-8 text-xs rounded-full bg-zinc-900 text-white hover:bg-zinc-850 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
+                                        View Setup Guide
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Button size="sm" onClick={install} className="h-8 text-xs rounded-full bg-zinc-900 text-white hover:bg-zinc-850 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 flex items-center gap-1">
+                                    <Download className="w-3.5 h-3.5" /> Install App
+                                </Button>
+                            )}
+                            <Button size="sm" variant="ghost" onClick={() => setShowBanner(false)} className="h-8 text-xs rounded-full text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
+                                Dismiss
+                            </Button>
+                        </div>
+                    </div>
+                    <button onClick={() => setShowBanner(false)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-0.5 rounded-lg flex-shrink-0 transition-colors">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
         </>
     );
 }

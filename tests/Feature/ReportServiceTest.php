@@ -11,8 +11,6 @@ use Database\Seeders\CurrenciesSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Modules\ERP\Models\Tenant;
-use Modules\ERP\Models\TenantClient;
 use Tests\TestCase;
 
 class ReportServiceTest extends TestCase
@@ -20,10 +18,6 @@ class ReportServiceTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
-
-    protected Tenant $tenant;
-
-    protected TenantClient $client;
 
     protected Currency $currency;
 
@@ -36,21 +30,6 @@ class ReportServiceTest extends TestCase
 
         $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
-
-        $this->tenant = Tenant::create([
-            'user_id' => $this->user->id,
-            'name' => 'Test Tenant',
-            'status' => 'active',
-        ]);
-
-        $this->client = TenantClient::create([
-            'tenant_id' => $this->tenant->id,
-            'name' => 'Acme Corp',
-            'email' => 'billing@acme.com',
-            'phone' => '+15551234567',
-            'currency' => 'USD',
-            'address' => '123 Main St, Anytown',
-        ]);
 
         $this->currency = Currency::firstOrCreate(
             ['currency' => 'USD'],

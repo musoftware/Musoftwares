@@ -82,7 +82,7 @@ class AdminCostAuditTest extends TestCase
             'reason' => 'New reason',
         ]);
 
-        $response->assertRedirect(route('admin.costs.index'));
+        $response->assertRedirect(route('admin.costs.show', $cost->id));
 
         $this->assertDatabaseHas('admin_audit_logs', [
             'action' => CostTransactionAuditService::ACTION_UPDATED,
@@ -97,7 +97,7 @@ class AdminCostAuditTest extends TestCase
         $this->assertNotNull($log);
         $this->assertContains('amount', $log->meta['changed']);
         $this->assertContains('reason', $log->meta['changed']);
-        $this->assertSame(250, $log->meta['after']['amount']);
+        $this->assertEquals(250, $log->meta['after']['amount']);
         $this->assertSame('New reason', $log->meta['after']['reason']);
     }
 
@@ -113,7 +113,7 @@ class AdminCostAuditTest extends TestCase
             'amount' => 100,
             'currency_id' => $this->currency->id,
             'reason' => 'Stable reason',
-        ])->assertRedirect(route('admin.costs.index'));
+        ])->assertRedirect(route('admin.costs.show', $cost->id));
 
         $found = collect(AdminAuditLog::$logs)
             ->contains(fn ($log) => $log->action === CostTransactionAuditService::ACTION_UPDATED
@@ -145,7 +145,7 @@ class AdminCostAuditTest extends TestCase
                 && $log->target_id === $cost->id);
 
         $this->assertNotNull($log);
-        $this->assertSame(75, $log->meta['amount']);
+        $this->assertEquals(75, $log->meta['amount']);
         $this->assertSame('Office supplies', $log->meta['reason']);
     }
 

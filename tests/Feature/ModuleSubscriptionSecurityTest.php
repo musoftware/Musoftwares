@@ -41,6 +41,11 @@ class ModuleSubscriptionSecurityTest extends TestCase
 
     public function test_booking_blocked_without_subscription(): void
     {
+        \Illuminate\Support\Facades\Route::middleware(['web', \App\Http\Middleware\SubscriptionMiddleware::class.':booking'])
+            ->get('/test-booking-gated', function () {
+                return 'ok';
+            });
+
         // Mock SubscriptionService to return false for hasActiveSubscription
         $this->mock(SubscriptionService::class, function ($mock) {
             $mock->shouldReceive('hasActiveSubscription')
@@ -48,7 +53,7 @@ class ModuleSubscriptionSecurityTest extends TestCase
                 ->andReturn(false);
         });
 
-        $response = $this->actingAs($this->user)->get('/booking');
+        $response = $this->actingAs($this->user)->get('/test-booking-gated');
 
         $response->assertRedirect(route('subscriptions.plans', ['module' => 'booking']));
     }

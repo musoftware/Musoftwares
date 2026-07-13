@@ -6,8 +6,6 @@ use App\Models\AdminNote;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\ERP\Models\Client;
-use Modules\ERP\Models\Tenant;
 use Tests\TestCase;
 
 class AdminNoteTest extends TestCase
@@ -16,9 +14,7 @@ class AdminNoteTest extends TestCase
 
     protected User $admin;
 
-    protected Tenant $tenant;
-
-    protected Client $client;
+    protected User $clientUser;
 
     protected function setUp(): void
     {
@@ -29,29 +25,19 @@ class AdminNoteTest extends TestCase
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
 
-        $this->tenant = Tenant::create([
-            'user_id' => $this->admin->id,
-            'name' => 'HQ Agency',
-            'status' => 'active',
-        ]);
-
-        session(['tenant_id' => $this->tenant->id]);
-
-        $this->client = Client::create([
-            'tenant_id' => $this->tenant->id,
+        $this->clientUser = User::factory()->create([
             'name' => 'Fraudulent Client Corp',
             'email' => 'suspicious@corp.com',
-            'phone' => '+1555000000',
             'currency_id' => 1,
-            'address' => 'Unknown St',
         ]);
+        $this->clientUser->assignRole('client');
     }
 
     public function test_can_list_admin_notes(): void
     {
         $note = AdminNote::create([
-            'noteable_type' => Client::class,
-            'noteable_id' => $this->client->id,
+            'noteable_type' => User::class,
+            'noteable_id' => $this->clientUser->id,
             'author_id' => $this->admin->id,
             'content' => 'Watch this client closely.',
             'type' => 'warning',
@@ -61,7 +47,7 @@ class AdminNoteTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)
-            ->getJson("/api/admin-notes?noteable_type=client&noteable_id={$this->client->id}");
+            ->getJson("/api/admin-notes?noteable_type=client&noteable_id={$this->clientUser->id}");
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -74,7 +60,7 @@ class AdminNoteTest extends TestCase
         $response = $this->actingAs($this->admin)
             ->postJson('/api/admin-notes', [
                 'noteable_type' => 'client',
-                'noteable_id' => $this->client->id,
+                'noteable_id' => $this->clientUser->id,
                 'content' => 'High risk account: excessive chargeback potential.',
                 'type' => 'fraud_risk',
                 'visibility' => 'admins_only',
@@ -83,8 +69,8 @@ class AdminNoteTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('admin_notes', [
-            'noteable_type' => Client::class,
-            'noteable_id' => $this->client->id,
+            'noteable_type' => User::class,
+            'noteable_id' => $this->clientUser->id,
             'author_id' => $this->admin->id,
             'content' => 'High risk account: excessive chargeback potential.',
             'type' => 'fraud_risk',
@@ -95,8 +81,8 @@ class AdminNoteTest extends TestCase
     public function test_can_toggle_pin_admin_note(): void
     {
         $note = AdminNote::create([
-            'noteable_type' => Client::class,
-            'noteable_id' => $this->client->id,
+            'noteable_type' => User::class,
+            'noteable_id' => $this->clientUser->id,
             'author_id' => $this->admin->id,
             'content' => 'A pinned warning note.',
             'type' => 'general',
@@ -122,8 +108,8 @@ class AdminNoteTest extends TestCase
     public function test_can_delete_admin_note(): void
     {
         $note = AdminNote::create([
-            'noteable_type' => Client::class,
-            'noteable_id' => $this->client->id,
+            'noteable_type' => User::class,
+            'noteable_id' => $this->clientUser->id,
             'author_id' => $this->admin->id,
             'content' => 'To be deleted.',
             'type' => 'general',
@@ -136,7 +122,7 @@ class AdminNoteTest extends TestCase
             ->deleteJson("/api/admin-notes/{$note->id}");
 
         $response->assertStatus(200);
-        $this->assertDatabaseMissing('admin_notes', [
+        $this->assertSoftDeleted('admin_notes', [
             'id' => $note->id,
         ]);
     }

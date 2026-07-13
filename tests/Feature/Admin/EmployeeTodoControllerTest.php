@@ -153,6 +153,6 @@ class EmployeeTodoControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('employee_todos', ['id' => $todo->id]);
+        $this->assertSoftDeleted('employee_todos', ['id' => $todo->id]);
     }
 }

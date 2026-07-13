@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('todos', function (Blueprint $table) {
-            $table->dropColumn(['cost', 'currency_id', 'is_paid', 'refunded', 'refunded_at', 'refund_amount']);
+            if (Schema::hasColumn('todos', 'currency')) {
+                $table->dropColumn('currency');
+            }
         });
     }
 

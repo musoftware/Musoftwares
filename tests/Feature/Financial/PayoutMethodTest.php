@@ -161,7 +161,7 @@ class PayoutMethodTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHasNoErrors();
 
-        $this->assertDatabaseMissing('payout_methods', [
+        $this->assertSoftDeleted('payout_methods', [
             'id' => $method->id,
         ]);
     }

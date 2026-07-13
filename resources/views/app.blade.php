@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
         <meta name="theme-color" content="#0f0f11">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -90,10 +90,26 @@
         <!-- End Custom Head Scripts -->
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
 
-        <!-- PWA -->
+        <!-- PWA Configuration -->
         <link rel="manifest" href="/manifest.json">
-        <link rel="apple-touch-icon" href="/icons/pwa-192.png">
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/pwa-152.png">
+        <link rel="apple-touch-icon" sizes="167x167" href="/icons/pwa-167.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+        <link rel="mask-icon" href="/favicon.svg" color="#0f0f11">
+
+        <!-- iOS Splash Screens (Launch Images) -->
+        <link rel="apple-touch-startup-image" href="/icons/pwa-512.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
+        <link rel="apple-touch-startup-image" href="/icons/pwa-512.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
+        <link rel="apple-touch-startup-image" href="/icons/pwa-512.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
+        <link rel="apple-touch-startup-image" href="/icons/pwa-512.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+        <link rel="apple-touch-startup-image" href="/icons/pwa-512.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+        <link rel="apple-touch-startup-image" href="/icons/pwa-512.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2)">
+        <link rel="apple-touch-startup-image" href="/icons/pwa-512.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
@@ -129,8 +145,24 @@
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                        .then(reg => console.debug('[SW] registered', reg.scope))
+                        .then(reg => {
+                            console.debug('[SW] registered', reg.scope);
+                            
+                            // Check for updates periodically
+                            setInterval(() => {
+                                reg.update();
+                            }, 60 * 60 * 1000); // Check hourly
+                        })
                         .catch(err => console.warn('[SW] registration failed', err));
+                });
+
+                // Reload the page when the new Service Worker takes control
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        window.location.reload();
+                    }
                 });
             }
         </script>

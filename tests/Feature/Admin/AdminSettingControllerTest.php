@@ -90,11 +90,13 @@ class AdminSettingControllerTest extends TestCase
         $this->assertEquals($currency->id, $this->clientUser->fresh()->hour_rate_currency_id);
     }
 
-    public function test_admin_can_recalculate_overhead_hourly_rate(): void
+    public function test_admin_can_calculate_hourly_rate(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.settings.recalculate-overhead-hourly-rate'));
+        $response = $this->actingAs($this->admin)->post(route('admin.settings.calculate-hourly-rate'), [
+            'currency_id' => 1,
+        ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        $response->assertOk();
+        $response->assertJsonStructure(['rate']);
     }
 }

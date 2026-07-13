@@ -15,7 +15,7 @@ class AdminNoteController extends Controller
         $query = AdminNote::query();
 
         if ($type === 'client') {
-            $query->where('noteable_type', 'Modules\\ERP\\Models\\Client')
+            $query->where('noteable_type', \App\Models\User::class)
                 ->where('noteable_id', $id);
         } else {
             $query->where('noteable_type', $type)
@@ -37,7 +37,7 @@ class AdminNoteController extends Controller
         ]);
 
         if ($data['noteable_type'] === 'client') {
-            $data['noteable_type'] = 'Modules\\ERP\\Models\\Client';
+            $data['noteable_type'] = \App\Models\User::class;
         }
 
         $data['author_id'] = auth()->id() ?? 1;

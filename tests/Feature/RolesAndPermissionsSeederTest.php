@@ -21,7 +21,6 @@ class RolesAndPermissionsSeederTest extends TestCase
             'moderator',
             'support_agent',
             'client',
-            'freelancer',
             'seller',
             'employee',
             'tenant_admin',

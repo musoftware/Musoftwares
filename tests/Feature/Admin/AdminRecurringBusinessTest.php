@@ -83,7 +83,7 @@ class AdminRecurringBusinessTest extends TestCase
 
         $response = $this->actingAs($this->admin)->delete(route('admin.recurring_costs.delete', $rCost->id));
         $response->assertRedirect();
-        $this->assertDatabaseMissing('recurring_costs', ['id' => $rCost->id]);
+        $this->assertSoftDeleted('recurring_costs', ['id' => $rCost->id]);
     }
 
     // Income
@@ -171,7 +171,7 @@ class AdminRecurringBusinessTest extends TestCase
         $transactions = $props['transactions'] ?? [];
 
         $this->assertCount(1, $transactions, 'Recurring cost view should expose generated transactions.');
-        $this->assertArrayHasKey('cost_transaction_id', $transactions[0], 'Each transaction must include cost_transaction_id.');
-        $this->assertSame($cost->id, $transactions[0]['cost_transaction_id']);
+        $this->assertArrayHasKey('id', $transactions[0], 'Each transaction must include id.');
+        $this->assertSame($cost->id, $transactions[0]['id']);
     }
 }

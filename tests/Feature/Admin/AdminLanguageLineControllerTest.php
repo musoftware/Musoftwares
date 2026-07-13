@@ -98,7 +98,7 @@ class AdminLanguageLineControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('language_lines', [
+        $this->assertSoftDeleted('language_lines', [
             'id' => $line->id,
         ]);
     }

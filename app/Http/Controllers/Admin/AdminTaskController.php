@@ -12,7 +12,6 @@ use App\Models\InvoiceItem;
 use App\Models\InvoiceItemTimer;
 use App\Models\RecurringBusyTime;
 use App\Models\Task;
-use App\Models\TenantClient;
 use App\Models\Todo;
 use App\Models\TodoChecklistItem;
 use App\Models\User;
@@ -55,6 +54,27 @@ class AdminTaskController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * Calculate client hourly rate in EGP, accounting for booking rate overrides,
+     * subscriptions/plans discounts, and referral commissions.
+     */
+    private function getClientHourlyRateInEgp(User $client): float
+    {
+        $rateEgp = FinanceHelper::calculateOverheadHourlyRate();
+        if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
+            $rateEgp = (float) CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency_id ?? $client->currency ?? 1, 2);
+        } elseif ($client->hasSubscription() && $client->plan) {
+            $rateEgp = $client->plan->calcDiscount((float) $rateEgp);
+        }
+        $fh = FinanceHelper::instance();
+        $baseCost = $fh->price_fixer($rateEgp, 2);
+        $commission = 0;
+        if ($client->ref_user && $client->ref_user->shouldAddCommissionToTotal()) {
+            $commission = $client->ref_user->calculateCommissionAmount($baseCost, 2, $client);
+        }
+        return (float) $fh->price_fixer($baseCost + $commission, 2);
     }
 
     /**
@@ -205,7 +225,7 @@ class AdminTaskController extends Controller
     /**
      * Store an unpaid todo in the queue.
      */
-    public function storeUnpaidTodo(Request $request, TenantClient $client)
+    public function storeUnpaidTodo(Request $request, User $client)
     {
         $request->validate([
             'title' => 'required|string|max:255',
@@ -214,12 +234,20 @@ class AdminTaskController extends Controller
         $todo = new Todo;
         $todo->title = $request->title;
         $todo->user_id = $client->id;
-        $todo->tenant_id = session('tenant_id');
+        if (Schema::hasColumn('todos', 'tenant_id')) {
+            $todo->tenant_id = session('tenant_id');
+        }
         $todo->is_paid = false;
+        $todo->completed = false;
+        $todo->inDate = now('Africa/Cairo')->format('M d, Y H:i:s');
+        $todo->priority = 'normal';
+        $todo->priorityColor = '#11cdef';
+        $todo->tags = []; // casts automatically to json because of $casts array in Todo model
 
-        // Use client's hourly rate and currency for future calculation
-        $todo->cost = $client->hourly_rate ?? 0;
-        $todo->currency_id = $client->currency;
+        // Use client's calculated hourly rate in EGP
+        $finalCostEgp = $this->getClientHourlyRateInEgp($client);
+        $todo->cost = $finalCostEgp;
+        $todo->currency_id = 2; // Stored in base EGP
 
         $todo->save();
 
@@ -522,15 +550,31 @@ class AdminTaskController extends Controller
     public function clientTasks(Request $request): InertiaResponse
     {
         $clientId = $request->get('client_id') ?? $request->get('tenant_id');
+        $search = $request->get('search');
+        $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
 
-        // Fetch all platform clients with task/todo metrics
-        // User has no todos() relationship, so we use raw subquery selects
-        $clients = User::role('client')
-            ->selectRaw('users.*, (SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id) as total_tasks')
-            ->selectRaw('(SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id AND todos.completed = 1) as completed_tasks')
-            ->orderBy('name')
-            ->get()
-            ->map(function ($u) {
+        $clients = [];
+        $pagination = null;
+
+        if (! $clientId) {
+            // Fetch all platform clients with task/todo metrics, sorted by id ASC default
+            // Unless direction is specified (following /admin-sorting-rules)
+            $clientsQuery = User::role('client')
+                ->selectRaw('users.id, users.name, users.email')
+                ->selectRaw('(SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id) as total_tasks')
+                ->selectRaw('(SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id AND todos.completed = 1) as completed_tasks');
+
+            if ($search) {
+                $clientsQuery->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('id', $search);
+                });
+            }
+
+            $paginator = $clientsQuery->orderBy('users.id', $direction)->paginate(12)->withQueryString();
+            
+            $clients = collect($paginator->items())->map(function ($u) {
                 // Get initials (multibyte-safe for Arabic/non-ASCII names)
                 $words = explode(' ', $u->name);
                 $initials = '';
@@ -551,6 +595,14 @@ class AdminTaskController extends Controller
                 ];
             });
 
+            $pagination = [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ];
+        }
+
         $selectedClient = null;
         $todos = [];
 
@@ -560,19 +612,7 @@ class AdminTaskController extends Controller
             $completedTasks = Todo::where('user_id', $clientUser->id)->where('completed', true)->count();
             $latestTask = Task::where('user_id', $clientUser->id)->latest()->first();
 
-            $rateEgp = FinanceHelper::calculateOverheadHourlyRate();
-            if ((float) $clientUser->booking_rate > 0 && ($clientUser->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(Carbon::parse($clientUser->booking_rate_expires_at)->startOfDay()))) {
-                $rateEgp = (float) CurrenciesExchange::RateToday($clientUser->booking_rate, $clientUser->booking_rate_currency ?? $clientUser->currency ?? 1, 2);
-            } elseif ($clientUser->hasSubscription() && $clientUser->plan) {
-                $rateEgp = $clientUser->plan->calcDiscount((float) $rateEgp);
-            }
-            $fh = FinanceHelper::instance();
-            $baseCost = $fh->price_fixer($rateEgp, 2);
-            $commission = 0;
-            if ($clientUser->ref_user && $clientUser->ref_user->shouldAddCommissionToTotal()) {
-                $commission = $clientUser->ref_user->calculateCommissionAmount($baseCost, 2, $clientUser);
-            }
-            $finalCostEgp = $fh->price_fixer($baseCost + $commission, 2);
+            $finalCostEgp = $this->getClientHourlyRateInEgp($clientUser);
             $hourlyRateInUserCurrency = CurrenciesExchange::RateToday((float) $finalCostEgp, 2, (int) $clientUser->currency);
 
             $selectedClient = [
@@ -642,8 +682,11 @@ class AdminTaskController extends Controller
             'clients' => $clients,
             'selectedClient' => $selectedClient,
             'todos' => $todos,
+            'pagination' => $pagination,
             'filters' => [
                 'client_id' => $clientId,
+                'search' => $search,
+                'direction' => $direction,
             ],
         ]));
     }
@@ -858,8 +901,8 @@ class AdminTaskController extends Controller
             'end_at' => 'required|date|after:start_at',
         ]);
 
-        $start = Carbon::parse($request->start_at);
-        $end = Carbon::parse($request->end_at);
+        $start = Carbon::parse($request->start_at, 'Africa/Cairo');
+        $end = Carbon::parse($request->end_at, 'Africa/Cairo');
 
         // Check for conflicting bookings (exclude this todo from the check)
         if (Todo::focusCalendarSlotTaken($start, $end, $todo->id)) {
@@ -902,25 +945,9 @@ class AdminTaskController extends Controller
 
                 $durationHours = $end->diffInMinutes($start) / 60;
 
-                $rateEgp = FinanceHelper::calculateOverheadHourlyRate();
-                if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
-                    $rateEgp = (float) CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
-                } elseif ($client->hasSubscription() && $client->plan) {
-                    $rateEgp = $client->plan->calcDiscount((float) $rateEgp);
-                }
-
-                $cost = $durationHours * $rateEgp;
-                $cost = round($cost, 2);
                 $currencyId = 2;
-
-                $fh = FinanceHelper::instance();
-                $baseCost = $fh->price_fixer($cost, $currencyId);
-
-                $commission = 0;
-                if ($client->ref_user && $client->ref_user->shouldAddCommissionToTotal()) {
-                    $commission = $client->ref_user->calculateCommissionAmount($baseCost, $currencyId, $client);
-                }
-                $finalCost = $fh->price_fixer($baseCost + $commission, $currencyId);
+                $finalCostEgp = $this->getClientHourlyRateInEgp($client);
+                $finalCost = round($finalCostEgp * $durationHours, 2);
 
                 $amountInUserCurrency = CurrenciesExchange::RateToday((float) $finalCost, $currencyId, (int) $client->currency);
 
@@ -1044,21 +1071,7 @@ class AdminTaskController extends Controller
             return back()->withErrors(['error' => 'This time slot overlaps with an existing scheduled focus task.']);
         }
 
-        // Calculate rate based on client config
-        $rateEgp = FinanceHelper::calculateOverheadHourlyRate();
-        if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
-            $rateEgp = (float) CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
-        } elseif ($client->hasSubscription() && $client->plan) {
-            $rateEgp = $client->plan->calcDiscount((float) $rateEgp);
-        }
-        $fh = FinanceHelper::instance();
-        $baseCost = $fh->price_fixer($rateEgp, 2);
-        $commission = 0;
-        if ($client->ref_user && $client->ref_user->shouldAddCommissionToTotal()) {
-            $commission = $client->ref_user->calculateCommissionAmount($baseCost, 2, $client);
-        }
-        $finalCostEgp = $fh->price_fixer($baseCost + $commission, 2);
-
+        $finalCostEgp = $this->getClientHourlyRateInEgp($client);
         $durationHours = $start->diffInMinutes($end) / 60;
         $totalCostEgp = $finalCostEgp * $durationHours;
 
@@ -1081,7 +1094,9 @@ class AdminTaskController extends Controller
                     $todo = new Todo;
                     $todo->title = $request->title;
                     $todo->user_id = $client->id;
-                    $todo->tenant_id = session('tenant_id');
+                    if (Schema::hasColumn('todos', 'tenant_id')) {
+                        $todo->tenant_id = session('tenant_id');
+                    }
                     $todo->start_at = $start->toDateTimeString();
                     $todo->end_at = $end->toDateTimeString();
                     $todo->is_paid = true;
@@ -1193,10 +1208,10 @@ class AdminTaskController extends Controller
             $todo->paused = (bool) $data['paused'];
         }
         if (array_key_exists('start_at', $data)) {
-            $todo->start_at = $data['start_at'] ? Carbon::parse($data['start_at'])->toDateTimeString() : null;
+            $todo->start_at = $data['start_at'] ? Carbon::parse($data['start_at'], 'Africa/Cairo')->toDateTimeString() : null;
         }
         if (array_key_exists('end_at', $data)) {
-            $todo->end_at = $data['end_at'] ? Carbon::parse($data['end_at'])->toDateTimeString() : null;
+            $todo->end_at = $data['end_at'] ? Carbon::parse($data['end_at'], 'Africa/Cairo')->toDateTimeString() : null;
         }
 
         $todo->save();

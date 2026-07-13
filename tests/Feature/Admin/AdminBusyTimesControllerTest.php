@@ -97,7 +97,7 @@ class AdminBusyTimesControllerTest extends TestCase
         $response->assertRedirect(route('admin.busy-times.index'));
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('recurring_busy_times', ['id' => $busyTime->id]);
+        $this->assertSoftDeleted('recurring_busy_times', ['id' => $busyTime->id]);
     }
 
     public function test_non_admin_cannot_destroy_busy_time(): void

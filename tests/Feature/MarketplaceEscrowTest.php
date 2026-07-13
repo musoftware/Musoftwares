@@ -54,7 +54,7 @@ class MarketplaceEscrowTest extends TestCase
             'title' => 'Test Service',
             'slug' => 'test-service',
             'description' => 'Test',
-            'status' => 'published',
+            'status' => 'active',
             'currency_id' => 1,
         ]);
 

@@ -106,4 +106,45 @@ class AdminTaskControllerTest extends TestCase
         $this->assertNotNull($todo->start_at);
         $this->assertNotNull($todo->end_at);
     }
+
+    public function test_admin_can_store_unpaid_todo_with_calculated_hourly_rate(): void
+    {
+        // Set booking rate for the client (assign directly to bypass mass-assignment)
+        $this->clientUser->booking_rate = 150.00;
+        $this->clientUser->booking_rate_currency_id = 2; // EGP
+        $this->clientUser->save();
+
+        $response = $this->actingAs($this->admin)->post(
+            route('admin.tasks.client-tasks.store-unpaid', $this->clientUser->id),
+            ['title' => 'Unpaid Test Task']
+        );
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('todos', [
+            'user_id' => $this->clientUser->id,
+            'title' => 'Unpaid Test Task',
+            'is_paid' => false,
+            'cost' => 150.00,
+            'currency_id' => 2, // EGP
+        ]);
+    }
+
+    public function test_admin_can_search_and_paginate_clients(): void
+    {
+        // Create multiple client users
+        $clientA = User::factory()->create(['name' => 'Alpha Client', 'onboarding_completed' => true]);
+        $clientA->assignRole('client');
+        $clientB = User::factory()->create(['name' => 'Beta Client', 'onboarding_completed' => true]);
+        $clientB->assignRole('client');
+
+        $response = $this->actingAs($this->admin)->get(route('admin.tasks.client-tasks', ['search' => 'Alpha']));
+        $response->assertStatus(200);
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Tasks/ClientTasks')
+            ->has('clients', 1)
+            ->where('clients.0.name', 'Alpha Client')
+        );
+    }
 }

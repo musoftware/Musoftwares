@@ -36,6 +36,7 @@ class AdminFreeDownloadControllerTest extends TestCase
                 $table->boolean('is_active')->default(true);
                 $table->integer('order_column')->default(0);
                 $table->timestamps();
+                $table->softDeletes();
             });
         }
 
@@ -130,6 +131,6 @@ class AdminFreeDownloadControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('free_downloads', ['id' => $download->id]);
+        $this->assertSoftDeleted('free_downloads', ['id' => $download->id]);
     }
 }
