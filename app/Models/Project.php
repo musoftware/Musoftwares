@@ -151,39 +151,10 @@ class Project extends Model
         return $this->hasMany(Transaction::class);
     }
 
-    public function add_balance($amount, $reason, $type, $invoice_id, $currency = null)
+    public function add_balance($amount, $reason, $type, ?int $currencyId = null, $createdAt = null)
     {
-        $this->client->add_balance($amount, $reason, $type, $invoice_id, $currency, $this);
-
-        //        $client_balance = new Transaction();
-        //        $client_balance->user_id = $this->user_id;
-        //        $client_balance->project_id = $this->id;
-        //        $client_balance->amount = $amount;
-        //        $client_balance->type = $type;
-        //        if (!empty($reason)) {
-        //            $client_balance->reason = $reason;
-        //        }
-        //        if ($currency == null) {
-        //            $client_balance->currency = $this->currency;
-        //        } else {
-        //            $client_balance->currency = $currency;
-        //        }
-        //        $client_balance->invoice_id = $invoice_id;
-        //
-        //        $client_balance->save();
-        //
-        //        $this->change_balance($currency);
-        //
-        //        $first_date = Carbon::now()->toDateTimeString();
-        //        $last_date = Carbon::now()->toDateTimeString();
-        //        TimerHelper::instance()->updateClientDate($this->user()->first(), $first_date, $last_date);
-        //        TimerHelper::instance()->updateProjectDate($this, $first_date, $last_date);
+        return $this->client->add_balance($amount, $reason, $type, $currencyId, $this, $createdAt);
     }
-
-    //    public function change_balance($currency = null)
-    //    {
-    //        $this->generate_finance($currency, true, true);
-    //    }
     public function get_currency()
     {
         // users.currency was renamed to users.currency_id (see 2026_05_24_000001).
@@ -275,7 +246,7 @@ class Project extends Model
 
     public function getNameAttribute()
     {
-        return $this->project_name;
+        return $this->project_name ?? ($this->attributes['name'] ?? null);
     }
 
     public function invoice_item_timers()

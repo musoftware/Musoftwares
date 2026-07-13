@@ -395,13 +395,14 @@ class User extends Authenticatable
         return CurrenciesExchange::RateToday($this->user_balance, $this->currency_id, $currency);
     }
 
-    public function add_balance($amount, $reason, $type, $currency = null, $project = null, $createdAt = null)
+    public function add_balance($amount, $reason, $type, $currencyId = null, ?Project $project = null, $createdAt = null)
     {
         if ($amount == 0) {
             return null;
         }
-        if ($currency != null) {
-            $amount = CurrenciesExchange::RateToday($amount, $currency, $this->currency_id);
+
+        if ($currencyId !== null) {
+            $amount = CurrenciesExchange::RateToday($amount, (int) $currencyId, $this->currency_id);
         }
         $currency = $this->currency_id;
 
@@ -415,8 +416,15 @@ class User extends Authenticatable
         }
         $client_balance->currency_id = $currency;
         if ($createdAt) {
-            $client_balance->created_at = Carbon::parse($createdAt);
-            $client_balance->updated_at = Carbon::parse($createdAt);
+            try {
+                $client_balance->created_at = Carbon::parse($createdAt);
+                $client_balance->updated_at = Carbon::parse($createdAt);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to parse createdAt date in User::add_balance: " . $e->getMessage(), [
+                    'createdAt' => $createdAt,
+                    'user_id' => $this->id
+                ]);
+            }
         }
 
         DB::transaction(function () use ($client_balance, $project, $amount, $type) {

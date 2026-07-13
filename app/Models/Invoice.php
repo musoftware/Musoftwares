@@ -217,12 +217,12 @@ class Invoice extends Model
 
         if (! empty($this->project_id)) {
             $project = Project::find($this->project_id);
-            $project->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->id, $this->currency_id);
-            $project->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->id, $this->currency_id);
+            $project->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
+            $project->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
         } else {
             $client = User::find($this->user_id);
-            $client->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->id, $this->currency_id);
-            $client->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->id, $this->currency_id);
+            $client->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
+            $client->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
         }
         $this->user->calc_ref($this->total_min_cost(), $this->id, $this->currency_id);
         $this->paid = $this->total();
