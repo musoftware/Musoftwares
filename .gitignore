@@ -222,7 +222,5 @@ wordpress-plugins/musoftware-sms-gateway.zip
 musoftware-sms-gateway-*.zip
 build.tar.gz
 .playwright-mcp/
-build_20260712193039.tar.gz
-build_20260712193156.tar.gz
-build_20260712194256.tar.gz
 u962989541_db
+build_*.tar.gz
