@@ -153,6 +153,12 @@ class InvoiceController extends Controller
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'invoices' => $invoices,
+            ]);
+        }
+
         $projects = $request->filled('client_id')
             ? Project::where('user_id', $request->client_id)->get()
             : Project::all();

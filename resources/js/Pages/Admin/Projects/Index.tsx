@@ -18,6 +18,7 @@ import ProjectActionsSheet from './ProjectActionsSheet';
 import { ProjectFormFields, EMPTY_PROJECT_FORM, formToPayload, projectToForm } from './Components/ProjectFormFields';
 import { ProjectCard } from './Components/ProjectCard';
 import { ProjectFiltersPanel, type FilterPartial } from './Components/ProjectFiltersPanel';
+import { UnpaidInvoicesSheet } from './Components/UnpaidInvoicesSheet';
 import { cn, formatMoney } from '@/lib/utils';
 import type { ProjectsIndexProps, Project, ProjectViewMode } from '@/types/project';
 
@@ -35,12 +36,20 @@ export default function Index(props: ProjectsIndexProps) {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+    const [selectedProjectForUnpaid, setSelectedProjectForUnpaid] = useState<Project | null>(null);
+    const [unpaidSheetOpen, setUnpaidSheetOpen] = useState(false);
+
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [filtersOpen, setFiltersOpen] = useState(false);
 
     const openProjectSheet = (project: Project) => {
         setSelectedProject(project);
         setIsSheetOpen(true);
+    };
+
+    const handleShowUnpaidInvoices = (project: Project) => {
+        setSelectedProjectForUnpaid(project);
+        setUnpaidSheetOpen(true);
     };
 
     const openFinance = (project: Project) => {
@@ -266,7 +275,11 @@ export default function Index(props: ProjectsIndexProps) {
                         <p className="text-xs text-slate-500 line-clamp-1">{project.description}</p>
                     )}
                     {(project.counts?.invoices_unpaid ?? 0) > 0 && (
-                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded w-fit" title={__('general.unpaid_invoices_count', { count: project.counts?.invoices_unpaid ?? 0 })}>
+                        <div 
+                            className="mt-1 flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded w-fit cursor-pointer hover:bg-red-100 transition-colors" 
+                            title={__('general.unpaid_invoices_count', { count: project.counts?.invoices_unpaid ?? 0 })}
+                            onClick={() => handleShowUnpaidInvoices(project)}
+                        >
                             <AlertCircle className="w-3 h-3" /> {project.counts?.invoices_unpaid} {__('general.unpaid_dues')}
                         </div>
                     )}
@@ -505,6 +518,7 @@ export default function Index(props: ProjectsIndexProps) {
                                     onArchive={handleArchive}
                                     onRestore={handleRestore}
                                     onDelete={handleDelete}
+                                    onShowUnpaidInvoices={handleShowUnpaidInvoices}
                                 />
                             ))}
                         </div>
@@ -601,6 +615,12 @@ export default function Index(props: ProjectsIndexProps) {
                 isOpen={isSheetOpen}
                 onClose={() => setIsSheetOpen(false)}
                 onEdit={(proj) => openEditModal(proj as Project)}
+            />
+
+            <UnpaidInvoicesSheet
+                project={selectedProjectForUnpaid}
+                isOpen={unpaidSheetOpen}
+                onClose={() => setUnpaidSheetOpen(false)}
             />
         </AdminSidebarLayout>
     );

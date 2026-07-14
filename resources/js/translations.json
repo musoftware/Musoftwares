@@ -8874,7 +8874,10 @@
             "no_purchases_yet": "ليس لديك أي مشتريات بعد.",
             "confirm_submit_delivery": "هل أنت متأكد من رغبتك في تسليم هذا الطلب؟",
             "confirm_accept_delivery": "هل أنت متأكد من رغبتك في قبول التسليم وإكمال الطلب؟",
-            "confirm_request_revision": "هل أنت متأكد من رغبتك في طلب تعديل؟"
+            "confirm_request_revision": "هل أنت متأكد من رغبتك في طلب تعديل؟",
+            "error_loading_invoices": "خطأ في تحميل الفواتير",
+            "no_due_date": "لا يوجد تاريخ استحقاق",
+            "project_all_invoices_paid": "جميع فواتير هذا المشروع مدفوعة بالكامل."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -18527,7 +18530,10 @@
             "no_purchases_yet": "You do not have any purchases yet.",
             "confirm_submit_delivery": "Are you sure you want to submit delivery for this order?",
             "confirm_accept_delivery": "Are you sure you want to accept this delivery and complete the order?",
-            "confirm_request_revision": "Are you sure you want to request a revision?"
+            "confirm_request_revision": "Are you sure you want to request a revision?",
+            "error_loading_invoices": "Error loading invoices",
+            "no_due_date": "No due date",
+            "project_all_invoices_paid": "All invoices for this project are fully paid."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

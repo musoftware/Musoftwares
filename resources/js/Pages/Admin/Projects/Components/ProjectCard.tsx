@@ -34,6 +34,7 @@ export interface ProjectCardProps {
     onArchive: (id: number) => void;
     onRestore: (id: number) => void;
     onDelete: (id: number) => void;
+    onShowUnpaidInvoices: (project: Project) => void;
 }
 
 export function ProjectCard({
@@ -46,6 +47,7 @@ export function ProjectCard({
     onArchive,
     onRestore,
     onDelete,
+    onShowUnpaidInvoices,
 }: ProjectCardProps) {
     const status = project.status ?? 'open';
     const unpaid = project.counts?.invoices_unpaid ?? 0;
@@ -143,8 +145,9 @@ export function ProjectCard({
 
                 {unpaid > 0 && (
                     <div
-                        className="mb-4 flex w-fit items-center gap-1 rounded border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700"
+                        className="mb-4 flex w-fit items-center gap-1 rounded border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 cursor-pointer hover:bg-red-100 transition-colors"
                         title={__('general.unpaid_invoices_count', { count: unpaid })}
+                        onClick={() => onShowUnpaidInvoices(project)}
                     >
                         <AlertCircle className="h-3 w-3" /> {unpaid} {__('general.unpaid_dues')}
                     </div>

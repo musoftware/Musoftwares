@@ -7667,4 +7667,7 @@ return [
     'confirm_submit_delivery' => 'Are you sure you want to submit delivery for this order?',
     'confirm_accept_delivery' => 'Are you sure you want to accept this delivery and complete the order?',
     'confirm_request_revision' => 'Are you sure you want to request a revision?',
+    'error_loading_invoices' => 'Error loading invoices',
+    'no_due_date' => 'No due date',
+    'project_all_invoices_paid' => 'All invoices for this project are fully paid.',
 ];

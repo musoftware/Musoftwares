@@ -7618,4 +7618,7 @@ return [
     'confirm_submit_delivery' => 'هل أنت متأكد من رغبتك في تسليم هذا الطلب؟',
     'confirm_accept_delivery' => 'هل أنت متأكد من رغبتك في قبول التسليم وإكمال الطلب؟',
     'confirm_request_revision' => 'هل أنت متأكد من رغبتك في طلب تعديل؟',
+    'error_loading_invoices' => 'خطأ في تحميل الفواتير',
+    'no_due_date' => 'لا يوجد تاريخ استحقاق',
+    'project_all_invoices_paid' => 'جميع فواتير هذا المشروع مدفوعة بالكامل.',
 ];
