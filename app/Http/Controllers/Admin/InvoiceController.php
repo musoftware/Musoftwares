@@ -46,6 +46,12 @@ class InvoiceController extends Controller
             $query->where('project_id', $request->project_id);
         }
 
+        if ($request->filled('from') && $request->filled('to')) {
+            $fromUtc = Carbon::parse($request->from)->startOfDay()->setTimezone('UTC');
+            $toUtc = Carbon::parse($request->to)->endOfDay()->setTimezone('UTC');
+            $query->whereBetween('created_at', [$fromUtc, $toUtc]);
+        }
+
         $filterBy = $request->input('filter_by', 'all');
         $search = $request->input('search');
 

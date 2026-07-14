@@ -156,6 +156,14 @@ class FinancialOperationsController extends Controller
                     if ($userId) {
                         $entriesQuery->where('user_id', $userId);
                     }
+                    if ($request->filled('project_id')) {
+                        $entriesQuery->where('project_id', $request->project_id);
+                    }
+                    if ($request->filled('from') && $request->filled('to')) {
+                        $fromUtc = Carbon::parse($request->from)->startOfDay()->setTimezone('UTC');
+                        $toUtc = Carbon::parse($request->to)->endOfDay()->setTimezone('UTC');
+                        $entriesQuery->whereBetween('created_at', [$fromUtc, $toUtc]);
+                    }
                     $entriesQuery->orderBy($sortBy, $sortDir);
                 } elseif ($currentTab === 'projects') {
                     if ($search) {
@@ -715,12 +723,14 @@ class FinancialOperationsController extends Controller
     public function export(Request $request)
     {
         $type = $request->query('type', 'pnl'); // pnl or ledger
-        $month = $request->query('month', now()->month);
-        $year = $request->query('year', now()->year);
+        $month = $request->has('month') ? (int) $request->query('month') : null;
+        $year = $request->has('year') ? (int) $request->query('year') : null;
+
+        $filenameSuffix = ($year && $month) ? "{$year}_{$month}" : "lifetime";
 
         $headers = [
             'Content-type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=finance_{$type}_{$year}_{$month}.csv",
+            'Content-Disposition' => "attachment; filename=finance_{$type}_{$filenameSuffix}.csv",
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -729,12 +739,21 @@ class FinancialOperationsController extends Controller
         $callback = function () use ($type, $month, $year) {
             $file = fopen('php://output', 'w');
 
+            $startUtc = null;
+            $endUtc = null;
+            if ($year && $month) {
+                $startUtc = Carbon::create($year, $month, 1, 0, 0, 0, 'Africa/Cairo')->setTimezone('UTC');
+                $endUtc = Carbon::create($year, $month, 1, 0, 0, 0, 'Africa/Cairo')->endOfMonth()->setTimezone('UTC');
+            }
+
             if ($type === 'pnl') {
                 fputcsv($file, ['Category', 'Type', 'Business Amount']);
 
                 // Income
-                $incomeQuery = Transaction::whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month);
+                $incomeQuery = Transaction::query();
+                if ($startUtc && $endUtc) {
+                    $incomeQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+                }
 
                 $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
                 $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
@@ -747,9 +766,11 @@ class FinancialOperationsController extends Controller
                 fputcsv($file, ['Net Revenue', 'Income', $net_revenue]);
 
                 // Expenses
-                $expenses = CostTransaction::whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month)
-                    ->select('reason', DB::raw('SUM(business_amount) as total'))
+                $expensesQuery = CostTransaction::query();
+                if ($startUtc && $endUtc) {
+                    $expensesQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+                }
+                $expenses = $expensesQuery->select('reason', DB::raw('SUM(business_amount) as total'))
                     ->groupBy('reason')
                     ->get();
 
@@ -763,16 +784,18 @@ class FinancialOperationsController extends Controller
             } else {
                 fputcsv($file, ['Date', 'Title', 'Type', 'Category', 'Original Amount', 'Currency', 'Business Amount']);
 
-                $incomes = Transaction::with(['currency_info'])
-                    ->whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month)
-                    ->whereIn('type', ['received', 'refunded', 'sent'])
-                    ->get();
+                $incomesQuery = Transaction::with(['currency_info'])
+                    ->whereIn('type', ['received', 'refunded', 'sent']);
+                if ($startUtc && $endUtc) {
+                    $incomesQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+                }
+                $incomes = $incomesQuery->get();
 
-                $costs = CostTransaction::with(['currency_info'])
-                    ->whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month)
-                    ->get();
+                $costsQuery = CostTransaction::with(['currency_info']);
+                if ($startUtc && $endUtc) {
+                    $costsQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+                }
+                $costs = $costsQuery->get();
 
                 $merged = $incomes->concat($costs)->sortByDesc('created_at')->values();
 

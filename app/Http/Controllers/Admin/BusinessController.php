@@ -1083,34 +1083,206 @@ class BusinessController extends Controller
 
     public function reports(Request $request)
     {
-        $bCurrency = CurrencyHelper::getBusinessCurrency();
+        $from = $request->query('from');
+        $to = $request->query('to');
+        $projectId = $request->query('project_id');
+        $category = $request->query('category');
 
-        $lifetimeReceived = Transaction::where('type', 'received')->sum('business_amount') ?? 0;
-        $lifetimeRefunded = Transaction::where('type', 'refunded')->sum('business_amount') ?? 0;
-        $lifetimeSent = Transaction::where('type', 'sent')->sum('business_amount') ?? 0;
+        $startUtc = null;
+        $endUtc = null;
+
+        // Apply Cairo timezone boundaries
+        if ($from && $to) {
+            $startUtc = Carbon::parse($from)->startOfDay()->setTimezone('UTC');
+            $endUtc = Carbon::parse($to)->endOfDay()->setTimezone('UTC');
+        }
+
+        // Dropdown options
+        $projects = Project::select('id', 'project_name as name')->get();
+        $txnCategories = Transaction::whereNotNull('category')->distinct()->pluck('category')->toArray();
+        $costCategories = CostTransaction::whereNotNull('category')->distinct()->pluck('category')->toArray();
+        $availableCategories = array_values(array_unique(array_filter(array_merge($txnCategories, $costCategories))));
+
+        // General Stats Queries
+        $usersQuery = User::query();
+        $projectsQuery = Project::query();
+        $invoicesQuery = Invoice::query();
+        $txnsQuery = Transaction::query();
+
+        if ($startUtc && $endUtc) {
+            $usersQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+            $projectsQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+            $invoicesQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+            $txnsQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+        }
+
+        if ($projectId) {
+            $invoicesQuery->where('project_id', $projectId);
+            $txnsQuery->where('project_id', $projectId);
+        }
+
+        if ($category) {
+            $txnsQuery->where('category', $category);
+        }
+
+        // Financial Calculations Queries
+        $incomeQuery = Transaction::where('type', 'received');
+        $refundedQuery = Transaction::where('type', 'refunded');
+        $sentQuery = Transaction::where('type', 'sent');
+        $expensesQuery = CostTransaction::query();
+
+        if ($startUtc && $endUtc) {
+            $incomeQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+            $refundedQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+            $sentQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+            $expensesQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+        }
+
+        if ($projectId) {
+            $incomeQuery->where('project_id', $projectId);
+            $refundedQuery->where('project_id', $projectId);
+            $sentQuery->where('project_id', $projectId);
+            $expensesQuery->where('project_id', $projectId);
+        }
+
+        if ($category) {
+            $incomeQuery->where('category', $category);
+            $refundedQuery->where('category', $category);
+            $sentQuery->where('category', $category);
+            $expensesQuery->where('category', $category);
+        }
+
+        $lifetimeReceived = $incomeQuery->sum('business_amount') ?? 0;
+        $lifetimeRefunded = $refundedQuery->sum('business_amount') ?? 0;
+        $lifetimeSent = $sentQuery->sum('business_amount') ?? 0;
         $lifetimeIncome = max(0, abs($lifetimeReceived) - abs($lifetimeRefunded) - abs($lifetimeSent));
 
-        $lifetimeExpenses = CostTransaction::sum('business_amount') ?? 0;
+        $lifetimeExpenses = $expensesQuery->sum('business_amount') ?? 0;
         $netProfit = $lifetimeIncome - abs($lifetimeExpenses);
+
+        // Category Breakdowns
+        $incomeCatQuery = Transaction::where('type', 'received');
+        $expenseCatQuery = CostTransaction::query();
+
+        if ($startUtc && $endUtc) {
+            $incomeCatQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+            $expenseCatQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+        }
+        if ($projectId) {
+            $incomeCatQuery->where('project_id', $projectId);
+            $expenseCatQuery->where('project_id', $projectId);
+        }
+        if ($category) {
+            $incomeCatQuery->where('category', $category);
+            $expenseCatQuery->where('category', $category);
+        }
+
+        $incomeByCategory = $incomeCatQuery->select('category', DB::raw('SUM(business_amount) as value'))
+            ->groupBy('category')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->category ?: __('general.uncategorized') ?: 'Uncategorized',
+                    'value' => round(abs($item->value), 2),
+                ];
+            })
+            ->filter(fn($x) => $x['value'] > 0)
+            ->values()
+            ->toArray();
+
+        $expensesByCategory = $expenseCatQuery->select('category', DB::raw('SUM(business_amount) as value'))
+            ->groupBy('category')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->category ?: __('general.uncategorized') ?: 'Uncategorized',
+                    'value' => round(abs($item->value), 2),
+                ];
+            })
+            ->filter(fn($x) => $x['value'] > 0)
+            ->values()
+            ->toArray();
+
+        // Monthly trends for chart
+        $startTrend = $from ? Carbon::parse($from)->startOfMonth() : now('Africa/Cairo')->subMonths(11)->startOfMonth();
+        $endTrend = $to ? Carbon::parse($to)->endOfMonth() : now('Africa/Cairo')->endOfMonth();
+
+        $monthlyTrends = [];
+        $temp = $startTrend->copy();
+        $loopCount = 0;
+        while ($temp->lte($endTrend) && $loopCount < 36) {
+            $mStart = $temp->copy()->startOfMonth()->setTimezone('UTC');
+            $mEnd = $temp->copy()->endOfMonth()->setTimezone('UTC');
+
+            $mIncomeQ = Transaction::whereBetween('created_at', [$mStart, $mEnd])->where('type', 'received');
+            $mRefundedQ = Transaction::whereBetween('created_at', [$mStart, $mEnd])->where('type', 'refunded');
+            $mSentQ = Transaction::whereBetween('created_at', [$mStart, $mEnd])->where('type', 'sent');
+            $mExpensesQ = CostTransaction::whereBetween('created_at', [$mStart, $mEnd]);
+
+            if ($projectId) {
+                $mIncomeQ->where('project_id', $projectId);
+                $mRefundedQ->where('project_id', $projectId);
+                $mSentQ->where('project_id', $projectId);
+                $mExpensesQ->where('project_id', $projectId);
+            }
+            if ($category) {
+                $mIncomeQ->where('category', $category);
+                $mRefundedQ->where('category', $category);
+                $mSentQ->where('category', $category);
+                $mExpensesQ->where('category', $category);
+            }
+
+            $incSum = $mIncomeQ->sum('business_amount') ?? 0;
+            $refSum = $mRefundedQ->sum('business_amount') ?? 0;
+            $sntSum = $mSentQ->sum('business_amount') ?? 0;
+            $mIncome = max(0, abs($incSum) - abs($refSum) - abs($sntSum));
+
+            $mExpenses = $mExpensesQ->sum('business_amount') ?? 0;
+
+            $monthlyTrends[] = [
+                'name' => $temp->format('M Y'),
+                'income' => round($mIncome, 2),
+                'costs' => round(abs($mExpenses), 2),
+                'profit' => round($mIncome - abs($mExpenses), 2),
+            ];
+
+            $temp->addMonth();
+            $loopCount++;
+        }
+
+        $bCurrency = CurrencyHelper::getBusinessCurrency();
 
         return Inertia::render('Admin/Business/Reports', [
             'stats' => [
-                'total_users' => User::count(),
-                'total_projects' => Project::count(),
-                'total_invoices' => Invoice::count(),
-                'total_transactions' => Transaction::count(),
+                'total_users' => $usersQuery->count(),
+                'total_projects' => $projectsQuery->count(),
+                'total_invoices' => $invoicesQuery->count(),
+                'total_transactions' => $txnsQuery->count(),
                 'lifetime_income' => $lifetimeIncome,
                 'lifetime_expenses' => abs($lifetimeExpenses),
                 'net_profit' => $netProfit,
                 'business_currency_code' => $bCurrency['currency'] ?? 'USD',
                 'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
             ],
+            'charts' => [
+                'monthly_trends' => $monthlyTrends,
+                'income_by_category' => $incomeByCategory,
+                'expenses_by_category' => $expensesByCategory,
+            ],
+            'projects' => $projects,
+            'categories' => $availableCategories,
+            'filters' => [
+                'from' => $from,
+                'to' => $to,
+                'project_id' => $projectId,
+                'category' => $category,
+            ],
         ]);
     }
 
     public function balance(Request $request)
     {
-        $currentYear = (int) now()->year;
+        $currentYear = (int) now('Africa/Cairo')->year;
         $year = (int) $request->query('year', $currentYear);
 
         $txnMin = Transaction::min('created_at');
@@ -1122,8 +1294,8 @@ class BusinessController extends Controller
         $maxes = array_filter([$txnMax, $costMax]);
 
         if (! empty($mins) && ! empty($maxes)) {
-            $earliestYear = (int) Carbon::parse(min($mins))->year;
-            $latestYear = (int) Carbon::parse(max($maxes))->year;
+            $earliestYear = (int) Carbon::parse(min($mins))->setTimezone('Africa/Cairo')->year;
+            $latestYear = (int) Carbon::parse(max($maxes))->setTimezone('Africa/Cairo')->year;
         } else {
             $earliestYear = $currentYear;
             $latestYear = $currentYear;
@@ -1133,12 +1305,22 @@ class BusinessController extends Controller
 
         $monthlyTrends = [];
         for ($i = 1; $i <= 12; $i++) {
-            $mReceived = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->where('type', 'received')->sum('business_amount') ?? 0;
-            $mRefunded = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->where('type', 'refunded')->sum('business_amount') ?? 0;
-            $mSent = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->where('type', 'sent')->sum('business_amount') ?? 0;
+            $startOfMonth = Carbon::create($year, $i, 1, 0, 0, 0, 'Africa/Cairo');
+            $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+            $mReceived = Transaction::whereBetween('created_at', [$startOfMonth->copy()->setTimezone('UTC'), $endOfMonth->copy()->setTimezone('UTC')])
+                ->where('type', 'received')
+                ->sum('business_amount') ?? 0;
+            $mRefunded = Transaction::whereBetween('created_at', [$startOfMonth->copy()->setTimezone('UTC'), $endOfMonth->copy()->setTimezone('UTC')])
+                ->where('type', 'refunded')
+                ->sum('business_amount') ?? 0;
+            $mSent = Transaction::whereBetween('created_at', [$startOfMonth->copy()->setTimezone('UTC'), $endOfMonth->copy()->setTimezone('UTC')])
+                ->where('type', 'sent')
+                ->sum('business_amount') ?? 0;
 
             $income = max(0, abs($mReceived) - abs($mRefunded) - abs($mSent));
-            $costs = CostTransaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->sum('business_amount') ?? 0;
+            $costs = CostTransaction::whereBetween('created_at', [$startOfMonth->copy()->setTimezone('UTC'), $endOfMonth->copy()->setTimezone('UTC')])
+                ->sum('business_amount') ?? 0;
             $profit = $income - abs($costs);
 
             $monthlyTrends[] = [

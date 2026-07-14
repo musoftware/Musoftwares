@@ -1125,7 +1125,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::delete('/income/{id}/delete', [BusinessController::class, 'delete_income'])->name('income.delete');
         Route::post('/income/{id}/reverse', [BusinessController::class, 'reverse_income'])->name('income.reverse');
 
-        Route::get('/reports', [BusinessController::class, 'reports'])->name('reports.index');
+        Route::get('/reports', [BusinessController::class, 'reports'])->name('business.reports');
         Route::get('/balance-report', [BusinessController::class, 'balance'])->name('reports.balance');
     });
 

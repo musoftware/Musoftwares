@@ -30,7 +30,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/Components/ui/table";
-import { formatCurrency } from '@/lib/utils';
+import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import {
     AreaChart,
@@ -72,8 +72,8 @@ export default function BalanceReport() {
                     {payload.map((entry: any, idx: number) => (
                         <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
                             <span className="text-slate-400 capitalize">{entry.name}:</span>
-                            <span className={`font-mono font-semibold ${entry.name === 'profit' && entry.value < 0 ? 'text-slate-900' : ''}`}>
-                                {formatCurrency(entry.value, stats.business_currency_code)}
+                            <span className={`font-mono font-semibold ${entry.name === __('general.profit') && entry.value < 0 ? 'text-red-600' : entry.name === __('general.profit') ? 'text-green-600' : 'text-slate-900'}`}>
+                                {formatMoney(entry.value, stats.business_currency_code)}
                             </span>
                         </div>
                     ))}
@@ -86,7 +86,7 @@ export default function BalanceReport() {
     return (
         <AdminSidebarLayout 
             title={__('general.balance_report')} 
-            header="Balance Report"
+            header={__('general.balance_report')}
             actions={
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="icon" onClick={handlePrevYear}>
@@ -113,12 +113,12 @@ export default function BalanceReport() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-slate-900" />
-                            Total Income ({stats.year})
+                            {__('general.total_income')} ({stats.year})
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                            {formatCurrency(stats.total_income, stats.business_currency_code)}
+                            {formatMoney(stats.total_income, stats.business_currency_code)}
                         </div>
                     </CardContent>
                 </Card>
@@ -127,12 +127,12 @@ export default function BalanceReport() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
                             <TrendingDown className="w-4 h-4 text-slate-900" />
-                            Total Costs ({stats.year})
+                            {__('general.total_costs')} ({stats.year})
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                            {formatCurrency(stats.total_costs, stats.business_currency_code)}
+                            {formatMoney(stats.total_costs, stats.business_currency_code)}
                         </div>
                     </CardContent>
                 </Card>
@@ -141,12 +141,12 @@ export default function BalanceReport() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
                             <Activity className="w-4 h-4 text-slate-900" />
-                            Net Profit ({stats.year})
+                            {__('general.net_profit')} ({stats.year})
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-3xl font-bold tracking-tight ${stats.total_profit >= 0 ? 'text-slate-900' : 'text-slate-900'}`}>
-                            {formatCurrency(stats.total_profit, stats.business_currency_code)}
+                        <div className={`text-3xl font-bold tracking-tight ${stats.total_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatMoney(stats.total_profit, stats.business_currency_code)}
                         </div>
                     </CardContent>
                 </Card>
@@ -154,7 +154,7 @@ export default function BalanceReport() {
 
             <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
                 <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-slate-900">Profit & Loss Chart ({stats.year})</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900">{__('general.profit_loss_trends')} ({stats.year})</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="h-[400px] mt-4">
@@ -193,7 +193,7 @@ export default function BalanceReport() {
                                 <Area 
                                     type="monotone" 
                                     dataKey="income" 
-                                    name="income"
+                                    name={__('general.income')}
                                     stroke="#10b981" 
                                     strokeWidth={2}
                                     fillOpacity={1} 
@@ -202,7 +202,7 @@ export default function BalanceReport() {
                                 <Area 
                                     type="monotone" 
                                     dataKey="costs" 
-                                    name="costs"
+                                    name={__('general.costs')}
                                     stroke="#e11d48" 
                                     strokeWidth={2}
                                     fillOpacity={1} 
@@ -211,7 +211,7 @@ export default function BalanceReport() {
                                 <Area 
                                     type="monotone" 
                                     dataKey="profit" 
-                                    name="profit"
+                                    name={__('general.profit')}
                                     stroke="#8b5cf6" 
                                     strokeWidth={3}
                                     fillOpacity={1} 
@@ -225,7 +225,7 @@ export default function BalanceReport() {
 
             <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
                 <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-slate-900">Monthly Breakdown ({stats.year})</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900">{__('general.monthly_breakdown')} ({stats.year})</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -242,17 +242,16 @@ export default function BalanceReport() {
                                 <TableRow key={idx}>
                                     <TableCell className="font-medium text-slate-700">{monthData.name}</TableCell>
                                     <TableCell className="text-end text-slate-900 font-medium">
-                                        {formatCurrency(monthData.income, stats.business_currency_code)}
+                                        {formatMoney(monthData.income, stats.business_currency_code)}
                                     </TableCell>
                                     <TableCell className="text-end text-slate-900 font-medium">
-                                        {formatCurrency(monthData.costs, stats.business_currency_code)}
+                                        {formatMoney(monthData.costs, stats.business_currency_code)}
                                     </TableCell>
-                                    <TableCell className={`text-end font-semibold ${monthData.profit >= 0 ? 'text-slate-900' : 'text-slate-900'}`}>
-                                        {formatCurrency(monthData.profit, stats.business_currency_code)}
+                                    <TableCell className={`text-end font-semibold ${monthData.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                        {formatMoney(monthData.profit, stats.business_currency_code)}
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
+                            ))}</TableBody>
                     </Table>
                 </CardContent>
             </Card>
