@@ -105,6 +105,11 @@ class Project extends Model
         return $this->hasMany(ProjectBoardNote::class, 'project_id');
     }
 
+    public function adminNotes()
+    {
+        return $this->hasMany(ProjectAdminNote::class, 'project_id');
+    }
+
     public function boardItems()
     {
         return $this->hasMany(ProjectBoardItem::class, 'project_id');

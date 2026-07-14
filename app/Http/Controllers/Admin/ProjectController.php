@@ -472,6 +472,7 @@ class ProjectController extends Controller
                     'files' => $project->files_count,
                 ],
             ],
+            'adminNotes' => fn () => $project->adminNotes()->with('author:id,name')->latest()->get(),
             'date' => $date->toDateString(),
             'lanes' => $this->boardService->lanes(),
             'cards' => fn () => $cards,

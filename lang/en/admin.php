@@ -210,6 +210,7 @@ return [
     'select_currency' => 'Select currency',
     'exchange_rate_hint' => 'The rate represents how many units of "To" equal 1 unit of "From".',
     'exchange_already_exists_for_pair_on_date' => 'An exchange rate for this pair already exists on the selected date.',
+    'receive_payment_link' => 'Receive Payment Link',
     'reschedule_invoice' => 'Reschedule Invoice',
     'new_invoice_date' => 'New Invoice Date',
     'notify_client' => 'Notify Client via WhatsApp',

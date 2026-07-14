@@ -44,6 +44,20 @@ export default function Show({ invoice }: { invoice: any }) {
         }
     };
 
+    const handlePaymentLinkRedirect = async () => {
+        try {
+            const response = await axios.post(route('admin.invoices.share-link', { invoice: String(invoice.id) }), { duration: '1_month' });
+            if (response.data?.url) {
+                window.open(response.data.url, '_blank');
+            } else {
+                alert(__('general.error_occurred'));
+            }
+        } catch (error: any) {
+            console.error("Failed to generate share link for redirect", error);
+            alert(__('general.error_occurred'));
+        }
+    };
+
     const [isSendingNotification, setIsSendingNotification] = useState<'fcm' | 'email' | null>(null);
 
     const handleSendNotification = (channel: 'fcm' | 'email') => {
@@ -78,7 +92,7 @@ export default function Show({ invoice }: { invoice: any }) {
     // Action Modal state
     const [actionModal, setActionModal] = useState<{
         isOpen: boolean;
-        type: 'bill_balance' | 'partial_pay' | null;
+        type: 'bill_balance' | 'partial_pay' | 'external_pay' | null;
         amount: string;
     }>({
         isOpen: false,
@@ -405,18 +419,38 @@ export default function Show({ invoice }: { invoice: any }) {
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button className="bg-slate-900 hover:bg-slate-900 h-10 px-4">
-                                <Share2 className="w-4 h-4 me-2" /> {__('admin.share')} <ChevronDown className="w-4 h-4 ms-2" />
+                            <Button className="bg-slate-900 hover:bg-slate-900 h-10 px-4 text-white font-semibold">
+                                <Layers className="w-4 h-4 me-2" /> {__('admin.actions') || 'Actions'} <ChevronDown className="w-4 h-4 ms-2" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleShareLink('24_hours')}>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuItem onClick={handlePaymentLinkRedirect} className="cursor-pointer">
+                                <CreditCard className="w-4 h-4 me-2" /> {__('admin.receive_payment_link') || 'Receive Payment Link'}
+                            </DropdownMenuItem>
+                            {invoice.status !== 'paid' && (
+                                <DropdownMenuItem onClick={() => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' })} className="cursor-pointer">
+                                    <Receipt className="w-4 h-4 me-2" /> {__('general.bill_from_balance')}
+                                </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => window.location.href = route('admin.transactions.create', { user: invoice.user?.id, type: 'receive' })} className="cursor-pointer">
+                                <Plus className="w-4 h-4 me-2" /> {__('general.receive_money') || 'Receive Money'}
+                            </DropdownMenuItem>
+                            {invoice.status !== 'paid' && (
+                                <DropdownMenuItem onClick={() => setActionModal({ isOpen: true, type: 'external_pay', amount: '' })} className="cursor-pointer">
+                                    <Check className="w-4 h-4 me-2" /> {__('general.mark_as_paid')}
+                                </DropdownMenuItem>
+                            )}
+                            <div className="h-px bg-slate-100 my-1" />
+                            <div className="px-2 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                {__('admin.share') || 'Share Link'}
+                            </div>
+                            <DropdownMenuItem onClick={() => handleShareLink('24_hours')} className="cursor-pointer">
                                 {__('admin.share_24_hours')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleShareLink('3_days')}>
+                            <DropdownMenuItem onClick={() => handleShareLink('3_days')} className="cursor-pointer">
                                 {__('admin.share_3_days')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleShareLink('1_month')}>
+                            <DropdownMenuItem onClick={() => handleShareLink('1_month')} className="cursor-pointer">
                                 {__('admin.share_1_month')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1347,10 +1381,12 @@ export default function Show({ invoice }: { invoice: any }) {
                     <DialogHeader>
                         <DialogTitle>
                             {actionModal.type === 'bill_balance' ? __('general.bill_from_balance') :
+                             actionModal.type === 'external_pay' ? __('general.mark_as_paid') :
                              __('general.partial_pay')}
                         </DialogTitle>
                         <DialogDescription>
                             {actionModal.type === 'bill_balance' ? __('general.confirm_bill_balance') :
+                             actionModal.type === 'external_pay' ? __('general.confirm_mark_paid') || 'Are you sure you want to mark this invoice as paid?' :
                              __('general.enter_payment_amount')}
                         </DialogDescription>
                     </DialogHeader>
@@ -1378,6 +1414,8 @@ export default function Show({ invoice }: { invoice: any }) {
                             onClick={() => {
                                 if (actionModal.type === 'bill_balance') {
                                     router.post(route('admin.invoices.mark-paid', { invoice: String(invoice.id) }));
+                                } else if (actionModal.type === 'external_pay') {
+                                    router.post(route('admin.invoices.external-pay', { invoice: String(invoice.id) }));
                                 } else if (actionModal.type === 'partial_pay') {
                                     const amt = parseFloat(actionModal.amount);
                                     if (amt > 0) {

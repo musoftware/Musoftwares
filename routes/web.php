@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\PayoutController;
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\ProjectContractController;
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\ProjectAdminNoteController;
 use App\Http\Controllers\Admin\ProjectFileController;
 use App\Http\Controllers\Admin\ProjectReportController;
 use App\Http\Controllers\Admin\RecurringBusinessController;
@@ -634,6 +635,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/projects/{project}/board', [ProjectController::class, 'boardIndex'])->name('projects.board.index');
     Route::get('/projects/{project}/board/{date}', [ProjectController::class, 'board'])->name('projects.board');
     Route::put('/projects/{project}/board/preferences', [ProjectController::class, 'updateBoardPreferences'])->name('projects.board.preferences.update');
+
+    // ── Project Admin Notes (internal notes) ──
+    Route::get('/projects/{project}/admin-notes', [ProjectAdminNoteController::class, 'index'])->name('projects.admin-notes.index');
+    Route::post('/projects/{project}/admin-notes', [ProjectAdminNoteController::class, 'store'])->name('projects.admin-notes.store');
+    Route::put('/projects/{project}/admin-notes/{note}', [ProjectAdminNoteController::class, 'update'])->name('projects.admin-notes.update');
+    Route::delete('/projects/{project}/admin-notes/{note}', [ProjectAdminNoteController::class, 'destroy'])->name('projects.admin-notes.destroy');
 
     // ── Project Finance / Cost Analysis (cost transactions + paid/pending invoices) ──
     Route::get('/projects/{project}/finance', [ProjectController::class, 'finance'])->name('projects.finance.index');

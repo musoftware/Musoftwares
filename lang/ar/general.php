@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'admin_notes_desc' => 'هذه الملاحظات خاصة وتظهر للمسؤولين والموظفين فقط.',
+    'category_name' => 'اسم القسم',
+    'custom_category' => 'قسم مخصص',
+    'note_created_successfully' => 'تم إضافة ملاحظة المسؤول بنجاح!',
+    'note_deleted_successfully' => 'تم حذف الملاحظة بنجاح!',
+    'note_updated_successfully' => 'تم تحديث الملاحظة بنجاح!',
+    'write_your_note_here' => 'اكتب ملاحظتك هنا...',
     'anydesk_id' => 'معرف AnyDesk',
     'anydesk_password' => 'كلمة مرور AnyDesk',
     'card_view' => 'عرض كروت',

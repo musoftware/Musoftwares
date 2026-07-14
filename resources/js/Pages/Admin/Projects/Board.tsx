@@ -7,6 +7,7 @@ import AdminBoardLayout from '@/Layouts/AdminBoardLayout';
 import ProjectBoard, { type BoardCard, type BoardPreferences } from '@/Pages/Client/Projects/Components/ProjectBoard';
 import BoardTopNav, { type BoardFilter } from './Components/BoardTopNav';
 import BoardCategoriesManager, { type BoardCategory } from './Components/BoardCategoriesManager';
+import ProjectAdminNotesSidebar, { type AdminNote } from './Components/ProjectAdminNotesSidebar';
 import { NOTICES_MANAGER_OPEN_EVENT } from '@/Components/Admin/NoticesManager';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,7 @@ interface Props {
     activeDates: string[];
     categories?: BoardCategory[];
     preferences?: BoardPreferences;
+    adminNotes: AdminNote[];
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -36,10 +38,12 @@ const STATUS_LABEL_KEY: Record<string, string> = {
     closed: 'general.status_closed',
 };
 
-export default function AdminProjectBoard({ project, date, lanes, cards, activeDates, categories, preferences }: Props) {
+export default function AdminProjectBoard({ project, date, lanes, cards, activeDates, categories, preferences, adminNotes }: Props) {
     const day = parseISO(date);
     const [filter, setFilter] = useState<string>('all');
     const [showCategories, setShowCategories] = useState<boolean>(false);
+    const [showAdminNotes, setShowAdminNotes] = useState<boolean>(false);
+    const [adminNotesList, setAdminNotesList] = useState<AdminNote[]>(adminNotes || []);
 
     const triggerAddNote = useCallback(() => {
         const btn = document.querySelector<HTMLButtonElement>('[data-board-add-note]');
@@ -97,6 +101,8 @@ export default function AdminProjectBoard({ project, date, lanes, cards, activeD
                 activeDates={activeDates}
                 onManageCategories={() => setShowCategories(true)}
                 onManageNotices={() => window.dispatchEvent(new CustomEvent(NOTICES_MANAGER_OPEN_EVENT))}
+                onToggleAdminNotes={() => setShowAdminNotes(prev => !prev)}
+                adminNotesOpen={showAdminNotes}
             />
 
             <div className="w-full space-y-6 px-4 py-6 sm:px-6 lg:px-8 max-w-none">
@@ -125,6 +131,15 @@ export default function AdminProjectBoard({ project, date, lanes, cards, activeD
                     initialCategories={categories}
                 />
             )}
+
+            <ProjectAdminNotesSidebar
+                projectId={project.id}
+                open={showAdminNotes}
+                onClose={() => setShowAdminNotes(false)}
+                notes={adminNotesList}
+                onNotesChange={setAdminNotesList}
+                boardCategories={categories}
+            />
         </AdminBoardLayout>
     );
 }

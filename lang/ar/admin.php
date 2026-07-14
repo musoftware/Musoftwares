@@ -210,6 +210,7 @@ return [
     'select_currency' => 'اختر العملة',
     'exchange_rate_hint' => 'السعر يمثّل عدد وحدات "إلى" التي تعادل وحدة واحدة من "من".',
     'exchange_already_exists_for_pair_on_date' => 'يوجد سعر صرف لهذا الزوج في التاريخ المحدد بالفعل.',
+    'receive_payment_link' => 'رابط دفع أونلاين',
     'reschedule_invoice' => 'إعادة جدولة الفاتورة',
     'new_invoice_date' => 'تاريخ الفاتورة الجديد',
     'notify_client' => 'إشعار العميل عبر الواتساب',

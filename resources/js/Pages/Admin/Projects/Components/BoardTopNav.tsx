@@ -62,6 +62,10 @@ interface BoardTopNavProps {
     onManageCategories?: () => void;
     /** Renders a small "Manage notices" action button that opens the inline recurring-notices manager. */
     onManageNotices?: () => void;
+    /** Renders a small "Admin Notes" button that toggles the Admin-only notes sidebar. */
+    onToggleAdminNotes?: () => void;
+    /** Whether the admin notes sidebar is open. */
+    adminNotesOpen?: boolean;
 }
 
 const FILTER_META: Record<BoardFilter, { labelKey: string; icon: IconType; activeColor: string; baseColor: string; shadowColor: string }> = {
@@ -89,7 +93,7 @@ const ADD_MENU: { kind: 'note' | 'task' | 'todo' | 'file' | 'report' | 'ai'; lab
 
 const FILTERS: BoardFilter[] = ['all', 'backlog', 'in_progress', 'review', 'done'];
 
-export default function BoardTopNav({ project, activeFilter, onFilterChange, counts, date, onAdd, activeDates = [], onManageCategories, onManageNotices }: BoardTopNavProps) {
+export default function BoardTopNav({ project, activeFilter, onFilterChange, counts, date, onAdd, activeDates = [], onManageCategories, onManageNotices, onToggleAdminNotes, adminNotesOpen = false }: BoardTopNavProps) {
     const day = parseISO(date);
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const prev = format(new Date(day.getTime() - 86400000), 'yyyy-MM-dd');
@@ -388,6 +392,25 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                             >
                                 <Bell className="h-4 w-4 text-sky-500 sm:h-3.5 sm:w-3.5" />
                                 <span className="hidden sm:inline">{__('general.manage_notices') || 'Manage notices'}</span>
+                            </button>
+                        )}
+
+                        {/* Admin Internal Notes (admin-only) */}
+                        {onToggleAdminNotes && (
+                            <button
+                                type="button"
+                                onClick={onToggleAdminNotes}
+                                className={cn(
+                                    "inline-flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-colors sm:w-auto sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold",
+                                    adminNotesOpen
+                                        ? "border-slate-900 bg-slate-900 text-white hover:bg-slate-800"
+                                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                                )}
+                                title={__('general.admin_notes') || 'Admin Notes'}
+                                aria-label={__('general.admin_notes') || 'Admin Notes'}
+                            >
+                                <StickyNote className={cn("h-4 w-4 sm:h-3.5 sm:w-3.5", adminNotesOpen ? "text-white" : "text-amber-500")} />
+                                <span className="hidden sm:inline">{__('general.admin_notes') || 'Admin Notes'}</span>
                             </button>
                         )}
 

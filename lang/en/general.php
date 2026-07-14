@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'admin_notes_desc' => 'These notes are private and visible only to administrators and staff.',
+    'category_name' => 'Category Name',
+    'custom_category' => 'Custom Category',
+    'note_created_successfully' => 'Admin note added successfully!',
+    'note_deleted_successfully' => 'Note deleted successfully!',
+    'note_updated_successfully' => 'Note updated successfully!',
+    'write_your_note_here' => 'Write your note here...',
     'anydesk_id' => 'AnyDesk ID',
     'anydesk_password' => 'AnyDesk Password',
     'card_view' => 'Card View',

@@ -237,6 +237,7 @@
             "select_currency": "اختر العملة",
             "exchange_rate_hint": "السعر يمثّل عدد وحدات \"إلى\" التي تعادل وحدة واحدة من \"من\".",
             "exchange_already_exists_for_pair_on_date": "يوجد سعر صرف لهذا الزوج في التاريخ المحدد بالفعل.",
+            "receive_payment_link": "رابط دفع أونلاين",
             "reschedule_invoice": "إعادة جدولة الفاتورة",
             "new_invoice_date": "تاريخ الفاتورة الجديد",
             "notify_client": "إشعار العميل عبر الواتساب",
@@ -1300,6 +1301,13 @@
             }
         },
         "general": {
+            "admin_notes_desc": "هذه الملاحظات خاصة وتظهر للمسؤولين والموظفين فقط.",
+            "category_name": "اسم القسم",
+            "custom_category": "قسم مخصص",
+            "note_created_successfully": "تم إضافة ملاحظة المسؤول بنجاح!",
+            "note_deleted_successfully": "تم حذف الملاحظة بنجاح!",
+            "note_updated_successfully": "تم تحديث الملاحظة بنجاح!",
+            "write_your_note_here": "اكتب ملاحظتك هنا...",
             "anydesk_id": "معرف AnyDesk",
             "anydesk_password": "كلمة مرور AnyDesk",
             "card_view": "عرض كروت",
@@ -9857,6 +9865,7 @@
             "select_currency": "Select currency",
             "exchange_rate_hint": "The rate represents how many units of \"To\" equal 1 unit of \"From\".",
             "exchange_already_exists_for_pair_on_date": "An exchange rate for this pair already exists on the selected date.",
+            "receive_payment_link": "Receive Payment Link",
             "reschedule_invoice": "Reschedule Invoice",
             "new_invoice_date": "New Invoice Date",
             "notify_client": "Notify Client via WhatsApp",
@@ -10920,6 +10929,13 @@
             }
         },
         "general": {
+            "admin_notes_desc": "These notes are private and visible only to administrators and staff.",
+            "category_name": "Category Name",
+            "custom_category": "Custom Category",
+            "note_created_successfully": "Admin note added successfully!",
+            "note_deleted_successfully": "Note deleted successfully!",
+            "note_updated_successfully": "Note updated successfully!",
+            "write_your_note_here": "Write your note here...",
             "anydesk_id": "AnyDesk ID",
             "anydesk_password": "AnyDesk Password",
             "card_view": "Card View",
