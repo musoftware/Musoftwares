@@ -1097,7 +1097,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/transactions/recalc-balance/{user_id}', [AdminTransactionController::class, 'regenerate'])->name('transactions.recalc-balance');
 
     // ── Third Party Integration Hooks ───────────────────────────────────────
-    Route::resource('payment-links', PaymentLinkController::class)->except(['create', 'edit', 'show', 'update']);
+    Route::resource('payment-links', PaymentLinkController::class)->except(['create', 'edit', 'show']);
+    Route::put('payment-links/{paymentLink}/cancel', [PaymentLinkController::class, 'cancel'])->name('payment-links.cancel');
+    Route::post('payment-links/{paymentLink}/mark-paid', [PaymentLinkController::class, 'markPaid'])->name('payment-links.mark-paid');
+    Route::post('payment-links/bulk-destroy', [PaymentLinkController::class, 'bulkDestroy'])->name('payment-links.bulk-destroy');
 
     // ── Admin Financial Operations ────────────────────────────────
     Route::get('/finance', [FinancialOperationsController::class, 'index'])->name('finance.index');
