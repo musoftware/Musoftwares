@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
@@ -114,15 +114,16 @@ export default function Index({
             }
         }, 350);
         return () => clearTimeout(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [localSearch]);
 
-    function applyFilters(partial: Partial<Filters>) {
+    const applyFilters = useCallback((partial: Partial<Filters>) => {
         router.get(
             route('admin.payment-links.index'),
             { ...filters, ...partial, page: 1 },
             { preserveState: true, replace: true, preserveScroll: true },
         );
-    }
+    }, [filters]);
 
     const filteredData: PaymentLink[] = useMemo(() => {
         return (paymentLinks?.data ?? []) as PaymentLink[];
