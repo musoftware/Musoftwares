@@ -32,7 +32,7 @@ import {
 import { __ } from '@/lib/i18n';
 
 export default function CostsCreate() {
-    const { users, projects, currencies, businessCurrency, paymentMethods, categories } = usePage<any>().props;
+    const { users, projects, currencies, businessCurrency, categories } = usePage<any>().props;
 
     const { data, setData, post, processing, errors, reset } = useForm({
         amount: '',
@@ -43,12 +43,6 @@ export default function CostsCreate() {
         project_id: '',
         category: '',
         category_text: '',
-        payment_method: '',
-        tax_amount: '0',
-        tax_rate: '0',
-        is_billable: false,
-        notes: '',
-        attachment: null as File | null,
         make_recurring: false,
         recurring: 'month',
         recurring_times: '1',
@@ -181,51 +175,6 @@ export default function CostsCreate() {
 
                                 <div className="space-y-2">
                                     <Label className="text-slate-700 font-semibold flex items-center gap-2">
-                                        <CreditCard className="w-4 h-4 text-slate-400" />
-                                        {__('general.payment_method')}
-                                    </Label>
-                                    <PremiumCombobox
-                                        value={data.payment_method}
-                                        onChange={(val) => setData('payment_method', val as string)}
-                                        options={paymentMethods || []}
-                                        placeholder={__('general.select_payment_method')}
-                                    />
-                                    {errors.payment_method && <p className="text-xs text-rose-600 mt-1">{errors.payment_method}</p>}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-slate-700 font-semibold flex items-center gap-2">
-                                        {__('general.tax_rate_percent')}
-                                    </Label>
-                                    <Input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        max="100"
-                                        value={data.tax_rate}
-                                        onChange={(e) => setData('tax_rate', e.target.value)}
-                                        className="h-11 bg-white"
-                                    />
-                                    {errors.tax_rate && <p className="text-xs text-rose-600 mt-1">{errors.tax_rate}</p>}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-slate-700 font-semibold flex items-center gap-2">
-                                        {__('general.tax_amount')}
-                                    </Label>
-                                    <Input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={data.tax_amount}
-                                        onChange={(e) => setData('tax_amount', e.target.value)}
-                                        className="h-11 bg-white"
-                                    />
-                                    {errors.tax_amount && <p className="text-xs text-rose-600 mt-1">{errors.tax_amount}</p>}
-                                </div>
-
-                                <div className="space-y-2 md:col-span-2 lg:col-span-1">
-                                    <Label className="text-slate-700 font-semibold flex items-center gap-2">
                                         <Calendar className="w-4 h-4 text-slate-400" />
                                         {__('general.date')}
                                     </Label>
@@ -236,17 +185,6 @@ export default function CostsCreate() {
                                         className="h-11 bg-white"
                                     />
                                     {errors.created_at && <p className="text-xs text-rose-600 mt-1">{errors.created_at}</p>}
-                                </div>
-
-                                <div className="md:col-span-2 flex items-center gap-2">
-                                    <Checkbox
-                                        id="is_billable"
-                                        checked={data.is_billable}
-                                        onCheckedChange={(v) => setData('is_billable', !!v)}
-                                    />
-                                    <Label htmlFor="is_billable" className="text-sm cursor-pointer">
-                                        {__('general.mark_as_billable')}
-                                    </Label>
                                 </div>
                             </div>
 
@@ -286,36 +224,6 @@ export default function CostsCreate() {
                                 </div>
                             </div>
 
-                            <div className="md:col-span-2 border-t border-slate-100 pt-6">
-                                <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                                    <Paperclip className="w-4 h-4 text-slate-400" />
-                                    {__('general.notes_and_attachment')}
-                                </h3>
-                                <div className="grid grid-cols-1 gap-6">
-                                    <div className="space-y-2">
-                                        <Label className="text-slate-700 text-sm">{__('general.notes')}</Label>
-                                        <Textarea
-                                            value={data.notes}
-                                            onChange={(e: any) => setData('notes', e.target.value)}
-                                            placeholder={__('general.notes_placeholder')}
-                                            className="min-h-[100px] bg-white"
-                                            maxLength={5000}
-                                        />
-                                        {errors.notes && <p className="text-xs text-rose-600 mt-1">{errors.notes}</p>}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-slate-700 text-sm">{__('general.attachment_optional')}</Label>
-                                        <Input
-                                            type="file"
-                                            accept=".jpg,.jpeg,.png,.pdf,.webp"
-                                            onChange={(e: any) => setData('attachment', e.target.files?.[0] ?? null)}
-                                            className="h-11 bg-white"
-                                        />
-                                        <p className="text-xs text-slate-500">{__('general.attachment_help')}</p>
-                                        {errors.attachment && <p className="text-xs text-rose-600 mt-1">{errors.attachment}</p>}
-                                    </div>
-                                </div>
-                            </div>
 
                             <div className="md:col-span-2 border-t border-slate-100 pt-6">
                                 <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">

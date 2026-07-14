@@ -7670,4 +7670,9 @@ return [
     'error_loading_invoices' => 'Error loading invoices',
     'no_due_date' => 'No due date',
     'project_all_invoices_paid' => 'All invoices for this project are fully paid.',
+    'gross_received_income' => 'Gross received income',
+    'net_income_description' => 'Net income (received minus refunded/sent)',
+    'refunds_sent' => 'Refunds and other sent transfers',
+    'total_received' => 'Total Received',
+    'total_refunded' => 'Total Refunded',
 ];

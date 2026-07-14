@@ -128,24 +128,11 @@ export default function CostsShow() {
                                         ~ {formatCurrency(Math.abs(cost.business_amount), business_currency_code)} ({__('general.business_currency')})
                                     </p>
                                 )}
-                                {cost.tax_amount > 0 && (
-                                    <p className="text-xs text-slate-500 mt-2">
-                                        {__('general.tax')}: {formatCurrency(cost.tax_amount, cost.currency_code)} ({cost.tax_rate}%)
-                                    </p>
-                                )}
-                                {cost.is_billable && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700 mt-3">
-                                        {__('general.billable')}
-                                    </span>
-                                )}
                             </div>
 
                             <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Field icon={<Tag className="h-4 w-4" />} label={__('general.category')}>
                                     {cost.category ? cost.category_label : <span className="text-slate-400">—</span>}
-                                </Field>
-                                <Field icon={<CreditCard className="h-4 w-4" />} label={__('general.payment_method')}>
-                                    {cost.payment_method ? (cost.payment_methods.find((p: any) => p.value === cost.payment_method)?.label ?? cost.payment_method) : <span className="text-slate-400">—</span>}
                                 </Field>
                                 <Field icon={<User className="h-4 w-4" />} label={__('general.client')}>
                                     {cost.user ? <Link className="text-slate-900 underline" href="#">{cost.user.name}</Link> : <span className="text-slate-400">—</span>}
@@ -160,39 +147,10 @@ export default function CostsShow() {
                                         </Link>
                                     ) : <span className="text-slate-400">—</span>}
                                 </Field>
-                                <Field icon={<Info className="h-4 w-4" />} label={__('general.created_by')}>
-                                    {cost.creator ? cost.creator.name : <span className="text-slate-400">{__('general.system')}</span>}
-                                </Field>
                             </div>
                         </div>
 
-                        {cost.notes && (
-                            <div className="mt-6 border-t border-slate-100 pt-6">
-                                <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                                    <FileText className="w-4 h-4 text-slate-400" />
-                                    {__('general.notes')}
-                                </h4>
-                                <p className="text-sm text-slate-700 whitespace-pre-wrap">{cost.notes}</p>
-                            </div>
-                        )}
 
-                        {cost.attachment_url && (
-                            <div className="mt-6 border-t border-slate-100 pt-6">
-                                <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                                    <Paperclip className="w-4 h-4 text-slate-400" />
-                                    {__('general.attachment')}
-                                </h4>
-                                {/\.(jpg|jpeg|png|webp)$/i.test(cost.attachment_path ?? '') ? (
-                                    <a href={cost.attachment_url} target="_blank" rel="noreferrer">
-                                        <img src={cost.attachment_url} alt="attachment" className="max-h-64 rounded-lg border border-slate-200" />
-                                    </a>
-                                ) : (
-                                    <a href={cost.attachment_url} target="_blank" rel="noreferrer" className="text-slate-700 underline text-sm">
-                                        {cost.attachment_path}
-                                    </a>
-                                )}
-                            </div>
-                        )}
                     </CardContent>
                 </Card>
 

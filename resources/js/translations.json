@@ -8877,7 +8877,12 @@
             "confirm_request_revision": "هل أنت متأكد من رغبتك في طلب تعديل؟",
             "error_loading_invoices": "خطأ في تحميل الفواتير",
             "no_due_date": "لا يوجد تاريخ استحقاق",
-            "project_all_invoices_paid": "جميع فواتير هذا المشروع مدفوعة بالكامل."
+            "project_all_invoices_paid": "جميع فواتير هذا المشروع مدفوعة بالكامل.",
+            "gross_received_income": "إجمالي الدخل المستلم",
+            "net_income_description": "صافي الدخل (المستلم مطروحاً منه المسترجع والمرسل)",
+            "refunds_sent": "المبالغ المسترجعة والتحويلات المرسلة",
+            "total_received": "إجمالي المستلم",
+            "total_refunded": "إجمالي المسترجع"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -18533,7 +18538,12 @@
             "confirm_request_revision": "Are you sure you want to request a revision?",
             "error_loading_invoices": "Error loading invoices",
             "no_due_date": "No due date",
-            "project_all_invoices_paid": "All invoices for this project are fully paid."
+            "project_all_invoices_paid": "All invoices for this project are fully paid.",
+            "gross_received_income": "Gross received income",
+            "net_income_description": "Net income (received minus refunded\/sent)",
+            "refunds_sent": "Refunds and other sent transfers",
+            "total_received": "Total Received",
+            "total_refunded": "Total Refunded"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

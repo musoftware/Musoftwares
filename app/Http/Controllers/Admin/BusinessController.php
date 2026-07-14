@@ -33,21 +33,85 @@ class BusinessController extends Controller
         $currentYear = (int) now()->year;
         $year = (int) $request->query('year', $currentYear);
         $month = (int) $request->query('month', now()->month);
+        $search = trim((string) $request->query('search', ''));
+        $projectId = $request->query('project_id');
+        $userId = $request->query('user_id');
+        $currencyId = $request->query('currency_id');
+        $category = $request->query('category');
+        $minAmount = $request->query('min_amount');
+        $maxAmount = $request->query('max_amount');
+        $preset = $request->query('preset');
+        $withTrashed = filter_var($request->query('with_trashed', false), FILTER_VALIDATE_BOOLEAN);
+        $sortBy = $request->query('sort_by', 'created_at');
+        $sortDir = $request->query('sort_dir', 'desc');
+        $allowedSorts = ['created_at', 'amount', 'business_amount', 'reason'];
+        if (! in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'created_at';
+        }
+        $sortDir = strtolower($sortDir) === 'asc' ? 'asc' : 'desc';
 
         $txMin = Transaction::min('created_at');
         $txMax = Transaction::max('created_at');
         $earliestYear = $txMin ? (int) Carbon::parse($txMin)->year : $currentYear;
         $latestYear = $txMax ? (int) Carbon::parse($txMax)->year : $currentYear;
+        if ($earliestYear > $currentYear) {
+            $earliestYear = $currentYear;
+        }
+        if ($latestYear < $currentYear) {
+            $latestYear = $currentYear;
+        }
         $availableYears = range($latestYear, $earliestYear);
         $availableMonths = range(1, 12);
 
-        $incomeQuery = Transaction::with(['user', 'project'])
-            ->whereIn('type', ['received', 'refunded', 'sent'])
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->orderBy('created_at', 'desc');
+        $baseQuery = Transaction::whereIn('type', ['received', 'refunded', 'sent']);
+        if ($preset === 'all') {
+            $incomeQuery = (clone $baseQuery);
+        } elseif ($preset === 'last_30') {
+            $incomeQuery = (clone $baseQuery)->where('created_at', '>=', now()->subDays(30));
+        } elseif ($preset === 'last_90') {
+            $incomeQuery = (clone $baseQuery)->where('created_at', '>=', now()->subDays(90));
+        } elseif ($preset === 'ytd') {
+            $incomeQuery = (clone $baseQuery)->whereYear('created_at', $currentYear);
+        } else {
+            $incomeQuery = (clone $baseQuery)->whereYear('created_at', $year)->whereMonth('created_at', $month);
+        }
 
-        $entries = $incomeQuery->paginate(50)->withQueryString();
+        $incomeQuery = $incomeQuery->with(['user', 'project'])
+            ->when($category, function ($q) use ($category) {
+                $q->where('category', $category);
+            })
+            ->when($userId, function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->when($projectId, function ($q) use ($projectId) {
+                $q->where('project_id', $projectId);
+            })
+            ->when($currencyId, function ($q) use ($currencyId) {
+                $q->where('currency_id', $currencyId);
+            })
+            ->when($minAmount !== null && $minAmount !== '', function ($q) use ($minAmount) {
+                $q->where('amount', '>=', (float) $minAmount);
+            })
+            ->when($maxAmount !== null && $maxAmount !== '', function ($q) use ($maxAmount) {
+                $q->where('amount', '<=', (float) $maxAmount);
+            })
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($w) use ($search) {
+                    $w->where('reason', 'like', "%{$search}%")
+                        ->orWhere('amount', 'like', "%{$search}%")
+                        ->orWhere('category', 'like', "%{$search}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('project', fn ($p) => $p->where('project_name', 'like', "%{$search}%"));
+                });
+            });
+
+        if ($withTrashed) {
+            $incomeQuery->withTrashed();
+        }
+
+        $incomeQuery->orderBy($sortBy, $sortDir);
+
+        $entries = $incomeQuery->paginate(25)->withQueryString();
 
         $currencies = Currency::as_array();
 
@@ -57,39 +121,44 @@ class BusinessController extends Controller
             $currencyCode = $currRow ? $currRow->currency : 'EGP';
             $currencySymbol = $currRow ? $currRow->symbol : '£';
 
+            $categoryName = $entry->category ?: $entry->reason;
+
             return [
                 'id' => $entry->id,
                 'title' => ucfirst($entry->reason ?: 'Income'),
+                'reason' => $entry->reason,
                 'amount' => $entry->amount,
                 'business_amount' => $entry->business_amount,
                 'currency' => $currencyCode,
                 'currency_symbol' => $currencySymbol,
                 'currency_id' => $currId,
-                'category' => ['name' => ucfirst($entry->reason ?: 'Income')],
+                'category' => ['name' => ucfirst($categoryName ?: 'Income')],
+                'category_slug' => Str::slug((string) ($categoryName ?? '')),
+                'category_raw' => $categoryName,
                 'is_recurring' => false,
                 'next_due_date' => $entry->due_date,
                 'status' => $entry->status ?? 'completed',
                 'user' => $entry->user ? ['id' => $entry->user->id, 'name' => $entry->user->name, 'email' => $entry->user->email] : null,
                 'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->project_name] : null,
                 'created_at' => $entry->created_at,
+                'updated_at' => $entry->updated_at,
+                'deleted_at' => $entry->deleted_at,
                 'type' => $entry->type,
             ];
         });
 
-        $iq = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $month);
-        $received = (clone $iq)->where('type', 'received')->sum('business_amount') ?? 0;
-        $refunded = (clone $iq)->where('type', 'refunded')->sum('business_amount') ?? 0;
-        $sent = (clone $iq)->where('type', 'sent')->sum('business_amount') ?? 0;
-        $costs = CostTransaction::whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('business_amount') ?? 0;
-        $netIncome = max(0, abs($received) - abs($refunded) - abs($sent)) - abs($costs);
+        // Statistics relative to selected filter / month
+        $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
+        $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
+        $sent = (clone $incomeQuery)->where('type', 'sent')->sum('business_amount') ?? 0;
+        $netIncome = max(0, abs($received) - abs($refunded) - abs($sent));
 
         $prevMonth = Carbon::createFromDate($year, $month)->subMonth();
-        $prevIq = Transaction::whereYear('created_at', $prevMonth->year)->whereMonth('created_at', $prevMonth->month);
+        $prevIq = Transaction::whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $prevMonth->year)->whereMonth('created_at', $prevMonth->month);
         $prevReceived = (clone $prevIq)->where('type', 'received')->sum('business_amount') ?? 0;
         $prevRefunded = (clone $prevIq)->where('type', 'refunded')->sum('business_amount') ?? 0;
         $prevSent = (clone $prevIq)->where('type', 'sent')->sum('business_amount') ?? 0;
-        $prevCosts = CostTransaction::whereYear('created_at', $prevMonth->year)->whereMonth('created_at', $prevMonth->month)->sum('business_amount') ?? 0;
-        $prevNetIncome = max(0, abs($prevReceived) - abs($prevRefunded) - abs($prevSent)) - abs($prevCosts);
+        $prevNetIncome = max(0, abs($prevReceived) - abs($prevRefunded) - abs($prevSent));
 
         $incomeChange = 0;
         if ($prevNetIncome > 0) {
@@ -98,6 +167,7 @@ class BusinessController extends Controller
             $incomeChange = 100;
         }
 
+        // Trends
         $monthlyTrends = [];
         $trendStart = now()->subMonths(5)->startOfMonth();
         $trendEnd = now()->endOfMonth();
@@ -139,7 +209,8 @@ class BusinessController extends Controller
             ];
         }
 
-        $monthlyClientData = Transaction::with('user')->whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->whereMonth('created_at', $month)->get()->groupBy('user_id');
+        // Client and Category breakdowns (relative to selected time filter)
+        $monthlyClientData = (clone $incomeQuery)->get()->groupBy('user_id');
         $monthlyClientBreakdown = [];
         foreach ($monthlyClientData as $userId => $txs) {
             $user = $txs->first()->user;
@@ -152,56 +223,60 @@ class BusinessController extends Controller
                 $monthlyClientBreakdown[] = ['name' => $userName, 'value' => $cNet];
             }
         }
-
-        $annualClientData = Transaction::with('user')->whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->get()->groupBy('user_id');
-        $annualClientBreakdown = [];
-        foreach ($annualClientData as $userId => $txs) {
-            $user = $txs->first()->user;
-            $userName = $user ? $user->name : 'Unknown';
-            $cReceived = $txs->where('type', 'received')->sum('business_amount');
-            $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
-            $cSent = $txs->where('type', 'sent')->sum('business_amount');
-            $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
-            if ($cNet > 0) {
-                $annualClientBreakdown[] = ['name' => $userName, 'value' => $cNet];
-            }
-        }
-
         usort($monthlyClientBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
-        usort($annualClientBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
 
-        $monthlyCategoryData = Transaction::whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->whereMonth('created_at', $month)->get()->groupBy('reason');
+        $monthlyCategoryData = (clone $incomeQuery)->get()->groupBy(fn ($item) => $item->category ?: $item->reason);
         $monthlyCategoryBreakdown = [];
-        foreach ($monthlyCategoryData as $reason => $txs) {
+        foreach ($monthlyCategoryData as $catKey => $txs) {
             $cReceived = $txs->where('type', 'received')->sum('business_amount');
             $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
             $cSent = $txs->where('type', 'sent')->sum('business_amount');
             $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
             if ($cNet > 0) {
-                $monthlyCategoryBreakdown[] = ['name' => ucfirst($reason ?: 'Other'), 'value' => $cNet];
+                $monthlyCategoryBreakdown[] = ['name' => ucfirst($catKey ?: 'Other'), 'value' => $cNet];
             }
         }
-
-        $annualCategoryData = Transaction::whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->get()->groupBy('reason');
-        $annualCategoryBreakdown = [];
-        foreach ($annualCategoryData as $reason => $txs) {
-            $cReceived = $txs->where('type', 'received')->sum('business_amount');
-            $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
-            $cSent = $txs->where('type', 'sent')->sum('business_amount');
-            $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
-            if ($cNet > 0) {
-                $annualCategoryBreakdown[] = ['name' => ucfirst($reason ?: 'Other'), 'value' => $cNet];
-            }
-        }
-
         usort($monthlyCategoryBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
-        usort($annualCategoryBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
 
         $bCurrency = CurrencyHelper::getBusinessCurrency();
+        $projectsList = Project::orderBy('project_name')->select('id', 'project_name', 'project_name as name')->limit(200)->get();
+        $usersList = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $currenciesList = collect($currencies)->map(fn ($c) => ['id' => $c->id, 'code' => $c->currency, 'symbol' => $c->symbol])->values();
+        $categoriesList = Transaction::whereIn('type', ['received', 'refunded', 'sent'])
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->limit(100)
+            ->pluck('category')
+            ->map(fn ($c) => ['value' => $c, 'label' => ucfirst($c)])
+            ->values();
 
         return Inertia::render('Admin/Business/Income', [
             'entries' => $entries,
-            'filters' => ['year' => $year, 'month' => $month, 'available_years' => $availableYears, 'available_months' => $availableMonths],
+            'filters' => [
+                'year' => $year,
+                'month' => $month,
+                'search' => $search,
+                'preset' => $preset,
+                'project_id' => $projectId,
+                'user_id' => $userId,
+                'currency_id' => $currencyId,
+                'category' => $category,
+                'min_amount' => $minAmount,
+                'max_amount' => $maxAmount,
+                'with_trashed' => $withTrashed,
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir,
+                'available_years' => $availableYears,
+                'available_months' => $availableMonths,
+            ],
+            'options' => [
+                'projects' => $projectsList,
+                'users' => $usersList,
+                'currencies' => $currenciesList,
+                'categories' => $categoriesList,
+            ],
             'stats' => [
                 'total_received' => abs($received),
                 'total_refunded' => abs($refunded),
@@ -211,9 +286,7 @@ class BusinessController extends Controller
                 'income_change_percent' => round($incomeChange, 1),
                 'monthly_trends' => $monthlyTrends,
                 'monthly_client_breakdown' => $monthlyClientBreakdown,
-                'annual_client_breakdown' => $annualClientBreakdown,
                 'monthly_category_breakdown' => $monthlyCategoryBreakdown,
-                'annual_category_breakdown' => $annualCategoryBreakdown,
                 'business_currency_code' => $bCurrency['currency'] ?? 'USD',
                 'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
             ],
@@ -269,7 +342,7 @@ class BusinessController extends Controller
             $costsQuery = (clone $baseQuery)->inYearMonth($year, $month);
         }
 
-        $costsQuery = $costsQuery->with(['user', 'project', 'recurringSources', 'creator'])
+        $costsQuery = $costsQuery->with(['user', 'project', 'recurringSources'])
             ->byCategory($category)
             ->forUser($userId)
             ->forProject($projectId)
@@ -323,19 +396,12 @@ class BusinessController extends Controller
                 'reason' => $entry->reason,
                 'amount' => $entry->amount,
                 'business_amount' => $entry->business_amount,
-                'tax_amount' => (float) ($entry->tax_amount ?? 0),
-                'tax_rate' => (float) ($entry->tax_rate ?? 0),
-                'net_amount' => $entry->net_amount,
                 'currency' => $currencyCode,
                 'currency_symbol' => $currencySymbol,
                 'currency_id' => $currId,
                 'category' => ['name' => ucfirst($categoryName ?: 'Cost')],
                 'category_slug' => Str::slug((string) ($categoryName ?? '')),
                 'category_raw' => $categoryName,
-                'payment_method' => $entry->payment_method,
-                'is_billable' => (bool) $entry->is_billable,
-                'notes' => $entry->notes,
-                'attachment_path' => $entry->attachment_path,
                 'is_recurring' => $isRecurring,
                 'recurring_cost_id' => $recurringCostId,
                 'recurring_cost_title' => $recurringCostTitle,
@@ -343,7 +409,6 @@ class BusinessController extends Controller
                 'status' => $entry->status ?? 'completed',
                 'user' => $entry->user ? ['id' => $entry->user->id, 'name' => $entry->user->name, 'email' => $entry->user->email] : null,
                 'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->project_name] : null,
-                'creator' => $entry->creator ? ['id' => $entry->creator->id, 'name' => $entry->creator->name] : null,
                 'created_at' => $entry->created_at,
                 'updated_at' => $entry->updated_at,
                 'deleted_at' => $entry->deleted_at,
@@ -500,7 +565,7 @@ class BusinessController extends Controller
 
     public function show_cost($id)
     {
-        $cost = CostTransaction::with(['user', 'project', 'recurringSources', 'creator'])
+        $cost = CostTransaction::with(['user', 'project', 'recurringSources'])
             ->withTrashed()
             ->findOrFail($id);
 
@@ -547,20 +612,11 @@ class BusinessController extends Controller
                 'title' => $cost->reason,
                 'amount' => $cost->amount,
                 'business_amount' => $cost->business_amount,
-                'tax_amount' => (float) ($cost->tax_amount ?? 0),
-                'tax_rate' => (float) ($cost->tax_rate ?? 0),
-                'net_amount' => $cost->net_amount,
                 'currency_id' => $currId,
                 'currency_code' => optional($currRow)->currency ?? 'USD',
                 'currency_symbol' => optional($currRow)->symbol ?? '',
                 'category' => $cost->category,
                 'category_label' => $cost->category ? ucfirst($cost->category) : null,
-                'payment_method' => $cost->payment_method,
-                'payment_methods' => self::COST_PAYMENT_METHODS,
-                'is_billable' => (bool) $cost->is_billable,
-                'notes' => $cost->notes,
-                'attachment_path' => $cost->attachment_path,
-                'attachment_url' => $cost->attachment_path ? Storage::disk('public')->url($cost->attachment_path) : null,
                 'created_at' => $cost->created_at,
                 'updated_at' => $cost->updated_at,
                 'deleted_at' => $cost->deleted_at,
@@ -570,7 +626,6 @@ class BusinessController extends Controller
                     'id' => $r->id,
                     'title' => $r->title,
                 ])->values(),
-                'creator' => $cost->creator ? ['id' => $cost->creator->id, 'name' => $cost->creator->name] : null,
             ],
             'related' => $related,
             'business_currency_code' => $bCurrency['currency'] ?? 'USD',
@@ -717,8 +772,7 @@ class BusinessController extends Controller
             $out = fopen('php://output', 'w');
             fputcsv($out, [
                 'id', 'date', 'reason', 'category', 'project', 'client', 'currency',
-                'amount', 'business_amount', 'tax_amount', 'tax_rate',
-                'payment_method', 'recurring', 'notes', 'created_by',
+                'amount', 'business_amount', 'recurring',
             ]);
             foreach ($rows as $r) {
                 $cid = $r->currency_id ?? $r->currency;
@@ -733,12 +787,7 @@ class BusinessController extends Controller
                     optional($crow)->currency,
                     (float) $r->amount,
                     (float) $r->business_amount,
-                    (float) $r->tax_amount,
-                    (float) $r->tax_rate,
-                    $r->payment_method,
                     $r->recurringSources->count() > 0 ? 'yes' : 'no',
-                    $r->notes,
-                    optional($r->creator)->name,
                 ]);
             }
             fclose($out);
@@ -787,12 +836,6 @@ class BusinessController extends Controller
             'project_id' => 'nullable|exists:projects,id',
             'category' => 'nullable|string|max:80',
             'category_text' => 'nullable|string|max:80',
-            'payment_method' => ['nullable', 'string', 'max:40', Rule::in(array_column(self::COST_PAYMENT_METHODS, 'value'))],
-            'tax_amount' => 'nullable|numeric|min:0',
-            'tax_rate' => 'nullable|numeric|min:0|max:100',
-            'is_billable' => 'nullable|boolean',
-            'notes' => 'nullable|string|max:5000',
-            'attachment' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
             'make_recurring' => 'nullable|boolean',
             'recurring' => 'nullable|string|in:day,week,month,year',
             'recurring_times' => 'nullable|integer|min:1',
@@ -803,23 +846,11 @@ class BusinessController extends Controller
             ? ($request->input('category_text') ?: null)
             : ($request->input('category') ?: null);
 
-        $attachmentPath = null;
-        if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('cost-attachments', 'public');
-        }
-
         $cost = new CostTransaction;
         $cost->amount = $request->amount;
         $cost->currency_id = $request->currency_id;
         $cost->reason = $request->reason;
         $cost->category = $category;
-        $cost->payment_method = $request->input('payment_method');
-        $cost->tax_amount = (float) ($request->input('tax_amount') ?? 0);
-        $cost->tax_rate = (float) ($request->input('tax_rate') ?? 0);
-        $cost->is_billable = (bool) $request->input('is_billable');
-        $cost->attachment_path = $attachmentPath;
-        $cost->notes = $request->input('notes');
-        $cost->created_by = auth()->id();
 
         if ($request->filled('created_at')) {
             $cost->created_at = $request->created_at;
@@ -872,7 +903,6 @@ class BusinessController extends Controller
                 'currency_id' => $cost->currency_id,
                 'reason' => $cost->reason,
                 'category' => $cost->category,
-                'payment_method' => $cost->payment_method,
                 'user_id' => $cost->user_id,
                 'project_id' => $cost->project_id,
                 'recurring_id' => $recurringId,
@@ -921,8 +951,7 @@ class BusinessController extends Controller
         $cost = CostTransaction::withTrashed()->findOrFail($id);
         $before = $cost->only([
             'amount', 'currency_id', 'reason', 'user_id', 'project_id',
-            'category', 'payment_method', 'tax_amount', 'tax_rate',
-            'is_billable', 'notes', 'created_at',
+            'category', 'created_at',
         ]);
 
         $request->validate([
@@ -934,46 +963,19 @@ class BusinessController extends Controller
             'project_id' => 'nullable|exists:projects,id',
             'category' => 'nullable|string|max:80',
             'category_text' => 'nullable|string|max:80',
-            'payment_method' => ['nullable', 'string', 'max:40', Rule::in(array_column(self::COST_PAYMENT_METHODS, 'value'))],
-            'tax_amount' => 'nullable|numeric|min:0',
-            'tax_rate' => 'nullable|numeric|min:0|max:100',
-            'is_billable' => 'nullable|boolean',
-            'notes' => 'nullable|string|max:5000',
-            'attachment' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,webp',
-            'remove_attachment' => 'nullable|boolean',
         ]);
 
         $category = $request->input('category') === '__new__'
             ? ($request->input('category_text') ?: null)
             : ($request->input('category') ?: null);
 
-        $attachmentPath = $cost->attachment_path;
-        $attachmentDeleted = false;
-        if ($request->boolean('remove_attachment') && $attachmentPath) {
-            Storage::disk('public')->delete($attachmentPath);
-            $attachmentPath = null;
-            $attachmentDeleted = true;
-        }
-        if ($request->hasFile('attachment')) {
-            if ($attachmentPath) {
-                Storage::disk('public')->delete($attachmentPath);
-            }
-            $attachmentPath = $request->file('attachment')->store('cost-attachments', 'public');
-        }
-
         $previousUserId = $cost->user_id;
 
-        DB::transaction(function () use ($cost, $request, $category, $attachmentPath, $previousUserId) {
+        DB::transaction(function () use ($cost, $request, $category, $previousUserId) {
             $cost->amount = $request->amount;
             $cost->currency_id = $request->currency_id;
             $cost->reason = $request->reason;
             $cost->category = $category;
-            $cost->payment_method = $request->input('payment_method');
-            $cost->tax_amount = (float) ($request->input('tax_amount') ?? 0);
-            $cost->tax_rate = (float) ($request->input('tax_rate') ?? 0);
-            $cost->is_billable = (bool) $request->input('is_billable');
-            $cost->notes = $request->input('notes');
-            $cost->attachment_path = $attachmentPath;
 
             if ($request->filled('created_at')) {
                 $cost->created_at = $request->created_at;
@@ -995,9 +997,6 @@ class BusinessController extends Controller
 
         $after = $cost->fresh()->only(array_keys($before));
         $changed = array_keys(array_diff_assoc($after, $before));
-        if ($attachmentDeleted) {
-            $changed[] = 'attachment_path';
-        }
         $changed = array_values(array_unique($changed));
 
         if ($changed !== []) {
@@ -1022,7 +1021,7 @@ class BusinessController extends Controller
         $wasTrashed = $cost->trashed();
         $snapshot = $cost->only([
             'amount', 'currency_id', 'reason', 'user_id', 'project_id',
-            'category', 'payment_method', 'tax_amount', 'tax_rate',
+            'category',
         ]);
         $costId = $cost->id;
         $userId = $cost->user_id;

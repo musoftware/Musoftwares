@@ -666,7 +666,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 mb-6">
                 {/* Left Column: Personal Info & Referral */}
                 <div className="col-span-1 space-y-6">
                     <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
@@ -719,10 +719,10 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                             <div>
                                 <span className="text-sm text-slate-500 block mb-1">Shareable Link:</span>
                                 <div className="flex items-center space-x-2">
-                                    <input type="text" readOnly value={referralLink} className="text-xs border-slate-300 rounded-[4px] w-full bg-slate-50 text-slate-600" />
-                                    <button onClick={() => copyToClipboard(referralLink)} className="p-2 border border-slate-300 rounded-[4px] hover:bg-slate-50 transition">
-                                        <Copy size={14} className="text-slate-600" />
-                                    </button>
+                                    <Input type="text" readOnly value={referralLink} className="bg-slate-50 text-slate-600 text-xs h-9" />
+                                    <Button variant="outline" size="icon" onClick={() => copyToClipboard(referralLink)} className="h-9 w-9 shrink-0">
+                                        <Copy className="h-4 w-4 text-slate-600" />
+                                    </Button>
                                 </div>
                             </div>
                             <div className="pt-4 border-t border-slate-100">
@@ -801,7 +801,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                     </div>
 
                     {/* Mail Sequence */}
-                    <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 mb-6">
+                    <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
                             <Mail size={18} className="text-slate-400" />{__('general.mail_sequence')}</h2>
                         {client.active_mail_sequence ? (
@@ -999,7 +999,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
 
             <UserLoansTab client={client} loans={loans} />
 
-            <div className="mt-8 bg-white p-6 rounded-lg border border-slate-200 flex flex-col items-center justify-center space-y-4">
+            <div className="bg-white p-6 rounded-[12px] border border-slate-200 flex flex-col items-center justify-center space-y-4">
                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
                     <ShieldCheck size={24} />
                 </div>

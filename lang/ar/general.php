@@ -7621,4 +7621,9 @@ return [
     'error_loading_invoices' => 'خطأ في تحميل الفواتير',
     'no_due_date' => 'لا يوجد تاريخ استحقاق',
     'project_all_invoices_paid' => 'جميع فواتير هذا المشروع مدفوعة بالكامل.',
+    'gross_received_income' => 'إجمالي الدخل المستلم',
+    'net_income_description' => 'صافي الدخل (المستلم مطروحاً منه المسترجع والمرسل)',
+    'refunds_sent' => 'المبالغ المسترجعة والتحويلات المرسلة',
+    'total_received' => 'إجمالي المستلم',
+    'total_refunded' => 'إجمالي المسترجع',
 ];

@@ -27,6 +27,7 @@ class Transaction extends Model
         'user_id',
         'amount',
         'reason',
+        'category',
         'type',
         'project_id',
         'currency_id',

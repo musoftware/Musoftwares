@@ -33,7 +33,7 @@ import { __ } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/utils';
 
 export default function CostsEdit() {
-    const { cost, users, projects, currencies, businessCurrency, paymentMethods, categories, attachment_url, business_currency_code } = usePage<any>().props;
+    const { cost, users, projects, currencies, businessCurrency, categories, business_currency_code } = usePage<any>().props;
 
     const { data, setData, put, processing, errors } = useForm({
         amount: cost?.amount ? String(cost.amount) : '',
@@ -44,13 +44,6 @@ export default function CostsEdit() {
         project_id: cost?.project_id ? String(cost.project_id) : '',
         category: cost?.category || '',
         category_text: '',
-        payment_method: cost?.payment_method || '',
-        tax_amount: cost?.tax_amount ? String(cost.tax_amount) : '0',
-        tax_rate: cost?.tax_rate ? String(cost.tax_rate) : '0',
-        is_billable: !!cost?.is_billable,
-        notes: cost?.notes || '',
-        attachment: null as File | null,
-        remove_attachment: false,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -60,7 +53,6 @@ export default function CostsEdit() {
         });
     };
 
-    const existingAttachment = cost?.attachment_path && !data.remove_attachment;
     const knownCategory = (categories || []).find((c: any) => c.value === data.category);
 
     return (
@@ -201,44 +193,6 @@ export default function CostsEdit() {
 
                                 <div className="space-y-2">
                                     <Label className="text-slate-700 font-semibold flex items-center gap-2">
-                                        <CreditCard className="w-4 h-4 text-slate-400" />
-                                        {__('general.payment_method')}
-                                    </Label>
-                                    <PremiumCombobox
-                                        value={data.payment_method}
-                                        onChange={(val) => setData('payment_method', val as string)}
-                                        options={[{ value: '', label: __('general.none') }, ...(paymentMethods || [])]}
-                                        placeholder={__('general.select_payment_method')}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-slate-700 font-semibold">{__('general.tax_rate_percent')}</Label>
-                                    <Input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        max="100"
-                                        value={data.tax_rate}
-                                        onChange={(e) => setData('tax_rate', e.target.value)}
-                                        className="h-11 bg-white"
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-slate-700 font-semibold">{__('general.tax_amount')}</Label>
-                                    <Input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={data.tax_amount}
-                                        onChange={(e) => setData('tax_amount', e.target.value)}
-                                        className="h-11 bg-white"
-                                    />
-                                </div>
-
-                                <div className="space-y-2 md:col-span-2 lg:col-span-1">
-                                    <Label className="text-slate-700 font-semibold flex items-center gap-2">
                                         <Calendar className="w-4 h-4 text-slate-400" />
                                         {__('general.date')}
                                     </Label>
@@ -248,17 +202,6 @@ export default function CostsEdit() {
                                         onChange={(e) => setData('created_at', e.target.value)}
                                         className="h-11 bg-white"
                                     />
-                                </div>
-
-                                <div className="md:col-span-2 flex items-center gap-2">
-                                    <Checkbox
-                                        id="is_billable_e"
-                                        checked={data.is_billable}
-                                        onCheckedChange={(v) => setData('is_billable', !!v)}
-                                    />
-                                    <Label htmlFor="is_billable_e" className="text-sm cursor-pointer">
-                                        {__('general.mark_as_billable')}
-                                    </Label>
                                 </div>
                             </div>
 
@@ -289,55 +232,6 @@ export default function CostsEdit() {
                                 </div>
                             </div>
 
-                            <div className="md:col-span-2 border-t border-slate-100 pt-6">
-                                <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                                    <Paperclip className="w-4 h-4 text-slate-400" />
-                                    {__('general.notes_and_attachment')}
-                                </h3>
-                                <div className="grid grid-cols-1 gap-6">
-                                    <div className="space-y-2">
-                                        <Label className="text-slate-700 text-sm">{__('general.notes')}</Label>
-                                        <Textarea
-                                            value={data.notes}
-                                            onChange={(e: any) => setData('notes', e.target.value)}
-                                            className="min-h-[100px] bg-white"
-                                            maxLength={5000}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-slate-700 text-sm">{__('general.attachment')}</Label>
-                                        {existingAttachment && (
-                                            <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50">
-                                                <a
-                                                    href={attachment_url || '#'}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="text-sm text-slate-700 hover:text-slate-900 underline truncate"
-                                                >
-                                                    {cost?.attachment_path}
-                                                </a>
-                                                <label className="flex items-center gap-2 ms-3 text-xs text-rose-600 cursor-pointer">
-                                                    <Checkbox
-                                                        checked={data.remove_attachment}
-                                                        onCheckedChange={(v) => setData('remove_attachment', !!v)}
-                                                    />
-                                                    <span>{__('general.remove')}</span>
-                                                </label>
-                                            </div>
-                                        )}
-                                        <Input
-                                            type="file"
-                                            accept=".jpg,.jpeg,.png,.pdf,.webp"
-                                            onChange={(e: any) => {
-                                                setData('attachment', e.target.files?.[0] ?? null);
-                                                setData('remove_attachment', false);
-                                            }}
-                                            className="h-11 bg-white"
-                                        />
-                                        <p className="text-xs text-slate-500">{__('general.attachment_help')}</p>
-                                    </div>
-                                </div>
-                            </div>
                         </CardContent>
                         <CardFooter className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3 rounded-b-xl">
                             <Button

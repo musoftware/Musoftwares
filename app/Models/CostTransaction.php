@@ -64,10 +64,6 @@ class CostTransaction extends Model
             ->withPivot([]);
     }
 
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
 
     public function scopeExcludingSalaries(Builder $query): Builder
     {
