@@ -103,6 +103,10 @@ class PaymentLinkController extends Controller
     {
         $this->authorize('update', $paymentLink);
 
+        if ($paymentLink->status === PaymentLink::STATUS_PAID) {
+            return redirect()->back()->with('error', __('admin.payment_link_cannot_edit_paid', ['default' => 'Paid payment links cannot be edited.']));
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:5000',

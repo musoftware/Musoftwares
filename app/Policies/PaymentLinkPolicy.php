@@ -7,14 +7,18 @@ use App\Models\User;
 
 class PaymentLinkPolicy
 {
-    public function before(User $user, string $ability): ?bool
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
+public function before(User $user, string $ability): ?bool
+{
+    if ($ability === 'forceMarkPaid') {
         return null;
     }
+
+    if ($user->isAdmin()) {
+        return true;
+    }
+
+    return null;
+}
 
     public function viewAny(User $user): bool
     {
