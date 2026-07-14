@@ -44,7 +44,7 @@ export default function Show({ invoice }: { invoice: any }) {
         }
     };
 
-    const handlePaymentLinkRedirect = async () => {
+    const handleSignedInvoiceRedirect = async () => {
         try {
             const response = await axios.post(route('admin.invoices.share-link', { invoice: String(invoice.id) }), { duration: '1_month' });
             if (response.data?.url) {
@@ -53,7 +53,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 alert(__('general.error_occurred'));
             }
         } catch (error: any) {
-            console.error("Failed to generate share link for redirect", error);
+            console.error("Failed to generate signed invoice link", error);
             alert(__('general.error_occurred'));
         }
     };
@@ -424,8 +424,8 @@ export default function Show({ invoice }: { invoice: any }) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuItem onClick={handlePaymentLinkRedirect} className="cursor-pointer">
-                                <CreditCard className="w-4 h-4 me-2" /> {__('admin.receive_payment_link') || 'Receive Payment Link'}
+                            <DropdownMenuItem onClick={handleSignedInvoiceRedirect} className="cursor-pointer">
+                                <CreditCard className="w-4 h-4 me-2" /> {__('admin.share_signed_invoice_link') || 'Share Signed Invoice Link'}
                             </DropdownMenuItem>
                             {invoice.status !== 'paid' && (
                                 <DropdownMenuItem onClick={() => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' })} className="cursor-pointer">
