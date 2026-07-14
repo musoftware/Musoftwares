@@ -171,6 +171,9 @@ class AdminUserService extends BaseService
         if ($request->has('allow_postpaid')) {
             $user->allow_postpaid = $request->boolean('allow_postpaid');
         }
+        if ($request->has('enable_notifications')) {
+            $user->enable_notifications = $request->boolean('enable_notifications');
+        }
 
         // Referral configuration fields
         if ($request->filled('affiliate_commission_percentage')) {

@@ -73,6 +73,7 @@ class UserResource extends JsonResource
             'timer_taxable' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (bool) $this->timer_taxable),
             'hour_rate' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->hour_rate),
             'allow_referral_system' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (bool) $this->allow_referral_system),
+            'enable_notifications' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (bool) ($this->enable_notifications ?? true)),
             'affiliate_commission_percentage' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->affiliate_commission_percentage),
             'add_commission_to_total' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (bool) $this->add_commission_to_total),
             'ref_user_id' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->ref_user_id),

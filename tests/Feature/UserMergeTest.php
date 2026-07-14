@@ -301,4 +301,64 @@ class UserMergeTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_merge_handles_roles_and_permissions_correctly(): void
+    {
+        $survivor = User::factory()->create();
+        $duplicate = User::factory()->create();
+
+        $roleId = DB::table('roles')->insertGetId([
+            'name' => 'test-role',
+            'guard_name' => 'web',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $permissionId = DB::table('permissions')->insertGetId([
+            'name' => 'test-permission',
+            'guard_name' => 'web',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        DB::table('model_has_roles')->insert([
+            'role_id' => $roleId,
+            'model_type' => User::class,
+            'model_id' => $duplicate->id,
+        ]);
+
+        DB::table('model_has_permissions')->insert([
+            'permission_id' => $permissionId,
+            'model_type' => User::class,
+            'model_id' => $duplicate->id,
+        ]);
+
+        // Also assign survivor the same role to test conflict skipping
+        DB::table('model_has_roles')->insert([
+            'role_id' => $roleId,
+            'model_type' => User::class,
+            'model_id' => $survivor->id,
+        ]);
+
+        $this->service->merge($survivor->id, $duplicate->id, [], 0);
+
+        $this->assertDatabaseHas('model_has_roles', [
+            'role_id' => $roleId,
+            'model_type' => User::class,
+            'model_id' => $survivor->id,
+        ]);
+
+        $this->assertDatabaseHas('model_has_permissions', [
+            'permission_id' => $permissionId,
+            'model_type' => User::class,
+            'model_id' => $survivor->id,
+        ]);
+
+        $this->assertDatabaseMissing('model_has_roles', [
+            'model_type' => User::class,
+            'model_id' => $duplicate->id,
+        ]);
+
+        $this->assertDatabaseMissing('model_has_permissions', [
+            'model_type' => User::class,
+            'model_id' => $duplicate->id,
+        ]);
+    }
 }

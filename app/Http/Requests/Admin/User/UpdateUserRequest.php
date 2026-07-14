@@ -53,6 +53,7 @@ class UpdateUserRequest extends FormRequest
             'allow_referral_system' => 'nullable|boolean',
             'allow_view_times' => 'nullable|boolean',
             'allow_postpaid' => 'nullable|boolean',
+            'enable_notifications' => 'nullable|boolean',
 
             'kyc_verified' => 'nullable|boolean',
             'kyc_notes' => 'nullable|string',

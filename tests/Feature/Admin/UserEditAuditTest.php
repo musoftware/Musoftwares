@@ -326,6 +326,7 @@ class UserEditAuditTest extends TestCase
             'allow_referral_system' => true,
             'allow_view_times' => false,
             'allow_postpaid' => true,
+            'enable_notifications' => false,
             'kyc_verified' => true,
             'kyc_notes' => 'manual audit verify',
             'affiliate_commission_percentage' => 2.5,
@@ -375,6 +376,7 @@ class UserEditAuditTest extends TestCase
         $this->assertTrue((bool) $user->allow_referral_system);
         $this->assertFalse((bool) $user->allow_view_times);
         $this->assertTrue((bool) $user->allow_postpaid);
+        $this->assertFalse((bool) $user->enable_notifications);
         $this->assertTrue((bool) $user->kyc_verified);
         $this->assertSame('manual audit verify', $user->kyc_notes);
         $this->assertSame('2.5', (string) $user->affiliate_commission_percentage);
@@ -634,5 +636,47 @@ class UserEditAuditTest extends TestCase
 
         $response->assertSessionHasNoErrors();
         $this->assertSame(2, (int) $this->target->fresh()->currency_id);
+    }
+
+    public function test_enable_notifications_false_blocks_notifications_except_password_reset(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $this->target->update(['enable_notifications' => false]);
+
+        $invoice = new \App\Models\Invoice();
+        $invoice->id = 999;
+        $invoice->invoice_number = 'INV-999';
+
+        $this->target->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
+        $this->target->notify(new \App\Notifications\Auth\ResetPasswordNotification('dummy-token'));
+
+        \Illuminate\Support\Facades\Notification::assertNotSentTo(
+            $this->target,
+            \App\Notifications\InvoiceCreatedNotification::class
+        );
+
+        \Illuminate\Support\Facades\Notification::assertSentTo(
+            $this->target,
+            \App\Notifications\Auth\ResetPasswordNotification::class
+        );
+    }
+
+    public function test_enable_notifications_true_allows_notifications(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $this->target->update(['enable_notifications' => true]);
+
+        $invoice = new \App\Models\Invoice();
+        $invoice->id = 999;
+        $invoice->invoice_number = 'INV-999';
+
+        $this->target->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
+
+        \Illuminate\Support\Facades\Notification::assertSentTo(
+            $this->target,
+            \App\Notifications\InvoiceCreatedNotification::class
+        );
     }
 }

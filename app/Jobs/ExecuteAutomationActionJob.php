@@ -44,6 +44,11 @@ class ExecuteAutomationActionJob implements ShouldQueue
                 $template = $this->action['template'] ?? 'System Notification';
                 if ($target) {
                     try {
+                        $userByEmail = \App\Models\User::where('email', $target)->first();
+                        if ($userByEmail && ! ($userByEmail->enable_notifications ?? true)) {
+                            Log::info("Automation email skipped: notifications are disabled for user/client email {$target}");
+                            break;
+                        }
                         Mail::raw("Automation triggered: {$template}", function ($message) use ($target) {
                             $message->to($target)->subject('Automation Notification');
                         });

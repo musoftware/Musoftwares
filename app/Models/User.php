@@ -35,6 +35,7 @@ class User extends Authenticatable
         'mobile_2',
         'telegram_username',
         'whatsapp_number',
+        'enable_notifications',
         'tour_completed',
         'tour_skipped',
         'current_tour_step',
@@ -85,6 +86,7 @@ class User extends Authenticatable
             'kyc_verified_at' => 'datetime',
             'workspace_settings' => 'array',
             'max_devices' => 'integer',
+            'enable_notifications' => 'boolean',
         ];
     }
 
@@ -677,5 +679,17 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Override the notify method to intercept client notifications.
+     */
+    public function notify($instance)
+    {
+        if (! ($this->enable_notifications ?? true) && ! ($instance instanceof ResetPasswordNotification)) {
+            return;
+        }
+
+        app(\Illuminate\Contracts\Notifications\Dispatcher::class)->send($this, $instance);
     }
 }

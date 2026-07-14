@@ -28,6 +28,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'role' => 'required|in:admin,client,user,employee,manager,moderator',
             'currency_id' => 'nullable|integer|exists:currencies,id',
+            'enable_notifications' => 'nullable|boolean',
         ];
     }
 

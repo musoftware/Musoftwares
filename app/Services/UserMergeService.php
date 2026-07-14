@@ -373,20 +373,25 @@ class UserMergeService
                 ->get();
 
             foreach ($rows as $row) {
-                $exists = DB::table($table)
+                $query = DB::table($table)
                     ->where('model_type', User::class)
-                    ->where('model_id', $survivorId)
-                    ->where('role_id', $row->role_id ?? null)
-                    ->where('permission_id', $row->permission_id ?? null)
-                    ->exists();
+                    ->where('model_id', $survivorId);
 
-                if (! $exists) {
-                    DB::table($table)->insert([
-                        'model_type' => User::class,
-                        'model_id' => $survivorId,
-                        'role_id' => $row->role_id ?? null,
-                        'permission_id' => $row->permission_id ?? null,
-                    ]);
+                $insertData = [
+                    'model_type' => User::class,
+                    'model_id' => $survivorId,
+                ];
+
+                if ($table === 'model_has_roles') {
+                    $query->where('role_id', $row->role_id);
+                    $insertData['role_id'] = $row->role_id;
+                } else {
+                    $query->where('permission_id', $row->permission_id);
+                    $insertData['permission_id'] = $row->permission_id;
+                }
+
+                if (! $query->exists()) {
+                    DB::table($table)->insert($insertData);
                     $count++;
                 }
             }

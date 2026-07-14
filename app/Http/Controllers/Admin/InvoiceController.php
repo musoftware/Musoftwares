@@ -746,22 +746,24 @@ class InvoiceController extends Controller
         $fcmError = null;
         if ($channel === 'all' || $channel === 'fcm') {
             try {
-                $tokens = $client->deviceTokens()->pluck('token')->filter()->values()->all();
-                if (! empty($tokens)) {
-                    FcmHelper::send_push_notif_to_device(
-                        $tokens,
-                        [
-                            'title' => __('general.notif_invoice_created_title'),
-                            'description' => __('general.notif_invoice_created_body', [
-                                'invoice' => $invoice->invoice_number ?? '#'.$invoice->id,
-                            ]),
-                            'image' => '',
-                            'order_id' => (string) $invoice->id,
-                            'type' => 'invoice_created',
-                            'data_id' => (string) $invoice->id,
-                        ],
-                        url('/app/invoices/'.$invoice->id)
-                    );
+                if ($client->enable_notifications ?? true) {
+                    $tokens = $client->deviceTokens()->pluck('token')->filter()->values()->all();
+                    if (! empty($tokens)) {
+                        FcmHelper::send_push_notif_to_device(
+                            $tokens,
+                            [
+                                'title' => __('general.notif_invoice_created_title'),
+                                'description' => __('general.notif_invoice_created_body', [
+                                    'invoice' => $invoice->invoice_number ?? '#'.$invoice->id,
+                                ]),
+                                'image' => '',
+                                'order_id' => (string) $invoice->id,
+                                'type' => 'invoice_created',
+                                'data_id' => (string) $invoice->id,
+                            ],
+                            url('/app/invoices/'.$invoice->id)
+                        );
+                    }
                 }
             } catch (\Throwable $e) {
                 \Log::warning('FcmHelper push failed for invoice #'.$invoice->id.': '.$e->getMessage());

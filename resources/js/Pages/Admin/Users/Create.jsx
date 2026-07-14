@@ -40,6 +40,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
         allow_referral_system: false,
         allow_view_times: false,
         allow_postpaid: false,
+        enable_notifications: true,
         kyc_verified: false,
         kyc_notes: '',
         affiliate_commission_percentage: 1.00,
@@ -300,6 +301,10 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="allow_postpaid" name="allow_postpaid" checked={data.allow_postpaid} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="allow_postpaid" className="cursor-pointer font-medium">{__('general.allow_postpaid')}</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        <input type="checkbox" id="enable_notifications" name="enable_notifications" checked={data.enable_notifications} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
+                                        <Label htmlFor="enable_notifications" className="cursor-pointer font-medium">{__('general.enable_notifications')}</Label>
                                     </div>
                                 </div>
                             </div>

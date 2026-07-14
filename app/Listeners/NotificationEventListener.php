@@ -85,6 +85,15 @@ class NotificationEventListener
         }
 
         if ($email) {
+            $userByEmail = \App\Models\User::where('email', $email)->first();
+            if ($userByEmail && ! ($userByEmail->enable_notifications ?? true)) {
+                Log::info('Notification skipped: notifications are disabled for this recipient email.', [
+                    'email' => $email,
+                    'notification' => get_class($notification),
+                ]);
+                return;
+            }
+
             Notification::route('mail', $email)->notify($notification);
 
             return;

@@ -40,6 +40,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
         allow_referral_system: user.allow_referral_system || false,
         allow_view_times: user.allow_view_times || false,
         allow_postpaid: user.allow_postpaid || false,
+        enable_notifications: user.enable_notifications ?? true,
         kyc_verified: user.kyc_verified || false,
         kyc_notes: user.kyc_notes || '',
         affiliate_commission_percentage: user.affiliate_commission_percentage ?? 1.00,
@@ -319,6 +320,10 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="allow_postpaid" name="allow_postpaid" checked={data.allow_postpaid} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="allow_postpaid" className="cursor-pointer font-medium">{__('general.allow_postpaid')}</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        <input type="checkbox" id="enable_notifications" name="enable_notifications" checked={data.enable_notifications} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
+                                        <Label htmlFor="enable_notifications" className="cursor-pointer font-medium">{__('general.enable_notifications')}</Label>
                                     </div>
                                 </div>
                             </div>

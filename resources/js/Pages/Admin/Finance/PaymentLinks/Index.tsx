@@ -186,7 +186,7 @@ export default function Index({ paymentLinks, currencies, stats }: any) {
                                                 {formatMoney(link.amount, link.currency)}
                                             </TableCell>
                                             <TableCell data-label={__('general.currency')} className="text-slate-600 text-sm">
-                                                {link.currency}
+                                                {typeof link.currency === 'object' ? link.currency?.currency : link.currency}
                                             </TableCell>
                                             <TableCell data-label={__('general.status')}>
                                                 <StatusBadge status={link.status} />

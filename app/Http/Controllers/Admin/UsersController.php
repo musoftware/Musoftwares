@@ -244,6 +244,7 @@ class UsersController extends Controller
                 'allow_referral_system' => (bool) ($user->allow_referral_system ?? false),
                 'allow_view_times' => (bool) ($user->allow_view_times ?? false),
                 'allow_postpaid' => (bool) ($user->allow_postpaid ?? false),
+                'enable_notifications' => (bool) ($user->enable_notifications ?? true),
 
                 'account_status' => $user->account_status ?? 'active',
                 'block_reason' => $user->block_reason ?? '',
