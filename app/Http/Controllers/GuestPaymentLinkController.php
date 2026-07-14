@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Builders\KashierCheckoutBuilder;
-use App\Helpers\KashierHelper;
+use App\Jobs\ProcessWebhookJob;
+use App\Models\IncomingWebhook;
 use App\Models\PaymentLink;
 use App\Traits\ConvertsCurrency;
 use Illuminate\Http\Request;
@@ -90,51 +91,32 @@ class GuestPaymentLinkController extends Controller
 
     public function paymentWebhook(Request $request)
     {
-        if (! KashierHelper::validatePayload()) {
-            Log::warning('Guest Payment Link Kashier webhook: Invalid signature.');
-
-            return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 400);
-        }
-
         $payload = json_decode($request->getContent(), true);
         if (! $payload || ! isset($payload['data'])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid payload format'], 400);
         }
 
-        $data = $payload['data'];
-        $metaData = json_decode($data['metaData'] ?? '{}', true);
-
+        $metaData = json_decode($payload['data']['metaData'] ?? '{}', true);
         if (($metaData['source'] ?? '') !== 'payment-link') {
             return response()->json(['status' => 'ignored', 'message' => 'Not a payment link payment']);
         }
 
-        $paymentLinkId = $metaData['payment_link_id'] ?? null;
-        if (! $paymentLinkId) {
-            return response()->json(['status' => 'error', 'message' => 'Missing payment link ID'], 400);
+        try {
+            $webhook = IncomingWebhook::create([
+                'source' => 'kashier',
+                'event_type' => $payload['data']['status'] ?? 'unknown',
+                'payload' => $payload,
+                'headers' => $request->headers->all(),
+                'status' => 'pending',
+            ]);
+
+            ProcessWebhookJob::dispatch($webhook);
+
+            return response()->json(['status' => 'accepted', 'id' => $webhook->id], 202);
+        } catch (\Exception $e) {
+            Log::error('Guest Payment Link webhook store failed: '.$e->getMessage());
+
+            return response()->json(['status' => 'error', 'message' => 'Internal error'], 500);
         }
-
-        $paymentLink = PaymentLink::find($paymentLinkId);
-        if (! $paymentLink) {
-            return response()->json(['status' => 'error', 'message' => 'Payment link not found'], 404);
-        }
-
-        if ($data['status'] === 'SUCCESS') {
-            if ($paymentLink->status !== 'paid') {
-                try {
-                    $paymentLink->status = 'paid';
-                    $paymentLink->paid_at = now();
-                    $paymentLink->save();
-                    Log::info("Guest Payment Link successful for link #{$paymentLink->id}");
-                } catch (\Exception $e) {
-                    Log::error("Guest Payment Link failed to mark as paid for link #{$paymentLink->id}: ".$e->getMessage());
-
-                    return response()->json(['status' => 'error', 'message' => 'Failed to process payment internally'], 500);
-                }
-            }
-        } else {
-            Log::info("Guest Payment Link failed for link #{$paymentLink->id}, Status: ".$data['status']);
-        }
-
-        return response()->json(['status' => 'success']);
     }
 }

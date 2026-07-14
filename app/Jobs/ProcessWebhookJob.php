@@ -293,15 +293,33 @@ class ProcessWebhookJob implements ShouldQueue
     private function handlePaymentLink($trxId, $amountPaid, $metaData)
     {
         $paymentLinkId = $metaData['payment_link_id'] ?? null;
-        if ($paymentLinkId && class_exists('\App\Models\PaymentLink')) {
-            $paymentLink = PaymentLink::find($paymentLinkId);
-            if ($paymentLink && $paymentLink->status !== 'paid') {
-                $paymentLink->status = 'paid';
-                $paymentLink->paid_at = now();
-                $paymentLink->save();
-                Log::info("Kashier payment link processed successfully for Link {$paymentLinkId}");
-            }
+        if (! $paymentLinkId || ! class_exists('\App\Models\PaymentLink')) {
+            return;
         }
+
+        DB::transaction(function () use ($paymentLinkId, $trxId, $amountPaid) {
+            $paymentLink = PaymentLink::lockForUpdate()->find($paymentLinkId);
+            if (! $paymentLink) {
+                Log::warning("Kashier payment link webhook: link {$paymentLinkId} not found.");
+
+                return;
+            }
+
+            if ($paymentLink->status === PaymentLink::STATUS_PAID) {
+                Log::info("Kashier payment link webhook: link {$paymentLinkId} already paid, idempotent skip.");
+
+                return;
+            }
+
+            if ((float) $paymentLink->amount !== (float) $amountPaid) {
+                Log::warning("Kashier payment link webhook amount mismatch for link {$paymentLinkId}: expected {$paymentLink->amount}, got {$amountPaid}.");
+
+                throw new \Exception("Payment amount mismatch for payment link {$paymentLinkId}");
+            }
+
+            $paymentLink->markPaid(PaymentLink::METHOD_KASHIER, (string) $trxId);
+            Log::info("Kashier payment link processed successfully for Link {$paymentLinkId}");
+        });
     }
 
     private function processWhatsApp($payload)
