@@ -10,6 +10,11 @@ use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\InvoiceItemTimer;
+use App\Models\Project;
+use App\Models\ProjectBoardItem;
+use App\Models\ProjectBoardNote;
+use App\Models\ProjectReport;
+use App\Models\ProjectFile;
 use App\Models\RecurringBusyTime;
 use App\Models\Task;
 use App\Models\Todo;
@@ -1225,5 +1230,169 @@ class AdminTaskController extends Controller
         }
 
         return redirect()->back()->with('message', __('general.task_status_updated_successfully'));
+    }
+
+    /**
+     * Display a paginated, searchable listing of all project board items.
+     */
+    public function boardExplorer(Request $request): InertiaResponse
+    {
+        $perPage = (int) $request->get('per_page', 25);
+        $search = $request->get('search');
+        $projectId = $request->get('project_id');
+        $clientId = $request->get('client_id');
+        $lane = $request->get('lane');
+        $type = $request->get('type');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+
+        $query = ProjectBoardItem::query()
+            ->with(['project.client', 'category', 'itemable']);
+
+        // Filter by project
+        if ($projectId && $projectId !== 'all') {
+            $query->where('project_id', $projectId);
+        }
+
+        // Filter by client
+        if ($clientId && $clientId !== 'all') {
+            $query->whereHas('project', function ($q) use ($clientId) {
+                $q->where('user_id', $clientId);
+            });
+        }
+
+        // Filter by lane
+        if ($lane && $lane !== 'all') {
+            $query->where('lane', $lane);
+        }
+
+        // Filter by item type
+        if ($type && $type !== 'all' && array_key_exists($type, ProjectBoardItem::MORPH_MAP)) {
+            $query->where('itemable_type', ProjectBoardItem::MORPH_MAP[$type]);
+        }
+
+        // Filter by date range
+        if ($dateFrom) {
+            $query->whereDate('for_date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('for_date', '<=', $dateTo);
+        }
+
+        // Search text in itemables
+        if ($search) {
+            $searchTerm = '%' . $search . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereHasMorph('itemable', [
+                    ProjectBoardNote::class,
+                    Task::class,
+                    ProjectReport::class,
+                    Todo::class,
+                    ProjectFile::class
+                ], function ($subQuery, $type) use ($searchTerm) {
+                    if ($type === ProjectBoardNote::class) {
+                        $subQuery->where('title', 'like', $searchTerm)->orWhere('content', 'like', $searchTerm);
+                    } elseif ($type === Task::class) {
+                        $subQuery->where('task_name', 'like', $searchTerm)->orWhere('task_description', 'like', $searchTerm);
+                    } elseif ($type === ProjectReport::class) {
+                        $subQuery->where('title', 'like', $searchTerm)->orWhere('summary', 'like', $searchTerm);
+                    } elseif ($type === Todo::class) {
+                        $subQuery->where('title', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm);
+                    } elseif ($type === ProjectFile::class) {
+                        $subQuery->where('original_name', 'like', $searchTerm);
+                    }
+                });
+            });
+        }
+
+        // Order by date desc, then sort order
+        $query->orderBy('for_date', 'desc')->orderBy('sort', 'asc');
+
+        // Paginate
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        // Map items
+        $items = collect($paginator->items())->map(function ($item) {
+            $title = '';
+            $description = '';
+            $typeAlias = array_search($item->itemable_type, ProjectBoardItem::MORPH_MAP) ?: 'note';
+            
+            $itemable = $item->itemable;
+            if ($itemable) {
+                if ($itemable instanceof ProjectBoardNote) {
+                    $title = $itemable->title;
+                    $description = $itemable->content;
+                } elseif ($itemable instanceof Task) {
+                    $title = $itemable->task_name;
+                    $description = $itemable->task_description;
+                } elseif ($itemable instanceof ProjectReport) {
+                    $title = $itemable->title;
+                    $description = $itemable->summary;
+                } elseif ($itemable instanceof Todo) {
+                    $title = $itemable->title;
+                    $description = $itemable->description;
+                } elseif ($itemable instanceof ProjectFile) {
+                    $title = $itemable->original_name;
+                    $description = $itemable->humanSize();
+                }
+            }
+
+            return [
+                'id' => $item->id,
+                'project_id' => $item->project_id,
+                'project_name' => $item->project?->project_name ?? __('general.unknown'),
+                'client_name' => $item->project?->client?->name ?? __('general.unknown'),
+                'lane' => $item->lane,
+                'for_date' => $item->for_date ? Carbon::parse($item->for_date)->toDateString() : null,
+                'type' => $typeAlias,
+                'itemable_id' => $item->itemable_id,
+                'title' => $title ?: __('general.untitled') ?: 'Untitled',
+                'description' => $description,
+                'category_name' => $item->category?->localizedName() ?? $item->category?->name,
+                'category_color' => $item->category?->color,
+            ];
+        });
+
+        // Get drop-downs
+        $projects = Project::where('archived', 0)
+            ->orderBy('project_name')
+            ->get(['id', 'project_name']);
+
+        $clients = User::role('client')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        // Stats (unfiltered baseline counts by type)
+        $stats = [
+            'total' => ProjectBoardItem::count(),
+            'notes' => ProjectBoardItem::where('itemable_type', ProjectBoardNote::class)->count(),
+            'tasks' => ProjectBoardItem::where('itemable_type', Task::class)->count(),
+            'reports' => ProjectBoardItem::where('itemable_type', ProjectReport::class)->count(),
+            'todos' => ProjectBoardItem::where('itemable_type', Todo::class)->count(),
+            'files' => ProjectBoardItem::where('itemable_type', ProjectFile::class)->count(),
+        ];
+
+        return Inertia::render('Admin/Tasks/BoardExplorer', $this->sanitizeUtf8([
+            'items' => $items,
+            'projects' => $projects,
+            'clients' => $clients,
+            'stats' => $stats,
+            'filters' => [
+                'search' => $search,
+                'project_id' => $projectId ?: 'all',
+                'client_id' => $clientId ?: 'all',
+                'lane' => $lane ?: 'all',
+                'type' => $type ?: 'all',
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'per_page' => $perPage,
+            ],
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+        ]));
     }
 }

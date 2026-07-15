@@ -383,4 +383,5 @@ return [
     'confirm_bulk_delete_payment_links' => 'Delete :count selected payment links? This cannot be undone.',
     'only_pending_can_be_cancelled' => 'Only pending links can be cancelled.',
     'only_super_admin_can_mark_paid' => 'Only super admins can manually mark a link as paid.',
+    'deleted_successfully' => 'Deleted successfully.',
 ];

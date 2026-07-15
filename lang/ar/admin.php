@@ -383,4 +383,5 @@ return [
     'confirm_bulk_delete_payment_links' => 'حذف :count من روابط الدفع المحددة؟ لا يمكن التراجع.',
     'only_pending_can_be_cancelled' => 'يمكن فقط إلغاء الروابط قيد الانتظار.',
     'only_super_admin_can_mark_paid' => 'يمكن فقط للمدير العام تحديد الرابط كمدفوع يدوياً.',
+    'deleted_successfully' => 'تم الحذف بنجاح.',
 ];

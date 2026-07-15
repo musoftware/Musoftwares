@@ -844,6 +844,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // Admin Tasks List (platform checklist items)
     Route::get('/tasks/as_list', [AdminTaskController::class, 'asList'])->name('tasks.as_list');
+    Route::get('/tasks/board-explorer', [AdminTaskController::class, 'boardExplorer'])->name('tasks.board-explorer');
     Route::get('/tasks/as_list/export', [AdminTaskController::class, 'exportAsList'])->name('tasks.as_list.export');
     Route::post('/tasks/todos/bulk-complete', [AdminTaskController::class, 'bulkCompleteTodos'])->name('tasks.todos.bulk-complete');
     Route::post('/tasks/todos/{todo}/complete', [AdminTaskController::class, 'completeTodo'])->name('tasks.todos.complete');

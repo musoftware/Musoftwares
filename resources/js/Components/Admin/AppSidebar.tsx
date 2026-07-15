@@ -45,12 +45,13 @@ const items: MenuItem[] = [
     title: "Tasks",
     url: "/admin/tasks",
     icon: ListTodo,
-    subItems: [
-        { title: "Tasks List", url: "/admin/tasks/as_list" },
-        { title: "Task Calendar", url: "/admin/tasks/calendar" },
-        { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
-        { title: "Employee Todos", url: "/admin/employee-todos" },
-    ]
+        subItems: [
+            { title: "Tasks List", url: "/admin/tasks/as_list" },
+            { title: "Board Explorer", url: "/admin/tasks/board-explorer" },
+            { title: "Task Calendar", url: "/admin/tasks/calendar" },
+            { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
+            { title: "Employee Todos", url: "/admin/employee-todos" },
+        ]
   },
   {
     title: "Invoices",

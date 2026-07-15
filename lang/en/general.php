@@ -7679,4 +7679,13 @@ return [
     'refunds_sent' => 'Refunds and other sent transfers',
     'total_received' => 'Total Received',
     'total_refunded' => 'Total Refunded',
+    'all_lanes' => 'All Lanes',
+    'backlog' => 'Backlog',
+    'board_explorer' => 'Board Explorer',
+    'board_explorer_subtitle' => 'Explore, search and trace all project board items across all days and lanes.',
+    'card' => 'Card',
+    'lane' => 'Lane',
+    'search_board_placeholder' => 'Search card content...',
+    'total_items' => 'Total Cards',
+    'untitled' => 'Untitled',
 ];
