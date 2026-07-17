@@ -1,50 +1,43 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-export type WatermarkTone = 'paid' | 'unpaid' | 'overdue' | 'draft' | 'cancelled';
-
-const TONE_STYLES: Record<WatermarkTone, { color: string; label: string }> = {
-    paid: { color: 'text-emerald-300', label: 'Paid' },
-    unpaid: { color: 'text-rose-300', label: 'Unpaid' },
-    overdue: { color: 'text-amber-300', label: 'Overdue' },
-    draft: { color: 'text-slate-300', label: 'Draft' },
-    cancelled: { color: 'text-slate-300', label: 'Cancelled' },
-};
+export type WatermarkTone = 'paid' | 'unpaid' | 'overdue' | 'draft';
 
 export interface WatermarkStampProps {
-    tone: string;
+    tone?: WatermarkTone;
     label?: string;
     className?: string;
 }
 
-function resolveTone(status: string): WatermarkTone {
-    const s = (status ?? '').toLowerCase();
-    if (s === 'paid' || s === 'partially_paid') return 'paid';
-    if (s === 'overdue') return 'overdue';
-    if (s === 'draft') return 'draft';
-    if (s === 'cancelled' || s === 'canceled' || s === 'refunded') return 'cancelled';
-    return 'unpaid';
-}
+const TONE_CLASSES: Record<WatermarkTone, string> = {
+    paid: 'text-emerald-500',
+    unpaid: 'text-rose-500',
+    overdue: 'text-amber-500',
+    draft: 'text-slate-400',
+};
 
-export function WatermarkStamp({ tone, label, className }: WatermarkStampProps) {
-    const t = TONE_STYLES[resolveTone(tone)];
+const TONE_LABELS: Record<WatermarkTone, string> = {
+    paid: 'PAID',
+    unpaid: 'UNPAID',
+    overdue: 'OVERDUE',
+    draft: 'DRAFT',
+};
+
+export function WatermarkStamp({ tone = 'draft', label, className }: WatermarkStampProps) {
+    const text = label ?? TONE_LABELS[tone];
     return (
         <div
             aria-hidden="true"
             className={cn(
-                'pointer-events-none absolute inset-0 hidden select-none items-center justify-center md:flex',
+                'pointer-events-none hidden select-none items-center justify-center md:flex',
+                'absolute end-8 top-6 -z-10',
+                'text-[88px] font-black uppercase tracking-[0.2em]',
+                'rotate-[-30deg] opacity-10 leading-none',
+                TONE_CLASSES[tone],
                 className,
             )}
         >
-            <span
-                className={cn(
-                    'rotate-[-30deg] text-[120px] font-black uppercase tracking-widest opacity-15',
-                    t.color,
-                )}
-                style={{ lineHeight: 1 }}
-            >
-                {label ?? t.label}
-            </span>
+            {text}
         </div>
     );
 }

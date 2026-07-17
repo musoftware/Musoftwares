@@ -11,6 +11,7 @@ return [
         'affsys'       => 'affiliate',
         'bookingsys'   => 'booking',
         'toolsys'      => 'tool',
+        'investorsys'  => 'investor',
     ],
 
     /*
@@ -26,6 +27,7 @@ return [
         'booking' => 3000,
         'tool' => 1000,
         'affiliate-pos' => 4000,
+        'investor' => 5000,
     ],
 
     /*

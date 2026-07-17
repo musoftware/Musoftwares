@@ -48,6 +48,8 @@ class SsoController extends Controller
             $targetUrl = config('services.bookingsys.url').'/sso/callback';
         } elseif ($system === 'goldsaversys') {
             $targetUrl = config('services.goldsaversys.url').'/sso/callback';
+        } elseif ($system === 'investorsys') {
+            $targetUrl = config('services.investorsys.url').'/sso/callback';
         } elseif ($system === 'toolsys') {
             $targetUrl = config('services.toolsys.url').'/sso/callback';
         } else {

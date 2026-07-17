@@ -34,6 +34,7 @@ import axios from 'axios';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
 import { __ } from '@/lib/i18n';
 import { useFCM } from '@/hooks/useFCM';
+import { PageTransition } from '@/Components/ui/PageTransition';
 
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (
@@ -110,6 +111,15 @@ function AuthenticatedContent({
         isRouteActive('referrals') || 
         isRouteActive('tickets') || 
         isRouteActive('messages');
+    const isAllTasksMenuActive = isRouteActive('client.projects.all-tasks');
+    const isProjectsMenuActive = isRouteActive('client.projects') && !isAllTasksMenuActive;
+    const isMessagesMenuActive = isRouteActive('messages');
+    const isInvoicesMenuActive = isRouteActive('billing.invoices');
+    const isTransactionsMenuActive = isRouteActive('financial.transactions');
+    const isWithdrawalsMenuActive = isRouteActive('financial.withdrawals');
+    const isPayoutMethodsMenuActive = isRouteActive('financial.payout-methods');
+    const isReferralsMenuActive = isRouteActive('referrals');
+    const isTicketsMenuActive = isRouteActive('tickets');
     const activeModules = auth?.active_modules || { erp: true, marketplace: true, booking: true, tools: true, fbmb: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
@@ -360,24 +370,24 @@ function AuthenticatedContent({
                                                     </span>
                                                 )}
                                             </div>
-                                            <DropdownMenuContent align="start" className="w-[820px] p-4 grid grid-cols-3 gap-6 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
+                                            <DropdownMenuContent align="start" className="w-[820px] p-5 grid grid-cols-3 gap-6 rounded-2xl border border-slate-200 bg-white isolate z-50" style={{ boxShadow: 'var(--shadow-menu-soft)' }}>
                                                 {/* Column 1: Projects & Collaboration */}
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                <div className="flex flex-col gap-1 divide-y divide-slate-100">
+                                                    <div className="px-2 py-2 mb-1 border-b border-blue-200">
                                                         <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.projects_and_collaboration')}</p>
                                                     </div>
                                                     
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
-                                                            isRouteActive('client.projects') && !route().current('client.projects.all-tasks')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isProjectsMenuActive
+                                                                ? "bg-blue-50/60 border-blue-100" 
+                                                                : "hover:bg-blue-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('client.projects.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('client.projects.index')} aria-current={isProjectsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <FolderKanban className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
+                                                            <FolderKanban className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.projects')}</p>
@@ -388,14 +398,14 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
-                                                            route().current('client.projects.all-tasks')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isAllTasksMenuActive
+                                                                ? "bg-blue-50/60 border-blue-100" 
+                                                                : "hover:bg-blue-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('client.projects.all-tasks')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('client.projects.all-tasks')} aria-current={isAllTasksMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <ListTodo className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
+                                                            <ListTodo className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.all_tasks')}</p>
@@ -406,14 +416,14 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
-                                                            isRouteActive('messages')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isMessagesMenuActive
+                                                                ? "bg-blue-50/60 border-blue-100" 
+                                                                : "hover:bg-blue-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('messages.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('messages.index')} aria-current={isMessagesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <MessageSquare className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
+                                                            <MessageSquare className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.messages')}</p>
@@ -423,22 +433,22 @@ function AuthenticatedContent({
                                                 </div>
 
                                                 {/* Column 2: Financials */}
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                <div className="flex flex-col gap-1 divide-y divide-slate-100">
+                                                    <div className="px-2 py-2 mb-1 border-b border-emerald-200">
                                                         <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.financials')}</p>
                                                     </div>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
-                                                            isRouteActive('billing.invoices')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isInvoicesMenuActive
+                                                                ? "bg-emerald-50/60 border-emerald-100" 
+                                                                : "hover:bg-emerald-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('billing.invoices.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('billing.invoices.index')} aria-current={isInvoicesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <FileText className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
+                                                            <FileText className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.my_invoices')}</p>
@@ -449,14 +459,14 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
-                                                            isRouteActive('financial.transactions')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isTransactionsMenuActive
+                                                                ? "bg-emerald-50/60 border-emerald-100" 
+                                                                : "hover:bg-emerald-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('financial.transactions')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('financial.transactions')} aria-current={isTransactionsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <ArrowRightLeft className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
+                                                            <ArrowRightLeft className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.transactions')}</p>
@@ -467,14 +477,14 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
-                                                            isRouteActive('financial.withdrawals')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isWithdrawalsMenuActive
+                                                                ? "bg-emerald-50/60 border-emerald-100" 
+                                                                : "hover:bg-emerald-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('financial.withdrawals')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('financial.withdrawals')} aria-current={isWithdrawalsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <ArrowUpRight className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
+                                                            <ArrowUpRight className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.request_withdrawal')}</p>
@@ -485,14 +495,14 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
-                                                            isRouteActive('financial.payout-methods')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isPayoutMethodsMenuActive
+                                                                ? "bg-emerald-50/60 border-emerald-100" 
+                                                                : "hover:bg-emerald-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('financial.payout-methods.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('financial.payout-methods.index')} aria-current={isPayoutMethodsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <CreditCard className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
+                                                            <CreditCard className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.payout_methods')}</p>
@@ -503,14 +513,14 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
-                                                            isRouteActive('referrals')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isReferralsMenuActive
+                                                                ? "bg-emerald-50/60 border-emerald-100" 
+                                                                : "hover:bg-emerald-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('referrals.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('referrals.index')} aria-current={isReferralsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <Users className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
+                                                            <Users className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.referrals')}</p>
@@ -520,22 +530,22 @@ function AuthenticatedContent({
                                                 </div>
 
                                                 {/* Column 3: Support */}
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                <div className="flex flex-col gap-1 divide-y divide-slate-100">
+                                                    <div className="px-2 py-2 mb-1 border-b border-orange-200">
                                                         <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.support')}</p>
                                                     </div>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
-                                                            isRouteActive('tickets')
-                                                                ? "bg-slate-50 border-slate-100" 
-                                                                : "hover:bg-slate-50 border-transparent"
+                                                            isTicketsMenuActive
+                                                                ? "bg-orange-50/60 border-orange-100" 
+                                                                : "hover:bg-orange-50/60 border-transparent"
                                                         )}
-                                                        render={<Link href={safeRoute('tickets.index')} className="flex items-start gap-3 p-2 rounded-lg w-full" />}
+                                                        render={<Link href={safeRoute('tickets.index')} aria-current={isTicketsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-300" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                                                            <LifeBuoy className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-md bg-orange-50 flex items-center justify-center shrink-0 text-orange-600">
+                                                            <LifeBuoy className="icon-md" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-slate-900">{__('general.support_tickets')}</p>
@@ -1069,7 +1079,7 @@ function AuthenticatedContent({
 
             {/* Main Content */}
             <main className="flex-1 w-full relative">
-                {children}
+                <PageTransition>{children}</PageTransition>
             </main>
 
             <BackgroundTaskStatus />

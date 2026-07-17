@@ -16,15 +16,23 @@ class ExchangeRateSyncController extends Controller
      */
     public function sync(Request $request): JsonResponse
     {
-        $secret = (string) config('services.goldsaversys.shared_secret', '');
+        $system = $request->header('X-Investor-System')
+            ?? $request->header('X-GoldSaver-System')
+            ?? $request->header('X-Sso-System');
 
-        $signature = $request->header('X-GoldSaver-Signature');
-        $timestamp = $request->header('X-GoldSaver-Timestamp');
-        $system = $request->header('X-GoldSaver-System');
+        $signature = $request->header('X-Investor-Signature')
+            ?? $request->header('X-GoldSaver-Signature')
+            ?? $request->header('X-Sso-Signature');
+
+        $timestamp = $request->header('X-Investor-Timestamp')
+            ?? $request->header('X-GoldSaver-Timestamp')
+            ?? $request->header('X-Sso-Timestamp');
 
         if (! $signature || ! $timestamp || ! $system) {
             return response()->json(['error' => 'missing_signature_headers'], 401);
         }
+
+        $secret = (string) config("services.{$system}.shared_secret", config('services.goldsaversys.shared_secret', ''));
 
         // Prevent replay attacks (allow 5 minute clock drift)
         if (abs(now()->timestamp - (int) $timestamp) > 300) {

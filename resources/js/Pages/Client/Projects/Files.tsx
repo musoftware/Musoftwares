@@ -36,7 +36,7 @@ export default function ProjectFiles({ project, files = [] }: Props) {
                 </div>
 
                 {files.length === 0 ? (
-                    <EmptyState icon={Paperclip} title={__('general.no_files')} description={__('general.no_files_desc')} />
+                    <EmptyState icon={Paperclip} tone="friendly" title={__('general.no_files')} description={__('general.no_files_desc')} />
                 ) : (
                     <div className="space-y-3">
                         {files.map((file) => (

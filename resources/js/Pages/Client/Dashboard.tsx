@@ -1,10 +1,9 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { Wallet, Sparkles } from 'lucide-react';
-import { formatMoney, safeRoute } from '@/lib/utils';
-import { MetricCard } from '@/Components/ui/MetricCard';
+import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { getGreeting } from '@/lib/greeting';
 import PendingInvoicesBanner from './Dashboard/Components/PendingInvoicesBanner';
 import CoreOperationsCards from './Dashboard/Components/CoreOperationsCards';
 import FinancialHistory from './Dashboard/Components/FinancialHistory';
@@ -63,23 +62,15 @@ export default function Dashboard({
 
                 {/* SECTION 2: HEADER & IDENTITY */}
                 <div className="mb-2">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                        {__('general.welcome')}, {user?.name}
-                    </h1>
-                </div>
-
-                {/* SECTION 3: FINANCIAL CONSOLIDATION (2 COLS) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <MetricCard
-                        label={__('general.account_balance')}
-                        value={formatMoney(stats.walletBalance, stats.currency)}
-                        icon={Wallet}
-                    />
-                    <MetricCard
-                        label={__('general.monthly_subscription')}
-                        value={formatMoney(stats.totalMonthlySubscription, stats.currency)}
-                        icon={Sparkles}
-                    />
+                    {(() => {
+                        const greeting = getGreeting();
+                        const greetingLabel = __(`general.greeting_${greeting.key}`);
+                        return (
+                            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+                                {greetingLabel}, {user?.name} <span aria-hidden="true">{greeting.emoji}</span>
+                            </h1>
+                        );
+                    })()}
                 </div>
 
                 {/* SECTION 3: CORE OPERATIONS (3 ACTION CARDS) */}

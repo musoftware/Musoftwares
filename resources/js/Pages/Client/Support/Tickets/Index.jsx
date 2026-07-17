@@ -1,22 +1,49 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Plus, Ticket, MessageSquare, Eye } from 'lucide-react';
+import { Plus, Ticket, MessageSquare, Eye, ExternalLink } from 'lucide-react';
 import { DataTable } from '@/Components/ui/DataTable';
 import { Button } from '@/Components/ui/button';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/Components/ui/sheet';
 
 import { AppPage } from '@/Components/ui/AppPage';
 import { SectionCard } from '@/Components/ui/SectionCard';
 import { ActionBar } from '@/Components/ui/ActionBar';
+import ChatWindow from '@/Components/Chat/ChatWindow';
 import { __ } from '@/lib/i18n';
 
 export default function TicketsIndex({ tickets, isAdmin }) {
     const { auth } = usePage().props;
     const [filterStatus, setFilterStatus] = useState('');
     const [filterPriority, setFilterPriority] = useState('');
+    const [openTicketId, setOpenTicketId] = useState<number | null>(null);
+    const triggerRef = React.useRef<HTMLElement | null>(null);
+
+    const openTicket = openTicketId != null
+        ? (tickets?.data ?? []).find((t) => t.id === openTicketId) ?? null
+        : null;
+
+    const handleRowOpen = (id, el) => {
+        triggerRef.current = el;
+        setOpenTicketId(id);
+        const url = new URL(window.location.href);
+        url.searchParams.set('open', String(id));
+        window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    };
+
+    const handleClose = () => {
+        const prev = triggerRef.current;
+        setOpenTicketId(null);
+        prev?.focus();
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('open')) {
+            url.searchParams.delete('open');
+            window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+        }
+    };
 
     const columns = [
         { key: 'id', label: 'ID', render: (row) => <span className="font-medium text-gray-900 font-mono">#{row.id}</span> },
@@ -46,12 +73,15 @@ export default function TicketsIndex({ tickets, isAdmin }) {
             label: '',
             render: (row) => (
                 <div className="text-end">
-                    <Link href={route('tickets.show', row.id)}>
-                        <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 shadow-none h-8 px-3 text-xs">
-                            <Eye className="w-3.5 h-3.5 me-1.5" />
-                            {isAdmin ? 'View / Respond' : 'View Ticket'}
-                        </Button>
-                    </Link>
+                    <button
+                        type="button"
+                        onClick={(e) => handleRowOpen(row.id, e.currentTarget)}
+                        className="inline-flex items-center rounded-md px-3 h-8 text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        aria-label={isAdmin ? 'View / Respond' : 'View Ticket'}
+                    >
+                        <Eye className="w-3.5 h-3.5 me-1.5" />
+                        {isAdmin ? 'View / Respond' : 'View Ticket'}
+                    </button>
                 </div>
             ),
         },
@@ -69,8 +99,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
     const emptyStateContent = (
         <EmptyState
             icon={Ticket}
+            tone="friendly"
             title={__('general.no_support_tickets_yet') || 'No Support Tickets Yet'}
-            description={__('general.need_help_with_billing_services_or_your_workspace_open_your_first_support_ticket') || 'Need help with billing, services, or your workspace? Open your first support ticket.'}
+            description={__('general.empty_tickets_friendly') || 'Quiet inbox. Need anything? We are here.'}
             actionLabel="Open Ticket"
             actionIcon={Plus}
             onClick={() => router.visit(route('tickets.create'))}
@@ -134,6 +165,48 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                     />
                 </SectionCard>
             </AppPage>
+
+            <Sheet open={openTicketId != null} onOpenChange={(o) => (o ? null : handleClose())}>
+                <SheetContent
+                    side="right"
+                    className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md"
+                >
+                    {openTicket && (
+                        <>
+                            <SheetHeader className="border-b border-slate-100 bg-slate-50/50 p-6 text-start">
+                                <SheetTitle className="text-lg font-semibold text-slate-900">
+                                    #{openTicket.id} — {openTicket.ticket_subject || openTicket.subject || openTicket.title}
+                                </SheetTitle>
+                                <SheetDescription className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                                    <StatusBadge status={openTicket.ticket_status || openTicket.status || 'open'} />
+                                    <span>·</span>
+                                    <span className="capitalize">{openTicket.priority || 'medium'}</span>
+                                </SheetDescription>
+                            </SheetHeader>
+                            <div className="flex h-[60vh] flex-col p-0">
+                                <ChatWindow
+                                    conversationId={openTicket.conversation_id || openTicket.id}
+                                    participants={[
+                                        {
+                                            id: openTicket.user_id,
+                                            name: openTicket.user?.name,
+                                        },
+                                    ]}
+                                    readOnly={openTicket.ticket_status === 'closed' || openTicket.ticket_status === 'resolved'}
+                                />
+                            </div>
+                            <div className="border-t border-slate-100 p-4">
+                                <Link
+                                    href={route('tickets.show', openTicket.id)}
+                                    className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                                >
+                                    <ExternalLink className="h-3.5 w-3.5" /> {__('general.open_in_page') || 'Open in page'}
+                                </Link>
+                            </div>
+                        </>
+                    )}
+                </SheetContent>
+            </Sheet>
         </AuthenticatedLayout>
     );
 }

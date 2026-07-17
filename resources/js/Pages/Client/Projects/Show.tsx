@@ -1,14 +1,24 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import {
-    ArrowLeft, ListTodo, CalendarDays, FileText, Paperclip, Wallet, PiggyBank, Clock,
-} from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeft, CalendarClock, FileText, ListTodo, Paperclip } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { MetricCard } from '@/Components/ui/MetricCard';
 import { Card, CardContent } from '@/Components/ui/card';
-import { EmptyState } from '@/Components/ui/EmptyState';
-import { formatMoney, formatDate } from '@/lib/utils';
+import { AvatarStack, AvatarStackMember } from '@/Components/ui/AvatarStack';
+import { ProjectBudgetRow } from '@/Components/ProjectBudgetRow';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
+import { formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+
+import ProjectTasksTab, { TabTask } from './tabs/Tasks';
+import ProjectDiscussionsTab, { TabDiscussion } from './tabs/Discussions';
+import ProjectFilesTab, { TabFile } from './tabs/Files';
+import ProjectFinancialsTab, { TabFinancials } from './tabs/Financials';
+
+const STATUS_STYLES: Record<string, string> = {
+    open: 'bg-emerald-100 text-emerald-700',
+    hold_on: 'bg-amber-100 text-amber-700',
+    closed: 'bg-slate-200 text-slate-700',
+};
 
 interface ProjectDetail {
     id: number;
@@ -19,13 +29,12 @@ interface ProjectDetail {
     date_start: string | null;
     date_end: string | null;
     budget: string;
-    // Logical, derivable financial metrics (no cached/fake "balance").
     cost: string;
     paid_invoices: string;
     pending_invoices: string;
     total_paid: string;
     hide_future_tasks: boolean;
-    currency: { currency: string; symbol: string; string_format?: string } | null;
+    currency: { id: number; currency: string; symbol: string; string_format?: string } | null;
     counts: { tasks: number; reports: number; files: number };
 }
 
@@ -37,110 +46,207 @@ interface RecentReport {
 
 interface Props {
     project: ProjectDetail;
-    recentReports: RecentReport[];
+    recentReports?: RecentReport[];
+    team?: AvatarStackMember[];
+    activeTab?: 'tasks' | 'discussions' | 'files' | 'financials';
+    tabContent?: {
+        tasks?: TabTask[];
+        discussions?: TabDiscussion[];
+        files?: TabFile[];
+        financials?: TabFinancials;
+    };
 }
 
-const STATUS_STYLES: Record<string, string> = {
-    open: 'bg-emerald-100 text-emerald-700',
-    hold_on: 'bg-amber-100 text-amber-700',
-    closed: 'bg-slate-200 text-slate-700',
-};
+const QUICK_ACTIONS = (project: ProjectDetail, today: string) =>
+    [
+        {
+            icon: ListTodo,
+            label: __('general.tasks'),
+            count: project.counts.tasks,
+            href: route('client.projects.tasks.index', { project: project.id }),
+        },
+        {
+            icon: CalendarClock,
+            label: __('general.day_board'),
+            count: null,
+            href: route('client.projects.calendar.date', { project: project.id, date: today }),
+        },
+        {
+            icon: FileText,
+            label: __('general.reports'),
+            count: project.counts.reports,
+            href: route('client.projects.show', project.id),
+        },
+        {
+            icon: Paperclip,
+            label: __('general.files'),
+            count: project.counts.files,
+            href: route('client.projects.files.index', { project: project.id }),
+        },
+    ];
 
-export default function ProjectShow({ project, recentReports = [] }: Props) {
+export default function ProjectShow({
+    project,
+    recentReports = [],
+    team = [],
+    activeTab = 'tasks',
+    tabContent = {},
+}: Props) {
     const today = new Date().toISOString().slice(0, 10);
+
+    const onTabChange = React.useCallback(
+        (next: string) => {
+            if (next === activeTab) return;
+            if (typeof window === 'undefined') return;
+            const target = new URL(window.location.href);
+            target.searchParams.set('tab', next);
+            router.get(target.pathname + target.search, { tab: next }, {
+                only: ['tabContent'],
+                preserveScroll: true,
+                preserveState: true,
+            });
+        },
+        [activeTab],
+    );
+
+    const quickActions = QUICK_ACTIONS(project, today);
 
     return (
         <AuthenticatedLayout>
             <Head title={project.name} />
             <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-                <div>
-                    <Link href={route('client.projects.index')} className="mb-1 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
-                        <ArrowLeft className="h-4 w-4" /> {__('general.all_projects')}
+                <header className="space-y-3">
+                    <Link
+                        href={route('client.projects.index')}
+                        className="inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-800"
+                    >
+                        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {__('general.all_projects')}
                     </Link>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{project.name}</h1>
-                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_STYLES[project.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                            {project.status?.replace('_', ' ')}
-                        </span>
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1 space-y-2">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <h1 className="truncate text-3xl font-bold tracking-tight text-slate-900">
+                                    {project.name}
+                                </h1>
+                                <span
+                                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ring-1 ring-inset ${
+                                        STATUS_STYLES[project.status] ?? 'bg-slate-100 text-slate-600 ring-slate-200'
+                                    }`}
+                                >
+                                    {project.status?.replace('_', ' ')}
+                                </span>
+                            </div>
+                            <AvatarStack members={team} max={5} size="sm" />
+                        </div>
                     </div>
-                </div>
+                </header>
 
-                {/* Financial summary */}
+                <ProjectBudgetRow
+                    budget={project.budget}
+                    totalPaid={project.total_paid}
+                    currency={project.currency}
+                    orientation="row"
+                />
+
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <MetricCard label={__('general.budget')} value={formatMoney(project.budget, project.currency)} icon={PiggyBank} />
-                    <MetricCard label={__('general.paid_invoices')} value={formatMoney(project.paid_invoices, project.currency)} icon={Wallet} />
-                    <MetricCard label={__('general.pending_invoices')} value={formatMoney(project.pending_invoices, project.currency)} icon={Wallet} />
-                    <MetricCard label={__('general.progress')} value={`${Math.round(project.percentage)}%`} icon={Clock} />
+                    {quickActions.map((action) => (
+                        <Link
+                            key={action.label}
+                            href={action.href}
+                            className="flex h-full items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                        >
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                <action.icon className="h-5 w-5" aria-hidden="true" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-medium text-slate-900">{action.label}</p>
+                                {action.count !== null && (
+                                    <p className="text-xs text-slate-400">{action.count}</p>
+                                )}
+                            </div>
+                        </Link>
+                    ))}
                 </div>
 
-                {/* Progress bar + dates */}
                 <Card className="rounded-xl border border-slate-200">
                     <CardContent className="p-5">
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                            <span className="font-medium text-slate-700">{__('general.completion')}</span>
-                            <span className="font-mono font-semibold text-slate-900">{Math.round(project.percentage)}%</span>
-                        </div>
-                        <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                            <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${Math.min(100, Math.max(0, project.percentage))}%` }} />
-                        </div>
-                        {(project.date_start || project.date_end) && (
-                            <p className="mt-3 text-xs text-slate-500">
-                                <Clock className="me-1 inline h-3.5 w-3.5" />
-                                {project.date_start ? formatDate(project.date_start) : '—'} → {project.date_end ? formatDate(project.date_end) : '…'}
-                            </p>
-                        )}
+                        <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
+                            <TabsList className="inline-flex h-10 w-full items-stretch justify-start gap-1 rounded-lg border border-slate-200 bg-white p-1 sm:w-auto">
+                                <TabsTrigger
+                                    value="tasks"
+                                    className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-500 transition-colors data-[state=active]:bg-slate-900 data-[state=active]:text-white"
+                                >
+                                    <ListTodo className="h-4 w-4" aria-hidden="true" /> {__('general.tasks')}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="discussions"
+                                    className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-500 transition-colors data-[state=active]:bg-slate-900 data-[state=active]:text-white"
+                                >
+                                    {__('general.discussions') || 'Discussions'}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="files"
+                                    className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-500 transition-colors data-[state=active]:bg-slate-900 data-[state=active]:text-white"
+                                >
+                                    <Paperclip className="h-4 w-4" aria-hidden="true" /> {__('general.files')}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="financials"
+                                    className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-500 transition-colors data-[state=active]:bg-slate-900 data-[state=active]:text-white"
+                                >
+                                    {__('general.financials') || 'Financials'}
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="tasks" className="mt-4">
+                                <ProjectTasksTab tasks={tabContent.tasks ?? []} />
+                            </TabsContent>
+                            <TabsContent value="discussions" className="mt-4">
+                                <ProjectDiscussionsTab discussions={tabContent.discussions ?? []} />
+                            </TabsContent>
+                            <TabsContent value="files" className="mt-4">
+                                <ProjectFilesTab files={tabContent.files ?? []} projectId={project.id} />
+                            </TabsContent>
+                            <TabsContent value="financials" className="mt-4">
+                                <ProjectFinancialsTab
+                                    financials={tabContent.financials ?? null}
+                                    currency={project.currency}
+                                />
+                            </TabsContent>
+                        </Tabs>
                     </CardContent>
                 </Card>
 
-                {/* Quick navigation */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {[
-                        { icon: ListTodo, label: __('general.tasks'), count: project.counts.tasks, route: 'client.projects.tasks.index', params: { project: project.id } },
-                        { icon: CalendarDays, label: __('general.day_board'), count: null, route: 'client.projects.calendar.date', params: { project: project.id, date: today } },
-                        { icon: FileText, label: __('general.reports'), count: project.counts.reports, route: null, params: null },
-                        { icon: Paperclip, label: __('general.files'), count: project.counts.files, route: 'client.projects.files.index', params: { project: project.id } },
-                    ].map((item) => {
-                        const Inner = (
-                            <div className="flex h-full items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300 hover:bg-slate-50">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
-                                    <item.icon className="h-5 w-5" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="font-medium text-slate-900">{item.label}</p>
-                                    {item.count !== null && <p className="text-xs text-slate-400">{item.count}</p>}
-                                </div>
-                            </div>
-                        );
-                        return item.route ? (
-                            <Link key={item.label} href={route(item.route, item.params)}>{Inner}</Link>
-                        ) : (
-                            <div key={item.label}>{Inner}</div>
-                        );
-                    })}
-                </div>
-
-                {/* Recent reports */}
-                <Card className="rounded-xl border border-slate-200">
-                    <CardContent className="p-5">
-                        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">{__('general.recent_reports')}</h2>
-                        {recentReports.length === 0 ? (
-                            <p className="py-6 text-center text-sm text-slate-400">{__('general.no_reports_yet')}</p>
-                        ) : (
+                {recentReports.length > 0 && (
+                    <Card className="rounded-xl border border-slate-200">
+                        <CardContent className="p-5">
+                            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+                                {__('general.recent_reports')}
+                            </h2>
                             <ul className="divide-y divide-slate-100">
-                                {recentReports.map((r) => (
-                                    <li key={r.id}>
-                                        <Link href={route('client.projects.reports.show', { project: project.id, report: r.id })} className="flex items-center justify-between py-3 hover:bg-slate-50">
+                                {recentReports.map((report) => (
+                                    <li key={report.id}>
+                                        <Link
+                                            href={route('client.projects.reports.show', {
+                                                project: project.id,
+                                                report: report.id,
+                                            })}
+                                            className="flex items-center justify-between py-3 transition-colors hover:bg-slate-50"
+                                        >
                                             <span className="flex items-center gap-2 font-medium text-slate-800">
-                                                <FileText className="h-4 w-4 text-slate-400" /> {r.title}
+                                                <FileText className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                                                {report.title}
                                             </span>
-                                            <span className="text-xs text-slate-400">{r.published_at ? formatDate(r.published_at) : '—'}</span>
+                                            <span className="text-xs text-slate-400">
+                                                {report.published_at ? formatDate(report.published_at) : '—'}
+                                            </span>
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
-                        )}
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </AuthenticatedLayout>
     );

@@ -105,6 +105,12 @@ return [
 
     'goldsaversys' => [
         'url' => env('GOLDSAVERSYS_URL', 'http://localhost:8006'),
+        'shared_secret' => env('GOLDSAVERSYS_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),
+    ],
+
+    'investorsys' => [
+        'url' => env('INVESTORSYS_URL', 'http://localhost:8008'),
+        'shared_secret' => env('INVESTORSYS_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),
     ],
 
     'toolsys' => [

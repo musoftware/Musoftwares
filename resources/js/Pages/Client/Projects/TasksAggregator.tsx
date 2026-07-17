@@ -12,11 +12,15 @@ import {
     ChevronRight,
     Layers,
     ArrowLeft,
+    Coffee,
+    Sparkles,
+    ExternalLink,
 } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent } from '@/Components/ui/card';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { MetricCard } from '@/Components/ui/MetricCard';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/Components/ui/sheet';
 import {
     Select,
     SelectContent,
@@ -172,6 +176,31 @@ function bucketize(items: Item[]): Bucket[] {
 export default function TasksAggregator({ projects = [], items = [], filters, stats }: Props) {
     const [projectId, setProjectId] = useState<string>(filters.project_id ? String(filters.project_id) : 'all');
     const [showCompleted, setShowCompleted] = useState<boolean>(filters.completed);
+    const [openItemKey, setOpenItemKey] = useState<string | null>(null);
+    const triggerRef = useState<{ current: HTMLElement | null }>({ current: null })[0];
+
+    const openItem = openItemKey
+        ? items.find((i) => `${i.kind}-${i.id}` === openItemKey) ?? null
+        : null;
+
+    const handleRowOpen = (item: Item, el: HTMLElement) => {
+        triggerRef.current = el;
+        setOpenItemKey(`${item.kind}-${item.id}`);
+        const url = new URL(window.location.href);
+        url.searchParams.set('open', `${item.kind}-${item.id}`);
+        window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    };
+
+    const handleClose = () => {
+        const prev = triggerRef.current;
+        setOpenItemKey(null);
+        prev?.focus();
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('open')) {
+            url.searchParams.delete('open');
+            window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+        }
+    };
 
     const buckets = useMemo(() => bucketize(items), [items]);
 
@@ -263,7 +292,8 @@ export default function TasksAggregator({ projects = [], items = [], filters, st
 
                 {buckets.length === 0 ? (
                     <EmptyState
-                        icon={ListTodo}
+                        icon={projectId === 'all' ? Coffee : Sparkles}
+                        tone="friendly"
                         title={__('general.all_tasks_empty_title')}
                         description={__('general.all_tasks_empty_desc')}
                     />
@@ -288,7 +318,11 @@ export default function TasksAggregator({ projects = [], items = [], filters, st
 
                                 <div className="space-y-2">
                                     {bucket.items.map((it) => (
-                                        <TaskRow key={`${it.kind}-${it.id}`} item={it} />
+                                        <TaskRow
+                                            key={`${it.kind}-${it.id}`}
+                                            item={it}
+                                            onOpen={handleRowOpen}
+                                        />
                                     ))}
                                 </div>
                             </section>
@@ -296,11 +330,62 @@ export default function TasksAggregator({ projects = [], items = [], filters, st
                     </div>
                 )}
             </div>
+
+            <Sheet open={openItemKey != null} onOpenChange={(o) => (o ? null : handleClose())}>
+                <SheetContent
+                    side="right"
+                    className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md"
+                >
+                    {openItem && (
+                        <>
+                            <SheetHeader className="border-b border-slate-100 bg-slate-50/50 p-6 text-start">
+                                <SheetTitle className="text-lg font-semibold text-slate-900">
+                                    {openItem.title}
+                                </SheetTitle>
+                                <SheetDescription className="mt-1 text-sm text-slate-500">
+                                    {openItem.kind === 'task' ? __('general.task') : __('general.todo')} ·{' '}
+                                    {openItem.project_name}
+                                </SheetDescription>
+                            </SheetHeader>
+                            <div className="space-y-4 p-6">
+                                {openItem.priority && (
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <Flag className="h-3.5 w-3.5 text-slate-400" />
+                                        <span
+                                            className={`rounded-full px-2 py-0.5 font-semibold capitalize ${
+                                                PRIORITY_STYLES[openItem.priority] ?? PRIORITY_STYLES.normal
+                                            }`}
+                                        >
+                                            {openItem.priority}
+                                        </span>
+                                    </div>
+                                )}
+                                {openItem.due_date && (
+                                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                                        <CalendarClock className="h-3.5 w-3.5" /> {formatDate(openItem.due_date)}
+                                    </div>
+                                )}
+                                {openItem.description ? (
+                                    <p className="whitespace-pre-wrap text-sm text-slate-700">{openItem.description}</p>
+                                ) : (
+                                    <p className="text-sm text-slate-400">{__('general.no_description')}</p>
+                                )}
+                                <Link
+                                    href={route('client.projects.show', openItem.project_id)}
+                                    className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900"
+                                >
+                                    <ExternalLink className="h-3.5 w-3.5" /> {__('general.open_project')}
+                                </Link>
+                            </div>
+                        </>
+                    )}
+                </SheetContent>
+            </Sheet>
         </AuthenticatedLayout>
     );
 }
 
-function TaskRow({ item }: { item: Item }) {
+function TaskRow({ item, onOpen }: { item: Item; onOpen: (item: Item, el: HTMLElement) => void }) {
     const projectHref = route('client.projects.show', item.project_id);
     const today = startOfDay(new Date());
     const isOverdue = !!item.due_date && startOfDay(new Date(item.due_date)).getTime() < today.getTime();
@@ -394,6 +479,14 @@ function TaskRow({ item }: { item: Item }) {
                         {__('general.open_project')}
                         <ChevronRight className="h-3 w-3" />
                     </Link>
+                    <button
+                        type="button"
+                        onClick={(e) => onOpen(item, e.currentTarget)}
+                        className="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        aria-label={__('general.open')}
+                    >
+                        {__('general.open')}
+                    </button>
                 </div>
             </CardContent>
         </Card>

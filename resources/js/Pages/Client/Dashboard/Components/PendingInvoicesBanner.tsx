@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { AlertTriangle, ArrowRight } from 'lucide-react';
-import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { IsoCurrencyAmount } from '@/lib/currencyDisplay';
 import { __ } from '@/lib/i18n';
 import { safeRoute } from '@/lib/utils';
 import type { DashboardStats } from '../types';
@@ -42,8 +42,8 @@ export default function PendingInvoicesBanner({ stats }: PendingInvoicesBannerPr
                                 </div>
                                 <p className="mt-1 text-sm leading-relaxed text-white/90 sm:text-base">
                                     {__('general.you_have_an_outstanding_balance_of')}
-                                    <span className="mx-1.5 inline-block rounded-md bg-white px-2.5 py-1 text-xl font-extrabold text-slate-900 sm:text-2xl tabular-nums">
-                                        <CurrencyDisplay amount={amount} currency={stats.currency} className="font-sans" />
+                                    <span className="mx-1.5 inline-flex items-center rounded-md bg-white px-2.5 py-1 text-slate-900">
+                                        <IsoCurrencyAmount amount={amount} currency={stats.currency} size="md" />
                                     </span>
                                     {__('general.that_needs_to_be_settled')}
                                 </p>
@@ -86,8 +86,8 @@ export default function PendingInvoicesBanner({ stats }: PendingInvoicesBannerPr
                             </div>
                             <p className="mt-1 text-sm leading-relaxed text-slate-600">
                                 {__('general.you_have_an_outstanding_balance_of')}
-                                <span className="mx-1 font-bold text-slate-900 tabular-nums">
-                                    <CurrencyDisplay amount={amount} currency={stats.currency} className="font-sans" />
+                                <span className="mx-1 inline-flex items-center font-semibold text-slate-900">
+                                    <IsoCurrencyAmount amount={amount} currency={stats.currency} size="md" />
                                 </span>
                                 {__('general.that_needs_to_be_settled')}
                             </p>

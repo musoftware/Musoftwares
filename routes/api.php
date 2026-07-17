@@ -2,6 +2,7 @@
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Api\SerialDeviceController;
+use App\Http\Controllers\Api\ExchangeRateSyncController;
 use App\Http\Controllers\Api\SubscriptionSyncController;
 use App\Http\Controllers\SsoController;
 use App\Http\Controllers\TrackerController;
@@ -176,3 +177,5 @@ Route::get('currencies', function () {
 
 Route::post('/sso/verify', [SsoController::class, 'verify'])->name('sso.verify');
 Route::post('/sso/subscriptions/sync', [SubscriptionSyncController::class, 'sync'])->name('sso.subscriptions.sync');
+Route::post('/sso/notify', [\App\Http\Controllers\Api\SsoNotificationController::class, 'notify'])->name('sso.notify');
+Route::post('/sso/exchange-rates/sync', [ExchangeRateSyncController::class, 'sync'])->name('sso.exchange-rates.sync');

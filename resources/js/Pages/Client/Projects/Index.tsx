@@ -1,12 +1,13 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { FolderKanban, ListTodo, FileText, Paperclip, CalendarDays } from 'lucide-react';
+import { CalendarDays, FileText, FolderKanban, ListTodo, Paperclip } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { Card, CardContent } from '@/Components/ui/card';
 import { EmptyState } from '@/Components/ui/EmptyState';
-import { formatMoney, formatDate } from '@/lib/utils';
+import { ProjectBudgetRow } from '@/Components/ProjectBudgetRow';
 import { __ } from '@/lib/i18n';
+import { formatDate } from '@/lib/utils';
 
 interface ProjectItem {
     id: number;
@@ -43,7 +44,7 @@ export default function ProjectsIndex({ projects }: Props) {
             <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
                     <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-slate-900">
-                        <FolderKanban className="h-7 w-7 text-slate-400" />
+                        <FolderKanban className="icon-md text-slate-400" aria-hidden="true" />
                         {__('general.my_projects')}
                     </h1>
                     <p className="mt-1 text-sm text-slate-500">{__('general.projects_portal_intro')}</p>
@@ -64,7 +65,10 @@ export default function ProjectsIndex({ projects }: Props) {
                 ) : (
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
                         {list.map((project) => (
-                            <Card key={project.id} className="flex flex-col overflow-hidden rounded-xl border border-slate-200 shadow-sm transition-shadow hover:shadow-md">
+                            <Card
+                                key={project.id}
+                                className="relative flex flex-col overflow-visible rounded-xl border border-slate-200 shadow-sm transition-all duration-200 before:pointer-events-none before:absolute before:-top-2 before:right-6 before:h-2 before:w-16 before:rounded-t-md before:bg-slate-200 before:content-[''] hover:-translate-y-0.5 hover:shadow-lg"
+                            >
                                 <CardContent className="flex flex-1 flex-col p-5">
                                     <div className="mb-3 flex items-start justify-between gap-2">
                                         <Link
@@ -78,7 +82,6 @@ export default function ProjectsIndex({ projects }: Props) {
                                         </span>
                                     </div>
 
-                                    {/* Progress */}
                                     <div className="mb-4">
                                         <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
                                             <span>{__('general.progress')}</span>
@@ -89,17 +92,12 @@ export default function ProjectsIndex({ projects }: Props) {
                                         </div>
                                     </div>
 
-                                    {/* Budget vs paid */}
-                                    <div className="mb-4 grid grid-cols-2 gap-2 text-sm">
-                                        <div className="rounded-lg bg-slate-50 p-2">
-                                            <p className="text-[11px] uppercase tracking-wide text-slate-400">{__('general.budget')}</p>
-                                            <p className="font-mono font-semibold text-slate-800">{formatMoney(project.budget, project.currency)}</p>
-                                        </div>
-                                        <div className="rounded-lg bg-emerald-50 p-2">
-                                            <p className="text-[11px] uppercase tracking-wide text-emerald-500/70">{__('general.paid')}</p>
-                                            <p className="font-mono font-semibold text-emerald-700">{formatMoney(project.total_paid, project.currency)}</p>
-                                        </div>
-                                    </div>
+                                    <ProjectBudgetRow
+                                        budget={project.budget}
+                                        totalPaid={project.total_paid}
+                                        currency={project.currency}
+                                        className="mb-4"
+                                    />
 
                                     {project.date_start && (
                                         <p className="mb-4 text-xs text-slate-400">
@@ -108,14 +106,14 @@ export default function ProjectsIndex({ projects }: Props) {
                                     )}
 
                                     <div className="mt-auto flex items-center gap-3 border-t border-slate-100 pt-3 text-xs text-slate-500">
-                                        <span className="inline-flex items-center gap-1"><ListTodo className="h-3.5 w-3.5" /> {project.counts.tasks}</span>
-                                        <span className="inline-flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> {project.counts.reports}</span>
-                                        <span className="inline-flex items-center gap-1"><Paperclip className="h-3.5 w-3.5" /> {project.counts.files}</span>
+                                        <span className="inline-flex items-center gap-1"><ListTodo className="h-3.5 w-3.5" aria-hidden="true" /> {project.counts.tasks}</span>
+                                        <span className="inline-flex items-center gap-1"><FileText className="h-3.5 w-3.5" aria-hidden="true" /> {project.counts.reports}</span>
+                                        <span className="inline-flex items-center gap-1"><Paperclip className="h-3.5 w-3.5" aria-hidden="true" /> {project.counts.files}</span>
                                         <Link
                                             href={route('client.projects.calendar.date', { project: project.id, date: new Date().toISOString().slice(0, 10) })}
                                             className="ms-auto inline-flex items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1 font-medium text-white hover:bg-slate-800"
                                         >
-                                            <CalendarDays className="h-3.5 w-3.5" /> {__('general.board')}
+                                            <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" /> {__('general.board')}
                                         </Link>
                                     </div>
                                 </CardContent>

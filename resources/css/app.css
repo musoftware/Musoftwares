@@ -31,6 +31,8 @@
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
     --shadow-md: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
     --shadow-lg: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-card-soft: 0 10px 30px rgba(0,0,0,0.04);
+    --shadow-menu-soft: 0 24px 48px -12px rgba(15,23,42,0.18);
 
     --color-foreground: var(--foreground);
     --color-card: var(--card);
@@ -139,6 +141,11 @@
     }
   }
 
+  .icon-md {
+    @apply h-5 w-5;
+    stroke-width: 1.75;
+  }
+
   .section-label {
     font-size: 12px;
     text-transform: uppercase;
@@ -197,5 +204,16 @@
 
   .hover-glow:hover {
     box-shadow: 0 0 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -4px rgba(99, 102, 241, 0.1);
+  }
+
+  .hover-lift-card {
+    @apply transition-all duration-200 hover:-translate-y-0.5;
+  }
+  .hover-lift-card:hover {
+    box-shadow: var(--shadow-card-soft);
+  }
+
+  .paper-shadow {
+    box-shadow: var(--shadow-card-soft);
   }
 }

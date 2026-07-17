@@ -1,7 +1,5 @@
 import React from 'react';
-import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/Components/ui/tooltip';
 
 export interface AvatarStackMember {
     id: number | string;
@@ -11,112 +9,121 @@ export interface AvatarStackMember {
 }
 
 export interface AvatarStackProps {
-    members?: AvatarStackMember[];
+    members?: AvatarStackMember[] | null;
     max?: number;
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'xs' | 'sm' | 'md' | 'lg';
     className?: string;
+    emptyLabel?: string;
 }
 
-const SIZE_CLASSES = {
-    sm: 'h-7 w-7 text-[10px]',
-    md: 'h-9 w-9 text-xs',
-    lg: 'h-11 w-11 text-sm',
-} as const;
+const SIZE_CLASSES: Record<NonNullable<AvatarStackProps['size']>, string> = {
+    xs: 'h-6 w-6 text-[10px]',
+    sm: 'h-8 w-8 text-xs',
+    md: 'h-10 w-10 text-sm',
+    lg: 'h-12 w-12 text-base',
+};
 
-function getInitials(name: string): string {
+function initials(name?: string | null): string {
     if (!name) return '?';
-    const parts = name.trim().split(/\s+/).slice(0, 2);
-    return parts.map((p) => p[0]?.toUpperCase() ?? '').join('') || '?';
-}
-
-function getTone(name: string): string {
-    const palette = [
-        'bg-rose-100 text-rose-700',
-        'bg-amber-100 text-amber-700',
-        'bg-emerald-100 text-emerald-700',
-        'bg-sky-100 text-sky-700',
-        'bg-indigo-100 text-indigo-700',
-        'bg-violet-100 text-violet-700',
-        'bg-teal-100 text-teal-700',
-        'bg-orange-100 text-orange-700',
-    ];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    const trimmed = name.trim();
+    if (!trimmed) return '?';
+    const parts = trimmed.split(/\s+/);
+    if (parts.length === 1) {
+        return parts[0].slice(0, 2).toUpperCase();
     }
-    return palette[hash % palette.length];
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-export function AvatarStack({ members = [], max = 5, size = 'md', className }: AvatarStackProps) {
-    const visible = members.slice(0, max);
-    const overflow = members.length - visible.length;
-    const sizeClass = SIZE_CLASSES[size];
+function avatarPalette(id: number | string): { bg: string; text: string } {
+    const palettes = [
+        { bg: 'bg-slate-100', text: 'text-slate-700' },
+        { bg: 'bg-zinc-100', text: 'text-zinc-700' },
+        { bg: 'bg-stone-100', text: 'text-stone-700' },
+        { bg: 'bg-neutral-100', text: 'text-neutral-700' },
+    ];
+    const numeric = typeof id === 'number' ? id : Number(String(id).replace(/\D+/g, '')) || 0;
+    return palettes[numeric % palettes.length];
+}
 
-    if (members.length === 0) {
+export function AvatarStack({
+    members = [],
+    max = 5,
+    size = 'sm',
+    className,
+    emptyLabel,
+}: AvatarStackProps) {
+    const list = Array.isArray(members) ? members : [];
+    const visible = list.slice(0, max);
+    const overflowCount = Math.max(0, list.length - visible.length);
+    const dim = SIZE_CLASSES[size];
+
+    if (list.length === 0) {
         return (
-            <span
+            <div
                 className={cn(
-                    'inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-500',
+                    'inline-flex items-center gap-2 rounded-full border border-dashed border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500',
                     className,
                 )}
             >
-                <User className="h-3.5 w-3.5" /> Unassigned
-            </span>
+                <span className={cn('inline-flex items-center justify-center rounded-full bg-white text-slate-400 ring-1 ring-slate-200', dim)}>
+                    ?
+                </span>
+                <span>{emptyLabel ?? 'No team assigned'}</span>
+            </div>
         );
     }
 
     return (
-        <TooltipProvider delayDuration={200}>
-            <div className={cn('flex -space-x-2', className)}>
+        <div
+            className={cn('inline-flex items-center', className)}
+            role="group"
+            aria-label="Project team"
+        >
+            <div className="flex -space-x-2">
                 {visible.map((member) => {
-                    const initials = getInitials(member.name);
-                    const tone = getTone(member.name);
+                    const palette = avatarPalette(member.id);
                     return (
-                        <Tooltip key={member.id}>
-                            <TooltipTrigger asChild>
-                                <span
-                                    role="img"
-                                    aria-label={`${member.name}${member.role ? ` · ${member.role}` : ''}`}
-                                    className={cn(
-                                        'relative inline-flex shrink-0 items-center justify-center rounded-full font-semibold uppercase ring-2 ring-white',
-                                        sizeClass,
-                                        tone,
-                                    )}
-                                >
-                                    {member.avatar_url ? (
-                                        <img
-                                            src={member.avatar_url}
-                                            alt=""
-                                            className="h-full w-full rounded-full object-cover"
-                                            onError={(e) => {
-                                                (e.currentTarget as HTMLImageElement).style.display = 'none';
-                                            }}
-                                        />
-                                    ) : (
-                                        <span aria-hidden="true">{initials}</span>
-                                    )}
-                                </span>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                                <span className="font-medium">{member.name}</span>
-                                {member.role && <span className="text-muted-foreground"> · {member.role}</span>}
-                            </TooltipContent>
-                        </Tooltip>
+                        <div
+                            key={member.id}
+                            className={cn(
+                                'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-semibold ring-2 ring-white',
+                                dim,
+                                member.avatar_url ? 'bg-white' : palette.bg,
+                                member.avatar_url ? palette.text : palette.text,
+                            )}
+                            title={member.role ? `${member.name} · ${member.role}` : member.name}
+                            aria-label={member.role ? `${member.name}, ${member.role}` : member.name}
+                        >
+                            {member.avatar_url ? (
+                                <img
+                                    src={member.avatar_url}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                    onError={(event) => {
+                                        const target = event.currentTarget;
+                                        target.style.display = 'none';
+                                    }}
+                                />
+                            ) : (
+                                <span aria-hidden="true">{initials(member.name)}</span>
+                            )}
+                        </div>
                     );
                 })}
-                {overflow > 0 && (
-                    <span
-                        aria-label={`${overflow} more`}
+                {overflowCount > 0 && (
+                    <div
                         className={cn(
-                            'relative inline-flex shrink-0 items-center justify-center rounded-full bg-slate-200 font-semibold text-slate-700 ring-2 ring-white',
-                            sizeClass,
+                            'relative inline-flex shrink-0 items-center justify-center rounded-full bg-slate-900 text-white ring-2 ring-white font-semibold',
+                            dim,
                         )}
+                        title={`+${overflowCount} more`}
+                        aria-label={`${overflowCount} more team members`}
                     >
-                        +{overflow}
-                    </span>
+                        +{overflowCount}
+                    </div>
                 )}
             </div>
-        </TooltipProvider>
+        </div>
     );
 }
 

@@ -1,27 +1,30 @@
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { usePage } from '@inertiajs/react';
 
 export interface PageTransitionProps {
     children: React.ReactNode;
+    durationMs?: number;
     className?: string;
 }
 
-export function PageTransition({ children, className }: PageTransitionProps) {
-    const { component } = usePage();
+export function PageTransition({ children, durationMs = 200, className }: PageTransitionProps) {
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        const id = window.requestAnimationFrame(() => setMounted(true));
+        return () => window.cancelAnimationFrame(id);
+    }, []);
+
     return (
-        <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-                key={component ?? 'page'}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className={className}
-            >
-                {children}
-            </motion.div>
-        </AnimatePresence>
+        <div
+            className={className}
+            style={{
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(4px)',
+                transition: `opacity ${durationMs}ms ease-out, transform ${durationMs}ms ease-out`,
+            }}
+        >
+            {children}
+        </div>
     );
 }
 
