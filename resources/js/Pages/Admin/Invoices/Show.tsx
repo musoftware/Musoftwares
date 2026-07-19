@@ -682,7 +682,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 <Clock className="w-4 h-4 me-2" />{__('general.log_time')}</Button>
                         </div>
                     </div>
-                    <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.mark-paid', { invoice: String(invoice.id) })); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
+                    <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.external-pay', { invoice: String(invoice.id) })); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
                         <CreditCard className="w-4 h-4 me-2" />{__('general.mark_as_paid')}</Button>
                 </div>
             )}

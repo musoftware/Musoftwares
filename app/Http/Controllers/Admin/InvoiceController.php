@@ -606,13 +606,17 @@ class InvoiceController extends Controller
                         throw new \RuntimeException('Invoice no longer eligible for conversion');
                     }
 
-                    $user->add_balance(
+                    $t = $user->add_balance(
                         -1 * $invoice_total,
                         'Invoice #'.$freshInv->id.' converted to transaction',
                         'used',
                         $freshInv->currency_id,
                         $project
                     );
+
+                    if ($t) {
+                        $freshInv->transactions()->attach($t);
+                    }
 
                     $freshInv->paid = $freshInv->total();
                     $freshInv->status = 'paid';

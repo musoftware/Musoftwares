@@ -4,7 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import ClientActionsSheet from '@/Pages/Admin/Users/ClientActionsSheet';
-import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus, List, Receipt, Clock, User, ClipboardList } from 'lucide-react';
+import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus, List, Receipt, Clock, User, ClipboardList, CreditCard } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
@@ -118,10 +118,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     };
 
     const handleMarkPaid = (id: any) => setPendingAction({ type: 'mark_paid', id });
+    const handleBillBalance = (id: any) => setPendingAction({ type: 'bill_balance', id });
 
     const confirmMarkPaid = () => {
         if (!pendingAction || pendingAction.type !== 'mark_paid') return;
-        router.post(route('admin.invoices.mark-paid', pendingAction.id), {}, {
+        router.post(route('admin.invoices.external-pay', pendingAction.id), {}, {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success(__('general.invoice_marked_paid') || 'Invoice marked as paid');
@@ -129,6 +130,22 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             },
             onError: () => {
                 toast.error(__('general.error_occurred') || 'Something went wrong');
+                setPendingAction(null);
+            },
+        });
+    };
+
+    const confirmBillBalance = () => {
+        if (!pendingAction || pendingAction.type !== 'bill_balance') return;
+        router.post(route('admin.invoices.mark-paid', pendingAction.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(__('general.invoice_marked_paid') || 'Invoice marked as paid');
+                setPendingAction(null);
+            },
+            onError: (errors: any) => {
+                const errMsg = errors?.message || Object.values(errors).join(', ') || __('general.error_occurred');
+                toast.error(errMsg);
                 setPendingAction(null);
             },
         });
@@ -514,8 +531,12 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <DropdownMenuSeparator />
                                                 
                                                     {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-                                                        <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
-                                                            <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('general.mark_as_paid')}</DropdownMenuItem>
+                                                        <>
+                                                            <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
+                                                                <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('general.mark_as_paid')}</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleBillBalance(invoice.id)}>
+                                                                <CreditCard className="me-2 h-4 w-4 text-slate-900" />{__('general.bill_from_balance')}</DropdownMenuItem>
+                                                        </>
                                                     )}
                                                     {invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleCancel(invoice.id)} className="text-red-600 focus:text-red-600">
@@ -654,6 +675,16 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                 confirmLabel={__('general.mark_as_paid')}
                 cancelLabel={__('general.cancel')}
                 onConfirm={confirmMarkPaid}
+                onCancel={() => setPendingAction(null)}
+            />
+
+            <ConfirmModal
+                isOpen={pendingAction?.type === 'bill_balance'}
+                title={__('general.bill_from_balance') || 'Bill from balance?'}
+                description={__('general.confirm_bill_balance') || 'Are you sure you want to bill this invoice from the client\'s balance?'}
+                confirmLabel={__('general.bill_from_balance') || 'Bill from Balance'}
+                cancelLabel={__('general.cancel')}
+                onConfirm={confirmBillBalance}
                 onCancel={() => setPendingAction(null)}
             />
 

@@ -215,15 +215,26 @@ class Invoice extends Model
 
         $this->calculate_cost();
 
+        $t1 = null;
+        $t2 = null;
+
         if (! empty($this->project_id)) {
             $project = Project::find($this->project_id);
-            $project->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
-            $project->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+            $t1 = $project->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
+            $t2 = $project->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
         } else {
             $client = User::find($this->user_id);
-            $client->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
-            $client->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+            $t1 = $client->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
+            $t2 = $client->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
         }
+
+        if ($t1) {
+            $this->transactions()->attach($t1);
+        }
+        if ($t2) {
+            $this->transactions()->attach($t2);
+        }
+
         $this->user->calc_ref($this->total_min_cost(), $this->id, $this->currency_id);
         $this->paid = $this->total();
         $this->status = 'paid';
