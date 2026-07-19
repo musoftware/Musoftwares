@@ -15,6 +15,8 @@ use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\Earning;
 use App\Models\ModulePlan;
+use App\Models\SerialDevice;
+use App\Models\SerialUserDevice;
 use App\Models\User;
 use App\Models\UserSubscription;
 use App\Services\AdminUserService;
@@ -51,11 +53,14 @@ class UsersController extends Controller
     {
         $query = User::query()->with('roles');
 
-        // Full-text search across name, email, whatsapp
+        // Full-text search across name, email, whatsapp, and email aliases
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('emails', function ($eq) use ($search) {
+                        $eq->where('email', 'like', "%{$search}%");
+                    });
 
                 if (Schema::hasColumn('users', 'whatsapp_number')) {
                     $q->orWhere('whatsapp_number', 'like', "%{$search}%");
@@ -158,6 +163,51 @@ class UsersController extends Controller
             ->get(['id', 'project_name', 'date_start', 'date_end', 'archived', 'status', 'updated_at']);
         $projectsCount = $user->projects()->count();
 
+        $serialUserDevices = SerialUserDevice::where('user_id', $user->id)
+            ->with(['devices.software'])
+            ->get()
+            ->map(function ($assignment) {
+                return [
+                    'id' => $assignment->id,
+                    'device_id' => $assignment->device_id,
+                    'status' => $assignment->status,
+                    'notes' => $assignment->notes,
+                    'created_at' => $assignment->created_at?->toDateString(),
+                    'updated_at' => $assignment->updated_at?->toDateTimeString(),
+                    'devices' => $assignment->devices->map(function ($device) {
+                        return [
+                            'id' => $device->id,
+                            'machine_name' => $device->machine_name,
+                            'user_name' => $device->user_name,
+                            'user_domain' => $device->user_domain,
+                            'os_version' => $device->os_version,
+                            'last_check_date' => $device->last_check_date?->diffForHumans(),
+                            'last_check_date_full' => $device->last_check_date?->toDateTimeString(),
+                            'software' => $device->software ? [
+                                'id' => $device->software->id,
+                                'name' => $device->software->name,
+                            ] : null,
+                        ];
+                    }),
+                ];
+            });
+
+        $assignedDeviceIds = SerialUserDevice::pluck('device_id')->toArray();
+        $availableDevices = SerialDevice::whereNotIn('device_id', $assignedDeviceIds)
+            ->select('device_id', 'machine_name', 'user_name', 'serial_software_id')
+            ->with('software:id,name')
+            ->distinct()
+            ->orderBy('device_id')
+            ->get()
+            ->map(function ($device) {
+                return [
+                    'device_id' => $device->device_id,
+                    'machine_name' => $device->machine_name,
+                    'user_name' => $device->user_name,
+                    'software_name' => $device->software?->name ?? 'Unknown Software',
+                ];
+            });
+
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
             'loans' => $user->loans,
@@ -167,7 +217,8 @@ class UsersController extends Controller
             'subscriptions' => $subscriptions,
             'recentProjects' => $recentProjects,
             'projectsCount' => $projectsCount,
-
+            'serialUserDevices' => $serialUserDevices,
+            'availableDevices' => $availableDevices,
         ]);
     }
 
@@ -188,8 +239,8 @@ class UsersController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-
-        $this->adminUserService->createFromRequest($request);
+        $user = $this->adminUserService->createFromRequest($request);
+        $user->save();
 
         return redirect()->route('admin.users.index')
             ->with('success', __('general.user_created_successfully'));

@@ -27,7 +27,7 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import UserLoansTab from './UserLoansTab';
 
-export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0 }) {
+export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0, serialUserDevices = [], availableDevices = [] }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [resetPasswordInfo, setResetPasswordInfo] = useState(null);
@@ -39,6 +39,11 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
     const [isActivateMembershipOpen, setIsActivateMembershipOpen] = useState(false);
     const [isFinanceModalOpen, setIsFinanceModalOpen] = useState(false);
     const [isRecalcLoading, setIsRecalcLoading] = useState(false);
+
+    // Serial Devices States
+    const [isAssignDeviceOpen, setIsAssignDeviceOpen] = useState(false);
+    const [assignDeviceForm, setAssignDeviceForm] = useState({ device_id: '', notes: '' });
+    const [tempValidUntil, setTempValidUntil] = useState(client.temp_valid_until || '');
 
     const handleRecalcBalance = () => {
         if (!confirm('Recalculate balance from transactions? This will update user_balance to match the sum of all transactions.')) return;
@@ -388,6 +393,64 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsDeleteUserOpen(false)}>{__('general.cancel')}</Button>
                             <Button type="submit" variant="destructive" disabled={deleteConfirmationText !== 'DELETE'}>{__('general.delete_user')}</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isAssignDeviceOpen} onOpenChange={setIsAssignDeviceOpen}>
+                <DialogContent>
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        router.post(route('admin.serial-user-devices.store'), {
+                            ...assignDeviceForm,
+                            user_id: client.id,
+                            status: 'active',
+                            redirect_back: true
+                        }, {
+                            preserveState: true,
+                            onSuccess: () => {
+                                setIsAssignDeviceOpen(false);
+                                setAssignDeviceForm({ device_id: '', notes: '' });
+                            }
+                        });
+                    }}>
+                        <DialogHeader>
+                            <DialogTitle>{__('general.assign_device') || 'Assign Device'}</DialogTitle>
+                            <DialogDescription>
+                                {__('general.assign_an_existing_device_to_this_client') || 'Assign an existing hardware device to this client.'}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div>
+                                <Label>{__('general.select_device') || 'Select Device'}</Label>
+                                <select 
+                                    className="border border-slate-300 rounded-md w-full p-2 mt-1 text-sm bg-white"
+                                    value={assignDeviceForm.device_id}
+                                    onChange={e => setAssignDeviceForm({...assignDeviceForm, device_id: e.target.value})}
+                                    required
+                                >
+                                    <option value="">-- {__('general.select_a_device') || 'Select a Device'} --</option>
+                                    {availableDevices.map(device => (
+                                        <option key={device.device_id} value={device.device_id}>
+                                            {device.device_id} ({device.software_name} - {device.machine_name || 'No machine name'})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <Label>{__('general.notes') || 'Notes'}</Label>
+                                <textarea
+                                    className="border border-slate-300 rounded-md w-full p-2 mt-1 text-sm bg-white h-24 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                    value={assignDeviceForm.notes}
+                                    onChange={e => setAssignDeviceForm({...assignDeviceForm, notes: e.target.value})}
+                                    placeholder={__('general.notes_placeholder') || 'Optional assignment notes...'}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsAssignDeviceOpen(false)}>{__('general.cancel')}</Button>
+                            <Button type="submit" disabled={!assignDeviceForm.device_id}>{__('general.assign') || 'Assign'}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -872,6 +935,144 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                         </div>
                     </div>
                     )}
+
+                    {/* Licenses & Devices Section */}
+                    <div id="licenses-devices" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24 mb-6">
+                        <div className="flex justify-between items-center mb-4 border-b pb-2">
+                            <h2 className="text-lg font-bold font-sora text-slate-900 flex items-center gap-2">
+                                <ShieldCheck size={18} className="text-slate-400" />{__('general.licenses_and_devices') || 'Licenses & Devices'}
+                            </h2>
+                            <Button 
+                                onClick={() => setIsAssignDeviceOpen(true)}
+                                className="bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-slate-800 transition flex items-center gap-1 font-semibold"
+                            >
+                                <Plus size={14} /> {__('general.assign_device') || 'Assign Device'}
+                            </Button>
+                        </div>
+
+                        {/* Temporary Validity Grace Period */}
+                        <div className="mb-6 p-4 border border-slate-100 bg-slate-50 rounded-[8px] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide">{__('general.temp_validity_period') || 'Temporary Validity Grace Period'}</h4>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.temp_validity_description') || 'Set a temporary grace period for this client. If active, deactivation scripts will not suspends licenses.'}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="date"
+                                    className="text-xs rounded border border-slate-300 p-1.5 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                    value={tempValidUntil ? tempValidUntil.substring(0, 10) : ''}
+                                    onChange={(e) => {
+                                        const newDate = e.target.value;
+                                        setTempValidUntil(newDate);
+                                        router.patch(route('admin.serial-user-devices.update-user-temp-valid', client.id), {
+                                            temp_valid_until: newDate || null
+                                        }, { preserveState: true });
+                                    }}
+                                />
+                                {tempValidUntil && (
+                                    <Button 
+                                        variant="ghost" 
+                                        size="xs" 
+                                        onClick={() => {
+                                            setTempValidUntil('');
+                                            router.patch(route('admin.serial-user-devices.update-user-temp-valid', client.id), {
+                                                temp_valid_until: null
+                                            }, { preserveState: true });
+                                        }}
+                                        className="text-red-500 text-xs hover:bg-red-50"
+                                    >
+                                        {__('general.clear') || 'Clear'}
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+
+                        {serialUserDevices && serialUserDevices.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-start text-sm">
+                                    <thead className="bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th className="p-3 font-bold text-slate-600 text-start">{__('general.device_id') || 'Device ID'}</th>
+                                            <th className="p-3 font-bold text-slate-600 text-start">{__('general.software_applications') || 'Software Applications'}</th>
+                                            <th className="p-3 font-bold text-slate-600 text-start">{__('general.environment') || 'Environment / Machine'}</th>
+                                            <th className="p-3 font-bold text-slate-600 text-center">{__('general.status') || 'Status'}</th>
+                                            <th className="p-3 text-end font-bold text-slate-600">{__('general.actions') || 'Actions'}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {serialUserDevices.map((assignment) => (
+                                            <tr key={assignment.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                                <td className="p-3 font-mono text-xs font-semibold text-slate-900">
+                                                    {assignment.device_id}
+                                                </td>
+                                                <td className="p-3">
+                                                    {assignment.devices && assignment.devices.length > 0 ? (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {assignment.devices.map((device, idx) => (
+                                                                <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-medium border">
+                                                                    {device.software?.name || 'Unknown'}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-400 italic text-xs">{__('general.no_checkins_yet') || 'No check-ins yet'}</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-3">
+                                                    {assignment.devices && assignment.devices[0] ? (
+                                                        <div>
+                                                            <div className="font-semibold text-slate-800 text-xs">
+                                                                {assignment.devices[0].machine_name} ({assignment.devices[0].user_name})
+                                                            </div>
+                                                            <div className="text-[10px] text-slate-500 mt-0.5">
+                                                                OS: {assignment.devices[0].os_version || '—'} | {__('general.last_check')}: {assignment.devices[0].last_check_date || '—'}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-400 text-xs">—</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-3 text-center">
+                                                    <select
+                                                        value={assignment.status}
+                                                        onChange={(e) => {
+                                                            router.patch(route('admin.serial-user-devices.status', assignment.id), {
+                                                                status: e.target.value
+                                                            }, { preserveState: true });
+                                                        }}
+                                                        className={`text-xs font-bold uppercase rounded px-2 py-1 cursor-pointer border focus:outline-none ${
+                                                            assignment.status === 'active' ? 'bg-green-100 border-green-200 text-green-800' : 'bg-red-100 border-red-200 text-red-800'
+                                                        }`}
+                                                    >
+                                                        <option value="active">{__('general.active')}</option>
+                                                        <option value="inactive">{__('general.inactive')}</option>
+                                                    </select>
+                                                </td>
+                                                <td className="p-3 text-end">
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="sm" 
+                                                        className="text-red-600 hover:text-red-800 hover:bg-red-50" 
+                                                        onClick={() => {
+                                                            if (confirm(__('general.are_you_sure_unassign_device') || 'Are you sure you want to unassign this device?')) {
+                                                                router.delete(route('admin.serial-user-devices.destroy', assignment.id), { preserveState: true });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">
+                                {__('general.no_assigned_devices_found') || 'No assigned serial devices found for this user.'}
+                            </p>
+                        )}
+                    </div>
 
                     {/* User Subscriptions List */}
                     <div id="subscriptions" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">

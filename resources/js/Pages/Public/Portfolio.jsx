@@ -9,8 +9,28 @@ import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Portfolio() {
+export default function Portfolio({ dbProjects = [] }) {
     const mainRef = useRef(null);
+
+    // Merge database projects with static items, avoiding duplicates
+    const allItems = useMemo(() => {
+        const combined = [...dbProjects];
+        const dbSlugs = new Set(dbProjects.map(item => item.slug));
+        
+        portfolioItems.forEach(item => {
+            if (!dbSlugs.has(item.slug)) {
+                combined.push({
+                    slug: item.slug,
+                    img: item.img,
+                    title: __(`general.${item.titleKey}`),
+                    desc: __(`general.${item.descKey}`),
+                    cat: item.cat,
+                    is_db: false
+                });
+            }
+        });
+        return combined;
+    }, [dbProjects]);
 
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
@@ -77,7 +97,7 @@ export default function Portfolio() {
                 <section className="snap-section py-24 lg:py-32 bg-white reveal-section">
                     <div className="max-w-[80rem] mx-auto px-6 lg:px-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e5e5e5] border border-[#e5e5e5]">
-                            {portfolioItems.map((item, index) => (
+                            {allItems.map((item, index) => (
                                 <Link 
                                     href={route('portfolio.show', item.slug)} 
                                     key={index} 
@@ -85,21 +105,27 @@ export default function Portfolio() {
                                 >
                                     <div className="h-2/3 w-full overflow-hidden relative">
                                         <div className="absolute inset-0 bg-[#111111]/10 group-hover:bg-transparent transition-colors duration-500 z-10 mix-blend-multiply"></div>
-                                        <img 
-                                            src={item.img} 
-                                            alt={`Portfolio ${index + 1}`} 
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out grayscale group-hover:grayscale-0"
-                                        />
+                                        {item.img ? (
+                                            <img 
+                                                src={item.img} 
+                                                alt={item.title} 
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out grayscale group-hover:grayscale-0"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-medium">
+                                                No Image
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="h-1/3 p-6 flex flex-col justify-center border-t border-[#e5e5e5] bg-white transition-colors group-hover:bg-[#fafafa]">
                                         <span className="text-[10px] font-bold tracking-widest uppercase text-[#888888] mb-2">
                                             {item.cat}
                                         </span>
                                         <h3 className="text-lg font-bold text-[#111111] mb-2 line-clamp-1">
-                                            {__(`general.${item.titleKey}`)}
+                                            {item.title}
                                         </h3>
                                         <p className="text-[#666666] text-xs leading-relaxed line-clamp-2">
-                                            {__(`general.${item.descKey}`)}
+                                            {item.desc}
                                         </p>
                                     </div>
                                 </Link>

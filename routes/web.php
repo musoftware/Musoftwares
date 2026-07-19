@@ -831,6 +831,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/serial-devices/bulk-delete', [SerialDeviceController::class, 'bulkDelete'])->name('serial-devices.bulk-delete');
     Route::patch('/serial-devices/{serialDevice}/status', [SerialDeviceController::class, 'updateStatus'])->name('serial-devices.status');
     Route::delete('/serial-devices/{serialDevice}', [SerialDeviceController::class, 'destroy'])->name('serial-devices.destroy');
+    Route::post('/serial-devices/{serialDevice}/assign-user', [SerialDeviceController::class, 'assignUser'])->name('serial-devices.assign-user');
 
     // User-Device assignments (admin maps device → user)
     Route::get('/serial-user-devices', [SerialUserDeviceController::class, 'index'])->name('serial-user-devices.index');

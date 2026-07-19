@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\SerialDevice\UpdateSerialDeviceStatusRequest;
 use App\Http\Resources\SerialDeviceResource;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
+use App\Models\User;
 use App\Services\SerialDeviceService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -108,6 +109,7 @@ class SerialDeviceController extends Controller
             'stats' => $stats,
             'perPageOptions' => $validPerPageOptions,
             'osVersions' => $osVersions,
+            'users' => User::orderBy('name')->get(['id', 'name', 'email']),
         ]);
     }
 
@@ -274,5 +276,32 @@ class SerialDeviceController extends Controller
         }
 
         return $query;
+    }
+
+    /**
+     * Assign, change, or clear client on a device.
+     */
+    public function assignUser(Request $request, SerialDevice $serialDevice): RedirectResponse
+    {
+        $validated = $request->validate([
+            'user_id' => ['nullable', 'exists:users,id'],
+        ]);
+
+        $userId = $validated['user_id'];
+
+        if ($userId === null) {
+            \App\Models\SerialUserDevice::where('device_id', $serialDevice->device_id)->delete();
+            return back()->with('success', __('general.device_unassigned_successfully') ?? 'Device unassigned successfully.');
+        }
+
+        \App\Models\SerialUserDevice::updateOrCreate(
+            ['device_id' => $serialDevice->device_id],
+            [
+                'user_id' => $userId,
+                'status' => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+            ]
+        );
+
+        return back()->with('success', __('general.device_assigned_successfully'));
     }
 }

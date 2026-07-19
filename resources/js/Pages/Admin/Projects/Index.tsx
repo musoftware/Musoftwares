@@ -65,7 +65,12 @@ export default function Index(props: ProjectsIndexProps) {
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingProject) return;
-        router.put(route('admin.projects.update', editingProject.id), formToPayload(editForm), {
+        
+        // Use POST with _method spoofing to support uploading files in PHP updates
+        router.post(route('admin.projects.update', editingProject.id), {
+            ...formToPayload(editForm),
+            _method: 'put'
+        }, {
             onSuccess: () => {
                 setIsEditOpen(false);
                 setEditingProject(null);

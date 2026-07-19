@@ -8,8 +8,10 @@ use App\Models\WebsiteService;
 use App\Services\IpGeolocationService;
 use App\Services\PricingService;
 use App\Traits\ConvertsCurrency;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -20,7 +22,25 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
+        $dbProjects = Project::landingPortfolio()->get()->map(function($project) {
+            return [
+                'slug' => Str::slug($project->portfolio_title ?? $project->project_name),
+                'img' => $project->portfolio_image ? asset($project->portfolio_image) : null,
+                'img_original' => is_array($project->portfolio_gallery) && count($project->portfolio_gallery) > 0 
+                    ? asset($project->portfolio_gallery[0]) 
+                    : ($project->portfolio_image ? asset($project->portfolio_image) : null),
+                'title' => $project->portfolio_title ?? $project->project_name,
+                'desc' => $project->portfolio_description ?? $project->description,
+                'cat' => $project->portfolio_category ?? 'Platform',
+                'live_url' => $project->portfolio_live_url,
+                'github_url' => $project->portfolio_github_url,
+                'techs' => $project->portfolio_tech ?? [],
+                'is_db' => true,
+            ];
+        })->toArray();
+
         return Inertia::render('Public/Home', [
+            'dbProjects' => $dbProjects,
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
         ])->withViewData([
@@ -35,7 +55,25 @@ class HomeController extends Controller
 
     public function portfolio()
     {
+        $dbProjects = Project::landingPortfolio()->get()->map(function($project) {
+            return [
+                'slug' => Str::slug($project->portfolio_title ?? $project->project_name),
+                'img' => $project->portfolio_image ? asset($project->portfolio_image) : null,
+                'img_original' => is_array($project->portfolio_gallery) && count($project->portfolio_gallery) > 0 
+                    ? asset($project->portfolio_gallery[0]) 
+                    : ($project->portfolio_image ? asset($project->portfolio_image) : null),
+                'title' => $project->portfolio_title ?? $project->project_name,
+                'desc' => $project->portfolio_description ?? $project->description,
+                'cat' => $project->portfolio_category ?? 'Platform',
+                'live_url' => $project->portfolio_live_url,
+                'github_url' => $project->portfolio_github_url,
+                'techs' => $project->portfolio_tech ?? [],
+                'is_db' => true,
+            ];
+        })->toArray();
+
         return Inertia::render('Public/Portfolio', [
+            'dbProjects' => $dbProjects,
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
         ])->withViewData([
@@ -50,8 +88,35 @@ class HomeController extends Controller
 
     public function portfolioShow($slug)
     {
+        $project = Project::where('show_on_landing_portfolio', true)
+            ->where(function($q) use ($slug) {
+                $q->where('portfolio_title', $slug)
+                  ->orWhere('project_name', $slug)
+                  ->orWhere(DB::raw('LOWER(REPLACE(portfolio_title, " ", "-"))'), $slug)
+                  ->orWhere(DB::raw('LOWER(REPLACE(project_name, " ", "-"))'), $slug);
+            })->first();
+
+        $dbProject = null;
+        if ($project) {
+            $dbProject = [
+                'slug' => $slug,
+                'img' => $project->portfolio_image ? asset($project->portfolio_image) : null,
+                'img_original' => is_array($project->portfolio_gallery) && count($project->portfolio_gallery) > 0 
+                    ? asset($project->portfolio_gallery[0]) 
+                    : ($project->portfolio_image ? asset($project->portfolio_image) : null),
+                'title' => $project->portfolio_title ?? $project->project_name,
+                'desc' => $project->portfolio_description ?? $project->description,
+                'cat' => $project->portfolio_category ?? 'Platform',
+                'live_url' => $project->portfolio_live_url,
+                'github_url' => $project->portfolio_github_url,
+                'techs' => $project->portfolio_tech ?? [],
+                'is_db' => true,
+            ];
+        }
+
         return Inertia::render('Public/PortfolioShow', [
             'slug' => $slug,
+            'dbProject' => $dbProject,
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
         ])->withViewData([

@@ -122,6 +122,10 @@ class SerialUserDeviceController extends Controller
     {
         $this->serialUserDeviceService->assignDevice($request->validated());
 
+        if ($request->input('redirect_back') || str_contains($request->header('referer', ''), '/users/')) {
+            return back()->with('success', __('general.device_assigned_successfully'));
+        }
+
         return redirect()
             ->route('admin.serial-user-devices.index')
             ->with('success', __('general.device_assigned_successfully'));

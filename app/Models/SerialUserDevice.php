@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Observers\SerialUserDeviceObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SerialUserDevice extends Model
@@ -44,8 +46,16 @@ class SerialUserDevice extends Model
     /**
      * Get the user that owns the device.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the serial devices checking in with this device_id.
+     */
+    public function devices(): HasMany
+    {
+        return $this->hasMany(SerialDevice::class, 'device_id', 'device_id');
     }
 }

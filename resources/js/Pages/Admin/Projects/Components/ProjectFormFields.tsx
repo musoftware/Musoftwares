@@ -19,6 +19,18 @@ export type ProjectFormState = {
     date_start: string;
     date_end: string;
     hide_future_tasks: boolean;
+    
+    // Portfolio fields
+    show_on_landing_portfolio: boolean;
+    portfolio_category: string;
+    portfolio_title: string;
+    portfolio_description: string;
+    portfolio_tech: string;
+    portfolio_live_url: string;
+    portfolio_github_url: string;
+    portfolio_sort_order: string;
+    portfolio_image_file: File | null;
+    portfolio_image_preview: string;
 };
 
 export const EMPTY_PROJECT_FORM: ProjectFormState = {
@@ -32,20 +44,21 @@ export const EMPTY_PROJECT_FORM: ProjectFormState = {
     date_start: '',
     date_end: '',
     hide_future_tasks: true,
+    
+    // Portfolio fields
+    show_on_landing_portfolio: false,
+    portfolio_category: 'Platform',
+    portfolio_title: '',
+    portfolio_description: '',
+    portfolio_tech: '',
+    portfolio_live_url: '',
+    portfolio_github_url: '',
+    portfolio_sort_order: '0',
+    portfolio_image_file: null,
+    portfolio_image_preview: '',
 };
 
-export function projectToForm(project: {
-    user_id?: number | null;
-    project_name?: string | null;
-    description?: string | null;
-    budget?: string | number | null;
-    hour_rate?: string | number | null;
-    percentage?: number | string | null;
-    status?: string | null;
-    date_start?: string | null;
-    date_end?: string | null;
-    hide_future_tasks?: boolean | null;
-} | null | undefined): ProjectFormState {
+export function projectToForm(project: any): ProjectFormState {
     if (!project) return { ...EMPTY_PROJECT_FORM };
     return {
         user_id: project.user_id ? String(project.user_id) : '',
@@ -58,11 +71,23 @@ export function projectToForm(project: {
         date_start: project.date_start ?? '',
         date_end: project.date_end ?? '',
         hide_future_tasks: Boolean(project.hide_future_tasks),
+        
+        // Portfolio fields
+        show_on_landing_portfolio: Boolean(project.show_on_landing_portfolio),
+        portfolio_category: project.portfolio_category ?? 'Platform',
+        portfolio_title: project.portfolio_title ?? '',
+        portfolio_description: project.portfolio_description ?? '',
+        portfolio_tech: Array.isArray(project.portfolio_tech) ? project.portfolio_tech.join(', ') : (project.portfolio_tech ?? ''),
+        portfolio_live_url: project.portfolio_live_url ?? '',
+        portfolio_github_url: project.portfolio_github_url ?? '',
+        portfolio_sort_order: project.portfolio_sort_order != null ? String(project.portfolio_sort_order) : '0',
+        portfolio_image_file: null,
+        portfolio_image_preview: project.portfolio_image ?? '',
     };
 }
 
-export function formToPayload(form: ProjectFormState): Record<string, string | number | boolean> {
-    const payload: Record<string, string | number | boolean | null> = {
+export function formToPayload(form: ProjectFormState): Record<string, any> {
+    const payload: Record<string, any> = {
         user_id: form.user_id,
         project_name: form.project_name,
         description: form.description || null,
@@ -73,11 +98,26 @@ export function formToPayload(form: ProjectFormState): Record<string, string | n
         date_start: form.date_start || null,
         date_end: form.date_end || null,
         hide_future_tasks: form.hide_future_tasks,
+        
+        // Portfolio fields
+        show_on_landing_portfolio: form.show_on_landing_portfolio ? 1 : 0,
+        portfolio_category: form.portfolio_category || null,
+        portfolio_title: form.portfolio_title || null,
+        portfolio_description: form.portfolio_description || null,
+        portfolio_tech: form.portfolio_tech ? form.portfolio_tech.split(',').map((t: string) => t.trim()).filter(Boolean) : null,
+        portfolio_live_url: form.portfolio_live_url || null,
+        portfolio_github_url: form.portfolio_github_url || null,
+        portfolio_sort_order: form.portfolio_sort_order ? Number(form.portfolio_sort_order) : 0,
     };
+    
+    if (form.portfolio_image_file) {
+        payload.portfolio_image_file = form.portfolio_image_file;
+    }
+    
     Object.keys(payload).forEach((k) => {
         if (payload[k] === '' || payload[k] === null) delete payload[k];
     });
-    return payload as Record<string, string | number | boolean>;
+    return payload;
 }
 
 interface ProjectFormFieldsProps {
@@ -208,6 +248,130 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                     {__('general.hide_future_tasks')}
                 </Label>
             </div>
+
+            <div className="flex items-center gap-2 sm:col-span-2 border-t border-slate-100 pt-4 mt-2">
+                <Checkbox
+                    id="show_on_landing_portfolio"
+                    checked={form.show_on_landing_portfolio}
+                    onCheckedChange={(checked) => setForm((prev) => ({ ...prev, show_on_landing_portfolio: Boolean(checked) }))}
+                    disabled={disabled}
+                />
+                <Label htmlFor="show_on_landing_portfolio" className="cursor-pointer font-semibold text-indigo-600">
+                    {__('general.show_on_landing_portfolio') || 'Show on Landing Portfolio'}
+                </Label>
+            </div>
+
+            {form.show_on_landing_portfolio && (
+                <div className="sm:col-span-2 border-t border-slate-100 pt-4 mt-2 space-y-4">
+                    <h3 className="text-sm font-bold text-slate-700">{__('general.portfolio_details') || 'Portfolio Details'}</h3>
+                    
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <Label htmlFor="portfolio_title">{__('general.portfolio_title') || 'Portfolio Title'}</Label>
+                            <Input
+                                id="portfolio_title"
+                                value={form.portfolio_title}
+                                onChange={(e) => setForm((prev) => ({ ...prev, portfolio_title: e.target.value }))}
+                                placeholder={form.project_name || 'Acel Bay'}
+                                disabled={disabled}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="portfolio_category">{__('general.portfolio_category') || 'Category'}</Label>
+                            <Input
+                                id="portfolio_category"
+                                value={form.portfolio_category}
+                                onChange={(e) => setForm((prev) => ({ ...prev, portfolio_category: e.target.value }))}
+                                placeholder="Platform, SaaS, E-Commerce..."
+                                disabled={disabled}
+                            />
+                        </div>
+                        <div className="sm:col-span-2">
+                            <Label htmlFor="portfolio_description">{__('general.portfolio_description') || 'Portfolio Description'}</Label>
+                            <Textarea
+                                id="portfolio_description"
+                                rows={3}
+                                value={form.portfolio_description}
+                                onChange={(e) => setForm((prev) => ({ ...prev, portfolio_description: e.target.value }))}
+                                placeholder={form.description || 'Describe the project outcomes and features...'}
+                                disabled={disabled}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="portfolio_live_url">{__('general.portfolio_live_url') || 'Website Link (Live URL)'}</Label>
+                            <Input
+                                id="portfolio_live_url"
+                                type="url"
+                                value={form.portfolio_live_url}
+                                onChange={(e) => setForm((prev) => ({ ...prev, portfolio_live_url: e.target.value }))}
+                                placeholder="https://acelbay.com"
+                                disabled={disabled}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="portfolio_github_url">{__('general.portfolio_github_url') || 'GitHub Link (Optional)'}</Label>
+                            <Input
+                                id="portfolio_github_url"
+                                type="url"
+                                value={form.portfolio_github_url}
+                                onChange={(e) => setForm((prev) => ({ ...prev, portfolio_github_url: e.target.value }))}
+                                placeholder="https://github.com/..."
+                                disabled={disabled}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="portfolio_tech">{__('general.portfolio_tech') || 'Technologies (comma separated)'}</Label>
+                            <Input
+                                id="portfolio_tech"
+                                value={form.portfolio_tech}
+                                onChange={(e) => setForm((prev) => ({ ...prev, portfolio_tech: e.target.value }))}
+                                placeholder="React, Laravel, Tailwind CSS"
+                                disabled={disabled}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="portfolio_sort_order">{__('general.portfolio_sort_order') || 'Sort Order'}</Label>
+                            <Input
+                                id="portfolio_sort_order"
+                                type="number"
+                                value={form.portfolio_sort_order}
+                                onChange={(e) => setForm((prev) => ({ ...prev, portfolio_sort_order: e.target.value }))}
+                                disabled={disabled}
+                            />
+                        </div>
+                        
+                        <div className="sm:col-span-2">
+                            <Label htmlFor="portfolio_image_file">{__('general.portfolio_image') || 'Website Screenshot (Large Image)'}</Label>
+                            <Input
+                                id="portfolio_image_file"
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] || null;
+                                    setForm((prev) => ({ ...prev, portfolio_image_file: file }));
+                                }}
+                                disabled={disabled}
+                                className="mt-1"
+                            />
+                            <p className="text-xs text-slate-400 mt-1">
+                                {__('general.portfolio_image_help') || 'Upload a full website screenshot. The system will automatically crop the top portion for previews and keep the full version for details.'}
+                            </p>
+                            {form.portfolio_image_preview && (
+                                <div className="mt-2 relative w-48 h-32 border rounded overflow-hidden bg-slate-50">
+                                    <img 
+                                        src={form.portfolio_image_preview} 
+                                        alt="Current preview" 
+                                        className="w-full h-full object-cover" 
+                                    />
+                                    <span className="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
+                                        Current Image
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

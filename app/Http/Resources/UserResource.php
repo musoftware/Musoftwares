@@ -86,6 +86,7 @@ class UserResource extends JsonResource
             'pending_commission' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (float) $this->pending_commission),
             'user_balance' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (float) $this->user_balance),
             'slug' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->slug),
+            'temp_valid_until' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->temp_valid_until),
             'referrals_count' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->my_ref_users()->count()),
             'aliases_count' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->emails()->count()),
             'aliases' => $this->when(

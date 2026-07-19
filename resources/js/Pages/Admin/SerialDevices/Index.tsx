@@ -31,6 +31,7 @@ import {
     Trash2,
     Filter,
     BarChart3,
+    User,
 } from 'lucide-react';
 
 /* ─── Types ─────────────────────────────────────────────────────── */
@@ -70,6 +71,8 @@ interface Stats {
     devices_per_software: DevicePerSoftware[];
 }
 
+interface UserSelectorItem { id: number; name: string; email: string; }
+
 interface Props {
     devices: { data: Device[]; links: any[]; meta: any };
     filters: Record<string, any>;
@@ -78,6 +81,7 @@ interface Props {
     stats: Stats;
     perPageOptions: number[];
     osVersions: string[];
+    users: UserSelectorItem[];
 }
 
 /* ─── Helpers ───────────────────────────────────────────────────── */
@@ -102,7 +106,7 @@ function truncateId(id: string, max = 20) {
 
 /* ─── Main Component ────────────────────────────────────────────── */
 
-export default function SerialDevicesIndex({ devices, filters, statuses, softwares, stats, perPageOptions, osVersions }: Props) {
+export default function SerialDevicesIndex({ devices, filters, statuses, softwares, stats, perPageOptions, osVersions, users = [] }: Props) {
     const [search, setSearch]                     = useState(filters.search ?? '');
     const [user, setUser]                         = useState(filters.user ?? '');
     const [detail, setDetail]                     = useState<Device | null>(null);
@@ -112,6 +116,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     const [deleteConfirmId, setDeleteConfirmId]    = useState<number | null>(null);
     const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
     const [bulkAction, setBulkAction]              = useState<string>('');
+    const [assignUserDevice, setAssignUserDevice]  = useState<Device | null>(null);
 
     /* ── Filter helpers ──────────────────────────────────────────── */
 
@@ -508,17 +513,36 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                 <p className="text-sm font-medium">{device.machine_name}</p>
                                                 <p className="text-xs text-muted-foreground">{device.user_domain}</p>
                                             </TableCell>
-                                            <TableCell>
-                                                <p className="text-sm">{device.user_name}</p>
-                                                {device.userDeviceAssignment?.user && (
-                                                    <Link
-                                                        href={route('admin.users.show', device.userDeviceAssignment.user.id)}
-                                                        className="text-xs text-slate-900 hover:underline"
-                                                        onClick={e => e.stopPropagation()}
-                                                    >
-                                                        {device.userDeviceAssignment.user.email}
-                                                    </Link>
-                                                )}
+                                            <TableCell onClick={e => e.stopPropagation()}>
+                                                <div className="flex flex-col gap-1">
+                                                    <p className="text-xs text-muted-foreground font-semibold uppercase">{__('general.machine_user') ?? 'OS User'}: {device.user_name}</p>
+                                                    {device.userDeviceAssignment?.user ? (
+                                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                                            <Link
+                                                                href={route('admin.users.show', device.userDeviceAssignment.user.id)}
+                                                                className="text-xs text-blue-600 hover:underline font-medium"
+                                                            >
+                                                                {device.userDeviceAssignment.user.name}
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => setAssignUserDevice(device)}
+                                                                className="text-[10px] text-muted-foreground hover:text-foreground font-mono bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded transition-colors"
+                                                            >
+                                                                {__('general.change') ?? 'Change'}
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                                            <span className="text-xs text-muted-foreground italic">{__('general.unassigned') ?? 'Unassigned'}</span>
+                                                            <button
+                                                                onClick={() => setAssignUserDevice(device)}
+                                                                className="text-[10px] text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition-colors"
+                                                            >
+                                                                {__('general.assign') ?? 'Assign'}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="text-muted-foreground text-xs">
                                                 {device.software?.name ?? '—'}
@@ -541,6 +565,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                         <DropdownMenuItem onClick={() => setDetail(device)}>
                                                             <Monitor className="w-4 h-4 me-2" />
                                                             {__('general.view_details')}
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => setAssignUserDevice(device)}>
+                                                            <User className="w-4 h-4 me-2" />
+                                                            {device.userDeviceAssignment?.user ? __('general.change_client') ?? 'Change Client' : __('general.assign_client') ?? 'Assign Client'}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {device.status !== 'active' && (
@@ -684,19 +712,111 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             <Separator />
                             <Row label={__('general.last_check')}  value={detail.last_check_date_full ?? '—'} />
                             <Row label={__('general.registered')}  value={detail.created_at ?? '—'} />
+                            <Separator />
+                            <Row label={__('general.client_assignment') ?? 'Client Assignment'} value={
+                                <select
+                                    className="text-sm rounded border border-slate-200 bg-white p-1 w-full focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
+                                    value={detail.userDeviceAssignment?.user?.id || ''}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        router.post(route('admin.serial-devices.assign-user', detail.id), {
+                                            user_id: val ? Number(val) : null
+                                        }, {
+                                            preserveState: true,
+                                            onSuccess: (page) => {
+                                                const updatedDevices = page.props.devices as any;
+                                                const updatedDetail = updatedDevices?.data?.find((d: any) => d.id === detail.id);
+                                                if (updatedDetail) {
+                                                    setDetail(updatedDetail);
+                                                }
+                                            }
+                                        });
+                                    }}
+                                >
+                                    <option value="">{__('general.unassigned') ?? 'Unassigned'}</option>
+                                    {users.map(u => (
+                                        <option key={u.id} value={u.id}>
+                                            {u.name} ({u.email})
+                                        </option>
+                                    ))}
+                                </select>
+                            } />
                             {detail.userDeviceAssignment?.user && (
-                                <>
-                                    <Separator />
-                                    <Row label={__('general.linked_user')} value={
-                                        <Link
-                                            href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
-                                            className="text-slate-900 hover:underline"
-                                        >
-                                            {detail.userDeviceAssignment.user.name} ({detail.userDeviceAssignment.user.email})
-                                        </Link>
-                                    } />
-                                </>
+                                <Row label={__('general.profile_link') ?? 'Profile Link'} value={
+                                    <Link
+                                        href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {__('general.view_client_profile') ?? 'View Client Profile'} &rarr;
+                                    </Link>
+                                } />
                             )}
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Assign User Dialog */}
+            <Dialog open={assignUserDevice !== null} onOpenChange={open => !open && setAssignUserDevice(null)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <User className="w-5 h-5 text-muted-foreground" />
+                            {assignUserDevice?.userDeviceAssignment?.user ? __('general.change_client') ?? 'Change Client' : __('general.assign_client') ?? 'Assign Client'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    {assignUserDevice && (
+                        <div className="space-y-4 pt-4 text-sm">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border space-y-1.5">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{__('general.device_id')}:</span>
+                                    <span className="font-mono text-xs font-bold">{assignUserDevice.device_id}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{__('general.machine')}:</span>
+                                    <span className="font-medium">{assignUserDevice.machine_name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{__('general.software')}:</span>
+                                    <span className="font-medium text-slate-700 dark:text-slate-300">{assignUserDevice.software?.name ?? '—'}</span>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase">
+                                    {__('general.select_client') ?? 'Select Client'}
+                                </label>
+                                <select
+                                    className="text-sm rounded border border-slate-200 bg-white p-2 w-full focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
+                                    value={assignUserDevice.userDeviceAssignment?.user?.id || ''}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        router.post(route('admin.serial-devices.assign-user', assignUserDevice.id), {
+                                            user_id: val ? Number(val) : null
+                                        }, {
+                                            preserveState: true,
+                                            onSuccess: (page) => {
+                                                const updatedDevices = page.props.devices as any;
+                                                const updatedDevice = updatedDevices?.data?.find((d: any) => d.id === assignUserDevice.id);
+                                                setAssignUserDevice(updatedDevice || null);
+                                            }
+                                        });
+                                    }}
+                                >
+                                    <option value="">{__('general.unassigned') ?? 'Unassigned'}</option>
+                                    {users.map(u => (
+                                        <option key={u.id} value={u.id}>
+                                            {u.name} ({u.email})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2">
+                                <Button variant="outline" size="sm" onClick={() => setAssignUserDevice(null)}>
+                                    {__('general.close') ?? 'Close'}
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </DialogContent>

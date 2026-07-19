@@ -217,4 +217,28 @@ class UsersTest extends TestCase
             'id' => $subscription->id,
         ]);
     }
+
+    public function test_admin_can_search_user_by_alias_email(): void
+    {
+        // Create an alias email for our clientUser
+        $alias = \App\Models\UserEmail::create([
+            'user_id' => $this->clientUser->id,
+            'email' => 'alias-search-target@example.com',
+            'verified_at' => now(),
+            'source' => \App\Models\UserEmail::SOURCE_ADMIN,
+        ]);
+
+        // Create another client user who doesn't match
+        $otherUser = User::factory()->create(['onboarding_completed' => true]);
+        $otherUser->assignRole('client');
+
+        // Request with search query matching the alias email
+        $response = $this->actingAs($this->admin)->get('/admin/users?search=alias-search-target');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->has('clients.data', 1)
+            ->where('clients.data.0.email', $this->clientUser->email)
+        );
+    }
 }

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
@@ -12,7 +12,7 @@ import { __ } from '@/lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Home() {
+export default function Home({ dbProjects = [] }) {
     const mainRef = useRef(null);
     const phoneNumber = "201015218548";
 
@@ -74,46 +74,73 @@ export default function Home() {
         }
     ];
 
-    const portfolio = [
-        {
-            name: "AMC Academy",
-            img: "/images/portfolio/amcacademy.jpg",
-            description: "AMC Academy is an educational platform designed specifically for students to access high-quality courses, track their learning progress, and interact with instructors. It provides a complete digital learning environment with full administrative control.",
-            features: [
-                "Online course streaming",
-                "Student progress tracking",
-                "Interactive exams & quizzes",
-                "Instructor dashboard",
-                "Secure payment gateway"
-            ],
-            techs: ["React", "Laravel", "PostgreSQL"]
-        },
-        {
-            name: "AmcTasks.com",
-            img: "/images/portfolio/amctasks.jpg",
-            description: "AmcTasks is a powerful social media automation platform designed to help businesses manage their online presence. Instead of jumping between different apps, you can schedule posts across multiple platforms, set up recurring content, and manage hundreds of Facebook comments automatically from a single dashboard.",
-            features: [
-                "Social media post scheduling",
-                "Automated bulk comment replies",
-                "SMS marketing campaigns",
-                "Recurring content automation",
-                "Analytics and export tools"
-            ],
-            techs: ["Laravel", "Redis", "Firebase"]
-        },
-        {
-            name: "Your Next Project?",
-            isPromotional: true,
-            description: "Are you ready to build something exceptional? We have the engineering power to turn your complex business logic into a scalable reality.",
-            features: [
-                "Custom Architecture",
-                "Scalable Infrastructure",
-                "Direct Communication",
-                "Ongoing Support"
-            ],
-            techs: ["Future-proof"]
+    const portfolio = useMemo(() => {
+        if (dbProjects && dbProjects.length > 0) {
+            const list = dbProjects.slice(0, 2).map(p => ({
+                name: p.title,
+                img: p.img,
+                description: p.desc,
+                features: p.techs && p.techs.length > 0 ? p.techs.map(t => `${t} implementation`) : ["Custom Business Logic", "Premium Responsive UI", "Database Integration", "Testing & Deployment"],
+                techs: p.techs || [],
+                live_url: p.live_url
+            }));
+            
+            list.push({
+                name: "Your Next Project?",
+                isPromotional: true,
+                description: "Are you ready to build something exceptional? We have the engineering power to turn your complex business logic into a scalable reality.",
+                features: [
+                    "Custom Architecture",
+                    "Scalable Infrastructure",
+                    "Direct Communication",
+                    "Ongoing Support"
+                ],
+                techs: ["Future-proof"]
+            });
+            return list;
         }
-    ];
+
+        return [
+            {
+                name: "AMC Academy",
+                img: "/images/portfolio/amcacademy.jpg",
+                description: "AMC Academy is an educational platform designed specifically for students to access high-quality courses, track their learning progress, and interact with instructors. It provides a complete digital learning environment with full administrative control.",
+                features: [
+                    "Online course streaming",
+                    "Student progress tracking",
+                    "Interactive exams & quizzes",
+                    "Instructor dashboard",
+                    "Secure payment gateway"
+                ],
+                techs: ["React", "Laravel", "PostgreSQL"]
+            },
+            {
+                name: "AmcTasks.com",
+                img: "/images/portfolio/amctasks.jpg",
+                description: "AmcTasks is a powerful social media automation platform designed to help businesses manage their online presence. Instead of jumping between different apps, you can schedule posts across multiple platforms, set up recurring content, and manage hundreds of Facebook comments automatically from a single dashboard.",
+                features: [
+                    "Social media post scheduling",
+                    "Automated bulk comment replies",
+                    "SMS marketing campaigns",
+                    "Recurring content automation",
+                    "Analytics and export tools"
+                ],
+                techs: ["Laravel", "Redis", "Firebase"]
+            },
+            {
+                name: "Your Next Project?",
+                isPromotional: true,
+                description: "Are you ready to build something exceptional? We have the engineering power to turn your complex business logic into a scalable reality.",
+                features: [
+                    "Custom Architecture",
+                    "Scalable Infrastructure",
+                    "Direct Communication",
+                    "Ongoing Support"
+                ],
+                techs: ["Future-proof"]
+            }
+        ];
+    }, [dbProjects]);
 
     const techCategories = [
         {
