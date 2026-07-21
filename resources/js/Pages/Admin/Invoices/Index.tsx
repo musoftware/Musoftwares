@@ -82,7 +82,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const [bulkActionProject, setBulkActionProject] = useState('');
     const [jobStatusDialog, setJobStatusDialog] = useState(null);
     const [newJobStatus, setNewJobStatus] = useState('');
-    const [pendingAction, setPendingAction] = useState<{ type: 'mark_paid' | 'cancel' | 'bulk'; id?: any } | null>(null);
+    const [pendingAction, setPendingAction] = useState<{ type: 'mark_paid' | 'cancel' | 'bulk' | 'bill_balance'; id?: any } | null>(null);
 
     useEffect(() => {
         if (selectAll) {

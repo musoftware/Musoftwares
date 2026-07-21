@@ -53,6 +53,9 @@ interface PricingBuilderProps {
         total: number;
     }) => React.ReactNode;
     proratedRefund?: number;
+    targetModule?: string | null;
+    targetTool?: string | null;
+    targetPlan?: string | null;
 }
 
 export default function PricingBuilder({ 
@@ -62,31 +65,45 @@ export default function PricingBuilder({
     isNewSystem = true, // default for guests is new system
     onSystemTypeChange,
     renderActions,
-    proratedRefund = 0
+    proratedRefund = 0,
+    targetModule = null,
+    targetTool = null,
+    targetPlan = null
 }: PricingBuilderProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     const [isCartExpanded, setIsCartExpanded] = useState(false);
     
-    // Determine default selected items (e.g., ERP and CRM) plus any module passed via URL
+    // Determine default selected items (e.g., ERP and CRM) plus any module/tool passed via URL or props
     const activeItems = useMemo(() => {
         const items: string[] = [];
         if (isNewSystem) {
             items.push(...serviceItems.filter(i => i.id === 'erp' || i.id === 'crm').map(i => i.id));
         }
         
+        let mod = targetModule;
+        let tool = targetTool;
+
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
-            const mod = params.get('module');
-            if (mod && !items.includes(mod)) {
-                // If they are upgrading, check if they already own it
-                const ownsMod = !isNewSystem && activeSubscription?.owned_features?.find(f => f.id === mod && f.status === 'active');
-                if (!ownsMod) {
-                    items.push(mod);
-                }
+            if (!mod) mod = params.get('module');
+            if (!tool) tool = params.get('tool');
+        }
+
+        if (mod && !items.includes(mod)) {
+            const ownsMod = !isNewSystem && activeSubscription?.owned_features?.find(f => f.id === mod && f.status === 'active');
+            if (!ownsMod) {
+                items.push(mod);
+            }
+        }
+
+        if (tool) {
+            const matchingItem = serviceItems.find(i => i.id === tool || i.slug === tool || i.id === 'tool-' + tool);
+            if (matchingItem && !items.includes(matchingItem.id)) {
+                items.push(matchingItem.id);
             }
         }
         return items;
-    }, [isNewSystem, serviceItems, activeSubscription]);
+    }, [isNewSystem, serviceItems, activeSubscription, targetModule, targetTool]);
 
     useEffect(() => {
         setSelectedItems(activeItems);

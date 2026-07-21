@@ -31,10 +31,20 @@ class SubscriptionSyncApiTest extends TestCase
             'expires_at' => now()->addYear(),
         ]);
 
+        // Configure the shared secret for testing
+        config(['services.toolsys.shared_secret' => 'test-secret-12345']);
+
+        $timestamp = (string) now()->timestamp;
+        $signature = hash_hmac('sha256', $timestamp.'.subscriptions-sync', 'test-secret-12345');
+
         // The GoldSaverSys module will request sync using module = 'goldsaversys'
         $response = $this->postJson('/api/sso/subscriptions/sync', [
             'module' => 'goldsaversys',
             'user_ids' => [$user->id],
+        ], [
+            'X-ToolSys-System' => 'toolsys',
+            'X-ToolSys-Signature' => $signature,
+            'X-ToolSys-Timestamp' => $timestamp,
         ]);
 
         $response->assertStatus(200);
@@ -45,5 +55,47 @@ class SubscriptionSyncApiTest extends TestCase
 
         // Assert that the active gold-saver subscription is prioritized and returned
         $this->assertEquals('active', $data[$user->id]['gold-saver']['status'] ?? 'cancelled', 'Failed: expected the active subscription to be prioritized over the cancelled one.');
+    }
+
+    public function test_it_rejects_sync_request_with_invalid_signature()
+    {
+        $user = User::factory()->create();
+        config(['services.toolsys.shared_secret' => 'test-secret-12345']);
+
+        $timestamp = (string) now()->timestamp;
+        $invalidSignature = 'wrong-signature-hash';
+
+        $response = $this->postJson('/api/sso/subscriptions/sync', [
+            'module' => 'goldsaversys',
+            'user_ids' => [$user->id],
+        ], [
+            'X-ToolSys-System' => 'toolsys',
+            'X-ToolSys-Signature' => $invalidSignature,
+            'X-ToolSys-Timestamp' => $timestamp,
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertEquals('invalid_signature', $response->json('error'));
+    }
+
+    public function test_it_rejects_sync_request_with_expired_timestamp()
+    {
+        $user = User::factory()->create();
+        config(['services.toolsys.shared_secret' => 'test-secret-12345']);
+
+        $expiredTimestamp = (string) (now()->timestamp - 400); // More than 5 minutes ago
+        $signature = hash_hmac('sha256', $expiredTimestamp.'.subscriptions-sync', 'test-secret-12345');
+
+        $response = $this->postJson('/api/sso/subscriptions/sync', [
+            'module' => 'goldsaversys',
+            'user_ids' => [$user->id],
+        ], [
+            'X-ToolSys-System' => 'toolsys',
+            'X-ToolSys-Signature' => $signature,
+            'X-ToolSys-Timestamp' => $expiredTimestamp,
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertEquals('signature_expired', $response->json('error'));
     }
 }

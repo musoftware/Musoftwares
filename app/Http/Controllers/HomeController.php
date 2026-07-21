@@ -474,6 +474,9 @@ class HomeController extends Controller
             'canRegister' => Route::has('register'),
             'serviceItems' => $serviceItems,
             'currency' => $currencyCode,
+            'targetModule' => $request->query('module'),
+            'targetTool' => $request->query('tool'),
+            'targetPlan' => $request->query('plan'),
         ])->withViewData([
             'meta' => [
                 'title' => 'Pricing | Musoftware',

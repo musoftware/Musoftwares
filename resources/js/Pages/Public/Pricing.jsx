@@ -12,7 +12,7 @@ import { __ } from '@/lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Pricing({ currency = 'USD', serviceItems = [] }) {
+export default function Pricing({ currency = 'USD', serviceItems = [], targetModule = null, targetTool = null, targetPlan = null }) {
     const mainRef = useRef(null);
     const phoneNumber = "201015218548";
 
@@ -77,6 +77,9 @@ export default function Pricing({ currency = 'USD', serviceItems = [] }) {
                                 serviceItems={serviceItems} 
                                 currency={currency} 
                                 isNewSystem={true} 
+                                targetModule={targetModule}
+                                targetTool={targetTool}
+                                targetPlan={targetPlan}
                             />
                         </div>
                     </div>

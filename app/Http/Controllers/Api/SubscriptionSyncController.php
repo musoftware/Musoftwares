@@ -16,6 +16,45 @@ class SubscriptionSyncController extends Controller
      */
     public function sync(Request $request)
     {
+        $system = $request->header('X-ToolSys-System')
+            ?? $request->header('X-Sso-System')
+            ?? $request->header('X-Investor-System')
+            ?? $request->header('X-GoldSaver-System');
+
+        $signature = $request->header('X-ToolSys-Signature')
+            ?? $request->header('X-Sso-Signature')
+            ?? $request->header('X-Investor-Signature')
+            ?? $request->header('X-GoldSaver-Signature');
+
+        $timestamp = $request->header('X-ToolSys-Timestamp')
+            ?? $request->header('X-Sso-Timestamp')
+            ?? $request->header('X-Investor-Timestamp')
+            ?? $request->header('X-GoldSaver-Timestamp');
+
+        $secret = $system ? (string) config("services.{$system}.shared_secret", '') : '';
+
+        if ($secret !== '') {
+            if (! $signature || ! $timestamp || ! $system) {
+                return response()->json(['error' => 'missing_signature_headers'], 401);
+            }
+
+            // Prevent replay attacks (allow 5 minute clock drift)
+            if (abs(now()->timestamp - (int) $timestamp) > 300) {
+                return response()->json(['error' => 'signature_expired'], 401);
+            }
+
+            $expected = hash_hmac('sha256', $timestamp.'.subscriptions-sync', $secret);
+            if (! hash_equals($expected, $signature)) {
+                \Illuminate\Support\Facades\Log::warning('SSO Subscription sync signature mismatch', [
+                    'ip' => $request->ip(),
+                    'received' => $signature,
+                    'expected' => $expected,
+                ]);
+
+                return response()->json(['error' => 'invalid_signature'], 401);
+            }
+        }
+
         $request->validate([
             'module' => 'required|string',
             'user_ids' => 'required|array',

@@ -59,7 +59,10 @@ class EventServiceProvider extends ServiceProvider
         SaaSLimitReached::class => [SaaSLimitReachedListener::class],
 
         // Marketplace
-        MarketplaceOrderPlaced::class => [ActivityEventListener::class],
+        MarketplaceOrderPlaced::class => [
+            ActivityEventListener::class,
+            \App\Listeners\CreateProjectFromMarketplaceOrder::class,
+        ],
         MarketplaceOrderCompleted::class => [ActivityEventListener::class],
 
         // Messaging & Timer
