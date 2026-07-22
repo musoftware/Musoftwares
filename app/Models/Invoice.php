@@ -212,44 +212,57 @@ class Invoice extends Model
 
     public function mark_as_paid()
     {
+        return DB::transaction(function () {
+            $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
-        $this->calculate_cost();
+            if (! $locked || $locked->status === 'paid') {
+                return;
+            }
 
-        $t1 = null;
-        $t2 = null;
+            $this->status = 'paid';
 
-        if (! empty($this->project_id)) {
-            $project = Project::find($this->project_id);
-            $t1 = $project->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
-            $t2 = $project->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
-        } else {
-            $client = User::find($this->user_id);
-            $t1 = $client->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
-            $t2 = $client->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
-        }
+            $t1 = null;
+            $t2 = null;
 
-        if ($t1) {
-            $this->transactions()->attach($t1);
-        }
-        if ($t2) {
-            $this->transactions()->attach($t2);
-        }
+            if (! empty($this->project_id)) {
+                $project = Project::find($this->project_id);
+                if ($project) {
+                    $t1 = $project->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
+                    $t2 = $project->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+                }
+            } else {
+                $client = User::find($this->user_id);
+                if ($client) {
+                    $t1 = $client->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->currency_id);
+                    $t2 = $client->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+                }
+            }
 
-        $this->user->calc_ref($this->total_min_cost(), $this->id, $this->currency_id);
-        $this->paid = $this->total();
-        $this->status = 'paid';
-        $this->job_status = 'done';
-        $this->clearSchedule();
-        $this->save();
+            if ($t1 && ! $this->transactions()->where('transactions.id', $t1)->exists()) {
+                $this->transactions()->attach($t1);
+            }
+            if ($t2 && ! $this->transactions()->where('transactions.id', $t2)->exists()) {
+                $this->transactions()->attach($t2);
+            }
 
-        $this->refresh();
-        $this->calculate_cost();
+            if ($this->user) {
+                $this->user->calc_ref($this->total_min_cost(), $this->id, $this->currency_id);
+            }
+            $this->paid = $this->total();
+            $this->status = 'paid';
+            $this->job_status = 'done';
+            $this->clearSchedule();
+            $this->save();
 
-        // إضافة جنيه واحد تلقائياً لعداد الخير عند دفع الفاتورة
-        $this->addCharityAmount();
+            $this->refresh();
+            $this->calculate_cost();
 
-        // Fire InvoicePaid event for notifications
-        event(new InvoicePaid($this));
+            // إضافة جنيه واحد تلقائياً لعداد الخير عند دفع الفاتورة
+            $this->addCharityAmount();
+
+            // Fire InvoicePaid event for notifications
+            event(new InvoicePaid($this));
+        });
     }
 
     public static function createInvoice($client, $project, $request)
@@ -648,27 +661,38 @@ class Invoice extends Model
 
     public function bill_invoice()
     {
-        DB::transaction(function () {
+        return DB::transaction(function () {
+            $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
-            if ($this->status == 'paid') {
+            if (! $locked || $locked->status === 'paid') {
                 return;
             }
 
-            $this->calculate_cost();
+            $transaction_id = null;
 
             if (! empty($this->project_id)) {
                 $client = User::find($this->user_id);
                 $project = Project::find($this->project_id);
-                $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
-                $this->transactions()->attach($transaction_id);
-                $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
+                if ($project) {
+                    $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+                }
+                if ($this->user) {
+                    $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
+                }
             } else {
                 $client = User::find($this->user_id);
-                $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
-
-                $this->transactions()->attach($transaction_id);
-                $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
+                if ($client) {
+                    $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+                }
+                if ($this->user) {
+                    $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
+                }
             }
+
+            if ($transaction_id && ! $this->transactions()->where('transactions.id', $transaction_id)->exists()) {
+                $this->transactions()->attach($transaction_id);
+            }
+
             $this->paid = $this->total();
             $this->unpaid = 0;
 
@@ -682,7 +706,9 @@ class Invoice extends Model
 
             $coins = max(1, CurrenciesExchange::RateToday($this->paid, $this->currency_id, 1) * 10);
 
-            ActionHelper::add_action_coins($this->user, 'Invoice Paid', $coins);
+            if ($this->user) {
+                ActionHelper::add_action_coins($this->user, 'Invoice Paid', $coins);
+            }
 
             event(new InvoicePaid($this));
 
@@ -691,19 +717,21 @@ class Invoice extends Model
 
             // Check and apply vouchers after invoice payment
             // Get the transaction that was created for this invoice payment
-            $paymentTransaction = Transaction::find($transaction_id);
-            if ($paymentTransaction && $client) {
-                try {
-                    $voucherService = new VoucherService;
-                    $voucherService->checkAndApplyVouchers($client, $paymentTransaction);
-                } catch (\Exception $e) {
-                    // Log error but don't fail the transaction
-                    \Log::error('Voucher check failed for invoice payment', [
-                        'user_id' => $client->id,
-                        'invoice_id' => $this->id,
-                        'transaction_id' => $transaction_id,
-                        'error' => $e->getMessage(),
-                    ]);
+            if ($transaction_id) {
+                $paymentTransaction = Transaction::find($transaction_id);
+                if ($paymentTransaction && isset($client) && $client) {
+                    try {
+                        $voucherService = new VoucherService;
+                        $voucherService->checkAndApplyVouchers($client, $paymentTransaction);
+                    } catch (\Exception $e) {
+                        // Log error but don't fail the transaction
+                        \Log::error('Voucher check failed for invoice payment', [
+                            'user_id' => $client->id,
+                            'invoice_id' => $this->id,
+                            'transaction_id' => $transaction_id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
                 }
             }
         });
@@ -770,16 +798,17 @@ class Invoice extends Model
 
     public function calculate_cost()
     {
-        if ($this->cost_calculated != '0') {
+        if ($this->status !== 'paid') {
+            return;
+        }
+
+        if ((string) $this->cost_calculated !== '0') {
             return;
         }
 
         $hasLines = $this->costLines()->exists();
 
         if ($hasLines) {
-            if ($this->status !== 'paid') {
-                return;
-            }
             foreach ($this->costLines()->orderBy('sort_order')->get() as $line) {
                 if ($line->line_type === 'direct' && (float) $line->amount > 0 && ! $line->cost_transaction_id) {
                     $reason = trim((string) $line->description) !== ''
@@ -793,7 +822,9 @@ class Invoice extends Model
                         $this->project_id
                     );
                     $line->update(['cost_transaction_id' => $c_id]);
-                    $this->cost_transactions()->attach($c_id);
+                    if ($c_id && ! $this->cost_transactions()->where('cost_transactions.id', $c_id)->exists()) {
+                        $this->cost_transactions()->attach($c_id);
+                    }
                 }
                 if ($line->line_type === 'user_credit' && (float) $line->amount > 0 && $line->credit_user_id && ! $line->earned_transaction_id) {
                     $payee = User::find($line->credit_user_id);
@@ -822,9 +853,6 @@ class Invoice extends Model
         }
 
         if ($this->cost_payable_user_id && $this->cost > 0) {
-            if ($this->status !== 'paid') {
-                return;
-            }
             $payee = User::find($this->cost_payable_user_id);
             if ($payee) {
                 $payee->add_balance(
@@ -848,7 +876,9 @@ class Invoice extends Model
                 $this->project_id
             );
 
-            $this->cost_transactions()->attach($c_id);
+            if ($c_id && ! $this->cost_transactions()->where('cost_transactions.id', $c_id)->exists()) {
+                $this->cost_transactions()->attach($c_id);
+            }
         }
         $this->update(['cost_calculated' => '1']);
     }

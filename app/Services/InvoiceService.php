@@ -58,6 +58,12 @@ class InvoiceService extends BaseService
                     if ($item && ! empty($itemData['merged_from'])) {
                         InvoiceItemTimer::whereIn('invoice_item_id', $itemData['merged_from'])
                             ->update(['invoice_item_id' => $item->id]);
+
+                        $reassignedTimerSum = (float) $item->timers()->sum('amount');
+                        if ($reassignedTimerSum > 0) {
+                            $nonTimerAmount = max(0.0, (float) $itemData['amount'] - $reassignedTimerSum);
+                            $item->update(['amount' => $nonTimerAmount]);
+                        }
                     }
                 }
             }

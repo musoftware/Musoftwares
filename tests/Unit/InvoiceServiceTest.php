@@ -110,5 +110,83 @@ class InvoiceServiceTest extends TestCase
             'id' => $timer2->id,
             'invoice_item_id' => $newItem->id,
         ]);
+
+        // CRITICAL: Total amount of merged timer item MUST equal the timer sum (250), NOT doubled (500)
+        $this->assertEquals(250.0, $newItem->total());
+        $this->assertEquals(0.0, (float) $newItem->amount);
+    }
+
+    public function test_update_invoice_merges_timer_and_simple_items_without_doubling()
+    {
+        $user = User::factory()->create();
+
+        $invoice = Invoice::create([
+            'user_id' => $user->id,
+            'status' => 'unpaid',
+            'currency_id' => 1,
+        ]);
+
+        $timerItem = InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'item_title' => 'Timer Task',
+            'item_type' => 'timer',
+            'amount' => 0,
+            'qty' => 1,
+            'currency' => 'USD',
+        ]);
+
+        $simpleItem = InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'item_title' => 'Fixed Fee',
+            'item_type' => 'simple',
+            'amount' => 50,
+            'qty' => 1,
+            'currency' => 'USD',
+        ]);
+
+        $timer = InvoiceItemTimer::create([
+            'invoice_item_id' => $timerItem->id,
+            'amount' => 89.46,
+            'date_start' => now()->subHours(1),
+            'date_end' => now(),
+            'currency_id' => 1,
+            'user_id' => $user->id,
+        ]);
+
+        $service = new InvoiceService;
+
+        // Frontend sends combined total = 89.46 + 50 = 139.46
+        $data = [
+            'deleted_items' => [$timerItem->id, $simpleItem->id],
+            'items' => [
+                [
+                    'item_title' => 'Merged Timer + Fixed',
+                    'amount' => '139.46',
+                    'qty' => 1,
+                    'item_type' => 'timer',
+                    'merged_from' => [$timerItem->id, $simpleItem->id],
+                ],
+            ],
+            'cost_lines' => [],
+            'deleted_cost_lines' => [],
+        ];
+
+        $service->updateInvoice($invoice, $data);
+
+        $mergedItem = InvoiceItem::where('invoice_id', $invoice->id)
+            ->where('item_title', 'Merged Timer + Fixed')
+            ->first();
+
+        $this->assertNotNull($mergedItem);
+
+        // Timer reassigned to merged item
+        $this->assertEquals($mergedItem->id, $timer->fresh()->invoice_item_id);
+
+        // Non-timer base amount should be 50.0 (139.46 - 89.46)
+        $this->assertEquals(50.0, (float) $mergedItem->amount);
+
+        // Total item amount MUST equal 139.46 (50.0 base + 89.46 timer)
+        $this->assertEquals(139.46, round($mergedItem->total(), 2));
+        $this->assertEquals(139.46, round($invoice->fresh()->total(), 2));
     }
 }

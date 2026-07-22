@@ -66,8 +66,14 @@ class SubscriptionSyncController extends Controller
 
         $subscriptionPrefix = config("saas.system_to_module.{$module}", $module);
 
+        $toolKeys = collect(config('tools', []))->flatMap(fn ($t, $g) => ['tool-'.$g, 'tool-'.($t['slug'] ?? ''), $g, $t['slug'] ?? ''])->filter()->toArray();
+        $toolKeys[] = $subscriptionPrefix;
+
         $subscriptions = UserSubscription::whereIn('user_id', $userIds)
-            ->where('object', 'like', $subscriptionPrefix.'%')
+            ->where(function ($query) use ($subscriptionPrefix, $toolKeys) {
+                $query->where('object', 'like', $subscriptionPrefix.'%')
+                    ->orWhereIn('object', $toolKeys);
+            })
             ->get(['user_id', 'object', 'status', 'expires_at'])
             ->groupBy('user_id');
 

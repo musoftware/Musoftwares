@@ -106,6 +106,7 @@ class SsoController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'currency_id' => $user->currency_id,
             ],
             'system' => $system,
             'subscription' => $subscription ? [
