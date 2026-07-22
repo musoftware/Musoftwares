@@ -2,7 +2,6 @@
 
 namespace Modules\Marketplace\Models;
 
-
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,38 +10,7 @@ class ServiceLandingPageAbMetric extends Model
 {
     use SoftDeletes, HasFactory;
 
-    protected $fillable = [
-        'landing_page_id',
-        'session_id',
-        'visitor_ip',
-        'user_agent',
-        'is_mobile',
-        'is_tablet',
-        'device_type',
-        'browser',
-        'os',
-        'country',
-        'city',
-        'language',
-        'referrer_url',
-        'utm_source',
-        'utm_medium',
-        'utm_campaign',
-        'utm_term',
-        'utm_content',
-        'page_views',
-        'unique_views',
-        'cta_clicks',
-        'form_views',
-        'form_submissions',
-        'scroll_depth_percentage',
-        'time_on_page_seconds',
-        'converted',
-        'converted_at',
-        'conversion_value',
-        'first_viewed_at',
-        'last_viewed_at',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'is_mobile' => 'boolean',
@@ -70,7 +38,7 @@ class ServiceLandingPageAbMetric extends Model
         if ($this->unique_views == 0) {
             return 0;
         }
-        
+
         return ($this->form_submissions / $this->unique_views) * 100;
     }
 
@@ -82,7 +50,7 @@ class ServiceLandingPageAbMetric extends Model
         if ($this->unique_views == 0) {
             return 0;
         }
-        
+
         return ($this->cta_clicks / $this->unique_views) * 100;
     }
 

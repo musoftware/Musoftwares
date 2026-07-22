@@ -255,32 +255,24 @@ function AuthenticatedContent({
                                                                             <Link href={safeRoute('financial.payout-methods.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
                                                                                 <CreditCard className="w-4 h-4 text-slate-400" />{__('general.payout_methods')}</Link>
                                                                             <Link href={safeRoute('tickets.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
-                                                                                <LifeBuoy className="w-4 h-4 text-slate-400" />{__('general.support_tickets')}</Link>
+                                                                                <LifeBuoy className="w-4 h-4 text-slate-400" />{__('general.support_tickets')}
+                                                                            </Link>
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
 
-                                                                <AccordionItem value="services" className="border-b-0">
-                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-slate-50 rounded-lg text-emerald-700 hover:no-underline">
-                                                                        <div className="flex items-center gap-3 font-medium">
-                                                                            <Briefcase className="w-5 h-5 text-emerald-600" /> {__('general.services')}</div>
-                                                                    </AccordionTrigger>
-                                                                    <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
-                                                                            <Link href={safeRoute('marketplace.services.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50/50 text-slate-600 font-medium">
-                                                                                <Briefcase className="w-4 h-4 text-emerald-500" /> {__('general.browse_services') || 'Browse Services'}
-                                                                            </Link>
-                                                                            <Link href={safeRoute('marketplace.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-violet-50/50 text-slate-600 font-medium">
-                                                                                <Megaphone className="w-4 h-4 text-violet-500" /> {__('general.marketing_suite')}
-                                                                            </Link>
-                                                                            {user?.roles?.includes('seller') && (
-                                                                                <Link href={safeRoute('seller.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-amber-50/50 text-slate-600 font-medium">
-                                                                                    <Building2 className="w-4 h-4 text-amber-500" /> Seller Portal
-                                                                                </Link>
-                                                                            )}
-                                                                        </div>
-                                                                    </AccordionContent>
-                                                                </AccordionItem>
+                                                                <Link
+                                                                    href={safeRoute('marketplace.services.index')}
+                                                                    onClick={() => setIsMobileOpen(false)}
+                                                                    className={cn(
+                                                                        "flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors",
+                                                                        isRouteActive('marketplace.services')
+                                                                            ? "bg-emerald-50 text-emerald-700"
+                                                                            : "text-emerald-700 hover:bg-slate-50"
+                                                                    )}
+                                                                >
+                                                                    <Briefcase className="w-5 h-5 text-emerald-600" /> {__('general.services')}
+                                                                </Link>
 
                                                                 <AccordionItem value="isaas" className="border-b-0">
                                                                     <AccordionTrigger className="px-3 py-2 hover:bg-slate-50 rounded-lg text-indigo-700 hover:no-underline">
@@ -563,87 +555,18 @@ function AuthenticatedContent({
                                             </DropdownMenuContent>
                                         </DropdownMenu>
 
-                                {/* SERVICES MEGA MENU */}
-                                <DropdownMenu>
-                                    <div className="relative inline-block">
-                                        <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-150 outline-none select-none">
-                                            <Briefcase className="me-1.5 h-3.5 w-3.5" /> {__('general.services')}<ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
-                                        </DropdownMenuTrigger>
-                                    </div>
-                                    <DropdownMenuContent align="start" className="w-[320px] p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
-                                        <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.service_hubs')}</p>
-                                        </div>
-                                        
-                                        <DropdownMenuItem
-                                            className={cn(
-                                                "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isRouteActive('marketplace.services.index') ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('marketplace.services.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isRouteActive('marketplace.services.index') ? "bg-emerald-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-emerald-50"
-                                            )}>
-                                                <Briefcase className={cn("w-4 h-4", isRouteActive('marketplace.services.index') ? "text-emerald-700" : "text-slate-500 group-hover/dropdown-menu-item:text-emerald-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isRouteActive('marketplace.services.index') ? "text-emerald-900" : "text-slate-900")}>{__('general.browse_services') || 'Browse Services'}</p>
-                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Services</span>
-                                                </div>
-                                                <p className={cn("text-xs truncate", isRouteActive('marketplace.services.index') ? "text-emerald-700/70" : "text-slate-500")}>Order programming and custom modules</p>
-                                            </div>
-                                        </DropdownMenuItem>
-                                        
-                                        <DropdownMenuItem
-                                            className={cn(
-                                                "p-0 outline-none border transition-colors duration-150 cursor-pointer mt-1",
-                                                isMarketplaceActive ? "bg-violet-50/80 border-violet-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('marketplace.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isMarketplaceActive ? "bg-violet-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-violet-50"
-                                            )}>
-                                                <Megaphone className={cn("w-4 h-4", isMarketplaceActive ? "text-violet-700" : "text-slate-500 group-hover/dropdown-menu-item:text-violet-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isMarketplaceActive ? "text-violet-900" : "text-slate-900")}>{__('general.marketing_suite')}</p>
-                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">{__('general.free')}</span>
-                                                </div>
-                                                <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>{__('general.services_clients_amp_campaigns')}</p>
-                                            </div>
-                                        </DropdownMenuItem>
-
-                                        {user?.roles?.includes('seller') && (
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer mt-1",
-                                                    isRouteActive('seller.dashboard') ? "bg-blue-50/80 border-blue-100" : "hover:bg-slate-50 border-transparent"
-                                                )}
-                                                render={<Link href={safeRoute('seller.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                            >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isRouteActive('seller.dashboard') ? "bg-blue-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-blue-50"
-                                                )}>
-                                                    <Building2 className={cn("w-4 h-4", isRouteActive('seller.dashboard') ? "text-blue-700" : "text-slate-500 group-hover/dropdown-menu-item:text-blue-600")} />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('seller.dashboard') ? "text-blue-900" : "text-slate-900")}>Seller Portal</p>
-                                                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">Seller</span>
-                                                    </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('seller.dashboard') ? "text-blue-700/70" : "text-slate-500")}>Manage products and payouts</p>
-                                                </div>
-                                            </DropdownMenuItem>
-                                        )}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                {/* SERVICES LINK */}
+                                <Link
+                                    href={safeRoute('marketplace.services.index')}
+                                    className={cn(
+                                        "inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none transition-colors duration-150 outline-none select-none",
+                                        isRouteActive('marketplace.services')
+                                            ? "bg-emerald-50 text-emerald-700 font-semibold"
+                                            : "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                                    )}
+                                >
+                                    <Briefcase className="me-1.5 h-3.5 w-3.5" /> {__('general.services')}
+                                </Link>
 
                                 {/* iSAAS MEGA MENU */}
                                 <DropdownMenu>

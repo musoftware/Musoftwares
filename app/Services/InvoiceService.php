@@ -121,6 +121,10 @@ class InvoiceService extends BaseService
             throw new \Exception('Invoice is already paid.');
         }
 
+        if ($older = $invoice->getOlderUnpaidInvoice()) {
+            throw new \Exception("Cannot pay invoice #{$invoice->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
+        }
+
         $invoice->mark_as_paid();
     }
 

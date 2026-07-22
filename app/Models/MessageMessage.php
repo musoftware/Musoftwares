@@ -10,6 +10,9 @@ class MessageMessage extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $guarded = [];
+
+
     public function thread()
     {
         return $this->morphTo('thread')->with('user');

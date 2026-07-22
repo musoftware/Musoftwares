@@ -45,6 +45,11 @@ class ServiceCategoryController extends Controller
         return redirect()->back()->with('success', __('general.category_updated'));
     }
 
+    public function apiIndex()
+    {
+        return response()->json(ServiceCategory::all());
+    }
+
     public function destroy(ServiceCategory $category)
     {
         $category->delete();
@@ -52,3 +57,4 @@ class ServiceCategoryController extends Controller
         return redirect()->back()->with('success', __('general.category_deleted'));
     }
 }
+

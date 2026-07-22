@@ -13,7 +13,10 @@ class Favorite extends Model
     protected $fillable = [
         'user_id',
         'service_id',
+        'favoritable_type',
+        'favoritable_id',
     ];
+
 
     /**
      * Get the user that owns the favorite.

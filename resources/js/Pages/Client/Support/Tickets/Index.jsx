@@ -19,8 +19,8 @@ export default function TicketsIndex({ tickets, isAdmin }) {
     const { auth } = usePage().props;
     const [filterStatus, setFilterStatus] = useState('');
     const [filterPriority, setFilterPriority] = useState('');
-    const [openTicketId, setOpenTicketId] = useState<number | null>(null);
-    const triggerRef = React.useRef<HTMLElement | null>(null);
+    const [openTicketId, setOpenTicketId] = useState(null);
+    const triggerRef = React.useRef(null);
 
     const openTicket = openTicketId != null
         ? (tickets?.data ?? []).find((t) => t.id === openTicketId) ?? null

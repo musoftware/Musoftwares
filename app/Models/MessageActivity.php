@@ -10,6 +10,9 @@ class MessageActivity extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $guarded = [];
+
+
     public function activity()
     {
         return $this->morphTo('activity')->with('user');

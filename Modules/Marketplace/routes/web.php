@@ -3,6 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Marketplace\Http\Controllers\DashboardController;
 use Modules\Marketplace\Http\Controllers\ServiceController;
+use Modules\Marketplace\Http\Controllers\ServiceCategoryController;
+use Modules\Marketplace\Http\Controllers\ServiceOrderController;
+use Modules\Marketplace\Http\Controllers\CheckoutController;
+use Modules\Marketplace\Http\Controllers\DeliverableController;
+use Modules\Marketplace\Http\Controllers\FreeDownloadController;
+use Modules\Marketplace\Http\Controllers\ServiceSerialController;
+use Modules\Marketplace\Http\Controllers\PromotionsController;
+use Modules\Marketplace\Http\Controllers\ReferralController;
+use Modules\Marketplace\Http\Controllers\CustomProjectController;
+use Modules\Marketplace\Http\Controllers\WishlistController;
+use Modules\Marketplace\Http\Controllers\PremiumToolController;
 
 // Single group — order matters: literal routes BEFORE wildcards
 Route::middleware('web')
@@ -13,10 +24,18 @@ Route::middleware('web')
         // ── Public ────────────────────────────────────────────────────────
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
         
-        // Navigation API
-        Route::get('/api/categories', function () {
-            return response()->json(\Modules\Marketplace\Models\ServiceCategory::all());
-        })->withoutMiddleware(['auth']); // Ensure it is public
+        // Navigation API (using controller action instead of route closure)
+        Route::get('/api/categories', [ServiceCategoryController::class, 'apiIndex'])->name('categories.api');
+
+        // Free downloads
+        Route::post('/downloads/{service}/request', [FreeDownloadController::class, 'requestDownload'])->name('downloads.request');
+        Route::get('/downloads/claim/{token}', [FreeDownloadController::class, 'claimDownload'])->name('downloads.claim');
+
+        // Software License Device Activation API
+        Route::post('/api/software/activate', [ServiceSerialController::class, 'activateDevice'])->name('serials.activate');
+
+        // Custom Bidding Projects Public Feed
+        Route::get('/projects', [CustomProjectController::class, 'index'])->name('projects.index');
 
         // ── Auth-only ─────────────────────────────────────────────────────
         Route::middleware('auth')->group(function () {
@@ -25,11 +44,41 @@ Route::middleware('web')
             Route::get('/',         [DashboardController::class, 'index'])->name('dashboard');
             Route::get('/dashboard',[DashboardController::class, 'index'])->name('dashboard.alias');
 
-            // !! MUST be before /services/{id} !!
+            // Services CRUD
             Route::get('/services/create',  [ServiceController::class, 'create'])->name('services.create');
             Route::post('/services',        [ServiceController::class, 'store'])->name('services.store');
 
+            // Orders Lifecycle
+            Route::get('/orders',           [ServiceOrderController::class, 'index'])->name('orders.index');
+            Route::get('/orders/{order}',   [ServiceOrderController::class, 'show'])->name('orders.show');
+            Route::post('/orders',          [ServiceOrderController::class, 'store'])->name('orders.store');
+            Route::post('/orders/{order}/complete', [ServiceOrderController::class, 'complete'])->name('orders.complete');
+            Route::post('/orders/{order}/dispute',  [ServiceOrderController::class, 'dispute'])->name('orders.dispute');
 
+            // Work Deliverables & Revisions
+            Route::post('/orders/{order}/deliver', [DeliverableController::class, 'submitWork'])->name('orders.deliver');
+            Route::post('/orders/{order}/revision',[DeliverableController::class, 'requestRevision'])->name('orders.revision');
+
+            // Cart Checkout
+            Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
+
+            // Promotions & Coupons
+            Route::post('/coupons/apply', [PromotionsController::class, 'applyCoupon'])->name('coupons.apply');
+
+            // Referral Network & Withdrawals
+            Route::post('/referral/withdraw', [ReferralController::class, 'withdraw'])->name('referral.withdraw');
+
+            // Custom Projects & Proposals
+            Route::post('/projects', [CustomProjectController::class, 'store'])->name('projects.store');
+            Route::post('/projects/{project}/bid', [CustomProjectController::class, 'submitProposal'])->name('projects.bid');
+            Route::post('/projects/{project}/accept', [CustomProjectController::class, 'acceptProposal'])->name('projects.accept');
+
+            // Wishlist / Favorites
+            Route::get('/favorites', [WishlistController::class, 'index'])->name('favorites.index');
+            Route::post('/services/{service}/favorite', [WishlistController::class, 'toggle'])->name('favorites.toggle');
+
+            // AI Tools Marketplace
+            Route::post('/tools/{toolSlug}/use', [PremiumToolController::class, 'useTool'])->name('tools.use');
         });
 
         // ── Wildcard — always last ─────────────────────────────────────────
@@ -72,6 +121,8 @@ Route::middleware(['web', 'auth', 'role:seller'])
         Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\Seller\SellerPortalController::class, 'dashboard'])->name('dashboard');
         Route::get('/products', [\Modules\Marketplace\Http\Controllers\Seller\SellerPortalController::class, 'products'])->name('products');
         Route::get('/payouts', [\Modules\Marketplace\Http\Controllers\Seller\SellerPortalController::class, 'payouts'])->name('payouts');
+        Route::get('/serials', [ServiceSerialController::class, 'index'])->name('serials.index');
+        Route::post('/serials', [ServiceSerialController::class, 'store'])->name('serials.store');
     });
 
 // -- Public Landing Page Routes ------------------------------------

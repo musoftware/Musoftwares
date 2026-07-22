@@ -44,6 +44,14 @@ class Invoice extends Model
         static::saving(function ($invoice) {
             unset($invoice->start_day);
         });
+
+        static::updating(function (Invoice $invoice) {
+            if ($invoice->isDirty('status') && $invoice->status === 'paid') {
+                if ($older = $invoice->getOlderUnpaidInvoice()) {
+                    throw new \Exception("Cannot mark invoice #{$invoice->id} as paid because older invoice #{$older->id} is still unpaid for this client.");
+                }
+            }
+        });
     }
 
     public function getCurrencyAttribute()
@@ -210,8 +218,31 @@ class Invoice extends Model
         return (float) $this->cost;
     }
 
+    /**
+     * Get the older unpaid invoice for the same client, if any.
+     */
+    public function getOlderUnpaidInvoice(): ?Invoice
+    {
+        if (! $this->user_id) {
+            return null;
+        }
+
+        $query = static::where('user_id', $this->user_id)
+            ->whereNotIn('status', ['paid', 'cancelled']);
+
+        if ($this->id) {
+            $query->where('id', '<', $this->id);
+        }
+
+        return $query->orderBy('id', 'asc')->first();
+    }
+
     public function mark_as_paid()
     {
+        if ($older = $this->getOlderUnpaidInvoice()) {
+            throw new \Exception("Cannot pay invoice #{$this->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
+        }
+
         return DB::transaction(function () {
             $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
@@ -661,6 +692,10 @@ class Invoice extends Model
 
     public function bill_invoice()
     {
+        if ($older = $this->getOlderUnpaidInvoice()) {
+            throw new \Exception("Cannot bill invoice #{$this->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
+        }
+
         return DB::transaction(function () {
             $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
@@ -885,6 +920,10 @@ class Invoice extends Model
 
     public function partially_bill_invoice($paid)
     {
+        if ($older = $this->getOlderUnpaidInvoice()) {
+            throw new \Exception("Cannot pay invoice #{$this->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
+        }
+
         if ($this->total() < $paid) {
             return false;
         }
