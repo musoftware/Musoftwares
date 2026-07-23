@@ -1,5 +1,5 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     LayoutDashboard,
     Package,
@@ -18,6 +18,9 @@ import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
 import { __ } from '@/lib/i18n';
 
 export default function SellerDashboard({ stats, recent_orders }: any) {
+    const { auth } = usePage().props as any;
+    const userCurrency = auth?.user?.currency;
+
     return (
         <MarketplaceLayout>
             <Head title={__('general.seller_portal')} />
@@ -32,7 +35,7 @@ export default function SellerDashboard({ stats, recent_orders }: any) {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <MetricCard 
                         label={__('general.total_sales')}
-                        value={formatMoney(stats.total_sales, 'USD')}
+                        value={formatMoney(stats.total_sales, userCurrency)}
                         icon={DollarSign}
                     />
                     <MetricCard 
@@ -42,7 +45,7 @@ export default function SellerDashboard({ stats, recent_orders }: any) {
                     />
                     <MetricCard 
                         label={__('general.pending_payouts')}
-                        value={formatMoney(stats.pending_payouts, 'USD')}
+                        value={formatMoney(stats.pending_payouts, userCurrency)}
                         icon={Wallet}
                     />
                 </div>
@@ -63,7 +66,7 @@ export default function SellerDashboard({ stats, recent_orders }: any) {
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className="text-xs font-mono font-semibold text-slate-900">
-                                                {formatMoney(order.amount, 'USD')}
+                                                {formatMoney(order.amount, order.currency || userCurrency)}
                                             </span>
                                             <StatusBadge status={order.status} size="sm" />
                                         </div>

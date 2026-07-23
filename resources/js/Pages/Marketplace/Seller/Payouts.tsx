@@ -1,5 +1,5 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { DollarSign } from 'lucide-react';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
@@ -9,6 +9,8 @@ import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
 import { __ } from '@/lib/i18n';
 
 export default function SellerPayouts({ escrows }: any) {
+    const { auth } = usePage().props as any;
+
     return (
         <MarketplaceLayout>
             <Head title={__('general.payouts_escrow')} />
@@ -28,13 +30,13 @@ export default function SellerPayouts({ escrows }: any) {
 
                 <SellerNav />
 
-                <OperationalCard noPadding>
+                <OperationalCard title={__('general.escrow_balances')} description={__('general.funds_held_in_escrow_awaiting_fulfillment')} noPadding>
                     <div className="divide-y divide-slate-100">
                         {escrows.data.map((escrow: any) => (
                             <div key={escrow.id} className="p-4 hover:bg-slate-50/50 transition flex items-center justify-between">
                                 <div className="space-y-1">
                                     <div className="font-medium text-slate-900 text-sm">
-                                        Escrow #{escrow.id} - Order #{escrow.order_id}
+                                        Escrow #{escrow.id} (Order #{escrow.service_order_id})
                                     </div>
                                     <div className="flex items-center gap-2 text-xs text-slate-500">
                                         <span>{__('general.service')}: {escrow.order?.package?.service?.title || 'Unknown'}</span>
@@ -44,7 +46,7 @@ export default function SellerPayouts({ escrows }: any) {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-xs font-mono font-semibold text-slate-900">
-                                        {formatMoney(escrow.amount, 'USD')}
+                                        {formatMoney(escrow.amount, escrow.currency || auth?.user?.currency)}
                                     </span>
                                     <StatusBadge status={escrow.status || 'held'} size="sm" />
                                 </div>

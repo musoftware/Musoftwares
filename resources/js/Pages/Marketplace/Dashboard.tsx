@@ -80,7 +80,7 @@ export default function MarketplaceDashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <MetricCard 
                         label={__('general.protected_escrow')}
-                        value={formatMoney(stats.lockedEscrow, 'USD')}
+                        value={formatMoney(stats.lockedEscrow, auth?.user?.currency)}
                         icon={Lock}
                     />
                     <MetricCard 
@@ -95,7 +95,7 @@ export default function MarketplaceDashboard({
                     />
                     <MetricCard 
                         label={isClient ? __('general.total_spent') : __('general.total_sales')}
-                        value={formatMoney(stats.totalSales, 'USD')}
+                        value={formatMoney(stats.totalSales, auth?.user?.currency)}
                         icon={DollarSign}
                     />
                 </div>
@@ -119,7 +119,7 @@ export default function MarketplaceDashboard({
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className="text-xs font-mono font-semibold text-slate-900">
-                                                {formatMoney(sale.amount, 'USD')}
+                                                {formatMoney(sale.amount, sale.currency || auth?.user?.currency)}
                                             </span>
                                             <StatusBadge status={sale.status} size="sm" />
                                         </div>
@@ -155,7 +155,7 @@ export default function MarketplaceDashboard({
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className="text-xs font-mono font-semibold text-slate-900">
-                                                {formatMoney(purchase.amount, 'USD')}
+                                                {formatMoney(purchase.amount, purchase.currency || auth?.user?.currency)}
                                             </span>
                                             <StatusBadge status={purchase.status} size="sm" />
                                         </div>
@@ -192,7 +192,7 @@ export default function MarketplaceDashboard({
                                         </div>
                                         <div className="text-end">
                                             <span className="font-mono font-bold text-slate-900 block text-sm">
-                                                {formatMoney(gig.price, 'USD')}
+                                                {formatMoney(gig.price, gig.currency || auth?.user?.currency)}
                                             </span>
                                             <span className="text-[10px] text-slate-400 block uppercase tracking-wider font-semibold">{__('general.starting_at')}</span>
                                         </div>
