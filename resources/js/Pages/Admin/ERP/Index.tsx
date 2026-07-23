@@ -17,6 +17,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
+import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
 interface Tenant {
@@ -110,7 +111,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                             <div className="me-auto space-y-1">
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.overall_platform_revenue')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">
-                                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.total_revenue)}
+                                    {formatMoney(stats.total_revenue, (stats as any)?.currency || 'USD')}
                                 </h3>
                             </div>
                             <div className="p-3 bg-slate-50 text-slate-900 rounded-lg">
@@ -209,7 +210,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-end font-bold text-slate-900 font-mono">
-                                                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tenant.revenue)}
+                                                {formatMoney(tenant.revenue, tenant.currency || 'USD')}
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 font-mono text-xs">
                                                 {tenant.created_at}

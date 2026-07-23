@@ -251,7 +251,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                     <div className="bg-muted/30 rounded-xl p-4 space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
                             <div className="md:col-span-5 space-y-1">
-                                <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Amount ({(user.currency_obj || businessCurrency)?.symbol || '$'})</Label>
+                                <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Amount ({(user.currency_obj || businessCurrency)?.symbol || (user.currency_obj || businessCurrency)?.currency || ''})</Label>
                                 <div className="flex">
                                     <Input 
                                         type="number" 
@@ -290,7 +290,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Net ({(user.currency_obj || businessCurrency)?.symbol || '$'})</Label>
+                                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Net ({(user.currency_obj || businessCurrency)?.symbol || (user.currency_obj || businessCurrency)?.currency || ''})</Label>
                                         <Input 
                                             type="text" 
                                             value={netAmount} 

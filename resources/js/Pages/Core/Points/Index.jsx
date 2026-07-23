@@ -14,12 +14,12 @@ import { AppPage } from '@/Components/ui/AppPage';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { __ } from '@/lib/i18n';
 
-export default function PointsIndex({ auth, tiers = [], quickPackages = [], transactions, egpToPreferredRate = 0.10, currency = 'USD' }) {
+export default function PointsIndex({ auth, tiers = [], quickPackages = [], transactions, egpToPreferredRate = 0.10, currency }) {
     const { wallet, flash } = usePage().props;
     const wallet_balance = wallet ? Number(wallet.balance) : 0;
     const Layout = AuthenticatedLayout;
     const [customPoints, setCustomPoints] = useState('');
-    const globalCurrency = currency || wallet?.currency || auth?.user?.preferred_currency;
+    const globalCurrency = currency || wallet?.currency || auth?.user?.currency || auth?.user?.preferred_currency;
 
     // Calculate dynamic price for custom amount using tiers
     const customPricing = useMemo(() => {

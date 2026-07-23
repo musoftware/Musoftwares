@@ -738,7 +738,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                         <div className="space-y-4 text-sm">
                             <div className="grid grid-cols-2 gap-2">
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.currency')}</span><span className="font-medium text-slate-900 break-words">{client.currency || <span className="text-slate-400 italic">{__('general.default')}</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Hour Rate (USD)</span><span className="font-medium text-slate-900 break-words">{client.hour_rate || "0.00"}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Hour Rate ({client.currency || 'USD'})</span><span className="font-medium text-slate-900 break-words">{client.hour_rate || "0.00"}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.phone')}</span><span className="font-medium text-slate-900 break-words">{client.phone || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>

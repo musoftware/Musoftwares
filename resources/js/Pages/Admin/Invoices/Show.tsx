@@ -387,7 +387,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             {new Date(invoice.created_at).toLocaleDateString()}
                         </span>
                         <span className="flex items-center gap-1">
-                            <span className="font-bold opacity-70">{invoice.currency_symbol || '$'}</span>
+                            <span className="font-bold opacity-70">{invoice.currency_symbol || invoice.currency}</span>
                             {invoice.currency}
                         </span>
                     </div>
@@ -1350,7 +1350,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <div className="flex justify-end gap-4 text-xs text-gray-400 mt-1">
                                         <span>{__('general.business_currency_total')}</span>
                                         <span>
-                                            {formatCurrency(payServicePreview.total_usd, 'USD')} {/* Assuming USD as base for display purpose here */}
+                                            {formatCurrency(payServicePreview.total_usd, payServicePreview.business_currency || 'USD')}
                                         </span>
                                     </div>
                                 </div>
