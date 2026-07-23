@@ -72,7 +72,8 @@ class ServiceLandingPageAIController extends Controller
             $prompt .= "    \"is_required\": true,\n";
             $prompt .= "    \"placeholder\": \"Select your budget\",\n";
             $prompt .= "    \"help_text\": \"This helps us provide the best solution for your needs\",\n";
-            $prompt .= "    \"field_options\": [\"Under $500\", \"$500-$1000\", \"$1000-$5000\", \"$5000+\"]\n";
+            $currencySymbol = optional($service->currency)->symbol ?: '$';
+            $prompt .= "    \"field_options\": [\"Under {$currencySymbol}500\", \"{$currencySymbol}500-{$currencySymbol}1000\", \"{$currencySymbol}1000-{$currencySymbol}5000\", \"{$currencySymbol}5000+\"]\n";
             $prompt .= "  }\n";
             $prompt .= "]\n\n";
             $prompt .= "Field types can be: text, textarea, email, phone, number, date, select, radio, checkbox";

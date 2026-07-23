@@ -363,7 +363,7 @@ class DashboardService extends BaseService
             $rate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrency->id) ?: 1.0;
         }
 
-        $egpRate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrency->id) ?: 50.0;
+        $egpRate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrency->id) ?: (CurrenciesExchange::RateBusiness(1, $usdCurrency->id) ?: 1.0);
 
         $convertPrice = function ($egpPrice) use ($egpRate, $rate, $userCurrency) {
             if ($userCurrency->currency === 'EGP') {

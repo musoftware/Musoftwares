@@ -172,7 +172,7 @@ class ServiceLandingPagePublicController extends Controller
             new ServiceLandingQuestion([
                 'question_text' => 'What is your budget?',
                 'field_type' => 'select',
-                'field_options' => ['$0-$100', '$100-$500', '$500+'],
+                'field_options' => [(optional($landingPage->service?->currency)->symbol ?: '$') . '0-' . (optional($landingPage->service?->currency)->symbol ?: '$') . '100', (optional($landingPage->service?->currency)->symbol ?: '$') . '100-' . (optional($landingPage->service?->currency)->symbol ?: '$') . '500', (optional($landingPage->service?->currency)->symbol ?: '$') . '500+'],
                 'is_required' => true,
                 'sort_order' => 0
             ])
