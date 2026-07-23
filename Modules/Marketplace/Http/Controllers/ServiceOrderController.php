@@ -77,9 +77,9 @@ class ServiceOrderController extends Controller
             return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
         }
 
-        // Commission logic
-        $commissionRate = config('marketplace.commission_rate', 0.10);
-        $commissionAmount = $package->price * $commissionRate;
+        // Commission logic (BC math for financial precision)
+        $commissionRate = config('marketplace.commission_rate', '0.10');
+        $commissionAmount = bcmul((string) $package->price, (string) $commissionRate, 4);
 
         DB::beginTransaction();
 

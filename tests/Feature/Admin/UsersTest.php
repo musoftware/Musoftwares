@@ -121,6 +121,23 @@ class UsersTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
     }
 
+    public function test_admin_cannot_delete_user_with_unpaid_invoices(): void
+    {
+        $userToDelete = User::factory()->create();
+
+        \App\Models\Invoice::create([
+            'user_id' => $userToDelete->id,
+            'status' => 'unpaid',
+            'unpaid' => 150,
+            'paid' => 0,
+        ]);
+
+        $response = $this->actingAs($this->admin)->delete("/admin/users/{$userToDelete->id}");
+
+        $response->assertSessionHasErrors('error');
+        $this->assertDatabaseHas('users', ['id' => $userToDelete->id, 'deleted_at' => null]);
+    }
+
     public function test_admin_can_toggle_block_user(): void
     {
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/toggle-block", [

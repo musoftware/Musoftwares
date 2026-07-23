@@ -10,8 +10,10 @@ import { __ } from '@/lib/i18n';
 
 export default function DeleteUserForm({
     className = '',
+    hasUnpaidInvoices = false,
 }: {
     className?: string;
+    hasUnpaidInvoices?: boolean;
 }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -59,7 +61,13 @@ export default function DeleteUserForm({
                     {__('general.once_your_account_is_deleted_all_of_its')}</p>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>{__('general.delete_account')}</DangerButton>
+            {hasUnpaidInvoices && (
+                <div className="rounded-md bg-amber-50 p-4 border border-amber-200 text-amber-800 text-sm">
+                    {__('general.cannot_delete_account_with_unpaid_invoices')}
+                </div>
+            )}
+
+            <DangerButton onClick={confirmUserDeletion} disabled={hasUnpaidInvoices}>{__('general.delete_account')}</DangerButton>
 
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
                 <form onSubmit={deleteUser} className="p-6">

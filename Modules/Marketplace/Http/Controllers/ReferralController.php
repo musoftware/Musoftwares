@@ -26,8 +26,16 @@ class ReferralController extends Controller
                 $validated['payment_details']
             );
 
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->with('success', __('general.withdrawal_requested_successfully'));
+            }
+
             return response()->json(['success' => true, 'request' => $withdrawRequest]);
         } catch (\Exception $e) {
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->withErrors(['withdrawal' => $e->getMessage()]);
+            }
+
             return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
         }
     }

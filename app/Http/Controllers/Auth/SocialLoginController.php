@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\User;
+use App\Models\UserEmail;
 use GeoIp2\Database\Reader;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -80,12 +81,46 @@ class SocialLoginController extends Controller
             }
 
             $googleUser = $userInfoResponse->json();
+            $googleEmail = strtolower(trim($googleUser['email'] ?? ''));
 
-            $user = User::where('email', $googleUser['email'])->first();
+            if (empty($googleEmail)) {
+                throw new \Exception('Google account did not return an email address.');
+            }
+
+            // Look up existing user across primary email and secondary emails
+            $existingUser = User::findForLogin($googleEmail);
+
+            // Handle scenario when user is already logged in (Linking Google Account)
+            if (Auth::check()) {
+                $authUser = Auth::user();
+
+                if ($existingUser) {
+                    if ($existingUser->id === $authUser->id) {
+                        return redirect()->route('profile.edit')->with('status', __('general.google_account_already_linked', ['email' => $googleEmail]));
+                    }
+
+                    return redirect()->route('profile.edit')->with('error', __('general.google_email_linked_other_account', ['email' => $googleEmail]));
+                }
+
+                // Attach Google email as a verified secondary email to the current authenticated user
+                UserEmail::create([
+                    'user_id' => $authUser->id,
+                    'email' => $googleEmail,
+                    'verified_at' => now(),
+                    'source' => UserEmail::SOURCE_SELF,
+                    'added_by_user_id' => $authUser->id,
+                ]);
+
+                return redirect()->route('profile.edit')->with('status', __('general.google_account_linked_success', ['email' => $googleEmail]));
+            }
+
+            // Handle Guest Login / Registration
+            $user = $existingUser;
+
             if (! $user) {
                 $user = User::create([
                     'name' => $googleUser['name'] ?? 'Google User',
-                    'email' => $googleUser['email'],
+                    'email' => $googleEmail,
                     'password' => bcrypt(Str::random(16)),
                     'email_verified_at' => now(), // Assume Google emails are verified
                 ]);
@@ -128,7 +163,8 @@ class SocialLoginController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
 
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', __('general.google_login_failed', ['message' => $e->getMessage()]));
+            $targetRoute = Auth::check() ? 'profile.edit' : 'login';
+            return redirect()->route($targetRoute)->with('error', __('general.google_login_failed', ['message' => $e->getMessage()]));
         }
     }
 }

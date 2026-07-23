@@ -243,7 +243,7 @@ class Invoice extends Model
             throw new \Exception("Cannot pay invoice #{$this->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
         }
 
-        return DB::transaction(function () {
+        DB::transaction(function () {
             $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
             if (! $locked || $locked->status === 'paid') {
@@ -696,7 +696,7 @@ class Invoice extends Model
             throw new \Exception("Cannot bill invoice #{$this->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
         }
 
-        return DB::transaction(function () {
+        DB::transaction(function () {
             $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
             if (! $locked || $locked->status === 'paid') {

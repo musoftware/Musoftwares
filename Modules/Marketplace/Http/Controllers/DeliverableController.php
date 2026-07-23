@@ -29,8 +29,17 @@ class DeliverableController extends Controller
 
         try {
             $order = $this->deliverableService->submitDeliverable($order, $validated['note'], $filePath);
+
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->with('success', __('general.work_submitted_successfully'));
+            }
+
             return response()->json(['success' => true, 'order' => $order]);
         } catch (\Exception $e) {
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->withErrors(['error' => $e->getMessage()]);
+            }
+
             return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
         }
     }
@@ -47,8 +56,17 @@ class DeliverableController extends Controller
 
         try {
             $order = $this->deliverableService->requestRevision($order, $validated['revision_note']);
+
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->with('success', __('general.revision_requested_successfully'));
+            }
+
             return response()->json(['success' => true, 'order' => $order]);
         } catch (\Exception $e) {
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->withErrors(['error' => $e->getMessage()]);
+            }
+
             return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
         }
     }

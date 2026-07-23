@@ -75,6 +75,14 @@ class FcmNotificationsTest extends TestCase
             'subscription_failed' => [new SubscriptionPaymentFailedNotification('ERP')],
             'contract_signed' => [new ContractSignedNotification((object) ['id' => 1])],
             'device_status_changed' => [new SerialUserDeviceStatusChangedNotification((object) ['id' => 1, 'device_id' => 'DEV1'], 'active', 'inactive')],
+            'timer_saved' => [new \App\Notifications\TimerSavedNotification((object) [
+                'id' => 1,
+                'date_start' => '2026-07-23 10:00:00',
+                'date_end' => '2026-07-23 11:30:00',
+                'amount' => 150.00,
+                'currency_id' => 1,
+                'invoiceItem' => (object) ['item_title' => 'Consulting Session', 'invoice_id' => 10],
+            ])],
         ];
     }
 

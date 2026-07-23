@@ -19,7 +19,7 @@ class OrderCollaborationService
      */
     public function sendMessage(ServiceOrder $order, User $sender, string $type, string $content, ?string $filePath = null): MessageActivity
     {
-        return DB::transaction(function () use ($order, $sender, $type, $content, $filePath) {
+        return DB::transaction(function () use ($order, $sender, $type, $content) {
             $activity = MessageActivity::create([
                 'order_id' => $order->id,
                 'user_id' => $sender->id,

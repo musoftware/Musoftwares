@@ -122,4 +122,29 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_user_cannot_delete_account_with_unpaid_invoices(): void
+    {
+        $user = User::factory()->create();
+
+        \App\Models\Invoice::create([
+            'user_id' => $user->id,
+            'status' => 'unpaid',
+            'unpaid' => 100,
+            'paid' => 0,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->delete('/profile', [
+                'password' => 'password',
+            ]);
+
+        $response
+            ->assertSessionHasErrors('password')
+            ->assertRedirect('/profile');
+
+        $this->assertNotNull($user->fresh());
+    }
 }

@@ -975,7 +975,7 @@ class InvoiceController extends Controller
             'span_seconds' => $spanSeconds,
             'system_base_rate' => round($system_base_rate, 2),
             'client_rate' => round($client_rate, 2),
-            'hour_rate' => round($client_rate > 0 ? $client_rate : $system_base_rate, 2),
+            'hour_rate' => round($system_base_rate, 2),
         ]);
     }
 

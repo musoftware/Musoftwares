@@ -5,6 +5,7 @@ namespace Modules\Marketplace\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 
 class ServiceSerial extends Model
@@ -22,12 +23,12 @@ class ServiceSerial extends Model
         'used_at' => 'datetime',
     ];
 
-    public function service()
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class, 'service_id');
     }
 
-    public function usedBy()
+    public function usedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'used_by');
     }

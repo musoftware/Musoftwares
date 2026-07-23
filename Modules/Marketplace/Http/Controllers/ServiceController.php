@@ -34,8 +34,12 @@ class ServiceController extends Controller
         $categories = ServiceCategory::all();
 
         $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
+        $userFavoriteIds = auth()->check()
+            ? \App\Models\Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->pluck('service_id')->toArray()
+            : [];
 
-        $services->getCollection()->transform(function ($service) use ($viewerCurrency) {
+        $services->getCollection()->transform(function ($service) use ($viewerCurrency, $userFavoriteIds) {
+            $service->is_favorited = in_array($service->id, $userFavoriteIds);
             $service->packages->transform(function ($package) use ($viewerCurrency) {
                 if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
                     $package->price = \App\Models\CurrenciesExchange::RateToday(
@@ -78,6 +82,10 @@ class ServiceController extends Controller
         }
 
         $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
+
+        $service->is_favorited = auth()->check()
+            ? \App\Models\Favorite::where('user_id', auth()->id())->where('service_id', $service->id)->exists()
+            : false;
 
         $service->packages->transform(function ($package) use ($viewerCurrency) {
             if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {

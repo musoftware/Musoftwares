@@ -1,6 +1,15 @@
 <?php
 
 return [
+    'google_login_failed' => 'فشل تسجيل الدخول باستخدام جوجل: :message',
+    'google_account_already_linked' => 'حساب جوجل (:email) مرتبط بالفعل بحسابك.',
+    'google_email_linked_other_account' => 'البريد الإلكتروني لجوجل (:email) مرتبط بحساب مستخدم آخر.',
+    'google_account_linked_success' => 'تم ربط حساب جوجل (:email) بنجاح بملفك الشخصي.',
+    'email_added_successfully' => 'تم إضافة عنوان البريد الإلكتروني بنجاح.',
+    'email_deleted_successfully' => 'تم حذف عنوان البريد الإلكتروني بنجاح.',
+    'email_updated_successfully' => 'تم تحديث عنوان البريد الإلكتروني بنجاح.',
+    'make_primary' => 'تعيين كبريد رئيسي',
+    'email_made_primary_successfully' => 'تم تعيين البريد الإلكتروني كبريد رئيسي بنجاح.',
     'assign_client' => 'تعيين العميل',
     'change_client' => 'تغيير العميل',
     'are_you_sure_unassign_device' => 'هل أنت متأكد من فك ارتباط هذا الجهاز؟',
@@ -1652,6 +1661,7 @@ return [
     'delay_between_profiles' => 'Delay between Profiles',
     'delete' => 'Delete',
     'delete_account' => 'Delete Account',
+    'cannot_delete_account_with_unpaid_invoices' => 'لا يمكنك حذف حسابك أثناء وجود فواتير غير مدفوعة. يرجى تسديد كافة الفواتير أولاً.',
     'delete_all' => 'Delete All',
     'delete_api_key' => 'حذف مفتاح API',
     'delete_board' => 'Delete Board',
@@ -7105,6 +7115,9 @@ return [
     'notif_device_status_title' => 'تم تحديث حالة الجهاز',
     'notif_device_status_body' => 'تم تغيير حالة جهازك :device إلى :status.',
     'notif_device_status_subject' => 'تم تحديث حالة الجهاز',
+    'notif_timer_saved_title' => 'تم حفظ المؤقت',
+    'notif_timer_saved_body' => 'تم تسجيل مؤقت لـ ":title": الوقت المستغرق :time، المبلغ الإجمالي :amount.',
+    'notif_timer_saved_subject' => 'تم تسجيل جلسة المؤقت',
     'board_nav_overview' => 'نظرة عامة',
     'board_nav_board' => 'اللوحة',
     'board_nav_cards' => 'البطاقات',

@@ -254,6 +254,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/emails', [ProfileController::class, 'storeEmail'])->name('profile.emails.store');
+    Route::delete('/profile/emails/{userEmail}', [ProfileController::class, 'destroyEmail'])->name('profile.emails.destroy');
+    Route::patch('/profile/emails/{userEmail}', [ProfileController::class, 'updateEmail'])->name('profile.emails.update');
+    Route::post('/profile/emails/{userEmail}/make-primary', [ProfileController::class, 'makePrimaryEmail'])->name('profile.emails.make-primary');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -745,6 +749,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post  ('/users/{user}/emails',                          [App\Http\Controllers\Admin\UserEmailController::class, 'store'])->name('users.emails.store');
     Route::delete('/users/{user}/emails/{email}',                  [App\Http\Controllers\Admin\UserEmailController::class, 'destroy'])->name('users.emails.destroy');
     Route::post  ('/users/{user}/emails/{email}/verify',           [App\Http\Controllers\Admin\UserEmailController::class, 'verify'])->name('users.emails.verify');
+    Route::post  ('/users/{user}/emails/{email}/make-primary',     [App\Http\Controllers\Admin\UserEmailController::class, 'makePrimary'])->name('users.emails.make-primary');
 
     // User Loans
     Route::post('/users/{user}/loans', [AdminUserLoanController::class, 'store'])->name('users.loans.store');

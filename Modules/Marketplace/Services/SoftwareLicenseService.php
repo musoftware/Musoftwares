@@ -16,7 +16,7 @@ class SoftwareLicenseService
      */
     public function assignSerialToOrder(int $serviceId, int $orderId): ServiceSerial
     {
-        return DB::transaction(function () use ($serviceId, $orderId) {
+        return DB::transaction(function () use ($serviceId) {
             $serial = ServiceSerial::where('service_id', $serviceId)
                 ->where('is_used', false)
                 ->lockForUpdate()

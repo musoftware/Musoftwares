@@ -344,6 +344,10 @@ class UsersController extends Controller
             return back()->withErrors(['error' => 'You cannot delete your own account.']);
         }
 
+        if ($user->hasUnpaidInvoices()) {
+            return back()->withErrors(['error' => __('general.cannot_delete_account_with_unpaid_invoices')]);
+        }
+
         $user->delete();
 
         return redirect()->route('admin.users.index')

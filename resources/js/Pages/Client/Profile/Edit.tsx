@@ -1,15 +1,30 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
+import UserEmailsForm from './Partials/UserEmailsForm';
 import { __ } from '@/lib/i18n';
+
+interface SecondaryEmail {
+    id: number;
+    email: string;
+    verified_at: string | null;
+    source: string;
+}
 
 export default function Edit({
     mustVerifyEmail,
     status,
-}: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
+    hasUnpaidInvoices = false,
+    emails = [],
+}: PageProps<{
+    mustVerifyEmail: boolean;
+    status?: string;
+    hasUnpaidInvoices?: boolean;
+    emails?: SecondaryEmail[];
+}>) {
     const Layout = AuthenticatedLayout;
 
     return (
@@ -32,11 +47,15 @@ export default function Edit({
                     </div>
 
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
+                        <UserEmailsForm emails={emails} className="w-full max-w-7xl" />
+                    </div>
+
+                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
                         <UpdatePasswordForm className="w-full max-w-7xl" />
                     </div>
 
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <DeleteUserForm className="w-full max-w-7xl" />
+                        <DeleteUserForm className="w-full max-w-7xl" hasUnpaidInvoices={hasUnpaidInvoices} />
                     </div>
                 </div>
             </div>

@@ -28,6 +28,10 @@ class CustomProjectController extends Controller
 
         $project = $this->customProjectService->createProject(auth()->user(), $validated);
 
+        if ($request->header('X-Inertia') || !$request->wantsJson()) {
+            return back()->with('success', __('general.project_created_successfully'));
+        }
+
         return response()->json(['success' => true, 'project' => $project]);
     }
 
@@ -41,8 +45,17 @@ class CustomProjectController extends Controller
 
         try {
             $proposal = $this->customProjectService->submitProposal($project, auth()->user(), $validated);
+
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->with('success', __('general.proposal_submitted_successfully'));
+            }
+
             return response()->json(['success' => true, 'proposal' => $proposal]);
         } catch (\Exception $e) {
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->withErrors(['error' => $e->getMessage()]);
+            }
+
             return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
         }
     }
@@ -61,8 +74,16 @@ class CustomProjectController extends Controller
                 (float) $validated['amount']
             );
 
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->with('success', __('general.proposal_accepted_successfully'));
+            }
+
             return response()->json(['success' => true, 'contract' => $contract]);
         } catch (\Exception $e) {
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->withErrors(['error' => $e->getMessage()]);
+            }
+
             return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
         }
     }

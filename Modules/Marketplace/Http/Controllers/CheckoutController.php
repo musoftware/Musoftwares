@@ -27,8 +27,16 @@ class CheckoutController extends Controller
                 $validated['extra_ids'] ?? []
             );
 
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return redirect()->route('marketplace.orders.show', $order->id)
+                    ->with('success', __('general.order_placed_successfully'));
+            }
+
             return response()->json(['success' => true, 'order_id' => $order->id]);
         } catch (\Exception $e) {
+            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+                return back()->withErrors(['error' => $e->getMessage()]);
+            }
             return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
         }
     }

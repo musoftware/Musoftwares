@@ -332,7 +332,12 @@ export default function Show({ service }: any) {
                                                         <div className="text-center text-sm font-medium text-red-600">
                                                             {__('general.need_more_balance', { amount: formatCurrency(selectedPackage.price - displayBalance, selectedPackage.currency) })}
                                                         </div>
-                                                        <button className="w-full rounded-lg bg-amber-500 px-4 py-3 font-bold text-white transition hover:bg-amber-600">{__('general.top_up_wallet')}</button>
+                                                        <Link
+                                                            href={route('billing.invoices.index')}
+                                                            className="block w-full text-center rounded-lg bg-amber-500 px-4 py-3 font-bold text-white transition hover:bg-amber-600 shadow-sm"
+                                                        >
+                                                            {__('general.top_up_wallet')}
+                                                        </Link>
                                                     </div>
                                                 )}
                                             </div>

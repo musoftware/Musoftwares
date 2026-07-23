@@ -45,6 +45,13 @@ export default function UserEmails({ user, primary, emails = [], suggestions = [
         });
     };
 
+    const makePrimary = (alias) => {
+        if (!confirm(`Make ${alias.email} the primary email for this account?`)) return;
+        router.post(`/admin/users/${user.id}/emails/${alias.id}/make-primary`, {}, {
+            preserveScroll: true,
+        });
+    };
+
     const searchDuplicates = (e) => {
         e.preventDefault();
         router.get(`/admin/users/${user.id}/emails`, { search: searchTerm }, {
@@ -166,6 +173,14 @@ export default function UserEmails({ user, primary, emails = [], suggestions = [
                                                     Verify
                                                 </Button>
                                             )}
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-blue-600 dark:text-blue-400"
+                                                onClick={() => makePrimary(alias)}
+                                            >
+                                                Make primary
+                                            </Button>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"

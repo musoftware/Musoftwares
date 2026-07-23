@@ -173,16 +173,31 @@ export default function Browse({ services, categories, filters }: any) {
                                                  <div className="absolute top-3 start-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
                                                      {__('general.featured')}</div>
                                              )}
-                                             <button className="absolute top-3 end-3 rounded-full bg-white/80 p-2 text-gray-400 transition-colors hover:text-red-500">
+                                             <button
+                                                 type="button"
+                                                 onClick={(e) => {
+                                                     e.preventDefault();
+                                                     e.stopPropagation();
+                                                     router.post(
+                                                         route('marketplace.favorites.toggle', service.id),
+                                                         {},
+                                                         { preserveScroll: true }
+                                                     );
+                                                 }}
+                                                 className={`absolute top-3 end-3 rounded-full bg-white/90 p-2 shadow-sm transition-colors ${service.is_favorited ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+                                                 title={service.is_favorited ? __('general.remove_from_favorites') || 'Remove from favorites' : __('general.add_to_favorites') || 'Add to favorites'}
+                                             >
                                                  <svg
                                                      className="h-5 w-5"
-                                                     fill="currentColor"
-                                                     viewBox="0 0 20 20"
+                                                     fill={service.is_favorited ? 'currentColor' : 'none'}
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24"
                                                  >
                                                      <path
-                                                         fillRule="evenodd"
-                                                         d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                                                         clipRule="evenodd"
+                                                         strokeLinecap="round"
+                                                         strokeLinejoin="round"
+                                                         strokeWidth="2"
+                                                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                                                      />
                                                  </svg>
                                              </button>

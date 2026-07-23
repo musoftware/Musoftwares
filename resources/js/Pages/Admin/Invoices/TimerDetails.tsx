@@ -100,7 +100,7 @@ export default function TimerDetails({
 
     const [manualHours, setManualHours] = useState('');
     const [manualMinutes, setManualMinutes] = useState('');
-    const [rate, setRate] = useState<number>(cache?.rate ?? hour_rate);
+    const [rate, setRate] = useState<number>(cache?.rate && cache.rate !== client_rate ? cache.rate : (system_base_rate || hour_rate));
     const [rateVisible, setRateVisible] = useState(false);
     const [reason, setReason] = useState(cache?.reason ?? (item.item_title || ''));
     const [isSaving, setIsSaving] = useState(false);
@@ -238,10 +238,6 @@ export default function TimerDetails({
     if (isRunning) lastEndDate = parseDateTime(new Date().toISOString()).full;
     else if (timers.length > 0) lastEndDate = parseDateTime(timers[timers.length - 1].end_date).full;
 
-    const rateUrl = item.project_id
-        ? route('admin.projects.edit', item.project_id)
-        : route('admin.users.edit', item.client_id || 0);
-
     return (
         <AdminSidebarLayout>
             <Head title={`${__('general.timer_details')} - Invoice #${item.invoice_number}`} />
@@ -275,31 +271,9 @@ export default function TimerDetails({
                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">
                                     {__('general.hour_rate')}
                                 </label>
-                                <div className="flex flex-col gap-2 mb-2.5">
-                                    <div className="flex items-center gap-4 text-xs font-medium">
-                                        <label className="flex items-center gap-1.5 cursor-pointer text-gray-700">
-                                            <input
-                                                type="radio"
-                                                name="rateType"
-                                                checked={rate === system_base_rate}
-                                                onChange={() => setRate(system_base_rate)}
-                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-slate-900 border-gray-300"
-                                                disabled={item.invoice_status !== 'unpaid'}
-                                            />
-                                            {__('admin.base_system_rate')} ({system_base_rate})
-                                        </label>
-                                        <label className={`flex items-center gap-1.5 cursor-pointer ${client_rate > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
-                                            <input
-                                                type="radio"
-                                                name="rateType"
-                                                checked={rate === client_rate}
-                                                onChange={() => setRate(client_rate)}
-                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-slate-900 border-gray-300"
-                                                disabled={item.invoice_status !== 'unpaid' || client_rate <= 0}
-                                            />
-                                            {__('admin.client_rate')} ({client_rate > 0 ? client_rate : __('general.not_set')})
-                                        </label>
-                                    </div>
+                                <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 mb-2.5">
+                                    <span className="font-semibold">{__('admin.base_system_rate')}</span>
+                                    <span className="text-gray-500">({system_base_rate})</span>
                                 </div>
                                 <div className="flex shadow-sm rounded-md">
                                     <Input
@@ -312,7 +286,7 @@ export default function TimerDetails({
                                     <Button type="button" variant="outline" className="rounded-none border-s-0 px-3 hover:bg-gray-100" onClick={() => setRateVisible((v) => !v)} aria-label={rateVisible ? __('general.hide_rate') : __('general.show_rate')}>
                                         {rateVisible ? <X className="w-4 h-4 text-gray-500" /> : <LinkIcon className="w-4 h-4 text-gray-500" />}
                                     </Button>
-                                    <Link href={rateUrl} target="_blank">
+                                    <Link href={route('admin.settings.index')} target="_blank">
                                         <Button type="button" variant="outline" className="rounded-s-none px-3 hover:bg-gray-100 border-s-0" aria-label={__('general.edit')}>
                                             <Edit className="w-4 h-4 text-slate-900" />
                                         </Button>

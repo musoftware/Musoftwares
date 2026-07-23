@@ -179,6 +179,14 @@ class User extends Authenticatable
         return $this->hasMany(Invoice::class);
     }
 
+    public function hasUnpaidInvoices(): bool
+    {
+        return $this->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->exists();
+    }
+
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'user_id');

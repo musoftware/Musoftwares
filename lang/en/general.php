@@ -1,6 +1,15 @@
 <?php
 
 return [
+    'google_login_failed' => 'Google authentication failed: :message',
+    'google_account_already_linked' => 'Google account (:email) is already linked to your account.',
+    'google_email_linked_other_account' => 'Google email (:email) is linked to another user account.',
+    'google_account_linked_success' => 'Google account (:email) linked successfully to your profile.',
+    'email_added_successfully' => 'Email address added successfully.',
+    'email_deleted_successfully' => 'Email address deleted successfully.',
+    'email_updated_successfully' => 'Email address updated successfully.',
+    'make_primary' => 'Make Primary',
+    'email_made_primary_successfully' => 'Email address set as primary successfully.',
     'assign_client' => 'Assign Client',
     'change_client' => 'Change Client',
     'are_you_sure_unassign_device' => 'Are you sure you want to unassign this device?',
@@ -1657,6 +1666,7 @@ return [
     'delay_between_profiles' => 'Delay between Profiles',
     'delete' => 'Delete',
     'delete_account' => 'Delete Account',
+    'cannot_delete_account_with_unpaid_invoices' => 'You cannot delete your account while you have unpaid invoices. Please settle all unpaid invoices first.',
     'delete_all' => 'Delete All',
     'delete_api_key' => 'Delete API Key',
     'delete_board' => 'Delete Board',
@@ -7112,6 +7122,9 @@ return [
     'notif_device_status_title' => 'Device Status Updated',
     'notif_device_status_body' => 'Your device :device status changed to :status.',
     'notif_device_status_subject' => 'Device Status Updated',
+    'notif_timer_saved_title' => 'Timer Saved',
+    'notif_timer_saved_body' => 'A timer session for ":title" was recorded: :time consumed, total :amount.',
+    'notif_timer_saved_subject' => 'Timer Session Recorded',
     'my_projects' => 'My Projects',
     'projects_portal_intro' => 'Projects your team is working on for you.',
     'open_tasks' => 'Open Tasks',

@@ -23,9 +23,13 @@ class WishlistController extends Controller
         return response()->json(['favorites' => $favorites]);
     }
 
-    public function toggle(Service $service)
+    public function toggle(Request $request, Service $service)
     {
         $isFavorited = $this->wishlistService->toggleFavorite(auth()->user(), $service);
+
+        if ($request->header('X-Inertia') || $request->wantsJson() === false) {
+            return back()->with('success', $isFavorited ? __('general.added_to_favorites') : __('general.removed_from_favorites'));
+        }
 
         return response()->json([
             'success' => true,

@@ -105,4 +105,31 @@ class UserEmailController extends Controller
             ->route('admin.users.emails.index', $user->id)
             ->with('success', 'Alias marked verified.');
     }
+
+    public function makePrimary(Request $request, User $user, UserEmail $email): RedirectResponse
+    {
+        abort_unless((int) $email->user_id === (int) $user->id, 404);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $email) {
+            $oldPrimaryEmail = $user->email;
+            $oldVerifiedAt = $user->email_verified_at;
+
+            $newPrimaryEmail = $email->email;
+            $newVerifiedAt = $email->verified_at ?? now();
+
+            $user->forceFill([
+                'email' => $newPrimaryEmail,
+                'email_verified_at' => $newVerifiedAt,
+            ])->save();
+
+            $email->forceFill([
+                'email' => $oldPrimaryEmail,
+                'verified_at' => $oldVerifiedAt,
+            ])->save();
+        });
+
+        return redirect()
+            ->route('admin.users.emails.index', $user->id)
+            ->with('success', 'Primary email updated successfully.');
+    }
 }
