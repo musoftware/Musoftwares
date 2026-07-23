@@ -15,7 +15,7 @@ return array (
     array (
       'title' => 'Starter',
       'desc' => 'Perfect for small businesses getting started.',
-      'price' => '$29',
+      'price' => ':amount',
       'interval' => '/mo',
       'f1' => 'Basic features',
       'f2' => 'Up to 5 users',
@@ -27,7 +27,7 @@ return array (
       'title' => 'Professional',
       'badge' => 'Most Popular',
       'desc' => 'For growing teams requiring advanced features.',
-      'price' => '$99',
+      'price' => ':amount',
       'interval' => '/mo',
       'f1' => 'Advanced features',
       'f2' => 'Unlimited users',

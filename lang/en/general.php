@@ -87,7 +87,7 @@ return [
     'a_proven_delivery_process' => 'A Proven Delivery Process',
     'a_sequence_is_a_series_of_automated_emails_sent_over_time' => 'A sequence is a series of automated emails sent over time.',
     'a_simple_transparent_4step_process' => 'A Simple Transparent 4step Process',
-    'a_unique_portal_url_will_be_generated_automatically_balance_starts_at_0' => 'A unique portal URL will be generated automatically. Balance starts at \\\$0.',
+    'a_unique_portal_url_will_be_generated_automatically_balance_starts_at_0' => 'A unique portal URL will be generated automatically. Balance starts at :amount.',
     'about' => 'About',
     'about_eng_mahmoud' => 'About Eng Mahmoud',
     'about_formats' => 'About Formats',
