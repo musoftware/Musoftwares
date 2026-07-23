@@ -68,9 +68,17 @@ export default function MarketplaceHeader() {
                         <Link href="/marketplace/services" className="hover:text-indigo-600 transition-colors">
                             {__('general.explore')}
                         </Link>
+                        <Link href="/marketplace/projects" className="hover:text-indigo-600 transition-colors">
+                            {__('general.custom_projects_bidding') || 'Projects'}
+                        </Link>
+                        <Link href="/marketplace/favorites" className="hover:text-indigo-600 transition-colors">
+                            {__('general.saved_favorites') || 'Wishlist'}
+                        </Link>
                         <button className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
                             <Globe className="h-4 w-4" /> {__('general.english')}</button>
-                        <button className="hover:text-indigo-600 transition-colors">US$ USD</button>
+                        <span className="hover:text-indigo-600 transition-colors font-medium">
+                            {user?.currency_obj?.symbol || user?.currency?.symbol || '$'} {user?.currency_obj?.currency || user?.currency?.currency || (typeof user?.currency === 'string' ? user.currency : 'USD')}
+                        </span>
                         {!user && (
                             <Link href="/marketplace/services/create" className="hover:text-indigo-600 transition-colors">
                                 {__('general.become_a_seller')}
@@ -112,6 +120,12 @@ export default function MarketplaceHeader() {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href="/marketplace/orders" className="cursor-pointer w-full">{__('general.orders')}</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/marketplace/projects" className="cursor-pointer w-full">{__('general.custom_projects_bidding') || 'Custom Projects'}</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/marketplace/favorites" className="cursor-pointer w-full">{__('general.saved_favorites') || 'Wishlist'}</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href="/profile" className="cursor-pointer w-full">{__('general.profile')}</Link>

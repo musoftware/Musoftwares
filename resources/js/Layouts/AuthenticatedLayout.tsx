@@ -5,7 +5,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Toaster } from '@/Components/ui/toaster';
 import { useToast } from '@/Components/ui/use-toast';
 import { Button, buttonVariants } from '@/Components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn, formatMoney } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/Components/ui/accordion';
 import {
@@ -795,7 +795,7 @@ function AuthenticatedContent({
                                             title={__('general.wallet_balance')}
                                         >
                                             <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                                            <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
+                                            <span>{wallet ? formatMoney(wallet.balance, wallet.currency) : formatMoney(0, (auth?.user as any)?.currency)}</span>
                                         </Link>
                                         {isTourOpen && tourStep === 3 && (
                                             <span className="absolute -top-1 -end-1 flex h-3 w-3">

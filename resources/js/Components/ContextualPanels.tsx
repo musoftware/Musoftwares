@@ -218,11 +218,11 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
                     </div>
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-200">{__('general.unified_wallet_balance')}</div>
                     <div className="font-mono text-3xl font-bold mt-1 text-white">
-                        {formatMoney(data.balance, 'USD')}
+                        {formatMoney(data.balance, data?.currency)}
                     </div>
                     <div className="mt-4 flex items-center justify-between text-xs text-slate-300 border-t border-white/10 pt-4">
                         <span className="flex items-center gap-1.5">
-                            <Lock className="h-3.5 w-3.5 text-indigo-300" /> Locked Holds: $0.00
+                            <Lock className="h-3.5 w-3.5 text-indigo-300" /> Locked Holds: {formatMoney(0, data?.currency)}
                         </span>
                         <span className="bg-white/15 px-2 py-0.5 rounded text-[10px] text-white">{__('general.active')}</span>
                     </div>
@@ -234,15 +234,15 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
                     <div className="space-y-2.5">
                         <div className="flex justify-between border-b border-border/40 pb-2.5">
                             <span className="text-text-muted">{__('general.available_funds')}</span>
-                            <span className="font-mono font-medium text-text-primary">{formatMoney(data.balance * 0.9, 'USD')}</span>
+                            <span className="font-mono font-medium text-text-primary">{formatMoney(data.balance * 0.9, data?.currency)}</span>
                         </div>
                         <div className="flex justify-between border-b border-border/40 pb-2.5">
                             <span className="text-text-muted">{__('general.referral_bonus_credit')}</span>
-                            <span className="font-mono font-medium text-text-primary">{formatMoney(data.balance * 0.1, 'USD')}</span>
+                            <span className="font-mono font-medium text-text-primary">{formatMoney(data.balance * 0.1, data?.currency)}</span>
                         </div>
                         <div className="flex justify-between border-b border-border/40 pb-2.5">
                             <span className="text-text-muted">{__('general.total_withdrawals_paid')}</span>
-                            <span className="font-mono font-medium text-text-primary">$1,250.00</span>
+                            <span className="font-mono font-medium text-text-primary">{formatMoney(1250, data?.currency)}</span>
                         </div>
                     </div>
                 </div>
@@ -263,7 +263,7 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
                                     <div className="text-[10px] text-text-muted mt-0.5">{formatDate(tx.date)}</div>
                                 </div>
                                 <span className={`font-mono font-bold self-center ${tx.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                    {tx.type === 'credit' ? '+' : ''}{formatMoney(tx.amount, 'USD')}
+                                    {tx.type === 'credit' ? '+' : ''}{formatMoney(tx.amount, data?.currency)}
                                 </span>
                             </div>
                         ))}
@@ -305,7 +305,7 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         <div>
                             <span className="text-text-muted block">{__('general.contract_value')}</span>
                             <span className="font-mono font-bold text-text-primary text-sm mt-0.5 block">
-                                {formatMoney(data.value || 3500, 'USD')}
+                                {formatMoney(data.value || 3500, data?.currency)}
                             </span>
                         </div>
                         <div>
@@ -424,13 +424,13 @@ export function CustomerQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         <div className="rounded-xl border border-border bg-white p-3.5 text-center">
                             <span className="text-text-muted text-[11px] block">{__('general.total_invoiced')}</span>
                             <span className="font-mono text-sm font-bold text-text-primary block mt-1">
-                                {formatMoney(data.totalInvoiced || 4800, 'USD')}
+                                {formatMoney(data.totalInvoiced || 4800, data?.currency)}
                             </span>
                         </div>
                         <div className="rounded-xl border border-border bg-white p-3.5 text-center">
                             <span className="text-text-muted text-[11px] block">{__('general.paid_balance')}</span>
                             <span className="font-mono text-sm font-bold text-emerald-600 block mt-1">
-                                {formatMoney(data.totalPaid || 3950, 'USD')}
+                                {formatMoney(data.totalPaid || 3950, data?.currency)}
                             </span>
                         </div>
                     </div>
@@ -528,7 +528,7 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                                 <span className="font-bold text-text-primary">{__('general.basic_conversion')}</span>
                                 <p className="text-[10px] text-text-muted mt-0.5">3 screens, standard styling</p>
                             </div>
-                            <span className="font-mono font-bold text-text-primary self-center">$450.00</span>
+                            <span className="font-mono font-bold text-text-primary self-center">{formatMoney(450, data?.currency)}</span>
                         </div>
                         <div className="flex justify-between p-3 border-s-2 border-indigo-500 bg-indigo-50/5">
                             <div>
@@ -536,14 +536,14 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                                 </span>
                                 <p className="text-[10px] text-text-muted mt-0.5">10 screens, advanced layouts, state controls</p>
                             </div>
-                            <span className="font-mono font-bold text-indigo-700 self-center">$850.00</span>
+                            <span className="font-mono font-bold text-indigo-700 self-center">{formatMoney(850, data?.currency)}</span>
                         </div>
                         <div className="flex justify-between p-3">
                             <div>
                                 <span className="font-bold text-text-primary">{__('general.enterprise_refactor')}</span>
                                 <p className="text-[10px] text-text-muted mt-0.5">{__('general.complete_system_architecture_overhaul')}</p>
                             </div>
-                            <span className="font-mono font-bold text-text-primary self-center">$1,500.00</span>
+                            <span className="font-mono font-bold text-text-primary self-center">{formatMoney(1500, data?.currency)}</span>
                         </div>
                     </div>
                 </div>
