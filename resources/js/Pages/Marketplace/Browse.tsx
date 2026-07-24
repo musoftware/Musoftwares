@@ -6,14 +6,15 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Browse({ services, categories, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');
-    const [categoryId, setCategoryId] = useState(filters.category_id || '');
+    const activeCategoryParam = filters.category || filters.category_id || '';
+    const [categoryId, setCategoryId] = useState(activeCategoryParam);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const handleSearch = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         router.get(
             route('marketplace.services.index'),
-            { search, category_id: categoryId },
+            { search, category: categoryId },
             { preserveState: true },
         );
     };
@@ -22,10 +23,11 @@ export default function Browse({ services, categories, filters }: any) {
         setCategoryId(id);
         router.get(
             route('marketplace.services.index'),
-            { search, category_id: id },
+            { search, category: id },
             { preserveState: true },
         );
     };
+
 
     // Horizontal drag to scroll
     let isDown = false;
@@ -90,39 +92,63 @@ export default function Browse({ services, categories, filters }: any) {
                 </div>
             </div>
 
-            {/* Category Filter (Horizontal Scroll) */}
-            <div className="border-b border-gray-200 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div
-                        ref={scrollContainerRef}
-                        className="no-scrollbar flex cursor-grab gap-4 overflow-x-auto py-4 active:cursor-grabbing"
-                        onMouseDown={handleMouseDown}
-                        onMouseLeave={handleMouseLeave}
-                        onMouseUp={handleMouseUp}
-                        onMouseMove={handleMouseMove}
-                        style={{
-                            scrollbarWidth: 'none',
-                            msOverflowStyle: 'none',
-                        }}
-                    >
+            {/* Active Filter Indicators */}
+            {(filters.category || filters.search) && (
+                <div className="border-b border-gray-200 bg-gray-50 py-3">
+                    <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                            <span className="font-medium text-gray-500">{__('general.filtering_by') || 'Filtering by'}:</span>
+                            {filters.category && (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">
+                                    {categories.find((c: any) => c.slug.toLowerCase() === filters.category.toString().toLowerCase() || c.id.toString() === filters.category.toString())?.name || filters.category}
+                                    <button
+                                        type="button"
+                                        onClick={() => selectCategory('')}
+                                        className="ms-1 font-bold hover:text-indigo-950"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            )}
+                            {filters.search && (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-800">
+                                    "{filters.search}"
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSearch('');
+                                            router.get(
+                                                route('marketplace.services.index'),
+                                                { category: categoryId },
+                                                { preserveState: true }
+                                            );
+                                        }}
+                                        className="ms-1 font-bold hover:text-gray-950"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            )}
+                        </div>
                         <button
-                            onClick={() => selectCategory('')}
-                            className={`rounded-full border px-4 py-2 whitespace-nowrap transition ${categoryId === '' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'}`}
-                        >{__('general.all_categories')}</button>
-                        {categories.map((cat: any) => (
-                            <button
-                                key={cat.id}
-                                onClick={() =>
-                                    selectCategory(cat.id.toString())
-                                }
-                                className={`rounded-full border px-4 py-2 whitespace-nowrap transition ${categoryId === cat.id.toString() ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'}`}
-                            >
-                                {cat.name}
-                            </button>
-                        ))}
+                            type="button"
+                            onClick={() => {
+                                setSearch('');
+                                setCategoryId('');
+                                router.get(
+                                    route('marketplace.services.index'),
+                                    {},
+                                    { preserveState: true }
+                                );
+                            }}
+                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                        >
+                            {__('general.clear_all_filters') || 'Clear all'}
+                        </button>
                     </div>
                 </div>
-            </div>
+            )}
+
 
             {/* Services Grid */}
             <div className="min-h-screen bg-gray-50 py-12">

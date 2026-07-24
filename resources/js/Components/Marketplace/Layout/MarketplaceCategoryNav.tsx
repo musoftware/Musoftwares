@@ -12,12 +12,14 @@ interface Category {
 
 export default function MarketplaceCategoryNav() {
     // Try to get from Inertia props first, fallback to empty array
-    const { categories: inertiaCategories } = usePage().props as any;
+    const { categories: inertiaCategories, filters } = usePage().props as any;
     
     const [categories, setCategories] = useState<Category[]>(
         Array.isArray(inertiaCategories) ? inertiaCategories : []
     );
     const [loading, setLoading] = useState(!Array.isArray(inertiaCategories) || inertiaCategories.length === 0);
+
+    const activeCategory = filters?.category || filters?.category_id || '';
 
     useEffect(() => {
         // If we didn't get categories from Inertia props, fetch them client-side
@@ -50,15 +52,25 @@ export default function MarketplaceCategoryNav() {
                             <Skeleton key={i} className="h-4 w-24 shrink-0" />
                         ))
                     ) : (
-                        categories.map((category) => (
-                            <Link
-                                key={category.id}
-                                href={`/marketplace/services?category=${category.slug || category.id}`}
-                                className="whitespace-nowrap text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline hover:underline-offset-8 transition-all shrink-0"
-                            >
-                                {category.name}
-                            </Link>
-                        ))
+                        categories.map((category) => {
+                            const isActive =
+                                activeCategory.toString().toLowerCase() === category.slug.toLowerCase() ||
+                                activeCategory.toString() === category.id.toString() ||
+                                activeCategory.toString().toLowerCase() === category.name.toLowerCase();
+                            return (
+                                <Link
+                                    key={category.id}
+                                    href={`/marketplace/services?category=${category.slug || category.id}`}
+                                    className={`whitespace-nowrap text-sm font-medium transition-all shrink-0 py-3 ${
+                                        isActive
+                                            ? 'text-indigo-600 font-bold border-b-2 border-indigo-600'
+                                            : 'text-gray-500 hover:text-gray-900 hover:underline hover:underline-offset-8'
+                                    }`}
+                                >
+                                    {category.name}
+                                </Link>
+                            );
+                        })
                     )}
                 </nav>
             </div>

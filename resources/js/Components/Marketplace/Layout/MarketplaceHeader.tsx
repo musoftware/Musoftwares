@@ -68,9 +68,6 @@ export default function MarketplaceHeader() {
                         <Link href="/marketplace/services" className="hover:text-indigo-600 transition-colors">
                             {__('general.explore')}
                         </Link>
-                        <Link href="/marketplace/projects" className="hover:text-indigo-600 transition-colors">
-                            {__('general.custom_projects_bidding') || 'Projects'}
-                        </Link>
                         <Link href="/marketplace/favorites" className="hover:text-indigo-600 transition-colors">
                             {__('general.saved_favorites') || 'Wishlist'}
                         </Link>
@@ -122,11 +119,9 @@ export default function MarketplaceHeader() {
                                         <Link href="/marketplace/orders" className="cursor-pointer w-full">{__('general.orders')}</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/marketplace/projects" className="cursor-pointer w-full">{__('general.custom_projects_bidding') || 'Custom Projects'}</Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
                                         <Link href="/marketplace/favorites" className="cursor-pointer w-full">{__('general.saved_favorites') || 'Wishlist'}</Link>
                                     </DropdownMenuItem>
+
                                     <DropdownMenuItem asChild>
                                         <Link href="/profile" className="cursor-pointer w-full">{__('general.profile')}</Link>
                                     </DropdownMenuItem>

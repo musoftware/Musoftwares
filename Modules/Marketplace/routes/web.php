@@ -11,7 +11,6 @@ use Modules\Marketplace\Http\Controllers\FreeDownloadController;
 use Modules\Marketplace\Http\Controllers\ServiceSerialController;
 use Modules\Marketplace\Http\Controllers\PromotionsController;
 use Modules\Marketplace\Http\Controllers\ReferralController;
-use Modules\Marketplace\Http\Controllers\CustomProjectController;
 use Modules\Marketplace\Http\Controllers\WishlistController;
 use Modules\Marketplace\Http\Controllers\PremiumToolController;
 
@@ -30,9 +29,6 @@ Route::middleware('web')
         // Free downloads
         Route::post('/downloads/{service}/request', [FreeDownloadController::class, 'requestDownload'])->name('downloads.request');
         Route::get('/downloads/claim/{token}', [FreeDownloadController::class, 'claimDownload'])->name('downloads.claim');
-
-        // Custom Bidding Projects Public Feed
-        Route::get('/projects', [CustomProjectController::class, 'index'])->name('projects.index');
 
         // ── Auth-only ─────────────────────────────────────────────────────
         Route::middleware('auth')->group(function () {
@@ -65,14 +61,10 @@ Route::middleware('web')
             // Referral Network & Withdrawals
             Route::post('/referral/withdraw', [ReferralController::class, 'withdraw'])->name('referral.withdraw');
 
-            // Custom Projects & Proposals
-            Route::post('/projects', [CustomProjectController::class, 'store'])->name('projects.store');
-            Route::post('/projects/{project}/bid', [CustomProjectController::class, 'submitProposal'])->name('projects.bid');
-            Route::post('/projects/{project}/accept', [CustomProjectController::class, 'acceptProposal'])->name('projects.accept');
-
             // Wishlist / Favorites
             Route::get('/favorites', [WishlistController::class, 'index'])->name('favorites.index');
             Route::post('/services/{service}/favorite', [WishlistController::class, 'toggle'])->name('favorites.toggle');
+
 
             // AI Tools Marketplace
             Route::post('/tools/{toolSlug}/use', [PremiumToolController::class, 'useTool'])->name('tools.use');

@@ -18,12 +18,21 @@ class ServiceController extends Controller
     {
         $query = Service::with(['seller', 'category', 'packages.currency'])->where('status', 'active');
 
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->input('category_id'));
+        $categoryParam = $request->input('category') ?? $request->input('category_id') ?? $request->input('category_slug');
+
+        if (!empty($categoryParam)) {
+            if (is_numeric($categoryParam)) {
+                $query->where('category_id', $categoryParam);
+            } else {
+                $query->whereHas('category', function ($q) use ($categoryParam) {
+                    $q->where('slug', $categoryParam)
+                      ->orWhere('name', 'like', "%{$categoryParam}%");
+                });
+            }
         }
 
-        if ($request->has('search')) {
-            $search = $request->input('search');
+        $search = $request->input('search') ?? $request->input('q');
+        if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
@@ -31,7 +40,7 @@ class ServiceController extends Controller
         }
 
         $services = $query->latest()->paginate(15);
-        $categories = ServiceCategory::all();
+        $categories = ServiceCategory::orderBy('name')->get();
 
         $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
         $userFavoriteIds = auth()->check()
@@ -58,7 +67,11 @@ class ServiceController extends Controller
         return Inertia::render('Marketplace/Browse', [
             'services' => $services,
             'categories' => $categories,
-            'filters' => $request->only(['search', 'category_id']),
+            'filters' => [
+                'search' => $search ?? '',
+                'category' => $categoryParam ?? '',
+                'category_id' => $categoryParam ?? '',
+            ],
         ]);
     }
 
