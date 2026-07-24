@@ -38,12 +38,21 @@ Write-Host "=== Deploy Build (Local to Remote) ===" -ForegroundColor Cyan
 Write-Host "Server: $SSH_USER@$SSH_HOST`:$SSH_PORT" -ForegroundColor Gray
 Write-Host ""
 
+# Detect PHP binary
+$PHP_BIN = "php"
+if (Test-Path "C:\tools\php83\php.exe") {
+    $PHP_BIN = "C:\tools\php83\php.exe"
+    $env:PATH = "C:\tools\php83;" + $env:PATH
+} elseif ((Get-Command php -ErrorAction SilentlyContinue)) {
+    $PHP_BIN = (Get-Command php).Source
+}
+
 # 1. Static Analysis
 Write-Host "[1/5] Running static analysis..." -ForegroundColor Yellow
 Set-Location $PROJECT_ROOT
 
 Write-Host "-> Checking PHP Code (PHPStan)..." -ForegroundColor DarkGray
-cmd.exe /c "C:\tools\php83\php.exe vendor\bin\phpstan analyse --memory-limit=2G"
+cmd.exe /c "`"$PHP_BIN`" vendor\bin\phpstan analyse --memory-limit=2G"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "PHPStan check failed! Upload aborted. Please fix the PHP errors." -ForegroundColor Red
     exit 1
@@ -57,7 +66,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "-> Checking Translations..." -ForegroundColor DarkGray
-cmd.exe /c "C:\tools\php83\php.exe artisan translations:check"
+cmd.exe /c "`"$PHP_BIN`" artisan translations:check"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Translation check failed! Upload aborted. Please complete all missing translations." -ForegroundColor Red
     exit 1

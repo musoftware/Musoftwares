@@ -100,7 +100,10 @@ export default function Browse({ services, categories, filters }: any) {
                             <span className="font-medium text-gray-500">{__('general.filtering_by') || 'Filtering by'}:</span>
                             {filters.category && (
                                 <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">
-                                    {categories.find((c: any) => c.slug.toLowerCase() === filters.category.toString().toLowerCase() || c.id.toString() === filters.category.toString())?.name || filters.category}
+                                    {categories.find((c: any) => 
+                                        (c?.slug && c.slug.toLowerCase() === filters.category?.toString().toLowerCase()) || 
+                                        (c?.id && c.id.toString() === filters.category?.toString())
+                                    )?.name || filters.category}
                                     <button
                                         type="button"
                                         onClick={() => selectCategory('')}

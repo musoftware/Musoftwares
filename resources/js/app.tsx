@@ -59,8 +59,14 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
         
-        if (props.initialPage.props.currencies) {
-            (window as any).currencies = props.initialPage.props.currencies;
+        const pageProps = props.initialPage.props as any;
+        if (pageProps.currencies) {
+            (window as any).currencies = pageProps.currencies;
+        }
+        if (pageProps.wallet?.currency) {
+            (window as any).defaultCurrency = pageProps.wallet.currency;
+        } else if (pageProps.settings?.base_currency) {
+            (window as any).defaultCurrency = pageProps.settings.base_currency;
         }
 
         root.render(

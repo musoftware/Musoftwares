@@ -1567,7 +1567,7 @@ export default function ProjectBoard({
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date &amp; Time
+                                    Publish Date & Time
                                     <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
                                 </Label>
                                 <Input
@@ -1636,7 +1636,7 @@ export default function ProjectBoard({
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date &amp; Time
+                                    Publish Date & Time
                                     <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
                                 </Label>
                                 <Input
@@ -1733,7 +1733,7 @@ export default function ProjectBoard({
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date &amp; Time
+                                    Publish Date & Time
                                     <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
                                 </Label>
                                 <Input
@@ -2073,7 +2073,7 @@ export default function ProjectBoard({
                             <div className="space-y-1">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date &amp; Time
+                                    Publish Date & Time
                                     <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
                                 </Label>
                                 <Input
@@ -2141,7 +2141,7 @@ export default function ProjectBoard({
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date &amp; Time
+                                    Publish Date & Time
                                     <span className="ml-auto text-[10px] font-normal text-slate-400">Specify when the report should become visible to guests/clients</span>
                                 </Label>
                                 <Input

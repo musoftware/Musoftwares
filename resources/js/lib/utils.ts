@@ -17,20 +17,25 @@ const CURRENCY_FORMATS: Record<string, string> = {
     'IQD': '%v IQD'
 };
 
-export function formatMoney(amount: number | string, currency: any) {
+export function formatMoney(amount: number | string, currency?: any) {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
 
-    if (!currency) {
-        return `[ERR: NO CURR] ${numericAmount}`;
-    }
-
     let curCode = 'USD';
-    if (typeof currency === 'string') {
+    if (typeof currency === 'string' && currency.trim() !== '') {
         curCode = currency;
     } else if (typeof currency === 'number') {
         curCode = String(currency);
-    } else if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
+    } else if (currency && typeof currency === 'object' && typeof currency.currency === 'string' && currency.currency.trim() !== '') {
         curCode = currency.currency;
+    } else {
+        if ((window as any).defaultCurrency) {
+            curCode = (window as any).defaultCurrency;
+        } else {
+            const dynamicCurrencies = (window as any).currencies;
+            if (Array.isArray(dynamicCurrencies) && dynamicCurrencies.length > 0 && dynamicCurrencies[0].currency) {
+                curCode = dynamicCurrencies[0].currency;
+            }
+        }
     }
     curCode = curCode.trim().toUpperCase();
 
@@ -96,19 +101,17 @@ export function formatMoney(amount: number | string, currency: any) {
 
 export { formatMoney as formatCurrency };
 
-export function formatCompactCurrency(amount: number | string, currency: any) {
+export function formatCompactCurrency(amount: number | string, currency?: any) {
     const numericAmount =
         typeof amount === 'string' ? parseFloat(amount) : amount;
 
-    if (!currency) {
-        return `[ERR: NO CURR] ${numericAmount}`;
-    }
-
     let curCode = 'USD';
-    if (typeof currency === 'string') {
+    if (typeof currency === 'string' && currency.trim() !== '') {
         curCode = currency;
-    } else if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
+    } else if (currency && typeof currency === 'object' && typeof currency.currency === 'string' && currency.currency.trim() !== '') {
         curCode = currency.currency;
+    } else if ((window as any).defaultCurrency) {
+        curCode = (window as any).defaultCurrency;
     }
     curCode = curCode.trim().toUpperCase();
 

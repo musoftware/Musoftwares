@@ -1,5 +1,5 @@
 import { StatusBadge } from '@/Components/ui/StatusBadge';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, Link, router } from '@inertiajs/react';
 
 import { useEffect } from 'react';
@@ -7,7 +7,7 @@ import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeCont
 import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency, formatDate } from '@/lib/utils';
 
-export default function Index({ orders, tab }: any) {
+export default function Index({ orders, tab, auth }: any) {
     const { mode, setMode } = useMarketplaceMode();
 
     useEffect(() => {
@@ -40,15 +40,14 @@ export default function Index({ orders, tab }: any) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-2xl leading-tight font-bold text-gray-800">
-                    {__('general.orders')}</h2>
-            }
-        >
+        <MarketplaceLayout>
             <Head title={__('general.orders')} />
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {/* Page Heading */}
+                    <div className="mb-6">
+                        <h1 className="text-2xl font-bold text-gray-900">{__('general.orders')}</h1>
+                    </div>
                     {/* Tabs */}
                     <div className="mb-6 flex space-x-8 border-b border-gray-200">
                         <button
@@ -187,7 +186,7 @@ export default function Index({ orders, tab }: any) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm font-bold text-gray-900">
-                                                            {formatCurrency(order.amount, order.currency)}
+                                                            {formatCurrency(order.amount, order.currency || order.package?.service?.currency)}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -290,6 +289,6 @@ export default function Index({ orders, tab }: any) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </MarketplaceLayout>
     );
 }

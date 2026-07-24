@@ -1,10 +1,26 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Globe, DollarSign, MessageCircle, Share2, Mail, Users } from 'lucide-react';
+import { Globe, MessageCircle, Share2, Mail, Users } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
 import { __ } from '@/lib/i18n';
 
 export default function MarketplaceFooter() {
+    const { locale } = usePage().props as any;
+    const currentLocale = locale || (typeof document !== 'undefined' ? document.documentElement.lang : 'en');
+
+    const handleLanguageChange = (newLang: string) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', newLang);
+        window.location.href = url.toString();
+    };
+
     return (
         <footer className="border-t border-gray-200 bg-white pt-16 pb-8 mt-auto">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -34,29 +50,29 @@ export default function MarketplaceFooter() {
                     <div>
                         <h4 className="font-bold text-gray-900 mb-6">{__('general.support')}</h4>
                         <ul className="space-y-4 text-sm text-gray-500">
-                            <li><Link href="/support" className="hover:underline">{__('general.help_support')}</Link></li>
-                            <li><Link href="/trust-safety" className="hover:underline">{__('general.trust_safety')}</Link></li>
-                            <li><Link href="/marketplace/services/create" className="hover:underline">{__('general.selling_on_musoftware')}</Link></li>
-                            <li><Link href="/marketplace" className="hover:underline">{__('general.buying_on_musoftware')}</Link></li>
+                            <li><Link href="/help" className="hover:underline">{__('general.help_support')}</Link></li>
+                            <li><Link href="/trust" className="hover:underline">{__('general.trust_safety')}</Link></li>
+                            <li><Link href="/selling" className="hover:underline">{__('general.selling_on_musoftware')}</Link></li>
+                            <li><Link href="/buying" className="hover:underline">{__('general.buying_on_musoftware')}</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-bold text-gray-900 mb-6">{__('general.community')}</h4>
                         <ul className="space-y-4 text-sm text-gray-500">
+                            <li><Link href="/events" className="hover:underline">{__('general.events')}</Link></li>
                             <li><Link href="/blog" className="hover:underline">{__('general.blog')}</Link></li>
-                            <li><Link href="/forum" className="hover:underline">{__('general.forum')}</Link></li>
-                            <li><Link href="/community" className="hover:underline">{__('general.community_standards')}</Link></li>
-                            <li><Link href="/podcast" className="hover:underline">{__('general.podcast')}</Link></li>
+                            <li><Link href="/forum" className="hover:underline">{__('general.community_standards')}</Link></li>
+                            <li><Link href="/affiliates" className="hover:underline">{__('general.affiliates')}</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-bold text-gray-900 mb-6">{__('general.more_from_musoftware')}</h4>
                         <ul className="space-y-4 text-sm text-gray-500">
-                            <li><Link href="/erp" className="hover:underline">{__('general.musoftware_erp')}</Link></li>
-                            <li><Link href="/crm" className="hover:underline">{__('general.musoftware_crm')}</Link></li>
-                            <li><Link href="/pos" className="hover:underline">{__('general.point_of_sale')}</Link></li>
+                            <li><Link href="/pro" className="hover:underline">{__('general.musoftware_pro')}</Link></li>
+                            <li><Link href="/studios" className="hover:underline">{__('general.musoftware_studios')}</Link></li>
+                            <li><Link href="/logo-maker" className="hover:underline">{__('general.logo_maker')}</Link></li>
                             <li><Link href="/business" className="hover:underline">{__('general.musoftware_business')}</Link></li>
                         </ul>
                     </div>
@@ -78,10 +94,28 @@ export default function MarketplaceFooter() {
                         </div>
                         
                         <div className="hidden md:flex items-center gap-4 ms-4">
-                            <button className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900">
-                                <Globe className="h-4 w-4" /> {__('general.english')}</button>
-                            <button className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900">
-                                <DollarSign className="h-4 w-4" /> {__('general.usd')}</button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 px-2 py-1 h-auto focus-visible:ring-0">
+                                        <Globe className="h-4 w-4" />
+                                        <span>{currentLocale === 'ar' ? 'العربية' : 'English'}</span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-36">
+                                    <DropdownMenuItem 
+                                        onClick={() => handleLanguageChange('en')}
+                                        className={`cursor-pointer ${currentLocale === 'en' ? 'font-bold text-indigo-600 bg-indigo-50' : ''}`}
+                                    >
+                                        English
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                        onClick={() => handleLanguageChange('ar')}
+                                        className={`cursor-pointer ${currentLocale === 'ar' ? 'font-bold text-indigo-600 bg-indigo-50' : ''}`}
+                                    >
+                                        العربية
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                 </div>

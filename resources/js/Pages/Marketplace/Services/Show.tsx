@@ -204,7 +204,7 @@ export default function Show({ service }: any) {
                                                     ? new Date(service.seller.created_at).getFullYear()
                                                     : '2026'}
                                             </p>
-                                            <Link href="/messages" className="inline-block rounded-md border border-indigo-600 px-6 py-2 font-medium text-indigo-600 transition hover:bg-indigo-50">{__('general.contact_me')}</Link>
+                                            <Link href={service.seller?.id ? route('messages.index', { recipient_id: service.seller.id }) : route('messages.index')} className="inline-block rounded-md border border-indigo-600 px-6 py-2 font-medium text-indigo-600 transition hover:bg-indigo-50">{__('general.contact_me')}</Link>
                                         </div>
                                     </div>
                                 </div>
@@ -346,7 +346,7 @@ export default function Show({ service }: any) {
                                                             </svg>
                                                         </button>
                                                         <Link
-                                                            href="/messages"
+                                                            href={service.seller?.id ? route('messages.index', { recipient_id: service.seller.id }) : route('messages.index')}
                                                             className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2.5 font-semibold text-slate-700 transition shadow-none text-sm"
                                                         >
                                                             {__('general.contact_seller') || 'Contact Seller'}
@@ -367,7 +367,7 @@ export default function Show({ service }: any) {
                                                             {__('general.top_up_wallet')}
                                                         </Link>
                                                         <Link
-                                                            href="/messages"
+                                                            href={service.seller?.id ? route('messages.index', { recipient_id: service.seller.id }) : route('messages.index')}
                                                             className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2.5 font-semibold text-slate-700 transition shadow-none text-sm"
                                                         >
                                                             {__('general.contact_seller') || 'Contact Seller'}

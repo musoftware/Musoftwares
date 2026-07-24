@@ -523,7 +523,7 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                     : 'text-slate-600 hover:text-slate-900'
                             )}
                         >
-                            Collaborative (Add &amp; Edit)
+                            Collaborative (Add & Edit)
                         </button>
                     </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
@@ -63,7 +63,7 @@ export default function CreateService({ categories, seller }: Props) {
     const selectedCategory = categories.find(c => String(c.id) === String(data.category_id));
 
     return (
-        <AuthenticatedLayout header={undefined}>
+        <MarketplaceLayout>
             <Head title={__('general.publish_a_service')} />
 
             <div className="min-h-screen bg-slate-50">
@@ -208,7 +208,7 @@ export default function CreateService({ categories, seller }: Props) {
                     </form>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </MarketplaceLayout>
     );
 }
 

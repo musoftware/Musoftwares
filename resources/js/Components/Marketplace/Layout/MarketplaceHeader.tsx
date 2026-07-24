@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { Search, Menu, Globe } from 'lucide-react';
+import { Search, Menu, Globe, Heart } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -17,9 +17,16 @@ import MarketplaceModeToggle from '../MarketplaceModeToggle';
 import { __ } from '@/lib/i18n';
 
 export default function MarketplaceHeader() {
-    const { auth } = usePage().props as any;
+    const { auth, locale } = usePage().props as any;
     const user = auth?.user;
+    const currentLocale = locale || (typeof document !== 'undefined' ? document.documentElement.lang : 'en');
     const [searchQuery, setSearchQuery] = useState('');
+
+    const handleLanguageChange = (newLang: string) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', newLang);
+        window.location.href = url.toString();
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -68,14 +75,38 @@ export default function MarketplaceHeader() {
                         <Link href="/marketplace/services" className="hover:text-indigo-600 transition-colors">
                             {__('general.explore')}
                         </Link>
-                        <Link href="/marketplace/favorites" className="hover:text-indigo-600 transition-colors">
-                            {__('general.saved_favorites') || 'Wishlist'}
+                        <Link
+                            href="/marketplace/favorites"
+                            className="text-gray-600 hover:text-indigo-600 transition-colors p-2 rounded-full hover:bg-gray-100 flex items-center justify-center"
+                            title={__('general.saved_favorites') || 'Saved Favorites'}
+                            aria-label={__('general.saved_favorites') || 'Saved Favorites'}
+                        >
+                            <Heart className="h-5 w-5" />
                         </Link>
-                        <button className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
-                            <Globe className="h-4 w-4" /> {__('general.english')}</button>
-                        <span className="hover:text-indigo-600 transition-colors font-medium">
-                            {user?.currency_obj?.symbol || user?.currency?.symbol || '$'} {user?.currency_obj?.currency || user?.currency?.currency || (typeof user?.currency === 'string' ? user.currency : 'USD')}
-                        </span>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-indigo-600 px-2 py-1.5 h-auto focus-visible:ring-0">
+                                    <Globe className="h-4 w-4" />
+                                    <span>{currentLocale === 'ar' ? 'العربية' : 'English'}</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-36">
+                                <DropdownMenuItem 
+                                    onClick={() => handleLanguageChange('en')}
+                                    className={`cursor-pointer ${currentLocale === 'en' ? 'font-bold text-indigo-600 bg-indigo-50' : ''}`}
+                                >
+                                    English
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    onClick={() => handleLanguageChange('ar')}
+                                    className={`cursor-pointer ${currentLocale === 'ar' ? 'font-bold text-indigo-600 bg-indigo-50' : ''}`}
+                                >
+                                    العربية
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
                         {!user && (
                             <Link href="/marketplace/services/create" className="hover:text-indigo-600 transition-colors">
                                 {__('general.become_a_seller')}
@@ -97,7 +128,7 @@ export default function MarketplaceHeader() {
                                         <Avatar className="h-9 w-9">
                                             <AvatarImage src={user.profile_photo_url || ''} alt={user.name} />
                                             <AvatarFallback className="bg-indigo-100 text-indigo-700 font-bold">
-                                                {user.name?.charAt(0).toUpperCase()}
+                                                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                                             </AvatarFallback>
                                         </Avatar>
                                     </Button>
@@ -119,7 +150,10 @@ export default function MarketplaceHeader() {
                                         <Link href="/marketplace/orders" className="cursor-pointer w-full">{__('general.orders')}</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/marketplace/favorites" className="cursor-pointer w-full">{__('general.saved_favorites') || 'Wishlist'}</Link>
+                                        <Link href="/marketplace/favorites" className="cursor-pointer w-full flex items-center gap-2">
+                                            <Heart className="h-4 w-4" />
+                                            <span>{__('general.saved_favorites') || 'Wishlist'}</span>
+                                        </Link>
                                     </DropdownMenuItem>
 
                                     <DropdownMenuItem asChild>

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class CheckMissingTranslations extends Command
 {
@@ -48,19 +49,26 @@ class CheckMissingTranslations extends Command
             $files = File::allFiles($directory);
 
             foreach ($files as $file) {
+                // Ignore node_modules, vendor, or dist directories
+                $pathname = $file->getPathname();
+                if (str_contains($pathname, 'node_modules') || str_contains($pathname, 'vendor') || str_contains($pathname, 'dist')) {
+                    continue;
+                }
+
                 if (! in_array($file->getExtension(), $extensions)) {
                     continue;
                 }
 
-                $content = file_get_contents($file->getPathname());
+                $content = file_get_contents($pathname);
 
-                // Match __('general.key') or trans('general.key') or @lang('key')
-                preg_match_all("/(?:__|trans|@lang)\(\s*['\"]([^'\"]+)['\"]\s*\)/U", $content, $matches);
+                // Match __('group.key', ...), trans('group.key', ...), @lang('group.key', ...), Lang::get('group.key', ...)
+                // Group & key must contain a dot (e.g. general.need_more_balance)
+                preg_match_all("/(?:__|trans|@lang|Lang::get)\(\s*['\"]([a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]+)['\"]/i", $content, $matches);
 
                 if (! empty($matches[1])) {
                     foreach ($matches[1] as $key) {
-                        // Skip variables or dynamic keys like 'erp.'.$section
-                        if (str_contains($key, '$') || str_contains($key, '{')) {
+                        // Skip variables, incomplete keys, or dynamic keys
+                        if (str_contains($key, '$') || str_contains($key, '{') || str_ends_with($key, '.')) {
                             continue;
                         }
                         $foundKeys[$key] = true;
@@ -69,17 +77,17 @@ class CheckMissingTranslations extends Command
             }
         }
 
-        $foundKeys = array_keys($foundKeys);
-        sort($foundKeys);
+        $foundKeysList = array_keys($foundKeys);
+        sort($foundKeysList);
 
-        $this->info('Found '.count($foundKeys).' unique translation keys used in the codebase.');
+        $this->info('Found '.count($foundKeysList).' unique translation keys used in the codebase.');
 
         $locales = ['en', 'ar'];
-        $missing = [];
+        $definedKeys = [];
 
         foreach ($locales as $locale) {
             $langPath = base_path("lang/{$locale}");
-            $definedKeys = [];
+            $definedKeys[$locale] = [];
 
             if (File::isDirectory($langPath)) {
                 $langFiles = File::allFiles($langPath);
@@ -88,29 +96,30 @@ class CheckMissingTranslations extends Command
                         $group = str_replace('.php', '', $file->getFilename());
                         $translations = require $file->getPathname();
 
-                        $flattened = Arr::dot($translations);
-                        foreach ($flattened as $k => $v) {
-                            $definedKeys["{$group}.{$k}"] = true;
+                        if (is_array($translations)) {
+                            $flattened = Arr::dot($translations);
+                            foreach ($flattened as $k => $v) {
+                                $definedKeys[$locale]["{$group}.{$k}"] = true;
+                            }
                         }
                     }
                 }
             }
+        }
 
-            // Also check root lang JSON files
-            $jsonFile = base_path("lang/{$locale}.json");
-            if (File::exists($jsonFile)) {
-                $translations = json_decode(file_get_contents($jsonFile), true) ?: [];
-                foreach ($translations as $k => $v) {
-                    $definedKeys[$k] = true;
-                }
-            }
+        // Collect all target keys: scanned in codebase + defined in any locale (for locale parity check)
+        $allTargetKeys = array_unique(array_merge(
+            $foundKeysList,
+            array_keys($definedKeys['en'] ?? []),
+            array_keys($definedKeys['ar'] ?? [])
+        ));
+        sort($allTargetKeys);
 
+        $missing = [];
+        foreach ($locales as $locale) {
             $missing[$locale] = [];
-
-            foreach ($foundKeys as $key) {
-                // If the key has no dot, it might be in JSON file or global
-                if (! isset($definedKeys[$key])) {
-                    // Sometimes keys are just plain text without group, like __('general.hello')
+            foreach ($allTargetKeys as $key) {
+                if (! isset($definedKeys[$locale][$key])) {
                     $missing[$locale][] = $key;
                 }
             }
@@ -120,7 +129,7 @@ class CheckMissingTranslations extends Command
         foreach ($locales as $locale) {
             if (count($missing[$locale]) > 0) {
                 $hasMissing = true;
-                $this->warn("\nMissing translations for locale: [{$locale}]");
+                $this->warn("\nMissing translations for locale: [{$locale}] (".count($missing[$locale])." missing)");
                 foreach ($missing[$locale] as $key) {
                     $this->line("- {$key}");
                 }
@@ -140,9 +149,8 @@ class CheckMissingTranslations extends Command
 
             $reportData = [
                 'locales_checked' => $locales,
-                'total_keys_found' => count($foundKeys),
+                'total_keys_scanned' => count($foundKeysList),
                 'missing_by_locale' => $missing,
-                'key_locations' => array_flip($foundKeys), // we need the locations
             ];
 
             file_put_contents($reportPath, json_encode($reportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -150,7 +158,7 @@ class CheckMissingTranslations extends Command
         }
 
         if ($this->option('write')) {
-            $this->info("\nWriting missing keys to files...");
+            $this->info("\nWriting missing keys to PHP language files...");
             $this->writeMissingKeys($missing);
         }
 
@@ -160,30 +168,24 @@ class CheckMissingTranslations extends Command
     protected function writeMissingKeys($missing)
     {
         foreach ($missing as $locale => $keys) {
-            $langPath = base_path("lang/{$locale}");
-
-            $grouped = [];
-            $jsonKeys = [];
-
-            foreach ($keys as $key) {
-                // If key has spaces or doesn't have a dot, it belongs in the JSON file
-                if (str_contains($key, ' ') || ! str_contains($key, '.')) {
-                    $jsonKeys[$key] = $key;
-                } else {
-                    [$group, $item] = explode('.', $key, 2);
-                    $grouped[$group][$item] = $item;
-                }
+            if (empty($keys)) {
+                continue;
             }
 
-            if (! empty($jsonKeys)) {
-                $jsonFile = base_path("lang/{$locale}.json");
-                $existing = [];
-                if (File::exists($jsonFile)) {
-                    $existing = json_decode(file_get_contents($jsonFile), true) ?: [];
+            $langPath = base_path("lang/{$locale}");
+            $grouped = [];
+
+            foreach ($keys as $key) {
+                if (str_contains($key, '.')) {
+                    [$group, $item] = explode('.', $key, 2);
+                } else {
+                    $group = 'general';
+                    $item = $key;
                 }
-                $merged = array_merge($jsonKeys, $existing);
-                file_put_contents($jsonFile, json_encode($merged, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                $this->info("Updated lang/{$locale}.json");
+
+                // Create a humanized default value
+                $defaultValue = Str::headline($item);
+                $grouped[$group][$item] = $defaultValue;
             }
 
             foreach ($grouped as $group => $items) {
@@ -191,23 +193,29 @@ class CheckMissingTranslations extends Command
                 $existing = [];
                 if (File::exists($file)) {
                     $existing = require $file;
+                    if (! is_array($existing)) {
+                        $existing = [];
+                    }
                 } else {
                     if (! File::isDirectory($langPath)) {
                         File::makeDirectory($langPath, 0755, true);
                     }
                 }
 
-                // Expand dot notation back to nested arrays for merging
-                $expandedItems = [];
-                foreach ($items as $k => $v) {
-                    Arr::set($expandedItems, $k, $v);
+                $updatedCount = 0;
+                foreach ($items as $itemKey => $defaultValue) {
+                    if (! Arr::has($existing, $itemKey)) {
+                        Arr::set($existing, $itemKey, $defaultValue);
+                        $updatedCount++;
+                    }
                 }
 
-                $merged = array_replace_recursive($expandedItems, $existing);
-
-                $content = "<?php\n\nreturn ".$this->varExport54($merged).";\n";
-                file_put_contents($file, $content);
-                $this->info("Updated lang/{$locale}/{$group}.php");
+                if ($updatedCount > 0) {
+                    ksort($existing);
+                    $content = "<?php\n\nreturn ".$this->varExport54($existing).";\n";
+                    file_put_contents($file, $content);
+                    $this->info("Updated lang/{$locale}/{$group}.php (+{$updatedCount} keys)");
+                }
             }
         }
     }
@@ -237,3 +245,4 @@ class CheckMissingTranslations extends Command
         }
     }
 }
+

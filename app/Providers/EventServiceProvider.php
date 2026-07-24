@@ -61,7 +61,6 @@ class EventServiceProvider extends ServiceProvider
         // Marketplace
         MarketplaceOrderPlaced::class => [
             ActivityEventListener::class,
-            \App\Listeners\CreateProjectFromMarketplaceOrder::class,
         ],
         MarketplaceOrderCompleted::class => [ActivityEventListener::class],
 

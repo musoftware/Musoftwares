@@ -72,6 +72,7 @@ interface UserOption {
 interface Props {
     conversations?: Conversation[];
     users?: UserOption[];
+    activeConversationId?: number | null;
 }
 
 function relativeTime(dateStr?: string) {
@@ -90,14 +91,16 @@ function relativeTime(dateStr?: string) {
     return parsed.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-export default function MessagesIndex({ conversations = [], users = [] }: Props) {
+export default function MessagesIndex({ conversations = [], users = [], activeConversationId = null }: Props) {
     const { auth } = usePage().props as unknown as { auth: { user: ParticipantUser } };
     const currentUser = auth.user;
 
-    const [activeTab, setActiveTab] = useState<string>('all');
+    const [activeTab, setActiveTab] = useState<string>(
+        activeConversationId ? 'direct_messages' : 'all',
+    );
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedConvId, setSelectedConvId] = useState<number | null>(
-        conversations.length > 0 ? conversations[0].id : null,
+        activeConversationId || (conversations.length > 0 ? conversations[0].id : null),
     );
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 

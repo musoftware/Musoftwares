@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'admin' => 'Admin',
     'ai' => [
         'auto_fill_with_ai' => 'ai.auto_fill_with_ai',
         'describe_your_service' => 'ai.describe_your_service',
@@ -8,7 +9,22 @@ return [
         'prompt_placeholder' => 'ai.prompt_placeholder',
         'prompt_too_short' => 'ai.prompt_too_short'
     ],
+    'amount_egp' => 'Amount Egp',
+    'an_admin_will_review_the' => 'An Admin Will Review The',
+    'an_error_occurred_during_payment' => 'An Error Occurred During Payment',
+    'any_android_80_device_works' => 'Any Android 80 Device Works',
+    'approve_release_payment' => 'Approve Release Payment',
+    'approved' => 'Approved',
+    'awaiting_payment' => 'Awaiting Payment',
     'back_to_services' => 'Back To Services',
+    'checkout' => 'Checkout',
+    'checkout_failed' => 'Checkout Failed',
+    'checkout_failed_2' => 'Checkout Failed 2',
+    'complete_payment' => 'Complete Payment',
+    'configure_checkout_options_and_select' => 'Configure Checkout Options And Select',
+    'confirm_checkout' => 'Confirm Checkout',
+    'confirm_payment' => 'Confirm Payment',
+    'conversion_rate' => 'Conversion Rate',
     'create' => [
         'page_title' => 'create.page_title',
         'steps' => [
@@ -30,6 +46,8 @@ return [
         ]
     ],
     'date_range' => 'Date Range',
+    'department_reports' => 'Department Reports',
+    'download_csv' => 'Download Csv',
     'edit' => [
         'page_title' => 'edit.page_title',
         'ref_from_fee' => 'edit.ref_from_fee',
@@ -43,6 +61,9 @@ return [
         'subtitle' => 'edit.subtitle',
         'title' => 'edit.title'
     ],
+    'edit_settings' => 'Edit Settings',
+    'equiv' => 'Equiv',
+    'export_description' => 'Export Description',
     'form' => [
         'add_service_extra' => 'form.add_service_extra',
         'additional_images' => 'form.additional_images',
@@ -85,6 +106,21 @@ return [
         'require_share_help' => 'free.require_share_help',
         'require_share_label' => 'free.require_share_label'
     ],
+    'generate_export' => 'Generate Export',
+    'have_your_developer_read_the' => 'Have Your Developer Read The',
+    'in_gateway_settings_add_the' => 'In Gateway Settings Add The',
+    'lead_sources' => 'Lead Sources',
+    'manage_discounts' => 'Manage Discounts',
+    'net_pay' => 'Net Pay',
+    'only_unpaid_invoices_can_be_edited' => 'Only Unpaid Invoices Can Be Edited',
+    'pay' => 'Pay',
+    'payment_failed' => 'Payment Failed',
+    'payment_failed_2' => 'Payment Failed 2',
+    'payment_method' => 'Payment Method',
+    'payment_pending_due_by' => 'Payment Pending Due By',
+    'payment_processing_failed' => 'Payment Processing Failed',
+    'payment_successful' => 'Payment Successful',
+    'payment_verified' => 'Payment Verified',
     'placeholders' => [
         'auto_reply_en' => 'placeholders.auto_reply_en',
         'description_ar' => 'placeholders.description_ar',
@@ -96,6 +132,15 @@ return [
         'title_ar' => 'placeholders.title_ar',
         'title_en' => 'placeholders.title_en',
         'validity_days' => 'placeholders.validity_days'
+    ],
+    'please_select_a_payment_method' => 'Please Select A Payment Method',
+    'profile' => [
+        'about' => [
+            'member_since' => 'Profile.about.member Since'
+        ],
+        'actions' => [
+            'explore_services' => 'Profile.actions.explore Services'
+        ]
     ],
     'referral_card' => [
         'copied' => 'referral_card.copied',
@@ -110,13 +155,32 @@ return [
         'sign_up_to_get_link' => 'referral_card.sign_up_to_get_link',
         'title' => 'referral_card.title'
     ],
+    'report_type' => 'Report Type',
+    'sales_performance' => 'Sales Performance',
+    'secure_payment' => 'Secure Payment',
+    'select_payment_method' => 'Select Payment Method',
+    'select_report_description' => 'Select Report Description',
+    'select_report_type' => 'Select Report Type',
+    'service_added_successfully' => 'Service Added Successfully',
     'service_desc' => 'Service Desc',
     'service_extras_upsells' => 'Service Extras Upsells',
     'service_image' => 'Service Image',
     'service_title' => 'Service Title',
+    'set_up_your_webhook_endpoint' => 'Set Up Your Webhook Endpoint',
+    'settle_pay_outstanding' => 'Settle Pay Outstanding',
+    'support_resolutions' => 'Support Resolutions',
+    'the_app_reads_incoming_sms' => 'The App Reads Incoming Sms',
+    'timer_session_deleted' => 'Timer Session Deleted',
+    'timer_sessions_saved' => 'Timer Sessions Saved',
     'tip' => [
         'create_help_text' => 'tip.create_help_text',
         'edit_help_text' => 'tip.edit_help_text',
         'title' => 'tip.title'
-    ]
+    ],
+    'total_customers' => 'Total Customers',
+    'total_leads' => 'Total Leads',
+    'total_net_pay' => 'Total Net Pay',
+    'total_value' => 'Total Value',
+    'view_in_admin_panel' => 'View In Admin Panel',
+    'yes_the_android_app_only' => 'Yes The Android App Only'
 ];

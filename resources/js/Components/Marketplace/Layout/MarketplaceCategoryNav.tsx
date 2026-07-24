@@ -53,21 +53,27 @@ export default function MarketplaceCategoryNav() {
                         ))
                     ) : (
                         categories.map((category) => {
+                            if (!category) return null;
+                            const catSlug = (category.slug || '').toLowerCase();
+                            const catName = (category.name || '').toLowerCase();
+                            const catId = (category.id ?? '').toString();
+                            const activeStr = (activeCategory ?? '').toString().toLowerCase();
+
                             const isActive =
-                                activeCategory.toString().toLowerCase() === category.slug.toLowerCase() ||
-                                activeCategory.toString() === category.id.toString() ||
-                                activeCategory.toString().toLowerCase() === category.name.toLowerCase();
+                                Boolean(activeStr) &&
+                                (activeStr === catSlug || activeStr === catId || activeStr === catName);
+
                             return (
                                 <Link
-                                    key={category.id}
-                                    href={`/marketplace/services?category=${category.slug || category.id}`}
+                                    key={category.id || category.slug || category.name}
+                                    href={`/marketplace/services?category=${encodeURIComponent(category.slug || category.id || '')}`}
                                     className={`whitespace-nowrap text-sm font-medium transition-all shrink-0 py-3 ${
                                         isActive
                                             ? 'text-indigo-600 font-bold border-b-2 border-indigo-600'
                                             : 'text-gray-500 hover:text-gray-900 hover:underline hover:underline-offset-8'
                                     }`}
                                 >
-                                    {category.name}
+                                    {category.name || ''}
                                 </Link>
                             );
                         })

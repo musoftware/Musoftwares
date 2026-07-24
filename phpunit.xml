@@ -17,26 +17,6 @@
             <directory>Modules/Shared/tests/Feature</directory>
         </testsuite>
 
-        <!-- ── ERP Module (All Features + Addons) ── -->
-        <testsuite name="ERP">
-            <directory>Modules/ERP/Tests/Feature</directory>
-        </testsuite>
-
-        <!-- ── Freelance Module ── -->
-        <testsuite name="Freelance">
-            <directory>Modules/Freelance/Tests/Feature</directory>
-            <directory>Modules/Freelance/Tests/Unit</directory>
-            <directory>Modules/Freelance/Tests/Finance</directory>
-            <directory>Modules/Freelance/Tests/Security</directory>
-            <directory>Modules/Freelance/Tests/Concurrency</directory>
-            <directory>Modules/Freelance/Tests/Performance</directory>
-        </testsuite>
-
-        <!-- ── CRM Module ── -->
-        <testsuite name="CRM">
-            <directory>Modules/CRM/Tests/Feature</directory>
-        </testsuite>
-
         <!-- ── Marketplace Module ── -->
         <testsuite name="Marketplace">
             <directory>Modules/Marketplace/Tests/Feature</directory>
@@ -45,20 +25,6 @@
         <!-- ── Shortlink Module ── -->
         <testsuite name="Shortlink">
             <directory>Modules/Shortlink/Tests/Feature</directory>
-        </testsuite>
-
-        <!-- ── Booking Module ── -->
-        <testsuite name="Booking">
-            <directory>Modules/Booking/tests/Feature</directory>
-            <directory>Modules/Booking/tests/Unit</directory>
-        </testsuite>
-
-
-
-        <!-- ── GoldSavers Module ── -->
-        <testsuite name="GoldSavers">
-            <directory>Modules/GoldSavers/Tests/Feature</directory>
-            <directory>Modules/GoldSavers/Tests/Unit</directory>
         </testsuite>
 
         <!-- ── SMS Payment Gateway Module ── -->

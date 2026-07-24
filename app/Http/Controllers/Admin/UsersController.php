@@ -726,7 +726,6 @@ class UsersController extends Controller
                 ?: 'A new password has been generated and emailed to the user.',
             'email' => $user->email,
             'name' => $user->name,
-            'password' => $plainPassword,
             'login_url' => $loginUrl,
         ]);
     }

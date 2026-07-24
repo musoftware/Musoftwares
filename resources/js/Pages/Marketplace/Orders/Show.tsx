@@ -1,5 +1,5 @@
 import { StatusBadge } from '@/Components/ui/StatusBadge';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { __ } from '@/lib/i18n';
@@ -75,13 +75,7 @@ export default function Show({ order, conversation }: any) {
     const sellerEarnings = parseFloat(order.amount) - fee;
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-2xl leading-tight font-bold text-gray-800">
-                    Order #{order.id}
-                </h2>
-            }
-        >
+        <MarketplaceLayout>
             <Head title={`Order #${order.id}`} />
 
             <div className="min-h-screen bg-gray-50 py-8">
@@ -516,7 +510,7 @@ export default function Show({ order, conversation }: any) {
                                                     <div className="flex justify-between text-gray-500">
                                                         <span>{__('general.price')}</span>
                                                         <span>
-                                                            {formatCurrency(order.amount, order.currency)}
+                                                            {formatCurrency(order.amount, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between text-red-500">
@@ -524,13 +518,13 @@ export default function Show({ order, conversation }: any) {
                                                             {__('general.platform_fee_label')}
                                                         </span>
                                                         <span>
-                                                            -{formatCurrency(order.commission_amount, order.currency)}
+                                                            -{formatCurrency(order.commission_amount, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between border-t border-gray-100 pt-2 font-bold text-gray-900">
                                                         <span>{__('general.your_earnings')}</span>
                                                         <span>
-                                                            {formatCurrency(sellerEarnings, order.currency)}
+                                                            {formatCurrency(sellerEarnings, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -538,7 +532,7 @@ export default function Show({ order, conversation }: any) {
                                                 <div className="flex justify-between text-lg font-bold text-gray-900">
                                                     <span>{__('general.total_paid')}</span>
                                                     <span>
-                                                        {formatCurrency(order.amount, order.currency)}
+                                                        {formatCurrency(order.amount, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
                                                     </span>
                                                 </div>
                                             )}
@@ -691,6 +685,6 @@ export default function Show({ order, conversation }: any) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </MarketplaceLayout>
     );
 }

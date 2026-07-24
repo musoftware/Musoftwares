@@ -1,5 +1,5 @@
 import Pagination from '@/Components/Pagination';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { formatDate, formatMoney } from '@/lib/utils';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -19,13 +19,9 @@ export default function Index({ services }: any) {
     }, []);
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl leading-tight font-semibold text-gray-800">{__('general.marketplace_services')}</h2>
-            }
-        >
+        <MarketplaceLayout>
             <Head title={__('general.services')} />
-            <div className="py-12">
+            <div className="py-12 bg-gray-50 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="relative overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                         {loading && (
@@ -75,7 +71,7 @@ export default function Index({ services }: any) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </MarketplaceLayout>
     );
 }
 

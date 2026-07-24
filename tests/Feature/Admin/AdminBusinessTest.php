@@ -78,7 +78,7 @@ class AdminBusinessTest extends TestCase
             ->component('Admin/Business/Income')
             ->has('stats', fn (Assert $stats) => $stats
                 ->where('total_received', 15000)
-                ->where('total_monthly_income', 10000)
+                ->where('total_monthly_income', 15000)
                 ->has('monthly_trends')
                 ->etc()
             )

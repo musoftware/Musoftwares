@@ -397,11 +397,13 @@ class DashboardService extends BaseService
 
     private function getRecentTransactions(User $user)
     {
+        $userCurrency = Currency::find($user->currency_id);
+
         return Transaction::with('currency')->where('user_id', $user->id)
             ->latest()
             ->limit(8)
             ->get()
-            ->map(function ($txn) {
+            ->map(function ($txn) use ($userCurrency) {
                 $isCredit = in_array($txn->type, ['received', 'earned']);
 
                 return [
@@ -410,7 +412,7 @@ class DashboardService extends BaseService
                     'type' => $isCredit ? 'deposit' : 'expense',
                     'amount' => $isCredit ? (float) $txn->amount : -1 * (float) $txn->amount,
                     'method' => ucwords(str_replace('_', ' ', $txn->reason ?? 'Wallet')),
-                    'currency' => $txn->currency,
+                    'currency' => $txn->currency ?? $userCurrency,
                 ];
             });
     }

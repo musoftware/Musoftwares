@@ -24,8 +24,8 @@ class AdminFreeDownloadControllerTest extends TestCase
     {
         parent::setUp();
 
-        if (! Schema::hasTable('free_downloads')) {
-            Schema::create('free_downloads', function (Blueprint $table) {
+        Schema::dropIfExists('free_downloads');
+        Schema::create('free_downloads', function (Blueprint $table) {
                 $table->id();
                 $table->string('title');
                 $table->text('description')->nullable();
@@ -38,7 +38,6 @@ class AdminFreeDownloadControllerTest extends TestCase
                 $table->timestamps();
                 $table->softDeletes();
             });
-        }
 
         $this->seed(RolesAndPermissionsSeeder::class);
 
