@@ -9,7 +9,6 @@ use Modules\Marketplace\Models\ServiceCategory;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceReview;
 use Modules\Marketplace\Services\WishlistService;
-use Modules\Marketplace\Services\PremiumToolService;
 
 class SocialProofAndGovernanceTest extends TestCase
 {
@@ -184,15 +183,5 @@ class SocialProofAndGovernanceTest extends TestCase
         // 2. Toggle OFF
         $removed = $wishlistService->toggleFavorite($buyer, $service);
         $this->assertFalse($removed);
-    }
-
-    public function test_ai_tools_daily_usage_quota()
-    {
-        $user = User::factory()->create();
-        $toolService = new PremiumToolService();
-
-        $res = $toolService->executeTool($user, 'prompt-generator', ['prompt' => 'Generate e-commerce ad copy']);
-        $this->assertTrue($res['success']);
-        $this->assertEquals('prompt-generator', $res['tool_slug']);
     }
 }

@@ -3,7 +3,7 @@
 namespace Modules\Marketplace\Services;
 
 use Modules\Marketplace\Models\ServiceOrder;
-use App\Models\OrderDeliveryFile;
+use Modules\Marketplace\Models\OrderDeliveryFile;
 use Modules\Marketplace\Enums\ServiceOrderStatus;
 use Modules\Marketplace\Services\EscrowService;
 use Illuminate\Support\Facades\DB;

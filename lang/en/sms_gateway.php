@@ -154,7 +154,7 @@ return [
     'invalid_currency' => 'Invalid currency code.',
     'key_name' => 'Key Name',
     'key_name_placeholder' => 'e.g. My E-Commerce Store',
-    'language_arabic' => 'Arabic (العربية)',
+    'language_arabic' => 'Arabic',
     'language_english' => 'English',
     'last_used' => 'Last Used',
     'lead_sources' => 'Lead Sources',

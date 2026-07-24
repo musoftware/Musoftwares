@@ -39,7 +39,7 @@ class MarketplaceEscrow extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class, 'order_id');
+        return $this->belongsTo(ServiceOrder::class, 'order_id');
     }
 
     public function buyerTransaction(): BelongsTo

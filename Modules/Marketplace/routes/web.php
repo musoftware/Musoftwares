@@ -12,7 +12,6 @@ use Modules\Marketplace\Http\Controllers\ServiceSerialController;
 use Modules\Marketplace\Http\Controllers\PromotionsController;
 use Modules\Marketplace\Http\Controllers\ReferralController;
 use Modules\Marketplace\Http\Controllers\WishlistController;
-use Modules\Marketplace\Http\Controllers\PremiumToolController;
 
 // Single group — order matters: literal routes BEFORE wildcards
 Route::middleware('web')
@@ -64,10 +63,6 @@ Route::middleware('web')
             // Wishlist / Favorites
             Route::get('/favorites', [WishlistController::class, 'index'])->name('favorites.index');
             Route::post('/services/{service}/favorite', [WishlistController::class, 'toggle'])->name('favorites.toggle');
-
-
-            // AI Tools Marketplace
-            Route::post('/tools/{toolSlug}/use', [PremiumToolController::class, 'useTool'])->name('tools.use');
         });
 
         // ── Wildcard — always last ─────────────────────────────────────────

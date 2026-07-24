@@ -17,9 +17,9 @@ export default function Show({ order, conversation }: any) {
         if (
             confirm(__('general.confirm_submit_delivery'))
         ) {
+            const combinedNote = deliveryLinks ? `${deliveryNote}\nLinks: ${deliveryLinks}` : deliveryNote;
             router.post(route('marketplace.orders.deliver', order.id), {
-                message: deliveryNote,
-                links: deliveryLinks,
+                note: combinedNote,
             });
         }
     };
@@ -35,9 +35,11 @@ export default function Show({ order, conversation }: any) {
     };
 
     const handleRequestRevision = () => {
-        if (confirm(__('general.confirm_request_revision'))) {
-            // Ideally an endpoint for revision, falling back to dispute for now or just a specific action
-            router.post(route('marketplace.orders.dispute', order.id));
+        const note = prompt(__('general.enter_revision_details') || 'Please enter revision details:');
+        if (note) {
+            router.post(route('marketplace.orders.revision', order.id), {
+                revision_note: note,
+            });
         }
     };
 

@@ -2,10 +2,11 @@
 
 namespace Modules\Marketplace\Models;
 
-
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 
 class ServiceOrder extends Model
@@ -13,10 +14,6 @@ class ServiceOrder extends Model
     use SoftDeletes;
 
     protected $table = 'marketplace_orders';
-
-    protected $appends = [];
-
-
 
     protected $fillable = [
         'buyer_id',
@@ -55,5 +52,20 @@ class ServiceOrder extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(ServicePackage::class, 'package_id');
+    }
+
+    public function escrow(): HasOne
+    {
+        return $this->hasOne(MarketplaceEscrow::class, 'order_id');
+    }
+
+    public function deliveryFiles(): HasMany
+    {
+        return $this->hasMany(OrderDeliveryFile::class, 'order_id');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ServiceReview::class, 'order_id');
     }
 }

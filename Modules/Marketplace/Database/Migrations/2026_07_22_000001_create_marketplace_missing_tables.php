@@ -35,16 +35,6 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('premium_tool_usages')) {
-            Schema::create('premium_tool_usages', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-                $table->string('tool_slug');
-                $table->text('input_data')->nullable();
-                $table->timestamps();
-            });
-        }
-
         if (!Schema::hasTable('marketplace_serial_user_devices')) {
             Schema::create('marketplace_serial_user_devices', function (Blueprint $table) {
                 $table->id();
@@ -121,7 +111,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('free_downloads');
         Schema::dropIfExists('favorites');
-        Schema::dropIfExists('premium_tool_usages');
         Schema::dropIfExists('marketplace_serial_user_devices');
         Schema::dropIfExists('service_landing_page_ab_metrics');
         Schema::dropIfExists('order_delivery_files');
