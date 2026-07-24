@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\IncomingWebhook;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class IncomingWebhooksController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $webhooks = IncomingWebhook::query()
             ->orderBy('id', 'desc')
@@ -20,12 +21,10 @@ class IncomingWebhooksController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show(IncomingWebhook $incomingWebhook): Response
     {
-        $webhook = IncomingWebhook::findOrFail($id);
-
         return Inertia::render('Admin/Settings/IncomingWebhooks/Show', [
-            'webhook' => $webhook,
+            'webhook' => $incomingWebhook,
         ]);
     }
 }

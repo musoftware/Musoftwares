@@ -81,12 +81,13 @@ export default function Index({ projects }: ProjectsIndexProps) {
         });
     };
 
-    const filteredProjects = projects.data.filter((p) => {
+    const filteredProjects = (projects?.data ?? []).filter((p) => {
         const matches =
-            p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.description.toLowerCase().includes(searchTerm.toLowerCase());
+            (p.title ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (p.description ?? '').toLowerCase().includes(searchTerm.toLowerCase());
         return matches;
     });
+
 
     return (
         <MarketplaceLayout>

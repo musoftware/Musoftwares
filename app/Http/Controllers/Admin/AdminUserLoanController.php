@@ -3,76 +3,68 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UserLoan\StoreLoanRepaymentRequest;
+use App\Http\Requests\Admin\UserLoan\StoreUserLoanRequest;
+use App\Http\Requests\Admin\UserLoan\UpdateUserLoanRequest;
 use App\Models\User;
 use App\Models\UserLoan;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class AdminUserLoanController extends Controller
 {
-    public function store(Request $request, User $user)
+    public function store(StoreUserLoanRequest $request, User $user): RedirectResponse
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'currency_id' => 'required|exists:currencies,id',
-            'date' => 'required|date',
-            'note' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $user->loans()->create([
-            'amount' => $request->amount,
+            'amount' => $validated['amount'],
             'paid_amount' => 0,
-            'currency_id' => $request->currency_id,
-            'date' => $request->date,
-            'note' => $request->note,
+            'currency_id' => $validated['currency_id'],
+            'date' => $validated['date'],
+            'note' => $validated['note'] ?? null,
             'status' => 'active',
         ]);
 
         return redirect()->back()->with('success', __('admin.loan_added_successfully'));
     }
 
-    public function update(Request $request, User $user, UserLoan $loan)
+    public function update(UpdateUserLoanRequest $request, User $user, UserLoan $loan): RedirectResponse
     {
-        $request->validate([
-            'date' => 'required|date',
-            'note' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $loan->update([
-            'date' => $request->date,
-            'note' => $request->note,
+            'date' => $validated['date'],
+            'note' => $validated['note'] ?? null,
         ]);
 
         return redirect()->back()->with('success', __('admin.loan_updated_successfully'));
     }
 
-    public function destroy(User $user, UserLoan $loan)
+    public function destroy(User $user, UserLoan $loan): RedirectResponse
     {
         $loan->delete();
 
         return redirect()->back()->with('success', __('admin.loan_deleted_successfully'));
     }
 
-    public function storeRepayment(Request $request, User $user, UserLoan $loan)
+    public function storeRepayment(StoreLoanRepaymentRequest $request, User $user, UserLoan $loan): RedirectResponse
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'date' => 'required|date',
-            'note' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
+        $amount = (float) $validated['amount'];
 
         // Calculate if amount exceeds remaining
         $remaining = $loan->amount - $loan->paid_amount;
-        if ($request->amount > $remaining) {
+        if ($amount > $remaining) {
             return redirect()->back()->with('error', __('admin.repayment_exceeds_loan_amount'));
         }
 
         $loan->repayments()->create([
-            'amount' => $request->amount,
-            'date' => $request->date,
-            'note' => $request->note,
+            'amount' => $amount,
+            'date' => $validated['date'],
+            'note' => $validated['note'] ?? null,
         ]);
 
-        $loan->paid_amount += $request->amount;
+        $loan->paid_amount += $amount;
         if ($loan->paid_amount >= $loan->amount) {
             $loan->status = 'paid';
         }

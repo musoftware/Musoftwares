@@ -647,7 +647,11 @@ return [
     'automatically_select_the_winning_variant_after_this_many_visits_leave_empty_to_manually_select' => 'Automatically select the winning variant after this many visits. Leave empty to manually select.',
     'automating_browser_to_load_more_results_please_keep_the_facebook_tab_active' => 'Automating browser to load more results... Please keep the Facebook tab active.',
     'automation_rules' => 'Automation Rules',
+    'automation_rule_created' => 'تم إنشاء قاعدة الأتمتة بنجاح.',
+    'automation_rule_deleted' => 'تم حذف قاعدة الأتمتة بنجاح.',
+    'automation_rule_updated' => 'تم تحديث قاعدة الأتمتة بنجاح.',
     'automation_tools' => 'Automation Tools',
+
     'automations' => 'Automations',
     'available' => 'Available',
     'available_across_all_platform_workspaces' => 'Available across all platform workspaces',
@@ -3621,7 +3625,9 @@ return [
     'merging' => 'Merging...',
     'message' => 'الرسالة',
     'message_body' => 'Message Body',
+    'message_body_or_attachment_required' => 'مطلوب كتابة نص الرسالة أو إرفاق ملف.',
     'message_client' => 'Message Client',
+
     'message_content' => 'محتوى الرسالة',
     'message_from_business' => 'Message from business',
     'message_limit' => 'Message Limit',

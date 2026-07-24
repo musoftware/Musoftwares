@@ -115,12 +115,13 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
         setTimeout(() => setCopiedId(null), 2000);
     };
 
-    const filteredSerials = serials.data.filter((s) => {
+    const filteredSerials = (serials?.data ?? []).filter((s) => {
         const matchesSearch =
-            s.serial_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (s.serial_code ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
             (s.service?.title && s.service.title.toLowerCase().includes(searchTerm.toLowerCase()));
         return matchesSearch;
     });
+
 
     return (
         <MarketplaceLayout>

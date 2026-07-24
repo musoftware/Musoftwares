@@ -7,8 +7,10 @@ use App\Http\Requests\Admin\Kyc\RejectKycRequest;
 use App\Http\Resources\KycUserResource;
 use App\Models\User;
 use App\Services\KycService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class KycController extends Controller
 {
@@ -16,7 +18,7 @@ class KycController extends Controller
         protected KycService $kycService
     ) {}
 
-    public function index()
+    public function index(): Response
     {
         // Get users with pending KYC documents or pending review note
         $users = User::whereHas('kycDocuments', function ($q) {
@@ -37,29 +39,25 @@ class KycController extends Controller
         ]);
     }
 
-    public function approve(Request $request, $id)
+    public function approve(Request $request, User $user): RedirectResponse
     {
-        $user = User::findOrFail($id);
-
         $this->kycService->approveKyc($user, $request->user()->id);
 
-        return back()->with('success', "User {$user->name} has been KYC verified successfully.");
+        return back()->with('success', __('admin.kyc_approved_successfully', ['name' => $user->name]));
     }
 
-    public function reject(RejectKycRequest $request, $id)
+    public function reject(RejectKycRequest $request, User $user): RedirectResponse
     {
-        $user = User::findOrFail($id);
-
         $this->kycService->rejectKyc($user, $request->validated('reason'));
 
-        return back()->with('success', "User {$user->name} KYC has been rejected.");
+        return back()->with('success', __('admin.kyc_rejected_successfully', ['name' => $user->name]));
     }
 
-    public function showUserDocuments($id)
+    public function showUserDocuments(User $user): Response
     {
-        $user = User::with(['kycDocuments' => function ($q) {
+        $user->load(['kycDocuments' => function ($q) {
             $q->latest();
-        }])->findOrFail($id);
+        }]);
 
         return Inertia::render('Admin/Kyc/UserDocuments', [
             'user' => (new KycUserResource($user))->resolve(),

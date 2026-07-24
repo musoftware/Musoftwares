@@ -122,11 +122,11 @@ class UserMergeController extends Controller
             if ($request->wantsJson()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Merge failed: '.$e->getMessage(),
+                    'message' => __('admin.merge_failed', ['error' => $e->getMessage()]),
                 ], 422);
             }
 
-            return redirect()->back()->with('error', 'Merge failed: '.$e->getMessage());
+            return redirect()->back()->with('error', __('admin.merge_failed', ['error' => $e->getMessage()]));
         }
 
         $aliases = UserEmail::where('user_id', $user->id)
@@ -139,7 +139,7 @@ class UserMergeController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'Accounts merged.',
+                'message' => __('admin.accounts_merged'),
                 'outcomes' => $outcomes,
                 'aliases' => $aliases,
             ]);
@@ -149,6 +149,7 @@ class UserMergeController extends Controller
 
         return redirect()
             ->route('admin.users.show', $user->id)
-            ->with('success', "{$count} account(s) merged into #{$user->id}.");
+            ->with('success', __('admin.accounts_merged_count', ['count' => $count, 'id' => $user->id]));
     }
+
 }

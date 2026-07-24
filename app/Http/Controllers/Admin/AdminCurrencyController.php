@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Currency\StoreCurrencyRequest;
+use App\Http\Requests\Admin\Currency\UpdateCurrencyRequest;
 use App\Models\Currency;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminCurrencyController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $search = $request->get('search', '');
 
@@ -30,70 +33,39 @@ class AdminCurrencyController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('Admin/Currencies/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCurrencyRequest $request): RedirectResponse
     {
-        $validated = $this->validatePayload($request);
-        $validated = $this->ensureUniqueCurrencyCode($validated);
-
-        Currency::create($validated);
+        Currency::create($request->validated());
 
         return redirect()->route('admin.currencies.index')
             ->with('success', __('admin.currency_created'));
     }
 
-    public function edit(Currency $currency)
+    public function edit(Currency $currency): Response
     {
         return Inertia::render('Admin/Currencies/Edit', [
             'currency' => $currency,
         ]);
     }
 
-    public function update(Request $request, Currency $currency)
+    public function update(UpdateCurrencyRequest $request, Currency $currency): RedirectResponse
     {
-        $validated = $this->validatePayload($request);
-        $validated = $this->ensureUniqueCurrencyCode($validated, $currency->id);
-
-        $currency->update($validated);
+        $currency->update($request->validated());
 
         return redirect()->route('admin.currencies.index')
             ->with('success', __('admin.currency_updated'));
     }
 
-    public function destroy(Currency $currency)
+    public function destroy(Currency $currency): RedirectResponse
     {
         $currency->delete();
 
         return redirect()->route('admin.currencies.index')
             ->with('success', __('admin.currency_deleted'));
-    }
-
-    protected function validatePayload(Request $request): array
-    {
-        return $request->validate([
-            'currency' => ['required', 'string', 'max:10'],
-            'symbol' => ['required', 'string', 'max:10'],
-            'string_format' => ['required', 'string', 'max:20'],
-        ]);
-    }
-
-    protected function ensureUniqueCurrencyCode(array $validated, ?int $ignoreId = null): array
-    {
-        $exists = Currency::withTrashed()
-            ->where('currency', $validated['currency'])
-            ->when($ignoreId !== null, fn ($q) => $q->where('id', '!=', $ignoreId))
-            ->exists();
-
-        if ($exists) {
-            throw ValidationException::withMessages([
-                'currency' => __('validation.unique', ['attribute' => 'currency']),
-            ]);
-        }
-
-        return $validated;
     }
 }

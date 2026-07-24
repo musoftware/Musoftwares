@@ -41,11 +41,10 @@ class AppServiceProvider extends ServiceProvider
             'App\Models\Ticket' => \App\Models\Ticket::class,
             'support_ticket' => \App\Models\Ticket::class,
             'ticket' => \App\Models\Ticket::class,
-            \App\Models\Ticket::class => \App\Models\Ticket::class,
             'App\Models\User' => \App\Models\User::class,
             'direct_message' => \App\Models\User::class,
-            \App\Models\User::class => \App\Models\User::class,
         ]);
+
 
         $this->configureRateLimiting();
 

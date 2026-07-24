@@ -59,7 +59,7 @@ class AdminBlogArticleController extends Controller
         BlogArticle::create($request->validated());
 
         return redirect()->route('admin.blog-articles.index')
-            ->with('success', __('admin.article_created_successfully', [], 'en'));
+            ->with('success', __('admin.article_created_successfully'));
     }
 
     /**
@@ -83,7 +83,7 @@ class AdminBlogArticleController extends Controller
         $blog_article->update($request->validated());
 
         return redirect()->route('admin.blog-articles.index')
-            ->with('success', __('admin.article_updated_successfully', [], 'en'));
+            ->with('success', __('admin.article_updated_successfully'));
     }
 
     /**
@@ -94,6 +94,7 @@ class AdminBlogArticleController extends Controller
         $blog_article->delete();
 
         return redirect()->route('admin.blog-articles.index')
-            ->with('success', __('admin.article_deleted_successfully', [], 'en'));
+            ->with('success', __('admin.article_deleted_successfully'));
     }
+
 }

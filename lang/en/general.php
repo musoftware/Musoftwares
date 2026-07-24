@@ -647,7 +647,11 @@ return [
     'automatically_select_the_winning_variant_after_this_many_visits_leave_empty_to_manually_select' => 'Automatically select the winning variant after this many visits. Leave empty to manually select.',
     'automating_browser_to_load_more_results_please_keep_the_facebook_tab_active' => 'Automating browser to load more results... Please keep the Facebook tab active.',
     'automation_rules' => 'Automation Rules',
+    'automation_rule_created' => 'Automation rule created successfully.',
+    'automation_rule_deleted' => 'Automation rule deleted successfully.',
+    'automation_rule_updated' => 'Automation rule updated successfully.',
     'automation_tools' => 'Automation Tools',
+
     'automations' => 'Automations',
     'available' => 'Available',
     'available_across_all_platform_workspaces' => 'Available across all platform workspaces',
@@ -3624,7 +3628,9 @@ return [
     'merging' => 'Merging...',
     'message' => 'Message',
     'message_body' => 'Message Body',
+    'message_body_or_attachment_required' => 'A message body or file attachment is required.',
     'message_client' => 'Message Client',
+
     'message_content' => 'Message Content',
     'message_from_business' => 'Message from business',
     'message_limit' => 'Message Limit',

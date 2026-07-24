@@ -81,7 +81,7 @@ class UserEmailController extends Controller
 
         return redirect()
             ->route('admin.users.emails.index', $user->id)
-            ->with('success', "Alias {$email} added.");
+            ->with('success', __('admin.alias_added', ['email' => $email]));
     }
 
     public function destroy(DestroyUserEmailRequest $request, User $user, UserEmail $email): RedirectResponse
@@ -92,7 +92,7 @@ class UserEmailController extends Controller
 
         return redirect()
             ->route('admin.users.emails.index', $user->id)
-            ->with('success', 'Alias removed.');
+            ->with('success', __('admin.alias_removed'));
     }
 
     public function verify(Request $request, User $user, UserEmail $email): RedirectResponse
@@ -103,7 +103,7 @@ class UserEmailController extends Controller
 
         return redirect()
             ->route('admin.users.emails.index', $user->id)
-            ->with('success', 'Alias marked verified.');
+            ->with('success', __('admin.alias_verified'));
     }
 
     public function makePrimary(Request $request, User $user, UserEmail $email): RedirectResponse
@@ -130,6 +130,7 @@ class UserEmailController extends Controller
 
         return redirect()
             ->route('admin.users.emails.index', $user->id)
-            ->with('success', 'Primary email updated successfully.');
+            ->with('success', __('admin.primary_email_updated'));
     }
+
 }

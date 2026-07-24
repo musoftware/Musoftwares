@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Plan\StoreUserSubscriptionRequest;
 use App\Models\AdminSettings;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
@@ -10,8 +11,11 @@ use App\Models\User;
 use App\Models\UserSubscription;
 use App\Services\PricingService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PlanController extends Controller
 {
@@ -19,14 +23,11 @@ class PlanController extends Controller
         protected PricingService $pricingService
     ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $businessCurrencyId = AdminSettings::business_currency();
         $businessCurrency = Currency::find($businessCurrencyId);
 
-        // Convert price to business currency (assuming PricingService base is EGP which is usually 1, but we can just use business currency directly if they are same)
-        // Since we don't know the exact EGP currency ID safely, we will just return raw from PricingService
-        // But for better compatibility if the base is EGP and business is USD:
         $egpCurrency = Currency::where('currency', 'EGP')->first();
 
         $convertPrice = function ($price) use ($egpCurrency, $businessCurrency) {
@@ -89,7 +90,7 @@ class PlanController extends Controller
         ]);
     }
 
-    public function searchUsers(Request $request)
+    public function searchUsers(Request $request): JsonResponse
     {
         $search = $request->input('q');
 
@@ -115,7 +116,7 @@ class PlanController extends Controller
         return response()->json($users);
     }
 
-    public function create()
+    public function create(): Response
     {
         $items = $this->pricingService->getServiceItems();
 
@@ -124,22 +125,17 @@ class PlanController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreUserSubscriptionRequest $request): RedirectResponse
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'object' => 'required|string',
-            'expires_at' => 'required|date',
-        ]);
-
-        $user = User::findOrFail($request->user_id);
+        $validated = $request->validated();
+        $user = User::findOrFail($validated['user_id']);
 
         $existingSub = $user->subscriptions()
-            ->where('object', $request->object)
+            ->where('object', $validated['object'])
             ->where('status', 'active')
             ->first();
 
-        $expiresAt = Carbon::parse($request->expires_at);
+        $expiresAt = Carbon::parse($validated['expires_at']);
 
         if ($existingSub) {
             $existingSub->expires_at = $expiresAt;
@@ -147,7 +143,7 @@ class PlanController extends Controller
         } else {
             UserSubscription::create([
                 'user_id' => $user->id,
-                'object' => $request->object,
+                'object' => $validated['object'],
                 'status' => 'active',
                 'started_at' => now(),
                 'expires_at' => $expiresAt,

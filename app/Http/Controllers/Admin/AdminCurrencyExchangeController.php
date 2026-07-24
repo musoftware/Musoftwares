@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CurrencyExchange\StoreCurrencyExchangeRequest;
+use App\Http\Requests\Admin\CurrencyExchange\UpdateCurrencyExchangeRequest;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminCurrencyExchangeController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $search = $request->get('search', '');
         $currencyId = $request->get('currency_id');
@@ -45,7 +47,7 @@ class AdminCurrencyExchangeController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         $currencies = Currency::orderBy('currency')->get(['id', 'currency', 'symbol']);
 
@@ -54,9 +56,9 @@ class AdminCurrencyExchangeController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreCurrencyExchangeRequest $request): RedirectResponse
     {
-        $validated = $this->validatePayload($request);
+        $validated = $request->validated();
 
         CurrenciesExchange::updateOrCreate(
             [
@@ -73,7 +75,7 @@ class AdminCurrencyExchangeController extends Controller
             ->with('success', __('admin.currency_exchange_created'));
     }
 
-    public function edit(CurrenciesExchange $currencyExchange)
+    public function edit(CurrenciesExchange $currencyExchange): Response
     {
         $currencies = Currency::orderBy('currency')->get(['id', 'currency', 'symbol']);
 
@@ -85,11 +87,9 @@ class AdminCurrencyExchangeController extends Controller
         ]);
     }
 
-    public function update(Request $request, CurrenciesExchange $currencyExchange)
+    public function update(UpdateCurrencyExchangeRequest $request, CurrenciesExchange $currencyExchange): RedirectResponse
     {
-        $validated = $this->validatePayload($request, $currencyExchange->id);
-
-        $currencyExchange->update($validated);
+        $currencyExchange->update($request->validated());
 
         CurrenciesExchange::flushCache();
 
@@ -97,7 +97,7 @@ class AdminCurrencyExchangeController extends Controller
             ->with('success', __('admin.currency_exchange_updated'));
     }
 
-    public function destroy(CurrenciesExchange $currencyExchange)
+    public function destroy(CurrenciesExchange $currencyExchange): RedirectResponse
     {
         $currencyExchange->delete();
 
@@ -105,35 +105,5 @@ class AdminCurrencyExchangeController extends Controller
 
         return redirect()->route('admin.currency-exchanges.index')
             ->with('success', __('admin.currency_exchange_deleted'));
-    }
-
-    protected function validatePayload(Request $request, ?int $ignoreId = null): array
-    {
-        $baseRules = [
-            'date_string' => ['required', 'date_format:Y-m-d'],
-            'currency1' => ['required', 'integer', 'different:currency2', Rule::exists('currencies', 'id')],
-            'currency2' => ['required', 'integer', Rule::exists('currencies', 'id')],
-            'rate' => ['required', 'numeric', 'gt:0'],
-        ];
-
-        $validated = $request->validate($baseRules);
-
-        // Enforce the table-level unique constraint (date, currency1, currency2)
-        $existsQuery = CurrenciesExchange::withTrashed()
-            ->where('date_string', $validated['date_string'])
-            ->where('currency1', $validated['currency1'])
-            ->where('currency2', $validated['currency2']);
-
-        if ($ignoreId !== null) {
-            $existsQuery->where('id', '!=', $ignoreId);
-        }
-
-        if ($existsQuery->exists()) {
-            throw ValidationException::withMessages([
-                'date_string' => __('admin.exchange_already_exists_for_pair_on_date'),
-            ]);
-        }
-
-        return $validated;
     }
 }

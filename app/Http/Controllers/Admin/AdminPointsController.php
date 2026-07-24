@@ -3,17 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Points\AdjustUserPointsRequest;
 use App\Models\PointTransaction;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminPointsController extends Controller
 {
     /**
      * Display all users with their current points balance.
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $search = $request->get('search', '');
 
@@ -39,7 +43,7 @@ class AdminPointsController extends Controller
     /**
      * Show the form to add or deduct points for a specific user.
      */
-    public function create(User $user)
+    public function create(User $user): Response
     {
         return Inertia::render('Admin/Points/Create', [
             'client' => [
@@ -54,12 +58,9 @@ class AdminPointsController extends Controller
     /**
      * Add or deduct points from a specific user.
      */
-    public function adjustPoints(Request $request, User $user)
+    public function adjustPoints(AdjustUserPointsRequest $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            'amount' => ['required', 'numeric', 'not_in:0'],
-            'reason' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         $amount = (int) $validated['amount'];
         $reason = trim($validated['reason']);
@@ -86,7 +87,7 @@ class AdminPointsController extends Controller
     /**
      * Return the points history for a specific user (JSON, used by modal).
      */
-    public function history(User $user)
+    public function history(User $user): JsonResponse
     {
         $actions = PointTransaction::where('user_id', $user->id)
             ->orderByDesc('created_at')

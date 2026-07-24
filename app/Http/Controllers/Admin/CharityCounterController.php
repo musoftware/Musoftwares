@@ -4,17 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CharityCounter;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CharityCounterController extends Controller
 {
     /**
      * Display the charity counter admin page.
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $query = CharityCounter::with('user')->orderBy('balance', 'desc');
 
@@ -43,7 +45,7 @@ class CharityCounterController extends Controller
     /**
      * Add amount to global counter.
      */
-    public function addAmount(Request $request)
+    public function addAmount(Request $request): RedirectResponse
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
@@ -61,18 +63,18 @@ class CharityCounterController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'تم إضافة المبلغ بنجاح');
+            return back()->with('success', __('admin.charity_amount_added_successfully'));
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'حدث خطأ: '.$e->getMessage());
+            return back()->with('error', __('admin.an_error_occurred', ['error' => $e->getMessage()]));
         }
     }
 
     /**
      * Subtract amount from global counter.
      */
-    public function subtractAmount(Request $request)
+    public function subtractAmount(Request $request): RedirectResponse
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
@@ -90,11 +92,11 @@ class CharityCounterController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'تم خصم المبلغ بنجاح');
+            return back()->with('success', __('admin.charity_amount_subtracted_successfully'));
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'حدث خطأ: '.$e->getMessage());
+            return back()->with('error', __('admin.an_error_occurred', ['error' => $e->getMessage()]));
         }
     }
 }

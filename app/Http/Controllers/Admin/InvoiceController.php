@@ -134,16 +134,12 @@ class InvoiceController extends Controller
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
-        $projects = $request->filled('client_id')
-            ? Project::where('user_id', $request->client_id)->get()
-            : Project::all();
-
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'all',
             'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
             'stats' => $this->getStats($request),
-            'projects' => $projects,
+            'projects' => $this->getFilteredProjects($request),
         ]);
     }
 
@@ -165,16 +161,12 @@ class InvoiceController extends Controller
             ]);
         }
 
-        $projects = $request->filled('client_id')
-            ? Project::where('user_id', $request->client_id)->get()
-            : Project::all();
-
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'unpaid',
             'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
             'stats' => $this->getStats($request),
-            'projects' => $projects,
+            'projects' => $this->getFilteredProjects($request),
         ]);
     }
 
@@ -190,17 +182,20 @@ class InvoiceController extends Controller
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
-        $projects = $request->filled('client_id')
-            ? Project::where('user_id', $request->client_id)->get()
-            : Project::all();
-
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'archive',
             'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
             'stats' => $this->getStats($request),
-            'projects' => $projects,
+            'projects' => $this->getFilteredProjects($request),
         ]);
+    }
+
+    private function getFilteredProjects(Request $request)
+    {
+        return $request->filled('client_id')
+            ? Project::where('user_id', $request->client_id)->get()
+            : Project::all();
     }
 
     /**

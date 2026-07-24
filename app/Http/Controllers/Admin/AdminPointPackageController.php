@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PointPackage\StorePointPackageRequest;
+use App\Http\Requests\Admin\PointPackage\UpdatePointPackageRequest;
 use App\Models\PointPackage;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminPointPackageController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $search = $request->get('search', '');
 
@@ -25,20 +29,14 @@ class AdminPointPackageController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('Admin/PointPackages/Create');
     }
 
-    public function store(Request $request)
+    public function store(StorePointPackageRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'points' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'is_active' => 'boolean',
-        ]);
-
+        $validated = $request->validated();
         $validated['is_active'] = $request->input('is_active', true);
 
         PointPackage::create($validated);
@@ -47,22 +45,16 @@ class AdminPointPackageController extends Controller
             ->with('success', __('admin.point_package_created'));
     }
 
-    public function edit(PointPackage $pointPackage)
+    public function edit(PointPackage $pointPackage): Response
     {
         return Inertia::render('Admin/PointPackages/Edit', [
             'pointPackage' => $pointPackage,
         ]);
     }
 
-    public function update(Request $request, PointPackage $pointPackage)
+    public function update(UpdatePointPackageRequest $request, PointPackage $pointPackage): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'points' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'is_active' => 'boolean',
-        ]);
-
+        $validated = $request->validated();
         $validated['is_active'] = $request->input('is_active', true);
 
         $pointPackage->update($validated);
@@ -71,7 +63,7 @@ class AdminPointPackageController extends Controller
             ->with('success', __('admin.point_package_updated'));
     }
 
-    public function destroy(PointPackage $pointPackage)
+    public function destroy(PointPackage $pointPackage): RedirectResponse
     {
         $pointPackage->delete();
 
