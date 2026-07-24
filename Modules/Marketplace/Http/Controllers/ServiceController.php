@@ -35,7 +35,7 @@ class ServiceController extends Controller
 
         $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
         $userFavoriteIds = auth()->check()
-            ? \App\Models\Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->pluck('service_id')->toArray()
+            ? \App\Models\Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->pluck('favoritable_id')->toArray()
             : [];
 
         $services->getCollection()->transform(function ($service) use ($viewerCurrency, $userFavoriteIds) {
@@ -84,8 +84,21 @@ class ServiceController extends Controller
         $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
 
         $service->is_favorited = auth()->check()
-            ? \App\Models\Favorite::where('user_id', auth()->id())->where('service_id', $service->id)->exists()
+            ? \App\Models\Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->where('favoritable_id', $service->id)->exists()
             : false;
+
+        if ($service->packages->isEmpty()) {
+            ServicePackage::create([
+                'service_id' => $service->id,
+                'name' => 'Standard',
+                'description' => $service->description ?: 'Standard package deliverable.',
+                'price' => $service->is_free ? 0 : 5,
+                'currency_id' => 1,
+                'delivery_days' => 3,
+                'revisions' => 2,
+            ]);
+            $service->load('packages.currency');
+        }
 
         $service->packages->transform(function ($package) use ($viewerCurrency) {
             if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {

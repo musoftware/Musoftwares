@@ -63,6 +63,11 @@ class Project extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function shares(): HasMany
     {
         return $this->hasMany(ProjectShare::class);
@@ -242,11 +247,6 @@ class Project extends Model
     public function date_end_str()
     {
         return Carbon::parse($this->date_end)->format('Y-m-d');
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function getNameAttribute()

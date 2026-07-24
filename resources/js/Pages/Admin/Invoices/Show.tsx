@@ -85,7 +85,7 @@ export default function Show({ invoice }: { invoice: any }) {
         service_pay_dest: 'cib_swype',
         service_revenue: '0'
     });
-    const [payServicePreview, setPayServicePreview] = useState<{ cost: number, total: number, total_usd: number, invoice_currency?: string } | null>(null);
+    const [payServicePreview, setPayServicePreview] = useState<{ cost: number, total: number, total_usd: number, invoice_currency?: string, business_currency?: string } | null>(null);
     const [isCalculatingPayService, setIsCalculatingPayService] = useState(false);
     const [isSubmittingPayService, setIsSubmittingPayService] = useState(false);
 
@@ -1350,7 +1350,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <div className="flex justify-end gap-4 text-xs text-gray-400 mt-1">
                                         <span>{__('general.business_currency_total')}</span>
                                         <span>
-                                            {formatCurrency(payServicePreview.total_usd, payServicePreview.business_currency || 'USD')}
+                                            {formatCurrency(payServicePreview.total_usd, (payServicePreview as any).business_currency || 'USD')}
                                         </span>
                                     </div>
                                 </div>

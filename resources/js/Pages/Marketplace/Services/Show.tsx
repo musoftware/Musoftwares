@@ -333,27 +333,28 @@ export default function Show({ service }: any) {
                                                     </span>
                                                 </div>
 
-                                                {selectedPackage.is_mock ? (
-                                                    <Link
-                                                        href="/messages"
-                                                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 hover:bg-slate-900 px-4 py-3 font-bold text-white transition shadow-sm"
-                                                    >
-                                                        {__('general.contact_seller') || 'Contact Seller'}
-                                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                                        </svg>
-                                                    </Link>
-                                                ) : displayBalance >= selectedPackage.price ? (
-                                                    <button
-                                                        onClick={() => handleBuyNow(selectedPackage.id)}
-                                                        disabled={processing}
-                                                        className={`flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 font-bold text-white transition ${processing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'}`}
-                                                    >
-                                                        {__('general.continue')} — {formatCurrency(selectedPackage.price, selectedPackage.currency)}
-                                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                                        </svg>
-                                                    </button>
+                                                {displayBalance >= selectedPackage.price ? (
+                                                    <div className="space-y-3">
+                                                        <button
+                                                            onClick={() => handleBuyNow(selectedPackage.id)}
+                                                            disabled={processing}
+                                                            className={`flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 font-bold text-white transition ${processing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'}`}
+                                                        >
+                                                            {__('general.continue')} — {formatCurrency(selectedPackage.price, selectedPackage.currency)}
+                                                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                                            </svg>
+                                                        </button>
+                                                        <Link
+                                                            href="/messages"
+                                                            className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2.5 font-semibold text-slate-700 transition shadow-none text-sm"
+                                                        >
+                                                            {__('general.contact_seller') || 'Contact Seller'}
+                                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                                            </svg>
+                                                        </Link>
+                                                    </div>
                                                 ) : (
                                                     <div className="space-y-3">
                                                         <div className="text-center text-sm font-medium text-red-600">
@@ -364,6 +365,15 @@ export default function Show({ service }: any) {
                                                             className="block w-full text-center rounded-lg bg-amber-500 px-4 py-3 font-bold text-white transition hover:bg-amber-600 shadow-sm"
                                                         >
                                                             {__('general.top_up_wallet')}
+                                                        </Link>
+                                                        <Link
+                                                            href="/messages"
+                                                            className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 px-4 py-2.5 font-semibold text-slate-700 transition shadow-none text-sm"
+                                                        >
+                                                            {__('general.contact_seller') || 'Contact Seller'}
+                                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                                            </svg>
                                                         </Link>
                                                     </div>
                                                 )}

@@ -5,48 +5,24 @@ namespace App\Http\Controllers;
 use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
-use App\Models\Message;
 use App\Models\Ticket;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ConversationController extends Controller
 {
     /**
-     * Helper to resolve conversation by ID or ticket ID.
-     */
-    private function resolveConversation($id): Conversation
-    {
-        $conversation = Conversation::find($id);
-
-        if (! $conversation) {
-            // Fallback: Check if $id refers to the ticket ID
-            $conversation = Conversation::where('conversable_type', Ticket::class)
-                ->where('conversable_id', $id)
-                ->first();
-        }
-
-        if (! $conversation) {
-            abort(404, __('general.conversation_not_found'));
-        }
-
-        return $conversation;
-    }
-
-    /**
      * Fetch messages for a conversation.
      */
-    public function messages(Request $request, $id)
+    public function messages(Request $request, int|string $id): JsonResponse
     {
         $user = $request->user();
         $conversation = $this->resolveConversation($id);
 
-        // Security check: user must be a participant or admin
-        $isParticipant = $conversation->participants()->where('user_id', $user->id)->exists();
-        if (! $isParticipant && ! $user->isAdmin()) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorizeAccess($conversation, $user);
 
-        // Return messages sorted descending (newest first) as ChatWindow.jsx calls reverse() on them
+        // Messages sorted descending (newest first) as ChatWindow expects
         $messages = $conversation->messages()
             ->with('sender')
             ->orderBy('created_at', 'desc')
@@ -60,16 +36,12 @@ class ConversationController extends Controller
     /**
      * Store a new message in a conversation.
      */
-    public function storeMessage(Request $request, $id)
+    public function storeMessage(Request $request, int|string $id): JsonResponse
     {
         $user = $request->user();
         $conversation = $this->resolveConversation($id);
 
-        // Security check: user must be a participant or admin
-        $isParticipant = $conversation->participants()->where('user_id', $user->id)->exists();
-        if (! $isParticipant && ! $user->isAdmin()) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorizeAccess($conversation, $user);
 
         $validated = $request->validate([
             'body' => 'nullable|string',
@@ -77,7 +49,7 @@ class ConversationController extends Controller
         ]);
 
         if (empty($validated['body']) && ! $request->hasFile('attachment')) {
-            return response()->json(['error' => 'Message body or attachment is required.'], 422);
+            return response()->json(['error' => __('general.message_body_or_attachment_required') ?: 'Message body or attachment is required.'], 422);
         }
 
         $attachmentPath = null;
@@ -96,7 +68,7 @@ class ConversationController extends Controller
         // Broadcast real-time message event
         broadcast(new MessageSent($message))->toOthers();
 
-        // Touch the conversation's timestamp
+        // Touch conversation updated_at timestamp
         $conversation->touch();
 
         return response()->json($message);
@@ -105,21 +77,48 @@ class ConversationController extends Controller
     /**
      * Mark conversation as read for the authenticated user.
      */
-    public function markAsRead(Request $request, $id)
+    public function markAsRead(Request $request, int|string $id): JsonResponse
     {
         $user = $request->user();
         $conversation = $this->resolveConversation($id);
 
-        $participant = ConversationParticipant::where('conversation_id', $conversation->id)
+        ConversationParticipant::where('conversation_id', $conversation->id)
             ->where('user_id', $user->id)
-            ->first();
-
-        if ($participant) {
-            $participant->update([
+            ->update([
                 'last_read_at' => now(),
             ]);
-        }
 
         return response()->json(['success' => true]);
     }
+
+    /**
+     * Helper to resolve conversation by ID or ticket ID.
+     */
+    private function resolveConversation(int|string $id): Conversation
+    {
+        $conversation = Conversation::find($id)
+            ?? Conversation::where('conversable_type', Ticket::class)
+                ->where('conversable_id', $id)
+                ->first();
+
+        if (! $conversation) {
+            abort(404, __('general.conversation_not_found'));
+        }
+
+        return $conversation;
+    }
+
+    /**
+     * Guard to verify user is a participant or administrator.
+     */
+    private function authorizeAccess(Conversation $conversation, User $user): void
+    {
+        $isParticipant = $conversation->participants()->where('user_id', $user->id)->exists();
+        $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
+
+        if (! $isParticipant && ! $isAdmin) {
+            abort(403, 'Unauthorized access to conversation.');
+        }
+    }
 }
+

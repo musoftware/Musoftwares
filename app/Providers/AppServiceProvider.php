@@ -33,6 +33,20 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
+        \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+            'App\Models\ServiceOrder' => \Modules\Marketplace\Models\ServiceOrder::class,
+            'service_order' => \Modules\Marketplace\Models\ServiceOrder::class,
+            'marketplace_order' => \Modules\Marketplace\Models\ServiceOrder::class,
+            \Modules\Marketplace\Models\ServiceOrder::class => \Modules\Marketplace\Models\ServiceOrder::class,
+            'App\Models\Ticket' => \App\Models\Ticket::class,
+            'support_ticket' => \App\Models\Ticket::class,
+            'ticket' => \App\Models\Ticket::class,
+            \App\Models\Ticket::class => \App\Models\Ticket::class,
+            'App\Models\User' => \App\Models\User::class,
+            'direct_message' => \App\Models\User::class,
+            \App\Models\User::class => \App\Models\User::class,
+        ]);
+
         $this->configureRateLimiting();
 
         Event::listen(

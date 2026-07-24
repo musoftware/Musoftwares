@@ -187,11 +187,23 @@ export default function Show({ order, conversation }: any) {
                                     </div>
 
                                     {order.delivery_payload?.links && (
-                                    <div className="mb-6">
-                                        <h5 className="mb-2 text-sm font-medium text-gray-700">
-                                            Delivery Links:
-                                        </h5>
-                                        <div className="flex cursor-pointer items-center rounded-lg border border-gray-200 p-3 transition hover:bg-gray-50">
+                                        <div className="mb-6">
+                                            <h5 className="mb-2 text-sm font-medium text-gray-700">
+                                                Delivery Links:
+                                            </h5>
+                                            <div className="flex cursor-pointer items-center rounded-lg border border-gray-200 p-3 transition hover:bg-gray-50">
+                                                <a
+                                                    href={order.delivery_payload.links}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-sm font-medium text-indigo-600 hover:underline break-all"
+                                                >
+                                                    {order.delivery_payload.links}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {order.delivery_payload?.serial_code && (
                                         <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 space-y-3 shadow-xs">
                                             <div className="flex items-center justify-between">

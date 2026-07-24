@@ -1,5 +1,5 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     ShoppingCart,
@@ -34,6 +34,7 @@ export default function MarketplaceDashboard({
     listedGigs: initialGigs,
     categories = []
 }: any) {
+    const { auth } = usePage().props as any;
     const [selectedService, setSelectedService] = useState<any>(null);
 
     const marketplaceModeContext = useMarketplaceMode();

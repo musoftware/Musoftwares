@@ -1,5 +1,19 @@
 import { useState } from 'react';
 
+function formatAttachmentUrl(path) {
+    if (!path) return '';
+    if (path.startsWith('blob:') || path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+    if (path.startsWith('/storage/')) {
+        return path;
+    }
+    if (path.startsWith('storage/')) {
+        return `/${path}`;
+    }
+    return `/storage/${path}`;
+}
+
 export default function Message({ message, isOwnMessage }) {
     const [isImageExpanded, setIsImageExpanded] = useState(false);
 
@@ -39,6 +53,30 @@ export default function Message({ message, isOwnMessage }) {
                         }`}
                         title={`${formattedDate}, ${formattedTime}`}
                     >
+                        {/* Handle single file path attachment */}
+                        {message.attachment && (
+                            <div className="mb-2">
+                                {/\.(jpeg|jpg|gif|png|svg|webp)$/i.test(message.attachment) ? (
+                                    <img
+                                        src={formatAttachmentUrl(message.attachment)}
+                                        alt="attachment"
+                                        className={`cursor-pointer rounded-lg transition-all ${isImageExpanded ? 'h-auto max-w-full' : 'h-32 w-48 object-cover'}`}
+                                        onClick={() => setIsImageExpanded(!isImageExpanded)}
+                                    />
+                                ) : (
+                                    <a
+                                        href={formatAttachmentUrl(message.attachment)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`inline-flex items-center gap-1.5 text-xs font-semibold underline p-2 rounded-lg ${isOwnMessage ? 'bg-indigo-700/50 text-white' : 'bg-slate-100 text-indigo-600 hover:bg-slate-200'}`}
+                                    >
+                                        📎 {message.attachment.split('/').pop() || 'Attachment'}
+                                    </a>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Handle attachments array */}
                         {message.attachments &&
                             message.attachments.length > 0 &&
                             message.attachments.map(
@@ -52,7 +90,7 @@ export default function Message({ message, isOwnMessage }) {
                                                 src={
                                                     attachment.isTempUrl
                                                         ? attachment.path
-                                                        : `/storage/${attachment.path}`
+                                                        : formatAttachmentUrl(attachment.path)
                                                 }
                                                 alt={
                                                     attachment.original_name ||
