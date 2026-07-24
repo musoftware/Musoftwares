@@ -3,15 +3,19 @@
 namespace Modules\Marketplace\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 use Modules\Marketplace\Services\CustomProjectService;
 
 class CustomProjectController extends Controller
 {
     public function __construct(protected CustomProjectService $customProjectService) {}
 
-    public function index(Request $request)
+    public function index(Request $request): Response|JsonResponse
     {
         $projects = Project::with('user')->where('status', 'open')->latest()->paginate(15);
 
@@ -19,12 +23,12 @@ class CustomProjectController extends Controller
             return response()->json(['projects' => $projects]);
         }
 
-        return \Inertia\Inertia::render('Marketplace/Projects/Index', [
-            'projects' => $projects
+        return Inertia::render('Marketplace/Projects/Index', [
+            'projects' => $projects,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -33,16 +37,16 @@ class CustomProjectController extends Controller
             'deadline' => 'nullable|date',
         ]);
 
-        $project = $this->customProjectService->createProject(auth()->user(), $validated);
+        $project = $this->customProjectService->createProject($request->user(), $validated);
 
-        if ($request->header('X-Inertia') || !$request->wantsJson()) {
+        if ($request->header('X-Inertia') || ! $request->wantsJson()) {
             return back()->with('success', __('general.project_created_successfully'));
         }
 
         return response()->json(['success' => true, 'project' => $project]);
     }
 
-    public function submitProposal(Request $request, Project $project)
+    public function submitProposal(Request $request, Project $project): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'price' => 'required|numeric|min:1',
@@ -51,15 +55,15 @@ class CustomProjectController extends Controller
         ]);
 
         try {
-            $proposal = $this->customProjectService->submitProposal($project, auth()->user(), $validated);
+            $proposal = $this->customProjectService->submitProposal($project, $request->user(), $validated);
 
-            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+            if ($request->header('X-Inertia') || ! $request->wantsJson()) {
                 return back()->with('success', __('general.proposal_submitted_successfully'));
             }
 
             return response()->json(['success' => true, 'proposal' => $proposal]);
         } catch (\Exception $e) {
-            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+            if ($request->header('X-Inertia') || ! $request->wantsJson()) {
                 return back()->withErrors(['error' => $e->getMessage()]);
             }
 
@@ -67,7 +71,7 @@ class CustomProjectController extends Controller
         }
     }
 
-    public function acceptProposal(Request $request, Project $project)
+    public function acceptProposal(Request $request, Project $project): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'freelancer_id' => 'required|exists:users,id',
@@ -81,13 +85,13 @@ class CustomProjectController extends Controller
                 (float) $validated['amount']
             );
 
-            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+            if ($request->header('X-Inertia') || ! $request->wantsJson()) {
                 return back()->with('success', __('general.proposal_accepted_successfully'));
             }
 
             return response()->json(['success' => true, 'contract' => $contract]);
         } catch (\Exception $e) {
-            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+            if ($request->header('X-Inertia') || ! $request->wantsJson()) {
                 return back()->withErrors(['error' => $e->getMessage()]);
             }
 
@@ -95,3 +99,4 @@ class CustomProjectController extends Controller
         }
     }
 }
+

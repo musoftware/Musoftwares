@@ -3,6 +3,8 @@
 namespace Modules\Marketplace\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Services\ReferralService;
 
@@ -10,7 +12,7 @@ class ReferralController extends Controller
 {
     public function __construct(protected ReferralService $referralService) {}
 
-    public function withdraw(Request $request)
+    public function withdraw(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:10',
@@ -20,19 +22,19 @@ class ReferralController extends Controller
 
         try {
             $withdrawRequest = $this->referralService->requestWithdrawal(
-                auth()->user(),
+                $request->user(),
                 (float) $validated['amount'],
                 $validated['payout_method'],
                 $validated['payment_details']
             );
 
-            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+            if ($request->header('X-Inertia') || ! $request->wantsJson()) {
                 return back()->with('success', __('general.withdrawal_requested_successfully'));
             }
 
             return response()->json(['success' => true, 'request' => $withdrawRequest]);
         } catch (\Exception $e) {
-            if ($request->header('X-Inertia') || !$request->wantsJson()) {
+            if ($request->header('X-Inertia') || ! $request->wantsJson()) {
                 return back()->withErrors(['withdrawal' => $e->getMessage()]);
             }
 
@@ -40,3 +42,4 @@ class ReferralController extends Controller
         }
     }
 }
+

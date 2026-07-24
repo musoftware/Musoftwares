@@ -33,40 +33,7 @@ class PayoutMethodController extends Controller
     public function store(Request $request)
     {
         $type = $request->input('type');
-
-        // Base validation rules
-        $rules = [
-            'type' => 'required|string|in:bank_transfer,paypal,vodafone_cash,instapay',
-            'is_default' => 'boolean',
-        ];
-
-        // Type-specific validation rules
-        switch ($type) {
-            case 'bank_transfer':
-                $rules['details.full_name'] = 'required|string|max:255';
-                $rules['details.bank_name'] = 'required|string|max:255';
-                $rules['details.account_number'] = 'required|string|max:50';
-                $rules['details.routing_number'] = 'nullable|string|max:50';
-                break;
-
-            case 'vodafone_cash':
-                $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
-                break;
-
-            case 'paypal':
-                $rules['details.paypal_email'] = 'required|email|max:255';
-                break;
-
-            case 'instapay':
-                $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
-                $rules['details.instapay_username'] = 'required|string|max:255';
-                break;
-        }
-
-        $request->validate($rules, [
-            'details.mobile_number.regex' => 'Mobile number must be 10-15 digits.',
-            'details.wallet_address.min' => 'Wallet address appears invalid.',
-        ]);
+        $this->validatePayoutDetails($request, (string) $type);
 
         $user = $request->user();
 
@@ -92,8 +59,23 @@ class PayoutMethodController extends Controller
         }
 
         $type = $request->input('type', $payoutMethod->type);
+        $this->validatePayoutDetails($request, (string) $type);
 
-        // Apply same type-specific validation as store()
+        if ($request->is_default) {
+            $request->user()->payoutMethods()->where('id', '!=', $payoutMethod->id)->update(['is_default' => false]);
+        }
+
+        $payoutMethod->update([
+            'type' => $request->type,
+            'details' => $request->details,
+            'is_default' => $request->is_default ?? false,
+        ]);
+
+        return back()->with('success', __('general.payout_method_updated_successfully'));
+    }
+
+    private function validatePayoutDetails(Request $request, string $type): array
+    {
         $rules = [
             'type' => 'required|string|in:bank_transfer,paypal,vodafone_cash,instapay',
             'details' => 'required|array',
@@ -107,31 +89,25 @@ class PayoutMethodController extends Controller
                 $rules['details.account_number'] = 'required|string|max:50';
                 $rules['details.routing_number'] = 'nullable|string|max:50';
                 break;
+
             case 'vodafone_cash':
                 $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
                 break;
+
             case 'paypal':
                 $rules['details.paypal_email'] = 'required|email|max:255';
                 break;
+
             case 'instapay':
                 $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
                 $rules['details.instapay_username'] = 'required|string|max:255';
                 break;
         }
 
-        $request->validate($rules);
-
-        if ($request->is_default) {
-            $request->user()->payoutMethods()->where('id', '!=', $payoutMethod->id)->update(['is_default' => false]);
-        }
-
-        $payoutMethod->update([
-            'type' => $request->type,
-            'details' => $request->details,
-            'is_default' => $request->is_default ?? false,
+        return $request->validate($rules, [
+            'details.mobile_number.regex' => 'Mobile number must be 10-15 digits.',
+            'details.wallet_address.min' => 'Wallet address appears invalid.',
         ]);
-
-        return back()->with('success', __('general.payout_method_updated_successfully'));
     }
 
     public function destroy(Request $request, PayoutMethod $payoutMethod)

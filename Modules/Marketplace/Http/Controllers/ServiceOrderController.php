@@ -43,10 +43,25 @@ class ServiceOrderController extends Controller
 
         $order->load(['buyer', 'seller', 'package.service']);
 
-        $conversation = Conversation::with(['messages.sender', 'participants'])
-            ->where('conversable_type', ServiceOrder::class)
-            ->where('conversable_id', $order->id)
-            ->first();
+        $conversation = Conversation::firstOrCreate(
+            [
+                'conversable_type' => ServiceOrder::class,
+                'conversable_id' => $order->id,
+            ],
+            [
+                'type' => 'marketplace_order',
+                'status' => 'open',
+            ]
+        );
+
+        if (! $conversation->participants()->exists()) {
+            $conversation->participants()->createMany([
+                ['user_id' => $order->buyer_id, 'role' => 'buyer'],
+                ['user_id' => $order->seller_id, 'role' => 'seller'],
+            ]);
+        }
+
+        $conversation->load(['messages.sender', 'participants.user']);
 
         return Inertia::render('Marketplace/Orders/Show', [
             'order' => $order,

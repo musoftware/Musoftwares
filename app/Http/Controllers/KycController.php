@@ -11,6 +11,8 @@ use Inertia\Inertia;
 
 class KycController extends Controller
 {
+    protected const REQUIRED_DOCS = ['id_front', 'selfie'];
+
     /**
      * Show the KYC verification page
      */
@@ -31,10 +33,7 @@ class KycController extends Controller
             ];
         });
 
-        // Check if all required documents are uploaded
-        $requiredDocs = ['id_front', 'selfie'];
-        $uploadedTypes = $documents->pluck('document_type')->toArray();
-        $missingDocs = array_values(array_diff($requiredDocs, $uploadedTypes));
+        $missingDocs = $this->getMissingRequiredDocs($user);
 
         return Inertia::render('Client/Kyc/Index', [
             'kycStatus' => [
@@ -45,7 +44,7 @@ class KycController extends Controller
             ],
             'documents' => $documents,
             'missingDocs' => $missingDocs,
-            'requiredDocs' => $requiredDocs,
+            'requiredDocs' => self::REQUIRED_DOCS,
         ]);
     }
 
@@ -106,10 +105,7 @@ class KycController extends Controller
             return back()->with('error', __('general.you_are_already_kyc_verified'));
         }
 
-        // Check if all required documents are uploaded
-        $requiredDocs = ['id_front', 'selfie'];
-        $uploadedDocs = $user->kycDocuments()->pluck('document_type')->toArray();
-        $missingDocs = array_diff($requiredDocs, $uploadedDocs);
+        $missingDocs = $this->getMissingRequiredDocs($user);
 
         if (! empty($missingDocs)) {
             return back()->withErrors(['kyc' => 'You must upload all required documents (ID Front, Selfie) before submitting.']);
@@ -122,6 +118,13 @@ class KycController extends Controller
         ]);
 
         return back()->with('success', __('general.kyc_application_submitted_successfully_we_will_review_it_shortly'));
+    }
+
+    private function getMissingRequiredDocs(User $user): array
+    {
+        $uploadedDocs = $user->kycDocuments()->pluck('document_type')->toArray();
+
+        return array_values(array_diff(self::REQUIRED_DOCS, $uploadedDocs));
     }
 
     /**

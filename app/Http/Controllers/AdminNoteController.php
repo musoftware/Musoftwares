@@ -14,11 +14,8 @@ class AdminNoteController extends Controller
 
         $query = AdminNote::query();
 
-        if ($type === 'client') {
-            $query->where('noteable_type', \App\Models\User::class)
-                ->where('noteable_id', $id);
-        } else {
-            $query->where('noteable_type', $type)
+        if ($type) {
+            $query->where('noteable_type', $this->resolveNoteableType($type))
                 ->where('noteable_id', $id);
         }
 
@@ -31,16 +28,13 @@ class AdminNoteController extends Controller
             'noteable_type' => 'required|string',
             'noteable_id' => 'required|integer',
             'content' => 'required|string',
-            'type' => 'required|string',
-            'visibility' => 'required|string',
-            'risk_level' => 'required|string',
+            'type' => 'required|string|max:50',
+            'visibility' => 'required|string|max:50',
+            'risk_level' => 'required|string|max:50',
         ]);
 
-        if ($data['noteable_type'] === 'client') {
-            $data['noteable_type'] = \App\Models\User::class;
-        }
-
-        $data['author_id'] = auth()->id() ?? 1;
+        $data['noteable_type'] = $this->resolveNoteableType($data['noteable_type']);
+        $data['author_id'] = $request->user()?->id ?? auth()->id();
 
         $note = AdminNote::create($data);
 
@@ -61,5 +55,10 @@ class AdminNoteController extends Controller
         $note->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    private function resolveNoteableType(string $type): string
+    {
+        return $type === 'client' ? \App\Models\User::class : $type;
     }
 }

@@ -39,10 +39,7 @@ class ContractController extends Controller
 
     public function edit(Contract $contract)
     {
-        // Enforce data isolation
-        if ($contract->user_id !== Auth::id()) {
-            abort(403, __('general.unauthorized_action'));
-        }
+        $this->authorizeOwnership($contract);
 
         $contract->load('user');
 
@@ -54,10 +51,7 @@ class ContractController extends Controller
 
     public function update(UpdateContractRequest $request, Contract $contract)
     {
-        // Enforce data isolation
-        if ($contract->user_id !== Auth::id()) {
-            abort(403, __('general.unauthorized_action'));
-        }
+        $this->authorizeOwnership($contract);
 
         $this->contractService->updateContract($contract, $request->validated());
 
@@ -103,10 +97,7 @@ class ContractController extends Controller
 
     public function updateStatus(UpdateContractStatusRequest $request, Contract $contract)
     {
-        // Enforce data isolation
-        if ($contract->user_id !== Auth::id()) {
-            abort(403, __('general.unauthorized_action'));
-        }
+        $this->authorizeOwnership($contract);
 
         $this->contractService->updateStatus($contract, $request->validated('status'));
 
@@ -115,14 +106,18 @@ class ContractController extends Controller
 
     public function destroy(Contract $contract)
     {
-        // Enforce data isolation
-        if ($contract->user_id !== Auth::id()) {
-            abort(403, __('general.unauthorized_action'));
-        }
+        $this->authorizeOwnership($contract);
 
         $this->contractService->deleteContract($contract);
 
         return redirect()->back()->with('success', __('general.contract_deleted_successfully'));
+    }
+
+    private function authorizeOwnership(Contract $contract): void
+    {
+        if ($contract->user_id !== Auth::id()) {
+            abort(403, __('general.unauthorized_action'));
+        }
     }
 
     public function searchUsers(Request $request)

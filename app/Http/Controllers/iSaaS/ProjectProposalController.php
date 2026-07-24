@@ -61,7 +61,7 @@ class ProjectProposalController extends Controller
 
     public function show(Request $request, $id)
     {
-        $proposal = ProjectProposal::where('user_id', $request->user()->id)->findOrFail($id);
+        $proposal = $this->findUserProposal($request->user(), $id);
 
         return Inertia::render('iSaaS/Proposals/Show', [
             'proposal' => $proposal,
@@ -70,7 +70,7 @@ class ProjectProposalController extends Controller
 
     public function update(Request $request, $id)
     {
-        $proposal = ProjectProposal::where('user_id', $request->user()->id)->findOrFail($id);
+        $proposal = $this->findUserProposal($request->user(), $id);
 
         $request->validate([
             'ai_estimate' => 'required|array',
@@ -86,7 +86,7 @@ class ProjectProposalController extends Controller
 
     public function convert(Request $request, $id)
     {
-        $proposal = ProjectProposal::where('user_id', $request->user()->id)->findOrFail($id);
+        $proposal = $this->findUserProposal($request->user(), $id);
 
         if ($proposal->status === 'converted') {
             return back()->withErrors(['error' => 'This proposal has already been converted to a contract.']);
@@ -121,9 +121,14 @@ class ProjectProposalController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $proposal = ProjectProposal::where('user_id', $request->user()->id)->findOrFail($id);
+        $proposal = $this->findUserProposal($request->user(), $id);
         $proposal->delete();
 
         return redirect()->route('isaas.proposals.index')->with('success', __('general.proposal_deleted'));
+    }
+
+    private function findUserProposal($user, int|string $id): ProjectProposal
+    {
+        return ProjectProposal::where('user_id', $user->id)->findOrFail($id);
     }
 }

@@ -3,6 +3,7 @@
 namespace Modules\Marketplace\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Services\FreeDownloadService;
@@ -11,7 +12,7 @@ class FreeDownloadController extends Controller
 {
     public function __construct(protected FreeDownloadService $freeDownloadService) {}
 
-    public function requestDownload(Request $request, Service $service)
+    public function requestDownload(Request $request, Service $service): JsonResponse
     {
         $validated = $request->validate([
             'email' => 'required|email',
@@ -37,10 +38,11 @@ class FreeDownloadController extends Controller
         }
     }
 
-    public function claimDownload(string $token)
+    public function claimDownload(string $token): JsonResponse
     {
         try {
             $download = $this->freeDownloadService->verifyAndClaimDownload($token);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Download granted.',
@@ -51,3 +53,4 @@ class FreeDownloadController extends Controller
         }
     }
 }
+

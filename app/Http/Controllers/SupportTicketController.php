@@ -3,19 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\Models\User;
 use App\Rules\Recaptcha;
 use App\Services\GuestTicketCreator;
 use App\Services\SupportDeskService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class SupportTicketController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(protected SupportDeskService $supportDeskService) {}
+
+    public function index(Request $request): Response
     {
-        $user = Auth::user();
-        $isAdmin = $user->isAdmin();
+        $user = $request->user();
+        $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
 
         $query = Ticket::with(['user', 'conversation.messages.sender']);
 
@@ -31,12 +35,12 @@ class SupportTicketController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('Client/Support/Tickets/Create');
     }
 
-    public function store(Request $request, SupportDeskService $service)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
@@ -44,8 +48,11 @@ class SupportTicketController extends Controller
             'description' => 'required|string',
         ]);
 
+        $user = $request->user();
+        $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
+
         try {
-            $ticket = $service->createTicket(Auth::user(), $validated, Auth::user()->isAdmin());
+            $ticket = $this->supportDeskService->createTicket($user, $validated, $isAdmin);
 
             return redirect()->route('tickets.show', $ticket->id)->with('success', __('general.support_ticket_opened_successfully'));
         } catch (\Exception $e) {
@@ -53,16 +60,11 @@ class SupportTicketController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(Request $request, int|string $id): Response
     {
         $ticket = Ticket::with(['user', 'conversation.messages.sender'])->findOrFail($id);
-        $user = Auth::user();
-
-        // Authorize (only owner or admin)
-        $isAdmin = $user && $user->isAdmin();
-        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
-            abort(403);
-        }
+        $user = $request->user();
+        $isAdmin = $this->authorizeAccess($ticket, $user);
 
         return Inertia::render('Client/Support/Tickets/Show', [
             'ticket' => $ticket,
@@ -70,53 +72,37 @@ class SupportTicketController extends Controller
         ]);
     }
 
-    public function resolve($id)
+    public function resolve(Request $request, int|string $id): RedirectResponse
     {
         $ticket = Ticket::findOrFail($id);
-        $user = Auth::user();
+        $this->authorizeAccess($ticket, $request->user());
 
-        // Authorize (only owner or admin)
-        $isAdmin = $user && $user->isAdmin();
-        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
-            abort(403);
-        }
-
-        app(SupportDeskService::class)->closeTicket($ticket);
+        $this->supportDeskService->closeTicket($ticket);
 
         return redirect()->back()->with('success', __('general.ticket_resolved'));
     }
 
-    public function close($id)
+    public function close(Request $request, int|string $id): RedirectResponse
     {
         $ticket = Ticket::findOrFail($id);
-        $user = Auth::user();
+        $this->authorizeAccess($ticket, $request->user());
 
-        $isAdmin = $user && $user->isAdmin();
-        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
-            abort(403);
-        }
-
-        app(SupportDeskService::class)->closeTicket($ticket);
+        $this->supportDeskService->closeTicket($ticket);
 
         return redirect()->back()->with('success', __('general.ticket_closed'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, int|string $id): RedirectResponse
     {
         $ticket = Ticket::findOrFail($id);
-        $user = Auth::user();
-
-        $isAdmin = $user && $user->isAdmin();
-        if (! $user || ($user->id !== $ticket->user_id && ! $isAdmin)) {
-            abort(403);
-        }
+        $this->authorizeAccess($ticket, $request->user());
 
         $ticket->delete();
 
         return redirect()->back()->with('success', __('general.ticket_deleted'));
     }
 
-    public function guestStore(Request $request, GuestTicketCreator $creator)
+    public function guestStore(Request $request, GuestTicketCreator $creator): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -143,4 +129,23 @@ class SupportTicketController extends Controller
             return redirect()->back()->withErrors(['error' => 'Failed to create ticket: '.$e->getMessage()]);
         }
     }
+
+    /**
+     * Authorize user for ticket operations. Returns whether user is admin.
+     */
+    private function authorizeAccess(Ticket $ticket, ?User $user): bool
+    {
+        if (! $user) {
+            abort(403, 'Unauthorized');
+        }
+
+        $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
+
+        if ($user->id !== $ticket->user_id && ! $isAdmin) {
+            abort(403, 'Unauthorized ticket access');
+        }
+
+        return $isAdmin;
+    }
 }
+
