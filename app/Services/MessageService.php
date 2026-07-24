@@ -20,10 +20,13 @@ class MessageService extends BaseService
                 ->first();
 
             if ($existing) {
-                $existing->messages()->create([
+                $msg = $existing->messages()->create([
                     'sender_id' => $sender->id,
                     'body' => $messageBody,
                 ]);
+
+                $msg->load(['sender', 'conversation']);
+                $recipient->notify(new \App\Notifications\NewMessageNotification($msg));
 
                 return $existing;
             }
@@ -45,10 +48,13 @@ class MessageService extends BaseService
                 'role' => 'seller',
             ]);
 
-            $conv->messages()->create([
+            $msg = $conv->messages()->create([
                 'sender_id' => $sender->id,
                 'body' => $messageBody,
             ]);
+
+            $msg->load(['sender', 'conversation']);
+            $recipient->notify(new \App\Notifications\NewMessageNotification($msg));
 
             return $conv;
         });

@@ -17,6 +17,8 @@ use Modules\Marketplace\Models\ServiceExtra;
 use Modules\Marketplace\Models\MarketplaceEscrow;
 use Modules\Marketplace\Enums\ServiceOrderStatus;
 use Modules\Marketplace\Enums\EscrowStatus;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\NewMessageNotification;
 use Spatie\Permission\Models\Role;
 use Carbon\Carbon;
 
@@ -277,12 +279,15 @@ class FiverrCloneWorkflowTest extends TestCase
         $this->actingAs($this->buyer)->post(route('marketplace.orders.store'), ['package_id' => $package->id]);
         $order = ServiceOrder::first();
 
+        Notification::fake();
+
         // Seller posts a message
         $responseSeller = $this->actingAs($this->seller)
             ->post(route('marketplace.orders.messages.store', $order->id), [
                 'body' => 'Hello buyer, I have started working on your order.'
             ]);
         $responseSeller->assertRedirect();
+        Notification::assertSentTo($this->buyer, NewMessageNotification::class);
 
         // Buyer posts a message
         $responseBuyer = $this->actingAs($this->buyer)
@@ -290,6 +295,7 @@ class FiverrCloneWorkflowTest extends TestCase
                 'body' => 'Thank you, looking forward to it.'
             ]);
         $responseBuyer->assertRedirect();
+        Notification::assertSentTo($this->seller, NewMessageNotification::class);
 
         $conversation = Conversation::where('conversable_id', $order->id)->first();
         $this->assertCount(2, $conversation->messages);

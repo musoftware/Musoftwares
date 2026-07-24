@@ -63,10 +63,17 @@ class ConversationController extends Controller
             'attachment' => $attachmentPath,
         ]);
 
-        $message->load('sender');
+        $message->load(['sender', 'conversation']);
 
-        // Broadcast real-time message event
-        broadcast(new MessageSent($message))->toOthers();
+        // Notify recipient via FCM & Database notification
+        $conversation->load('participants.user');
+        $recipients = $conversation->participants
+            ->pluck('user')
+            ->filter(fn ($u) => $u && (int) $u->id !== (int) $user->id);
+
+        foreach ($recipients as $recipient) {
+            $recipient->notify(new \App\Notifications\NewMessageNotification($message));
+        }
 
         // Touch conversation updated_at timestamp
         $conversation->touch();

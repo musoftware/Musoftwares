@@ -83,6 +83,12 @@ class FcmNotificationsTest extends TestCase
                 'currency_id' => 1,
                 'invoiceItem' => (object) ['item_title' => 'Consulting Session', 'invoice_id' => 10],
             ])],
+            'new_message' => [new \App\Notifications\NewMessageNotification(new \App\Models\Message([
+                'id' => 1,
+                'conversation_id' => 5,
+                'sender_id' => 2,
+                'body' => 'Hello, this is a test message',
+            ]))],
         ];
     }
 

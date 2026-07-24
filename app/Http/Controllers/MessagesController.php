@@ -13,6 +13,40 @@ class MessagesController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $recipientId = $request->query('recipient_id') ?? $request->query('user_id');
+        $activeConversationId = null;
+
+        if ($recipientId && (int) $recipientId !== (int) $user->id) {
+            $recipient = User::find($recipientId);
+            if ($recipient) {
+                // Find or create direct_message conversation between user and recipient
+                $conv = Conversation::where('type', 'direct_message')
+                    ->whereHas('participants', fn ($q) => $q->where('user_id', $user->id))
+                    ->whereHas('participants', fn ($q) => $q->where('user_id', $recipient->id))
+                    ->first();
+
+                if (! $conv) {
+                    $conv = Conversation::create([
+                        'conversable_type' => User::class,
+                        'conversable_id' => $user->id,
+                        'type' => 'direct_message',
+                        'status' => 'open',
+                    ]);
+
+                    $conv->participants()->create([
+                        'user_id' => $user->id,
+                        'role' => 'buyer',
+                    ]);
+
+                    $conv->participants()->create([
+                        'user_id' => $recipient->id,
+                        'role' => 'seller',
+                    ]);
+                }
+
+                $activeConversationId = $conv->id;
+            }
+        }
 
         // Fetch all conversations where user is participant
         $conversations = Conversation::with([
@@ -27,9 +61,7 @@ class MessagesController extends Controller
             ->get()
             ->map(fn ($conv) => $this->formatConversation($conv, $user));
 
-        // Security: only expose admin/support accounts for direct chat.
         $users = User::where('id', '!=', $user->id)
-            ->whereHas('roles', fn ($q) => $q->whereIn('name', ['admin', 'support_agent', 'super_admin']))
             ->select('id', 'name', 'email')
             ->with('roles')
             ->orderBy('name')
@@ -44,23 +76,14 @@ class MessagesController extends Controller
         return Inertia::render('Client/Messages/Index', [
             'conversations' => $conversations,
             'users' => $users,
+            'activeConversationId' => $activeConversationId,
         ]);
     }
 
     public function storeDirectMessage(Request $request)
     {
         $request->validate([
-            'recipient_id' => [
-                'required',
-                'exists:users,id',
-                // Server-side guard: users can only direct-message admins/support
-                function ($attribute, $value, $fail) {
-                    $recipient = User::find($value);
-                    if ($recipient && ! $recipient->roles()->whereIn('name', ['admin', 'support_agent', 'super_admin'])->exists()) {
-                        $fail(__('general.direct_messages_support_only'));
-                    }
-                },
-            ],
+            'recipient_id' => 'required|exists:users,id',
             'message' => 'required|string',
         ]);
 
@@ -80,10 +103,13 @@ class MessagesController extends Controller
                     ->first();
 
                 if ($existing) {
-                    $existing->messages()->create([
+                    $msg = $existing->messages()->create([
                         'sender_id' => $sender->id,
                         'body' => $request->message,
                     ]);
+
+                    $msg->load(['sender', 'conversation']);
+                    $recipient->notify(new \App\Notifications\NewMessageNotification($msg));
 
                     return $existing;
                 }
@@ -106,10 +132,13 @@ class MessagesController extends Controller
                     'role' => 'seller',
                 ]);
 
-                $conv->messages()->create([
+                $msg = $conv->messages()->create([
                     'sender_id' => $sender->id,
                     'body' => $request->message,
                 ]);
+
+                $msg->load(['sender', 'conversation']);
+                $recipient->notify(new \App\Notifications\NewMessageNotification($msg));
 
                 return $conv;
             });
