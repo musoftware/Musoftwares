@@ -31,40 +31,35 @@ class SoftwareLicensingTest extends TestCase
         $this->assertTrue((bool)$serial->is_used);
     }
 
-    public function test_activate_device_and_enforce_quota_limits()
+    public function test_seller_can_bulk_add_serials_and_check_inventory()
     {
-        $category = ServiceCategory::create(['name' => 'Software', 'slug' => 'software']);
+        $category = ServiceCategory::create(['name' => 'Digital Goods', 'slug' => 'digital-goods']);
         $service = Service::create([
             'seller_id' => User::factory()->create()->id,
-            'title' => 'Software App',
+            'title' => 'API Access Keys',
             'category_id' => $category->id,
-            'description' => 'App',
+            'description' => 'Vouchers',
             'status' => 'active',
-        ]);
-
-        $serial = ServiceSerial::create([
-            'service_id' => $service->id,
-            'serial_code' => 'KEY-TEST-1234',
-            'is_used' => true,
         ]);
 
         $licenseService = new SoftwareLicenseService();
 
-        // Device 1 activation
-        $res1 = $licenseService->activateDevice('KEY-TEST-1234', 'HWID-111', '00:11:22:33:44:55');
-        $this->assertTrue($res1['activated']);
+        $addedCount = $licenseService->addSerialsToService($service->id, [
+            'KEY-1001',
+            'KEY-1002',
+            'KEY-1003',
+        ]);
 
-        // Device 2 activation
-        $res2 = $licenseService->activateDevice('KEY-TEST-1234', 'HWID-222', '00:11:22:33:44:66');
-        $this->assertTrue($res2['activated']);
+        $this->assertEquals(3, $addedCount);
+        $this->assertEquals(3, $licenseService->getAvailableSerialsCount($service->id));
 
-        // Device 3 activation
-        $res3 = $licenseService->activateDevice('KEY-TEST-1234', 'HWID-333', '00:11:22:33:44:77');
-        $this->assertTrue($res3['activated']);
+        // Assign one to an order
+        $serial = $licenseService->assignSerialToOrder($service->id, 202);
+        $this->assertEquals('KEY-1001', $serial->serial_code);
+        $this->assertTrue($serial->is_used);
 
-        // Device 4 activation (Exceeds quota limit of 3)
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Maximum device activation limit reached (3).");
-        $licenseService->activateDevice('KEY-TEST-1234', 'HWID-444', '00:11:22:33:44:88');
+        // Remaining count should be 2
+        $this->assertEquals(2, $licenseService->getAvailableSerialsCount($service->id));
     }
 }
+

@@ -1007,7 +1007,7 @@ class InvoiceController extends Controller
                 'date_end' => Carbon::parse($session['end_date'])->toDateTimeString(),
                 'amount' => $session['amount'],
                 'project_id' => $item->invoice->project_id ?? null,
-                'user_id' => auth()->id(),
+                'user_id' => $item->invoice->user_id ?? auth()->id(),
                 'currency_id' => $item->invoice->currency_id,
             ]);
         }

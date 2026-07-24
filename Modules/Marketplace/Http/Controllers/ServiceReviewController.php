@@ -19,11 +19,12 @@ class ServiceReviewController extends Controller
     public function store(Request $request, ServiceOrder $order): RedirectResponse
     {
         // Auth checks
-        if ($order->buyer_id !== auth()->id()) {
+        if ((int)$order->buyer_id !== (int)auth()->id()) {
             abort(403, __('general.only_the_buyer_can_leave_a_review'));
         }
 
-        if ($order->status !== ServiceOrderStatus::COMPLETED) {
+        $orderStatusValue = $order->status instanceof ServiceOrderStatus ? $order->status->value : (string)$order->status;
+        if ($orderStatusValue !== ServiceOrderStatus::COMPLETED->value) {
             return back()->with('error', __('general.you_can_only_review_completed_orders'));
         }
 
@@ -37,8 +38,11 @@ class ServiceReviewController extends Controller
             'review' => ['nullable', 'string', 'max:1500'],
         ]);
 
+        $order->loadMissing('package');
+        $serviceId = $order->package?->service_id ?? $order->service_id;
+
         ServiceReview::create([
-            'service_id'  => $order->package->service_id ?? 0,
+            'service_id'  => $serviceId,
             'order_id'    => $order->id,
             'reviewer_id' => auth()->id(),
             'seller_id'   => $order->seller_id,
@@ -48,7 +52,9 @@ class ServiceReviewController extends Controller
         ]);
 
         // Update aggregate rating on the service
-        ServiceReview::syncServiceRating($order->package->service_id ?? 0);
+        if ($serviceId) {
+            ServiceReview::syncServiceRating($serviceId);
+        }
 
         return back()->with('success', __('general.thank_you_for_your_review'));
     }

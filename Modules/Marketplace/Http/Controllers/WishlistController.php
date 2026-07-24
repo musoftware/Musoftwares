@@ -12,15 +12,21 @@ class WishlistController extends Controller
 {
     public function __construct(protected WishlistService $wishlistService) {}
 
-    public function index()
+    public function index(Request $request)
     {
         $favorites = Favorite::where('user_id', auth()->id())
             ->where('favoritable_type', Service::class)
-            ->with('favoritable')
+            ->with('favoritable.seller')
             ->latest()
             ->paginate(15);
 
-        return response()->json(['favorites' => $favorites]);
+        if ($request->wantsJson()) {
+            return response()->json(['favorites' => $favorites]);
+        }
+
+        return \Inertia\Inertia::render('Marketplace/Favorites/Index', [
+            'favorites' => $favorites
+        ]);
     }
 
     public function toggle(Request $request, Service $service)

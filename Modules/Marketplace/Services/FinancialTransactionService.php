@@ -19,7 +19,7 @@ class FinancialTransactionService
                 'user_id' => $user->id,
                 'type' => $type,
                 'amount' => $amount,
-                'currency' => 'USD',
+                'currency' => $user->currency_name() ?? 'EGP',
                 'description' => $description,
             ]);
         });
@@ -35,14 +35,13 @@ class FinancialTransactionService
         }
 
         DB::transaction(function () use ($user, $amount, $description) {
-            $user->user_balance -= $amount;
-            $user->save();
+            $user->add_balance(-$amount, $description, 'used', $user->currency_id);
 
             Transaction::create([
                 'user_id' => $user->id,
                 'type' => 'payment',
                 'amount' => $amount,
-                'currency' => 'USD',
+                'currency' => $user->currency_name() ?? 'EGP',
                 'description' => $description,
             ]);
         });
@@ -54,13 +53,13 @@ class FinancialTransactionService
     public function processCredit(User $user, float $amount, string $description): void
     {
         DB::transaction(function () use ($user, $amount, $description) {
-            $user->add_balance($amount);
+            $user->add_balance($amount, $description, 'earned', $user->currency_id);
 
             Transaction::create([
                 'user_id' => $user->id,
                 'type' => 'credit',
                 'amount' => $amount,
-                'currency' => 'USD',
+                'currency' => $user->currency_name() ?? 'EGP',
                 'description' => $description,
             ]);
         });

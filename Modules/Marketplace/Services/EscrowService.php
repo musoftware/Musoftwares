@@ -20,7 +20,7 @@ class EscrowService
         return DB::transaction(function () use ($order) {
             $buyer = $order->buyer;
             
-            if ($buyer->user_balance < $order->amount) {
+            if ($buyer->available_balance() < $order->amount) {
                 throw new Exception("Insufficient balance to hold funds.");
             }
 
@@ -38,7 +38,7 @@ class EscrowService
 
             $currencyStr = \App\Models\Currency::find($order->currency_id)->currency ?? '';
 
-            $exchangeRate = CurrenciesExchange::RateByDate(now()->toDateString(), 1, $currencyStr, $businessCurrencyStr);
+            $exchangeRate = CurrenciesExchange::RateByDate(now('Africa/Cairo')->toDateString(), 1, $currencyStr, $businessCurrencyStr);
             // Ensure proper normalized business amount for the entire order
             $businessAmount = $order->amount * $exchangeRate;
 
@@ -50,7 +50,7 @@ class EscrowService
                 'business_amount' => $businessAmount,
                 'business_currency_id' => $businessCurrencyId,
                 'exchange_rate' => $exchangeRate,
-                'exchange_rate_date' => now(),
+                'exchange_rate_date' => now('Africa/Cairo'),
                 'status' => EscrowStatus::HELD
             ]);
 
@@ -84,7 +84,7 @@ class EscrowService
             $escrow->update([
                 'status' => EscrowStatus::RELEASED,
                 'seller_wallet_transaction_id' => $transactionId,
-                'released_at' => now(),
+                'released_at' => now('Africa/Cairo'),
             ]);
         });
     }
@@ -112,7 +112,7 @@ class EscrowService
 
             $escrow->update([
                 'status' => EscrowStatus::REFUNDED,
-                'refunded_at' => now(),
+                'refunded_at' => now('Africa/Cairo'),
             ]);
         });
     }

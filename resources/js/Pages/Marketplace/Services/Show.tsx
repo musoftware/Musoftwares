@@ -83,32 +83,44 @@ export default function Show({ service }: any) {
                         <h1 className="mb-4 text-3xl font-bold text-gray-900">
                             {service.title}
                         </h1>
-                        <div className="mb-6 flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
-                                    {service.seller?.name?.charAt(0) || '?'}
-                                </div>
-                                <span className="font-medium text-gray-900">
-                                    {service.seller?.name}
-                                </span>
-                            </div>
-                            <div className="flex items-center text-sm text-amber-500">
-                                <span className="flex items-center">
-                                    <svg
-                                        className="me-1 h-4 w-4"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <span className="font-bold text-gray-900">
-                                        4.9
+                        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                                        {service.seller?.name?.charAt(0) || '?'}
+                                    </div>
+                                    <span className="font-medium text-gray-900">
+                                        {service.seller?.name}
                                     </span>
-                                </span>
-                                <span className="ms-1 text-gray-500">
-                                    (128 reviews)
-                                </span>
+                                </div>
+                                <div className="flex items-center text-sm text-amber-500">
+                                    <span className="flex items-center">
+                                        <svg
+                                            className="me-1 h-4 w-4"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        <span className="font-bold text-gray-900">
+                                            {service.avg_rating || '5.0'}
+                                        </span>
+                                    </span>
+                                    <span className="ms-1 text-gray-500">
+                                        ({service.review_count || 0} reviews)
+                                    </span>
+                                </div>
                             </div>
+
+                            <button
+                                onClick={() => router.post(`/marketplace/services/${service.id}/favorite`, {}, { preserveScroll: true })}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition ${service.is_favorited ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+                            >
+                                <svg className={`w-4 h-4 ${service.is_favorited ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                {service.is_favorited ? 'Saved to Wishlist' : 'Save to Wishlist'}
+                            </button>
                         </div>
 
                         {/* Image Gallery */}
@@ -126,14 +138,6 @@ export default function Show({ service }: any) {
                                     </span>
                                 )}
                             </div>
-                            <div className="flex gap-2 overflow-x-auto p-2">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div
-                                        key={i}
-                                        className={`h-16 w-24 cursor-pointer rounded border-2 bg-gray-200 ${i === 1 ? 'border-indigo-600' : 'border-transparent hover:border-gray-400'}`}
-                                    ></div>
-                                ))}
-                            </div>
                         </div>
 
                         {/* Tabs */}
@@ -149,7 +153,7 @@ export default function Show({ service }: any) {
                                     onClick={() => setActiveTab('reviews')}
                                     className={`border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'reviews' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}
                                 >
-                                    {__('general.reviews')}
+                                    {__('general.reviews')} ({service.review_count || 0})
                                 </button>
                             </nav>
                         </div>
@@ -188,17 +192,17 @@ export default function Show({ service }: any) {
                                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                                 </svg>
                                                 <span className="font-bold text-gray-900">
-                                                    4.9
+                                                    {service.avg_rating || '5.0'}
                                                 </span>
                                                 <span className="text-gray-500">
-                                                    (128 reviews)
+                                                    ({service.review_count || 0} reviews)
                                                 </span>
                                             </div>
                                             <p className="mb-4 text-sm text-gray-500">
                                                 Member since{' '}
-                                                {new Date(
-                                                    service.seller?.created_at,
-                                                ).getFullYear()}
+                                                {service.seller?.created_at
+                                                    ? new Date(service.seller.created_at).getFullYear()
+                                                    : '2026'}
                                             </p>
                                             <Link href="/messages" className="inline-block rounded-md border border-indigo-600 px-6 py-2 font-medium text-indigo-600 transition hover:bg-indigo-50">{__('general.contact_me')}</Link>
                                         </div>
@@ -208,7 +212,30 @@ export default function Show({ service }: any) {
                         )}
 
                         {activeTab === 'reviews' && (
-                            <div className="py-8 text-center text-gray-500">{__('general.reviews_will_be_displayed_here')}</div>
+                            <div className="space-y-4 py-4">
+                                {(!service.reviews || service.reviews.length === 0) ? (
+                                    <div className="py-8 text-center text-gray-500">
+                                        No customer reviews for this service yet.
+                                    </div>
+                                ) : (
+                                    service.reviews.map((rev: any) => (
+                                        <div key={rev.id} className="p-4 rounded-xl border border-gray-200 bg-white space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 font-bold text-xs flex items-center justify-center text-slate-700">
+                                                        {rev.reviewer?.name?.charAt(0) || 'U'}
+                                                    </div>
+                                                    <span className="font-semibold text-slate-900 text-sm">{rev.reviewer?.name || 'Verified Buyer'}</span>
+                                                </div>
+                                                <span className="text-amber-500 font-bold text-xs flex items-center gap-1">
+                                                    ★ {rev.rating}/5
+                                                </span>
+                                            </div>
+                                            <p className="text-slate-600 text-sm">{rev.review || 'Great seller and high quality deliverable!'}</p>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
                         )}
                     </div>
 

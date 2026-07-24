@@ -64,7 +64,7 @@ class ServiceController extends Controller
 
     public function show($id, Request $request)
     {
-        $service = Service::with(['seller', 'category', 'packages.currency'])->find($id);
+        $service = Service::with(['seller', 'category', 'packages.currency', 'reviews.reviewer'])->find($id);
 
         if (!$service) {
             return Inertia::render('Marketplace/Services/ExclusiveService', [

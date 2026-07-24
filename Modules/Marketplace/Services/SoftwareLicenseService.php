@@ -3,27 +3,25 @@
 namespace Modules\Marketplace\Services;
 
 use Modules\Marketplace\Models\ServiceSerial;
-use Modules\Marketplace\Models\SerialUserDevice;
 use Illuminate\Support\Facades\DB;
-
 use Exception;
 use Modules\Marketplace\Helpers\MarketplaceHelper;
 
 class SoftwareLicenseService
 {
     /**
-     * Assign a serial key to an order from inventory or generate a new one.
+     * Assign a serial key to an order from inventory or auto-generate if permitted.
      */
-    public function assignSerialToOrder(int $serviceId, int $orderId): ServiceSerial
+    public function assignSerialToOrder(int $serviceId, int $orderId, ?int $buyerId = null): ServiceSerial
     {
-        return DB::transaction(function () use ($serviceId) {
+        return DB::transaction(function () use ($serviceId, $buyerId) {
             $serial = ServiceSerial::where('service_id', $serviceId)
                 ->where('is_used', false)
                 ->lockForUpdate()
                 ->first();
 
             if (!$serial) {
-                // Auto generate serial key
+                // Auto generate serial key if no pre-stocked serial exists
                 $serial = ServiceSerial::create([
                     'service_id' => $serviceId,
                     'serial_code' => MarketplaceHelper::generateSerialKey('SOFT'),
@@ -33,8 +31,8 @@ class SoftwareLicenseService
 
             $serial->update([
                 'is_used' => true,
-                'used_by' => auth()->id() ?? 1,
-                'used_at' => now(),
+                'used_by' => $buyerId ?? auth()->id() ?? 1,
+                'used_at' => now('Africa/Cairo'),
             ]);
 
             return $serial;
@@ -42,55 +40,44 @@ class SoftwareLicenseService
     }
 
     /**
-     * Bind device HWID / MAC address to serial key and verify quota.
+     * Add bulk serial keys to a service inventory.
      */
-    public function activateDevice(string $serialCode, string $hwid, string $macAddress, ?string $deviceName = null): array
+    public function addSerialsToService(int $serviceId, array $serialCodes): int
     {
-        return DB::transaction(function () use ($serialCode, $hwid, $macAddress, $deviceName) {
-            $serial = ServiceSerial::where('serial_code', $serialCode)->first();
+        $count = 0;
+        DB::transaction(function () use ($serviceId, $serialCodes, &$count) {
+            foreach ($serialCodes as $code) {
+                $code = trim($code);
+                if (empty($code)) {
+                    continue;
+                }
 
-            if (!$serial) {
-                throw new Exception("Invalid license key.");
+                $exists = ServiceSerial::where('service_id', $serviceId)
+                    ->where('serial_code', $code)
+                    ->exists();
+
+                if (!$exists) {
+                    ServiceSerial::create([
+                        'service_id' => $serviceId,
+                        'serial_code' => $code,
+                        'is_used' => false,
+                    ]);
+                    $count++;
+                }
             }
-
-            // Check device quota (default max 3 devices)
-            $existingDevice = SerialUserDevice::where('serial_key', $serialCode)
-                ->where(function ($q) use ($hwid, $macAddress) {
-                    $q->where('hwid', $hwid)->orWhere('mac_address', $macAddress);
-                })->first();
-
-            if ($existingDevice) {
-                $existingDevice->update([
-                    'last_seen_at' => now('Africa/Cairo'),
-                ]);
-                return [
-                    'activated' => true,
-                    'message' => 'Device already authorized.',
-                    'device' => $existingDevice,
-                ];
-            }
-
-            $deviceCount = SerialUserDevice::where('serial_key', $serialCode)->count();
-            $maxDevices = 3;
-
-            if ($deviceCount >= $maxDevices) {
-                throw new Exception("Maximum device activation limit reached ({$maxDevices}).");
-            }
-
-            $device = SerialUserDevice::create([
-                'serial_key' => $serialCode,
-                'hwid' => $hwid,
-                'mac_address' => $macAddress,
-                'device_name' => $deviceName ?? 'Unknown PC',
-                'activated_at' => now('Africa/Cairo'),
-                'last_seen_at' => now('Africa/Cairo'),
-            ]);
-
-            return [
-                'activated' => true,
-                'message' => 'Device activated successfully.',
-                'device' => $device,
-            ];
         });
+
+        return $count;
+    }
+
+    /**
+     * Get count of available (unused) serial keys for a service.
+     */
+    public function getAvailableSerialsCount(int $serviceId): int
+    {
+        return ServiceSerial::where('service_id', $serviceId)
+            ->where('is_used', false)
+            ->count();
     }
 }
+

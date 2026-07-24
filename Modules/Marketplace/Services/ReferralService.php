@@ -59,7 +59,7 @@ class ReferralService
      */
     public function requestWithdrawal(User $user, float $amount, string $payoutMethod, array $paymentDetails, ?int $userPaymentMethodId = null): UserReferralRequestWithdraw
     {
-        if ($user->user_balance < $amount) {
+        if ($user->available_balance() < $amount) {
             throw new Exception("Insufficient balance for withdrawal request.");
         }
 

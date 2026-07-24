@@ -11,10 +11,17 @@ class CustomProjectController extends Controller
 {
     public function __construct(protected CustomProjectService $customProjectService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::where('status', 'open')->latest()->paginate(15);
-        return response()->json(['projects' => $projects]);
+        $projects = Project::with('user')->where('status', 'open')->latest()->paginate(15);
+
+        if ($request->wantsJson()) {
+            return response()->json(['projects' => $projects]);
+        }
+
+        return \Inertia\Inertia::render('Marketplace/Projects/Index', [
+            'projects' => $projects
+        ]);
     }
 
     public function store(Request $request)

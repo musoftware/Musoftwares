@@ -5,6 +5,7 @@ namespace Modules\Marketplace\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Models\ServiceSerial;
+use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Services\SoftwareLicenseService;
 
 class ServiceSerialController extends Controller
@@ -13,52 +14,62 @@ class ServiceSerialController extends Controller
 
     public function index(Request $request)
     {
-        $serials = ServiceSerial::with('service')
+        $serials = ServiceSerial::with(['service', 'usedBy'])
             ->whereHas('service', function ($q) {
                 $q->where('seller_id', auth()->id());
             })
             ->latest()
             ->paginate(15);
 
-        return response()->json(['serials' => $serials]);
+        $services = Service::where('seller_id', auth()->id())
+            ->select('id', 'title', 'generate_serials')
+            ->get();
+
+        if ($request->wantsJson()) {
+            return response()->json(['serials' => $serials, 'services' => $services]);
+        }
+
+        return \Inertia\Inertia::render('Marketplace/Seller/Serials', [
+            'serials' => $serials,
+            'services' => $services,
+        ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'service_id' => 'required|exists:marketplace_services,id',
-            'serial_key' => 'required|string|unique:marketplace_service_serials,serial_key',
+            'serial_code' => 'required|string',
         ]);
 
+        $service = Service::where('id', $validated['service_id'])
+            ->where('seller_id', auth()->id())
+            ->firstOrFail();
+
         $serial = ServiceSerial::create([
-            'service_id' => $validated['service_id'],
-            'serial_key' => $validated['serial_key'],
-            'status' => 'available',
+            'service_id' => $service->id,
+            'serial_code' => trim($validated['serial_code']),
+            'is_used' => false,
         ]);
 
         return response()->json(['success' => true, 'serial' => $serial]);
     }
 
-    public function activateDevice(Request $request)
+    public function bulkStore(Request $request)
     {
         $validated = $request->validate([
-            'serial_key' => 'required|string',
-            'hwid' => 'required|string',
-            'mac_address' => 'required|string',
-            'device_name' => 'nullable|string',
+            'service_id' => 'required|exists:marketplace_services,id',
+            'serial_codes' => 'required|array',
+            'serial_codes.*' => 'string',
         ]);
 
-        try {
-            $result = $this->softwareLicenseService->activateDevice(
-                $validated['serial_key'],
-                $validated['hwid'],
-                $validated['mac_address'],
-                $validated['device_name'] ?? null
-            );
+        $service = Service::where('id', $validated['service_id'])
+            ->where('seller_id', auth()->id())
+            ->firstOrFail();
 
-            return response()->json($result);
-        } catch (\Exception $e) {
-            return response()->json(['activated' => false, 'error' => $e->getMessage()], 422);
-        }
+        $addedCount = $this->softwareLicenseService->addSerialsToService($service->id, $validated['serial_codes']);
+
+        return response()->json(['success' => true, 'added_count' => $addedCount]);
     }
 }
+

@@ -54,7 +54,7 @@ class ServiceOrderController extends Controller
         ]);
     }
 
-    public function store(Request $request, FinancialTransactionService $financialService, EscrowService $escrowService)
+    public function store(Request $request, FinancialTransactionService $financialService, EscrowService $escrowService, \Modules\Marketplace\Services\SoftwareLicenseService $digitalKeyService)
     {
         $validated = $request->validate([
             'package_id' => 'required|exists:marketplace_packages,id',
@@ -73,7 +73,7 @@ class ServiceOrderController extends Controller
             return redirect()->back()->withErrors(['error' => 'You cannot purchase your own service.']);
         }
 
-        if ($buyer->user_balance < $package->price) {
+        if ($buyer->available_balance() < $package->price) {
             return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
         }
 
@@ -86,9 +86,19 @@ class ServiceOrderController extends Controller
         try {
             // Lock buyer to prevent concurrent balance deductions
             $lockedBuyer = \App\Models\User::where('id', $buyer->id)->lockForUpdate()->first();
-            if ($lockedBuyer->user_balance < $package->price) {
+            if ($lockedBuyer->available_balance() < $package->price) {
                 DB::rollBack();
                 return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
+            }
+
+            $deliveryPayload = null;
+            $orderStatus = ServiceOrderStatus::PENDING;
+
+            // Handle Instant Digital Delivery Key if service provides serials
+            if ($package->service->generate_serials) {
+                $serial = $digitalKeyService->assignSerialToOrder($package->service->id, 0, $lockedBuyer->id);
+                $deliveryPayload = ['serial_code' => $serial->serial_code];
+                $orderStatus = ServiceOrderStatus::DELIVERED;
             }
 
             // Create Order
@@ -99,7 +109,10 @@ class ServiceOrderController extends Controller
                 'amount' => $package->price,
                 'currency_id' => $package->currency_id,
                 'commission_amount' => $commissionAmount,
-                'status' => ServiceOrderStatus::PENDING
+                'status' => $orderStatus,
+                'delivery_payload' => $deliveryPayload,
+                'delivered_at' => $package->service->generate_serials ? now('Africa/Cairo') : null,
+                'auto_complete_at' => $package->service->generate_serials ? now('Africa/Cairo')->addDays(3) : null,
             ]);
 
             // Delegate escrow creation and lock to the EscrowService
@@ -145,8 +158,8 @@ class ServiceOrderController extends Controller
 
         $order->update([
             'status' => ServiceOrderStatus::DELIVERED,
-            'delivered_at' => now(),
-            'auto_complete_at' => now()->addDays(3),
+            'delivered_at' => now('Africa/Cairo'),
+            'auto_complete_at' => now('Africa/Cairo')->addDays(3),
             'delivery_payload' => $payload
         ]);
 
@@ -165,7 +178,7 @@ class ServiceOrderController extends Controller
         try {
             $order->update([
                 'status' => ServiceOrderStatus::COMPLETED,
-                'completed_at' => now(),
+                'completed_at' => now('Africa/Cairo'),
             ]);
 
             $escrow = \Modules\Marketplace\Models\MarketplaceEscrow::where('order_id', $order->id)->first();

@@ -58,8 +58,9 @@ class CheckoutService
                 $savedAmount = $discountAmount;
             }
 
-            if ($lockedBuyer->user_balance < $totalAmount) {
-                throw new Exception("Insufficient balance. Required: {$totalAmount}, Available: {$lockedBuyer->user_balance}");
+            $availableBalance = $lockedBuyer->available_balance();
+            if ($availableBalance < $totalAmount) {
+                throw new Exception("Insufficient balance. Required: {$totalAmount}, Available: {$availableBalance}");
             }
 
             $commissionRate = config('marketplace.commission_rate', 0.10);

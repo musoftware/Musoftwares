@@ -31,9 +31,6 @@ Route::middleware('web')
         Route::post('/downloads/{service}/request', [FreeDownloadController::class, 'requestDownload'])->name('downloads.request');
         Route::get('/downloads/claim/{token}', [FreeDownloadController::class, 'claimDownload'])->name('downloads.claim');
 
-        // Software License Device Activation API
-        Route::post('/api/software/activate', [ServiceSerialController::class, 'activateDevice'])->name('serials.activate');
-
         // Custom Bidding Projects Public Feed
         Route::get('/projects', [CustomProjectController::class, 'index'])->name('projects.index');
 
@@ -113,7 +110,7 @@ Route::middleware(['web', 'auth'])
         Route::post('/landing-pages/{service}/generate-content', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateLandingPageContent'])->name('landing-pages.generate-content');
     });
 
-// -- Seller Portal -------------------------------------------------
+        // ── Seller Portal ─────────────────────────────────────────────────
 Route::middleware(['web', 'auth', 'role:seller'])
     ->prefix('seller')
     ->name('seller.')
@@ -123,6 +120,7 @@ Route::middleware(['web', 'auth', 'role:seller'])
         Route::get('/payouts', [\Modules\Marketplace\Http\Controllers\Seller\SellerPortalController::class, 'payouts'])->name('payouts');
         Route::get('/serials', [ServiceSerialController::class, 'index'])->name('serials.index');
         Route::post('/serials', [ServiceSerialController::class, 'store'])->name('serials.store');
+        Route::post('/serials/bulk', [ServiceSerialController::class, 'bulkStore'])->name('serials.bulkStore');
     });
 
 // -- Public Landing Page Routes ------------------------------------

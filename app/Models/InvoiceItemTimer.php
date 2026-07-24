@@ -17,27 +17,11 @@ class InvoiceItemTimer extends Model
     {
         static::saved(function (InvoiceItemTimer $timer) {
             try {
-                $client = null;
+                $client = $timer->invoiceItem?->invoice?->user
+                    ?? $timer->invoiceItem?->invoice?->client
+                    ?? $timer->user;
 
-                if ($timer->invoiceItem && $timer->invoiceItem->invoice) {
-                    $client = $timer->invoiceItem->invoice->user ?? $timer->invoiceItem->invoice->client;
-                }
-
-                if (! $client && $timer->user_id) {
-                    $candidate = $timer->user;
-                    if ($candidate && ! $candidate->hasAnyRole(['admin', 'super-admin', 'employee'])) {
-                        $client = $candidate;
-                    }
-                }
-
-                // Do not notify the admin performing the action
-                if ($client && auth()->check() && $client->id === auth()->id()) {
-                    if ($client->hasAnyRole(['admin', 'super-admin', 'employee'])) {
-                        return;
-                    }
-                }
-
-                if ($client) {
+                if ($client && ! $client->hasAnyRole(['admin', 'super-admin', 'employee'])) {
                     $client->notify(new \App\Notifications\TimerSavedNotification($timer));
                 }
             } catch (\Throwable $e) {
