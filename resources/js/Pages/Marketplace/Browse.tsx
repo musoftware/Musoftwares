@@ -184,9 +184,9 @@ export default function Browse({ services, categories, filters }: any) {
 
                              return (
                                  <Link
-                                     href={route(
+                                     href={service.url || route(
                                          'marketplace.services.show',
-                                         service.id,
+                                         { id: service.id, slug: service.slug }
                                      )}
                                      key={service.id}
                                      className="group block h-full"
@@ -196,9 +196,9 @@ export default function Browse({ services, categories, filters }: any) {
                                      >
                                          {/* Cover Image */}
                                          <div className="relative h-52 overflow-hidden bg-gray-200">
-                                             {service.cover_image ? (
+                                             {(service.thumbnail || service.cover_image) ? (
                                                  <img
-                                                     src={service.cover_image}
+                                                     src={service.thumbnail || service.cover_image}
                                                      alt={service.title}
                                                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                  />

@@ -28,7 +28,7 @@ class Service extends Model
     protected $table = 'marketplace_services';
 
     protected $fillable = [
-        'seller_id', 'category_id', 'title', 'tagline', 'description', 'auto_reply', 'status',
+        'seller_id', 'category_id', 'title', 'slug', 'thumbnail', 'tagline', 'description', 'auto_reply', 'status',
         'title_translations', 'tagline_translations', 'description_translations', 'auto_reply_translations',
         'tags', 'faq', 'requirements', 'gallery', 'video_url',
         'approved_at', 'approved_by', 'rejected_at', 'rejection_reason',
@@ -37,7 +37,7 @@ class Service extends Model
         'referral_commission_from', 'referral_commission_percentage', 'is_free'
     ];
 
-    protected $appends = ['cover_image', 'slug', 'url'];
+    protected $appends = ['cover_image', 'thumbnail', 'slug', 'url'];
 
     protected $casts = [
         'is_featured'  => 'boolean',
@@ -118,8 +118,31 @@ class Service extends Model
         return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80';
     }
 
+    public function getThumbnailAttribute()
+    {
+        if (!empty($this->attributes['thumbnail'])) {
+            $path = $this->attributes['thumbnail'];
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+            $cleanPath = ltrim($path, '/');
+            if (str_starts_with($cleanPath, 'storage/')) {
+                $cleanPath = substr($cleanPath, 8);
+            }
+            if (str_starts_with($cleanPath, 'uploads/')) {
+                $cleanPath = substr($cleanPath, 8);
+            }
+            return Storage::disk('public_uploads')->url($cleanPath);
+        }
+
+        return $this->cover_image;
+    }
+
     public function getSlugAttribute(): string
     {
+        if (!empty($this->attributes['slug'])) {
+            return $this->attributes['slug'];
+        }
         $titleStr = (string)($this->title ?? '');
         return \Illuminate\Support\Str::slug($titleStr !== '' ? $titleStr : ('service-' . $this->id));
     }

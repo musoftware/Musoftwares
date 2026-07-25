@@ -79,27 +79,35 @@ class ServiceController extends Controller
     public function show($id, Request $request, $slug = null)
     {
         $targetId = $id;
+        $extractedSlug = $slug;
         
         // Handle URLs formatted as /services/98-some-title-slug
         if (!is_numeric($id)) {
-            if (preg_match('/^(\d+)/', (string)$id, $matches)) {
+            if (preg_match('/^(\d+)-(.*)$/', (string)$id, $matches)) {
+                $targetId = $matches[1];
+                $extractedSlug = $matches[2];
+            } elseif (preg_match('/^(\d+)$/', (string)$id, $matches)) {
                 $targetId = $matches[1];
             }
         }
 
         $query = Service::with(['seller', 'category', 'packages.currency', 'reviews.reviewer', 'extras']);
 
+        $service = null;
         if (is_numeric($targetId)) {
-            $service = $query->find($targetId);
-        } else {
-            $service = null;
+            $service = (clone $query)->find($targetId);
+        }
+
+        if (!$service) {
+            $searchSlug = $extractedSlug ?: $id;
+            $service = (clone $query)->where('slug', $searchSlug)->first();
         }
 
         if (!$service) {
             // Search by title slug fallback
-            $service = $query->get()->first(function ($s) use ($id, $slug) {
+            $service = $query->get()->first(function ($s) use ($id, $slug, $extractedSlug) {
                 $sSlug = \Illuminate\Support\Str::slug($s->title);
-                return $sSlug === $id || $sSlug === $slug;
+                return $sSlug === $id || $sSlug === $slug || $sSlug === $extractedSlug;
             });
         }
 
@@ -196,9 +204,28 @@ class ServiceController extends Controller
                 }
             }
 
+            $thumbnailPath = null;
+            if (!empty($galleryPaths[0])) {
+                $firstImagePath = $galleryPaths[0];
+                $fullPath = public_path('uploads/' . ltrim($firstImagePath, '/'));
+                $thumbRelative = 'services/' . auth()->id() . '/thumb_' . basename($firstImagePath);
+                $thumbFullPath = public_path('uploads/' . $thumbRelative);
+
+                if (\App\Helpers\ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
+                    $thumbnailPath = $thumbRelative;
+                } else {
+                    $thumbnailPath = $firstImagePath;
+                }
+            }
+
+            $user = auth()->user();
+            $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin));
+
             $service = Service::create([
                 'seller_id'    => auth()->id(),
                 'title'        => $validated['title'] ?? null,
+                'slug'         => !empty($validated['title']) ? Str::slug($validated['title']) : null,
+                'thumbnail'    => $thumbnailPath,
                 'title_translations' => $validated['title_translations'] ?? null,
                 'tagline'      => $validated['tagline'] ?? null,
                 'tagline_translations' => $validated['tagline_translations'] ?? null,
@@ -207,7 +234,9 @@ class ServiceController extends Controller
                 'auto_reply'   => $validated['auto_reply'] ?? null,
                 'auto_reply_translations' => $validated['auto_reply_translations'] ?? null,
                 'category_id'  => $validated['category_id'],
-                'status'       => 'draft',
+                'status'       => $isAdmin ? 'active' : 'draft',
+                'approved_at'  => $isAdmin ? now() : null,
+                'approved_by'  => $isAdmin ? $user->id : null,
                 'tags'         => $validated['tags'] ?? [],
                 'faq'          => $validated['faq'] ?? [],
                 'requirements' => $validated['requirements'] ?? [],
@@ -249,8 +278,14 @@ class ServiceController extends Controller
             return $service;
         });
 
+        $user = auth()->user();
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin));
+        $msg = $isAdmin
+            ? __('general.service_created')
+            : __('general.service_submitted_for_review_it_will_be_visible_once_approved');
+
         return redirect()->route('marketplace.services.show', $service->id)
-            ->with('success', __('general.service_submitted_for_review_it_will_be_visible_once_approved'));
+            ->with('success', $msg);
     }
 
     public function edit(Service $service)
@@ -283,8 +318,27 @@ class ServiceController extends Controller
                 }
             }
 
+            $thumbnailPath = $service->thumbnail;
+            if (!empty($galleryPaths[0])) {
+                $firstImagePath = $galleryPaths[0];
+                $fullPath = public_path('uploads/' . ltrim($firstImagePath, '/'));
+                $thumbRelative = 'services/' . auth()->id() . '/thumb_' . basename($firstImagePath);
+                $thumbFullPath = public_path('uploads/' . $thumbRelative);
+
+                if (\App\Helpers\ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
+                    $thumbnailPath = $thumbRelative;
+                } else {
+                    $thumbnailPath = $firstImagePath;
+                }
+            }
+
+            $user = auth()->user();
+            $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin));
+
             $service->update([
                 'title'        => $validated['title'] ?? null,
+                'slug'         => !empty($validated['title']) ? Str::slug($validated['title']) : $service->slug,
+                'thumbnail'    => $thumbnailPath,
                 'title_translations' => $validated['title_translations'] ?? null,
                 'tagline'      => $validated['tagline'] ?? null,
                 'tagline_translations' => $validated['tagline_translations'] ?? null,
@@ -305,7 +359,9 @@ class ServiceController extends Controller
                 'validity_days' => $validated['validity_days'] ?? null,
                 'referral_commission_from' => $validated['referral_commission_from'] ?? 'fee',
                 'referral_commission_percentage' => $validated['referral_commission_percentage'] ?? null,
-                'status'       => 'draft', // Requires re-approval
+                'status'       => $isAdmin ? 'active' : 'draft',
+                'approved_at'  => $isAdmin ? ($service->approved_at ?? now()) : $service->approved_at,
+                'approved_by'  => $isAdmin ? ($service->approved_by ?? $user->id) : $service->approved_by,
             ]);
 
             $submittedExtraIds = collect($validated['extras'] ?? [])->pluck('id')->filter()->toArray();
