@@ -1,6 +1,8 @@
 <?php
 
 return [
+  'marketplace_seo_description' => 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
+  'software_services_marketplace' => 'Software Development & IT Services Marketplace',
   'download_file' => 'Download File',
   'enter_revision_details' => 'Enter revision details and required modifications...',
   'escrow_summary' => 'Escrow & Financial Ledger',
@@ -1115,6 +1117,7 @@ return [
   'cash' => 'Cash',
   'cashier' => 'Cashier',
   'catalog_gigs' => 'Catalog Gigs',
+  'cannot_delete_category_with_services' => 'Cannot delete category because it has linked services.',
   'categories' => 'Categories',
   'categories_list' => 'List of categories',
   'categorize_icons' => 'Categorize Icons',
@@ -5353,8 +5356,9 @@ return [
   'profit_loss_ledger' => 'Profit & Loss Ledger',
   'profit_loss_trends' => 'Profit Loss Trends',
   'profit_margin' => 'Profit Margin',
-  'programming_tech' => 'programming tech',
+  'programming_tech' => 'Programming & Tech',
   'programming_technologies' => 'Programming Technologies',
+  'web_development' => 'Web Development',
   'progress' => 'Progress',
   'progress_reports' => 'Progress reports',
   'progress_saved' => 'Progress saved',

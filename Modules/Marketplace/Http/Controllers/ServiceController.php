@@ -20,14 +20,57 @@ class ServiceController extends Controller
         $query = Service::with(['seller', 'category', 'packages.currency'])->where('status', 'active');
 
         $categoryParam = $request->input('category') ?? $request->input('category_id') ?? $request->input('category_slug');
+        $resolvedCategory = null;
 
         if (!empty($categoryParam)) {
-            if (is_numeric($categoryParam)) {
-                $query->where('category_id', $categoryParam);
+            $paramStr = trim((string) $categoryParam);
+
+            if (is_numeric($paramStr)) {
+                $resolvedCategory = ServiceCategory::find((int) $paramStr);
+            }
+
+            if (!$resolvedCategory) {
+                $resolvedCategory = ServiceCategory::where('slug', $paramStr)->first();
+            }
+
+            if (!$resolvedCategory) {
+                $aliases = [
+                    'web' => 'web-development',
+                    'dev' => 'web-development',
+                    'development' => 'web-development',
+                    'design' => 'graphic-design',
+                    'graphics' => 'graphic-design',
+                    'marketing' => 'digital-marketing',
+                    'writing' => 'writing-translation',
+                    'translation' => 'writing-translation',
+                    'video' => 'video-animation',
+                    'animation' => 'video-animation',
+                    'music' => 'music-audio',
+                    'audio' => 'music-audio',
+                    'tech' => 'programming-tech',
+                    'programming' => 'programming-tech',
+                    'software' => 'programming-tech',
+                    'biz' => 'business',
+                ];
+
+                $aliasSlug = $aliases[strtolower($paramStr)] ?? null;
+                if ($aliasSlug) {
+                    $resolvedCategory = ServiceCategory::where('slug', $aliasSlug)->first();
+                }
+            }
+
+            if (!$resolvedCategory) {
+                $resolvedCategory = ServiceCategory::where('slug', 'like', "%{$paramStr}%")
+                    ->orWhere('name', 'like', "%{$paramStr}%")
+                    ->first();
+            }
+
+            if ($resolvedCategory) {
+                $query->where('category_id', $resolvedCategory->id);
             } else {
-                $query->whereHas('category', function ($q) use ($categoryParam) {
-                    $q->where('slug', $categoryParam)
-                      ->orWhere('name', 'like', "%{$categoryParam}%");
+                $query->whereHas('category', function ($q) use ($paramStr) {
+                    $q->where('slug', 'like', "%{$paramStr}%")
+                      ->orWhere('name', 'like', "%{$paramStr}%");
                 });
             }
         }
@@ -70,9 +113,18 @@ class ServiceController extends Controller
             'categories' => $categories,
             'filters' => [
                 'search' => $search ?? '',
-                'category' => $categoryParam ?? '',
-                'category_id' => $categoryParam ?? '',
+                'category' => $resolvedCategory ? $resolvedCategory->slug : ($categoryParam ?? ''),
+                'category_id' => $resolvedCategory ? $resolvedCategory->id : ($categoryParam ?? ''),
+                'category_name' => $resolvedCategory ? $resolvedCategory->name : '',
             ],
+        ])->withViewData([
+            'meta' => [
+                'title'       => 'Software Development & IT Services Marketplace | MuSoftwares',
+                'description' => 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
+                'image'       => url('/images/og-default.jpg'),
+                'url'         => route('marketplace.services.index'),
+                'type'        => 'website',
+            ]
         ]);
     }
 

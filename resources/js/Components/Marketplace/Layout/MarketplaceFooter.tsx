@@ -29,11 +29,12 @@ export default function MarketplaceFooter() {
                     <div>
                         <h4 className="font-bold text-slate-900 mb-6 text-sm uppercase tracking-wider">{__('general.categories') || 'Categories'}</h4>
                         <ul className="space-y-3.5 text-sm text-slate-500">
-                            <li><Link href="/marketplace/services?category=web-development" className="hover:text-indigo-600 transition-colors">{__('general.programming_tech') || 'Web & Software Tech'}</Link></li>
+                            <li><Link href="/marketplace/services?category=web-development" className="hover:text-indigo-600 transition-colors">{__('general.web_development') || 'Web Development'}</Link></li>
                             <li><Link href="/marketplace/services?category=graphic-design" className="hover:text-indigo-600 transition-colors">{__('general.graphics_design') || 'Graphics & UI/UX Design'}</Link></li>
                             <li><Link href="/marketplace/services?category=digital-marketing" className="hover:text-indigo-600 transition-colors">{__('general.digital_marketing') || 'Digital Marketing'}</Link></li>
                             <li><Link href="/marketplace/services?category=video-animation" className="hover:text-indigo-600 transition-colors">{__('general.video_animation') || 'Video & Animation'}</Link></li>
                             <li><Link href="/marketplace/services?category=writing-translation" className="hover:text-indigo-600 transition-colors">{__('general.writing_translation') || 'Writing & Translation'}</Link></li>
+                            <li><Link href="/marketplace/services?category=programming-tech" className="hover:text-indigo-600 transition-colors">{__('general.programming_tech') || 'Programming & Tech'}</Link></li>
                         </ul>
                     </div>
 

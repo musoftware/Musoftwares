@@ -20,6 +20,7 @@ export default function MarketplaceCategoryNav() {
     const [loading, setLoading] = useState(!Array.isArray(inertiaCategories) || inertiaCategories.length === 0);
 
     const activeCategory = filters?.category || filters?.category_id || '';
+    const activeCategoryId = filters?.category_id ?? null;
 
     useEffect(() => {
         if (categories.length === 0) {
@@ -73,7 +74,14 @@ export default function MarketplaceCategoryNav() {
 
                             const isActive =
                                 Boolean(activeStr) &&
-                                (activeStr === catSlug || activeStr === catId || activeStr === catName);
+                                (
+                                    (activeCategoryId && catId === activeCategoryId.toString()) ||
+                                    activeStr === catSlug ||
+                                    activeStr === catId ||
+                                    activeStr === catName ||
+                                    (catSlug && catSlug.startsWith(activeStr)) ||
+                                    (activeStr.length >= 3 && catSlug.includes(activeStr))
+                                );
 
                             return (
                                 <Link

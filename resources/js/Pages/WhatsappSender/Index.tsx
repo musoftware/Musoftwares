@@ -10,6 +10,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Badge } from '@/Components/ui/badge';
 import { useToast } from '@/Components/ui/use-toast';
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/Components/ui/dialog';
+import {
     MessageSquare,
     Send,
     ShieldCheck,
@@ -26,7 +34,11 @@ import {
     Wallet,
     Building2,
     DollarSign,
-    History
+    History,
+    HelpCircle,
+    BookOpen,
+    ExternalLink,
+    Key
 } from 'lucide-react';
 
 interface WhatsappBusiness {
@@ -106,6 +118,7 @@ export default function Index({
     const { toast } = useToast();
     const { flash } = usePage().props as any;
     const [copiedToken, setCopiedToken] = useState(false);
+    const [showGuideModal, setShowGuideModal] = useState(false);
 
     // Defensive array guards
     const safeBusinesses = Array.isArray(businesses) ? businesses : [];
@@ -278,14 +291,25 @@ export default function Index({
                         </p>
                     </div>
 
-                    <a href={facebookLoginUrl || '#'} className="shrink-0">
-                        <Button className="bg-[#1877F2] hover:bg-[#166fe5] text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm text-sm">
-                            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                            </svg>
-                            Connect with Facebook Login
+                    <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setShowGuideModal(true)}
+                            className="border-indigo-300 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 font-medium px-3.5 py-2 rounded-lg flex items-center gap-2 text-sm shadow-sm"
+                        >
+                            <HelpCircle className="w-4 h-4 text-indigo-600" />
+                            الشرح ودليل الخطوات
                         </Button>
-                    </a>
+                        <a href={facebookLoginUrl || '#'} className="shrink-0">
+                            <Button className="bg-[#1877F2] hover:bg-[#166fe5] text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm text-sm">
+                                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                </svg>
+                                Connect with Facebook Login
+                            </Button>
+                        </a>
+                    </div>
                 </div>
             }
         >
@@ -752,13 +776,24 @@ export default function Index({
                             {/* TAB 3: ACCOUNTS & FACEBOOK CONNECT */}
                             <TabsContent value="accounts" className="mt-6">
                                 <Card className="border-slate-200 shadow-sm rounded-xl bg-white">
-                                    <CardHeader className="border-b border-slate-100 pb-4">
-                                        <CardTitle className="text-lg font-semibold flex items-center gap-2 text-slate-900">
-                                            <ShieldCheck className="w-5 h-5 text-indigo-600" /> Connect Meta Credentials ({activeBusiness?.name || 'Default'})
-                                        </CardTitle>
-                                        <CardDescription>
-                                            Link Meta Phone Number ID & Access Token for {activeBusiness?.name || 'Business'}
-                                        </CardDescription>
+                                    <CardHeader className="border-b border-slate-100 pb-4 flex flex-row items-center justify-between gap-4">
+                                        <div>
+                                            <CardTitle className="text-lg font-semibold flex items-center gap-2 text-slate-900">
+                                                <ShieldCheck className="w-5 h-5 text-indigo-600" /> Connect Meta Credentials ({activeBusiness?.name || 'Default'})
+                                            </CardTitle>
+                                            <CardDescription>
+                                                Link Meta Phone Number ID & Access Token for {activeBusiness?.name || 'Business'}
+                                            </CardDescription>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => setShowGuideModal(true)}
+                                            className="border-indigo-300 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 font-medium text-xs h-9 px-3 gap-1.5 shrink-0"
+                                        >
+                                            <HelpCircle className="w-4 h-4 text-indigo-600" />
+                                            الشرح ودليل الخطوات
+                                        </Button>
                                     </CardHeader>
                                     <CardContent className="pt-6">
                                         <form onSubmit={handleAccountSubmit} className="space-y-4 max-w-xl">
@@ -935,6 +970,110 @@ export default function Index({
                     </div>
                 </div>
             </div>
+
+            {/* META API GUIDE MODAL */}
+            <Dialog open={showGuideModal} onOpenChange={setShowGuideModal}>
+                <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold flex items-center gap-2 text-slate-900 dir-rtl text-right">
+                            <BookOpen className="w-6 h-6 text-indigo-600 shrink-0" />
+                            دليل خطوة بخطوة: كيفية الحصول على بيانات Meta WhatsApp API
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-slate-500 dir-rtl text-right">
+                            شرح توضيحي للحصول على Meta Phone Number ID و WABA ID و Meta Access Token من لوحة مطوري فيسبوك Meta.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-6 py-2 text-slate-800 text-sm dir-rtl text-right">
+
+                        {/* Quick Link Button Banner */}
+                        <div className="p-4 bg-indigo-50/80 border border-indigo-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <Key className="w-6 h-6 text-indigo-600 shrink-0" />
+                                <div>
+                                    <p className="font-semibold text-indigo-950 text-sm">لوحة مطوري ميتا Meta Developers Portal</p>
+                                    <p className="text-xs text-indigo-700">تفتح في نافذة جديدة مباشرة للبدء في إعداد تطبيقك</p>
+                                </div>
+                            </div>
+                            <a
+                                href="https://developers.facebook.com/apps/"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors shrink-0"
+                            >
+                                Meta Developers Portal <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                        </div>
+
+                        {/* STEP 1 */}
+                        <div className="space-y-2 border-b border-slate-100 pb-4">
+                            <div className="flex items-center gap-2 font-bold text-slate-900 text-base">
+                                <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
+                                إنشاء تطبيق مطورين (Meta App)
+                            </div>
+                            <ul className="list-disc list-inside space-y-1.5 text-slate-600 text-xs pr-8 leading-relaxed">
+                                <li>قم بزيارة <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer" className="text-indigo-600 underline font-medium">Meta for Developers</a> وسجل الدخول بحساب فيسبوك.</li>
+                                <li>اضغط على زر <strong className="text-slate-900">Create App (إنشاء تطبيق)</strong> في أعلى الشاشة.</li>
+                                <li>اختر نوع التطبيق: <strong className="text-slate-900">Other (آخر)</strong> ثم اختر <strong className="text-slate-900">Business (أعمال)</strong> واضغط التالي.</li>
+                                <li>أدخل اسم التطبيق واضغط على <strong className="text-slate-900">Create App</strong>.</li>
+                            </ul>
+                        </div>
+
+                        {/* STEP 2 */}
+                        <div className="space-y-2 border-b border-slate-100 pb-4">
+                            <div className="flex items-center gap-2 font-bold text-slate-900 text-base">
+                                <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
+                                إضافة منتج WhatsApp للتطبيق
+                            </div>
+                            <ul className="list-disc list-inside space-y-1.5 text-slate-600 text-xs pr-8 leading-relaxed">
+                                <li>من لوحة تحكم تطبيقك الجديد، انزل لأسفل لقسم المنتجات وابحث عن <strong className="text-slate-900">WhatsApp</strong> واضغط على <strong className="text-slate-900">Set Up (إعداد)</strong>.</li>
+                                <li>اختر حساب Business Account المرتبط أو قم بإنشاء واحد جديد مجاناً.</li>
+                            </ul>
+                        </div>
+
+                        {/* STEP 3 */}
+                        <div className="space-y-2 border-b border-slate-100 pb-4">
+                            <div className="flex items-center gap-2 font-bold text-slate-900 text-base">
+                                <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">3</span>
+                                استخراج Phone Number ID و WABA ID
+                            </div>
+                            <ul className="list-disc list-inside space-y-1.5 text-slate-600 text-xs pr-8 leading-relaxed">
+                                <li>من القائمة الجانبية اختر <strong className="text-slate-900">WhatsApp 👈 API Setup</strong>.</li>
+                                <li>في منتصف الصفحة تحت عنوان <strong className="text-slate-900">Send and receive messages</strong> ستجد:</li>
+                                <li className="pr-4"><strong className="text-emerald-700 font-mono">Meta Phone Number ID:</strong> رقم معرف الهاتف (يتكون من 15 رقم مثل <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-800">104829103948123</code>). قم بنسخه ولصقه في الخانة الأولى.</li>
+                                <li className="pr-4"><strong className="text-indigo-700 font-mono">WABA ID (WhatsApp Business Account ID):</strong> رقم معرف حساب الواتساب تجاري. قم بنسخه ولصقه في الخانة الثانية (اختياري).</li>
+                            </ul>
+                        </div>
+
+                        {/* STEP 4 */}
+                        <div className="space-y-2 pb-2">
+                            <div className="flex items-center gap-2 font-bold text-slate-900 text-base">
+                                <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">4</span>
+                                استخراج Access Token الدائم (System User Token)
+                            </div>
+                            <ul className="list-disc list-inside space-y-1.5 text-slate-600 text-xs pr-8 leading-relaxed">
+                                <li>لإنشاء رمز وصول دائم لا ينتهي صلاحيته، اذهب إلى <a href="https://business.facebook.com/settings/" target="_blank" rel="noreferrer" className="text-indigo-600 underline font-medium">Meta Business Settings</a>.</li>
+                                <li>من القائمة الجانبية: اختر <strong className="text-slate-900">Users 👈 System Users</strong> ثم اضغط <strong className="text-slate-900">Add</strong> لإضافة مستخدم نظام جديد باسم <code className="bg-slate-100 px-1 rounded font-mono">WhatsApp System User</code> بدور <strong className="text-slate-900">Admin</strong>.</li>
+                                <li>اضغط على <strong className="text-slate-900">Add Assets</strong> وقم بإعطاء مستخدم النظام التحكم الكامل بالكامل (Full Control) لتطبيقك.</li>
+                                <li>اضغط على <strong className="text-slate-900">Generate New Token</strong> واختر التطبيق، ثم حدد الصلاحيتين التاليتين:
+                                    <div className="my-1.5 flex flex-wrap gap-2">
+                                        <span className="bg-slate-900 text-white text-[11px] font-mono px-2 py-0.5 rounded">whatsapp_business_messaging</span>
+                                        <span className="bg-slate-900 text-white text-[11px] font-mono px-2 py-0.5 rounded">whatsapp_business_management</span>
+                                    </div>
+                                </li>
+                                <li>انسخ الرمز الذي يظهر لك (يبدأ بـ <code className="bg-slate-100 px-1 font-mono text-emerald-700">EAA...</code>) وضعه في خانة <strong className="text-slate-900">Meta Access Token</strong> ثم احفظ البيانات.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <DialogFooter className="dir-rtl flex justify-between items-center sm:justify-between border-t border-slate-100 pt-3">
+                        <span className="text-xs text-slate-500">جاهز للتوصيل؟ اضغط إغلاق وابدأ بإدخال البيانات.</span>
+                        <Button type="button" onClick={() => setShowGuideModal(false)} className="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4">
+                            إغلاق الشرح
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AuthenticatedLayout>
     );
 }

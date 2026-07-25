@@ -1,14 +1,13 @@
 {
   "id": "/?source=pwa",
-  "name": "Musoftware Platform",
+  "name": "Musoftware | منصة البرمجيات والحلول الرقمية",
   "short_name": "Musoftware",
-  "description": "Control your local automation tools from the web — WhatsApp, TikTok, Snapchat and more.",
+  "description": "منصة Musoftware المتكاملة لتطوير البرمجيات، الحلول البرمجية المخصصة، أنظمة إدارة الأعمال وأدوات الأتمتة الرقمية.",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "display_override": [
     "standalone",
-    "window-controls-overlay",
     "minimal-ui",
     "browser"
   ],
@@ -16,12 +15,13 @@
   "background_color": "#0f0f11",
   "theme_color": "#0f0f11",
   "categories": [
+    "business",
     "productivity",
     "utilities",
-    "business"
+    "developer tools"
   ],
-  "lang": "en",
-  "dir": "ltr",
+  "lang": "ar",
+  "dir": "rtl",
   "prefer_related_applications": false,
   "related_applications": [],
   "icons": [
@@ -108,9 +108,9 @@
   ],
   "shortcuts": [
     {
-      "name": "My Dashboard",
-      "short_name": "Dashboard",
-      "description": "Open your workspace dashboard",
+      "name": "لوحة التحكم",
+      "short_name": "الرئيسية",
+      "description": "الانتقال إلى لوحة التحكم الخاصة بك",
       "url": "/dashboard?source=pwa-shortcut",
       "icons": [
         {
@@ -121,10 +121,10 @@
       ]
     },
     {
-      "name": "Tools",
-      "short_name": "Tools",
-      "description": "Access all your automation tools",
-      "url": "/tools?source=pwa-shortcut",
+      "name": "متجر البرمجيات والخدمات",
+      "short_name": "المتجر",
+      "description": "تصفح البرمجيات، الحلول الرقمية وخدمات التطوير",
+      "url": "/marketplace?source=pwa-shortcut",
       "icons": [
         {
           "src": "/icons/shortcut-tools.png",
@@ -136,57 +136,11 @@
   ],
   "screenshots": [
     {
-      "src": "/images/hero_illustration.png",
+      "src": "/images/portfolio/musoftwares.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Musoftware Automation Dashboard"
+      "label": "منصة Musoftware لتطوير البرمجيات والحلول الرقمية"
     }
-  ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+musoftware",
-      "url": "/dashboard?protocol=%s"
-    }
-  ],
-  "share_target": {
-    "action": "/dashboard?shared=true",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
-  "launch_handler": {
-    "client_mode": [
-      "focus-existing",
-      "auto"
-    ]
-  },
-  "file_handlers": [
-    {
-      "action": "/dashboard",
-      "accept": {
-        "text/json": [
-          ".json"
-        ],
-        "application/json": [
-          ".json"
-        ]
-      },
-      "icons": [
-        {
-          "src": "/icons/pwa-96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ],
-      "launch_type": "single-client"
-    }
-  ],
-  "edge_side_panel": {
-    "preferred_width": 400
-  }
+  ]
 }

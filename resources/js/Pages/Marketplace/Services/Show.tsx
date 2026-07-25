@@ -20,17 +20,17 @@ export default function Show({ service }: any) {
     const sortedPackages = packages.length > 0
         ? [...packages].sort((a: any, b: any) => a.price - b.price)
         : [
-              {
-                  id: 0,
-                  name: __('general.standard') || 'Standard',
-                  description: service.description || __('general.no_description_available') || 'No description available.',
-                  price: service.is_free ? 0 : 5,
-                  currency: 'USD',
-                  delivery_days: 3,
-                  revisions: 2,
-                  is_mock: true
-              }
-          ];
+            {
+                id: 0,
+                name: __('general.standard') || 'Standard',
+                description: service.description || __('general.no_description_available') || 'No description available.',
+                price: service.is_free ? 0 : 5,
+                currency: 'USD',
+                delivery_days: 3,
+                revisions: 2,
+                is_mock: true
+            }
+        ];
     const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
         sortedPackages.length > 0 ? sortedPackages[0].id : null,
     );
@@ -109,14 +109,51 @@ export default function Show({ service }: any) {
 
     const activeMedia = mediaItems[activeMediaIndex] || mediaItems[0];
 
+    const serviceCanonicalUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/marketplace/services/${service.id}/${service.slug || ''}`
+        : `https://www.musoftwares.com/marketplace/services/${service.id}`;
+
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        'name': service.title,
+        'description': service.tagline || service.description?.substring(0, 300) || service.title,
+        'image': service.cover_image || service.thumbnail,
+        'url': serviceCanonicalUrl,
+        'category': service.category?.name || 'Software Services',
+        'provider': {
+            '@type': 'Organization',
+            'name': service.seller?.name || 'MuSoftwares Marketplace',
+            'url': 'https://www.musoftwares.com'
+        },
+        'offers': {
+            '@type': 'Offer',
+            'price': selectedPackage?.price || service.starting_price || 0,
+            'priceCurrency': selectedPackage?.currency?.code || 'USD',
+            'availability': 'https://schema.org/InStock',
+            'url': serviceCanonicalUrl
+        },
+        ...(service.avg_rating && Number(service.avg_rating) > 0 ? {
+            'aggregateRating': {
+                '@type': 'AggregateRating',
+                'ratingValue': service.avg_rating,
+                'reviewCount': service.review_count || 1,
+                'bestRating': 5,
+                'worstRating': 1
+            }
+        } : {})
+    };
+
     return (
         <MarketplaceLayout>
             <SeoHead
-                title={`${service.title} | Musoftware Marketplace`}
+                title={`${service.title} | MuSoftwares Marketplace`}
                 description={service.tagline || service.description?.substring(0, 160)}
-                image={service.cover_image}
-                url={route('marketplace.services.show', service.id)}
+                image={service.cover_image || service.thumbnail}
+                url={serviceCanonicalUrl}
+                canonicalUrl={serviceCanonicalUrl}
                 type="product"
+                jsonLd={jsonLd}
             />
 
             {/* Breadcrumb */}
@@ -218,7 +255,7 @@ export default function Show({ service }: any) {
 
                         {/* Interactive Media Gallery (Video & Images) */}
                         <div className="mb-8 space-y-3">
-                            <div 
+                            <div
                                 className={`relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-200 bg-slate-900 shadow-sm flex items-center justify-center ${activeMedia?.type === 'image' ? 'cursor-zoom-in group' : ''}`}
                                 onClick={() => activeMedia?.type === 'image' && setIsZoomOpen(true)}
                             >
@@ -259,11 +296,10 @@ export default function Show({ service }: any) {
                                             key={idx}
                                             type="button"
                                             onClick={() => setActiveMediaIndex(idx)}
-                                            className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all ${
-                                                activeMediaIndex === idx
+                                            className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all ${activeMediaIndex === idx
                                                     ? 'border-indigo-600 ring-2 ring-indigo-200 scale-105'
                                                     : 'border-gray-200 opacity-70 hover:opacity-100'
-                                            }`}
+                                                }`}
                                         >
                                             <img src={item.thumbnail} alt={`Media ${idx}`} className="h-full w-full object-cover" />
                                             {item.type === 'video' && (
