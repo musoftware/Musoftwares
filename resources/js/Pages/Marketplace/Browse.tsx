@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { MouseEvent as ReactMouseEvent, useRef, useState } from 'react';
 import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { Plus } from 'lucide-react';
 
 export default function Browse({ services, categories, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');
@@ -89,6 +90,16 @@ export default function Browse({ services, categories, filters }: any) {
                         >
                             {__('general.search')}</button>
                     </form>
+                    <div className="mt-4 flex items-center justify-center gap-3 text-sm">
+                        <span className="text-indigo-200">{__('general.are_you_a_freelancer_or_vendor') || 'Are you a freelancer or software seller?'}</span>
+                        <Link
+                            href="/marketplace/services/create"
+                            className="inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 px-4 py-1.5 font-semibold text-white backdrop-blur-sm transition border border-white/20"
+                        >
+                            <Plus className="h-4 w-4 text-indigo-300" />
+                            <span>{__('general.add_marketplace_item') || __('general.publish_service') || 'Add Marketplace Item'}</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
 

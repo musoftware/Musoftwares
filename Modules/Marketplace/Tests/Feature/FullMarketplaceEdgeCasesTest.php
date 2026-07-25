@@ -199,10 +199,8 @@ class FullMarketplaceEdgeCasesTest extends TestCase
             'status' => ServiceOrderStatus::PENDING
         ]);
 
-        $attachment = MarketplaceAttachment::create([
+        $attachment = $order->attachments()->create([
             'user_id' => $this->seller->id,
-            'attachable_type' => ServiceOrder::class,
-            'attachable_id' => $order->id,
             'file_name' => 'final_design.pdf',
             'file_path' => 'deliveries/final_design.pdf',
             'mime_type' => 'application/pdf',

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { ChevronRight } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Skeleton } from '@/Components/ui/skeleton';
+import { __ } from '@/lib/i18n';
 
 interface Category {
     id: number;
@@ -11,7 +12,6 @@ interface Category {
 }
 
 export default function MarketplaceCategoryNav() {
-    // Try to get from Inertia props first, fallback to empty array
     const { categories: inertiaCategories, filters } = usePage().props as any;
     
     const [categories, setCategories] = useState<Category[]>(
@@ -22,7 +22,6 @@ export default function MarketplaceCategoryNav() {
     const activeCategory = filters?.category || filters?.category_id || '';
 
     useEffect(() => {
-        // If we didn't get categories from Inertia props, fetch them client-side
         if (categories.length === 0) {
             axios.get('/marketplace/api/categories')
                 .then(response => {
@@ -39,17 +38,30 @@ export default function MarketplaceCategoryNav() {
     }, [categories.length]);
 
     if (!loading && categories.length === 0) {
-        return null; // Don't render empty nav bar
+        return null;
     }
 
     return (
-        <div className="hidden md:block w-full border-b border-gray-200 bg-white">
+        <div className="hidden md:block w-full border-b border-slate-200/80 bg-slate-50/50">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <nav className="flex items-center h-12 overflow-x-auto no-scrollbar gap-6">
+                <nav className="flex items-center h-11 overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 py-1">
+                    <Link
+                        href="/marketplace/services"
+                        className={`inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold px-3 py-1.5 rounded-full transition-all shrink-0 ${
+                            !activeCategory
+                                ? 'bg-indigo-600 text-white shadow-2xs'
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        }`}
+                    >
+                        <Sparkles className="w-3 h-3" />
+                        <span>{__('general.all_services') || 'All Services'}</span>
+                    </Link>
+
+                    <div className="h-4 w-px bg-slate-200 shrink-0 mx-1"></div>
+
                     {loading ? (
-                        // Skeleton loader
                         Array.from({ length: 8 }).map((_, i) => (
-                            <Skeleton key={i} className="h-4 w-24 shrink-0" />
+                            <Skeleton key={i} className="h-6 w-24 rounded-full shrink-0" />
                         ))
                     ) : (
                         categories.map((category) => {
@@ -67,10 +79,10 @@ export default function MarketplaceCategoryNav() {
                                 <Link
                                     key={category.id || category.slug || category.name}
                                     href={`/marketplace/services?category=${encodeURIComponent(category.slug || category.id || '')}`}
-                                    className={`whitespace-nowrap text-sm font-medium transition-all shrink-0 py-3 ${
+                                    className={`whitespace-nowrap text-xs font-medium px-3 py-1.5 rounded-full transition-all shrink-0 ${
                                         isActive
-                                            ? 'text-indigo-600 font-bold border-b-2 border-indigo-600'
-                                            : 'text-gray-500 hover:text-gray-900 hover:underline hover:underline-offset-8'
+                                            ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200/80'
+                                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                                     }`}
                                 >
                                     {category.name || ''}

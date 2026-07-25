@@ -25,6 +25,7 @@ class OrderDeliveryFile extends Model
 
     public function serviceOrder(): BelongsTo
     {
-        return $this->belongsTo(ServiceOrder::class, 'order_id');
+        $foreignKey = \Illuminate\Support\Facades\Schema::hasColumn('order_delivery_files', 'order_id') ? 'order_id' : 'service_order_id';
+        return $this->belongsTo(ServiceOrder::class, $foreignKey);
     }
 }

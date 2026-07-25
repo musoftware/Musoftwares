@@ -120,7 +120,8 @@ class ServiceOrder extends Model
 
     public function deliveryFiles(): HasMany
     {
-        return $this->hasMany(OrderDeliveryFile::class, 'order_id');
+        $foreignKey = \Illuminate\Support\Facades\Schema::hasColumn('order_delivery_files', 'order_id') ? 'order_id' : 'service_order_id';
+        return $this->hasMany(OrderDeliveryFile::class, $foreignKey);
     }
 
     public function reviews(): HasMany

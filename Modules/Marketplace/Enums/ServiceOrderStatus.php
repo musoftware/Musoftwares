@@ -15,6 +15,7 @@ enum ServiceOrderStatus: string
     case DELIVERED = 'delivered';
     case REVISION = 'revision';
     case COMPLETED = 'completed';
+    case AUTO_COMPLETED = 'auto_completed';
     case CANCELLED = 'cancelled';
     case CANCELLATION_REQUESTED = 'cancellation_requested';
     case DISPUTED = 'disputed';

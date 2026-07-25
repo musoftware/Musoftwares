@@ -60,7 +60,7 @@ class OrderFulfillmentAndWorkspaceTest extends TestCase
 
         // Buyer requests revision
         $order = $deliverableService->requestRevision($order, 'Please revise paragraph 2.');
-        $this->assertEquals('processing', $order->status->value);
+        $this->assertEquals('revision', $order->status->value);
     }
 
     public function test_workspace_direct_chat_messaging_and_read_tracking()
