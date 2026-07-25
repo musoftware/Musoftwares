@@ -102,28 +102,23 @@ export default function EditService({ categories, service }: Props) {
                     {/* Step tabs */}
                     <div className="max-w-7xl mx-auto px-4 sm:px-6">
                         <div className="flex">
-                            {STEPS.map((s, i) => {
-                                const done = step > s.id;
+                            {STEPS.map((s) => {
                                 const active = step === s.id;
                                 return (
                                     <button
                                         key={s.id}
-                                        onClick={() => done && setStep(s.id)}
-                                        disabled={!done}
+                                        type="button"
+                                        onClick={() => setStep(s.id)}
                                         className={cn(
-                                            'flex-1 flex flex-col sm:flex-row items-center justify-center gap-2 px-2 py-3 text-xs font-semibold border-b-2 transition-all',
-                                            active ? 'border-indigo-600 text-indigo-700 bg-indigo-50/40' :
-                                            done  ? 'border-emerald-400 text-emerald-700 cursor-pointer hover:bg-slate-50' :
-                                                    'border-transparent text-slate-400'
+                                            'flex-1 flex flex-col sm:flex-row items-center justify-center gap-2 px-2 py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer hover:bg-slate-50',
+                                            active ? 'border-indigo-600 text-indigo-700 bg-indigo-50/40' : 'border-transparent text-slate-500 hover:text-slate-900'
                                         )}
                                     >
                                         <span className={cn(
                                             'w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
-                                            active ? 'bg-indigo-600 text-white' :
-                                            done  ? 'bg-emerald-500 text-white' :
-                                                    'bg-slate-200 text-slate-500'
+                                            active ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600'
                                         )}>
-                                            {done ? <Check className="w-3 h-3" /> : s.id}
+                                            {s.id}
                                         </span>
                                         <span className="hidden sm:block">{s.label}</span>
                                     </button>
@@ -177,7 +172,7 @@ export default function EditService({ categories, service }: Props) {
                                     {data.gallery.length > 0 ? (
                                         <img src={URL.createObjectURL(data.gallery[0])} alt="Thumbnail" className="w-full h-full object-cover" />
                                     ) : data.kept_gallery.length > 0 ? (
-                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('services/') ? `/uploads/${data.kept_gallery[0]}` : `/${data.kept_gallery[0]}`))} alt="Thumbnail" className="w-full h-full object-cover" />
+                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : `/uploads/${data.kept_gallery[0].replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt="Thumbnail" className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="text-slate-400 flex flex-col items-center">
                                             <span className="text-4xl mb-2">📸</span>

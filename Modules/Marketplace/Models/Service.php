@@ -9,6 +9,8 @@ use App\Models\User;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+use Illuminate\Support\Facades\Storage;
+
 class Service extends Model
 {
     use Searchable, SoftDeletes, HasFactory;
@@ -98,13 +100,10 @@ class Service extends Model
             if (str_starts_with($cleanPath, 'storage/')) {
                 $cleanPath = substr($cleanPath, 8);
             }
-            if (str_starts_with($cleanPath, 'services/')) {
-                $cleanPath = 'uploads/' . $cleanPath;
+            if (str_starts_with($cleanPath, 'uploads/')) {
+                $cleanPath = substr($cleanPath, 8);
             }
-            if (!str_starts_with($cleanPath, 'uploads/')) {
-                $cleanPath = 'uploads/' . $cleanPath;
-            }
-            return asset($cleanPath);
+            return Storage::disk('public_uploads')->url($cleanPath);
         }
         return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80';
     }

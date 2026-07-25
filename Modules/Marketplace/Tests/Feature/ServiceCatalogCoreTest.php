@@ -103,4 +103,44 @@ class ServiceCatalogCoreTest extends TestCase
         $claimed = $downloadService->verifyAndClaimDownload($download->download_token);
         $this->assertNotNull($claimed->downloaded_at);
     }
+
+    public function test_service_gallery_upload_and_cover_image_accessor()
+    {
+        \Illuminate\Support\Facades\Storage::fake('public_uploads', ['url' => 'https://www.musoftwares.com/uploads']);
+
+        $seller = User::factory()->create();
+        $category = ServiceCategory::create(['name' => 'Design', 'slug' => 'design-test']);
+        $currency = Currency::firstOrCreate(['id' => 1], ['currency' => 'USD', 'symbol' => '$', 'name' => 'US Dollar']);
+
+        $file = \Illuminate\Http\UploadedFile::fake()->image('cover.jpg');
+
+        $response = $this->actingAs($seller)->post(route('marketplace.services.store'), [
+            'title' => 'Graphic Design Service Test',
+            'category_id' => $category->id,
+            'description' => 'Professional graphic design service test description',
+            'gallery' => [$file],
+            'packages' => [
+                [
+                    'name' => 'Basic',
+                    'description' => 'Basic package',
+                    'price' => 100,
+                    'currency_id' => $currency->id,
+                    'delivery_days' => 2,
+                ]
+            ]
+        ]);
+
+        $response->assertRedirect();
+
+        $service = Service::where('title', 'Graphic Design Service Test')->first();
+        $this->assertNotNull($service);
+        $this->assertNotEmpty($service->gallery);
+
+        // Assert file exists on public_uploads disk
+        \Illuminate\Support\Facades\Storage::disk('public_uploads')->assertExists($service->gallery[0]);
+
+        // Assert cover_image accessor generates valid URL using public_uploads disk
+        $coverUrl = $service->cover_image;
+        $this->assertStringContainsString('/uploads/', $coverUrl);
+    }
 }

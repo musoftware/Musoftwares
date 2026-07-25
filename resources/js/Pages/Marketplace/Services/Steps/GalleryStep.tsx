@@ -6,21 +6,38 @@ import { useDropzone } from 'react-dropzone';
 import { __ } from '@/lib/i18n';
 
 export default function GalleryStep({ data, setData, errors }: any) {
+    const keptCount = data.kept_gallery?.length || 0;
+    const totalCount = keptCount + (data.gallery?.length || 0);
+
     const onDrop = useCallback((acceptedFiles: File[]) => {
-        if (data.gallery.length + acceptedFiles.length <= 5) {
-            setData('gallery', [...data.gallery, ...acceptedFiles]);
+        const currentTotal = (data.kept_gallery?.length || 0) + (data.gallery?.length || 0);
+        if (currentTotal + acceptedFiles.length <= 5) {
+            setData('gallery', [...(data.gallery || []), ...acceptedFiles]);
         }
-    }, [data.gallery, setData]);
+    }, [data.gallery, data.kept_gallery, setData]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: { 'image/*': ['.jpeg', '.png', '.jpg', '.webp'] },
         maxSize: 5 * 1024 * 1024, // 5MB
-        disabled: data.gallery.length >= 5
+        disabled: totalCount >= 5
     });
 
-    const removeImage = (idx: number) => {
+    const removeKeptImage = (pathToRemove: string) => {
+        if (setData && data.kept_gallery) {
+            setData('kept_gallery', data.kept_gallery.filter((path: string) => path !== pathToRemove));
+        }
+    };
+
+    const removeNewImage = (idx: number) => {
         setData('gallery', data.gallery.filter((_: any, i: number) => i !== idx));
+    };
+
+    const getImageSrc = (path: string) => {
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('/')) return path;
+        const clean = path.replace(/^storage\//, '').replace(/^uploads\//, '');
+        return `/uploads/${clean}`;
     };
 
     return (
@@ -39,12 +56,12 @@ export default function GalleryStep({ data, setData, errors }: any) {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {/* Existing Images */}
-                    {data.gallery.map((file: File, idx: number) => (
-                        <div key={idx} className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 group bg-slate-100">
-                            <img src={URL.createObjectURL(file)} alt={`Upload ${idx}`} className="w-full h-full object-cover" />
+                    {/* Existing Kept Images */}
+                    {data.kept_gallery?.map((path: string, idx: number) => (
+                        <div key={`kept-${idx}`} className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 group bg-slate-100">
+                            <img src={getImageSrc(path)} alt={`Kept ${idx}`} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <button type="button" onClick={() => removeImage(idx)} className="p-2 bg-white rounded-full text-red-500 hover:scale-110 transition-transform">
+                                <button type="button" onClick={() => removeKeptImage(path)} className="p-2 bg-white rounded-full text-red-500 hover:scale-110 transition-transform">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
@@ -55,8 +72,24 @@ export default function GalleryStep({ data, setData, errors }: any) {
                         </div>
                     ))}
 
+                    {/* New Uploaded Images */}
+                    {data.gallery?.map((file: File, idx: number) => (
+                        <div key={`new-${idx}`} className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 group bg-slate-100">
+                            <img src={URL.createObjectURL(file)} alt={`Upload ${idx}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button type="button" onClick={() => removeNewImage(idx)} className="p-2 bg-white rounded-full text-red-500 hover:scale-110 transition-transform">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            {keptCount === 0 && idx === 0 && (
+                                <div className="absolute top-2 start-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
+                                    {__('general.primary')}</div>
+                            )}
+                        </div>
+                    ))}
+
                     {/* Upload Dropzone */}
-                    {data.gallery.length < 5 && (
+                    {totalCount < 5 && (
                         <div 
                             {...getRootProps()} 
                             className={`aspect-[4/3] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all ${

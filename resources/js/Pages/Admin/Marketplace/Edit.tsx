@@ -475,7 +475,7 @@ export default function Edit({ auth, service, categories }: Props) {
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {data.kept_gallery.map((path, index) => (
                                     <div key={`kept-${index}`} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                                        <img src={path.startsWith('http') ? path : (path.startsWith('/') ? path : (path.startsWith('services/') ? `/uploads/${path}` : `/${path}`))} alt="Gallery" className="w-full h-full object-cover" />
+                                        <img src={path.startsWith('http') ? path : (path.startsWith('/') ? path : `/uploads/${path.replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt="Gallery" className="w-full h-full object-cover" />
                                         <Button type="button" onClick={() => removeKeptImage(path)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
                                             <Trash2 className="w-4 h-4" />
                                         </Button>

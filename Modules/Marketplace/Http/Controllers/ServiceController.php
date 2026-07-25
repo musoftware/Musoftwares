@@ -152,17 +152,11 @@ class ServiceController extends Controller
         $validated = $request->validated();
 
         $service = DB::transaction(function () use ($validated, $request) {
-            // Handle gallery uploads to public folder directly (uploads/services)
+            // Handle gallery uploads using standard Laravel Storage disk (public_uploads disk points directly to public/uploads)
             $galleryPaths = [];
             if ($request->hasFile('gallery')) {
-                $targetDir = public_path('uploads/services/' . auth()->id());
-                if (!file_exists($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
                 foreach ($request->file('gallery') as $image) {
-                    $filename = Str::random(40) . '.' . $image->getClientOriginalExtension();
-                    $image->move($targetDir, $filename);
-                    $galleryPaths[] = 'uploads/services/' . auth()->id() . '/' . $filename;
+                    $galleryPaths[] = $image->store('services/' . auth()->id(), 'public_uploads');
                 }
             }
 
@@ -248,14 +242,8 @@ class ServiceController extends Controller
             $galleryPaths = $validated['kept_gallery'] ?? [];
 
             if ($request->hasFile('gallery')) {
-                $targetDir = public_path('uploads/services/' . auth()->id());
-                if (!file_exists($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
                 foreach ($request->file('gallery') as $image) {
-                    $filename = Str::random(40) . '.' . $image->getClientOriginalExtension();
-                    $image->move($targetDir, $filename);
-                    $galleryPaths[] = 'uploads/services/' . auth()->id() . '/' . $filename;
+                    $galleryPaths[] = $image->store('services/' . auth()->id(), 'public_uploads');
                 }
             }
 
