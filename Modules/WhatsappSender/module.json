@@ -1,0 +1,10 @@
+{
+    "name": "WhatsappSender",
+    "alias": "whatsapp-sender",
+    "description": "WhatsApp Sender API Service via Meta Cloud API with Facebook Login",
+    "priority": 0,
+    "providers": [
+        "Modules\\WhatsappSender\\Providers\\WhatsappSenderServiceProvider"
+    ],
+    "files": []
+}
