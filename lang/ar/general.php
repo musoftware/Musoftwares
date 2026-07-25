@@ -7331,6 +7331,7 @@ return array (
   'use_name_to_insert_the_recipient_apos_s_name' => 'اسم Use \\\\$\\\\$NAME\\\\$\\\\$ to insert the recipient&apos;s',
   'use_points_for_job_applications_proposal_boosts_isaas_lookups_and_premium_marketplace_tools' => 'Use points for job applications, proposal boosts, iSAAS lookups, and premium المتجر tools.',
   'use_the_session_id_you_created_on_your_backend_and_your' => 'Use the جلسة ID you تم الإنشاء on your backend and your',
+  'use_up_to_10_relevant_tags_so_buyers_can_easily_find_your_service' => 'استخدم حتى 10 وسوم ذات صلة حتى يتمكن المترددون من العثور على خدمتك بسهولة.',
   'use_up_to_5_relevant_tags_so_buyers_can_easily_find_your_service' => 'Use up to 5 relevant وسوم so buyers can easily find your service.',
   'used' => 'مستخدم',
   'used_for_invoice_reminders_payment_confirmations_and_automated_notifications' => 'Used for فاتورة reminders, دفع confirmations, and automated notifications.',

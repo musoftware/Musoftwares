@@ -8,18 +8,40 @@ import { __ } from '@/lib/i18n';
 export default function OverviewStep({ data, setData, errors, categories }: any) {
     const [tagInput, setTagInput] = useState('');
 
+    const processTagText = (text: string) => {
+        const items = text
+            .split(/[\r\n,]+/)
+            .map(t => t.trim().toLowerCase())
+            .filter(t => t.length > 0);
+
+        if (items.length === 0) return;
+
+        const newTags = [...data.tags];
+        for (const item of items) {
+            if (newTags.length >= 10) break;
+            if (!newTags.includes(item)) {
+                newTags.push(item);
+            }
+        }
+        setData('tags', newTags);
+        setTagInput('');
+    };
+
     const addTag = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
             e.stopPropagation();
-            const val = tagInput.trim().toLowerCase();
-            if (val && data.tags.length < 5 && !data.tags.includes(val)) {
-                setData('tags', [...data.tags, val]);
-            }
-            setTagInput('');
+            processTagText(tagInput);
         }
     };
 
+    const handlePaste = (e: React.ClipboardEvent) => {
+        const pastedText = e.clipboardData.getData('text');
+        if (pastedText && (pastedText.includes('\n') || pastedText.includes('\r') || pastedText.includes(','))) {
+            e.preventDefault();
+            processTagText(pastedText);
+        }
+    };
 
     const removeTag = (tag: string) => {
         setData('tags', data.tags.filter((t: string) => t !== tag));
@@ -81,7 +103,7 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <Label className="text-sm font-semibold text-slate-700">{__('general.search_tags')}</Label>
-                    <span className="text-xs text-slate-500">{data.tags.length}/5 tags</span>
+                    <span className="text-xs text-slate-500">{data.tags.length}/10 tags</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-2">
                     {data.tags.map((tag: string) => (
@@ -97,11 +119,12 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
                     value={tagInput}
                     onChange={e => setTagInput(e.target.value)}
                     onKeyDown={addTag}
+                    onPaste={handlePaste}
                     placeholder={__('general.enter_keywords_and_press_enter')}
-                    disabled={data.tags.length >= 5}
+                    disabled={data.tags.length >= 10}
                     className="h-12"
                 />
-                <p className="text-xs text-slate-500">{__('general.use_up_to_5_relevant_tags_so_buyers_can_easily_find_your_service')}</p>
+                <p className="text-xs text-slate-500">{__('general.use_up_to_10_relevant_tags_so_buyers_can_easily_find_your_service') || 'Use up to 10 relevant tags so buyers can easily find your service'}</p>
                 {errors.tags && <p className="text-xs text-red-500 font-medium">{errors.tags}</p>}
             </div>
         </div>

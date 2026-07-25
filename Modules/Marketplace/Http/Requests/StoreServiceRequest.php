@@ -23,7 +23,7 @@ class StoreServiceRequest extends FormRequest
             'auto_reply'               => 'nullable|string',
             'auto_reply_translations'  => 'nullable|array',
             'category_id'              => 'required|exists:marketplace_service_categories,id',
-            'tags'                     => 'nullable|array|max:5',
+            'tags'                     => 'nullable|array|max:10',
             'tags.*'                   => 'string|max:40',
             'video_url'                => 'nullable|url|max:255',
             'is_free'                  => 'nullable|boolean',
