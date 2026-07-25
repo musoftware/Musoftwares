@@ -9816,7 +9816,18 @@
             "saas_workspace": "منصة إدارة الأعمال",
             "seller_dashboard": "مساحة عمل البائع",
             "sellers_vendors": "البائعون والمستقلون",
-            "verified_deliverables": "تسليمات موثقة ومضمونة"
+            "verified_deliverables": "تسليمات موثقة ومضمونة",
+            "active_client_orders": "طلبات العملاء النشطة",
+            "buyer_dashboard": "لوحة المشتري",
+            "create_a_gig": "إنشاء خدمة جديدة",
+            "my_gigs": "خدماتي المعروضة",
+            "needs_your_action": "يتطلب إجرائك فوراً",
+            "no_client_orders_yet": "لا توجد طلبات عملاء قيد التنفيذ",
+            "no_orders_yet": "لا توجد طلبات حالية",
+            "orders_need_attention": "طلبات تتطلب اهتمامك",
+            "seller_workspace": "مساحة عمل البائع",
+            "what_should_i_do_now": "ما الإجراء المطلوب مني الآن؟",
+            "what_work_should_i_do_now": "ما الشغل المطلوب مني تنفيذه الآن؟"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -21442,7 +21453,18 @@
             "saas_workspace": "Main SaaS App",
             "seller_dashboard": "Seller Workspace",
             "sellers_vendors": "Sellers & Vendors",
-            "verified_deliverables": "Verified Deliverables"
+            "verified_deliverables": "Verified Deliverables",
+            "active_client_orders": "Active Client Orders",
+            "buyer_dashboard": "Buyer Dashboard",
+            "create_a_gig": "Create a Gig",
+            "my_gigs": "My Services & Gigs",
+            "needs_your_action": "Needs Your Action",
+            "no_client_orders_yet": "No Active Client Orders",
+            "no_orders_yet": "No Orders Yet",
+            "orders_need_attention": "Orders Need Attention",
+            "seller_workspace": "Seller Workspace",
+            "what_should_i_do_now": "What should I do now?",
+            "what_work_should_i_do_now": "What work should I do now?"
         },
         "gold_saver": {
             "achieved": "Achieved",
