@@ -68,8 +68,8 @@ Route::middleware('web')
             Route::post('/services/{service}/favorite', [WishlistController::class, 'toggle'])->name('favorites.toggle');
         });
 
-        // ── Wildcard — always last ─────────────────────────────────────────
-        Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services.show');
+        // ── Wildcard — optional slug supported ────────────────────────────
+        Route::get('/services/{id}/{slug?}', [ServiceController::class, 'show'])->name('services.show');
     });
 
 // -- Seller Landing Pages ------------------------------------------

@@ -76,9 +76,32 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function show($id, Request $request)
+    public function show($id, Request $request, $slug = null)
     {
-        $service = Service::with(['seller', 'category', 'packages.currency', 'reviews.reviewer', 'extras'])->find($id);
+        $targetId = $id;
+        
+        // Handle URLs formatted as /services/98-some-title-slug
+        if (!is_numeric($id)) {
+            if (preg_match('/^(\d+)/', (string)$id, $matches)) {
+                $targetId = $matches[1];
+            }
+        }
+
+        $query = Service::with(['seller', 'category', 'packages.currency', 'reviews.reviewer', 'extras']);
+
+        if (is_numeric($targetId)) {
+            $service = $query->find($targetId);
+        } else {
+            $service = null;
+        }
+
+        if (!$service) {
+            // Search by title slug fallback
+            $service = $query->get()->first(function ($s) use ($id, $slug) {
+                $sSlug = \Illuminate\Support\Str::slug($s->title);
+                return $sSlug === $id || $sSlug === $slug;
+            });
+        }
 
         if (!$service) {
             return Inertia::render('Marketplace/Services/ExclusiveService', [
@@ -130,7 +153,7 @@ class ServiceController extends Controller
         $shareTitle = $service->title . ' | Musoftware Marketplace';
         $shareDesc = \Illuminate\Support\Str::limit(strip_tags($service->tagline ?: $service->description ?: $service->title), 160);
         $shareImage = $service->cover_image;
-        $shareUrl = route('marketplace.services.show', $service->id);
+        $shareUrl = route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug]);
 
         return Inertia::render('Marketplace/Services/Show', [
             'service' => $service,

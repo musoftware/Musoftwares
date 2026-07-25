@@ -11,6 +11,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @property int $id
+ * @property string|null $title
+ * @property string|null $tagline
+ * @property string|null $description
+ * @property array|null $gallery
+ * @property string $cover_image
+ * @property string $slug
+ * @property string $url
+ */
 class Service extends Model
 {
     use Searchable, SoftDeletes, HasFactory;
@@ -27,7 +37,7 @@ class Service extends Model
         'referral_commission_from', 'referral_commission_percentage', 'is_free'
     ];
 
-    protected $appends = ['cover_image'];
+    protected $appends = ['cover_image', 'slug', 'url'];
 
     protected $casts = [
         'is_featured'  => 'boolean',
@@ -106,5 +116,16 @@ class Service extends Model
             return Storage::disk('public_uploads')->url($cleanPath);
         }
         return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80';
+    }
+
+    public function getSlugAttribute(): string
+    {
+        $titleStr = (string)($this->title ?? '');
+        return \Illuminate\Support\Str::slug($titleStr !== '' ? $titleStr : ('service-' . $this->id));
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return route('marketplace.services.show', ['id' => $this->id, 'slug' => $this->slug]);
     }
 }
