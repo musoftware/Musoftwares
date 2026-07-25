@@ -2,7 +2,7 @@ import { __ } from '@/lib/i18n';
 import { Button } from '@/Components/ui/button';
 import { Link, usePage, useForm, Head } from '@inertiajs/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin, Send } from 'lucide-react';
+import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin, Send, Briefcase } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
@@ -72,42 +72,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         }[];
     };
 
-    const { website_services, locale } = usePage().props as any;
-
-    const servicesItems = (website_services || []).map((s: any) => ({
-        title: locale === 'ar' ? s.title_ar : s.title_en,
-        desc: locale === 'ar' ? (s.subtitle_ar || s.description_ar || '') : (s.subtitle_en || s.description_en || ''),
-        href: route('website-services.show', s.slug),
-        icon: (locale === 'ar' ? s.primary_image_ar : s.primary_image_en) 
-            ? <img src={`/${locale === 'ar' ? s.primary_image_ar : s.primary_image_en}`} alt={locale === 'ar' ? s.title_ar : s.title_en} className="w-full h-full object-cover rounded-lg" /> 
-            : <Monitor className="w-5 h-5 text-slate-400" />
-    }));
-
     const navItems: NavItem[] = [
-        {
-            id: 'services',
-            label: __('general.services') || 'Services',
-            href: '#',
-            items: servicesItems
-        },
-        {
-            id: 'saas',
-            label: __('general.saas_tools') || 'SaaS Tools',
-            href: '/platforms',
-            items: [
-                { title: 'MU ERP', desc: 'Enterprise Resource Planning & Automation', href: '/platforms/erp' },
-                { title: 'MU CRM', desc: 'Customer Relationship Management', href: '/platforms/crm' },
-                { title: 'Smart Booking', desc: 'Advanced scheduling & calendars', href: '/pricing' },
-                { title: 'Affiliate & POS', desc: 'Multi-vendor e-commerce & retail', href: '/pricing' },
-                { title: 'Gold Saver', desc: 'Live gold portfolio management', href: '/pricing' },
-            ]
-        },
-        {
-            id: 'marketplace',
-            label: __('general.marketplace') || 'Marketplace',
-            href: '/marketplace/services',
-            items: []
-        },
         {
             id: 'pricing',
             label: __('general.pricing') || 'Pricing',
@@ -187,8 +152,16 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </span>
                         </Link>
 
-                        {/* Desktop Navigation (Mega Menu triggers) */}
+                        {/* Desktop Navigation */}
                         <nav className="hidden lg:flex items-center gap-1">
+                            <Link
+                                href="/marketplace/services"
+                                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-all"
+                            >
+                                <Briefcase className="w-4 h-4 text-emerald-600" />
+                                {__('general.services') || 'Services'}
+                            </Link>
+
                             {navItems.map((item) => (
                                 <div key={item.id} className="relative">
                                     <Link
@@ -277,6 +250,17 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     </div>
 
                     <div className="flex-1 px-6 py-8 space-y-8">
+                        <div className="space-y-4">
+                            <Link
+                                href="/marketplace/services"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center gap-2.5 text-emerald-600 hover:text-emerald-700 font-semibold"
+                            >
+                                <Briefcase className="w-5 h-5 text-emerald-600" />
+                                <span className="text-sm font-bold uppercase tracking-wider text-emerald-600">{__('general.services') || 'Services'}</span>
+                            </Link>
+                        </div>
+
                         {navItems.map((item) => (
                             <div key={item.id} className="space-y-4">
                                 <Link href={item.href} onClick={() => setMobileMenuOpen(false)}>
@@ -320,7 +304,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             {/* Structured Enterprise Footer */}
             <footer className="border-t border-slate-200 bg-slate-50 pt-20 pb-12 text-slate-600">
                 <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-7 gap-8 lg:gap-12 mb-16">
+                    <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-8 lg:gap-12 mb-16">
                         {/* Brand Column */}
                         <div className="col-span-2 lg:col-span-2 space-y-6">
                             <Link href="/" className="flex items-center gap-2 group">
@@ -375,26 +359,16 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </div>
                         </div>
 
-                        {/* SaaS Tools */}
+                        {/* Services */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.saas_tools')}</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.services') || 'Services'}</h3>
                             <ul className="space-y-4">
-                                <li><Link href="/platforms/erp" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_erp')}</Link></li>
-                                <li><Link href="/platforms/crm" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_crm')}</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.smart_booking')}</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.affiliate_pos')}</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.gold_saver')}</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* Platforms */}
-                        <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.platforms')}</h3>
-                            <ul className="space-y-4">
-                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_crm')}</Link></li>
-                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_erp')}</Link></li>
-                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_cloud')}</Link></li>
-                                <li><Link href="/marketplace/services" className="text-sm hover:text-slate-900 transition-colors">{__('general.marketplace') || 'Marketplace'}</Link></li>
+                                <li>
+                                    <Link href="/marketplace/services" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1.5">
+                                        <Briefcase className="w-4 h-4 text-emerald-600" />
+                                        {__('general.services') || 'Services'}
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
 
