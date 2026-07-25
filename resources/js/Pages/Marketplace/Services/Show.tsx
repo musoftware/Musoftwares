@@ -49,6 +49,63 @@ export default function Show({ service }: any) {
 
     const isOwner = auth?.user && (auth.user.id === service.seller_id || auth.user.role === 'admin');
 
+    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+
+    const mediaItems = (() => {
+        const items: Array<{ type: 'image' | 'video'; url: string; thumbnail: string }> = [];
+
+        if (service.video_url) {
+            const videoUrl = service.video_url.trim();
+            const shortsMatch = videoUrl.match(/(?:youtube\.com|youtu\.be)\/shorts\/([a-zA-Z0-9_-]+)/);
+            const youtubeMatch = videoUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+            const vimeoMatch = videoUrl.match(/vimeo\.com\/(?:video\/)?([0-9]+)/);
+
+            if (shortsMatch && shortsMatch[1]) {
+                const id = shortsMatch[1];
+                items.push({
+                    type: 'video',
+                    url: `https://www.youtube.com/embed/${id}`,
+                    thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+                });
+            } else if (youtubeMatch && youtubeMatch[1]) {
+                const id = youtubeMatch[1];
+                items.push({
+                    type: 'video',
+                    url: `https://www.youtube.com/embed/${id}`,
+                    thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+                });
+            } else if (vimeoMatch && vimeoMatch[1]) {
+                const id = vimeoMatch[1];
+                items.push({
+                    type: 'video',
+                    url: `https://player.vimeo.com/video/${id}`,
+                    thumbnail: `https://vumbnail.com/${id}.jpg`,
+                });
+            }
+        }
+
+        if (service.gallery && Array.isArray(service.gallery) && service.gallery.length > 0) {
+            service.gallery.forEach((path: string) => {
+                if (path) {
+                    let imgUrl = path;
+                    if (!path.startsWith('http') && !path.startsWith('/')) {
+                        const clean = path.replace(/^storage\//, '').replace(/^uploads\//, '');
+                        imgUrl = `/uploads/${clean}`;
+                    }
+                    items.push({ type: 'image', url: imgUrl, thumbnail: imgUrl });
+                }
+            });
+        }
+
+        if (items.length === 0 && service.cover_image) {
+            items.push({ type: 'image', url: service.cover_image, thumbnail: service.cover_image });
+        }
+
+        return items;
+    })();
+
+    const activeMedia = mediaItems[activeMediaIndex] || mediaItems[0];
+
     return (
         <MarketplaceLayout>
             <Head title={service.title} />
@@ -150,21 +207,58 @@ export default function Show({ service }: any) {
                             </button>
                         </div>
 
-                        {/* Image Gallery */}
-                        <div className="mb-8 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                            <div className="flex aspect-video w-full items-center justify-center bg-gray-100 text-gray-400">
-                                {service.cover_image ? (
+                        {/* Interactive Media Gallery (Video & Images) */}
+                        <div className="mb-8 space-y-3">
+                            <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-200 bg-slate-900 shadow-sm flex items-center justify-center">
+                                {activeMedia?.type === 'video' ? (
+                                    <iframe
+                                        src={activeMedia.url}
+                                        title={service.title}
+                                        className="h-full w-full border-0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        allowFullScreen
+                                    />
+                                ) : activeMedia?.type === 'image' ? (
                                     <img
-                                        src={service.cover_image}
+                                        src={activeMedia.url}
                                         alt={service.title}
                                         className="h-full w-full object-cover"
                                     />
                                 ) : (
-                                    <span className="text-lg">
-                                        [Main Image]
-                                    </span>
+                                    <div className="text-gray-400 text-sm">
+                                        [No Media Preview]
+                                    </div>
                                 )}
                             </div>
+
+                            {/* Media Thumbnails Slider */}
+                            {mediaItems.length > 1 && (
+                                <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin">
+                                    {mediaItems.map((item, idx) => (
+                                        <button
+                                            key={idx}
+                                            type="button"
+                                            onClick={() => setActiveMediaIndex(idx)}
+                                            className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all ${
+                                                activeMediaIndex === idx
+                                                    ? 'border-indigo-600 ring-2 ring-indigo-200 scale-105'
+                                                    : 'border-gray-200 opacity-70 hover:opacity-100'
+                                            }`}
+                                        >
+                                            <img src={item.thumbnail} alt={`Media ${idx}`} className="h-full w-full object-cover" />
+                                            {item.type === 'video' && (
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                    <div className="w-6 h-6 rounded-full bg-white/90 text-indigo-600 flex items-center justify-center shadow">
+                                                        <svg className="w-3.5 h-3.5 fill-current ms-0.5" viewBox="0 0 24 24">
+                                                            <path d="M8 5v14l11-7z" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Tabs */}
