@@ -113,7 +113,7 @@ export default function Pending({ auth, services, filters }: any) {
                                     <div className="relative shrink-0 bg-slate-100 md:w-64 border-b md:border-b-0 md:border-e border-slate-200">
                                         {service.gallery && service.gallery.length > 0 ? (
                                             <img
-                                                src={`/storage/${service.gallery[0]}`}
+                                                src={service.gallery[0].startsWith('http') ? service.gallery[0] : (service.gallery[0].startsWith('/') ? service.gallery[0] : (service.gallery[0].startsWith('services/') ? `/uploads/${service.gallery[0]}` : `/${service.gallery[0]}`))}
                                                 alt={service.title}
                                                 className="h-48 w-full object-cover md:h-full"
                                             />

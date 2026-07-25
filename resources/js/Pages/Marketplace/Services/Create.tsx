@@ -53,8 +53,15 @@ export default function CreateService({ categories, seller }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (step < STEPS.length) {
+            if (canNext()) {
+                setStep(s => s + 1);
+            }
+            return;
+        }
         post(route('marketplace.services.store'));
     };
+
 
     const lowestPrice = data.packages.reduce((min, p) => p.price && Number(p.price) < min ? Number(p.price) : min, Infinity);
     const displayPrice = lowestPrice === Infinity ? 0 : lowestPrice;

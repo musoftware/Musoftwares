@@ -28,6 +28,7 @@ return [
         'tool' => 1000,
         'affiliate-pos' => 4000,
         'investor' => 5000,
+        'whatsapp-sender' => 3000,
     ],
 
     /*

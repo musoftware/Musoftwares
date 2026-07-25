@@ -14,7 +14,9 @@ class WhatsappLog extends Model
     protected $fillable = [
         'user_id',
         'whatsapp_account_id',
+        'whatsapp_business_id',
         'recipient_phone',
+        'cost_charged',
         'message_type',
         'message_body',
         'status',
@@ -25,6 +27,7 @@ class WhatsappLog extends Model
 
     protected $casts = [
         'payload' => 'array',
+        'cost_charged' => 'decimal:4',
     ];
 
     public function user(): BelongsTo
@@ -35,5 +38,10 @@ class WhatsappLog extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(WhatsappAccount::class, 'whatsapp_account_id');
+    }
+
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(WhatsappBusiness::class, 'whatsapp_business_id');
     }
 }

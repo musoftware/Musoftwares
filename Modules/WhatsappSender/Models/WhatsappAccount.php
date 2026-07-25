@@ -14,6 +14,7 @@ class WhatsappAccount extends Model
 
     protected $fillable = [
         'user_id',
+        'whatsapp_business_id',
         'name',
         'phone_number_id',
         'waba_id',
@@ -30,6 +31,11 @@ class WhatsappAccount extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(WhatsappBusiness::class, 'whatsapp_business_id');
     }
 
     public function logs(): HasMany

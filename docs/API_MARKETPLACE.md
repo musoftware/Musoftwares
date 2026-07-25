@@ -33,7 +33,7 @@ Base Endpoint: `/marketplace/api`
         "rating_avg": 4.95,
         "total_reviews": 48
       },
-      "cover_image": "/storage/services/covers/saas-architecture.jpg",
+      "cover_image": "/services/covers/saas-architecture.jpg",
       "starting_price": 499.00,
       "amount_currency": "USD",
       "is_featured": true,
@@ -62,8 +62,8 @@ Retrieves complete service detail including all active tier packages (Basic, Sta
     "slug": "full-stack-saas-development-laravel-react",
     "description": "I will construct a highly scalable modular monolith...",
     "images": [
-      "/storage/services/gallery/screen1.jpg",
-      "/storage/services/gallery/screen2.jpg"
+      "/services/gallery/screen1.jpg",
+      "/services/gallery/screen2.jpg"
     ],
     "packages": [
       {

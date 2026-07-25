@@ -90,7 +90,7 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                                     className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-950 px-3 text-xs font-semibold text-white shadow hover:bg-slate-800 transition-colors"
                                 >
                                     <LayoutDashboard className="h-3.5 w-3.5" />
-                                    <span>{__('general.board_go_to_panel') || 'Go to Control Panel'}</span>
+                                    <span>{__('general.board_go_to_panel') || 'Go to Dashboard'}</span>
                                 </Link>
                             ) : (
                                 <Link

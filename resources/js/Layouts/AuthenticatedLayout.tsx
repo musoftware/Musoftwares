@@ -302,6 +302,9 @@ function AuthenticatedContent({
                                                                             <Link href={safeRoute('fbmb.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-teal-50/50 text-slate-600 font-medium">
                                                                                 <Activity className="w-4 h-4 text-teal-500" /> {__('general.isaas_fb_lookup')}
                                                                             </Link>
+                                                                            <Link href={safeRoute('whatsapp.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50/50 text-slate-600 font-medium">
+                                                                                <MessageSquare className="w-4 h-4 text-emerald-500" /> WhatsApp Sender API
+                                                                            </Link>
                                                                             <Link href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-rose-50/50 text-slate-600 font-medium">
                                                                                 <MessageSquare className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway')}
                                                                             </Link>
@@ -689,6 +692,28 @@ function AuthenticatedContent({
                                                         {isRouteActive('fbmb.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">{__('general.active')}</span>}
                                                     </div>
                                                     <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>{__('general.search_mobile_by_fbid')}</p>
+                                                </div>
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isRouteActive('whatsapp.index') ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={safeRoute('whatsapp.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isRouteActive('whatsapp.index') ? "bg-emerald-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-emerald-50"
+                                                )}>
+                                                    <MessageSquare className={cn("w-4 h-4", isRouteActive('whatsapp.index') ? "text-emerald-700" : "text-slate-500 group-hover/dropdown-menu-item:text-emerald-600")} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isRouteActive('whatsapp.index') ? "text-emerald-900" : "text-slate-900")}>WhatsApp Sender API</p>
+                                                        {isRouteActive('whatsapp.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">{__('general.active')}</span>}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isRouteActive('whatsapp.index') ? "text-emerald-700/70" : "text-slate-500")}>Meta Cloud API & FB Login</p>
                                                 </div>
                                             </DropdownMenuItem>
 

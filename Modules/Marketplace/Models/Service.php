@@ -90,7 +90,21 @@ class Service extends Model
     public function getCoverImageAttribute()
     {
         if (!empty($this->gallery) && is_array($this->gallery) && isset($this->gallery[0])) {
-            return asset('storage/' . $this->gallery[0]);
+            $path = $this->gallery[0];
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+            $cleanPath = ltrim($path, '/');
+            if (str_starts_with($cleanPath, 'storage/')) {
+                $cleanPath = substr($cleanPath, 8);
+            }
+            if (str_starts_with($cleanPath, 'services/')) {
+                $cleanPath = 'uploads/' . $cleanPath;
+            }
+            if (!str_starts_with($cleanPath, 'uploads/')) {
+                $cleanPath = 'uploads/' . $cleanPath;
+            }
+            return asset($cleanPath);
         }
         return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80';
     }

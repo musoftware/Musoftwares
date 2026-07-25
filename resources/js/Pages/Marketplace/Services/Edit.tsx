@@ -69,8 +69,15 @@ export default function EditService({ categories, service }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (step < STEPS.length) {
+            if (canNext()) {
+                setStep(s => s + 1);
+            }
+            return;
+        }
         post(route('marketplace.services.update', service.id));
     };
+
 
     const lowestPrice = data.packages.reduce((min, p) => p.price && Number(p.price) < min ? Number(p.price) : min, Infinity);
     const displayPrice = lowestPrice === Infinity ? 0 : lowestPrice;
@@ -170,7 +177,7 @@ export default function EditService({ categories, service }: Props) {
                                     {data.gallery.length > 0 ? (
                                         <img src={URL.createObjectURL(data.gallery[0])} alt="Thumbnail" className="w-full h-full object-cover" />
                                     ) : data.kept_gallery.length > 0 ? (
-                                        <img src={'/storage/' + data.kept_gallery[0]} alt="Thumbnail" className="w-full h-full object-cover" />
+                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('services/') ? `/uploads/${data.kept_gallery[0]}` : `/${data.kept_gallery[0]}`))} alt="Thumbnail" className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="text-slate-400 flex flex-col items-center">
                                             <span className="text-4xl mb-2">📸</span>

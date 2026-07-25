@@ -87,9 +87,11 @@ function getBasePrice(packages: any[]) {
 
 function ServiceThumb({ gallery, title }: { gallery: string[] | null; title: string }) {
     if (gallery && gallery.length > 0) {
+        const first = gallery[0];
+        const src = first.startsWith('http') ? first : (first.startsWith('/') ? first : (first.startsWith('services/') ? `/uploads/${first}` : `/${first}`));
         return (
             <img
-                src={`/storage/${gallery[0]}`}
+                src={src}
                 alt={title}
                 className="h-10 w-14 rounded object-cover border border-slate-100 bg-slate-50 shrink-0"
             />

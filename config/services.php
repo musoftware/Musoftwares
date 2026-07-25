@@ -62,6 +62,12 @@ return [
         'redirect' => env('GOOGLE_CALENDAR_REDIRECT_URI', '/admin/google-calendar/callback'),
     ],
 
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT_URI', '/whatsapp-sender/auth/facebook/callback'),
+    ],
+
     /*
      * Shared HMAC secret for the public serial-device license check-in API.
      * Each client software instance ships with this secret baked in (per-

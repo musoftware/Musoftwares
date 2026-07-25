@@ -7820,4 +7820,7 @@ return array (
   'seller_workspace' => 'مساحة عمل البائع',
   'what_should_i_do_now' => 'ما الإجراء المطلوب مني الآن؟',
   'what_work_should_i_do_now' => 'ما الشغل المطلوب مني تنفيذه الآن؟',
+  'service_deleted_successfully' => 'تم حذف الخدمة بنجاح.',
+  'are_you_sure_you_want_to_delete_this_service' => 'هل أنت تأكد من رغبتك في حذف هذه الخدمة؟',
 );
+

@@ -1,5 +1,5 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
@@ -9,6 +9,12 @@ import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
 import { __ } from '@/lib/i18n';
 
 export default function SellerProducts({ products }: any) {
+    const handleDelete = (id: number, title: string) => {
+        if (confirm(__('general.are_you_sure_you_want_to_delete_this_service') || `Are you sure you want to delete "${title}"?`)) {
+            router.delete(route('marketplace.services.destroy', id));
+        }
+    };
+
     return (
         <MarketplaceLayout>
             <Head title={__('general.my_products')} />
@@ -57,9 +63,17 @@ export default function SellerProducts({ products }: any) {
                                      >
                                          {__('general.preview')}
                                      </Link>
+                                     <button
+                                         type="button"
+                                         onClick={() => handleDelete(product.id, product.title)}
+                                         className="text-rose-600 hover:text-rose-800 text-xs font-medium"
+                                     >
+                                         {__('general.delete') || 'Delete'}
+                                     </button>
                                  </div>
                              </div>
                         ))}
+
                         {products.data.length === 0 && (
                             <div className="p-8 text-center text-slate-500">
                                 {__('general.no_services_found_1')}

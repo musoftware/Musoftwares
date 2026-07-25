@@ -4,6 +4,7 @@ namespace Modules\WhatsappSender\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Modules\WhatsappSender\Models\WhatsappAccount;
 use Modules\WhatsappSender\Models\WhatsappLog;
 use Tests\TestCase;
@@ -68,5 +69,71 @@ class WhatsappSenderTest extends TestCase
         $this->assertDatabaseMissing('whatsapp_accounts', [
             'id' => $account->id,
         ]);
+    }
+
+    public function test_api_requires_sanctum_authentication()
+    {
+        $response = $this->postJson('/api/v1/whatsapp/send', [
+            'recipient_phone' => '201001234567',
+            'message_body' => 'Hello',
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_api_send_validates_e164_recipient_phone()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/whatsapp/send', [
+            'recipient_phone' => 'invalid-phone-abc',
+            'message_body' => 'Hello World',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'status' => 'error',
+            ]);
+    }
+
+    public function test_api_send_fails_gracefully_when_no_active_account()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/whatsapp/send', [
+            'recipient_phone' => '201001234567',
+            'message_body' => 'Test message',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'status' => 'error',
+            ]);
+    }
+
+    public function test_api_accounts_returns_connected_user_accounts()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        WhatsappAccount::create([
+            'user_id' => $user->id,
+            'name' => 'API Account 1',
+            'phone_number_id' => '111222333',
+            'access_token' => 'token123',
+            'status' => 'active',
+        ]);
+
+        $response = $this->getJson('/api/v1/whatsapp/accounts');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'count' => 1,
+            ]);
     }
 }

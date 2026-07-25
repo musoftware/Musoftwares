@@ -37,8 +37,11 @@ Route::middleware('web')
             Route::get('/dashboard',[DashboardController::class, 'index'])->name('dashboard.alias');
 
             // Services CRUD
-            Route::get('/services/create',  [ServiceController::class, 'create'])->name('services.create');
-            Route::post('/services',        [ServiceController::class, 'store'])->name('services.store');
+            Route::get('/services/create',        [ServiceController::class, 'create'])->name('services.create');
+            Route::post('/services',              [ServiceController::class, 'store'])->name('services.store');
+            Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
+            Route::put('/services/{service}',     [ServiceController::class, 'update'])->name('services.update');
+            Route::delete('/services/{service}',  [ServiceController::class, 'destroy'])->name('services.destroy');
 
             // Orders Lifecycle
             Route::get('/orders',           [ServiceOrderController::class, 'index'])->name('orders.index');

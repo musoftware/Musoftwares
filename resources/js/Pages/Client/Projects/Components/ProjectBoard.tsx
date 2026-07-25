@@ -354,6 +354,7 @@ export default function ProjectBoard({
                 window.history.replaceState({ path: newUrl }, '', newUrl);
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cards]);
 
     // Fall back to the four canonical system categories if the parent didn't pass any.

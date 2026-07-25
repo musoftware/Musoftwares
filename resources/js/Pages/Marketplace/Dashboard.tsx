@@ -1,5 +1,5 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     AlertCircle,
     CheckCircle2,
@@ -20,7 +20,9 @@ import {
     FileText,
     Check,
     ChevronRight,
-    Briefcase
+    Briefcase,
+    Edit,
+    Trash2
 } from 'lucide-react';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
@@ -96,6 +98,13 @@ export default function MarketplaceDashboard({
     const { auth } = usePage().props as any;
     const { mode, setMode } = useMarketplaceMode();
     const isBuyer = mode === 'client';
+
+    const handleDeleteGig = (id: number, title: string) => {
+        if (confirm(__('general.are_you_sure_you_want_to_delete_this_service') || `Are you sure you want to delete "${title}"?`)) {
+            router.delete(route('marketplace.services.destroy', id));
+        }
+    };
+
 
     return (
         <MarketplaceLayout>
@@ -509,8 +518,29 @@ export default function MarketplaceDashboard({
                                 ) : (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                         {listedGigs.map((gig) => (
-                                            <div key={gig.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-200 transition space-y-3">
-                                                <h4 className="font-bold text-slate-900 text-sm line-clamp-2">{gig.title}</h4>
+                                            <div key={gig.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-200 transition space-y-3 flex flex-col justify-between">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <h4 className="font-bold text-slate-900 text-sm line-clamp-2">{gig.title}</h4>
+                                                        <div className="flex items-center gap-1 shrink-0">
+                                                            <Link
+                                                                href={route('marketplace.services.edit', gig.id)}
+                                                                className="p-1 text-slate-400 hover:text-indigo-600 rounded hover:bg-slate-100 transition-colors"
+                                                                title={__('general.edit') || 'Edit'}
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </Link>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleDeleteGig(gig.id, gig.title)}
+                                                                className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-100 transition-colors"
+                                                                title={__('general.delete') || 'Delete'}
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-200/60">
                                                     <span className="font-bold text-slate-900">From {formatMoney(gig.price, auth?.user?.currency)}</span>
                                                     <div className="flex items-center gap-1 text-amber-600 font-bold">

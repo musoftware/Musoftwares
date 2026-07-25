@@ -11,6 +11,7 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
     const addTag = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
+            e.stopPropagation();
             const val = tagInput.trim().toLowerCase();
             if (val && data.tags.length < 5 && !data.tags.includes(val)) {
                 setData('tags', [...data.tags, val]);
@@ -18,6 +19,7 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
             setTagInput('');
         }
     };
+
 
     const removeTag = (tag: string) => {
         setData('tags', data.tags.filter((t: string) => t !== tag));

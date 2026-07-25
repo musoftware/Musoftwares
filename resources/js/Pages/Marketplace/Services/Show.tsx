@@ -47,33 +47,60 @@ export default function Show({ service }: any) {
         (p: any) => p.id === selectedPackageId,
     );
 
+    const isOwner = auth?.user && (auth.user.id === service.seller_id || auth.user.role === 'admin');
+
     return (
         <MarketplaceLayout>
             <Head title={service.title} />
 
             {/* Breadcrumb */}
             <div className="border-b border-gray-200 bg-white">
-                <div className="mx-auto max-w-7xl px-4 py-3 text-sm text-gray-500 sm:px-6 lg:px-8">
-                    <Link
-                        href={route('marketplace.services.index')}
-                        className="transition-colors hover:text-indigo-600"
-                    >
-                        {__('general.marketplace')}</Link>
-                    <span className="mx-2">/</span>
-                    <Link
-                        href={route('marketplace.services.index', {
-                            category_id: service.category_id,
-                        })}
-                        className="transition-colors hover:text-indigo-600"
-                    >
-                        {service.category?.name || 'Category'}
-                    </Link>
-                    <span className="mx-2">/</span>
-                    <span className="font-medium text-gray-900">
-                        {service.title}
-                    </span>
+                <div className="mx-auto max-w-7xl px-4 py-3 text-sm text-gray-500 sm:px-6 lg:px-8 flex items-center justify-between">
+                    <div>
+                        <Link
+                            href={route('marketplace.services.index')}
+                            className="transition-colors hover:text-indigo-600"
+                        >
+                            {__('general.marketplace')}</Link>
+                        <span className="mx-2">/</span>
+                        <Link
+                            href={route('marketplace.services.index', {
+                                category_id: service.category_id,
+                            })}
+                            className="transition-colors hover:text-indigo-600"
+                        >
+                            {service.category?.name || 'Category'}
+                        </Link>
+                        <span className="mx-2">/</span>
+                        <span className="font-medium text-gray-900">
+                            {service.title}
+                        </span>
+                    </div>
+
+                    {isOwner && (
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href={route('marketplace.services.edit', service.id)}
+                                className="px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold transition-colors"
+                            >
+                                {__('general.edit')}
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (confirm(__('general.are_you_sure_you_want_to_delete_this_service') || 'Are you sure you want to delete this service?')) {
+                                        router.delete(route('marketplace.services.destroy', service.id));
+                                    }
+                                }}
+                                className="px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition-colors"
+                            >
+                                {__('general.delete') || 'Delete'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
+
 
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="mx-auto flex max-w-7xl flex-col gap-8 sm:px-6 lg:flex-row lg:px-8">
