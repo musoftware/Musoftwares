@@ -13,7 +13,12 @@ class Currency extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['currency', 'symbol', 'string_format'];
+    protected $fillable = ['currency', 'symbol', 'string_format', 'country_codes', 'is_default'];
+
+    protected $casts = [
+        'country_codes' => 'array',
+        'is_default' => 'boolean',
+    ];
 
     public static function as_array()
     {
@@ -23,6 +28,32 @@ class Currency extends Model
         }
 
         return $as_array;
+    }
+
+    public static function getDefault(): ?Currency
+    {
+        return static::where('is_default', true)->first()
+            ?? static::where('currency', 'USD')->first()
+            ?? static::first();
+    }
+
+    public static function getForCountryCode(?string $countryCode): ?Currency
+    {
+        if (!$countryCode) {
+            return static::getDefault();
+        }
+
+        $code = strtoupper(trim($countryCode));
+
+        $currencies = static::all();
+        foreach ($currencies as $currency) {
+            $codes = $currency->country_codes ?? [];
+            if (is_array($codes) && in_array($code, array_map('strtoupper', $codes))) {
+                return $currency;
+            }
+        }
+
+        return static::getDefault();
     }
 
     public function exchangesFrom(): HasMany

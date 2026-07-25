@@ -125,30 +125,10 @@ class SocialLoginController extends Controller
                     'email_verified_at' => now(), // Assume Google emails are verified
                 ]);
 
-                // Auto-assign currency based on GeoIP
-                $detectedCountry = null;
-                $geoDbPath = storage_path('app/geoip.mmdb');
-                if (file_exists($geoDbPath)) {
-                    try {
-                        $reader = new Reader($geoDbPath);
-                        $ip = $request->ip();
-                        if ($ip !== '127.0.0.1' && $ip !== '::1') {
-                            $record = $reader->city($ip);
-                            if ($record && $record->country->name) {
-                                $detectedCountry = $record->country->name;
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        // Ignore if IP not found in DB or DB missing
-                    }
-                }
-
-                $mappedCurrencyCode = config('geo_currency.mapping.'.$detectedCountry, 'USD');
-                $currency = Currency::where('currency', $mappedCurrencyCode)->first();
-
-                if (! $currency) {
-                    $currency = Currency::where('currency', 'USD')->first(); // fallback to default
-                }
+                // Auto-assign currency based on GeoIP & DB country mappings
+                /** @var \App\Services\IpGeolocationService $geoService */
+                $geoService = app(\App\Services\IpGeolocationService::class);
+                $currency = $geoService->getCurrencyForIp($request->ip());
 
                 if ($currency) {
                     $user->currency_id = $currency->id;

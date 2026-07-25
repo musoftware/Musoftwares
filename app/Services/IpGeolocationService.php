@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Currency;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Stevebauman\Location\Facades\Location;
@@ -238,6 +239,17 @@ class IpGeolocationService extends BaseService
     }
 
     /**
+     * Get currency model for country
+     *
+     * @param  string|null  $countryCode
+     * @return Currency|null
+     */
+    public function getCurrencyForCountry($countryCode)
+    {
+        return Currency::getForCountryCode($countryCode);
+    }
+
+    /**
      * Get currency code for country
      *
      * @param  string|null  $countryCode
@@ -245,11 +257,17 @@ class IpGeolocationService extends BaseService
      */
     public function getCurrencyCodeForCountry($countryCode)
     {
-        if (! $countryCode) {
-            return null;
+        $currency = $this->getCurrencyForCountry($countryCode);
+        if ($currency) {
+            return $currency->currency;
         }
 
-        return self::COUNTRY_TO_CURRENCY_MAP[strtoupper($countryCode)] ?? null;
+        if (! $countryCode) {
+            $default = Currency::getDefault();
+            return $default ? $default->currency : 'USD';
+        }
+
+        return self::COUNTRY_TO_CURRENCY_MAP[strtoupper($countryCode)] ?? (Currency::getDefault()?->currency ?? 'USD');
     }
 
     /**
@@ -263,5 +281,18 @@ class IpGeolocationService extends BaseService
         $countryCode = $this->getCountryFromIp($ip);
 
         return $this->getCurrencyCodeForCountry($countryCode);
+    }
+
+    /**
+     * Get currency model for IP
+     *
+     * @param  string  $ip
+     * @return Currency
+     */
+    public function getCurrencyForIp($ip)
+    {
+        $countryCode = $this->getCountryFromIp($ip);
+
+        return Currency::getForCountryCode($countryCode);
     }
 }

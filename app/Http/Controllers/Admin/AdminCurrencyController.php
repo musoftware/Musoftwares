@@ -40,7 +40,11 @@ class AdminCurrencyController extends Controller
 
     public function store(StoreCurrencyRequest $request): RedirectResponse
     {
-        Currency::create($request->validated());
+        $data = $request->validated();
+        if (! empty($data['is_default'])) {
+            Currency::query()->update(['is_default' => false]);
+        }
+        Currency::create($data);
 
         return redirect()->route('admin.currencies.index')
             ->with('success', __('admin.currency_created'));
@@ -55,7 +59,11 @@ class AdminCurrencyController extends Controller
 
     public function update(UpdateCurrencyRequest $request, Currency $currency): RedirectResponse
     {
-        $currency->update($request->validated());
+        $data = $request->validated();
+        if (! empty($data['is_default'])) {
+            Currency::where('id', '!=', $currency->id)->update(['is_default' => false]);
+        }
+        $currency->update($data);
 
         return redirect()->route('admin.currencies.index')
             ->with('success', __('admin.currency_updated'));

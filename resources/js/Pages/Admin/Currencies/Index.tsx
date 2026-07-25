@@ -26,6 +26,8 @@ interface Currency {
     currency: string;
     symbol: string;
     string_format: string;
+    country_codes?: string[];
+    is_default?: boolean;
     exchanges_from_count?: number;
     exchanges_to_count?: number;
 }
@@ -99,8 +101,9 @@ export default function Index({ currencies, search }: Props) {
                                 <tr>
                                     <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.currency_code')}</th>
                                     <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.symbol')}</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.countries')}</th>
                                     <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.string_format')}</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.exchange_rates')}</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.default')}</th>
                                     <th className="px-4 py-3 font-semibold text-slate-500 text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
@@ -111,10 +114,27 @@ export default function Index({ currencies, search }: Props) {
                                             <td className="px-4 py-3 font-medium text-slate-900">{c.currency}</td>
                                             <td className="px-4 py-3 text-slate-600">{c.symbol}</td>
                                             <td className="px-4 py-3 text-slate-600">
+                                                {c.country_codes && c.country_codes.length > 0 ? (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {c.country_codes.map((code) => (
+                                                            <span key={code} className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
+                                                                {code}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-slate-400">-</span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 text-slate-600">
                                                 <code className="rounded bg-slate-100 px-2 py-1 text-xs">{c.string_format}</code>
                                             </td>
                                             <td className="px-4 py-3 text-slate-600">
-                                                {(c.exchanges_from_count ?? 0) + (c.exchanges_to_count ?? 0)}
+                                                {c.is_default ? (
+                                                    <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-200">
+                                                        {__('general.default') || 'Default'}
+                                                    </span>
+                                                ) : null}
                                             </td>
                                             <td className="px-4 py-3 text-end">
                                                 <Dialog>

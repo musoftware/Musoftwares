@@ -23,6 +23,9 @@ class StoreCurrencyRequest extends FormRequest
             ],
             'symbol' => ['required', 'string', 'max:10'],
             'string_format' => ['required', 'string', 'max:20'],
+            'country_codes' => ['nullable', 'array'],
+            'country_codes.*' => ['string', 'max:5'],
+            'is_default' => ['nullable', 'boolean'],
         ];
     }
 }

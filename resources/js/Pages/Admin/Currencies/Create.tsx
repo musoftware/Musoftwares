@@ -12,7 +12,20 @@ export default function Create() {
         currency: '',
         symbol: '',
         string_format: '',
+        country_codes: [] as string[],
+        is_default: false,
     });
+
+    const [countryCodesString, setCountryCodesString] = React.useState('');
+
+    const handleCountryCodesChange = (val: string) => {
+        setCountryCodesString(val);
+        const parsed = val
+            .split(',')
+            .map((c) => c.trim().toUpperCase())
+            .filter((c) => c.length > 0);
+        setData('country_codes', parsed);
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -79,6 +92,32 @@ export default function Create() {
                                     <p className="text-xs text-red-500">{errors.string_format}</p>
                                 )}
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="country_codes">{__('admin.countries')} (أكواد الدول يفصل بينها فاصلة)</Label>
+                            <Input
+                                id="country_codes"
+                                value={countryCodesString}
+                                onChange={(e) => handleCountryCodesChange(e.target.value)}
+                                placeholder="US, CA, SA, EG"
+                            />
+                            <p className="text-xs text-slate-500">
+                                أدخل أكواد الدول بصيغة ISO ذات حرفين (مثل: US, SA, EG, AE).
+                            </p>
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-2">
+                            <input
+                                type="checkbox"
+                                id="is_default"
+                                checked={data.is_default}
+                                onChange={(e) => setData('is_default', e.target.checked)}
+                                className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                            />
+                            <Label htmlFor="is_default" className="font-medium cursor-pointer">
+                                {__('admin.set_as_default_currency') || 'تعيين كعملة افتراضية للنظام (عند عدم وجود دولة الزائر)'}
+                            </Label>
                         </div>
 
                         <p className="text-xs text-slate-500">

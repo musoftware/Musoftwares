@@ -160,11 +160,65 @@ class HandleInertiaRequests extends Middleware
                     return class_exists(AdminSettings::class) ? AdminSettings::GetValue('business_email', 'admin@musoftwares.com') : 'admin@musoftwares.com';
                 },
             ],
+            'active_currency' => function () use ($request, $user) {
+                if ($user && $user->currency_id) {
+                    $c = Currency::find($user->currency_id);
+                    if ($c) {
+                        return [
+                            'id' => $c->id,
+                            'currency' => $c->currency,
+                            'symbol' => $c->symbol,
+                            'string_format' => $c->string_format,
+                            'is_default' => (bool) $c->is_default,
+                        ];
+                    }
+                }
+
+                $guestCurrencyId = session('guest_currency_id');
+                if ($guestCurrencyId) {
+                    $c = Currency::find($guestCurrencyId);
+                    if ($c) {
+                        return [
+                            'id' => $c->id,
+                            'currency' => $c->currency,
+                            'symbol' => $c->symbol,
+                            'string_format' => $c->string_format,
+                            'is_default' => (bool) $c->is_default,
+                        ];
+                    }
+                }
+
+                // Resolve via IpGeolocationService and cache in session for guest
+                /** @var \App\Services\IpGeolocationService $geoService */
+                $geoService = app(\App\Services\IpGeolocationService::class);
+                $c = $geoService->getCurrencyForIp($request->ip()) ?? Currency::getDefault();
+
+                if ($c) {
+                    session(['guest_currency_id' => $c->id]);
+                    return [
+                        'id' => $c->id,
+                        'currency' => $c->currency,
+                        'symbol' => $c->symbol,
+                        'string_format' => $c->string_format,
+                        'is_default' => (bool) $c->is_default,
+                    ];
+                }
+
+                return [
+                    'id' => 1,
+                    'currency' => 'USD',
+                    'symbol' => '$',
+                    'string_format' => '$%01.2f',
+                    'is_default' => true,
+                ];
+            },
             'currencies' => fn () => Currency::all()->map(fn ($c) => [
                 'id' => $c->id,
                 'currency' => $c->currency,
                 'symbol' => $c->symbol,
                 'string_format' => $c->string_format,
+                'country_codes' => $c->country_codes ?? [],
+                'is_default' => (bool) $c->is_default,
             ])->toArray(),
             'website_services' => fn () => class_exists(WebsiteService::class) ? WebsiteService::all()->toArray() : [],
             'flash' => [
