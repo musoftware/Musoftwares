@@ -1,8 +1,10 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { SeoHead } from '@/Components/ui/SeoHead';
 import { useState } from 'react';
 import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { HelpCircle, Zap, ClipboardList, CheckCircle2, Tag, ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Show({ service }: any) {
     const { auth, wallet } = usePage().props as any;
@@ -11,6 +13,7 @@ export default function Show({ service }: any) {
     const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>(
         'overview',
     );
+    const [isZoomOpen, setIsZoomOpen] = useState(false);
 
     // Sort packages Basic, Standard, Premium if names match, otherwise just take what's given.
     const packages = service.packages || [];
@@ -108,7 +111,13 @@ export default function Show({ service }: any) {
 
     return (
         <MarketplaceLayout>
-            <Head title={service.title} />
+            <SeoHead
+                title={`${service.title} | Musoftware Marketplace`}
+                description={service.tagline || service.description?.substring(0, 160)}
+                image={service.cover_image}
+                url={route('marketplace.services.show', service.id)}
+                type="product"
+            />
 
             {/* Breadcrumb */}
             <div className="border-b border-gray-200 bg-white">
@@ -209,7 +218,10 @@ export default function Show({ service }: any) {
 
                         {/* Interactive Media Gallery (Video & Images) */}
                         <div className="mb-8 space-y-3">
-                            <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-200 bg-slate-900 shadow-sm flex items-center justify-center">
+                            <div 
+                                className={`relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-200 bg-slate-900 shadow-sm flex items-center justify-center ${activeMedia?.type === 'image' ? 'cursor-zoom-in group' : ''}`}
+                                onClick={() => activeMedia?.type === 'image' && setIsZoomOpen(true)}
+                            >
                                 {activeMedia?.type === 'video' ? (
                                     <iframe
                                         src={activeMedia.url}
@@ -219,11 +231,19 @@ export default function Show({ service }: any) {
                                         allowFullScreen
                                     />
                                 ) : activeMedia?.type === 'image' ? (
-                                    <img
-                                        src={activeMedia.url}
-                                        alt={service.title}
-                                        className="h-full w-full object-cover"
-                                    />
+                                    <>
+                                        <img
+                                            src={activeMedia.url}
+                                            alt={service.title}
+                                            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                            <div className="bg-white/95 backdrop-blur-md text-slate-900 px-4 py-2 rounded-full text-xs font-bold shadow-xl flex items-center gap-2 border border-white/40">
+                                                <ZoomIn className="w-4 h-4 text-indigo-600" />
+                                                <span>Click to Zoom</span>
+                                            </div>
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="text-gray-400 text-sm">
                                         [No Media Preview]
@@ -291,6 +311,87 @@ export default function Show({ service }: any) {
                                         </p>
                                     </div>
                                 </div>
+
+                                {/* Available Extras / Add-ons */}
+                                {service.extras && service.extras.length > 0 && (
+                                    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                            <Zap className="w-5 h-5 text-amber-500" />
+                                            {__('general.service_extras') || 'Available Extras & Upgrades'}
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {service.extras.map((extra: any) => (
+                                                <div key={extra.id} className="flex items-center justify-between p-3.5 rounded-lg border border-slate-100 bg-slate-50 hover:bg-slate-100/80 transition-colors">
+                                                    <div>
+                                                        <h4 className="font-bold text-slate-900 text-sm">{extra.title}</h4>
+                                                        {extra.duration_days > 0 && (
+                                                            <span className="text-xs text-slate-500 font-medium">+ {extra.duration_days} {extra.duration_days === 1 ? 'day' : 'days'} delivery</span>
+                                                        )}
+                                                    </div>
+                                                    <span className="font-bold text-indigo-600 text-sm bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100">
+                                                        + {formatCurrency(extra.price, selectedPackage?.currency || 'USD')}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Frequently Asked Questions (FAQ) */}
+                                {service.faq && service.faq.length > 0 && (
+                                    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                            <HelpCircle className="w-5 h-5 text-indigo-600" />
+                                            {__('general.frequently_asked_questions') || 'Frequently Asked Questions'}
+                                        </h3>
+                                        <div className="divide-y divide-gray-100">
+                                            {service.faq.map((item: any, idx: number) => (
+                                                <div key={idx} className="py-3.5 first:pt-0 last:pb-0">
+                                                    <h4 className="font-semibold text-gray-900 text-sm mb-1 flex items-start gap-2">
+                                                        <span className="text-indigo-600 font-bold shrink-0">Q:</span>
+                                                        <span>{item.question}</span>
+                                                    </h4>
+                                                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap ps-6">
+                                                        {item.answer}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Requirements Needed From Buyer */}
+                                {service.requirements && service.requirements.length > 0 && (
+                                    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                            <ClipboardList className="w-5 h-5 text-indigo-600" />
+                                            {__('general.requirements_from_buyer') || 'Requirements Needed From Buyer'}
+                                        </h3>
+                                        <ul className="space-y-2">
+                                            {service.requirements.map((req: string, idx: number) => (
+                                                <li key={idx} className="flex items-start gap-2.5 text-sm text-gray-700">
+                                                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                                                    <span>{req}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {/* Tags */}
+                                {service.tags && service.tags.length > 0 && (
+                                    <div className="pt-4 border-t border-gray-200">
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{__('general.tags') || 'Tags'}</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {service.tags.map((tag: string, idx: number) => (
+                                                <span key={idx} className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">
+                                                    <Tag className="w-3 h-3 text-slate-400" />
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Seller Card */}
                                 <div>
@@ -511,6 +612,63 @@ export default function Show({ service }: any) {
                     </div>
                 </div>
             </div>
+
+            {/* Fullscreen Lightbox Zoom Modal */}
+            {isZoomOpen && activeMedia?.type === 'image' && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md animate-in fade-in duration-200"
+                    onClick={() => setIsZoomOpen(false)}
+                >
+                    <div
+                        className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-2xl shadow-2xl flex items-center justify-center bg-slate-950/80 p-2"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close Button */}
+                        <button
+                            type="button"
+                            onClick={() => setIsZoomOpen(false)}
+                            className="absolute top-4 end-4 z-20 p-2.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-lg border border-white/10"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        {/* Previous Image Button */}
+                        {mediaItems.length > 1 && (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveMediaIndex((prev) => (prev > 0 ? prev - 1 : mediaItems.length - 1));
+                                }}
+                                className="absolute start-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-lg border border-white/10"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                        )}
+
+                        {/* Next Image Button */}
+                        {mediaItems.length > 1 && (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveMediaIndex((prev) => (prev < mediaItems.length - 1 ? prev + 1 : 0));
+                                }}
+                                className="absolute end-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-lg border border-white/10"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+                        )}
+
+                        {/* Zoomed Image */}
+                        <img
+                            src={activeMedia.url}
+                            alt={service.title}
+                            className="max-h-[85vh] max-w-[85vw] object-contain rounded-xl select-none"
+                        />
+                    </div>
+                </div>
+            )}
         </MarketplaceLayout>
     );
 }

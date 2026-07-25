@@ -2295,6 +2295,8 @@ return array (
   'ecommerce_solutions_musoftware' => 'Ecommerce Solutions Musoftware',
   'ecommerce_tool' => 'Ecommerce أداة',
   'edit' => 'تعديل',
+  'requirements_from_buyer' => 'متطلبات الخدمة من المشتري',
+  'service_extras' => 'تطويرات وإضافات الخدمة',
   'edit_account' => 'تعديل Account',
   'edit_article' => 'تعديل Article',
   'edit_automation' => 'تعديل Automation',

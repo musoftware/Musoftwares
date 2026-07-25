@@ -78,7 +78,7 @@ class ServiceController extends Controller
 
     public function show($id, Request $request)
     {
-        $service = Service::with(['seller', 'category', 'packages.currency', 'reviews.reviewer'])->find($id);
+        $service = Service::with(['seller', 'category', 'packages.currency', 'reviews.reviewer', 'extras'])->find($id);
 
         if (!$service) {
             return Inertia::render('Marketplace/Services/ExclusiveService', [
@@ -127,8 +127,21 @@ class ServiceController extends Controller
             return $package;
         });
 
+        $shareTitle = $service->title . ' | Musoftware Marketplace';
+        $shareDesc = \Illuminate\Support\Str::limit(strip_tags($service->tagline ?: $service->description ?: $service->title), 160);
+        $shareImage = $service->cover_image;
+        $shareUrl = route('marketplace.services.show', $service->id);
+
         return Inertia::render('Marketplace/Services/Show', [
             'service' => $service,
+        ])->withViewData([
+            'meta' => [
+                'title'       => $shareTitle,
+                'description' => $shareDesc,
+                'image'       => $shareImage,
+                'url'         => $shareUrl,
+                'type'        => 'product',
+            ]
         ]);
     }
 
