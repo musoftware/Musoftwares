@@ -86,13 +86,13 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     const navItems: NavItem[] = [
         {
             id: 'services',
-            label: 'Services',
+            label: __('general.services') || 'Services',
             href: '#',
             items: servicesItems
         },
         {
             id: 'saas',
-            label: 'SaaS Tools',
+            label: __('general.saas_tools') || 'SaaS Tools',
             href: '/platforms',
             items: [
                 { title: 'MU ERP', desc: 'Enterprise Resource Planning & Automation', href: '/platforms/erp' },
@@ -103,14 +103,20 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             ]
         },
         {
+            id: 'marketplace',
+            label: __('general.marketplace') || 'Marketplace',
+            href: '/marketplace/services',
+            items: []
+        },
+        {
             id: 'pricing',
-            label: 'Pricing',
+            label: __('general.pricing') || 'Pricing',
             href: '/pricing',
             items: []
         },
         {
             id: 'company',
-            label: 'Company',
+            label: __('general.company') || 'Company',
             href: '/company',
             items: [
                 { title: 'About Us', desc: 'Our enterprise vision', href: '/company/about' },
@@ -388,6 +394,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                 <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_crm')}</Link></li>
                                 <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_erp')}</Link></li>
                                 <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_cloud')}</Link></li>
+                                <li><Link href="/marketplace/services" className="text-sm hover:text-slate-900 transition-colors">{__('general.marketplace') || 'Marketplace'}</Link></li>
                             </ul>
                         </div>
 

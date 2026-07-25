@@ -2,57 +2,55 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use Modules\Marketplace\Models\MarketplaceEscrow;
 use Modules\Marketplace\Models\ServiceOrder;
+use Modules\Marketplace\Services\EscrowService;
+use Modules\Marketplace\Enums\EscrowStatus;
+use Illuminate\Support\Facades\DB;
 
 class MarketplaceOrderService extends BaseService
 {
-    public function resolveDispute(ServiceOrder $order, string $action): void
+    public function __construct(
+        protected EscrowService $escrowService
+    ) {}
+
+    public function resolveDispute(ServiceOrder $order, string $action, ?string $reason = null): void
     {
-        if ($order->status === 'completed' || $order->status === 'cancelled') {
+        if (in_array($order->status, ['completed', 'cancelled'])) {
             throw new \Exception('Order is already closed.');
         }
 
-        $escrow = MarketplaceEscrow::where('order_id', $order->id)->where('status', 'held')->first();
+        $escrow = MarketplaceEscrow::where('order_id', $order->id)
+            ->whereIn('status', [EscrowStatus::HELD->value, EscrowStatus::DISPUTED->value, 'held', 'disputed'])
+            ->first();
 
-        if ($action === 'refund_buyer') {
-            $order->status = 'cancelled';
-            $order->save();
+        DB::transaction(function () use ($order, $escrow, $action, $reason) {
+            $timestamp = now('Africa/Cairo')->toDateTimeString();
+            $actionTitle = $action === 'refund_buyer' ? 'Refunded to Buyer' : 'Released to Seller';
+            $resolutionNote = "[{$timestamp}] Admin Dispute Resolution: {$actionTitle}";
 
-            if ($escrow) {
-                $buyer = User::find($order->buyer_id);
-                if ($buyer) {
-                    if (! $escrow->currency_id) {
-                        throw new \Exception(__('errors.escrow_currency_not_found'));
-                    }
-                    $transactionId = $buyer->add_balance($escrow->amount, "Refund for cancelled service order #{$order->id} (Dispute)", 'refunded', $escrow->currency_id);
+            if ($reason) {
+                $resolutionNote .= " - Reason: {$reason}";
+            }
 
-                    $escrow->update([
-                        'status' => 'refunded',
-                        'buyer_wallet_transaction_id' => $transactionId, // overwriting or just keeping record
-                        'refunded_at' => now(),
-                    ]);
+            $order->notes = trim(($order->notes ? $order->notes . "\n" : '') . $resolutionNote);
+
+            if ($action === 'refund_buyer') {
+                $order->status = 'cancelled';
+                $order->save();
+
+                if ($escrow) {
+                    $this->escrowService->refundFunds($escrow);
+                }
+            } elseif ($action === 'release_to_seller') {
+                $order->status = 'completed';
+                $order->completed_at = now('Africa/Cairo');
+                $order->save();
+
+                if ($escrow) {
+                    $this->escrowService->releaseFunds($escrow);
                 }
             }
-        } elseif ($action === 'release_to_seller') {
-            $order->status = 'completed';
-            $order->completed_at = now();
-            $order->save();
-
-            if ($escrow) {
-                $seller = User::find($order->seller_id);
-                if ($seller) {
-                    $sellerCredit = $order->amount - $order->commission_amount;
-                    $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Dispute Resolved)", 'received', $order->currency_id);
-
-                    $escrow->update([
-                        'status' => 'released',
-                        'seller_wallet_transaction_id' => $transactionId,
-                        'released_at' => now(),
-                    ]);
-                }
-            }
-        }
+        });
     }
 }

@@ -116,6 +116,16 @@ class ServiceOrderController extends Controller
                 $orderStatus = ServiceOrderStatus::DELIVERED;
             }
 
+            $snapshot = [
+                'service_title' => $package->service->title,
+                'service_description' => $package->service->description,
+                'package_name' => $package->name,
+                'package_description' => $package->description,
+                'price' => (float) $package->price,
+                'delivery_days' => $package->delivery_days,
+                'revisions' => $package->revisions ?? 1,
+            ];
+
             // Create Order
             $order = ServiceOrder::create([
                 'buyer_id' => $lockedBuyer->id,
@@ -125,9 +135,20 @@ class ServiceOrderController extends Controller
                 'currency_id' => $package->currency_id,
                 'commission_amount' => $commissionAmount,
                 'status' => $orderStatus,
+                'snapshot' => $snapshot,
+                'due_date' => now('Africa/Cairo')->addDays($package->delivery_days),
                 'delivery_payload' => $deliveryPayload,
                 'delivered_at' => $package->service->generate_serials ? now('Africa/Cairo') : null,
                 'auto_complete_at' => $package->service->generate_serials ? now('Africa/Cairo')->addDays(3) : null,
+            ]);
+
+            // Log status history
+            \Modules\Marketplace\Models\OrderStatusHistory::create([
+                'order_id' => $order->id,
+                'old_status' => null,
+                'new_status' => $orderStatus->value,
+                'changed_by' => $lockedBuyer->id,
+                'note' => 'Order created and payment held in escrow.'
             ]);
 
             // Delegate escrow creation and lock to the EscrowService

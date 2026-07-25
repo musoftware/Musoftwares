@@ -53,7 +53,7 @@ class MessagesController extends Controller
             'participants.user',
             'messages' => fn ($q) => $q->latest()->take(1),
             'conversable' => fn ($morphTo) => $morphTo->morphWith([
-                \Modules\Marketplace\Models\ServiceOrder::class => ['service'],
+                \Modules\Marketplace\Models\ServiceOrder::class => ['service', 'package.service'],
             ]),
         ])
             ->whereHas('participants', fn ($q) => $q->where('user_id', $user->id))
@@ -181,7 +181,8 @@ class MessagesController extends Controller
             $orderNum = $conversable?->order_number ?? $conversable?->id ?? $conv->conversable_id;
             $serviceTitle = $conversable?->service?->title ?? '';
             $title = $serviceTitle ? "Order #{$orderNum}: {$serviceTitle}" : "Order #{$orderNum}";
-            $subtitle = $conversable?->status ? "Status: {$conversable->status}" : $otherUserName;
+            $statusVal = $conversable?->status instanceof \BackedEnum ? $conversable->status->value : $conversable?->status;
+            $subtitle = $statusVal ? "Status: {$statusVal}" : $otherUserName;
             if ($conversable?->id) {
                 $targetUrl = "/marketplace/orders/{$conversable->id}";
             }

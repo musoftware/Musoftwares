@@ -15,6 +15,7 @@ class ResolveMarketplaceDisputeRequest extends FormRequest
     {
         return [
             'action' => 'required|in:refund_buyer,release_to_seller',
+            'resolution_reason' => 'nullable|string|max:1000',
         ];
     }
 }

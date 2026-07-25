@@ -64,8 +64,8 @@ class EscrowService
     public function releaseFunds(MarketplaceEscrow $escrow): void
     {
         DB::transaction(function () use ($escrow) {
-            if ($escrow->status !== EscrowStatus::HELD) {
-                throw new Exception("Escrow is not held. Current status: " . $escrow->status->value);
+            if (!in_array($escrow->status, [EscrowStatus::HELD, EscrowStatus::DISPUTED])) {
+                throw new Exception("Escrow is not in releaseable state. Current status: " . (is_object($escrow->status) ? $escrow->status->value : $escrow->status));
             }
 
             $order = $escrow->order;

@@ -16,7 +16,14 @@ class DeliverableService
      */
     public function submitDeliverable(ServiceOrder $order, string $note, ?string $filePath = null): ServiceOrder
     {
-        if ($order->status !== ServiceOrderStatus::PENDING && $order->status !== ServiceOrderStatus::PROCESSING) {
+        $allowedStatuses = [
+            ServiceOrderStatus::PENDING,
+            ServiceOrderStatus::PROCESSING,
+            ServiceOrderStatus::IN_PROGRESS,
+            ServiceOrderStatus::REVISION,
+        ];
+
+        if (! in_array($order->status, $allowedStatuses, true)) {
             throw new Exception("Order cannot receive work submission in current status: {$order->status->value}");
         }
 
@@ -34,6 +41,7 @@ class DeliverableService
                 'status' => ServiceOrderStatus::DELIVERED,
                 'delivered_at' => now('Africa/Cairo'),
                 'auto_complete_at' => now('Africa/Cairo')->addDays(3),
+                'delivery_count' => ($order->delivery_count ?? 0) + 1,
                 'delivery_payload' => [
                     'message' => $note,
                     'file_path' => $filePath,
@@ -53,8 +61,16 @@ class DeliverableService
             throw new Exception("Revisions can only be requested for delivered orders.");
         }
 
+        \Modules\Marketplace\Models\OrderRevision::create([
+            'order_id' => $order->id,
+            'buyer_id' => $order->buyer_id,
+            'message' => $revisionNote,
+            'status' => 'pending',
+        ]);
+
         $order->update([
-            'status' => ServiceOrderStatus::PROCESSING,
+            'status' => ServiceOrderStatus::REVISION,
+            'revision_count' => ($order->revision_count ?? 0) + 1,
             'revision_requested_at' => now('Africa/Cairo'),
             'delivery_payload' => array_merge($order->delivery_payload ?? [], [
                 'latest_revision_note' => $revisionNote,

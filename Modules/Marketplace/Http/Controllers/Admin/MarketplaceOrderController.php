@@ -29,7 +29,14 @@ class MarketplaceOrderController extends Controller
 
     public function show($id)
     {
-        $order = ServiceOrder::with(['buyer', 'seller', 'package.service'])->findOrFail($id);
+        $order = ServiceOrder::with([
+            'buyer',
+            'seller',
+            'package.service',
+            'escrow',
+            'deliveryFiles',
+            'conversation.messages.sender'
+        ])->findOrFail($id);
 
         return Inertia::render('Admin/Marketplace/Orders/Show', [
             'order' => (new MarketplaceOrderResource($order))->resolve()
@@ -41,7 +48,11 @@ class MarketplaceOrderController extends Controller
         $order = ServiceOrder::findOrFail($id);
 
         try {
-            $this->marketplaceOrderService->resolveDispute($order, $request->validated('action'));
+            $this->marketplaceOrderService->resolveDispute(
+                $order,
+                $request->validated('action'),
+                $request->validated('resolution_reason')
+            );
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }

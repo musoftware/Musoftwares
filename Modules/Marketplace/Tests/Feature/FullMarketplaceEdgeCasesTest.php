@@ -209,6 +209,7 @@ class FullMarketplaceEdgeCasesTest extends TestCase
             'file_size' => 102400
         ]);
 
+        $order->refresh();
         $this->assertCount(1, $order->attachments);
         $this->assertEquals('final_design.pdf', $order->attachments->first()->file_name);
         $this->assertInstanceOf(ServiceOrder::class, $attachment->attachable);
