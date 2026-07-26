@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import {
-    ChevronRight, ChevronLeft, Check, Send, ArrowLeft, Star
+    ChevronRight, ChevronLeft, Check, Send, ArrowLeft, Star, Sparkles
 } from 'lucide-react';
 import OverviewStep from './Steps/OverviewStep';
 import PricingStep from './Steps/PricingStep';
@@ -29,6 +29,9 @@ export const emptyPackage = () => ({
 });
 
 export default function CreateService({ categories, seller }: Props) {
+    const { auth } = usePage().props as any;
+    const isAdmin = auth?.user && (auth.user.role === 'admin' || auth.user.roles?.includes('admin') || auth.user.is_admin);
+
     const [step, setStep] = useState(1);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -116,6 +119,35 @@ export default function CreateService({ categories, seller }: Props) {
                         </div>
                     </div>
                 </div>
+
+                {/* Admin AI Banner */}
+                {isAdmin && (
+                    <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-500/30 py-3.5 px-4 sm:px-6 shadow-inner">
+                        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-indigo-500/20 rounded-lg border border-indigo-400/30 shrink-0">
+                                    <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-bold flex items-center gap-2 text-white">
+                                        إنشاء خدمة فورية بالذكاء الاصطناعي (أدمن فقط)
+                                        <span className="text-[10px] bg-amber-400/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">Admin Only</span>
+                                    </h3>
+                                    <p className="text-xs text-slate-300">
+                                        اكتب عنوان الخدمة فقط والذكاء الاصطناعي (ChatGPT / Gemini) سينشئ التفاصيل، الباقات، والصورة تلقائياً!
+                                    </p>
+                                </div>
+                            </div>
+                            <Link
+                                href="/marketplace/services/create-ai"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs font-bold rounded-lg shadow-md hover:shadow-indigo-500/25 transition-all shrink-0 cursor-pointer"
+                            >
+                                <Sparkles className="w-4 h-4 text-amber-300" />
+                                استخدام مولد AI
+                            </Link>
+                        </div>
+                    </div>
+                )}
 
                 {/* Content */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">

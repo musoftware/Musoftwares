@@ -7830,5 +7830,6 @@ return array (
   'what_work_should_i_do_now' => 'ما الشغل المطلوب مني تنفيذه الآن؟',
   'service_deleted_successfully' => 'تم حذف الخدمة بنجاح.',
   'are_you_sure_you_want_to_delete_this_service' => 'هل أنت تأكد من رغبتك في حذف هذه الخدمة؟',
+  'service_created_successfully_by_ai' => 'تم توليد الخدمة ونشرها بنجاح بواسطة الذكاء الاصطناعي!',
 );
 

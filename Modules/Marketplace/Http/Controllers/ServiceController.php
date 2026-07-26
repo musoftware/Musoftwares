@@ -169,9 +169,16 @@ class ServiceController extends Controller
             ]);
         }
 
+        $user = auth()->user();
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+
         if ($service->status !== 'active') {
-            $user = auth()->user();
-            if (!$user || ($user->id !== $service->seller_id && !$user->hasRole('admin'))) {
+            if ($isAdmin) {
+                $service->status = 'active';
+                $service->approved_at = $service->approved_at ?: now();
+                $service->approved_by = $service->approved_by ?: $user->id;
+                $service->save();
+            } elseif (!$user || $user->id !== $service->seller_id) {
                 return Inertia::render('Marketplace/Services/ExclusiveService', [
                     'serviceSlug' => $service->title ?? str_replace('-', ' ', $id),
                 ]);
@@ -475,15 +482,91 @@ class ServiceController extends Controller
             ->with('success', __('general.service_updated_successfully_and_submitted_for_re_approval'));
     }
 
-    public function destroy(Service $service)
+    public function createAi()
     {
-        $this->authorize('delete', $service);
+        $user = auth()->user();
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
 
-        $service->delete();
+        if (!$isAdmin) {
+            abort(403, 'Unauthorized access.');
+        }
 
-        return redirect()->back()
-            ->with('success', __('general.service_deleted_successfully'));
+        $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
+
+        return Inertia::render('Marketplace/Services/CreateAi', [
+            'categories' => $categories,
+        ]);
     }
 
+    public function storeAi(Request $request)
+    {
+        $user = auth()->user();
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+
+        if (!$isAdmin) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|min:5|max:255',
+            'provider' => 'required|string|in:chatgpt,gemini',
+        ]);
+
+        $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug'])->toArray();
+
+        $aiService = app(\App\Services\AI\MarketplaceAiService::class);
+        $aiData = $aiService->generateServiceData($validated['title'], $validated['provider'], $categories, $user->id);
+
+        $service = DB::transaction(function () use ($aiData, $user) {
+            $service = Service::create([
+                'seller_id'    => $user->id,
+                'title'        => $aiData['title'],
+                'slug'         => Str::slug($aiData['title']),
+                'thumbnail'    => $aiData['thumbnail'] ?? null,
+                'tagline'      => $aiData['tagline'] ?? null,
+                'description'  => $aiData['description'] ?? null,
+                'category_id'  => $aiData['category_id'],
+                'status'       => 'active',
+                'approved_at'  => now(),
+                'approved_by'  => $user->id,
+                'tags'         => $aiData['tags'] ?? [],
+                'faq'          => $aiData['faq'] ?? [],
+                'requirements' => $aiData['requirements'] ?? [],
+                'gallery'      => $aiData['gallery'] ?? [],
+                'is_free'      => false,
+            ]);
+
+            if (!empty($aiData['packages']) && is_array($aiData['packages'])) {
+                foreach ($aiData['packages'] as $pkg) {
+                    ServicePackage::create([
+                        'service_id'    => $service->id,
+                        'name'          => $pkg['name'] ?? 'Standard',
+                        'description'   => $pkg['description'] ?? '',
+                        'price'         => $pkg['price'] ?? 25,
+                        'currency_id'   => $pkg['currency_id'] ?? 1,
+                        'delivery_days' => $pkg['delivery_days'] ?? 3,
+                        'revisions'     => $pkg['revisions'] ?? 2,
+                        'features'      => $pkg['features'] ?? [],
+                    ]);
+                }
+            } else {
+                ServicePackage::create([
+                    'service_id'    => $service->id,
+                    'name'          => 'Standard',
+                    'description'   => $service->description ?: 'Standard package deliverable.',
+                    'price'         => 25,
+                    'currency_id'   => 1,
+                    'delivery_days' => 3,
+                    'revisions'     => 2,
+                    'features'      => [],
+                ]);
+            }
+
+            return $service;
+        });
+
+        return redirect()->route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug])
+            ->with('success', __('general.service_created_successfully_by_ai') ?? 'Service generated successfully by AI!');
+    }
 }
 

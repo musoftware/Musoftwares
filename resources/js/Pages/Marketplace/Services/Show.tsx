@@ -50,7 +50,7 @@ export default function Show({ service }: any) {
         (p: any) => p.id === selectedPackageId,
     );
 
-    const isOwner = auth?.user && (auth.user.id === service.seller_id || auth.user.role === 'admin');
+    const isOwner = auth?.user && (auth.user.id === service.seller_id || auth.user.role === 'admin' || auth.user.roles?.includes('admin') || auth.user.is_admin);
 
     const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 

@@ -106,7 +106,7 @@ You MUST return strictly raw valid JSON matching this exact structure without ma
       "features": ["Everything in Standard", "Priority Support", "Source Code", "Custom Addons"]
     }
   ],
-  "image_prompt": "A modern sleek futuristic isometric 3D graphic banner illustrating {$titlePrompt}, vibrant indigo blue lighting, clean vector UI design, high quality 8k render."
+  "image_prompt": "A professional software feature showcase grid collage on a clean light background for {$titlePrompt}. Displays a multi-panel layout showing realistic web application UI dashboard mockups, admin analytics charts, browser popup dialogs, numbered badge labels (1, 2, 3), and a clean system architecture diagram. Modern crisp typography, clean SaaS presentation mockup, high quality 8k render."
 }
 PROMPT;
     }
@@ -211,6 +211,8 @@ PROMPT;
         $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
         $imageBinary = null;
 
+        $uiCollagePrompt = "A professional software feature showcase grid collage on a clean light background for " . Str::limit($imagePrompt, 300) . ". Displays a multi-panel layout showing realistic web application UI dashboard mockups, admin analytics charts, browser popup dialogs, numbered badge labels (1, 2, 3), and a clean system architecture diagram. Modern crisp typography, clean SaaS presentation mockup, high quality 8k render.";
+
         if ($apiKey) {
             try {
                 $response = Http::timeout(60)
@@ -220,7 +222,7 @@ PROMPT;
                     ])
                     ->post('https://api.openai.com/v1/images/generations', [
                         'model'           => 'dall-e-3',
-                        'prompt'          => 'Clean professional digital marketplace cover illustration: ' . Str::limit($imagePrompt, 400) . '. High quality digital artwork style, modern UI design elements.',
+                        'prompt'          => $uiCollagePrompt,
                         'n'               => 1,
                         'size'            => '1024x1024',
                         'response_format' => 'url',
@@ -241,7 +243,7 @@ PROMPT;
                         ])
                         ->post('https://api.openai.com/v1/images/generations', [
                             'model'           => 'dall-e-2',
-                            'prompt'          => Str::limit($imagePrompt, 350),
+                            'prompt'          => Str::limit($uiCollagePrompt, 350),
                             'n'               => 1,
                             'size'            => '512x512',
                             'response_format' => 'url',
@@ -261,7 +263,7 @@ PROMPT;
         // Fallback to Pollinations AI image generator if OpenAI failed or key is missing
         if (!$imageBinary) {
             try {
-                $pollinationsUrl = 'https://image.pollinations.ai/prompt/' . urlencode($imagePrompt) . '?width=1024&height=680&nologo=true&seed=' . rand(100, 9999);
+                $pollinationsUrl = 'https://image.pollinations.ai/prompt/' . urlencode($uiCollagePrompt) . '?width=1024&height=680&nologo=true&seed=' . rand(100, 9999);
                 $imageBinary = Http::timeout(25)->get($pollinationsUrl)->body();
             } catch (\Exception $e) {
                 Log::error('Pollinations fallback image generation failed: ' . $e->getMessage());

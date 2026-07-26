@@ -9,7 +9,7 @@ class ServicePolicy
 {
     public function before(User $user, $ability): ?bool
     {
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin') {
             return true;
         }
 

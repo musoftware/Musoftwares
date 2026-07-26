@@ -434,6 +434,8 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
         Route::get('/dashboard', [Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
+        Route::get('/services/create-ai', [ServiceController::class, 'createAi'])->name('services.create_ai');
+        Route::post('/services/store-ai', [ServiceController::class, 'storeAi'])->name('services.store_ai');
         Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
         Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
         Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
