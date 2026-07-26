@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
@@ -311,8 +311,7 @@ export default function Index({
 
     const handleDeleteAccount = (id: number) => {
         if (confirm('Are you sure you want to disconnect this Meta WhatsApp account?')) {
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useForm().delete(route('whatsapp.accounts.destroy', id), {
+            router.delete(route('whatsapp.accounts.destroy', id), {
                 onSuccess: () => {
                     toast({
                         title: 'Account Disconnected',

@@ -75,6 +75,12 @@ export const MetaSetupGuideModal: React.FC<MetaSetupGuideModalProps> = ({
             badge: 'الخطوة 5',
             icon: Sparkles,
         },
+        {
+            id: 6,
+            title: 'الأسئلة الشائعة والأخطاء',
+            badge: 'الخطوة 6',
+            icon: HelpCircle,
+        },
     ];
 
     return (
@@ -442,11 +448,62 @@ export const MetaSetupGuideModal: React.FC<MetaSetupGuideModalProps> = ({
                                     </div>
                                 </div>
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => setCurrentStep(6)}
                                     className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 shrink-0"
                                 >
-                                    إغلاق وبدء الربط الان
+                                    الأسئلة الشائعة والأخطاء
                                 </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* STEP 6: FAQS & TROUBLESHOOTING */}
+                    {currentStep === 6 && (
+                        <div className="space-y-4 animate-in fade-in duration-300">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                        <HelpCircle className="w-5 h-5 text-emerald-400" />
+                                        الأسئلة الشائعة وحل المشاكل الشائعة (FAQ & Troubleshooting)
+                                    </h3>
+                                    <p className="text-sm text-slate-400 mt-1">
+                                        حلول الأخطاء الشائعة أثناء ربط رقم الهاتف بـ Meta Cloud API.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 text-xs">
+                                <div className="p-4 bg-slate-900 border border-amber-500/40 rounded-xl space-y-3">
+                                    <h4 className="font-bold text-amber-300 text-sm flex items-center gap-2">
+                                        <AlertTriangle className="w-4 h-4 text-amber-400" />
+                                        Q: كيف أحل خطأ رقم الهاتف مستخدم بالفعل (Error #2655122 - Phone Number In Use)؟
+                                    </h4>
+                                    <p className="text-slate-300 leading-relaxed">
+                                        يحدث الخطأ <strong>#2655122 ("Phone Number In Use")</strong> لأن رقم الهاتف ما زال مسجلاً في تطبيق WhatsApp العادي أو WhatsApp Business على الهاتف، أو مرتبطة بحساب سحابي آخر.
+                                    </p>
+
+                                    <div className="space-y-3 pt-2">
+                                        <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
+                                            <span className="font-bold text-emerald-400 block">الطريقة الأولى: حذف الحساب من تطبيق الواتساب على الهاتف (WhatsApp Mobile App Workaround)</span>
+                                            <ol className="list-decimal list-inside text-slate-300 space-y-1 leading-relaxed">
+                                                <li>قم بتحميل تطبيق WhatsApp Messenger أو WhatsApp Business على هاتفك.</li>
+                                                <li>قم بتفعيل وتأكيد الرقم فيه.</li>
+                                                <li>بعد التفعيل فوراً، اذهب إلى <strong>الإعدادات (Settings) &gt; الحساب (Account) &gt; حذف حسابي (Delete my account)</strong>.</li>
+                                                <li>انتظر مدة <strong>24 إلى 48 ساعة</strong> حتى يقوم النظام بتحرير الرقم بالكامل من منصة الهاتف.</li>
+                                                <li>بعد انتهاء مهلة الانتظار، جرب إضافة الرقم مجدداً في Meta Business Account.</li>
+                                            </ol>
+                                        </div>
+
+                                        <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
+                                            <span className="font-bold text-emerald-400 block">الطريقة الثانية: التواصل مع دعم Meta لفك إلغاء التسجيل يدوياً (Contact WhatsApp Support)</span>
+                                            <ol className="list-decimal list-inside text-slate-300 space-y-1 leading-relaxed">
+                                                <li>انتقل إلى صفحة الدعم الفني لـ WhatsApp Meta Center.</li>
+                                                <li>أرفق إثبات ملكية للرقم (مثل فاتورة هاتف حديثة برقمك أو عقد الخط).</li>
+                                                <li>اطلب منهم يدوياً: <em>"Request to deregister the phone number so it can be used for WhatsApp Business Platform / Cloud API"</em>.</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -455,9 +512,9 @@ export const MetaSetupGuideModal: React.FC<MetaSetupGuideModalProps> = ({
                 {/* Footer Controls */}
                 <DialogFooter className="p-4 bg-slate-900/90 border-t border-slate-800 flex items-center justify-between sm:justify-between flex-row-reverse">
                     <div>
-                        {currentStep < 5 ? (
+                        {currentStep < 6 ? (
                             <Button
-                                onClick={() => setCurrentStep((prev) => Math.min(prev + 1, 5))}
+                                onClick={() => setCurrentStep((prev) => Math.min(prev + 1, 6))}
                                 className="bg-emerald-600 hover:bg-emerald-500 text-white gap-2 font-semibold text-xs px-5"
                             >
                                 الخطوة التالية
@@ -485,7 +542,7 @@ export const MetaSetupGuideModal: React.FC<MetaSetupGuideModalProps> = ({
                             </Button>
                         )}
                         <span className="text-xs text-slate-400 font-medium px-2">
-                            خطوة {currentStep} من 5
+                            خطوة {currentStep} من 6
                         </span>
                     </div>
                 </DialogFooter>

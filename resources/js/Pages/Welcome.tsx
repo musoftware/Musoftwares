@@ -337,8 +337,8 @@ export default function Welcome({
                                 <div>
                                     <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Legal</h4>
                                     <ul className="space-y-3 text-zinc-500 dark:text-zinc-400">
-                                        <li><a href="/privacy" className="hover:text-zinc-900 dark:hover:text-zinc-100">Privacy Policy</a></li>
-                                        <li><a href="/terms" className="hover:text-zinc-900 dark:hover:text-zinc-100">Terms of Service</a></li>
+                                        <li><a href="/privacy-policy" className="hover:text-zinc-900 dark:hover:text-zinc-100">Privacy Policy</a></li>
+                                        <li><a href="/terms-of-service" className="hover:text-zinc-900 dark:hover:text-zinc-100">Terms of Service</a></li>
                                     </ul>
                                 </div>
                             </div>

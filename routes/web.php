@@ -174,6 +174,14 @@ Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('l
 Route::get('/terms-of-service', [HomeController::class, 'termsOfService'])->name('legal.terms');
 Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('legal.cookies');
 
+// Short Alias Redirects (301) to prevent 404
+Route::redirect('/privacy', '/privacy-policy', 301);
+Route::redirect('/terms', '/terms-of-service', 301);
+Route::redirect('/cookies', '/cookie-policy', 301);
+Route::redirect('/legal/privacy', '/privacy-policy', 301);
+Route::redirect('/legal/terms', '/terms-of-service', 301);
+Route::redirect('/legal/cookies', '/cookie-policy', 301);
+
 // Pricing
 Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 

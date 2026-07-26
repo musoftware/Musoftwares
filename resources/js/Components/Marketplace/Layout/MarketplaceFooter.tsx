@@ -66,8 +66,8 @@ export default function MarketplaceFooter() {
                                 <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
                                 <span>{__('general.verified_deliverables') || 'Verified Deliverables'}</span>
                             </li>
-                            <li><Link href="/terms" className="hover:text-indigo-600 transition-colors">{__('general.terms_of_service') || 'Terms of Service'}</Link></li>
-                            <li><Link href="/privacy" className="hover:text-indigo-600 transition-colors">{__('general.privacy_policy') || 'Privacy Policy'}</Link></li>
+                            <li><Link href="/terms-of-service" className="hover:text-indigo-600 transition-colors">{__('general.terms_of_service') || 'Terms of Service'}</Link></li>
+                            <li><Link href="/privacy-policy" className="hover:text-indigo-600 transition-colors">{__('general.privacy_policy') || 'Privacy Policy'}</Link></li>
                         </ul>
                     </div>
 

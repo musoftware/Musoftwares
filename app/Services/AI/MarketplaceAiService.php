@@ -114,7 +114,7 @@ You MUST return strictly raw valid JSON matching this exact structure without ma
       "features": ["Everything in Standard", "Priority Support", "Source Code", "Custom Addons"]
     }
   ],
-  "image_prompt": "A sleek, modern SaaS web application hero dashboard for {$titlePrompt}, featuring elegant UI cards, minimal dark mode aesthetic, clean data analytics charts, soft studio lighting, 8k resolution, professional software hero showcase."
+  "image_prompt": "A short, vivid description of a single hero visual scene for {$titlePrompt} matching its exact real-world service category (e.g. for account verification: official verified shield badge & approval card; for mobile: flagship smartphone UI; for API/Backend: glowing cloud API network diagram; for web apps: SaaS UI dashboard)."
 }
 PROMPT;
     }
@@ -212,70 +212,20 @@ PROMPT;
     }
 
     /**
-     * Detect visual archetype category based on service title & description keywords
-     */
-    public function detectVisualCategory(string $title, ?string $description = null): string
-    {
-        $text = strtolower($title . ' ' . ($description ?? ''));
-
-        if (Str::contains($text, ['firebase', 'supabase', 'api', 'backend', 'webhook', 'database', 'postgresql', 'mysql', 'sql', 'graphql', 'rest api', 'stripe', 'paypal', 'integration', 'sdk'])) {
-            return 'backend_api';
-        }
-
-        if (Str::contains($text, ['mobile', 'ios', 'android', 'flutter', 'react native', 'swift', 'app', 'apk', 'smartphone', 'xamarin'])) {
-            return 'mobile_app';
-        }
-
-        if (Str::contains($text, ['docker', 'kubernetes', 'aws', 'cloud', 'server', 'devops', 'nginx', 'ssl', 'security', 'linux', 'vps', 'ci/cd', 'deployment'])) {
-            return 'devops_cloud';
-        }
-
-        if (Str::contains($text, ['ai', 'chatgpt', 'openai', 'bot', 'automation', 'n8n', 'zapier', 'scraping', 'machine learning', 'llm', 'gpt'])) {
-            return 'ai_automation';
-        }
-
-        if (Str::contains($text, ['ecommerce', 'shopify', 'woocommerce', 'store', 'cart', 'checkout', 'payment', 'gateway', 'online shop'])) {
-            return 'ecommerce_store';
-        }
-
-        return 'web_saas';
-    }
-
-    /**
-     * Get archetype starter prompt template for a specific visual category
-     */
-    public function getArchetypePromptTemplate(string $category, string $topic): string
-    {
-        return match ($category) {
-            'backend_api' => "A modern, high-tech visual representation of {$topic}. Feature a glowing cloud API network node diagram, clean code editor window snippet, seamless data stream lines connecting two systems, minimalist dark neon theme, 8k resolution, isometric technical hero shot.",
-            'mobile_app' => "A premium flagship smartphone mockup showcasing a sleek modern mobile app UI for {$topic}. Clean glassmorphism cards, vibrant accents, soft studio lighting, minimal floating perspective display, 8k resolution product hero shot.",
-            'devops_cloud' => "A sophisticated cloud infrastructure architecture diagram for {$topic}. Glowing server nodes, secure data flow pipelines, high-tech dark background with cyan and emerald neon connections, 8k resolution, modern tech presentation.",
-            'ai_automation' => "An interactive AI workflow automation node canvas for {$topic}. Connected visual logic nodes, glowing execution pathways, clean futuristic glass UI panels, vibrant purple and blue ambient lighting, 8k resolution hero shot.",
-            'ecommerce_store' => "A modern high-converting e-commerce storefront interface for {$topic}. Floating product showcase cards, smooth payment checkout badge, clean shopping cart UI, minimal luxury lighting, 8k resolution.",
-            default => "A sleek, modern SaaS web application hero dashboard for {$topic}, featuring elegant UI analytics cards, subtle glassmorphism header, responsive layout, minimal clean aesthetic, soft studio lighting, 8k resolution, professional software mockup.",
-        };
-    }
-
-    /**
-     * Refine and structure prompt based on category visual archetype (80-120 words)
+     * Refine and structure prompt using Pure Semantic LLM Engine based on full title & description
      */
     public function getRefinedImagePrompt(string $rawPrompt, ?string $description = null): string
     {
-        $cleanTopic = Str::limit(trim(strip_tags($rawPrompt)), 200);
+        $cleanTitle = Str::limit(trim(strip_tags($rawPrompt)), 250);
 
-        if (Str::contains(strtolower($cleanTopic), ['architecture diagram', 'smartphone mockup', 'node canvas', 'hero dashboard', 'cloud infrastructure', 'storefront interface'])) {
-            return Str::limit($cleanTopic, 400);
+        // Stage 2: Pass full title and description to AI Visual Engine for deep semantic prompt generation
+        $aiPrompt = $this->generatePromptViaLlm($cleanTitle, $description);
+        if (!empty($aiPrompt)) {
+            return $aiPrompt;
         }
 
-        // Try calling lightweight LLM to generate category-tailored visual prompt
-        $llmPrompt = $this->generatePromptViaLlm($cleanTopic, $description);
-        if (!empty($llmPrompt)) {
-            return $llmPrompt;
-        }
-
-        // Fallback to category archetype template
-        $category = $this->detectVisualCategory($cleanTopic, $description);
-        return $this->getArchetypePromptTemplate($category, $cleanTopic);
+        // Dynamic universal fallback (zero hardcoded keywords or static category assumptions)
+        return "A sleek, high-tech visual hero showcase representation for {$cleanTitle}. Minimal modern design aesthetic, elegant floating UI elements, soft studio lighting, ultra-crisp 8k resolution, professional presentation.";
     }
 
     /**
@@ -287,7 +237,7 @@ PROMPT;
     }
 
     /**
-     * Internal LLM Prompt Generator with Category Visual Archetypes
+     * Internal Pure Semantic LLM Prompt Engine
      */
     private function generatePromptViaLlm(string $title, ?string $description = null): ?string
     {
@@ -296,22 +246,36 @@ PROMPT;
             return null;
         }
 
-        $category = $this->detectVisualCategory($title, $description);
-
         try {
-            $meta = $description ? " Context: " . Str::limit(strip_tags($description), 300) : "";
-            $system = "You are an expert AI image prompt optimizer for software services. Your goal is to convert a software service topic into a vivid, ultra-clean DALL-E / ChatGPT image prompt (80-120 words).
-IMPORTANT VISUAL CATEGORY INSTRUCTIONS:
-- If Backend / API / Integration: Generate a glowing architecture network node diagram, clean code snippet, and seamless API data flow.
-- If Mobile App: Generate a premium flagship smartphone mockup with modern mobile UI cards.
-- If Cloud / DevOps / Server: Generate a high-tech cloud infrastructure diagram with glowing server nodes and secure data pipelines.
-- If AI / Automation: Generate an interactive visual node graph canvas with glowing automation flows.
-- If E-Commerce: Generate a modern storefront UI with floating product cards and clean checkout components.
-- If Web App / SaaS: Generate a clean modern SaaS dashboard with analytics widgets.
+            $meta = $description ? " Context & Description: " . Str::limit(strip_tags($description), 500) : "";
+            $system = "You are an expert AI visual prompt architect for digital services and software products.
+Your task is to analyze the provided service title and description, semantically determine what real-world domain it belongs to, and craft a single, highly professional DALL-E image prompt (80-120 words).
 
-Detected Category: {$category}. Rules: Focus on a SINGLE hero scene matching the category. No bad text clutter, no 3D cartoon art. Return ONLY the raw English image prompt text without quotes or markdown wraps.";
+UNIVERSAL DOMAIN REASONING DIRECTIVES:
+- ADMINISTRATIVE & BUSINESS VERIFICATION (e.g. Account verification, identity audit, legal approval, registration):
+  Visualize an official verified shield badge, sleek business profile approval card with a prominent blue/green checkmark, or trusted brand certificate. STRICTLY FORBID source code snippets, database diagrams, or API flow charts.
 
-            $response = Http::timeout(10)
+- CREATIVE, DESIGN & MARKETING (e.g. Logo design, branding, SEO, social media, copywriting):
+  Visualize a modern creative workspace studio, vibrant digital portfolio presentation, or growth analytics showcase.
+
+- MOBILE APPLICATIONS (e.g. iOS, Android, Flutter, React Native apps):
+  Visualize a flagship modern smartphone mockup showcasing elegant mobile UI glassmorphism screens.
+
+- WEB APPLICATIONS & PLATFORMS (e.g. SaaS, portals, ERP, CRM):
+  Visualize a clean, modern web application dashboard interface with responsive UI components.
+
+- CLOUD INFRASTRUCTURE & DEVOPS (e.g. Servers, Docker, Kubernetes, AWS):
+  Visualize high-tech cloud server nodes and secure data flow pipelines.
+
+- DEVELOPER APIS & CODING (Only if explicitly developer code / API integration):
+  Visualize a clean API architecture diagram or modern code editor window snippet.
+
+GENERAL RULES:
+1. Always evaluate the service's true purpose before deciding on visual elements.
+2. Focus on a SINGLE hero scene. No messy collages, no unreadable text clutter, no low-quality 3D cartoons.
+3. Output ONLY the plain English DALL-E image prompt text without quotes or markdown formatting.";
+
+            $response = Http::timeout(12)
                 ->withHeaders([
                     'Authorization' => 'Bearer ' . trim($apiKey),
                     'Content-Type'  => 'application/json',
@@ -320,10 +284,10 @@ Detected Category: {$category}. Rules: Focus on a SINGLE hero scene matching the
                     'model' => 'gpt-4o-mini',
                     'messages' => [
                         ['role' => 'system', 'content' => $system],
-                        ['role' => 'user', 'content' => "Service Topic: {$title}.{$meta}"],
+                        ['role' => 'user', 'content' => "Analyze and design image prompt for Service: \"{$title}\".{$meta}"],
                     ],
-                    'max_tokens'  => 200,
-                    'temperature' => 0.5,
+                    'max_tokens'  => 220,
+                    'temperature' => 0.4,
                 ]);
 
             if ($response->successful()) {
