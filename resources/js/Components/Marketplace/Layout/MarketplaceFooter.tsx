@@ -101,10 +101,8 @@ export default function MarketplaceFooter() {
 
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-4">
-                            <a href="#" className="text-slate-400 hover:text-indigo-600 transition-colors"><Share2 className="h-4.5 w-4.5" /></a>
-                            <a href="#" className="text-slate-400 hover:text-indigo-600 transition-colors"><MessageCircle className="h-4.5 w-4.5" /></a>
-                            <a href="#" className="text-slate-400 hover:text-indigo-600 transition-colors"><Mail className="h-4.5 w-4.5" /></a>
-                            <a href="#" className="text-slate-400 hover:text-indigo-600 transition-colors"><Users className="h-4.5 w-4.5" /></a>
+                            <a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" title="WhatsApp" className="text-slate-400 hover:text-[#25D366] transition-colors"><MessageCircle className="h-4.5 w-4.5" /></a>
+                            <a href="mailto:support@musoftwares.com" title="Email" className="text-slate-400 hover:text-indigo-600 transition-colors"><Mail className="h-4.5 w-4.5" /></a>
                         </div>
                         
                         <div className="hidden md:flex items-center gap-4 ms-4">

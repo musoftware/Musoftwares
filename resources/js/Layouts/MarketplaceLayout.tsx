@@ -3,6 +3,7 @@ import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import MarketplaceHeader from '@/Components/Marketplace/Layout/MarketplaceHeader';
 import MarketplaceCategoryNav from '@/Components/Marketplace/Layout/MarketplaceCategoryNav';
 import MarketplaceFooter from '@/Components/Marketplace/Layout/MarketplaceFooter';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 
 export default function MarketplaceLayout({
     children,
@@ -21,6 +22,12 @@ export default function MarketplaceLayout({
             </main>
 
             <MarketplaceFooter />
+
+            <FloatingWhatsAppButton
+                phoneNumber="201015218548"
+                defaultMessage="Hello Mahmoud 👋 I have an inquiry about Musoftware Marketplace"
+            />
         </div>
     );
 }
+

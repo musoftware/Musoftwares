@@ -79,7 +79,7 @@ export const MetaSetupGuideModal: React.FC<MetaSetupGuideModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-950 text-slate-100 border-slate-800 p-0 sm:rounded-2xl dir-rtl">
+            <DialogContent className="w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] max-w-none sm:max-w-none max-h-[92vh] overflow-y-auto bg-slate-950 text-slate-100 border-slate-800 p-0 sm:rounded-2xl dir-rtl">
                 {/* Header Section */}
                 <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 border-b border-slate-800/80 p-6 relative overflow-hidden">
                     <div className="absolute -top-12 -left-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
