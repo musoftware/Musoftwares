@@ -42,9 +42,11 @@ export default function CreateService({ categories, seller }: Props) {
         faq: [] as {question: string, answer: string}[],
         requirements: [] as string[],
         gallery: [] as File[],
+        kept_gallery: [] as string[],
         video_url: '',
         packages: [emptyPackage()],
     });
+
 
     const canNext = () => {
         if (step === 1) return data.title.trim().length >= 10 && data.category_id;
@@ -192,12 +194,15 @@ export default function CreateService({ categories, seller }: Props) {
                                 <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden flex items-center justify-center">
                                     {data.gallery.length > 0 ? (
                                         <img src={URL.createObjectURL(data.gallery[0])} alt="Thumbnail" className="w-full h-full object-cover" />
+                                    ) : data.kept_gallery?.length > 0 ? (
+                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : `/uploads/${data.kept_gallery[0].replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt="Thumbnail" className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="text-slate-400 flex flex-col items-center">
                                             <span className="text-4xl mb-2">📸</span>
                                             <span className="text-xs font-medium">{__('general.image_preview')}</span>
                                         </div>
                                     )}
+
                                     {selectedCategory && (
                                         <div className="absolute top-3 start-3 bg-white/90 backdrop-blur text-slate-800 text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
                                             {selectedCategory.name}

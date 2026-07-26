@@ -105,6 +105,8 @@ interface PageProps {
     apiToken?: string;
     facebookLoginUrl?: string;
     fbOauthToken?: string | null;
+    webhookUrl?: string;
+    webhookVerifyToken?: string;
 }
 
 export default function Index({
@@ -114,12 +116,20 @@ export default function Index({
     transactions = [],
     apiToken = '',
     facebookLoginUrl = '',
-    fbOauthToken = null
+    fbOauthToken = null,
+    webhookUrl = '',
+    webhookVerifyToken = 'musoftware_whatsapp_verify_token_2026',
 }: PageProps) {
     const { toast } = useToast();
     const { flash } = usePage().props as any;
     const [copiedToken, setCopiedToken] = useState(false);
+    const [copiedWebhookUrl, setCopiedWebhookUrl] = useState(false);
+    const [copiedVerifyToken, setCopiedVerifyToken] = useState(false);
     const [showGuideModal, setShowGuideModal] = useState(false);
+
+    const webhookForm = useForm({
+        webhook_verify_token: webhookVerifyToken,
+    });
 
     // Defensive array guards
     const safeBusinesses = Array.isArray(businesses) ? businesses : [];
@@ -221,6 +231,40 @@ export default function Index({
                 toast({
                     title: 'Save Error',
                     description: Object.values(errors)[0] as string || 'Failed to save account credentials.',
+                    variant: 'destructive',
+                });
+            },
+        });
+    };
+
+    const copyWebhookUrl = () => {
+        const fullUrl = webhookUrl || `${window.location.origin}/api/v1/whatsapp/webhook`;
+        navigator.clipboard.writeText(fullUrl);
+        setCopiedWebhookUrl(true);
+        setTimeout(() => setCopiedWebhookUrl(false), 2000);
+        toast({ title: 'Copied', description: 'Callback URL copied to clipboard.' });
+    };
+
+    const copyVerifyToken = () => {
+        navigator.clipboard.writeText(webhookForm.data.webhook_verify_token);
+        setCopiedVerifyToken(true);
+        setTimeout(() => setCopiedVerifyToken(false), 2000);
+        toast({ title: 'Copied', description: 'Verify token copied to clipboard.' });
+    };
+
+    const handleWebhookSettingsSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        webhookForm.post(route('whatsapp.webhook-settings.update'), {
+            onSuccess: () => {
+                toast({
+                    title: 'Webhook Token Saved',
+                    description: 'Verify token updated successfully. Use this token when configuring Meta Webhook.',
+                });
+            },
+            onError: (errors) => {
+                toast({
+                    title: 'Save Error',
+                    description: Object.values(errors)[0] as string || 'Failed to update verify token.',
                     variant: 'destructive',
                 });
             },
@@ -858,8 +902,104 @@ export default function Index({
                                 </Card>
                             </TabsContent>
 
-                            {/* TAB 4: API DOCS & KEYS */}
-                            <TabsContent value="api" className="mt-6">
+                            {/* TAB 4: API DOCS & WEBHOOKS */}
+                            <TabsContent value="api" className="mt-6 space-y-6">
+                                {/* META WEBHOOK SETUP CARD (Step 2 Production setup) */}
+                                <Card className="border-slate-200 shadow-sm rounded-xl bg-white">
+                                    <CardHeader className="border-b border-slate-100 pb-4 flex flex-row items-center justify-between gap-4">
+                                        <div>
+                                            <CardTitle className="text-lg font-semibold flex items-center gap-2 text-slate-900">
+                                                <Activity className="w-5 h-5 text-indigo-600" /> Meta Webhooks Configuration (Step 2. Production setup)
+                                            </CardTitle>
+                                            <CardDescription>
+                                                Configure Webhooks in Meta for Developers Console to receive incoming messages & status updates.
+                                            </CardDescription>
+                                        </div>
+                                        <Badge className="bg-indigo-50 text-indigo-700 border-indigo-200 text-xs font-semibold px-2.5 py-1">
+                                            Meta Cloud API
+                                        </Badge>
+                                    </CardHeader>
+                                    <CardContent className="pt-6 space-y-6">
+                                        {/* Helper Banner matching Meta screenshot */}
+                                        <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl flex items-start gap-3 text-xs text-amber-900">
+                                            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                            <div className="space-y-1">
+                                                <strong className="font-bold text-amber-950 block">إعدادات الـ Webhooks في Meta Developer Console:</strong>
+                                                <p className="leading-relaxed text-amber-800">
+                                                    انتقل إلى منصة <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer" className="underline font-bold text-amber-950">Meta for Developers</a> 👈 تطبيقك 👈 <strong className="text-amber-950">WhatsApp 👈 Configuration / API Setup</strong>، ثم ألصق الـ <strong className="text-amber-950">Callback URL</strong> والـ <strong className="text-amber-950 font-mono">Verify Token</strong> الموضحين بالأسفل واضغط على <strong className="text-amber-950">Verify and save</strong>.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <form onSubmit={handleWebhookSettingsSubmit} className="space-y-4">
+                                            {/* Field 1: Callback URL */}
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="webhook_callback_url" className="text-slate-800 font-semibold flex items-center gap-2">
+                                                    Callback URL
+                                                    <span className="text-xs text-slate-400 font-normal">(عنوان الـ Webhook الخاص بنظامك في Meta)</span>
+                                                </Label>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        id="webhook_callback_url"
+                                                        readOnly
+                                                        value={webhookUrl || `${window.location.origin}/api/v1/whatsapp/webhook`}
+                                                        className="font-mono text-xs bg-slate-50 border-slate-300 text-slate-900"
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        onClick={copyWebhookUrl}
+                                                        variant="outline"
+                                                        className="shrink-0 flex items-center gap-2 border-slate-300 text-slate-700 hover:bg-slate-100"
+                                                    >
+                                                        {copiedWebhookUrl ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                                                        {copiedWebhookUrl ? 'Copied URL' : 'Copy Callback URL'}
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                            {/* Field 2: Verify Token */}
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="webhook_verify_token" className="text-slate-800 font-semibold flex items-center gap-2">
+                                                    Verify token
+                                                    <span className="text-xs text-slate-400 font-normal">(رمز التوثيق السري لمصادقة الـ Webhook)</span>
+                                                </Label>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        id="webhook_verify_token"
+                                                        value={webhookForm.data.webhook_verify_token}
+                                                        onChange={(e) => webhookForm.setData('webhook_verify_token', e.target.value)}
+                                                        placeholder="musoftware_whatsapp_verify_token_2026"
+                                                        className="font-mono text-xs bg-white border-slate-300 text-slate-900"
+                                                        required
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        onClick={copyVerifyToken}
+                                                        variant="outline"
+                                                        className="shrink-0 flex items-center gap-2 border-slate-300 text-slate-700 hover:bg-slate-100"
+                                                    >
+                                                        {copiedVerifyToken ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                                                        {copiedVerifyToken ? 'Copied Token' : 'Copy Token'}
+                                                    </Button>
+                                                </div>
+                                                {webhookForm.errors.webhook_verify_token && (
+                                                    <span className="text-xs text-rose-600">{webhookForm.errors.webhook_verify_token}</span>
+                                                )}
+                                            </div>
+
+                                            <div className="flex justify-end pt-2">
+                                                <Button
+                                                    type="submit"
+                                                    disabled={webhookForm.processing}
+                                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-5"
+                                                >
+                                                    {webhookForm.processing ? 'Saving...' : 'Save Custom Verify Token'}
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    </CardContent>
+                                </Card>
+
                                 <Card className="border-slate-200 shadow-sm rounded-xl bg-white">
                                     <CardHeader className="border-b border-slate-100 pb-4">
                                         <CardTitle className="text-lg font-semibold flex items-center gap-2 text-slate-900">

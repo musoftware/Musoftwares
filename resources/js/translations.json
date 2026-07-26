@@ -9840,7 +9840,8 @@
             "what_should_i_do_now": "ما الإجراء المطلوب مني الآن؟",
             "what_work_should_i_do_now": "ما الشغل المطلوب مني تنفيذه الآن؟",
             "are_you_sure_you_want_to_delete_this_service": "هل أنت تأكد من رغبتك في حذف هذه الخدمة؟",
-            "service_created_successfully_by_ai": "تم توليد الخدمة ونشرها بنجاح بواسطة الذكاء الاصطناعي!"
+            "service_created_successfully_by_ai": "تم توليد الخدمة ونشرها بنجاح بواسطة الذكاء الاصطناعي!",
+            "webhook_settings_saved_successfully": "تم حفظ إعدادات الويب هوك بنجاح."
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -21490,7 +21491,8 @@
             "what_should_i_do_now": "What should I do now?",
             "what_work_should_i_do_now": "What work should I do now?",
             "are_you_sure_you_want_to_delete_this_service": "Are you sure you want to delete this service?",
-            "service_created_successfully_by_ai": "Service generated and published successfully by AI!"
+            "service_created_successfully_by_ai": "Service generated and published successfully by AI!",
+            "webhook_settings_saved_successfully": "Webhook settings saved successfully."
         },
         "gold_saver": {
             "achieved": "Achieved",

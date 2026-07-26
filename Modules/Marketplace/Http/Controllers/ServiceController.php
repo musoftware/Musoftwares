@@ -256,7 +256,7 @@ class ServiceController extends Controller
 
         $service = DB::transaction(function () use ($validated, $request) {
             // Handle gallery uploads using standard Laravel Storage disk (public_uploads disk points directly to public/uploads)
-            $galleryPaths = [];
+            $galleryPaths = $validated['kept_gallery'] ?? $request->input('kept_gallery', []);
             if ($request->hasFile('gallery')) {
                 foreach ($request->file('gallery') as $image) {
                     $galleryPaths[] = $image->store('services/' . auth()->id(), 'public_uploads');
@@ -270,7 +270,9 @@ class ServiceController extends Controller
                 $thumbRelative = 'services/' . auth()->id() . '/thumb_' . basename($firstImagePath);
                 $thumbFullPath = public_path('uploads/' . $thumbRelative);
 
-                if (\App\Helpers\ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
+                if (file_exists(public_path('uploads/' . $thumbRelative))) {
+                    $thumbnailPath = $thumbRelative;
+                } elseif (\App\Helpers\ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
                     $thumbnailPath = $thumbRelative;
                 } else {
                     $thumbnailPath = $firstImagePath;
@@ -278,6 +280,7 @@ class ServiceController extends Controller
             }
 
             $user = auth()->user();
+
             $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin));
 
             $service = Service::create([
@@ -568,5 +571,55 @@ class ServiceController extends Controller
         return redirect()->route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug])
             ->with('success', __('general.service_created_successfully_by_ai') ?? 'Service generated successfully by AI!');
     }
+
+    public function destroy(Service $service)
+    {
+        $this->authorize('delete', $service);
+
+        $service->delete();
+
+        $referer = request()->headers->get('referer');
+        if ($referer && (str_contains($referer, '/marketplace/services/' . $service->id) || str_contains($referer, '/marketplace/services/' . $service->slug))) {
+            return redirect()->route('marketplace.services.index')
+                ->with('success', __('general.service_deleted_successfully'));
+        }
+
+        return redirect()->back()
+            ->with('success', __('general.service_deleted_successfully'));
+    }
+
+    public function generateAiImage(Request $request)
+    {
+        $user = auth()->user();
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+
+        if (!$isAdmin) {
+            return response()->json(['error' => 'Unauthorized access. Only admins can generate AI images.'], 403);
+        }
+
+        $validated = $request->validate([
+            'title'  => 'required|string|max:255',
+            'prompt' => 'nullable|string|max:500',
+        ]);
+
+        $prompt = !empty($validated['prompt']) ? $validated['prompt'] : $validated['title'];
+        $aiService = app(\App\Services\AI\MarketplaceAiService::class);
+        $result = $aiService->generateCoverImage($prompt, $user->id);
+
+        if (!empty($result['gallery'][0])) {
+            $imagePath = $result['gallery'][0];
+            return response()->json([
+                'success' => true,
+                'path'    => $imagePath,
+                'url'     => asset('uploads/' . ltrim($imagePath, '/')),
+            ]);
+        }
+
+        return response()->json([
+            'error' => 'Failed to generate AI image. Please verify API settings or try again.'
+        ], 500);
+    }
 }
+
+
 

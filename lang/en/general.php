@@ -7831,5 +7831,6 @@ return [
   'service_deleted_successfully' => 'Service deleted successfully.',
   'are_you_sure_you_want_to_delete_this_service' => 'Are you sure you want to delete this service?',
   'service_created_successfully_by_ai' => 'Service generated and published successfully by AI!',
+  'webhook_settings_saved_successfully' => 'Webhook settings saved successfully.',
 ];
 

@@ -62,13 +62,21 @@ The user provided the following service topic/title: "{$titlePrompt}".
 Available Category List (Pick the single best category_id matching this service):
 {$categoriesJson}
 
+DESCRIPTION FORMATTING REQUIREMENTS:
+The "description" field MUST be formatted professionally following this exact structure with clear section breaks:
+1. An engaging hook question or headline (e.g. "Need to integrate real-time notifications into your users?").
+2. An introductory value proposition paragraph explaining what will be built and the core benefits.
+3. A scenario paragraph detailing use cases (e.g. "Whether you need announcements, order updates, reminders, marketing campaigns...").
+4. A "What's Included" section with a bulleted list of 6-10 specific features/deliverables.
+5. A "Technologies" section with a bulleted list of relevant programming languages, frameworks, APIs, and databases.
+
 You MUST return strictly raw valid JSON matching this exact structure without markdown backticks:
 {
   "title": "Professional Catchy Title (5-10 words)",
   "tagline": "Compelling short tagline highlighting key benefit (1 sentence)",
   "category_id": 1,
   "tags": ["tag1", "tag2", "tag3", "tag4"],
-  "description": "Comprehensive detailed overview of the service (minimum 150 words). Include key features, technologies used, deliverables, and why clients should choose this service.",
+  "description": "Engaging hook question?\n\nClear introduction paragraph detailing exact integration and value proposition.\n\nWhether you need use case 1, use case 2, or use case 3, I will configure everything correctly and ensure seamless operation.\n\nWhat's Included\n- Deliverable 1\n- Deliverable 2\n- Deliverable 3\n- Deliverable 4\n- Deliverable 5\n- Clean, maintainable code\n\nTechnologies\n- Technology 1\n- Technology 2\n- Technology 3",
   "faq": [
     {"question": "What is included in the service?", "answer": "Detailed answer explaining deliverables..."},
     {"question": "How long does delivery take?", "answer": "Detailed answer explaining timeline..."}
@@ -106,7 +114,7 @@ You MUST return strictly raw valid JSON matching this exact structure without ma
       "features": ["Everything in Standard", "Priority Support", "Source Code", "Custom Addons"]
     }
   ],
-  "image_prompt": "A professional software feature showcase grid collage on a clean light background for {$titlePrompt}. Displays a multi-panel layout showing realistic web application UI dashboard mockups, admin analytics charts, browser popup dialogs, numbered badge labels (1, 2, 3), and a clean system architecture diagram. Modern crisp typography, clean SaaS presentation mockup, high quality 8k render."
+  "image_prompt": "A professional software feature showcase grid collage presentation for {$titlePrompt}. Clean light backdrop displaying multiple realistic SaaS web app UI dashboards, admin control screens with analytics graphs, browser push notification popup dialogs, numbered badge headers (1, 2, 3), and a clean system architecture diagram. Modern, crisp, ultra-high resolution software presentation mockup."
 }
 PROMPT;
     }
@@ -120,7 +128,7 @@ PROMPT;
             return null;
         }
 
-        $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
+        $model = AdminSettings::GetValue('openai_model') ?: 'gpt-4o';
 
         try {
             $response = Http::timeout(45)
@@ -211,11 +219,11 @@ PROMPT;
         $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
         $imageBinary = null;
 
-        $uiCollagePrompt = "A professional software feature showcase grid collage on a clean light background for " . Str::limit($imagePrompt, 300) . ". Displays a multi-panel layout showing realistic web application UI dashboard mockups, admin analytics charts, browser popup dialogs, numbered badge labels (1, 2, 3), and a clean system architecture diagram. Modern crisp typography, clean SaaS presentation mockup, high quality 8k render.";
+        $uiCollagePrompt = "A professional software feature showcase grid collage presentation for " . Str::limit($imagePrompt, 300) . ". Clean light backdrop displaying multiple realistic SaaS web app UI dashboards, admin control screens with analytics graphs, browser push notification popup dialogs, numbered badge headers (1, 2, 3), and a clean system architecture diagram. Modern, crisp, ultra-high resolution software presentation mockup.";
 
         if ($apiKey) {
             try {
-                $response = Http::timeout(60)
+                $response = Http::timeout(65)
                     ->withHeaders([
                         'Authorization' => 'Bearer ' . trim($apiKey),
                         'Content-Type'  => 'application/json',
@@ -223,8 +231,10 @@ PROMPT;
                     ->post('https://api.openai.com/v1/images/generations', [
                         'model'           => 'dall-e-3',
                         'prompt'          => $uiCollagePrompt,
+                        'quality'         => 'hd',
+                        'style'           => 'vivid',
                         'n'               => 1,
-                        'size'            => '1024x1024',
+                        'size'            => '1792x1024',
                         'response_format' => 'url',
                     ]);
 
@@ -234,18 +244,18 @@ PROMPT;
                         $imageBinary = Http::timeout(30)->get($imageUrl)->body();
                     }
                 } else {
-                    Log::warning('DALL-E 3 failed, trying DALL-E 2 fallback...', ['response' => $response->body()]);
-                    // Fallback to DALL-E 2
-                    $response2 = Http::timeout(45)
+                    Log::warning('DALL-E 3 HD failed, trying DALL-E 3 standard fallback...', ['response' => $response->body()]);
+                    // Fallback to DALL-E 3 Standard 1024x1024
+                    $response2 = Http::timeout(50)
                         ->withHeaders([
                             'Authorization' => 'Bearer ' . trim($apiKey),
                             'Content-Type'  => 'application/json',
                         ])
                         ->post('https://api.openai.com/v1/images/generations', [
-                            'model'           => 'dall-e-2',
-                            'prompt'          => Str::limit($uiCollagePrompt, 350),
+                            'model'           => 'dall-e-3',
+                            'prompt'          => Str::limit($uiCollagePrompt, 400),
                             'n'               => 1,
-                            'size'            => '512x512',
+                            'size'            => '1024x1024',
                             'response_format' => 'url',
                         ]);
                     if ($response2->successful()) {
@@ -260,13 +270,13 @@ PROMPT;
             }
         }
 
-        // Fallback to Pollinations AI image generator if OpenAI failed or key is missing
+        // Fallback to Pollinations Flux AI model if OpenAI failed or key is missing
         if (!$imageBinary) {
             try {
-                $pollinationsUrl = 'https://image.pollinations.ai/prompt/' . urlencode($uiCollagePrompt) . '?width=1024&height=680&nologo=true&seed=' . rand(100, 9999);
-                $imageBinary = Http::timeout(25)->get($pollinationsUrl)->body();
+                $pollinationsUrl = 'https://image.pollinations.ai/prompt/' . urlencode($uiCollagePrompt) . '?width=1200&height=675&model=flux&nologo=true&seed=' . rand(100, 9999);
+                $imageBinary = Http::timeout(30)->get($pollinationsUrl)->body();
             } catch (\Exception $e) {
-                Log::error('Pollinations fallback image generation failed: ' . $e->getMessage());
+                Log::error('Pollinations Flux fallback image generation failed: ' . $e->getMessage());
             }
         }
 

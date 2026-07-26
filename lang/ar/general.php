@@ -7831,5 +7831,6 @@ return array (
   'service_deleted_successfully' => 'تم حذف الخدمة بنجاح.',
   'are_you_sure_you_want_to_delete_this_service' => 'هل أنت تأكد من رغبتك في حذف هذه الخدمة؟',
   'service_created_successfully_by_ai' => 'تم توليد الخدمة ونشرها بنجاح بواسطة الذكاء الاصطناعي!',
+  'webhook_settings_saved_successfully' => 'تم حفظ إعدادات الويب هوك بنجاح.',
 );
 

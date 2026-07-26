@@ -190,4 +190,58 @@ class MarketplaceWorkflowTest extends TestCase
         // After completion, seller gets funds (price - 10% commission = 450)
         $this->assertEquals(550.00, $this->seller->fresh()->user_balance);
     }
+
+    public function test_seller_can_delete_own_service(): void
+    {
+        $service = Service::create([
+            'seller_id' => $this->seller->id,
+            'category_id' => $this->category->id,
+            'title' => 'Service To Be Deleted',
+            'description' => 'This service will be deleted by seller.',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($this->seller)
+            ->delete(route('marketplace.services.destroy', $service->id));
+
+        $response->assertStatus(302);
+        $this->assertSoftDeleted('marketplace_services', [
+            'id' => $service->id,
+        ]);
+    }
+
+    public function test_user_cannot_delete_other_user_service(): void
+    {
+        $otherUser = User::factory()->create(['onboarding_completed' => true]);
+        $otherUser->assignRole('client');
+
+        $service = Service::create([
+            'seller_id' => $this->seller->id,
+            'category_id' => $this->category->id,
+            'title' => 'Protected Service',
+            'description' => 'This service belongs to another seller.',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($otherUser)
+            ->delete(route('marketplace.services.destroy', $service->id));
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('marketplace_services', [
+            'id' => $service->id,
+            'deleted_at' => null,
+        ]);
+    }
+
+    public function test_non_admin_cannot_generate_ai_image(): void
+    {
+        $response = $this->actingAs($this->seller)
+            ->postJson(route('marketplace.services.generate-ai-image'), [
+                'title' => 'Test Service Title',
+            ]);
+
+        $response->assertStatus(403);
+    }
 }
+
+

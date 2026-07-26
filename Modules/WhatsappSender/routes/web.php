@@ -23,4 +23,7 @@ Route::middleware(['auth'])
         // Facebook Login OAuth routes
         Route::get('/auth/facebook', [FacebookAuthController::class, 'redirect'])->name('auth.facebook');
         Route::get('/auth/facebook/callback', [FacebookAuthController::class, 'callback'])->name('auth.facebook.callback');
+
+        // Webhook settings route
+        Route::post('/webhook-settings', [WhatsappSenderController::class, 'updateWebhookSettings'])->name('webhook-settings.update');
     });

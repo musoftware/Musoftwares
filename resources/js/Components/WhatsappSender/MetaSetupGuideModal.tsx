@@ -403,19 +403,32 @@ export const MetaSetupGuideModal: React.FC<MetaSetupGuideModalProps> = ({
 
                                 <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-3 text-xs text-slate-300">
                                     <h4 className="font-bold text-emerald-400 text-sm flex items-center gap-2">
-                                        <ExternalLink className="w-4 h-4" /> 2. إعداد الـ Webhooks (اختياري):
+                                        <ExternalLink className="w-4 h-4" /> 2. إعداد الـ Webhooks في Meta:
                                     </h4>
                                     <p className="leading-relaxed">
-                                        في تطبيق Meta، اذهب لـ <strong className="text-white">WhatsApp &gt; Configuration</strong> واشترك في الأحداث لمتابعة حالة التسليم والرسائل الواردة.
+                                        في تطبيق Meta، اذهب لـ <strong className="text-white">WhatsApp &gt; Configuration / API Setup</strong> وأدخل البيانات التالية ثم اضغط <strong className="text-emerald-400">Verify and save</strong>:
                                     </p>
-                                    <div className="p-2.5 bg-slate-950 border border-slate-800 rounded font-mono text-[11px] text-emerald-400 flex items-center justify-between">
-                                        <span className="truncate">/api/v1/whatsapp/webhook</span>
-                                        <button
-                                            onClick={() => copyToClipboard('/api/v1/whatsapp/webhook', 'webhook')}
-                                            className="text-slate-400 hover:text-white shrink-0 ml-2"
-                                        >
-                                            {copiedField === 'webhook' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                                        </button>
+                                    <div className="space-y-2 dir-ltr">
+                                        <div className="p-2 bg-slate-950 border border-slate-800 rounded font-mono text-[11px] text-emerald-400 flex items-center justify-between">
+                                            <span className="truncate">{window.location.origin}/api/v1/whatsapp/webhook</span>
+                                            <button
+                                                onClick={() => copyToClipboard(`${window.location.origin}/api/v1/whatsapp/webhook`, 'webhook_url')}
+                                                className="text-slate-400 hover:text-white shrink-0 ml-2 flex items-center gap-1 text-[10px]"
+                                            >
+                                                {copiedField === 'webhook_url' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                {copiedField === 'webhook_url' ? 'Copied' : 'Callback URL'}
+                                            </button>
+                                        </div>
+                                        <div className="p-2 bg-slate-950 border border-slate-800 rounded font-mono text-[11px] text-emerald-400 flex items-center justify-between">
+                                            <span className="truncate">musoftware_whatsapp_verify_token_2026</span>
+                                            <button
+                                                onClick={() => copyToClipboard('musoftware_whatsapp_verify_token_2026', 'verify_token')}
+                                                className="text-slate-400 hover:text-white shrink-0 ml-2 flex items-center gap-1 text-[10px]"
+                                            >
+                                                {copiedField === 'verify_token' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                {copiedField === 'verify_token' ? 'Copied' : 'Verify Token'}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

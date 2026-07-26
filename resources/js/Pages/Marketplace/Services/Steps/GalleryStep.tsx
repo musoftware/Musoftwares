@@ -1,13 +1,50 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
-import { Image as ImageIcon, Video, X, UploadCloud } from 'lucide-react';
+import { Image as ImageIcon, Video, X, UploadCloud, Sparkles, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { usePage } from '@inertiajs/react';
+import axios from 'axios';
 import { __ } from '@/lib/i18n';
 
 export default function GalleryStep({ data, setData, errors }: any) {
+    const { auth } = usePage().props as any;
+    const isAdmin = auth?.user && (
+        auth.user.role === 'admin' || 
+        auth.user.role === 'super_admin' || 
+        auth.user.roles?.includes('admin') || 
+        auth.user.is_admin
+    );
+
+    const [generatingAi, setGeneratingAi] = useState(false);
+    const [aiError, setAiError] = useState<string | null>(null);
+
     const keptCount = data.kept_gallery?.length || 0;
     const totalCount = keptCount + (data.gallery?.length || 0);
+
+    const handleGenerateAiImage = async () => {
+        if (totalCount >= 5) return;
+        setGeneratingAi(true);
+        setAiError(null);
+
+        try {
+            const titlePrompt = data.title || 'Software Development Service';
+            const response = await axios.post(route('marketplace.services.generate-ai-image'), {
+                title: titlePrompt,
+            });
+
+            if (response.data?.success && response.data?.path) {
+                const newKept = [...(data.kept_gallery || []), response.data.path];
+                setData('kept_gallery', newKept);
+            } else {
+                setAiError(response.data?.error || 'فشل في توليد الصورة. يرجى المحاولة لاحقاً.');
+            }
+        } catch (err: any) {
+            setAiError(err?.response?.data?.error || err?.message || 'حدث خطأ أثناء الاتصال بسيرفر الذكاء الاصطناعي.');
+        } finally {
+            setGeneratingAi(false);
+        }
+    };
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const currentTotal = (data.kept_gallery?.length || 0) + (data.gallery?.length || 0);
@@ -47,7 +84,52 @@ export default function GalleryStep({ data, setData, errors }: any) {
                 <p className="text-sm text-slate-500">{__('general.encourage_buyers_to_choose_your_service_by_featuring_a_variety_of_your_work')}</p>
             </div>
 
+            {isAdmin && (
+                <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 sm:p-5 border border-indigo-500/30 shadow-md">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-indigo-500/20 rounded-xl border border-indigo-400/30 shrink-0">
+                                <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold flex items-center gap-2 text-white">
+                                    توليد صورة بالذكاء الاصطناعي (أدمن فقط)
+                                    <span className="text-[10px] bg-amber-400/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">Admin Only</span>
+                                </h4>
+                                <p className="text-xs text-slate-300 mt-0.5">
+                                    سيقوم الذكاء الاصطناعي (DALL-E 3 / Flux) بتصميم غلاف برادكست شوت واحترافي لخدمتك وتطبيقه فوراً!
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={handleGenerateAiImage}
+                            disabled={generatingAi || totalCount >= 5}
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {generatingAi ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
+                                    <span>جاري تصميم الصورة بالـ AI...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="w-4 h-4 text-amber-300" />
+                                    <span>توليد صورة AI تلقائياً</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {aiError && (
+                        <p className="text-xs text-red-400 mt-2 font-medium bg-red-950/40 p-2 rounded-lg border border-red-500/20">{aiError}</p>
+                    )}
+                </div>
+            )}
+
             <div className="space-y-4">
+
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
                         <ImageIcon className="w-5 h-5 text-indigo-500" /> Images (up to 5)

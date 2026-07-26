@@ -79,6 +79,10 @@ class WhatsappSenderController extends Controller
             session()->forget('fb_oauth_token');
         }
 
+        // Webhook settings & token
+        $webhookUrl = url('/api/v1/whatsapp/webhook');
+        $webhookVerifyToken = \App\Models\AdminSettings::GetValue('whatsapp_webhook_verify_token', 'musoftware_whatsapp_verify_token_2026');
+
         return Inertia::render('WhatsappSender/Index', [
             'businesses' => $businesses,
             'accounts' => $accounts,
@@ -87,7 +91,23 @@ class WhatsappSenderController extends Controller
             'apiToken' => $apiToken,
             'facebookLoginUrl' => route('whatsapp.auth.facebook'),
             'fbOauthToken' => $fbOauthToken,
+            'webhookUrl' => $webhookUrl,
+            'webhookVerifyToken' => $webhookVerifyToken,
         ]);
+    }
+
+    /**
+     * Update Meta Webhook Verify Token in AdminSettings.
+     */
+    public function updateWebhookSettings(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'webhook_verify_token' => ['required', 'string', 'max:255'],
+        ]);
+
+        \App\Models\AdminSettings::SetValue('whatsapp_webhook_verify_token', trim($validated['webhook_verify_token']));
+
+        return redirect()->route('whatsapp.index')->with('success', __('general.webhook_settings_saved_successfully') ?? 'Webhook verify token updated successfully!');
     }
 
     /**

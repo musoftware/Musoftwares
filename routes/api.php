@@ -130,6 +130,12 @@ if (file_exists(base_path('Modules/CRM/routes/api.php'))) {
     require base_path('Modules/CRM/routes/api.php');
 }
 
+// ── Meta WhatsApp Cloud API Webhook ─────────────────────────────────────────
+Route::get('v1/whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'verify'])
+    ->name('api.v1.whatsapp.webhook.verify');
+Route::post('v1/whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'handle'])
+    ->name('api.v1.whatsapp.webhook.handle');
+
 // ── Incoming Webhooks ────────────────────────────────────────────────────────
 // Handles all incoming webhooks from external providers
 Route::post('webhooks/incoming/{source}', [WebhookController::class, 'handle'])
