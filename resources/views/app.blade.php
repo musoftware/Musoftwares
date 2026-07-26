@@ -11,20 +11,36 @@
 
         <title inertia>{{ isset($meta) && isset($meta['title']) ? $meta['title'] : config('app.name', 'Laravel') }}</title>
         
+        @php
+            $cleanCurrentUrl = strtok(url()->full(), '?');
+            $canonicalUrl = $meta['canonical_url'] ?? $cleanCurrentUrl;
+            $enAlternateUrl = $meta['en_url'] ?? ($cleanCurrentUrl . '?lang=en');
+            $arAlternateUrl = $meta['ar_url'] ?? ($cleanCurrentUrl . '?lang=ar');
+        @endphp
+
+        <link rel="canonical" href="{{ $canonicalUrl }}">
+        <link rel="alternate" hreflang="en" href="{{ $enAlternateUrl }}" />
+        <link rel="alternate" hreflang="ar" href="{{ $arAlternateUrl }}" />
+        <link rel="alternate" hreflang="x-default" href="{{ $canonicalUrl }}" />
+
         @if(isset($meta))
             <meta name="description" content="{{ $meta['description'] ?? '' }}">
             <meta property="og:title" content="{{ $meta['title'] ?? '' }}">
             <meta property="og:description" content="{{ $meta['description'] ?? '' }}">
             <meta property="og:image" content="{{ $meta['image'] ?? '' }}">
-            <meta property="og:url" content="{{ $meta['url'] ?? url()->current() }}">
+            <meta property="og:url" content="{{ $meta['url'] ?? $cleanCurrentUrl }}">
             <meta property="og:type" content="{{ $meta['type'] ?? 'website' }}">
             <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
             <meta name="twitter:card" content="summary_large_image">
             <meta name="twitter:title" content="{{ $meta['title'] ?? '' }}">
             <meta name="twitter:description" content="{{ $meta['description'] ?? '' }}">
             <meta name="twitter:image" content="{{ $meta['image'] ?? '' }}">
-            <link rel="canonical" href="{{ $meta['url'] ?? url()->current() }}">
             <meta name="robots" content="{{ $meta['robots'] ?? 'index, follow' }}">
+            @if(isset($meta['schema_json']))
+                <script type="application/ld+json">
+                    {!! json_encode($meta['schema_json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+                </script>
+            @endif
         @else
             <meta name="robots" content="index, follow">
             <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">

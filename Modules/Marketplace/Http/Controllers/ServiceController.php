@@ -86,13 +86,15 @@ class ServiceController extends Controller
         $services = $query->latest()->paginate(15);
         $categories = ServiceCategory::orderBy('name')->get();
 
+        $currentLocale = app()->getLocale();
         $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
         $userFavoriteIds = auth()->check()
             ? \App\Models\Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->pluck('favoritable_id')->toArray()
             : [];
 
-        $services->getCollection()->transform(function ($service) use ($viewerCurrency, $userFavoriteIds) {
+        $services->getCollection()->transform(function ($service) use ($viewerCurrency, $userFavoriteIds, $currentLocale) {
             $service->is_favorited = in_array($service->id, $userFavoriteIds);
+            $service = $this->localizeService($service, $currentLocale);
             $service->packages->transform(function ($package) use ($viewerCurrency) {
                 if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
                     $package->price = \App\Models\CurrenciesExchange::RateToday(
@@ -108,6 +110,9 @@ class ServiceController extends Controller
             return $service;
         });
 
+        $canonicalUrl = route('marketplace.services.index');
+        $isAr = $currentLocale === 'ar';
+
         return Inertia::render('Marketplace/Browse', [
             'services' => $services,
             'categories' => $categories,
@@ -119,10 +124,13 @@ class ServiceController extends Controller
             ],
         ])->withViewData([
             'meta' => [
-                'title'       => 'Software Development & IT Services Marketplace | MuSoftwares',
-                'description' => 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
+                'title'       => $isAr ? 'سوق تطوير البرمجيات والخدمات التقنية | MuSoftwares' : 'Software Development & IT Services Marketplace | MuSoftwares',
+                'description' => $isAr ? 'تصفح أفضل خدمات تطوير البرمجيات وحلول تقنية المعلومات والسكربتات المخصصة على سوق MuSoftwares.' : 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
                 'image'       => url('/images/og-default.jpg'),
-                'url'         => route('marketplace.services.index'),
+                'url'         => $canonicalUrl,
+                'canonical_url' => $canonicalUrl,
+                'en_url'      => $canonicalUrl . '?lang=en',
+                'ar_url'      => $canonicalUrl . '?lang=ar',
                 'type'        => 'website',
             ]
         ]);
@@ -217,10 +225,28 @@ class ServiceController extends Controller
             return $package;
         });
 
+        $currentLocale = app()->getLocale();
+        $service = $this->localizeService($service, $currentLocale);
+
         $shareTitle = $service->title . ' | Musoftware Marketplace';
         $shareDesc = \Illuminate\Support\Str::limit(strip_tags($service->tagline ?: $service->description ?: $service->title), 160);
         $shareImage = $service->cover_image;
-        $shareUrl = route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug]);
+        $canonicalUrl = route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug]);
+
+        $schemaJson = [
+            '@context' => 'https://schema.org/',
+            '@type' => 'Product',
+            'name' => $service->title,
+            'image' => [$shareImage],
+            'description' => $shareDesc,
+            'offers' => [
+                '@type' => 'AggregateOffer',
+                'priceCurrency' => $viewerCurrency->currency ?? 'USD',
+                'lowPrice' => $service->packages->min('price') ?? 0,
+                'highPrice' => $service->packages->max('price') ?? 0,
+                'offerCount' => $service->packages->count() ?: 1,
+            ]
+        ];
 
         return Inertia::render('Marketplace/Services/Show', [
             'service' => $service,
@@ -229,10 +255,99 @@ class ServiceController extends Controller
                 'title'       => $shareTitle,
                 'description' => $shareDesc,
                 'image'       => $shareImage,
-                'url'         => $shareUrl,
+                'url'         => $canonicalUrl,
+                'canonical_url' => $canonicalUrl,
+                'en_url'      => $canonicalUrl . '?lang=en',
+                'ar_url'      => $canonicalUrl . '?lang=ar',
                 'type'        => 'product',
+                'schema_json' => $schemaJson,
             ]
         ]);
+    }
+
+    /**
+     * Auto-translate service fields if missing for current locale and cache in DB.
+     */
+    protected function localizeService(Service $service, string $targetLocale): Service
+    {
+        if (!in_array($targetLocale, ['en', 'ar'])) {
+            return $service;
+        }
+
+        try {
+            /** @var \App\Services\TranslationService $translator */
+            $translator = app(\App\Services\TranslationService::class);
+            $updated = false;
+
+            $titleTrans = $service->title_translations ?? [];
+            if (empty($titleTrans[$targetLocale]) && !empty($service->title)) {
+                $sourceLang = $translator->detectLanguage($service->title);
+                if ($sourceLang !== $targetLocale) {
+                    $translatedTitle = $translator->translate($service->title, $targetLocale, $sourceLang);
+                    if (!empty($translatedTitle)) {
+                        $titleTrans[$targetLocale] = $translatedTitle;
+                        $service->title_translations = $titleTrans;
+                        $updated = true;
+                    }
+                } else {
+                    $titleTrans[$targetLocale] = $service->title;
+                    $service->title_translations = $titleTrans;
+                    $updated = true;
+                }
+            }
+
+            $taglineTrans = $service->tagline_translations ?? [];
+            if (empty($taglineTrans[$targetLocale]) && !empty($service->tagline)) {
+                $sourceLang = $translator->detectLanguage($service->tagline);
+                if ($sourceLang !== $targetLocale) {
+                    $translatedTagline = $translator->translate($service->tagline, $targetLocale, $sourceLang);
+                    if (!empty($translatedTagline)) {
+                        $taglineTrans[$targetLocale] = $translatedTagline;
+                        $service->tagline_translations = $taglineTrans;
+                        $updated = true;
+                    }
+                } else {
+                    $taglineTrans[$targetLocale] = $service->tagline;
+                    $service->tagline_translations = $taglineTrans;
+                    $updated = true;
+                }
+            }
+
+            $descTrans = $service->description_translations ?? [];
+            if (empty($descTrans[$targetLocale]) && !empty($service->description)) {
+                $sourceLang = $translator->detectLanguage($service->description);
+                if ($sourceLang !== $targetLocale) {
+                    $translatedDesc = $translator->translate($service->description, $targetLocale, $sourceLang);
+                    if (!empty($translatedDesc)) {
+                        $descTrans[$targetLocale] = $translatedDesc;
+                        $service->description_translations = $descTrans;
+                        $updated = true;
+                    }
+                } else {
+                    $descTrans[$targetLocale] = $service->description;
+                    $service->description_translations = $descTrans;
+                    $updated = true;
+                }
+            }
+
+            if ($updated) {
+                $service->save();
+            }
+
+            if (!empty($titleTrans[$targetLocale])) {
+                $service->title = $titleTrans[$targetLocale];
+            }
+            if (!empty($taglineTrans[$targetLocale])) {
+                $service->tagline = $taglineTrans[$targetLocale];
+            }
+            if (!empty($descTrans[$targetLocale])) {
+                $service->description = $descTrans[$targetLocale];
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("localizeService failed for service {$service->id}: " . $e->getMessage());
+        }
+
+        return $service;
     }
 
     public function create()

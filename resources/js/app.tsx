@@ -1,14 +1,23 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from '@/Components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
+import { syncDocumentDirection } from '@/lib/i18n';
 // WebSockets disabled for main SaaS
+
+// Listen for Inertia page transitions to keep document lang & dir synced
+router.on('navigate', (event) => {
+    const locale = (event.detail.page.props as any)?.locale;
+    if (locale) {
+        syncDocumentDirection(locale);
+    }
+});
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -60,6 +69,9 @@ createInertiaApp({
         const root = createRoot(el);
         
         const pageProps = props.initialPage.props as any;
+        if (pageProps.locale) {
+            syncDocumentDirection(pageProps.locale);
+        }
         if (pageProps.currencies) {
             (window as any).currencies = pageProps.currencies;
         }
