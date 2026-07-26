@@ -212,7 +212,7 @@ PROMPT;
     }
 
     /**
-     * Generate Cover Image via OpenAI DALL-E (or fallback to Pollinations)
+     * Generate Cover Image via latest OpenAI ChatGPT Image API (gpt-image-2 / dall-e-3) with Pollinations fallback
      */
     public function generateCoverImage(string $imagePrompt, int $sellerId): array
     {
@@ -222,51 +222,72 @@ PROMPT;
         $uiCollagePrompt = "A professional software feature showcase grid collage presentation for " . Str::limit($imagePrompt, 300) . ". Clean light backdrop displaying multiple realistic SaaS web app UI dashboards, admin control screens with analytics graphs, browser push notification popup dialogs, numbered badge headers (1, 2, 3), and a clean system architecture diagram. Modern, crisp, ultra-high resolution software presentation mockup.";
 
         if ($apiKey) {
-            try {
-                $response = Http::timeout(65)
-                    ->withHeaders([
-                        'Authorization' => 'Bearer ' . trim($apiKey),
-                        'Content-Type'  => 'application/json',
-                    ])
-                    ->post('https://api.openai.com/v1/images/generations', [
-                        'model'           => 'dall-e-3',
+            $primaryModel = AdminSettings::GetValue('openai_image_model', 'gpt-image-2');
+            $modelsToTry = array_unique(['gpt-image-2', 'dall-e-3']);
+
+            foreach ($modelsToTry as $model) {
+                try {
+                    $payload = [
+                        'model'           => $model,
                         'prompt'          => $uiCollagePrompt,
-                        'quality'         => 'hd',
-                        'style'           => 'vivid',
                         'n'               => 1,
                         'size'            => '1792x1024',
                         'response_format' => 'url',
-                    ]);
+                    ];
 
-                if ($response->successful()) {
-                    $imageUrl = $response->json('data.0.url');
-                    if ($imageUrl) {
-                        $imageBinary = Http::timeout(30)->get($imageUrl)->body();
+                    if (in_array($model, ['gpt-image-2', 'dall-e-3'])) {
+                        $payload['quality'] = 'hd';
+                        $payload['style']   = 'vivid';
                     }
-                } else {
-                    Log::warning('DALL-E 3 HD failed, trying DALL-E 3 standard fallback...', ['response' => $response->body()]);
-                    // Fallback to DALL-E 3 Standard 1024x1024
-                    $response2 = Http::timeout(50)
+
+                    $response = Http::timeout(65)
                         ->withHeaders([
                             'Authorization' => 'Bearer ' . trim($apiKey),
                             'Content-Type'  => 'application/json',
                         ])
-                        ->post('https://api.openai.com/v1/images/generations', [
-                            'model'           => 'dall-e-3',
+                        ->post('https://api.openai.com/v1/images/generations', $payload);
+
+                    if ($response->successful()) {
+                        $imageUrl = $response->json('data.0.url');
+                        if ($imageUrl) {
+                            $imageBinary = Http::timeout(30)->get($imageUrl)->body();
+                            if (!empty($imageBinary)) {
+                                Log::info("Successfully generated cover image using OpenAI model: {$model}");
+                                break;
+                            }
+                        }
+                    } else {
+                        Log::warning("OpenAI image generation failed with model {$model}, trying next fallback...", ['response' => $response->body()]);
+                        
+                        // Try 1024x1024 standard resolution for model if widescreen failed
+                        $fallbackPayload = [
+                            'model'           => $model,
                             'prompt'          => Str::limit($uiCollagePrompt, 400),
                             'n'               => 1,
                             'size'            => '1024x1024',
                             'response_format' => 'url',
-                        ]);
-                    if ($response2->successful()) {
-                        $imageUrl = $response2->json('data.0.url');
-                        if ($imageUrl) {
-                            $imageBinary = Http::timeout(30)->get($imageUrl)->body();
+                        ];
+                        $response2 = Http::timeout(50)
+                            ->withHeaders([
+                                'Authorization' => 'Bearer ' . trim($apiKey),
+                                'Content-Type'  => 'application/json',
+                            ])
+                            ->post('https://api.openai.com/v1/images/generations', $fallbackPayload);
+
+                        if ($response2->successful()) {
+                            $imageUrl = $response2->json('data.0.url');
+                            if ($imageUrl) {
+                                $imageBinary = Http::timeout(30)->get($imageUrl)->body();
+                                if (!empty($imageBinary)) {
+                                    Log::info("Successfully generated cover image (1024x1024) using OpenAI model: {$model}");
+                                    break;
+                                }
+                            }
                         }
                     }
+                } catch (\Exception $e) {
+                    Log::error("OpenAI image generation exception with model {$model}: " . $e->getMessage());
                 }
-            } catch (\Exception $e) {
-                Log::error('DALL-E image generation exception: ' . $e->getMessage());
             }
         }
 
@@ -274,7 +295,10 @@ PROMPT;
         if (!$imageBinary) {
             try {
                 $pollinationsUrl = 'https://image.pollinations.ai/prompt/' . urlencode($uiCollagePrompt) . '?width=1200&height=675&model=flux&nologo=true&seed=' . rand(100, 9999);
-                $imageBinary = Http::timeout(30)->get($pollinationsUrl)->body();
+                $res = Http::timeout(30)->get($pollinationsUrl);
+                if ($res->successful()) {
+                    $imageBinary = $res->body();
+                }
             } catch (\Exception $e) {
                 Log::error('Pollinations Flux fallback image generation failed: ' . $e->getMessage());
             }
