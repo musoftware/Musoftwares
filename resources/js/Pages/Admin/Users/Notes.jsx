@@ -278,20 +278,17 @@ export default function Notes({ user, notes, stats }) {
         setContent(decContent && !decContent.startsWith('🔒') ? decContent : '');
         setCategory(note.category === 'archived' ? 'notes' : note.category);
         setExpiresAt(note.expires_at ? note.expires_at.slice(0, 10) : '');
-        
-        if (window.innerWidth < 1024) {
-            setShowCreateSheet(true);
-        } else {
-            const formElement = document.getElementById('category');
-            if (formElement) {
-                formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                // Focus the title input for editing immediate convenience
-                setTimeout(() => {
-                    const titleInput = document.getElementById('title');
-                    if (titleInput) titleInput.focus();
-                }, 300);
-            }
-        }
+        setError(null);
+        setShowCreateSheet(true);
+    };
+
+    const handleOpenCreateModal = () => {
+        setEditingNote(null);
+        setTitle('');
+        setContent('');
+        setExpiresAt('');
+        setError(null);
+        setShowCreateSheet(true);
     };
 
     const handleArchive = (noteId, currentCategory) => {
@@ -445,6 +442,15 @@ export default function Notes({ user, notes, stats }) {
                     <p className="text-slate-500 text-sm">{__('general.encrypted_notes_for_user', { name: user.name })}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                    <Button
+                        type="button"
+                        onClick={handleOpenCreateModal}
+                        disabled={!isPasswordSet}
+                        className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
+                    >
+                        <Plus size={16} className="me-2" />
+                        {__('general.create_note') || 'Create Note'}
+                    </Button>
                     <Button asChild variant="outline" className="border-slate-200">
                         <Link href={`/admin/users/${user.id}/files`}>{__('general.files')}</Link>
                     </Button>
@@ -530,8 +536,7 @@ export default function Notes({ user, notes, stats }) {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-4">
+            <div className="w-full space-y-4">
                     <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
                         <div className="flex flex-wrap items-center gap-3 flex-1">
                             <Input
@@ -621,7 +626,7 @@ export default function Notes({ user, notes, stats }) {
                     )}
 
                     {viewMode === 'card' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {filteredNotes.map((note) => (
                                 <CardViewItem
                                     key={note.id}
@@ -742,7 +747,7 @@ export default function Notes({ user, notes, stats }) {
                                     : __('general.unlock_to_view_notes')}
                             </p>
                             {isPasswordSet && (
-                                <Button onClick={() => setShowCreateSheet(true)} className="bg-slate-900 hover:bg-slate-800 text-white">
+                                <Button onClick={handleOpenCreateModal} className="bg-slate-900 hover:bg-slate-800 text-white">
                                     <Plus size={16} className="me-2" /> {__('general.add_first_note')}
                                 </Button>
                             )}
@@ -818,33 +823,8 @@ export default function Notes({ user, notes, stats }) {
                     )}
                 </div>
 
-                <div className="lg:col-span-1 hidden lg:block">
-                    <CreateNoteForm
-                        title={title}
-                        content={content}
-                        category={category}
-                        expiresAt={expiresAt}
-                        loading={loading}
-                        error={error}
-                        editingNote={editingNote}
-                        isPasswordSet={isPasswordSet}
-                        setTitle={setTitle}
-                        setContent={setContent}
-                        setCategory={setCategory}
-                        setExpiresAt={setExpiresAt}
-                        onSubmit={() => submitNote(editingNote ? 'edit' : 'create')}
-                        onCancel={() => {
-                            setEditingNote(null);
-                            setTitle('');
-                            setContent('');
-                            setExpiresAt('');
-                        }}
-                    />
-                </div>
-            </div>
-
             <div className="lg:hidden fixed bottom-6 inset-x-0 z-30 px-6">
-                <Button onClick={() => setShowCreateSheet(true)} className="w-full bg-slate-900 hover:bg-slate-800 text-white shadow-lg">
+                <Button onClick={handleOpenCreateModal} disabled={!isPasswordSet} className="w-full bg-slate-900 hover:bg-slate-800 text-white shadow-lg">
                     <Plus size={16} className="me-2" /> {__('general.add_note')}
                 </Button>
             </div>
@@ -911,7 +891,19 @@ export default function Notes({ user, notes, stats }) {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={showCreateSheet} onOpenChange={setShowCreateSheet}>
+            <Dialog
+                open={showCreateSheet}
+                onOpenChange={(open) => {
+                    setShowCreateSheet(open);
+                    if (!open) {
+                        setEditingNote(null);
+                        setTitle('');
+                        setContent('');
+                        setExpiresAt('');
+                        setError(null);
+                    }
+                }}
+            >
                 <DialogContent className="sm:max-w-lg bg-white p-0 overflow-hidden">
                     <CreateNoteForm
                         title={title}
@@ -934,6 +926,7 @@ export default function Notes({ user, notes, stats }) {
                             setTitle('');
                             setContent('');
                             setExpiresAt('');
+                            setError(null);
                         }}
                     />
                 </DialogContent>

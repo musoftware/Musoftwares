@@ -49,6 +49,7 @@ interface WhatsappBusiness {
     currency: string;
     per_message_fee: string | number;
     status: string;
+    webhook_verify_token?: string;
     accounts_count?: number;
     created_at: string;
 }
@@ -237,34 +238,44 @@ export default function Index({
         });
     };
 
+    useEffect(() => {
+        if (activeBusiness?.webhook_verify_token) {
+            webhookForm.setData('webhook_verify_token', activeBusiness.webhook_verify_token);
+        }
+    }, [activeBusiness?.id, activeBusiness?.webhook_verify_token]);
+
+    const currentBusinessWebhookUrl = activeBusiness
+        ? `${window.location.origin}/api/v1/whatsapp/webhook/biz/${activeBusiness.id}`
+        : `${window.location.origin}/api/v1/whatsapp/webhook`;
+
     const copyWebhookUrl = () => {
-        const fullUrl = webhookUrl || `${window.location.origin}/api/v1/whatsapp/webhook`;
-        navigator.clipboard.writeText(fullUrl);
+        navigator.clipboard.writeText(currentBusinessWebhookUrl);
         setCopiedWebhookUrl(true);
         setTimeout(() => setCopiedWebhookUrl(false), 2000);
-        toast({ title: 'Copied', description: 'Callback URL copied to clipboard.' });
+        toast({ title: 'Copied', description: `Callback URL for ${activeBusiness?.name || 'Business'} copied to clipboard.` });
     };
 
     const copyVerifyToken = () => {
         navigator.clipboard.writeText(webhookForm.data.webhook_verify_token);
         setCopiedVerifyToken(true);
         setTimeout(() => setCopiedVerifyToken(false), 2000);
-        toast({ title: 'Copied', description: 'Verify token copied to clipboard.' });
+        toast({ title: 'Copied', description: `Verify token for ${activeBusiness?.name || 'Business'} copied to clipboard.` });
     };
 
     const handleWebhookSettingsSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        webhookForm.post(route('whatsapp.webhook-settings.update'), {
+        if (!activeBusiness) return;
+        webhookForm.post(route('whatsapp.businesses.webhook-token', activeBusiness.id), {
             onSuccess: () => {
                 toast({
-                    title: 'Webhook Token Saved',
-                    description: 'Verify token updated successfully. Use this token when configuring Meta Webhook.',
+                    title: 'Business Webhook Token Saved',
+                    description: `Verify token for "${activeBusiness.name}" updated successfully.`,
                 });
             },
             onError: (errors) => {
                 toast({
                     title: 'Save Error',
-                    description: Object.values(errors)[0] as string || 'Failed to update verify token.',
+                    description: Object.values(errors)[0] as string || 'Failed to update business verify token.',
                     variant: 'destructive',
                 });
             },
@@ -909,14 +920,14 @@ export default function Index({
                                     <CardHeader className="border-b border-slate-100 pb-4 flex flex-row items-center justify-between gap-4">
                                         <div>
                                             <CardTitle className="text-lg font-semibold flex items-center gap-2 text-slate-900">
-                                                <Activity className="w-5 h-5 text-indigo-600" /> Meta Webhooks Configuration (Step 2. Production setup)
+                                                <Activity className="w-5 h-5 text-indigo-600" /> Meta Webhooks Configuration ({activeBusiness?.name || 'Business'})
                                             </CardTitle>
                                             <CardDescription>
-                                                Configure Webhooks in Meta for Developers Console to receive incoming messages & status updates.
+                                                Configure Webhooks in Meta for Developers Console to receive incoming messages & status updates for {activeBusiness?.name || 'this business profile'}.
                                             </CardDescription>
                                         </div>
                                         <Badge className="bg-indigo-50 text-indigo-700 border-indigo-200 text-xs font-semibold px-2.5 py-1">
-                                            Meta Cloud API
+                                            Per-Business Webhook
                                         </Badge>
                                     </CardHeader>
                                     <CardContent className="pt-6 space-y-6">
@@ -924,9 +935,9 @@ export default function Index({
                                         <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl flex items-start gap-3 text-xs text-amber-900">
                                             <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                             <div className="space-y-1">
-                                                <strong className="font-bold text-amber-950 block">إعدادات الـ Webhooks في Meta Developer Console:</strong>
+                                                <strong className="font-bold text-amber-950 block">إعدادات الـ Webhooks في Meta Developer Console لـ ({activeBusiness?.name}):</strong>
                                                 <p className="leading-relaxed text-amber-800">
-                                                    انتقل إلى منصة <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer" className="underline font-bold text-amber-950">Meta for Developers</a> 👈 تطبيقك 👈 <strong className="text-amber-950">WhatsApp 👈 Configuration / API Setup</strong>، ثم ألصق الـ <strong className="text-amber-950">Callback URL</strong> والـ <strong className="text-amber-950 font-mono">Verify Token</strong> الموضحين بالأسفل واضغط على <strong className="text-amber-950">Verify and save</strong>.
+                                                    انتقل إلى منصة <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer" className="underline font-bold text-amber-950">Meta for Developers</a> 👈 تطبيقك 👈 <strong className="text-amber-950">WhatsApp 👈 Configuration / API Setup</strong>، ثم ألصق الـ <strong className="text-amber-950">Callback URL</strong> والـ <strong className="text-amber-950 font-mono">Verify Token</strong> الموضحين بالأسفل لـ <strong className="text-indigo-950 underline">{activeBusiness?.name}</strong> واضغط على <strong className="text-amber-950">Verify and save</strong>.
                                                 </p>
                                             </div>
                                         </div>
@@ -935,15 +946,15 @@ export default function Index({
                                             {/* Field 1: Callback URL */}
                                             <div className="space-y-1.5">
                                                 <Label htmlFor="webhook_callback_url" className="text-slate-800 font-semibold flex items-center gap-2">
-                                                    Callback URL
-                                                    <span className="text-xs text-slate-400 font-normal">(عنوان الـ Webhook الخاص بنظامك في Meta)</span>
+                                                    Callback URL ({activeBusiness?.name})
+                                                    <span className="text-xs text-slate-400 font-normal">(عنوان الـ Webhook المخصص لملف هذا الـ Business في Meta)</span>
                                                 </Label>
                                                 <div className="flex gap-2">
                                                     <Input
                                                         id="webhook_callback_url"
                                                         readOnly
-                                                        value={webhookUrl || `${window.location.origin}/api/v1/whatsapp/webhook`}
-                                                        className="font-mono text-xs bg-slate-50 border-slate-300 text-slate-900"
+                                                        value={currentBusinessWebhookUrl}
+                                                        className="font-mono text-xs bg-slate-50 border-slate-300 text-slate-900 font-semibold"
                                                     />
                                                     <Button
                                                         type="button"
@@ -960,15 +971,15 @@ export default function Index({
                                             {/* Field 2: Verify Token */}
                                             <div className="space-y-1.5">
                                                 <Label htmlFor="webhook_verify_token" className="text-slate-800 font-semibold flex items-center gap-2">
-                                                    Verify token
-                                                    <span className="text-xs text-slate-400 font-normal">(رمز التوثيق السري لمصادقة الـ Webhook)</span>
+                                                    Verify token ({activeBusiness?.name})
+                                                    <span className="text-xs text-slate-400 font-normal">(رمز التوثيق السري الخاص بملف هذا الـ Business)</span>
                                                 </Label>
                                                 <div className="flex gap-2">
                                                     <Input
                                                         id="webhook_verify_token"
                                                         value={webhookForm.data.webhook_verify_token}
                                                         onChange={(e) => webhookForm.setData('webhook_verify_token', e.target.value)}
-                                                        placeholder="musoftware_whatsapp_verify_token_2026"
+                                                        placeholder="biz_wt_..."
                                                         className="font-mono text-xs bg-white border-slate-300 text-slate-900"
                                                         required
                                                     />
@@ -993,7 +1004,7 @@ export default function Index({
                                                     disabled={webhookForm.processing}
                                                     className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-5"
                                                 >
-                                                    {webhookForm.processing ? 'Saving...' : 'Save Custom Verify Token'}
+                                                    {webhookForm.processing ? 'Saving...' : `Save ${activeBusiness?.name || 'Business'} Verify Token`}
                                                 </Button>
                                             </div>
                                         </form>

@@ -18,6 +18,7 @@ Route::middleware(['auth'])
         // Business Client Profiles & Wallet Recharge routes
         Route::post('/businesses', [WhatsappBusinessController::class, 'storeBusiness'])->name('businesses.store');
         Route::post('/businesses/{id}/recharge', [WhatsappBusinessController::class, 'rechargeWallet'])->name('businesses.recharge');
+        Route::post('/businesses/{id}/webhook-token', [WhatsappBusinessController::class, 'updateWebhookToken'])->name('businesses.webhook-token');
         Route::delete('/businesses/{id}', [WhatsappBusinessController::class, 'destroyBusiness'])->name('businesses.destroy');
 
         // Facebook Login OAuth routes

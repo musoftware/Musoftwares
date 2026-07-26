@@ -127,6 +127,26 @@ class WhatsappBusinessController extends Controller
     }
 
     /**
+     * Save or regenerate custom Webhook verify token for a specific Business profile.
+     */
+    public function updateWebhookToken(Request $request, int $id): RedirectResponse
+    {
+        $business = WhatsappBusiness::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'webhook_verify_token' => ['required', 'string', 'max:255'],
+        ]);
+
+        $business->update([
+            'webhook_verify_token' => trim($validated['webhook_verify_token']),
+        ]);
+
+        return redirect()->route('whatsapp.index')->with('success', __('general.webhook_settings_saved_successfully') ?? 'Business Webhook verify token updated successfully.');
+    }
+
+    /**
      * Delete business client profile.
      */
     public function destroyBusiness(Request $request, int $id): RedirectResponse

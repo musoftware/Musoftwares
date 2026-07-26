@@ -131,6 +131,13 @@ if (file_exists(base_path('Modules/CRM/routes/api.php'))) {
 }
 
 // ── Meta WhatsApp Cloud API Webhook ─────────────────────────────────────────
+// Dedicated per-business Webhook routes
+Route::get('v1/whatsapp/webhook/biz/{businessId}', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'verifyBusiness'])
+    ->name('api.v1.whatsapp.webhook.biz.verify');
+Route::post('v1/whatsapp/webhook/biz/{businessId}', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'handleBusiness'])
+    ->name('api.v1.whatsapp.webhook.biz.handle');
+
+// Fallback global Webhook routes
 Route::get('v1/whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'verify'])
     ->name('api.v1.whatsapp.webhook.verify');
 Route::post('v1/whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'handle'])

@@ -588,6 +588,33 @@ class ServiceController extends Controller
             ->with('success', __('general.service_deleted_successfully'));
     }
 
+    public function getAiImagePrompt(Request $request)
+    {
+        $user = auth()->user();
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+
+        if (!$isAdmin) {
+            return response()->json(['error' => 'Unauthorized access. Only admins can view AI image prompts.'], 403);
+        }
+
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'prompt'      => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:2000',
+        ]);
+
+        $prompt = !empty($validated['prompt']) ? $validated['prompt'] : $validated['title'];
+        $description = $validated['description'] ?? null;
+
+        $aiService = app(\App\Services\AI\MarketplaceAiService::class);
+        $refinedPrompt = $aiService->getRefinedImagePrompt($prompt, $description);
+
+        return response()->json([
+            'success' => true,
+            'prompt'  => $refinedPrompt,
+        ]);
+    }
+
     public function generateAiImage(Request $request)
     {
         $user = auth()->user();
@@ -598,25 +625,31 @@ class ServiceController extends Controller
         }
 
         $validated = $request->validate([
-            'title'  => 'required|string|max:255',
-            'prompt' => 'nullable|string|max:500',
+            'title'       => 'required|string|max:255',
+            'prompt'      => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:2000',
         ]);
 
         $prompt = !empty($validated['prompt']) ? $validated['prompt'] : $validated['title'];
+        $description = $validated['description'] ?? null;
+
         $aiService = app(\App\Services\AI\MarketplaceAiService::class);
-        $result = $aiService->generateCoverImage($prompt, $user->id);
+        $refinedPrompt = $aiService->getRefinedImagePrompt($prompt, $description);
+        $result = $aiService->generateCoverImage($refinedPrompt, $user->id);
 
         if (!empty($result['gallery'][0])) {
             $imagePath = $result['gallery'][0];
             return response()->json([
                 'success' => true,
+                'prompt'  => $refinedPrompt,
                 'path'    => $imagePath,
                 'url'     => asset('uploads/' . ltrim($imagePath, '/')),
             ]);
         }
 
         return response()->json([
-            'error' => 'Failed to generate AI image. Please verify API settings or try again.'
+            'error'  => 'Failed to generate AI image. Please verify API settings or try again.',
+            'prompt' => $refinedPrompt,
         ], 500);
     }
 }

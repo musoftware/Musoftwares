@@ -40,6 +40,7 @@ class WhatsappSenderController extends Controller
                 'currency' => 'USD',
                 'per_message_fee' => 0.0010,
                 'status' => 'active',
+                'webhook_verify_token' => 'biz_wt_' . \Illuminate\Support\Str::random(24),
             ]);
 
             WhatsappTransaction::create([
@@ -52,6 +53,12 @@ class WhatsappSenderController extends Controller
             ]);
 
             $businesses = collect([$defaultBiz]);
+        } else {
+            foreach ($businesses as $biz) {
+                if (empty($biz->webhook_verify_token)) {
+                    $biz->update(['webhook_verify_token' => 'biz_wt_' . \Illuminate\Support\Str::random(24)]);
+                }
+            }
         }
 
         $accounts = WhatsappAccount::where('user_id', $user->id)

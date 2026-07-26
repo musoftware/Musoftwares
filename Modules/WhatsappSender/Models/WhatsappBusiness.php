@@ -20,7 +20,19 @@ class WhatsappBusiness extends Model
         'currency',
         'per_message_fee',
         'status',
+        'webhook_verify_token',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($business) {
+            if (empty($business->webhook_verify_token)) {
+                $business->webhook_verify_token = 'biz_wt_' . \Illuminate\Support\Str::random(24);
+            }
+        });
+    }
 
     protected $casts = [
         'wallet_balance' => 'decimal:4',
