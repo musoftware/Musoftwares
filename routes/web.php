@@ -92,7 +92,6 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SsoController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SupportTicketController;
-use App\Http\Controllers\TenantBackupController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\WalletTransferController;
@@ -548,10 +547,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
 
 // Settings & Account Routes
 Route::middleware(['auth', 'verified'])->prefix('settings')->name('settings.')->group(function () {
-    Route::get('/backup', [TenantBackupController::class, 'index'])->name('backup.index');
-    Route::get('/backup/export', [TenantBackupController::class, 'export'])->name('backup.export');
-    Route::post('/backup/import', [TenantBackupController::class, 'import'])->name('backup.import');
-
     // Automations
     Route::resource('automations', AutomationRuleController::class)->except(['show']);
 });

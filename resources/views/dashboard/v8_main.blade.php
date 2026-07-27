@@ -102,7 +102,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Logo -->
-            <div class="col-lg-2 col-md-2 col-4">
+            <div class="col-lg-3 col-md-3 col-6">
                 <div class="logo-parent d-flex align-items-center">
                     <img class="logo pointer" src="{{ asset('v8main/img/amc8.png') }}"
                          data-href="{{ url('/dashboard') }}"
@@ -110,74 +110,76 @@
                 </div>
             </div>
 
-            <!-- Center icons -->
-            <div class="center-icons text-center col-lg-2 col-md-2 text-light col-4">
-                <div class="row d-flex align-items-center justify-content-center">
-                    <div class="px-2 hover" data-href="{{ url('/marketplace/services') }}">
-                        <i class="icon-social d-block"></i>
-                        <h3 class="m-auto">Market</h3>
-                    </div>
-                    <div class="px-2 hover" data-href="{{ url('/profile') }}">
-                        <i class="icon-user d-block"></i>
-                        <h3 class="m-auto">Profile</h3>
-                    </div>
-                </div>
-            </div>
-
-            <!-- User Data & Financial Widgets -->
-            <div class="user-reference col-lg-8 col-md-8 col-12 mt-2 mt-md-0">
+            <!-- User Data & Streamlined Financial Controls -->
+            <div class="user-reference col-lg-9 col-md-9 col-6 mt-0">
                 <div class="text-light flex-row d-flex align-items-center justify-content-end text-center">
-                    <!-- Live System Status Indicator -->
-                    <div class="system-status-pill mr-2 pointer d-none d-lg-flex" title="System Operational Status">
-                        <span class="status-dot-led"></span>
-                        <span>Operational</span>
-                    </div>
 
-                    <!-- Search (Ctrl + K) Trigger Button -->
-                    <div class="command-bar-trigger mr-2 d-flex align-items-center pointer" data-toggle="modal" data-target="#commandBarModal" title="Universal Search (Ctrl + K)">
-                        <i class="icon-search mr-1" style="font-size: 12px; color: #00e5ff;"></i>
-                        <span class="mr-2 d-none d-sm-inline">Search...</span>
+                    <!-- Search (Ctrl + K) & Embedded Live Operational LED -->
+                    <div class="command-bar-trigger mr-2 d-flex align-items-center pointer" data-toggle="modal" data-target="#commandBarModal" title="Universal Search & Actions (Ctrl + K)">
+                        <span class="status-dot-led mr-2" title="System Operational"></span>
+                        <i class="icon-search mr-1" style="font-size: 12px; color: #8A4FFF;"></i>
+                        <span class="mr-2 d-none d-sm-inline" style="color: #f3e8ff;">Search...</span>
                         <kbd class="command-bar-kbd">Ctrl K</kbd>
                     </div>
 
-                    <ul class="d-flex align-items-center mb-0 mr-3 pl-0">
-                        <li class="hover active list-inline-item d-flex align-items-center justify-content-center"
-                            data-href="{{ url('/referrals') }}">
-                            <i class="icon-users"></i>
-                        </li>
-                        <li class="hover active list-inline-item d-flex align-items-center justify-content-center"
-                            data-href="{{ url('/messages') }}">
-                            <i class="icon-message"></i>
-                        </li>
-                        <li class="hover active list-inline-item d-flex align-items-center justify-content-center"
-                            data-href="{{ url('/notifications') }}">
-                            <i class="icon-bell"></i>
-                        </li>
-                    </ul>
-
-                    <!-- Financial Widgets & Pay Due Button (1-Line Inline Badges) -->
-                    <div class="d-flex align-items-center mr-3 header-financial-widgets">
-                        <div class="financial-pill wallet-pill mr-2 d-flex align-items-center px-2 py-1" title="Wallet Balance">
-                            <i class="icon-credit-card text-cyan mr-1" style="font-size: 13px;"></i>
-                            <span class="pill-value text-cyan" style="font-size: 11px;">{{ $userBalanceFormatted }}</span>
+                    <!-- Streamlined Notification Hub Dropdown -->
+                    <div class="dropdown mr-2">
+                        <div class="command-bar-trigger d-flex align-items-center justify-content-center pointer position-relative dropdown-toggle"
+                             id="notificationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                             title="Notifications & Messages" style="width: 36px; padding: 0;">
+                            <i class="icon-bell" style="color: #8A4FFF; font-size: 14px;"></i>
+                            <span class="status-dot-led position-absolute" style="top: 4px; right: 4px; width: 6px; height: 6px; background-color: #8A4FFF; box-shadow: 0 0 6px #8A4FFF;"></span>
                         </div>
 
-                        <div class="financial-pill points-pill mr-2 d-flex align-items-center px-2 py-1" title="Reward Points">
-                            <i class="icon-star text-amber mr-1" style="font-size: 13px;"></i>
-                            <span class="pill-value text-amber" style="font-size: 11px;">{{ number_format($userPoints) }} Pts</span>
-                        </div>
+                        <!-- Notification Dropdown Menu -->
+                        <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="notificationDropdown"
+                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); width: 280px;">
+                            
+                            <!-- Header -->
+                            <div class="d-flex align-items-center justify-content-between pb-2 mb-2" style="border-bottom: 1px solid rgba(138,79,255,0.25);">
+                                <div class="font-weight-bold" style="color: #f3e8ff; font-size: 13px;">
+                                    <i class="icon-bell mr-1" style="color: #8A4FFF;"></i> Notifications
+                                </div>
+                                <a href="{{ url('/notifications') }}" class="small" style="color: #a855f7;">View All</a>
+                            </div>
 
-                        <button class="btn btn-pay-due btn-sm d-flex align-items-center px-3 py-1" data-toggle="modal" data-target="#payDueModal">
-                            <i class="icon-basket mr-1" style="font-size: 13px;"></i>
-                            <span>دفع الفلوس</span>
-                            @if($totalDueAmount > 0)
-                                <span class="badge badge-danger ml-2 px-2 py-1 pulse-badge">{{ $totalDueFormatted }}</span>
-                            @else
-                                <span class="badge ml-2 px-2 py-1" style="background: rgba(0, 229, 255, 0.15); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; font-size: 9px;">0</span>
-                            @endif
-                        </button>
+                            <!-- Quick Action Hub Tiles -->
+                            <div class="row m-0 text-center mb-2">
+                                <div class="col-4 p-1">
+                                    <a href="{{ url('/notifications') }}" class="d-block p-2 text-decoration-none rounded" style="background: #180c30; border: 1px solid rgba(138,79,255,0.25); color: #f3e8ff;">
+                                        <i class="icon-bell d-block mb-1" style="color: #8A4FFF; font-size: 14px;"></i>
+                                        <span style="font-size: 9px;">Alerts</span>
+                                    </a>
+                                </div>
+                                <div class="col-4 p-1">
+                                    <a href="{{ url('/messages') }}" class="d-block p-2 text-decoration-none rounded" style="background: #180c30; border: 1px solid rgba(138,79,255,0.25); color: #f3e8ff;">
+                                        <i class="icon-message d-block mb-1" style="color: #a855f7; font-size: 14px;"></i>
+                                        <span style="font-size: 9px;">Inbox</span>
+                                    </a>
+                                </div>
+                                <div class="col-4 p-1">
+                                    <a href="{{ url('/referrals') }}" class="d-block p-2 text-decoration-none rounded" style="background: #180c30; border: 1px solid rgba(138,79,255,0.25); color: #f3e8ff;">
+                                        <i class="icon-users d-block mb-1" style="color: #c084fc; font-size: 14px;"></i>
+                                        <span style="font-size: 9px;">Team</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Recent Notification Feed -->
+                            <div class="notification-list text-left" style="max-height: 160px; overflow-y: auto;">
+                                <div class="p-2 mb-1 rounded position-relative" style="background: rgba(138,79,255,0.08); border-left: 2px solid #8A4FFF;">
+                                    <div class="small font-weight-bold" style="color: #f3e8ff; font-size: 11px;">Runtime Agent Connected</div>
+                                    <div style="color: #d8b4fe; font-size: 9px;">Local automation engine running</div>
+                                </div>
+                                <div class="p-2 rounded" style="background: rgba(255,255,255,0.02);">
+                                    <div class="small font-weight-bold" style="color: #f3e8ff; font-size: 11px;">System Operational</div>
+                                    <div style="color: #94a3b8; font-size: 9px;">All services active</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Streamlined User Profile Capsule with Dropdown Financial Summary -->
                     <div class="user-data d-flex align-items-center px-2 py-1 dropdown-toggle dropdown pointer"
                          id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
@@ -188,18 +190,36 @@
                             <div class="username text-capitalize">{{ Auth::user()->name ?? 'User' }}</div>
                             <div class="user-level text-uppercase">{{ Auth::user()->role ?? 'Admin' }}</div>
                         </div>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuOffset"
-                             style="background-color: rgb(0, 0, 0);color: rgb(33, 151, 154);border-bottom: rgb(33, 151, 154) 1px solid;border-left: 1px solid rgb(33, 151, 154);border-right: 1px solid rgb(33, 151, 154);position: absolute;will-change: transform;top: 0px;left: 0px;transform: translate3d(1px, 56px, 0px);">
-                            <a class="dropdown-item" href="{{ url('/admin/dashboard') }}">Admin Panel</a>
-                            <a class="dropdown-item" href="{{ url('/profile') }}">My Profile</a>
-                            <a class="dropdown-item" href="{{ url('/billing/invoices') }}">Billing</a>
-                            <a class="dropdown-item" href="{{ url('/financial/transactions') }}">Wallet</a>
-                            <a class="dropdown-item" href="{{ url('/settings/backup') }}">Settings</a>
-                            <a class="dropdown-item" href="#" id="resetWelcomeIntroBtn">Reset Welcome Intro</a>
+
+                        <!-- Dropdown Menu with Integrated Financial Summary -->
+                        <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="dropdownMenuOffset"
+                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); min-width: 250px;">
+                            
+                            <!-- Financial Summary Section -->
+                            <div class="mb-3 p-2 text-left" style="background: #180c30; border: 1px solid rgba(138,79,255,0.3); border-radius: 8px;">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="small" style="color: #d8b4fe;">Wallet:</span>
+                                    <span class="font-weight-bold" style="color: #a855f7;">{{ $userBalanceFormatted }}</span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="small" style="color: #d8b4fe;">Points:</span>
+                                    <span class="font-weight-bold" style="color: #ffb703;">{{ number_format($userPoints) }} Pts</span>
+                                </div>
+                                <button class="btn btn-pay-due btn-block btn-sm mt-1" data-toggle="modal" data-target="#payDueModal">
+                                    <i class="icon-basket mr-1"></i> دفع الفلوس ({{ $totalDueFormatted }})
+                                </button>
+                            </div>
+
+                            <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}"><i class="icon-user mr-2"></i>Admin Panel</a>
+                            <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>My Profile</a>
+                            <a class="dropdown-item py-2" href="{{ url('/billing/invoices') }}"><i class="icon-doc mr-2"></i>Billing &amp; Invoices</a>
+                            <a class="dropdown-item py-2" href="{{ url('/financial/transactions') }}"><i class="icon-credit-card mr-2"></i>Wallet &amp; Transactions</a>
+                            <a class="dropdown-item py-2" href="{{ url('/settings/automations') }}"><i class="icon-cog mr-2"></i>Settings</a>
+                            <a class="dropdown-item py-2" href="#" id="resetWelcomeIntroBtn"><i class="icon-bell mr-2"></i>Reset Welcome Intro</a>
                             <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">
                                 @csrf
                             </form>
-                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                            <a class="dropdown-item py-2 text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
                         </div>
                     </div>
 
@@ -290,11 +310,11 @@
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Automations</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/backup') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/automations') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="add"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Backup</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Automations</div>
                                 </div>
                                 <div class="col-4 px-0 pointer" data-href="{{ url('/points') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
@@ -326,13 +346,13 @@
                 <div id="logo-it" style="width: 286px; height: 285px; margin: 0 auto; background: none !important;"></div>
 
                 <!-- Username SVG & Title -->
-                <div class="end-icon mt-5" id="incenter_username" style="display: none;">
+                <div class="end-icon mt-4" id="incenter_username" style="display: block;">
                     <svg class="mx-auto d-block" xmlns="http://www.w3.org/2000/svg" width="22px" height="23px">
-                        <path fill-rule="evenodd" fill="rgb(41, 186, 189)"
+                        <path fill-rule="evenodd" fill="#8A4FFF"
                               d="M19.263,5.321 C18.960,5.321 18.669,5.267 18.399,5.169 C18.399,5.169 18.399,5.169 17.269,6.329 C18.315,7.690 18.939,9.406 18.939,11.268 C18.939,13.131 18.314,14.847 17.269,16.208 C17.269,16.208 17.269,16.208 18.399,17.367 C18.669,17.270 18.960,17.216 19.263,17.216 C20.697,17.216 21.859,18.408 21.859,19.880 C21.859,21.351 20.697,22.544 19.263,22.544 C17.830,22.544 16.667,21.351 16.667,19.880 C16.667,19.569 16.720,19.271 16.815,19.993 C16.815,18.993 16.815,18.993 15.645,17.792 C14.375,18.717 12.824,19.261 11.152,19.261 C9.479,19.261 7.928,18.717 6.658,17.792 C6.658,17.792 6.658,17.792 5.488,18.993 C5.583,19.270 5.636,19.569 5.636,19.880 C5.636,21.351 4.474,22.544 3.040,22.544 C1.607,22.544 0.445,21.351 0.445,19.880 C0.445,18.408 1.607,17.216 3.040,17.216 C3.343,17.216 3.634,17.270 3.904,17.368 C3.904,17.368 3.904,17.368 5.034,16.208 C3.989,14.847 3.365,13.131 3.365,11.269 C3.365,9.406 3.989,7.690 5.034,6.329 C5.034,6.329 5.034,6.329 3.904,5.170 C3.634,5.267 3.343,5.321 3.040,5.321 C1.607,5.321 0.445,4.129 0.445,2.657 C0.445,1.186 1.607,-0.007 3.040,-0.007 C4.474,-0.007 5.636,1.186 5.636,2.657 C5.636,2.968 5.583,3.267 5.488,3.544 C5.488,3.544 5.488,3.544 6.658,4.745 C7.928,3.820 9.479,3.276 11.152,3.276 C12.824,3.276 14.375,3.820 15.645,4.745 C15.645,4.745 15.645,4.745 16.815,3.544 C16.720,3.267 16.667,2.968 16.667,2.657 C16.667,1.186 17.830,-0.007 19.263,-0.007 C20.697,-0.007 21.859,1.186 21.859,2.657 C21.859,4.129 20.697,5.321 19.263,5.321 ZM11.152,4.813 C7.678,4.813 4.862,7.704 4.862,11.269 C4.862,12.834 5.405,14.270 6.309,15.387 C6.396,14.523 6.577,13.485 7.023,13.303 L9.354,12.349 C9.354,12.349 9.354,12.349 9.900,11.876 C10.044,11.752 10.257,11.760 10.391,11.897 L11.152,12.672 C11.152,12.672 11.152,12.672 11.911,11.897 C12.045,11.760 12.258,11.751 12.402,11.876 L12.948,12.349 C12.948,12.349 12.948,12.349 15.280,13.303 C15.726,13.485 15.907,14.523 15.994,15.388 C16.898,14.270 17.441,12.834 17.441,11.269 C17.441,7.704 14.625,4.813 11.152,4.813 ZM11.152,11.691 C9.719,11.714 8.840,10.426 8.818,8.303 C8.803,6.753 9.640,5.948 11.152,5.948 C12.697,5.948 13.486,6.753 13.486,8.303 C13.486,11.788 11.152,11.691 11.152,11.691 Z"/>
                     </svg>
                     <svg class="mx-auto d-block" xmlns="http://www.w3.org/2000/svg" width="169px" height="14px">
-                        <path fill-rule="evenodd" fill="rgb(41, 186, 189)"
+                        <path fill-rule="evenodd" fill="#8A4FFF"
                               d="M165.698,5.676 C164.323,5.676 163.184,4.687 162.953,3.386 L115.214,3.386 L108.007,12.328 L108.146,12.328 L107.182,13.259 C107.123,13.235 107.032,13.182 106.920,13.105 L62.564,13.105 C62.531,13.105 62.500,13.098 62.469,13.093 C62.286,13.221 62.146,13.296 62.124,13.270 L61.976,13.086 L61.897,13.086 L60.781,11.712 L60.869,11.712 L54.158,3.386 L6.436,3.386 C6.204,4.687 5.058,5.676 3.677,5.676 C2.129,5.676 0.874,4.433 0.874,2.901 C0.874,1.368 2.129,0.125 3.677,0.125 C4.901,0.125 5.939,0.903 6.321,1.985 L54.193,1.985 C54.375,1.985 54.538,2.055 54.663,2.168 C54.785,2.092 54.872,2.051 54.889,2.071 L62.659,11.712 L106.713,11.712 L114.483,2.071 C114.500,2.050 114.592,2.094 114.719,2.174 C114.844,2.057 115.011,1.985 115.195,1.985 L163.066,1.985 C163.447,0.903 164.480,0.125 165.698,0.125 C167.239,0.125 168.488,1.368 168.488,2.901 C168.488,4.433 167.239,5.676 165.698,5.676 Z"/>
                     </svg>
                     <h2 class="item-title text-center d-block pb-0 mt-2 text-uppercase" style="font-size: 17px;">
@@ -371,7 +391,7 @@
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Seller Portal</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" onclick="toggler('.site>.popup-wrap')">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="popup"></div>
                                     </div>
@@ -389,7 +409,7 @@
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">SMS Gateway</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/backup') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/automations') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="shorten"></div>
                                     </div>
@@ -398,42 +418,7 @@
                             </div>
                         </div>
 
-                        <!-- WhatsApp sub-panel -->
-                        <div class="wrapper clearfix popup-wrap pb-2 float-right">
-                            <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">WhatsApp Tools</span>
-                                <span class="back-btn ml-auto d-inline-block position-relative pr-2 pointer"
-                                      onclick="toggler('.site>.main')">
-                                    <span class="d-inline-block px-2">BACK</span>
-                                    <span class="back-icon d-inline-block position-absolute">
-                                        <svg class="position-absolute" xmlns="http://www.w3.org/2000/svg" width="5px" height="9px">
-                                            <path fill-rule="evenodd" fill="rgb(0, 0, 0)"
-                                                  d="M4.216,8.866 C4.395,9.043 4.685,9.043 4.865,8.866 C5.044,8.689 5.044,8.402 4.865,8.224 C1.105,4.500 1.105,4.500 1.105,4.500 L4.865,0.775 C5.044,0.598 5.044,0.310 4.865,0.133 C4.685,-0.044 4.395,-0.044 4.215,0.133 C0.132,4.178 0.132,4.178 0.132,4.178 C-0.045,4.354 -0.045,4.646 0.132,4.821 L4.216,8.866 Z"/>
-                                        </svg>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="add-popup"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Sender</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="mange-pop"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Accounts</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="pop-balance"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Messages</div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- MY FINANCE -->
@@ -486,36 +471,7 @@
                             </div>
                         </div>
 
-                        <!-- Transactions sub-panel -->
-                        <div class="wrapper clearfix pb-2 campaings-wrap float-right">
-                            <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Transactions</span>
-                                <span class="back-btn ml-auto d-inline-block position-relative pr-2 pointer"
-                                      onclick="toggler('.services>.main')">
-                                    <span class="d-inline-block px-2">BACK</span>
-                                    <span class="back-icon d-inline-block position-absolute">
-                                        <svg class="position-absolute" xmlns="http://www.w3.org/2000/svg" width="5px" height="9px">
-                                            <path fill-rule="evenodd" fill="rgb(0, 0, 0)"
-                                                  d="M4.216,8.866 C4.395,9.043 4.685,9.043 4.865,8.866 C5.044,8.689 5.044,8.402 4.865,8.224 C1.105,4.500 1.105,4.500 1.105,4.500 L4.865,0.775 C5.044,0.598 5.044,0.310 4.865,0.133 C4.685,-0.044 4.395,-0.044 4.215,0.133 C0.132,4.178 0.132,4.178 0.132,4.178 C-0.045,4.354 -0.045,4.646 0.132,4.821 L4.216,8.866 Z"/>
-                                        </svg>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/add-balance') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="add-camp"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Add Balance</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/withdrawals') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="mange-camp"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Withdrawals</div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 

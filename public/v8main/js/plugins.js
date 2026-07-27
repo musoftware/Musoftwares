@@ -11,7 +11,7 @@ if (screen.width < screen.height) {
 
 
 function toggler(selector) {
-    $(selector).slideToggle().siblings('.wrapper').hide();
+    $(selector).slideToggle();
 }
 
 localStorage.setItem('theme', 'dark');
@@ -27,6 +27,8 @@ function checkWelcomeSuppressed() {
 function bypassPreloaderNow() {
     $('.preloader-wrapper').stop(true, true).hide();
     $(".animation-start").stop(true, true).show().addClass('basic');
+    $('.content .wrapper').show();
+    $("#incenter_username").show();
 }
 
 // Early check on DOM ready
@@ -141,11 +143,8 @@ function type(playAudio) {
             });
 
             if (!isMobile) {
-                toggler('.academy>.wrapper');
-                toggler('.notification>.wrapper');
-                toggler('.site>.main');
-                toggler('.services>.main');
-                $("#incenter_username").delay(1500).fadeIn(500);
+                $('.content .wrapper').fadeIn(500);
+                $("#incenter_username").delay(500).fadeIn(500);
             } else {
                 $("#incenter_username").hide();
             }
