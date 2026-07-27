@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Isaas;
+namespace App\Http\Controllers\iSaaS;
 
 use App\Http\Controllers\Controller;
 use App\Models\Billing\PlatformContract;

@@ -287,13 +287,108 @@ class DashboardService extends BaseService
 
     public function getClientDashboardData(User $user): array
     {
+        $stats = $this->getClientStats($user);
+        $userBalanceVal = $stats['walletBalance'] ?? (float) ($user->user_balance ?? 0);
+        $currencySymbol = isset($stats['currency']) ? $stats['currency']->symbol : (optional($user->currencyRelation)->symbol ?? 'EGP');
+        $userBalanceFormatted = number_format($userBalanceVal, 2) . ' ' . $currencySymbol;
+        $userPoints = $stats['pointsBalance'] ?? $user->points ?? 0;
+
+        $unpaidInvoices = method_exists($user, 'invoices')
+            ? $user->invoices()->where('unpaid', '>', 0)->whereIn('status', ['unpaid', 'partially_paid'])->get()
+            : collect();
+        $unpaidCount = $stats['unpaidInvoices'] ?? 0;
+        $unpaidAmount = $stats['unpaidAmount'] ?? 0;
+        $totalDueFormatted = number_format($unpaidAmount, 2) . ' ' . $currencySymbol;
+
         return [
-            'stats' => $this->getClientStats($user),
+            'stats' => $stats,
             'recentTransactions' => $this->getRecentTransactions($user),
             'chartData' => $this->getWalletChartData($user),
             'activeToolLicenses' => $this->getActiveToolLicenses($user),
             'userProjects' => $this->getUserProjects($user),
+            'realNotifications' => $this->getUserRealNotifications($user),
+            'authUser' => $user,
+            'userBalanceVal' => $userBalanceVal,
+            'currencySymbol' => $currencySymbol,
+            'userBalanceFormatted' => $userBalanceFormatted,
+            'userPoints' => $userPoints,
+            'unpaidInvoices' => $unpaidInvoices,
+            'unpaidCount' => $unpaidCount,
+            'unpaidAmount' => $unpaidAmount,
+            'totalDueAmount' => $unpaidAmount,
+            'totalDueFormatted' => $totalDueFormatted,
         ];
+    }
+
+    public function getUserRealNotifications(User $user): array
+    {
+        $realNotifications = collect();
+
+        // 1. Fetch real DB unread notifications if available
+        if (method_exists($user, 'unreadNotifications')) {
+            try {
+                $dbUnread = $user->unreadNotifications()->take(5)->get();
+                foreach ($dbUnread as $notif) {
+                    $data = $notif->data ?? [];
+                    $realNotifications->push([
+                        'title' => $data['title'] ?? $data['subject'] ?? 'Notification Alert',
+                        'desc' => $data['message'] ?? $data['body'] ?? 'New notification received',
+                        'time' => $notif->created_at ? $notif->created_at->diffForHumans() : 'Recently',
+                        'type' => 'alert',
+                        'link' => $data['url'] ?? url('/notifications')
+                    ]);
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // 2. Real Unpaid Invoice Alerts
+        if (method_exists($user, 'invoices')) {
+            try {
+                $currencySymbol = optional($user->currencyRelation)->symbol ?? 'EGP';
+                $unpaidInvoices = $user->invoices()
+                    ->where('unpaid', '>', 0)
+                    ->whereIn('status', ['unpaid', 'partially_paid'])
+                    ->take(3)
+                    ->get();
+
+                foreach ($unpaidInvoices as $inv) {
+                    $realNotifications->push([
+                        'title' => 'Unpaid Invoice #' . $inv->id,
+                        'desc' => 'Due: ' . number_format($inv->unpaid, 2) . ' ' . $currencySymbol,
+                        'time' => $inv->created_at ? $inv->created_at->diffForHumans() : 'Action Needed',
+                        'type' => 'warning',
+                        'link' => url('/billing/invoices/' . $inv->id)
+                    ]);
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // 3. Real Wallet Balance Notification
+        $currencySymbol = optional($user->currencyRelation)->symbol ?? 'EGP';
+        $userBalanceVal = (float) ($user->user_balance ?? 0);
+        $userBalanceFormatted = number_format($userBalanceVal, 2) . ' ' . $currencySymbol;
+
+        $realNotifications->push([
+            'title' => 'Wallet Balance: ' . $userBalanceFormatted,
+            'desc' => $userBalanceVal > 0 ? 'Active balance for subscriptions & services' : 'Low balance. Click to add funds.',
+            'time' => 'Live',
+            'type' => 'info',
+            'link' => url('/financial/add-balance')
+        ]);
+
+        // 4. Real Reward Points Notification
+        $userPoints = $user->points ?? $user->reward_points ?? 0;
+        if ($userPoints > 0) {
+            $realNotifications->push([
+                'title' => 'Reward Points: ' . number_format($userPoints) . ' Pts',
+                'desc' => 'Earned points available for marketplace rewards',
+                'time' => 'Live',
+                'type' => 'success',
+                'link' => url('/points')
+            ]);
+        }
+
+        return $realNotifications->toArray();
     }
 
     private function getClientStats(User $user): array

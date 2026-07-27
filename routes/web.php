@@ -76,7 +76,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\iSaaS\ClientPortalController;
 use App\Http\Controllers\iSaaS\ContractController;
-use App\Http\Controllers\Isaas\ProjectProposalController;
+use App\Http\Controllers\iSaaS\ProjectProposalController;
 use App\Http\Controllers\KycController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\NotificationController;

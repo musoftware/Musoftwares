@@ -1756,6 +1756,16 @@ header .user-data .dropdown-menu .dropdown-item:hover {
     opacity: 0.6 !important;
 }
 
+.modal-command-bar .modal-dialog {
+    max-width: 920px !important;
+}
+
+.command-results-container {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding-right: 4px !important;
+}
+
 .command-result-item {
     background: #180c30 !important;
     border: 1px solid rgba(138, 79, 255, 0.2) !important;

@@ -1,22 +1,3 @@
-@php
-    $authUser = Auth::user();
-    $userBalanceVal = $authUser->user_balance ?? 0;
-    $currencySymbol = optional($authUser->currencyRelation)->symbol ?? 'EGP';
-    $userBalanceFormatted = number_format($userBalanceVal, 2) . ' ' . $currencySymbol;
-    $userPoints = $authUser->points ?? $authUser->reward_points ?? 0;
-
-    $unpaidInvoices = collect();
-    $totalDueAmount = 0;
-
-    if ($authUser && method_exists($authUser, 'invoices')) {
-        $unpaidInvoices = $authUser->invoices()
-            ->where('unpaid', '>', 0)
-            ->whereIn('status', ['unpaid', 'partially_paid'])
-            ->get();
-        $totalDueAmount = $unpaidInvoices->sum('unpaid');
-    }
-    $totalDueFormatted = number_format($totalDueAmount, 2) . ' ' . $currencySymbol;
-@endphp
 <!doctype html>
 <html lang="en" style="overflow: overlay;">
 
@@ -61,6 +42,41 @@
             body {
                 zoom: 0.70;
             }
+        }
+
+        /* Red Alert Tactical HUD Icons & Tiles */
+        .hud-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: rgba(22, 10, 42, 0.75);
+            border: 1px solid rgba(138, 79, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 0 10px rgba(138, 79, 255, 0.1);
+        }
+        .hud-icon-box svg {
+            width: 22px;
+            height: 22px;
+            stroke: #8A4FFF;
+            fill: none;
+            transition: all 0.3s ease;
+        }
+        .hud-item:hover .hud-icon-box {
+            border-color: #C77DFF;
+            background: rgba(138, 79, 255, 0.3);
+            box-shadow: 0 0 15px rgba(199, 125, 255, 0.5), inset 0 0 15px rgba(138, 79, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .hud-item:hover .hud-icon-box svg {
+            stroke: #C77DFF;
+            filter: drop-shadow(0 0 6px #C77DFF);
+        }
+        .hud-item:hover .item-captian {
+            color: #E0AAFF !important;
+            text-shadow: 0 0 8px rgba(199, 125, 255, 0.6);
         }
     </style>
 </head>
@@ -124,57 +140,40 @@
 
                     <!-- Streamlined Notification Hub Dropdown -->
                     <div class="dropdown mr-2">
-                        <div class="command-bar-trigger d-flex align-items-center justify-content-center pointer position-relative dropdown-toggle"
+                        <div class="d-flex align-items-center justify-content-center pointer position-relative dropdown-toggle"
                              id="notificationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                             title="Notifications & Messages" style="width: 36px; padding: 0;">
+                             title="Notifications & Messages" style="width: 36px; height: 32px; padding: 0; background: rgba(22, 10, 42, 0.6); border: 1px solid rgba(138, 79, 255, 0.4); border-radius: 8px;">
                             <i class="icon-bell" style="color: #8A4FFF; font-size: 14px;"></i>
                             <span class="status-dot-led position-absolute" style="top: 4px; right: 4px; width: 6px; height: 6px; background-color: #8A4FFF; box-shadow: 0 0 6px #8A4FFF;"></span>
                         </div>
 
                         <!-- Notification Dropdown Menu -->
                         <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="notificationDropdown"
-                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); width: 280px;">
+                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); width: 290px;">
                             
                             <!-- Header -->
                             <div class="d-flex align-items-center justify-content-between pb-2 mb-2" style="border-bottom: 1px solid rgba(138,79,255,0.25);">
                                 <div class="font-weight-bold" style="color: #f3e8ff; font-size: 13px;">
                                     <i class="icon-bell mr-1" style="color: #8A4FFF;"></i> Notifications
                                 </div>
-                                <a href="{{ url('/notifications') }}" class="small" style="color: #a855f7;">View All</a>
+                                <a href="{{ url('/notifications') }}" class="small font-weight-bold" style="color: #a855f7;">View All</a>
                             </div>
 
-                            <!-- Quick Action Hub Tiles -->
-                            <div class="row m-0 text-center mb-2">
-                                <div class="col-4 p-1">
-                                    <a href="{{ url('/notifications') }}" class="d-block p-2 text-decoration-none rounded" style="background: #180c30; border: 1px solid rgba(138,79,255,0.25); color: #f3e8ff;">
-                                        <i class="icon-bell d-block mb-1" style="color: #8A4FFF; font-size: 14px;"></i>
-                                        <span style="font-size: 9px;">Alerts</span>
+                            <!-- Real Notification Feed -->
+                            <div class="notification-list text-left" style="max-height: 240px; overflow-y: auto;">
+                                @forelse($realNotifications as $notif)
+                                    <a href="{{ $notif['link'] ?? url('/notifications') }}" class="d-block p-2 mb-2 rounded position-relative text-decoration-none" style="background: rgba(138,79,255,0.08); border-left: 3px solid #8A4FFF; transition: all 0.2s ease;">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="small font-weight-bold" style="color: #f3e8ff; font-size: 11px;">{{ $notif['title'] }}</div>
+                                            <span style="color: #a855f7; font-size: 8px;">{{ $notif['time'] }}</span>
+                                        </div>
+                                        <div style="color: #d8b4fe; font-size: 10px; line-height: 1.3;" class="mt-1">{{ $notif['desc'] }}</div>
                                     </a>
-                                </div>
-                                <div class="col-4 p-1">
-                                    <a href="{{ url('/messages') }}" class="d-block p-2 text-decoration-none rounded" style="background: #180c30; border: 1px solid rgba(138,79,255,0.25); color: #f3e8ff;">
-                                        <i class="icon-message d-block mb-1" style="color: #a855f7; font-size: 14px;"></i>
-                                        <span style="font-size: 9px;">Inbox</span>
-                                    </a>
-                                </div>
-                                <div class="col-4 p-1">
-                                    <a href="{{ url('/referrals') }}" class="d-block p-2 text-decoration-none rounded" style="background: #180c30; border: 1px solid rgba(138,79,255,0.25); color: #f3e8ff;">
-                                        <i class="icon-users d-block mb-1" style="color: #c084fc; font-size: 14px;"></i>
-                                        <span style="font-size: 9px;">Team</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Recent Notification Feed -->
-                            <div class="notification-list text-left" style="max-height: 160px; overflow-y: auto;">
-                                <div class="p-2 mb-1 rounded position-relative" style="background: rgba(138,79,255,0.08); border-left: 2px solid #8A4FFF;">
-                                    <div class="small font-weight-bold" style="color: #f3e8ff; font-size: 11px;">Runtime Agent Connected</div>
-                                    <div style="color: #d8b4fe; font-size: 9px;">Local automation engine running</div>
-                                </div>
-                                <div class="p-2 rounded" style="background: rgba(255,255,255,0.02);">
-                                    <div class="small font-weight-bold" style="color: #f3e8ff; font-size: 11px;">System Operational</div>
-                                    <div style="color: #94a3b8; font-size: 9px;">All services active</div>
-                                </div>
+                                @empty
+                                    <div class="p-3 text-center text-muted" style="font-size: 11px;">
+                                        No new notifications at this time.
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -235,7 +234,7 @@
     <div class="container-fluid">
         <div class="row m-0">
 
-            <!-- LEFT COLUMN -->
+            <!-- LEFT COLUMN (MY ISAAS & MY WORKFLOW) -->
             <div class="col-lg-4 col-12 mt-5 p-0 left">
                 <div class="row">
 
@@ -246,42 +245,78 @@
                         </h2>
                         <div class="wrapper pb-2">
                             <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">iSaaS Platforms &amp; SSO Systems</span>
+                                <span class="position-relative">Core SaaS Platforms &amp; Tools</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/erp') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/erp') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="dowloads"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M6 8h4m-4 4h8"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">ERP System</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/crm') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/crm') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="ad"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">CRM System</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/goldsaversys') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/whatsapp-sender') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="courses"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                        </div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Gold POS</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">WhatsApp</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/affsys') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/fbmb') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="monster"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                                        </div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Affiliate POS</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">FB Marketing</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/bookingsys') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sms-payment-gateway') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="events"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 7h6m-6 4h4"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">SMS Gateway</div>
+                                </div>
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/bookingsys') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Booking System</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/isaas/contracts') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/goldsaversys') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="books"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Gold POS</div>
+                                </div>
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/affsys') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Affiliate POS</div>
+                                </div>
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/isaas/contracts') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Contracts</div>
                                 </div>
@@ -296,24 +331,38 @@
                         </h2>
                         <div class="wrapper pb-2">
                             <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Automation &amp; System Tools</span>
+                                <span class="position-relative">Tasks &amp; Communication</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/points') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/projects') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="mange-noti"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v7m4-7v4m4-4v9"/></svg>
+                                        </div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Points</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Projects</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/notifications') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/isaas/proposals') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="search"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Proposals</div>
+                                </div>
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/notifications') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Notifications</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/messages') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/messages') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="all"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Messages</div>
                                 </div>
@@ -324,7 +373,7 @@
                 </div>
             </div>
 
-            <!-- CENTER COLUMN (PURE THREE.JS 3D HOLOGRAM) -->
+            <!-- CENTER COLUMN (PURE THREE.JS 3D HOLOGRAM RADAR) -->
             <div class="col-lg-4 col-12 mt-5 position-relative center-logo">
                 <div id="logo-it" style="width: 286px; height: 285px; margin: 0 auto; background: none !important;"></div>
 
@@ -347,7 +396,7 @@
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN -->
+            <!-- RIGHT COLUMN (MY TOOLS & MY FINANCE) -->
             <div class="col-lg-4 col-12 mt-5 p-0 right">
                 <div class="row">
 
@@ -359,43 +408,27 @@
                         <div class="clearfix"></div>
                         <div class="wrapper main clearfix pb-2 float-right">
                             <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Marketplace &amp; Tools</span>
+                                <span class="position-relative">Marketplace &amp; Apps</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/marketplace/services') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/marketplace/services') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="sites"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Marketplace</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/marketplace/dashboard') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/marketplace/dashboard') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="sales"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Seller Portal</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="popup"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">WhatsApp</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/fbmb') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="post"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">FB Marketing</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/sms-payment-gateway') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="gl"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">SMS Gateway</div>
-                                </div>
-
                             </div>
                         </div>
-
 
                     </div>
 
@@ -407,51 +440,87 @@
                         <div class="clearfix"></div>
                         <div class="wrapper main clearfix pb-2 float-right">
                             <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Wallet, Billing &amp; Subscriptions</span>
+                                <span class="position-relative">Wallet &amp; Subscriptions</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/add-balance') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/financial/add-balance') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="camp"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M12 14v4m-2-2h4"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Add Balance</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/billing/invoices') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/billing/invoices') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="sales"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Invoices</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/subscriptions/plans') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/subscriptions/plans') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="reports"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Plans</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/transactions') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/financial/transactions') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="full"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Transactions</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/vouchers') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/vouchers') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="upload"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="13" y1="6" x2="11" y2="18"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Vouchers</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/withdrawals') }}">
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/financial/withdrawals') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="setting"></div>
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/><path d="M5 21h14"/></svg>
+                                        </div>
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Withdrawals</div>
+                                </div>
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/points') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Points</div>
+                                </div>
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/referrals') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Referrals</div>
+                                </div>
+                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/kyc') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="hud-icon-box">
+                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2m-2 4h2m-6 4h6M7 16c0-1 1-2 2-2s2 1 2 2"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">KYC Verification</div>
                                 </div>
                             </div>
                         </div>
 
-
                     </div>
                 </div>
+            </div>
 
             </div>
         </div>
@@ -564,13 +633,13 @@
 
 <!-- UX FEATURE 1: Universal Command Bar (Ctrl + K) Modal -->
 <div class="modal fade modal-command-bar" id="commandBarModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 920px;">
         <div class="modal-content">
             <div class="modal-body p-4 text-left">
                 <div class="d-flex align-items-center mb-3">
                     <input type="text" id="commandSearchInput" class="command-search-input" placeholder="Search systems, tools, invoices, actions... (e.g. ERP, CRM, Gold, Wallet)" autofocus autocomplete="off">
                 </div>
-                <div id="commandResultsList" class="command-results-container" style="max-height: 320px; overflow-y: auto;">
+                <div id="commandResultsList" class="command-results-container" style="max-height: 360px; overflow-y: auto; overflow-x: hidden; padding-right: 6px;">
                     <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/erp') }}">
                         <div><i class="icon-calendar text-cyan mr-2"></i><strong>ERP Enterprise System</strong> <span class="text-muted small ml-2">- Financial & Accounting Operations</span></div>
                         <span class="badge badge-outline-info">Open</span>
@@ -661,6 +730,18 @@
     $('#commandSearchInput').on('input', function () {
         var query = $(this).val().toLowerCase().trim();
         $('.command-result-item').each(function () {
+            var text = $(this).text().toLowerCase();
+            if (text.indexOf(query) !== -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    $('#notificationSearchInput').on('input', function () {
+        var query = $(this).val().toLowerCase().trim();
+        $('.notification-feed-item').each(function () {
             var text = $(this).text().toLowerCase();
             if (text.indexOf(query) !== -1) {
                 $(this).show();
