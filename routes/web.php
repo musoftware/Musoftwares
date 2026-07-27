@@ -53,7 +53,6 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\WebsiteServiceController;
 use App\Http\Controllers\AdminNoteController;
 use App\Http\Controllers\Auth\SocialLoginController;
-use App\Http\Controllers\AutomationRuleController;
 use App\Http\Controllers\BackgroundTaskController;
 use App\Http\Controllers\Billing\InvoiceController;
 use App\Http\Controllers\BlogController;
@@ -86,7 +85,6 @@ use App\Http\Controllers\PayoutMethodController;
 use App\Http\Controllers\PointPurchaseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReferralController;
-use App\Http\Controllers\RuntimeDownloadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SsoController;
@@ -276,7 +274,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/runtime/download', [RuntimeDownloadController::class, 'index'])->name('runtime.download');
     Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.wizard');
     Route::post('/onboarding', [OnboardingController::class, 'store'])->middleware('throttle:60,1')->name('onboarding.store');
     Route::post('/product-tour/status', [OnboardingController::class, 'updateTourStatus'])->name('product-tour.status');
@@ -545,11 +542,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     // Admin Views
 });
 
-// Settings & Account Routes
-Route::middleware(['auth', 'verified'])->prefix('settings')->name('settings.')->group(function () {
-    // Automations
-    Route::resource('automations', AutomationRuleController::class)->except(['show']);
-});
+
 
 if (file_exists(base_path('Modules/CRM/routes/web.php'))) {
     require base_path('Modules/CRM/routes/web.php');

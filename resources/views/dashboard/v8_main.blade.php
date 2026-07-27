@@ -214,7 +214,6 @@
                             <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>My Profile</a>
                             <a class="dropdown-item py-2" href="{{ url('/billing/invoices') }}"><i class="icon-doc mr-2"></i>Billing &amp; Invoices</a>
                             <a class="dropdown-item py-2" href="{{ url('/financial/transactions') }}"><i class="icon-credit-card mr-2"></i>Wallet &amp; Transactions</a>
-                            <a class="dropdown-item py-2" href="{{ url('/settings/automations') }}"><i class="icon-cog mr-2"></i>Settings</a>
                             <a class="dropdown-item py-2" href="#" id="resetWelcomeIntroBtn"><i class="icon-bell mr-2"></i>Reset Welcome Intro</a>
                             <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">
                                 @csrf
@@ -298,24 +297,6 @@
                                 <span class="position-relative">Automation &amp; System Tools</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/runtime/download') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="add-browser"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Runtime Agent</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/automations') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="mange-browser"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Automations</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/automations') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="add"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Automations</div>
-                                </div>
                                 <div class="col-4 px-0 pointer" data-href="{{ url('/points') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="mange-noti"></div>
@@ -409,12 +390,7 @@
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">SMS Gateway</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/automations') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="shorten"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Settings</div>
-                                </div>
+
                             </div>
                         </div>
 

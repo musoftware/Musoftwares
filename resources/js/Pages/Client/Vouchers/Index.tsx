@@ -65,7 +65,7 @@ export default function Index({ auth, vouchers, redemptions }: Props) {
                         </p>
                     </div>
                     <Button asChild size="lg" className="shrink-0">
-                        <Link href={route('client.balances.charge')}>
+                        <Link href={route('financial.add-balance')}>
                             <Wallet className="me-2 h-5 w-5" />
                             {__('vouchers.add_balance')}
                         </Link>
@@ -152,7 +152,7 @@ export default function Index({ auth, vouchers, redemptions }: Props) {
                                     </div>
 
                                     <Button asChild className="w-full mt-auto" size="lg">
-                                        <Link href={route('client.balances.charge')}>
+                                        <Link href={route('financial.add-balance')}>
                                             <Wallet className="me-2 h-4 w-4" />
                                             {__('vouchers.add_balance_and_pay')}
                                         </Link>

@@ -24,7 +24,6 @@ use App\Events\WithdrawalApproved;
 use App\Events\WithdrawalRequested;
 use App\Listeners\ActivityEventListener;
 use App\Listeners\AmountReceivedListener;
-use App\Listeners\AutomationEngineListener;
 use App\Listeners\CalculateReferralListener;
 use App\Listeners\NotificationEventListener;
 use App\Listeners\SaaSLimitListener;
@@ -73,7 +72,5 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
-
-        Event::listen('*', [AutomationEngineListener::class, 'handle']);
     }
 }
