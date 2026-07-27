@@ -2,16 +2,24 @@
 
 namespace Modules\Marketplace\Http\Controllers;
 
+use App\Helpers\FinanceHelper;
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
+use App\Models\CurrenciesExchange;
+use App\Models\Favorite;
+use App\Services\AI\MarketplaceAiService;
+use App\Services\TranslationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Marketplace\Models\Service;
-use Modules\Marketplace\Models\ServiceCategory;
-use Modules\Marketplace\Models\ServicePackage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Modules\Marketplace\Http\Requests\StoreServiceRequest;
 use Modules\Marketplace\Http\Requests\UpdateServiceRequest;
-use Inertia\Inertia;
-use Illuminate\Support\Str;
+use Modules\Marketplace\Models\Service;
+use Modules\Marketplace\Models\ServiceCategory;
+use Modules\Marketplace\Models\ServiceExtra;
+use Modules\Marketplace\Models\ServicePackage;
 
 class ServiceController extends Controller
 {
@@ -22,18 +30,18 @@ class ServiceController extends Controller
         $categoryParam = $request->input('category') ?? $request->input('category_id') ?? $request->input('category_slug');
         $resolvedCategory = null;
 
-        if (!empty($categoryParam)) {
+        if (! empty($categoryParam)) {
             $paramStr = trim((string) $categoryParam);
 
             if (is_numeric($paramStr)) {
                 $resolvedCategory = ServiceCategory::find((int) $paramStr);
             }
 
-            if (!$resolvedCategory) {
+            if (! $resolvedCategory) {
                 $resolvedCategory = ServiceCategory::where('slug', $paramStr)->first();
             }
 
-            if (!$resolvedCategory) {
+            if (! $resolvedCategory) {
                 $aliases = [
                     'web' => 'web-development',
                     'dev' => 'web-development',
@@ -59,7 +67,7 @@ class ServiceController extends Controller
                 }
             }
 
-            if (!$resolvedCategory) {
+            if (! $resolvedCategory) {
                 $resolvedCategory = ServiceCategory::where('slug', 'like', "%{$paramStr}%")
                     ->orWhere('name', 'like', "%{$paramStr}%")
                     ->first();
@@ -70,16 +78,16 @@ class ServiceController extends Controller
             } else {
                 $query->whereHas('category', function ($q) use ($paramStr) {
                     $q->where('slug', 'like', "%{$paramStr}%")
-                      ->orWhere('name', 'like', "%{$paramStr}%");
+                        ->orWhere('name', 'like', "%{$paramStr}%");
                 });
             }
         }
 
         $search = $request->input('search') ?? $request->input('q');
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -87,9 +95,9 @@ class ServiceController extends Controller
         $categories = ServiceCategory::orderBy('name')->get();
 
         $currentLocale = app()->getLocale();
-        $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
+        $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
         $userFavoriteIds = auth()->check()
-            ? \App\Models\Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->pluck('favoritable_id')->toArray()
+            ? Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->pluck('favoritable_id')->toArray()
             : [];
 
         $services->getCollection()->transform(function ($service) use ($viewerCurrency, $userFavoriteIds, $currentLocale) {
@@ -97,7 +105,7 @@ class ServiceController extends Controller
             $service = $this->localizeService($service, $currentLocale);
             $service->packages->transform(function ($package) use ($viewerCurrency) {
                 if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
-                    $package->price = \App\Models\CurrenciesExchange::RateToday(
+                    $package->price = CurrenciesExchange::RateToday(
                         $package->price,
                         $package->currency_id,
                         $viewerCurrency->id
@@ -105,8 +113,10 @@ class ServiceController extends Controller
                     $package->currency_id = $viewerCurrency->id;
                     $package->setRelation('currency', $viewerCurrency);
                 }
+
                 return $package;
             });
+
             return $service;
         });
 
@@ -124,15 +134,15 @@ class ServiceController extends Controller
             ],
         ])->withViewData([
             'meta' => [
-                'title'       => $isAr ? 'سوق تطوير البرمجيات والخدمات التقنية | MuSoftwares' : 'Software Development & IT Services Marketplace | MuSoftwares',
+                'title' => $isAr ? 'سوق تطوير البرمجيات والخدمات التقنية | MuSoftwares' : 'Software Development & IT Services Marketplace | MuSoftwares',
                 'description' => $isAr ? 'تصفح أفضل خدمات تطوير البرمجيات وحلول تقنية المعلومات والسكربتات المخصصة على سوق MuSoftwares.' : 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
-                'image'       => url('/images/og-default.jpg'),
-                'url'         => $canonicalUrl,
+                'image' => url('/images/og-default.jpg'),
+                'url' => $canonicalUrl,
                 'canonical_url' => $canonicalUrl,
-                'en_url'      => $canonicalUrl . '?lang=en',
-                'ar_url'      => $canonicalUrl . '?lang=ar',
-                'type'        => 'website',
-            ]
+                'en_url' => $canonicalUrl.'?lang=en',
+                'ar_url' => $canonicalUrl.'?lang=ar',
+                'type' => 'website',
+            ],
         ]);
     }
 
@@ -140,13 +150,13 @@ class ServiceController extends Controller
     {
         $targetId = $id;
         $extractedSlug = $slug;
-        
+
         // Handle URLs formatted as /services/98-some-title-slug
-        if (!is_numeric($id)) {
-            if (preg_match('/^(\d+)-(.*)$/', (string)$id, $matches)) {
+        if (! is_numeric($id)) {
+            if (preg_match('/^(\d+)-(.*)$/', (string) $id, $matches)) {
                 $targetId = $matches[1];
                 $extractedSlug = $matches[2];
-            } elseif (preg_match('/^(\d+)$/', (string)$id, $matches)) {
+            } elseif (preg_match('/^(\d+)$/', (string) $id, $matches)) {
                 $targetId = $matches[1];
             }
         }
@@ -158,27 +168,28 @@ class ServiceController extends Controller
             $service = (clone $query)->find($targetId);
         }
 
-        if (!$service) {
+        if (! $service) {
             $searchSlug = $extractedSlug ?: $id;
             $service = (clone $query)->where('slug', $searchSlug)->first();
         }
 
-        if (!$service) {
+        if (! $service) {
             // Search by title slug fallback
             $service = $query->get()->first(function ($s) use ($id, $slug, $extractedSlug) {
-                $sSlug = \Illuminate\Support\Str::slug($s->title);
+                $sSlug = Str::slug($s->title);
+
                 return $sSlug === $id || $sSlug === $slug || $sSlug === $extractedSlug;
             });
         }
 
-        if (!$service) {
+        if (! $service) {
             return Inertia::render('Marketplace/Services/ExclusiveService', [
                 'serviceSlug' => str_replace('-', ' ', $id),
             ]);
         }
 
         $user = auth()->user();
-        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin) || ($user->role ?? null) === 'admin');
 
         if ($service->status !== 'active') {
             if ($isAdmin) {
@@ -186,17 +197,17 @@ class ServiceController extends Controller
                 $service->approved_at = $service->approved_at ?: now();
                 $service->approved_by = $service->approved_by ?: $user->id;
                 $service->save();
-            } elseif (!$user || $user->id !== $service->seller_id) {
+            } elseif (! $user || $user->id !== $service->seller_id) {
                 return Inertia::render('Marketplace/Services/ExclusiveService', [
                     'serviceSlug' => $service->title ?? str_replace('-', ' ', $id),
                 ]);
             }
         }
 
-        $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
+        $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
 
         $service->is_favorited = auth()->check()
-            ? \App\Models\Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->where('favoritable_id', $service->id)->exists()
+            ? Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->where('favoritable_id', $service->id)->exists()
             : false;
 
         if ($service->packages->isEmpty()) {
@@ -214,7 +225,7 @@ class ServiceController extends Controller
 
         $service->packages->transform(function ($package) use ($viewerCurrency) {
             if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
-                $package->price = \App\Models\CurrenciesExchange::RateToday(
+                $package->price = CurrenciesExchange::RateToday(
                     $package->price,
                     $package->currency_id,
                     $viewerCurrency->id
@@ -222,46 +233,116 @@ class ServiceController extends Controller
                 $package->currency_id = $viewerCurrency->id;
                 $package->setRelation('currency', $viewerCurrency);
             }
+
             return $package;
         });
 
         $currentLocale = app()->getLocale();
         $service = $this->localizeService($service, $currentLocale);
 
-        $shareTitle = $service->title . ' | Musoftware Marketplace';
-        $shareDesc = \Illuminate\Support\Str::limit(strip_tags($service->tagline ?: $service->description ?: $service->title), 160);
+        $shareTitle = $service->title.' | Musoftware Marketplace';
+        $shareDesc = Str::limit(strip_tags($service->tagline ?: $service->description ?: $service->title), 160);
         $shareImage = $service->cover_image;
         $canonicalUrl = route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug]);
 
         $schemaJson = [
-            '@context' => 'https://schema.org/',
-            '@type' => 'Product',
-            'name' => $service->title,
-            'image' => [$shareImage],
-            'description' => $shareDesc,
-            'offers' => [
-                '@type' => 'AggregateOffer',
-                'priceCurrency' => $viewerCurrency->currency ?? 'USD',
-                'lowPrice' => $service->packages->min('price') ?? 0,
-                'highPrice' => $service->packages->max('price') ?? 0,
-                'offerCount' => $service->packages->count() ?: 1,
-            ]
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'Product',
+                    '@id' => $canonicalUrl.'#product',
+                    'name' => $service->title,
+                    'image' => array_filter([$shareImage]),
+                    'description' => $shareDesc,
+                    'category' => $service->category->name ?? 'Software Services',
+                    'brand' => [
+                        '@type' => 'Brand',
+                        'name' => 'Musoftware Marketplace',
+                    ],
+                    'offers' => [
+                        '@type' => 'AggregateOffer',
+                        'priceCurrency' => $viewerCurrency->code ?? $viewerCurrency->currency ?? 'USD',
+                        'lowPrice' => (float) ($service->packages->min('price') ?? 0),
+                        'highPrice' => (float) ($service->packages->max('price') ?? 0),
+                        'offerCount' => $service->packages->count() ?: 1,
+                        'availability' => 'https://schema.org/InStock',
+                    ],
+                    'seller' => [
+                        '@type' => 'Organization',
+                        'name' => $service->seller->name ?? 'Verified Seller',
+                    ],
+                ],
+                [
+                    '@type' => 'BreadcrumbList',
+                    '@id' => $canonicalUrl.'#breadcrumb',
+                    'itemListElement' => [
+                        [
+                            '@type' => 'ListItem',
+                            'position' => 1,
+                            'name' => 'Home',
+                            'item' => url('/'),
+                        ],
+                        [
+                            '@type' => 'ListItem',
+                            'position' => 2,
+                            'name' => 'Marketplace',
+                            'item' => route('marketplace.services.index'),
+                        ],
+                        [
+                            '@type' => 'ListItem',
+                            'position' => 3,
+                            'name' => $service->title,
+                            'item' => $canonicalUrl,
+                        ],
+                    ],
+                ],
+                [
+                    '@type' => 'FAQPage',
+                    '@id' => $canonicalUrl.'#faq',
+                    'mainEntity' => [
+                        [
+                            '@type' => 'Question',
+                            'name' => 'How does the escrow payment system work?',
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => 'Funds are securely held in escrow by Musoftware Marketplace and are only released to the seller after you review and approve the final deliverable.',
+                            ],
+                        ],
+                        [
+                            '@type' => 'Question',
+                            'name' => 'Can I request revisions for this service?',
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => 'Yes, each service package includes defined revision rounds. You can request revisions directly through the order dashboard.',
+                            ],
+                        ],
+                        [
+                            '@type' => 'Question',
+                            'name' => 'What happens if the seller does not deliver on time?',
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => 'If a seller misses the agreed delivery deadline without mutual agreement, you can request an instant full refund or cancellation.',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         return Inertia::render('Marketplace/Services/Show', [
             'service' => $service,
         ])->withViewData([
             'meta' => [
-                'title'       => $shareTitle,
+                'title' => $shareTitle,
                 'description' => $shareDesc,
-                'image'       => $shareImage,
-                'url'         => $canonicalUrl,
+                'image' => $shareImage,
+                'url' => $canonicalUrl,
                 'canonical_url' => $canonicalUrl,
-                'en_url'      => $canonicalUrl . '?lang=en',
-                'ar_url'      => $canonicalUrl . '?lang=ar',
-                'type'        => 'product',
+                'en_url' => $canonicalUrl.'?lang=en',
+                'ar_url' => $canonicalUrl.'?lang=ar',
+                'type' => 'product',
                 'schema_json' => $schemaJson,
-            ]
+            ],
         ]);
     }
 
@@ -270,21 +351,21 @@ class ServiceController extends Controller
      */
     protected function localizeService(Service $service, string $targetLocale): Service
     {
-        if (!in_array($targetLocale, ['en', 'ar'])) {
+        if (! in_array($targetLocale, ['en', 'ar'])) {
             return $service;
         }
 
         try {
-            /** @var \App\Services\TranslationService $translator */
-            $translator = app(\App\Services\TranslationService::class);
+            /** @var TranslationService $translator */
+            $translator = app(TranslationService::class);
             $updated = false;
 
             $titleTrans = $service->title_translations ?? [];
-            if (empty($titleTrans[$targetLocale]) && !empty($service->title)) {
+            if (empty($titleTrans[$targetLocale]) && ! empty($service->title)) {
                 $sourceLang = $translator->detectLanguage($service->title);
                 if ($sourceLang !== $targetLocale) {
                     $translatedTitle = $translator->translate($service->title, $targetLocale, $sourceLang);
-                    if (!empty($translatedTitle)) {
+                    if (! empty($translatedTitle)) {
                         $titleTrans[$targetLocale] = $translatedTitle;
                         $service->title_translations = $titleTrans;
                         $updated = true;
@@ -297,11 +378,11 @@ class ServiceController extends Controller
             }
 
             $taglineTrans = $service->tagline_translations ?? [];
-            if (empty($taglineTrans[$targetLocale]) && !empty($service->tagline)) {
+            if (empty($taglineTrans[$targetLocale]) && ! empty($service->tagline)) {
                 $sourceLang = $translator->detectLanguage($service->tagline);
                 if ($sourceLang !== $targetLocale) {
                     $translatedTagline = $translator->translate($service->tagline, $targetLocale, $sourceLang);
-                    if (!empty($translatedTagline)) {
+                    if (! empty($translatedTagline)) {
                         $taglineTrans[$targetLocale] = $translatedTagline;
                         $service->tagline_translations = $taglineTrans;
                         $updated = true;
@@ -314,11 +395,11 @@ class ServiceController extends Controller
             }
 
             $descTrans = $service->description_translations ?? [];
-            if (empty($descTrans[$targetLocale]) && !empty($service->description)) {
+            if (empty($descTrans[$targetLocale]) && ! empty($service->description)) {
                 $sourceLang = $translator->detectLanguage($service->description);
                 if ($sourceLang !== $targetLocale) {
                     $translatedDesc = $translator->translate($service->description, $targetLocale, $sourceLang);
-                    if (!empty($translatedDesc)) {
+                    if (! empty($translatedDesc)) {
                         $descTrans[$targetLocale] = $translatedDesc;
                         $service->description_translations = $descTrans;
                         $updated = true;
@@ -334,17 +415,17 @@ class ServiceController extends Controller
                 $service->save();
             }
 
-            if (!empty($titleTrans[$targetLocale])) {
+            if (! empty($titleTrans[$targetLocale])) {
                 $service->title = $titleTrans[$targetLocale];
             }
-            if (!empty($taglineTrans[$targetLocale])) {
+            if (! empty($taglineTrans[$targetLocale])) {
                 $service->tagline = $taglineTrans[$targetLocale];
             }
-            if (!empty($descTrans[$targetLocale])) {
+            if (! empty($descTrans[$targetLocale])) {
                 $service->description = $descTrans[$targetLocale];
             }
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("localizeService failed for service {$service->id}: " . $e->getMessage());
+            Log::warning("localizeService failed for service {$service->id}: ".$e->getMessage());
         }
 
         return $service;
@@ -358,8 +439,8 @@ class ServiceController extends Controller
         return Inertia::render('Marketplace/Services/Create', [
             'categories' => $categories,
             'seller' => [
-                'id'     => $user->id,
-                'name'   => $user->name,
+                'id' => $user->id,
+                'name' => $user->name,
                 'avatar' => $user->avatar ?? null,
             ],
         ]);
@@ -374,20 +455,20 @@ class ServiceController extends Controller
             $galleryPaths = $validated['kept_gallery'] ?? $request->input('kept_gallery', []);
             if ($request->hasFile('gallery')) {
                 foreach ($request->file('gallery') as $image) {
-                    $galleryPaths[] = $image->store('services/' . auth()->id(), 'public_uploads');
+                    $galleryPaths[] = $image->store('services/'.auth()->id(), 'public_uploads');
                 }
             }
 
             $thumbnailPath = null;
-            if (!empty($galleryPaths[0])) {
+            if (! empty($galleryPaths[0])) {
                 $firstImagePath = $galleryPaths[0];
-                $fullPath = public_path('uploads/' . ltrim($firstImagePath, '/'));
-                $thumbRelative = 'services/' . auth()->id() . '/thumb_' . basename($firstImagePath);
-                $thumbFullPath = public_path('uploads/' . $thumbRelative);
+                $fullPath = public_path('uploads/'.ltrim($firstImagePath, '/'));
+                $thumbRelative = 'services/'.auth()->id().'/thumb_'.basename($firstImagePath);
+                $thumbFullPath = public_path('uploads/'.$thumbRelative);
 
-                if (file_exists(public_path('uploads/' . $thumbRelative))) {
+                if (file_exists(public_path('uploads/'.$thumbRelative))) {
                     $thumbnailPath = $thumbRelative;
-                } elseif (\App\Helpers\ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
+                } elseif (ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
                     $thumbnailPath = $thumbRelative;
                 } else {
                     $thumbnailPath = $firstImagePath;
@@ -396,31 +477,31 @@ class ServiceController extends Controller
 
             $user = auth()->user();
 
-            $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin));
+            $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin));
 
             $service = Service::create([
-                'seller_id'    => auth()->id(),
-                'title'        => $validated['title'] ?? null,
-                'slug'         => !empty($validated['title']) ? Str::slug($validated['title']) : null,
-                'thumbnail'    => $thumbnailPath,
+                'seller_id' => auth()->id(),
+                'title' => $validated['title'] ?? null,
+                'slug' => ! empty($validated['title']) ? Str::slug($validated['title']) : null,
+                'thumbnail' => $thumbnailPath,
                 'title_translations' => $validated['title_translations'] ?? null,
-                'tagline'      => $validated['tagline'] ?? null,
+                'tagline' => $validated['tagline'] ?? null,
                 'tagline_translations' => $validated['tagline_translations'] ?? null,
-                'description'  => $validated['description'] ?? null,
+                'description' => $validated['description'] ?? null,
                 'description_translations' => $validated['description_translations'] ?? null,
-                'auto_reply'   => $validated['auto_reply'] ?? null,
+                'auto_reply' => $validated['auto_reply'] ?? null,
                 'auto_reply_translations' => $validated['auto_reply_translations'] ?? null,
-                'category_id'  => $validated['category_id'],
-                'status'       => $isAdmin ? 'active' : 'draft',
-                'approved_at'  => $isAdmin ? now() : null,
-                'approved_by'  => $isAdmin ? $user->id : null,
-                'tags'         => $validated['tags'] ?? [],
-                'faq'          => $validated['faq'] ?? [],
+                'category_id' => $validated['category_id'],
+                'status' => $isAdmin ? 'active' : 'draft',
+                'approved_at' => $isAdmin ? now() : null,
+                'approved_by' => $isAdmin ? $user->id : null,
+                'tags' => $validated['tags'] ?? [],
+                'faq' => $validated['faq'] ?? [],
                 'requirements' => $validated['requirements'] ?? [],
-                'gallery'      => $galleryPaths,
-                'video_url'    => $validated['video_url'] ?? null,
+                'gallery' => $galleryPaths,
+                'video_url' => $validated['video_url'] ?? null,
                 'service_link' => $validated['service_link'] ?? null,
-                'is_free'      => $validated['is_free'] ?? false,
+                'is_free' => $validated['is_free'] ?? false,
                 'generate_serials' => $validated['generate_serials'] ?? false,
                 'allow_random_serial' => $validated['allow_random_serial'] ?? false,
                 'validity_days' => $validated['validity_days'] ?? null,
@@ -430,10 +511,10 @@ class ServiceController extends Controller
 
             if (isset($validated['extras'])) {
                 foreach ($validated['extras'] as $extra) {
-                    \Modules\Marketplace\Models\ServiceExtra::create([
-                        'service_id'    => $service->id,
-                        'title'         => $extra['title'],
-                        'price'         => $extra['price'],
+                    ServiceExtra::create([
+                        'service_id' => $service->id,
+                        'title' => $extra['title'],
+                        'price' => $extra['price'],
                         'duration_days' => $extra['duration_days'] ?? 0,
                     ]);
                 }
@@ -441,14 +522,14 @@ class ServiceController extends Controller
 
             foreach ($validated['packages'] as $pkg) {
                 ServicePackage::create([
-                    'service_id'    => $service->id,
-                    'name'          => $pkg['name'],
-                    'description'   => $pkg['description'],
-                    'price'         => $pkg['price'],
-                    'currency_id'   => $pkg['currency_id'],
+                    'service_id' => $service->id,
+                    'name' => $pkg['name'],
+                    'description' => $pkg['description'],
+                    'price' => $pkg['price'],
+                    'currency_id' => $pkg['currency_id'],
                     'delivery_days' => $pkg['delivery_days'],
-                    'revisions'     => $pkg['revisions'] ?? 2,
-                    'features'      => $pkg['features'] ?? [],
+                    'revisions' => $pkg['revisions'] ?? 2,
+                    'features' => $pkg['features'] ?? [],
                 ]);
             }
 
@@ -456,7 +537,7 @@ class ServiceController extends Controller
         });
 
         $user = auth()->user();
-        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin));
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin));
         $msg = $isAdmin
             ? __('general.service_created')
             : __('general.service_submitted_for_review_it_will_be_visible_once_approved');
@@ -491,18 +572,18 @@ class ServiceController extends Controller
 
             if ($request->hasFile('gallery')) {
                 foreach ($request->file('gallery') as $image) {
-                    $galleryPaths[] = $image->store('services/' . auth()->id(), 'public_uploads');
+                    $galleryPaths[] = $image->store('services/'.auth()->id(), 'public_uploads');
                 }
             }
 
             $thumbnailPath = $service->thumbnail;
-            if (!empty($galleryPaths[0])) {
+            if (! empty($galleryPaths[0])) {
                 $firstImagePath = $galleryPaths[0];
-                $fullPath = public_path('uploads/' . ltrim($firstImagePath, '/'));
-                $thumbRelative = 'services/' . auth()->id() . '/thumb_' . basename($firstImagePath);
-                $thumbFullPath = public_path('uploads/' . $thumbRelative);
+                $fullPath = public_path('uploads/'.ltrim($firstImagePath, '/'));
+                $thumbRelative = 'services/'.auth()->id().'/thumb_'.basename($firstImagePath);
+                $thumbFullPath = public_path('uploads/'.$thumbRelative);
 
-                if (\App\Helpers\ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
+                if (ImageHelper::createThumbnail($fullPath, $thumbFullPath, 600, 400, 80)) {
                     $thumbnailPath = $thumbRelative;
                 } else {
                     $thumbnailPath = $firstImagePath;
@@ -510,35 +591,35 @@ class ServiceController extends Controller
             }
 
             $user = auth()->user();
-            $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin));
+            $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin));
 
             $service->update([
-                'title'        => $validated['title'] ?? null,
-                'slug'         => !empty($validated['title']) ? Str::slug($validated['title']) : $service->slug,
-                'thumbnail'    => $thumbnailPath,
+                'title' => $validated['title'] ?? null,
+                'slug' => ! empty($validated['title']) ? Str::slug($validated['title']) : $service->slug,
+                'thumbnail' => $thumbnailPath,
                 'title_translations' => $validated['title_translations'] ?? null,
-                'tagline'      => $validated['tagline'] ?? null,
+                'tagline' => $validated['tagline'] ?? null,
                 'tagline_translations' => $validated['tagline_translations'] ?? null,
-                'description'  => $validated['description'] ?? null,
+                'description' => $validated['description'] ?? null,
                 'description_translations' => $validated['description_translations'] ?? null,
-                'auto_reply'   => $validated['auto_reply'] ?? null,
+                'auto_reply' => $validated['auto_reply'] ?? null,
                 'auto_reply_translations' => $validated['auto_reply_translations'] ?? null,
-                'category_id'  => $validated['category_id'],
-                'tags'         => $validated['tags'] ?? [],
-                'faq'          => $validated['faq'] ?? [],
+                'category_id' => $validated['category_id'],
+                'tags' => $validated['tags'] ?? [],
+                'faq' => $validated['faq'] ?? [],
                 'requirements' => $validated['requirements'] ?? [],
-                'gallery'      => $galleryPaths,
-                'video_url'    => $validated['video_url'] ?? null,
+                'gallery' => $galleryPaths,
+                'video_url' => $validated['video_url'] ?? null,
                 'service_link' => $validated['service_link'] ?? null,
-                'is_free'      => $validated['is_free'] ?? false,
+                'is_free' => $validated['is_free'] ?? false,
                 'generate_serials' => $validated['generate_serials'] ?? false,
                 'allow_random_serial' => $validated['allow_random_serial'] ?? false,
                 'validity_days' => $validated['validity_days'] ?? null,
                 'referral_commission_from' => $validated['referral_commission_from'] ?? 'fee',
                 'referral_commission_percentage' => $validated['referral_commission_percentage'] ?? null,
-                'status'       => $isAdmin ? 'active' : 'draft',
-                'approved_at'  => $isAdmin ? ($service->approved_at ?? now()) : $service->approved_at,
-                'approved_by'  => $isAdmin ? ($service->approved_by ?? $user->id) : $service->approved_by,
+                'status' => $isAdmin ? 'active' : 'draft',
+                'approved_at' => $isAdmin ? ($service->approved_at ?? now()) : $service->approved_at,
+                'approved_by' => $isAdmin ? ($service->approved_by ?? $user->id) : $service->approved_by,
             ]);
 
             $submittedExtraIds = collect($validated['extras'] ?? [])->pluck('id')->filter()->toArray();
@@ -546,17 +627,17 @@ class ServiceController extends Controller
 
             if (isset($validated['extras'])) {
                 foreach ($validated['extras'] as $extra) {
-                    if (!empty($extra['id'])) {
+                    if (! empty($extra['id'])) {
                         $service->extras()->where('id', $extra['id'])->update([
-                            'title'         => $extra['title'],
-                            'price'         => $extra['price'],
+                            'title' => $extra['title'],
+                            'price' => $extra['price'],
                             'duration_days' => $extra['duration_days'] ?? 0,
                         ]);
                     } else {
-                        \Modules\Marketplace\Models\ServiceExtra::create([
-                            'service_id'    => $service->id,
-                            'title'         => $extra['title'],
-                            'price'         => $extra['price'],
+                        ServiceExtra::create([
+                            'service_id' => $service->id,
+                            'title' => $extra['title'],
+                            'price' => $extra['price'],
                             'duration_days' => $extra['duration_days'] ?? 0,
                         ]);
                     }
@@ -569,28 +650,28 @@ class ServiceController extends Controller
             $service->packages()->whereNotIn('id', $submittedPackageIds)->delete();
 
             foreach ($validated['packages'] as $pkg) {
-                if (!empty($pkg['id'])) {
+                if (! empty($pkg['id'])) {
                     // Update existing
                     $service->packages()->where('id', $pkg['id'])->update([
-                        'name'          => $pkg['name'],
-                        'description'   => $pkg['description'],
-                        'price'         => $pkg['price'],
-                        'currency_id'   => $pkg['currency_id'],
+                        'name' => $pkg['name'],
+                        'description' => $pkg['description'],
+                        'price' => $pkg['price'],
+                        'currency_id' => $pkg['currency_id'],
                         'delivery_days' => $pkg['delivery_days'],
-                        'revisions'     => $pkg['revisions'] ?? 2,
-                        'features'      => $pkg['features'] ?? [],
+                        'revisions' => $pkg['revisions'] ?? 2,
+                        'features' => $pkg['features'] ?? [],
                     ]);
                 } else {
                     // Create new
                     ServicePackage::create([
-                        'service_id'    => $service->id,
-                        'name'          => $pkg['name'],
-                        'description'   => $pkg['description'],
-                        'price'         => $pkg['price'],
-                        'currency_id'   => $pkg['currency_id'],
+                        'service_id' => $service->id,
+                        'name' => $pkg['name'],
+                        'description' => $pkg['description'],
+                        'price' => $pkg['price'],
+                        'currency_id' => $pkg['currency_id'],
                         'delivery_days' => $pkg['delivery_days'],
-                        'revisions'     => $pkg['revisions'] ?? 2,
-                        'features'      => $pkg['features'] ?? [],
+                        'revisions' => $pkg['revisions'] ?? 2,
+                        'features' => $pkg['features'] ?? [],
                     ]);
                 }
             }
@@ -603,9 +684,9 @@ class ServiceController extends Controller
     public function createAi()
     {
         $user = auth()->user();
-        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin) || ($user->role ?? null) === 'admin');
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -619,9 +700,9 @@ class ServiceController extends Controller
     public function storeAi(Request $request)
     {
         $user = auth()->user();
-        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin) || ($user->role ?? null) === 'admin');
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -632,51 +713,51 @@ class ServiceController extends Controller
 
         $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug'])->toArray();
 
-        $aiService = app(\App\Services\AI\MarketplaceAiService::class);
+        $aiService = app(MarketplaceAiService::class);
         $aiData = $aiService->generateServiceData($validated['title'], $validated['provider'], $categories, $user->id);
 
         $service = DB::transaction(function () use ($aiData, $user) {
             $service = Service::create([
-                'seller_id'    => $user->id,
-                'title'        => $aiData['title'],
-                'slug'         => Str::slug($aiData['title']),
-                'thumbnail'    => $aiData['thumbnail'] ?? null,
-                'tagline'      => $aiData['tagline'] ?? null,
-                'description'  => $aiData['description'] ?? null,
-                'category_id'  => $aiData['category_id'],
-                'status'       => 'active',
-                'approved_at'  => now(),
-                'approved_by'  => $user->id,
-                'tags'         => $aiData['tags'] ?? [],
-                'faq'          => $aiData['faq'] ?? [],
+                'seller_id' => $user->id,
+                'title' => $aiData['title'],
+                'slug' => Str::slug($aiData['title']),
+                'thumbnail' => $aiData['thumbnail'] ?? null,
+                'tagline' => $aiData['tagline'] ?? null,
+                'description' => $aiData['description'] ?? null,
+                'category_id' => $aiData['category_id'],
+                'status' => 'active',
+                'approved_at' => now(),
+                'approved_by' => $user->id,
+                'tags' => $aiData['tags'] ?? [],
+                'faq' => $aiData['faq'] ?? [],
                 'requirements' => $aiData['requirements'] ?? [],
-                'gallery'      => $aiData['gallery'] ?? [],
-                'is_free'      => false,
+                'gallery' => $aiData['gallery'] ?? [],
+                'is_free' => false,
             ]);
 
-            if (!empty($aiData['packages']) && is_array($aiData['packages'])) {
+            if (! empty($aiData['packages']) && is_array($aiData['packages'])) {
                 foreach ($aiData['packages'] as $pkg) {
                     ServicePackage::create([
-                        'service_id'    => $service->id,
-                        'name'          => $pkg['name'] ?? 'Standard',
-                        'description'   => $pkg['description'] ?? '',
-                        'price'         => $pkg['price'] ?? 25,
-                        'currency_id'   => $pkg['currency_id'] ?? 1,
+                        'service_id' => $service->id,
+                        'name' => $pkg['name'] ?? 'Standard',
+                        'description' => $pkg['description'] ?? '',
+                        'price' => $pkg['price'] ?? 25,
+                        'currency_id' => $pkg['currency_id'] ?? 1,
                         'delivery_days' => $pkg['delivery_days'] ?? 3,
-                        'revisions'     => $pkg['revisions'] ?? 2,
-                        'features'      => $pkg['features'] ?? [],
+                        'revisions' => $pkg['revisions'] ?? 2,
+                        'features' => $pkg['features'] ?? [],
                     ]);
                 }
             } else {
                 ServicePackage::create([
-                    'service_id'    => $service->id,
-                    'name'          => 'Standard',
-                    'description'   => $service->description ?: 'Standard package deliverable.',
-                    'price'         => 25,
-                    'currency_id'   => 1,
+                    'service_id' => $service->id,
+                    'name' => 'Standard',
+                    'description' => $service->description ?: 'Standard package deliverable.',
+                    'price' => 25,
+                    'currency_id' => 1,
                     'delivery_days' => 3,
-                    'revisions'     => 2,
-                    'features'      => [],
+                    'revisions' => 2,
+                    'features' => [],
                 ]);
             }
 
@@ -694,7 +775,7 @@ class ServiceController extends Controller
         $service->delete();
 
         $referer = request()->headers->get('referer');
-        if ($referer && (str_contains($referer, '/marketplace/services/' . $service->id) || str_contains($referer, '/marketplace/services/' . $service->slug))) {
+        if ($referer && (str_contains($referer, '/marketplace/services/'.$service->id) || str_contains($referer, '/marketplace/services/'.$service->slug))) {
             return redirect()->route('marketplace.services.index')
                 ->with('success', __('general.service_deleted_successfully'));
         }
@@ -706,68 +787,66 @@ class ServiceController extends Controller
     public function getAiImagePrompt(Request $request)
     {
         $user = auth()->user();
-        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin) || ($user->role ?? null) === 'admin');
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             return response()->json(['error' => 'Unauthorized access. Only admins can view AI image prompts.'], 403);
         }
 
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'prompt'      => 'nullable|string|max:500',
+            'title' => 'required|string|max:255',
+            'prompt' => 'nullable|string|max:500',
             'description' => 'nullable|string|max:2000',
         ]);
 
-        $prompt = !empty($validated['prompt']) ? $validated['prompt'] : $validated['title'];
+        $prompt = ! empty($validated['prompt']) ? $validated['prompt'] : $validated['title'];
         $description = $validated['description'] ?? null;
 
-        $aiService = app(\App\Services\AI\MarketplaceAiService::class);
+        $aiService = app(MarketplaceAiService::class);
         $refinedPrompt = $aiService->getRefinedImagePrompt($prompt, $description);
 
         return response()->json([
             'success' => true,
-            'prompt'  => $refinedPrompt,
+            'prompt' => $refinedPrompt,
         ]);
     }
 
     public function generateAiImage(Request $request)
     {
         $user = auth()->user();
-        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || !empty($user->is_admin) || ($user->role ?? null) === 'admin');
+        $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin) || ($user->role ?? null) === 'admin');
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             return response()->json(['error' => 'Unauthorized access. Only admins can generate AI images.'], 403);
         }
 
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'prompt'      => 'nullable|string|max:500',
+            'title' => 'required|string|max:255',
+            'prompt' => 'nullable|string|max:500',
             'description' => 'nullable|string|max:2000',
         ]);
 
-        $prompt = !empty($validated['prompt']) ? $validated['prompt'] : $validated['title'];
+        $prompt = ! empty($validated['prompt']) ? $validated['prompt'] : $validated['title'];
         $description = $validated['description'] ?? null;
 
-        $aiService = app(\App\Services\AI\MarketplaceAiService::class);
+        $aiService = app(MarketplaceAiService::class);
         $refinedPrompt = $aiService->getRefinedImagePrompt($prompt, $description);
         $result = $aiService->generateCoverImage($refinedPrompt, $user->id);
 
-        if (!empty($result['gallery'][0])) {
+        if (! empty($result['gallery'][0])) {
             $imagePath = $result['gallery'][0];
+
             return response()->json([
                 'success' => true,
-                'prompt'  => $refinedPrompt,
-                'path'    => $imagePath,
-                'url'     => asset('uploads/' . ltrim($imagePath, '/')),
+                'prompt' => $refinedPrompt,
+                'path' => $imagePath,
+                'url' => asset('uploads/'.ltrim($imagePath, '/')),
             ]);
         }
 
         return response()->json([
-            'error'  => 'Failed to generate AI image. Please verify API settings or try again.',
+            'error' => 'Failed to generate AI image. Please verify API settings or try again.',
             'prompt' => $refinedPrompt,
         ], 500);
     }
 }
-
-
-

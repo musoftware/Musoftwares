@@ -71,7 +71,26 @@ class ExportTranslations extends Command
             }
         }
 
-        File::put($outputPath, json_encode($translations, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $encoded = json_encode($translations, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        $attempts = 0;
+        $maxAttempts = 5;
+        $saved = false;
+
+        while ($attempts < $maxAttempts && ! $saved) {
+            $attempts++;
+            try {
+                File::replace($outputPath, $encoded);
+                $saved = true;
+            } catch (\Throwable $e) {
+                if ($attempts >= $maxAttempts) {
+                    File::put($outputPath, $encoded);
+                    $saved = true;
+                } else {
+                    usleep(100000); // 100ms retry delay
+                }
+            }
+        }
 
         $this->info("Translations exported successfully to {$outputPath}");
 

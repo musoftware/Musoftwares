@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { Download, X } from 'lucide-react';
+import { MarketplaceGeoSection } from '@/Components/Public/MarketplaceGeoSection';
 
 // Schema Data
 const schemaData = {
@@ -305,6 +306,8 @@ export default function Welcome({
                                 </div>
                             </div>
                         </section>
+
+                        <MarketplaceGeoSection />
                     </main>
 
                     <footer className="w-full bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 py-12">

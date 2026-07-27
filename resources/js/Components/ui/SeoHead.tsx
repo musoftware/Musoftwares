@@ -8,6 +8,8 @@ interface SeoHeadProps {
     url?: string;
     type?: string;
     canonicalUrl?: string;
+    arUrl?: string;
+    enUrl?: string;
     jsonLd?: Record<string, any>;
 }
 
@@ -18,6 +20,8 @@ export function SeoHead({
     url,
     type = 'website',
     canonicalUrl,
+    arUrl,
+    enUrl,
     jsonLd
 }: SeoHeadProps) {
     const { props } = usePage();
@@ -27,6 +31,9 @@ export function SeoHead({
     const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
     const canonical = canonicalUrl || (typeof window !== 'undefined' ? window.location.origin + window.location.pathname : '');
     
+    const arHref = arUrl || (canonical ? `${canonical}?lang=ar` : '');
+    const enHref = enUrl || (canonical ? `${canonical}?lang=en` : '');
+
     // If description is empty, try to get a default one, otherwise just use a generic one
     const safeDescription = description || `Welcome to ${appName}`;
 
@@ -49,8 +56,11 @@ export function SeoHead({
             <meta name="twitter:description" content={safeDescription} />
             {image && <meta name="twitter:image" content={image} />}
 
-            {/* Canonical URL */}
+            {/* Canonical & hreflang URLs */}
             {canonical && <link rel="canonical" href={canonical} />}
+            {arHref && <link rel="alternate" hrefLang="ar" href={arHref} />}
+            {enHref && <link rel="alternate" hrefLang="en" href={enHref} />}
+            {canonical && <link rel="alternate" hrefLang="x-default" href={canonical} />}
 
             {/* JSON-LD Schema */}
             {jsonLd && (
