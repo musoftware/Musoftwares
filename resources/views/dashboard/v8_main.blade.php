@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" style="overflow: overlay;">
 
 <head>
@@ -285,32 +285,35 @@
     </div>
 </header>
 <!-- ════════════════════════════════════════════════════════════
-     CAR CONSOLE DASHBOARD — 🔮 Magnificent Enlarged 3D Hologram Core
-     Target: 1366×768  |  Zero-Scroll  |  High-Impact Sci-Fi Presence
+     CAR CONSOLE DASHBOARD — 🔮 Perfect Viewport (No Black Line & Perfect Bounds)
+     Target: 1366×768  |  Zero-Scroll  |  Centered 3D Buttons
 ════════════════════════════════════════════════════════════ -->
 <style>
-    /* ── No-Scroll Viewport Reset ───────────────────────────── */
+    /* ── Seamless Full Viewport Reset (No Black Bar at Bottom) ── */
     html, body {
         overflow: hidden !important;
         height: 100% !important;
         max-height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #0d061a !important; /* Deep sci-fi purple matching gradient edge */
     }
 
     .orbital-viewport {
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 56px); /* subtract header */
+        height: calc(100vh - 56px);
         overflow: hidden;
         position: relative;
-        padding: 10px 20px;
+        padding: 0 20px;
         box-sizing: border-box;
-        background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.18) 0%, rgba(13, 6, 26, 0.98) 75%);
+        background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.18) 0%, rgba(13, 6, 26, 0.98) 75%) !important;
     }
 
     /* ── MAGNIFICENT ENLARGED CENTER HOLOGRAM CORE ──────────────── */
     .orbital-center-core {
         position: absolute;
-        top: 46%;
+        top: 45%;
         left: 50%;
         transform: translate(-50%, -50%);
         display: flex;
