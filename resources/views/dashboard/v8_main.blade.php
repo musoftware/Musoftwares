@@ -285,8 +285,8 @@
     </div>
 </header>
 <!-- ════════════════════════════════════════════════════════════
-     CAR CONSOLE DASHBOARD — 🔮 Perfect Viewport (No Black Line & Perfect Bounds)
-     Target: 1366×768  |  Zero-Scroll  |  Centered 3D Buttons
+     CAR CONSOLE DASHBOARD — 🔮 Theme-Matching Core Hover Glow (No Button Scale)
+     Target: 1366×768  |  Zero-Scroll  |  Dynamic Core Reaction
 ════════════════════════════════════════════════════════════ -->
 <style>
     /* ── Seamless Full Viewport Reset (No Black Bar at Bottom) ── */
@@ -296,7 +296,7 @@
         max-height: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: #0d061a !important; /* Deep sci-fi purple matching gradient edge */
+        background: #0d061a !important;
     }
 
     .orbital-viewport {
@@ -308,6 +308,7 @@
         padding: 0 20px;
         box-sizing: border-box;
         background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.18) 0%, rgba(13, 6, 26, 0.98) 75%) !important;
+        transition: background 0.6s ease;
     }
 
     /* ── MAGNIFICENT ENLARGED CENTER HOLOGRAM CORE ──────────────── */
@@ -333,6 +334,33 @@
         width: 320px !important;
         height: 290px !important;
         filter: drop-shadow(0 0 65px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 25px rgba(0, 240, 255, 0.4));
+        transition: filter 0.5s ease-out, transform 0.5s ease-out;
+    }
+
+    /* 🌟 Dynamic Core Glow Reaction when hovering any 3D button */
+    .orbital-viewport[data-core-glow="red"] .orbital-center-core #logo-it {
+        filter: drop-shadow(0 0 95px rgba(244, 63, 94, 0.98)) drop-shadow(0 0 40px rgba(244, 63, 94, 0.8)) drop-shadow(0 0 15px #fff) !important;
+        transform: scale(1.05);
+    }
+    .orbital-viewport[data-core-glow="emerald"] .orbital-center-core #logo-it {
+        filter: drop-shadow(0 0 95px rgba(16, 185, 129, 0.98)) drop-shadow(0 0 40px rgba(16, 185, 129, 0.8)) drop-shadow(0 0 15px #fff) !important;
+        transform: scale(1.05);
+    }
+    .orbital-viewport[data-core-glow="cyan"] .orbital-center-core #logo-it {
+        filter: drop-shadow(0 0 95px rgba(0, 240, 255, 0.98)) drop-shadow(0 0 40px rgba(0, 240, 255, 0.8)) drop-shadow(0 0 15px #fff) !important;
+        transform: scale(1.05);
+    }
+    .orbital-viewport[data-core-glow="pink"] .orbital-center-core #logo-it {
+        filter: drop-shadow(0 0 95px rgba(236, 72, 153, 0.98)) drop-shadow(0 0 40px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 15px #fff) !important;
+        transform: scale(1.05);
+    }
+    .orbital-viewport[data-core-glow="amber"] .orbital-center-core #logo-it {
+        filter: drop-shadow(0 0 95px rgba(245, 158, 11, 0.98)) drop-shadow(0 0 40px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 15px #fff) !important;
+        transform: scale(1.05);
+    }
+    .orbital-viewport[data-core-glow="gold"] .orbital-center-core #logo-it {
+        filter: drop-shadow(0 0 95px rgba(251, 191, 36, 0.98)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 15px #fff) !important;
+        transform: scale(1.05);
     }
 
     /* User identity below enlarged hologram */
@@ -350,6 +378,7 @@
         text-transform: uppercase;
         letter-spacing: 4px;
         text-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 8px rgba(255, 255, 255, 0.6);
+        transition: text-shadow 0.5s ease;
     }
     .orbital-identity .c-role {
         font-size: 11px;
@@ -360,7 +389,7 @@
         text-shadow: 0 0 10px rgba(255, 124, 32, 0.6);
     }
 
-    /* ── Floating Orbital Arc Nodes Layout (CLOSER TO CORE) ──────── */
+    /* ── Floating Orbital Arc Nodes Layout (NO SCALE UP ON HOVER) ──────── */
     .orbital-arc-container {
         position: relative;
         width: 100%;
@@ -387,7 +416,7 @@
     .orbital-col.orbital-left { align-items: flex-start; }
     .orbital-col.orbital-right { align-items: flex-end; }
 
-    /* Orbital App Node Item - BUTTERY SMOOTH SCALE ON HOVER */
+    /* Orbital App Node Item - SCALE UP REMOVED AS REQUESTED */
     .orbital-node {
         display: flex;
         align-items: center;
@@ -399,11 +428,7 @@
         padding: 0;
         position: relative;
         z-index: 6;
-        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .orbital-node:hover {
-        transform: scale(1.14);
+        transform: none !important;
     }
 
     /* ── 85px 3D CUBE SCENE ───────────────────────────────────────── */
@@ -822,14 +847,24 @@
 
 </div>
 
-<!-- Buttery Smooth Scale Layer + 60fps 3D Cursor Look-At JavaScript -->
+<!-- Dynamic Theme-Matching Core Glow Reaction + 3D Cursor Look-At JavaScript -->
 <script>
+    var viewportEl = document.getElementById('orbitalViewport');
+
     document.querySelectorAll('.orbital-node').forEach(function(node) {
         var cube = node.querySelector('.cube-3d');
+        var themeScene = node.querySelector('.cube-3d-scene');
         if (!cube) return;
+
+        // Extract theme color name (e.g. red, emerald, cyan, pink, amber, gold)
+        var themeMatch = themeScene ? themeScene.className.match(/cube-theme-(\w+)/) : null;
+        var themeName = themeMatch ? themeMatch[1] : 'purple';
 
         node.addEventListener('mouseenter', function() {
             node.classList.add('is-hovered');
+            if (viewportEl) {
+                viewportEl.setAttribute('data-core-glow', themeName);
+            }
         });
 
         node.addEventListener('mousemove', function(e) {
@@ -851,6 +886,9 @@
         node.addEventListener('mouseleave', function() {
             node.classList.remove('is-hovered');
             cube.style.transform = ''; // Smoothly resume CSS 3D floating animation
+            if (viewportEl) {
+                viewportEl.removeAttribute('data-core-glow');
+            }
         });
     });
 </script>
