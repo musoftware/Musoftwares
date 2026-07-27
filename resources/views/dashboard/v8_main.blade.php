@@ -285,8 +285,8 @@
     </div>
 </header>
 <!-- ════════════════════════════════════════════════════════════
-     CAR CONSOLE DASHBOARD — 🌌 Pure Sci-Fi Hologram Core
-     Target: 1366×768  |  Zero-Scroll  |  Ultra-Symmetric 3D Cubes
+     CAR CONSOLE DASHBOARD — 🎲 Liquid Smooth Scale & 3D Cursor Tracking
+     Target: 1366×768  |  Zero-Scroll  |  Separated Smooth Scale Layer
 ════════════════════════════════════════════════════════════ -->
 <style>
     /* ── No-Scroll Viewport Reset ───────────────────────────── */
@@ -383,7 +383,7 @@
     .orbital-col.orbital-left { align-items: flex-start; }
     .orbital-col.orbital-right { align-items: flex-end; }
 
-    /* Orbital App Node Item */
+    /* Orbital App Node Item - BUTTERY SMOOTH SCALE ON HOVER */
     .orbital-node {
         display: flex;
         align-items: center;
@@ -395,7 +395,11 @@
         padding: 0;
         position: relative;
         z-index: 6;
-        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .orbital-node:hover {
+        transform: scale(1.14);
     }
 
     /* ── 85px 3D CUBE SCENE ───────────────────────────────────────── */
@@ -429,7 +433,7 @@
         opacity: 0.9;
     }
 
-    /* ── LEFT FLANK 3D CUBES: Face Inward Towards Center Right (+20deg) ── */
+    /* ── LEFT FLANK 3D CUBES ── */
     @keyframes orbitHoverWaveLeft {
         0%   { transform: rotateX(-16deg) rotateY(20deg) rotateZ(-5deg) translateY(0px); }
         50%  { transform: rotateX(-12deg) rotateY(28deg) rotateZ(5deg) translateY(-10px); }
@@ -443,15 +447,10 @@
         transform-style: preserve-3d;
         transform: rotateX(-16deg) rotateY(20deg);
         animation: orbitHoverWaveLeft 5.5s ease-in-out infinite;
-        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .orbital-left .orbital-node:hover .cube-3d {
-        animation-play-state: paused;
-        transform: rotateX(-8deg) rotateY(42deg) translateZ(20px) scale(1.14) !important;
-    }
-
-    /* ── RIGHT FLANK 3D CUBES: Face Inward Towards Center Left (-20deg) ── */
+    /* ── RIGHT FLANK 3D CUBES ── */
     @keyframes orbitHoverWaveRight {
         0%   { transform: rotateX(-16deg) rotateY(-20deg) rotateZ(5deg) translateY(0px); }
         50%  { transform: rotateX(-12deg) rotateY(-28deg) rotateZ(-5deg) translateY(-10px); }
@@ -465,12 +464,7 @@
         transform-style: preserve-3d;
         transform: rotateX(-16deg) rotateY(-20deg);
         animation: orbitHoverWaveRight 5.5s ease-in-out infinite;
-        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .orbital-right .orbital-node:hover .cube-3d {
-        animation-play-state: paused;
-        transform: rotateX(-8deg) rotateY(-42deg) translateZ(20px) scale(1.14) !important;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Staggered Floating Delays */
@@ -482,6 +476,11 @@
     .orbital-node[data-node="6"] .cube-3d { animation-delay: 1.05s; }
     .orbital-node[data-node="7"] .cube-3d { animation-delay: 1.75s; }
     .orbital-node[data-node="8"] .cube-3d { animation-delay: 2.45s; }
+
+    /* Pause animation on active hover */
+    .orbital-node.is-hovered .cube-3d {
+        animation-play-state: paused !important;
+    }
 
     /* 6 Faces of the 85px 3D Cube */
     .cube-face {
@@ -495,7 +494,7 @@
         align-items: center;
         justify-content: center;
         backdrop-filter: blur(8px);
-        transition: border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
+        transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
     }
 
     /* FRONT FACE: SVG Icon + Text Label INSIDE */
@@ -515,10 +514,10 @@
         stroke-linecap: round;
         stroke-linejoin: round;
         filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
-        transition: filter 0.5s ease, transform 0.5s ease;
+        transition: filter 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .orbital-node:hover .cube-face-front svg {
-        transform: scale(1.06);
+        transform: scale(1.08);
     }
     .cube-face-front .cube-inner-label {
         margin-top: 4px;
@@ -530,7 +529,7 @@
         line-height: 1.1;
         white-space: normal;
         word-break: break-word;
-        transition: color 0.5s ease, text-shadow 0.5s ease;
+        transition: color 0.45s ease, text-shadow 0.45s ease;
     }
     .orbital-node:hover .cube-face-front .cube-inner-label {
         color: #fff;
@@ -657,10 +656,10 @@
         </div>
     </div>
 
-    <!-- ══ FLOATING 85px 3D CUBES WITH SYMMETRIC INWARD PERSPECTIVE ══ -->
+    <!-- ══ FLOATING 85px 3D CUBES WITH DYNAMIC MOUSE CURSOR LOOK-AT ══ -->
     <div class="orbital-arc-container">
 
-        <!-- ◀ LEFT ORBITAL FLANK (Facing Right Towards Center) -->
+        <!-- ◀ LEFT ORBITAL FLANK -->
         <div class="orbital-col orbital-left">
 
             <!-- 3D Cube Node 1: Pay Due Amount -->
@@ -736,7 +735,7 @@
 
         </div>
 
-        <!-- ▶ RIGHT ORBITAL FLANK (Facing Left Towards Center - Symmetric Perspective) -->
+        <!-- ▶ RIGHT ORBITAL FLANK -->
         <div class="orbital-col orbital-right">
 
             <!-- 3D Cube Node 5: Store -->
@@ -812,6 +811,39 @@
     </div>
 
 </div>
+
+<!-- Buttery Smooth Scale Layer + 60fps 3D Cursor Look-At JavaScript -->
+<script>
+    document.querySelectorAll('.orbital-node').forEach(function(node) {
+        var cube = node.querySelector('.cube-3d');
+        if (!cube) return;
+
+        node.addEventListener('mouseenter', function() {
+            node.classList.add('is-hovered');
+        });
+
+        node.addEventListener('mousemove', function(e) {
+            var rect = node.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+
+            // Normalized delta offsets (-1.0 to +1.0)
+            var dx = (e.clientX - cx) / (rect.width / 2);
+            var dy = (e.clientY - cy) / (rect.height / 2);
+
+            // Smooth pitch (rotateX) & yaw (rotateY) pointing towards cursor
+            var rotX = -dy * 24; // max ±24deg pitch
+            var rotY = dx * 28;  // max ±28deg yaw
+
+            cube.style.transform = 'rotateX(' + rotX.toFixed(1) + 'deg) rotateY(' + rotY.toFixed(1) + 'deg) translateZ(22px)';
+        });
+
+        node.addEventListener('mouseleave', function() {
+            node.classList.remove('is-hovered');
+            cube.style.transform = ''; // Smoothly resume CSS 3D floating animation
+        });
+    });
+</script>
 
 <!-- Fancy Sci-Fi Glass Payment Modal -->
 <div class="modal fade modal-scifi-glass" id="payDueModal" tabindex="-1" role="dialog" aria-labelledby="payDueModalLabel" aria-hidden="true">
