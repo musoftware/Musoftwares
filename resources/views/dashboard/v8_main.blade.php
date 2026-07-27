@@ -127,7 +127,20 @@
             <!-- User Data & Financial Widgets -->
             <div class="user-reference col-lg-8 col-md-8 col-12 mt-2 mt-md-0">
                 <div class="text-light flex-row d-flex align-items-center justify-content-end text-center">
-                    <ul class="d-flex align-items-center mb-0 mr-4 pl-0">
+                    <!-- Live System Status Indicator -->
+                    <div class="system-status-pill mr-2 pointer d-none d-lg-flex" title="System Operational Status">
+                        <span class="status-dot-led"></span>
+                        <span>Operational</span>
+                    </div>
+
+                    <!-- Search (Ctrl + K) Trigger Button -->
+                    <div class="command-bar-trigger mr-2 d-flex align-items-center pointer" data-toggle="modal" data-target="#commandBarModal" title="Universal Search (Ctrl + K)">
+                        <i class="icon-search mr-1" style="font-size: 12px; color: #00e5ff;"></i>
+                        <span class="mr-2 d-none d-sm-inline">Search...</span>
+                        <kbd class="command-bar-kbd">Ctrl K</kbd>
+                    </div>
+
+                    <ul class="d-flex align-items-center mb-0 mr-3 pl-0">
                         <li class="hover active list-inline-item d-flex align-items-center justify-content-center"
                             data-href="{{ url('/referrals') }}">
                             <i class="icon-users"></i>
@@ -142,31 +155,25 @@
                         </li>
                     </ul>
 
-                    <!-- Financial Widgets & Pay Due Button -->
-                    <div class="d-flex align-items-center mr-4 header-financial-widgets">
-                        <div class="financial-pill wallet-pill mr-3 d-flex align-items-center px-3 py-1" title="Wallet Balance">
-                            <i class="icon-credit-card text-cyan mr-2" style="font-size: 16px;"></i>
-                            <div class="text-left">
-                                <span class="d-block pill-label">Wallet</span>
-                                <strong class="pill-value text-cyan">{{ $userBalanceFormatted }}</strong>
-                            </div>
+                    <!-- Financial Widgets & Pay Due Button (1-Line Inline Badges) -->
+                    <div class="d-flex align-items-center mr-3 header-financial-widgets">
+                        <div class="financial-pill wallet-pill mr-2 d-flex align-items-center px-2 py-1" title="Wallet Balance">
+                            <i class="icon-credit-card text-cyan mr-1" style="font-size: 13px;"></i>
+                            <span class="pill-value text-cyan" style="font-size: 11px;">{{ $userBalanceFormatted }}</span>
                         </div>
 
-                        <div class="financial-pill points-pill mr-3 d-flex align-items-center px-3 py-1" title="Reward Points">
-                            <i class="icon-star text-amber mr-2" style="font-size: 16px;"></i>
-                            <div class="text-left">
-                                <span class="d-block pill-label">Points</span>
-                                <strong class="pill-value text-amber">{{ number_format($userPoints) }} Pts</strong>
-                            </div>
+                        <div class="financial-pill points-pill mr-2 d-flex align-items-center px-2 py-1" title="Reward Points">
+                            <i class="icon-star text-amber mr-1" style="font-size: 13px;"></i>
+                            <span class="pill-value text-amber" style="font-size: 11px;">{{ number_format($userPoints) }} Pts</span>
                         </div>
 
-                        <button class="btn btn-pay-due btn-sm d-flex align-items-center px-3 py-2" data-toggle="modal" data-target="#payDueModal">
-                            <i class="icon-basket mr-1" style="font-size: 14px;"></i>
+                        <button class="btn btn-pay-due btn-sm d-flex align-items-center px-3 py-1" data-toggle="modal" data-target="#payDueModal">
+                            <i class="icon-basket mr-1" style="font-size: 13px;"></i>
                             <span>دفع الفلوس</span>
                             @if($totalDueAmount > 0)
                                 <span class="badge badge-danger ml-2 px-2 py-1 pulse-badge">{{ $totalDueFormatted }}</span>
                             @else
-                                <span class="badge badge-success ml-2 px-2 py-1" style="font-size: 10px;">0 مستحقات</span>
+                                <span class="badge ml-2 px-2 py-1" style="background: rgba(0, 229, 255, 0.15); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; font-size: 9px;">0</span>
                             @endif
                         </button>
                     </div>
@@ -314,10 +321,9 @@
                 </div>
             </div>
 
-            <!-- CENTER COLUMN -->
+            <!-- CENTER COLUMN (PURE THREE.JS 3D HOLOGRAM) -->
             <div class="col-lg-4 col-12 mt-5 position-relative center-logo">
-                <div class="animation-start hidden" id="logo-it"></div>
-                <div class="basic hidden"></div>
+                <div id="logo-it" style="width: 286px; height: 285px; margin: 0 auto; background: none !important;"></div>
 
                 <!-- Username SVG & Title -->
                 <div class="end-icon mt-5" id="incenter_username" style="display: none;">
@@ -622,7 +628,60 @@
     </div>
 </div>
 
-<!-- JS files -->
+<!-- UX FEATURE 1: Universal Command Bar (Ctrl + K) Modal -->
+<div class="modal fade modal-command-bar" id="commandBarModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body p-4 text-left">
+                <div class="d-flex align-items-center mb-3">
+                    <input type="text" id="commandSearchInput" class="command-search-input" placeholder="Search systems, tools, invoices, actions... (e.g. ERP, CRM, Gold, Wallet)" autofocus autocomplete="off">
+                </div>
+                <div id="commandResultsList" class="command-results-container" style="max-height: 320px; overflow-y: auto;">
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/erp') }}">
+                        <div><i class="icon-calendar text-cyan mr-2"></i><strong>ERP Enterprise System</strong> <span class="text-muted small ml-2">- Financial & Accounting Operations</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/crm') }}">
+                        <div><i class="icon-users text-cyan mr-2"></i><strong>CRM Customer Management</strong> <span class="text-muted small ml-2">- Leads & Client Interactions</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/goldsaversys') }}">
+                        <div><i class="icon-star text-amber mr-2"></i><strong>Gold Saver System</strong> <span class="text-muted small ml-2">- Precious Metal Investment</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/affsys') }}">
+                        <div><i class="icon-chart-bar text-cyan mr-2"></i><strong>Affiliate POS System</strong> <span class="text-muted small ml-2">- Partner Sales & Commissions</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/bookingsys') }}">
+                        <div><i class="icon-clock text-cyan mr-2"></i><strong>Booking System</strong> <span class="text-muted small ml-2">- Reservations & Appointments</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/toolsys') }}">
+                        <div><i class="icon-cog text-cyan mr-2"></i><strong>Runtime Agent Tools</strong> <span class="text-muted small ml-2">- AI & Automation Engines</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/marketplace/services') }}">
+                        <div><i class="icon-social text-cyan mr-2"></i><strong>Marketplace Services</strong> <span class="text-muted small ml-2">- Addons & Plugins Catalog</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/billing/invoices') }}">
+                        <div><i class="icon-credit-card text-cyan mr-2"></i><strong>Billing & Invoices</strong> <span class="text-muted small ml-2">- Manage Payments</span></div>
+                        <span class="badge badge-outline-info">Open</span>
+                    </div>
+                    <div class="command-result-item d-flex align-items-center justify-content-between" data-target="#payDueModal" data-toggle="modal" data-dismiss="modal">
+                        <div><i class="icon-basket text-amber mr-2"></i><strong>Pay Due Amount (دفع الفلوس)</strong> <span class="text-muted small ml-2">- Quick Settlement Modal</span></div>
+                        <span class="badge badge-outline-warning">Action</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between text-muted small mt-3 pt-2 border-top border-secondary">
+                    <span>Navigation: <kbd class="command-bar-kbd">↑</kbd> <kbd class="command-bar-kbd">↓</kbd> to select, <kbd class="command-bar-kbd">Enter</kbd> to open</span>
+                    <span>Close: <kbd class="command-bar-kbd">Esc</kbd></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="{{ asset('v8main/js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ asset('v8main/js/popper.min.js') }}"></script>
@@ -637,6 +696,38 @@
 
     $('*[data-href]').click(function () {
         location.assign($(this).data('href'));
+    });
+
+    /* ==========================================================================
+       UX FEATURE 1: UNIVERSAL COMMAND BAR (CTRL + K) SPOTLIGHT ENGINE
+       ========================================================================== */
+    $(document).on('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            $('#commandBarModal').modal('show');
+        }
+    });
+
+    $(document).on('click', '.command-bar-trigger', function (e) {
+        e.preventDefault();
+        $('#commandBarModal').modal('show');
+    });
+
+    $('#commandBarModal').on('shown.bs.modal', function () {
+        $('#commandSearchInput').focus().val('');
+        $('.command-result-item').show();
+    });
+
+    $('#commandSearchInput').on('input', function () {
+        var query = $(this).val().toLowerCase().trim();
+        $('.command-result-item').each(function () {
+            var text = $(this).text().toLowerCase();
+            if (text.indexOf(query) !== -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
     });
 
     /* ==========================================================================
@@ -673,11 +764,15 @@
     })();
 
     /* ==========================================================================
-       THREE.JS WEBGL LIVING REACTIVE 3D HOLOGRAM CORE
+       THREE.JS WEBGL PURE LIVING 3D HOLOGRAM CORE (CALM TEAL & CYAN)
        ========================================================================== */
     (function () {
         var container = document.getElementById('logo-it');
         if (!container || typeof THREE === 'undefined') return;
+
+        // Clean any pre-existing canvas
+        var oldCanvas = document.getElementById('three-hologram-canvas');
+        if (oldCanvas) oldCanvas.remove();
 
         var canvas = document.createElement('canvas');
         canvas.id = 'three-hologram-canvas';
@@ -705,35 +800,77 @@
         var globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        var sphereGeo = new THREE.SphereGeometry(52, 22, 22);
-        var sphereMat = new THREE.MeshBasicMaterial({
-            color: 0x00f0ff,
+        // 1. 3D Holographic Tech Earth Globe Core
+        var globeGeo = new THREE.SphereGeometry(50, 64, 64);
+        var textureLoader = new THREE.TextureLoader();
+        
+        var earthTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg');
+        
+        var globeMat = new THREE.MeshPhongMaterial({
+            map: earthTexture,
+            bumpScale: 0.05,
+            specular: new THREE.Color(0x00e5ff),
+            shininess: 30,
+            emissive: new THREE.Color(0x02162e),
+            transparent: true,
+            opacity: 0.92
+        });
+        var globeMesh = new THREE.Mesh(globeGeo, globeMat);
+        globeGroup.add(globeMesh);
+
+        // 2. Cyan Sci-Fi Tech Wireframe Overlay
+        var wireGeo = new THREE.SphereGeometry(50.8, 32, 32);
+        var wireMat = new THREE.MeshBasicMaterial({
+            color: 0x00e5ff,
             wireframe: true,
             transparent: true,
-            opacity: 0.35
+            opacity: 0.18
         });
-        var sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
-        globeGroup.add(sphereMesh);
+        var wireMesh = new THREE.Mesh(wireGeo, wireMat);
+        globeGroup.add(wireMesh);
 
-        var ringGeo1 = new THREE.TorusGeometry(70, 1.2, 16, 64);
-        var ringMat1 = new THREE.MeshBasicMaterial({ color: 0xd946ef, transparent: true, opacity: 0.65 });
+        // 3. Atmosphere Halo Glow
+        var atmosGeo = new THREE.SphereGeometry(54, 32, 32);
+        var atmosMat = new THREE.MeshBasicMaterial({
+            color: 0x00a8ff,
+            transparent: true,
+            opacity: 0.28,
+            blending: THREE.AdditiveBlending,
+            side: THREE.BackSide
+        });
+        var atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+        globeGroup.add(atmosMesh);
+
+        // 4. Orbital Sci-Fi Tech HUD Ring 1
+        var ringGeo1 = new THREE.TorusGeometry(68, 1.2, 16, 64);
+        var ringMat1 = new THREE.MeshBasicMaterial({ color: 0x00a8ff, transparent: true, opacity: 0.65 });
         var ringMesh1 = new THREE.Mesh(ringGeo1, ringMat1);
         ringMesh1.rotation.x = Math.PI / 3;
         globeGroup.add(ringMesh1);
 
-        var ringGeo2 = new THREE.TorusGeometry(82, 1.0, 16, 48);
-        var ringMat2 = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.5 });
+        // 5. Counter-Rotating Orbital HUD Ring 2
+        var ringGeo2 = new THREE.TorusGeometry(82, 0.9, 16, 48);
+        var ringMat2 = new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.45 });
         var ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
         ringMesh2.rotation.y = Math.PI / 4;
         globeGroup.add(ringMesh2);
 
-        var particleCount = 500;
+        // Directional & Ambient Lighting for Realistic 3D Earth
+        var ambientLight = new THREE.AmbientLight(0x0a2540, 1.5);
+        scene.add(ambientLight);
+
+        var dirLight = new THREE.DirectionalLight(0x00e5ff, 2.0);
+        dirLight.position.set(100, 100, 100);
+        scene.add(dirLight);
+
+        // 6. Particle Swarm (450 Particles)
+        var particleCount = 450;
         var particleGeo = new THREE.BufferGeometry();
         var positions = new Float32Array(particleCount * 3);
         var colors = new Float32Array(particleCount * 3);
 
-        var colorCyan = new THREE.Color(0x00f0ff);
-        var colorMagenta = new THREE.Color(0xd946ef);
+        var colorBlue = new THREE.Color(0x00a8ff);
+        var colorCyan = new THREE.Color(0x00e5ff);
 
         for (var i = 0; i < particleCount; i++) {
             var u = Math.random();
@@ -746,7 +883,7 @@
             positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
             positions[i * 3 + 2] = r * Math.cos(phi);
 
-            var mixColor = Math.random() > 0.5 ? colorCyan : colorMagenta;
+            var mixColor = Math.random() > 0.5 ? colorBlue : colorCyan;
             colors[i * 3] = mixColor.r;
             colors[i * 3 + 1] = mixColor.g;
             colors[i * 3 + 2] = mixColor.b;
@@ -756,10 +893,10 @@
         particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
         var particleMat = new THREE.PointsMaterial({
-            size: 2.2,
+            size: 2.0,
             vertexColors: true,
             transparent: true,
-            opacity: 0.85
+            opacity: 0.75
         });
         var particleSystem = new THREE.Points(particleGeo, particleMat);
         globeGroup.add(particleSystem);
@@ -768,28 +905,15 @@
         document.addEventListener('mousemove', function (e) {
             var windowHalfX = window.innerWidth / 2;
             var windowHalfY = window.innerHeight / 2;
-            mouseX = (e.clientX - windowHalfX) * 0.0008;
-            mouseY = (e.clientY - windowHalfY) * 0.0008;
+            mouseX = (e.clientX - windowHalfX) * 0.0006;
+            mouseY = (e.clientY - windowHalfY) * 0.0006;
         });
 
+        // Hover Interactions
         $('.item, .btn-pay-due, header .user-reference ul li').hover(function () {
-            var targetColorHex = 0x00f0ff;
-            if ($(this).hasClass('btn-pay-due')) {
-                targetColorHex = 0xf43f5e;
-            } else if ($(this).parents('.left').length) {
-                targetColorHex = 0x00f0ff;
-            } else if ($(this).parents('.right').length) {
-                targetColorHex = 0xd946ef;
-            } else {
-                targetColorHex = 0x8b5cf6;
-            }
-            sphereMat.color.setHex(targetColorHex);
-            sphereMat.opacity = 0.75;
-            ringMat1.opacity = 0.95;
-            globeGroup.scale.set(1.1, 1.1, 1.1);
+            ringMat1.opacity = 0.9;
+            globeGroup.scale.set(1.06, 1.06, 1.06);
         }, function () {
-            sphereMat.color.setHex(0x00f0ff);
-            sphereMat.opacity = 0.35;
             ringMat1.opacity = 0.65;
             globeGroup.scale.set(1.0, 1.0, 1.0);
         });
@@ -797,12 +921,13 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            globeGroup.rotation.y += 0.008 + mouseX * 0.1;
-            globeGroup.rotation.x += (mouseY - globeGroup.rotation.x) * 0.05;
+            globeMesh.rotation.y += 0.004;
+            globeGroup.rotation.y += mouseX * 0.04;
+            globeGroup.rotation.x += (mouseY - globeGroup.rotation.x) * 0.04;
 
-            ringMesh1.rotation.z += 0.012;
-            ringMesh2.rotation.z -= 0.015;
-            particleSystem.rotation.y -= 0.004;
+            ringMesh1.rotation.z += 0.008;
+            ringMesh2.rotation.z -= 0.01;
+            particleSystem.rotation.y -= 0.003;
 
             renderer.render(scene, camera);
         }

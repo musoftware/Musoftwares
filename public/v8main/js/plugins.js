@@ -154,8 +154,7 @@ function type(playAudio) {
         }
     );
     $(".item").hover(function () {
-
-        $(".animation-start").toggleClass('hover-icon-basic');
+        window.dispatchEvent(new Event('3d-hologram-pulse'));
         var hoverAudio = new Audio(resource_link + 'sound/hover-icons.mp3');
 
         if (playAudio == 'yes') {
