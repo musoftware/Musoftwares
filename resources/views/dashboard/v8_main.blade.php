@@ -272,6 +272,7 @@
                                 <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.admin_panel') }}</a>
                             @endif
                             <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.my_profile') }}</a>
+                            <a class="dropdown-item py-2" href="{{ url('/dashboard/directory') }}"><i class="icon-grid mr-2" style="color: #a855f7;"></i>{{ __('dashboard.all_apps_dir') }}</a>
                             <div class="dropdown-divider" style="border-color: rgba(138,79,255,0.2);"></div>
                             <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">@csrf</form>
                             <a class="dropdown-item py-2 text-danger font-weight-bold" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('dashboard.logout') }}</a>
@@ -284,446 +285,533 @@
     </div>
 </header>
 <!-- ════════════════════════════════════════════════════════════
-     CAR CONSOLE DASHBOARD — Android Square App Icon Style
-     Target: 1366×768  |  Zero-Scroll Layout  |  8 Android App Tiles
+     CAR CONSOLE DASHBOARD — 🌌 Pure Sci-Fi Hologram Core
+     Target: 1366×768  |  Zero-Scroll  |  Ultra-Symmetric 3D Cubes
 ════════════════════════════════════════════════════════════ -->
 <style>
-    /* ── No-Scroll Car Console Reset ───────────────────────────── */
+    /* ── No-Scroll Viewport Reset ───────────────────────────── */
     html, body {
         overflow: hidden !important;
         height: 100% !important;
         max-height: 100% !important;
     }
-    .console-viewport {
+
+    .orbital-viewport {
         display: flex;
         flex-direction: column;
         height: calc(100vh - 56px); /* subtract header */
         overflow: hidden;
-        padding: 8px 12px 6px;
-        gap: 8px;
+        position: relative;
+        padding: 10px 20px;
         box-sizing: border-box;
+        background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.16) 0%, rgba(13, 6, 26, 0.98) 75%);
     }
 
-    /* ── Hologram Strip (top row) ───────────────────────────────── */
-    .console-top {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
-        flex: 0 0 auto;
-        height: 170px;
-    }
-    .console-top #logo-it {
-        zoom: 0.75 !important;
-        width: 200px !important;
-        height: 170px !important;
-        flex-shrink: 0;
-    }
-    .console-identity {
+    /* ── Pure Sci-Fi Center Hologram Core ───────────────────────── */
+    .orbital-center-core {
+        position: absolute;
+        top: 48%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        pointer-events: none;
     }
-    .console-identity .c-name {
-        font-size: 15px;
-        font-weight: 700;
-        color: #a855f7;
+
+    .orbital-center-core * {
+        pointer-events: auto;
+    }
+
+    .orbital-center-core #logo-it {
+        zoom: 0.95 !important;
+        width: 240px !important;
+        height: 220px !important;
+        filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.65));
+    }
+
+    /* User identity below hologram */
+    .orbital-identity {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: -5px;
+        gap: 2px;
+    }
+    .orbital-identity .c-name {
+        font-size: 18px;
+        font-weight: 800;
+        color: #f3e8ff;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 3px;
+        text-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
     }
-    .console-identity .c-role {
-        font-size: 9px;
+    .orbital-identity .c-role {
+        font-size: 10px;
+        font-weight: 700;
         color: #ff7c20;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-    }
-    .console-wallet-pill {
-        display: flex;
-        gap: 10px;
-        margin-top: 4px;
-    }
-    .console-wallet-pill .cpill {
-        background: rgba(22,10,42,0.85);
-        border: 1px solid rgba(138,79,255,0.3);
-        border-radius: 8px;
-        padding: 5px 14px;
-        font-size: 11px;
-        font-weight: 600;
-    }
-    .console-wallet-pill .cpill span { color: #a78bfa; display: block; font-size: 8px; font-weight: 400; }
-    .console-wallet-pill .cpill strong { color: #c084fc; }
-    .console-wallet-pill .cpill.cpill-due { border-color: rgba(244,63,94,0.4); }
-    .console-wallet-pill .cpill.cpill-due strong { color: #f43f5e; }
-    .console-wallet-pill .cpill.cpill-pts { border-color: rgba(251,191,36,0.35); }
-    .console-wallet-pill .cpill.cpill-pts strong { color: #fbbf24; }
-    .c-dir-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 6px;
-        padding: 6px 14px;
-        border: 1px solid rgba(138,79,255,0.5);
-        background: rgba(138,79,255,0.18);
-        border-radius: 8px;
-        color: #d8b4fe;
-        font-size: 11px;
-        font-weight: 600;
-        text-decoration: none !important;
-        letter-spacing: 0.4px;
-        transition: all 0.2s;
-    }
-    .c-dir-btn:hover { background: rgba(138,79,255,0.35); color: #fff; text-decoration: none !important; box-shadow: 0 0 14px rgba(138,79,255,0.4); }
-
-    /* ── 2×2 Panel Grid (bottom fill) ──────────────────────────── */
-    .console-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 8px;
-        flex: 1 1 auto;
-        overflow: hidden;
-        min-height: 0;
-    }
-    .c-panel {
-        background: rgba(14, 6, 30, 0.88);
-        border-radius: 12px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
+        letter-spacing: 2.5px;
     }
 
-    /* Panel Headers */
-    .c-panel-head {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 14px;
-        background: rgba(138, 79, 255, 0.12);
-        border-bottom: 1px solid rgba(138, 79, 255, 0.18);
-        flex-shrink: 0;
-    }
-    .c-panel-head-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .c-panel-head-icon svg {
-        width: 14px;
-        height: 14px;
-        fill: none;
-    }
-
-    /* Distinct Accents per Panel */
-    .c-panel-finances .c-panel-head-icon { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); }
-    .c-panel-finances .c-panel-head-icon svg { stroke: #10b981; }
-
-    .c-panel-market .c-panel-head-icon { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); }
-    .c-panel-market .c-panel-head-icon svg { stroke: #f59e0b; }
-
-    .c-panel-services .c-panel-head-icon { background: rgba(0, 240, 255, 0.2); border: 1px solid rgba(0, 240, 255, 0.4); }
-    .c-panel-services .c-panel-head-icon svg { stroke: #00f0ff; }
-
-    .c-panel-projects .c-panel-head-icon { background: rgba(236, 72, 153, 0.2); border: 1px solid rgba(236, 72, 153, 0.4); }
-    .c-panel-projects .c-panel-head-icon svg { stroke: #ec4899; }
-
-    .c-panel-head .c-panel-title {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1.8px;
-        color: #e2d4f7;
-        text-transform: uppercase;
-    }
-    .c-panel-head .c-panel-sub {
-        margin-left: auto;
-        font-size: 9px;
-        color: rgba(168,85,247,0.6);
-        letter-spacing: 0.5px;
-    }
-
-    .c-panel-body {
-        flex: 1 1 auto;
-        overflow: hidden;
-        padding: 10px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 0;
-    }
-
-    /* ── Android Square App Icon Grid System ──────────────────────── */
-    .c-app-grid {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 24px;
+    /* ── Floating Orbital Arc Nodes Layout (CLOSER TO CORE) ──────── */
+    .orbital-arc-container {
+        position: relative;
         width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+        padding: 0 20px;
+        z-index: 5;
     }
 
-    .c-app-item {
+    /* Left & Right Node Columns */
+    .orbital-col {
         display: flex;
         flex-direction: column;
+        justify-content: space-around;
+        height: 84%;
+        width: 110px;
+    }
+
+    .orbital-col.orbital-left { align-items: flex-start; }
+    .orbital-col.orbital-right { align-items: flex-end; }
+
+    /* Orbital App Node Item */
+    .orbital-node {
+        display: flex;
         align-items: center;
         justify-content: center;
         text-decoration: none !important;
         cursor: pointer;
-        transition: transform 0.2s ease;
         background: transparent;
         border: none;
         padding: 0;
+        position: relative;
+        z-index: 6;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .c-app-item:hover {
-        transform: translateY(-3px) scale(1.05);
+    /* ── 85px 3D CUBE SCENE ───────────────────────────────────────── */
+    .cube-3d-scene {
+        width: 85px;
+        height: 85px;
+        perspective: 900px;
+        flex-shrink: 0;
+        position: relative;
     }
 
-    /* Square App Box with Centered Icon */
-    .c-app-box {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
-        background: rgba(22, 10, 42, 0.85);
-        border: 1.5px solid rgba(138, 79, 255, 0.4);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(138, 79, 255, 0.15);
+    /* Ambient Glowing Aura Ring behind each Cube */
+    .cube-3d-scene::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 85px;
+        height: 85px;
+        transform: translate(-50%, -50%) scale(0.85);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(138, 79, 255, 0) 70%);
+        opacity: 0;
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.55s ease;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .orbital-node:hover .cube-3d-scene::before {
+        transform: translate(-50%, -50%) scale(1.45);
+        opacity: 0.9;
+    }
+
+    /* ── LEFT FLANK 3D CUBES: Face Inward Towards Center Right (+20deg) ── */
+    @keyframes orbitHoverWaveLeft {
+        0%   { transform: rotateX(-16deg) rotateY(20deg) rotateZ(-5deg) translateY(0px); }
+        50%  { transform: rotateX(-12deg) rotateY(28deg) rotateZ(5deg) translateY(-10px); }
+        100% { transform: rotateX(-16deg) rotateY(20deg) rotateZ(-5deg) translateY(0px); }
+    }
+
+    .orbital-left .cube-3d {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transform: rotateX(-16deg) rotateY(20deg);
+        animation: orbitHoverWaveLeft 5.5s ease-in-out infinite;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .orbital-left .orbital-node:hover .cube-3d {
+        animation-play-state: paused;
+        transform: rotateX(-8deg) rotateY(42deg) translateZ(20px) scale(1.14) !important;
+    }
+
+    /* ── RIGHT FLANK 3D CUBES: Face Inward Towards Center Left (-20deg) ── */
+    @keyframes orbitHoverWaveRight {
+        0%   { transform: rotateX(-16deg) rotateY(-20deg) rotateZ(5deg) translateY(0px); }
+        50%  { transform: rotateX(-12deg) rotateY(-28deg) rotateZ(-5deg) translateY(-10px); }
+        100% { transform: rotateX(-16deg) rotateY(-20deg) rotateZ(5deg) translateY(0px); }
+    }
+
+    .orbital-right .cube-3d {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transform: rotateX(-16deg) rotateY(-20deg);
+        animation: orbitHoverWaveRight 5.5s ease-in-out infinite;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .orbital-right .orbital-node:hover .cube-3d {
+        animation-play-state: paused;
+        transform: rotateX(-8deg) rotateY(-42deg) translateZ(20px) scale(1.14) !important;
+    }
+
+    /* Staggered Floating Delays */
+    .orbital-node[data-node="1"] .cube-3d { animation-delay: 0s; }
+    .orbital-node[data-node="2"] .cube-3d { animation-delay: 0.7s; }
+    .orbital-node[data-node="3"] .cube-3d { animation-delay: 1.4s; }
+    .orbital-node[data-node="4"] .cube-3d { animation-delay: 2.1s; }
+    .orbital-node[data-node="5"] .cube-3d { animation-delay: 0.35s; }
+    .orbital-node[data-node="6"] .cube-3d { animation-delay: 1.05s; }
+    .orbital-node[data-node="7"] .cube-3d { animation-delay: 1.75s; }
+    .orbital-node[data-node="8"] .cube-3d { animation-delay: 2.45s; }
+
+    /* 6 Faces of the 85px 3D Cube */
+    .cube-face {
+        position: absolute;
+        width: 85px;
+        height: 85px;
+        box-sizing: border-box;
+        border-radius: 12px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        position: relative;
-        transition: all 0.2s ease;
+        backdrop-filter: blur(8px);
+        transition: border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
     }
 
-    .c-app-box svg {
-        width: 24px;
-        height: 24px;
-        stroke: #c084fc;
+    /* FRONT FACE: SVG Icon + Text Label INSIDE */
+    .cube-face-front {
+        transform: translateZ(42.5px);
+        background: linear-gradient(135deg, rgba(35, 16, 70, 0.96), rgba(16, 7, 34, 0.98));
+        border: 1.5px solid rgba(168, 85, 247, 0.55);
+        box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.25);
+        padding: 6px;
+        text-align: center;
+    }
+    .cube-face-front svg {
+        width: 32px;
+        height: 32px;
         fill: none;
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
+        filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
+        transition: filter 0.5s ease, transform 0.5s ease;
     }
-
-    .c-app-item:hover .c-app-box {
-        border-color: #a855f7;
-        background: rgba(138, 79, 255, 0.25);
-        box-shadow: 0 0 18px rgba(168, 85, 247, 0.5), inset 0 0 12px rgba(138, 79, 255, 0.3);
+    .orbital-node:hover .cube-face-front svg {
+        transform: scale(1.06);
     }
-
-    /* Text Outside (Underneath Icon) */
-    .c-app-label {
-        margin-top: 6px;
-        font-size: 11px;
-        font-weight: 600;
-        color: #e2d4f7;
-        text-align: center;
-        letter-spacing: 0.2px;
-        white-space: nowrap;
+    .cube-face-front .cube-inner-label {
+        margin-top: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        color: #f3e8ff;
+        text-transform: uppercase;
+        line-height: 1.1;
+        white-space: normal;
+        word-break: break-word;
+        transition: color 0.5s ease, text-shadow 0.5s ease;
     }
-    .c-app-item:hover .c-app-label {
+    .orbital-node:hover .cube-face-front .cube-inner-label {
         color: #fff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     }
 
-    /* Color Accents per App Box */
-    .c-app-box-red { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.5); }
-    .c-app-box-red svg { stroke: #f43f5e; }
-    .c-app-item:hover .c-app-box-red { background: rgba(244, 63, 94, 0.3); border-color: #f43f5e; box-shadow: 0 0 18px rgba(244, 63, 94, 0.6); }
+    /* BACK FACE */
+    .cube-face-back {
+        transform: rotateY(180deg) translateZ(42.5px);
+        background: rgba(14, 6, 30, 0.95);
+        border: 1px solid rgba(138, 79, 255, 0.3);
+    }
 
-    .c-app-box-emerald { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); }
-    .c-app-box-emerald svg { stroke: #10b981; }
+    /* RIGHT FACE (Shaded Depth for Left Flank) */
+    .orbital-left .cube-face-right {
+        transform: rotateY(90deg) translateZ(42.5px);
+        background: linear-gradient(135deg, rgba(22, 10, 44, 0.95), rgba(10, 4, 20, 0.98));
+        border: 1px solid rgba(138, 79, 255, 0.35);
+        filter: brightness(0.72);
+    }
 
-    .c-app-box-amber { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); }
-    .c-app-box-amber svg { stroke: #f59e0b; }
+    .orbital-left .cube-face-left {
+        transform: rotateY(-90deg) translateZ(42.5px);
+        background: rgba(22, 10, 44, 0.95);
+        border: 1px solid rgba(138, 79, 255, 0.35);
+    }
 
-    .c-app-box-cyan { background: rgba(0, 240, 255, 0.15); border-color: rgba(0, 240, 255, 0.4); }
-    .c-app-box-cyan svg { stroke: #00f0ff; }
+    /* LEFT FACE (Shaded Depth for Right Flank - Inward Symmetry) */
+    .orbital-right .cube-face-left {
+        transform: rotateY(-90deg) translateZ(42.5px);
+        background: linear-gradient(135deg, rgba(22, 10, 44, 0.95), rgba(10, 4, 20, 0.98));
+        border: 1px solid rgba(138, 79, 255, 0.35);
+        filter: brightness(0.72);
+    }
 
-    .c-app-box-pink { background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); }
-    .c-app-box-pink svg { stroke: #ec4899; }
+    .orbital-right .cube-face-right {
+        transform: rotateY(90deg) translateZ(42.5px);
+        background: rgba(22, 10, 44, 0.95);
+        border: 1px solid rgba(138, 79, 255, 0.35);
+    }
 
-    /* Notification / Due Badge on Corner of Box */
+    /* TOP FACE (Glossy Specular Light) */
+    .cube-face-top {
+        transform: rotateX(90deg) translateZ(42.5px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(168, 85, 247, 0.18));
+        border: 1px solid rgba(255, 255, 255, 0.45);
+    }
+
+    /* BOTTOM FACE (Shadow) */
+    .cube-face-bottom {
+        transform: rotateX(-90deg) translateZ(42.5px);
+        background: rgba(0, 0, 0, 0.85);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.9);
+    }
+
+    /* 🎨 3D CUBE THEME COLOR ACCENTS WITH ULTRA SMOOTH GLOW */
+    /* 🔴 Red Due Cube */
+    .cube-theme-red .cube-3d-scene::before { background: radial-gradient(circle, rgba(244, 63, 94, 0.5) 0%, rgba(244, 63, 94, 0) 70%); }
+    .cube-theme-red .cube-face-front { background: linear-gradient(135deg, rgba(244, 63, 94, 0.38), rgba(30, 10, 20, 0.98)); border-color: #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.45), inset 0 0 14px rgba(244, 63, 94, 0.35); }
+    .cube-theme-red .cube-face-front svg { stroke: #f43f5e; filter: drop-shadow(0 0 10px #f43f5e); }
+    .cube-theme-red .cube-face-top { background: linear-gradient(135deg, rgba(244, 63, 94, 0.65), rgba(255, 255, 255, 0.35)); }
+    .orbital-node:hover .cube-theme-red .cube-face-front { box-shadow: 0 0 40px rgba(244, 63, 94, 0.95); }
+
+    /* 🟢 Emerald Add Balance Cube */
+    .cube-theme-emerald .cube-3d-scene::before { background: radial-gradient(circle, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 0) 70%); }
+    .cube-theme-emerald .cube-face-front { background: linear-gradient(135deg, rgba(16, 185, 129, 0.38), rgba(10, 30, 20, 0.98)); border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
+    .cube-theme-emerald .cube-face-front svg { stroke: #10b981; filter: drop-shadow(0 0 10px #10b981); }
+    .cube-theme-emerald .cube-face-top { background: linear-gradient(135deg, rgba(16, 185, 129, 0.65), rgba(255, 255, 255, 0.35)); }
+    .orbital-node:hover .cube-theme-emerald .cube-face-front { box-shadow: 0 0 40px rgba(16, 185, 129, 0.95); }
+
+    /* 🩵 Cyan ERP Cube */
+    .cube-theme-cyan .cube-3d-scene::before { background: radial-gradient(circle, rgba(0, 240, 255, 0.5) 0%, rgba(0, 240, 255, 0) 70%); }
+    .cube-theme-cyan .cube-face-front { background: linear-gradient(135deg, rgba(0, 240, 255, 0.38), rgba(10, 25, 40, 0.98)); border-color: #00f0ff; box-shadow: 0 0 20px rgba(0, 240, 255, 0.45); }
+    .cube-theme-cyan .cube-face-front svg { stroke: #00f0ff; filter: drop-shadow(0 0 10px #00f0ff); }
+    .cube-theme-cyan .cube-face-top { background: linear-gradient(135deg, rgba(0, 240, 255, 0.65), rgba(255, 255, 255, 0.35)); }
+    .orbital-node:hover .cube-theme-cyan .cube-face-front { box-shadow: 0 0 40px rgba(0, 240, 255, 0.95); }
+
+    /* 🩷 Pink CRM / Projects Cube */
+    .cube-theme-pink .cube-3d-scene::before { background: radial-gradient(circle, rgba(236, 72, 153, 0.5) 0%, rgba(236, 72, 153, 0) 70%); }
+    .cube-theme-pink .cube-face-front { background: linear-gradient(135deg, rgba(236, 72, 153, 0.38), rgba(35, 10, 30, 0.98)); border-color: #ec4899; box-shadow: 0 0 20px rgba(236, 72, 153, 0.45); }
+    .cube-theme-pink .cube-face-front svg { stroke: #ec4899; filter: drop-shadow(0 0 10px #ec4899); }
+    .cube-theme-pink .cube-face-top { background: linear-gradient(135deg, rgba(236, 72, 153, 0.65), rgba(255, 255, 255, 0.35)); }
+    .orbital-node:hover .cube-theme-pink .cube-face-front { box-shadow: 0 0 40px rgba(236, 72, 153, 0.95); }
+
+    /* 🟧 Amber Marketplace / SMS Cube */
+    .cube-theme-amber .cube-3d-scene::before { background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, rgba(245, 158, 11, 0) 70%); }
+    .cube-theme-amber .cube-face-front { background: linear-gradient(135deg, rgba(245, 158, 11, 0.38), rgba(35, 20, 10, 0.98)); border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.45); }
+    .cube-theme-amber .cube-face-front svg { stroke: #f59e0b; filter: drop-shadow(0 0 10px #f59e0b); }
+    .cube-theme-amber .cube-face-top { background: linear-gradient(135deg, rgba(245, 158, 11, 0.65), rgba(255, 255, 255, 0.35)); }
+    .orbital-node:hover .cube-theme-amber .cube-face-front { box-shadow: 0 0 40px rgba(245, 158, 11, 0.95); }
+
+    /* 🪙 Gold Saver Cube */
+    .cube-theme-gold .cube-3d-scene::before { background: radial-gradient(circle, rgba(251, 191, 36, 0.5) 0%, rgba(251, 191, 36, 0) 70%); }
+    .cube-theme-gold .cube-face-front { background: linear-gradient(135deg, rgba(251, 191, 36, 0.45), rgba(40, 30, 10, 0.98)); border-color: #fbbf24; box-shadow: 0 0 20px rgba(251, 191, 36, 0.45); }
+    .cube-theme-gold .cube-face-front svg { stroke: #fbbf24; filter: drop-shadow(0 0 10px #fbbf24); }
+    .cube-theme-gold .cube-face-top { background: linear-gradient(135deg, rgba(251, 191, 36, 0.75), rgba(255, 255, 255, 0.45)); }
+    .orbital-node:hover .cube-theme-gold .cube-face-front { box-shadow: 0 0 40px rgba(251, 191, 36, 0.95); }
+
+    /* Notification / Due Badge on Corner of Cube */
     .c-box-badge {
         position: absolute;
-        top: -4px;
-        right: -4px;
+        top: -6px;
+        right: -6px;
         font-size: 8px;
         font-weight: 700;
         color: #fff;
         background: #f43f5e;
-        padding: 1px 5px;
+        padding: 1px 6px;
         border-radius: 10px;
-        box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
+        box-shadow: 0 0 10px rgba(244, 63, 94, 0.9);
+        z-index: 10;
     }
 </style>
 
-<div class="console-viewport">
+<div class="orbital-viewport" id="orbitalViewport">
 
-    <!-- ══ TOP: Hologram + Identity ══ -->
-    <div class="console-top">
+    <!-- ══ PURE SCI-FI CENTER CORE: 3D Hologram + User Identity ══ -->
+    <div class="orbital-center-core" id="orbitalCenter">
+        <div id="logo-it"></div>
 
-        <!-- Left identity text -->
-        <div class="console-identity text-right" style="align-items: flex-end;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" style="margin-bottom:3px;">
-                <path fill-rule="evenodd" fill="#8A4FFF" d="M15.842,4.424 C15.594,4.424 15.361,4.379 15.145,4.304 L14.212,5.261 C15.088,6.359 15.604,7.753 15.604,9.268 C15.604,10.783 15.088,12.177 14.212,13.275 L15.145,14.232 C15.361,14.157 15.594,14.112 15.842,14.112 C17.010,14.112 17.957,15.082 17.957,16.278 C17.957,17.474 17.010,18.444 15.842,18.444 C14.674,18.444 13.727,17.474 13.727,16.278 C13.727,16.026 13.769,15.785 13.845,15.562 L12.906,14.600 C11.880,15.346 10.619,15.790 9.253,15.790 C7.887,15.790 6.626,15.346 5.600,14.600 L4.661,15.562 C4.737,15.785 4.779,16.026 4.779,16.278 C4.779,17.474 3.832,18.444 2.664,18.444 C1.496,18.444 0.549,17.474 0.549,16.278 C0.549,15.082 1.496,14.112 2.664,14.112 C2.912,14.112 3.145,14.157 3.361,14.232 L4.294,13.275 C3.418,12.177 2.902,10.783 2.902,9.268 C2.902,7.753 3.418,6.359 4.294,5.261 L3.361,4.304 C3.145,4.379 2.912,4.424 2.664,4.424 C1.496,4.424 0.549,3.454 0.549,2.258 C0.549,1.062 1.496,0.092 2.664,0.092 C3.832,0.092 4.779,1.062 4.779,2.258 C4.779,2.510 4.737,2.751 4.661,2.974 L5.600,3.936 C6.626,3.190 7.887,2.746 9.253,2.746 C10.619,2.746 11.880,3.190 12.906,3.936 L13.845,2.974 C13.769,2.751 13.727,2.510 13.727,2.258 C13.727,1.062 14.674,0.092 15.842,0.092 C17.010,0.092 17.957,1.062 17.957,2.258 C17.957,3.454 17.010,4.424 15.842,4.424 Z"/>
-            </svg>
+        <div class="orbital-identity">
             <div class="c-name">{{ Auth::user()->name ?? 'User' }}</div>
             <div class="c-role">{{ Auth::user()->role ?? 'Client' }}</div>
         </div>
+    </div>
 
-        <!-- Hologram orb -->
-        <div id="logo-it" style="flex-shrink:0;"></div>
+    <!-- ══ FLOATING 85px 3D CUBES WITH SYMMETRIC INWARD PERSPECTIVE ══ -->
+    <div class="orbital-arc-container">
 
-        <!-- Right wallet + directory -->
-        <div class="console-identity" style="align-items: flex-start;">
-            <div class="console-wallet-pill">
-                <div class="cpill">
-                    <span>{{ __('dashboard.wallet') }}</span>
-                    <strong>{{ $userBalanceFormatted }}</strong>
+        <!-- ◀ LEFT ORBITAL FLANK (Facing Right Towards Center) -->
+        <div class="orbital-col orbital-left">
+
+            <!-- 3D Cube Node 1: Pay Due Amount -->
+            <button class="orbital-node" data-node="1" data-toggle="modal" data-target="#payDueModal">
+                <div class="cube-3d-scene cube-theme-red">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.pay_due_amount') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                    @if($unpaidAmount > 0)
+                        <span class="c-box-badge">{{ $totalDueFormatted }}</span>
+                    @endif
                 </div>
-                @if($unpaidCount > 0)
-                <div class="cpill cpill-due">
-                    <span>{{ __('dashboard.due') }}</span>
-                    <strong>{{ $totalDueFormatted }}</strong>
+            </button>
+
+            <!-- 3D Cube Node 2: Add Balance -->
+            <a href="{{ url('/financial/add-balance') }}" class="orbital-node" data-node="2">
+                <div class="cube-3d-scene cube-theme-emerald">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.add_balance') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
                 </div>
-                @endif
-                <div class="cpill cpill-pts">
-                    <span>{{ __('dashboard.points') }}</span>
-                    <strong>{{ number_format($userPoints) }}</strong>
-                </div>
-            </div>
-            <a href="{{ url('/dashboard/directory') }}" class="c-dir-btn">
-                <div class="c-app-box c-app-box-cyan" style="width:18px; height:18px; border-radius:4px; border:none; background:transparent;">
-                    <svg viewBox="0 0 24 24" style="width:14px; height:14px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-                </div>
-                {{ __('dashboard.all_apps_dir') }} &rsaquo;
             </a>
+
+            <!-- 3D Cube Node 3: ERP System -->
+            <a href="{{ url('/sso/erp') }}" class="orbital-node" data-node="3">
+                <div class="cube-3d-scene cube-theme-cyan">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.erp_system') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 3D Cube Node 4: CRM System -->
+            <a href="{{ url('/sso/crm') }}" class="orbital-node" data-node="4">
+                <div class="cube-3d-scene cube-theme-pink">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.crm_system') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- ▶ RIGHT ORBITAL FLANK (Facing Left Towards Center - Symmetric Perspective) -->
+        <div class="orbital-col orbital-right">
+
+            <!-- 3D Cube Node 5: Store -->
+            <a href="{{ url('/marketplace/services') }}" class="orbital-node" data-node="5">
+                <div class="cube-3d-scene cube-theme-amber">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.browse_marketplace') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 3D Cube Node 6: My Projects -->
+            <a href="{{ url('/projects') }}" class="orbital-node" data-node="6">
+                <div class="cube-3d-scene cube-theme-pink">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v7m4-7v4m4-4v9"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.my_projects_btn') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 3D Cube Node 7: SMS Gateway -->
+            <a href="{{ url('/sms-payment-gateway') }}" class="orbital-node" data-node="7">
+                <div class="cube-3d-scene cube-theme-amber">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 7h6M9 11h4"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.sms_gateway') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 3D Cube Node 8: Gold Saver System -->
+            <a href="{{ url('/sso/goldsaversys') }}" class="orbital-node" data-node="8">
+                <div class="cube-3d-scene cube-theme-gold">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.gold_saver_sys') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
         </div>
 
     </div>
 
-    <!-- ══ BOTTOM: 2×2 Panel Grid (Android App Icons Style) ══ -->
-    <div class="console-grid">
-
-        <!-- ① MY FINANCES ─────────────────────────────────────── -->
-        <div class="c-panel c-panel-finances">
-            <div class="c-panel-head">
-                <div class="c-panel-head-icon">
-                    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M16 14h.01"/></svg>
-                </div>
-                <span class="c-panel-title">{{ __('dashboard.my_finances') }}</span>
-                <span class="c-panel-sub">{{ __('dashboard.dues_payments') }}</span>
-            </div>
-            <div class="c-panel-body">
-                <div class="c-app-grid">
-                    <!-- Pay Due App Button -->
-                    <button class="c-app-item" data-toggle="modal" data-target="#payDueModal">
-                        <div class="c-app-box c-app-box-red">
-                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            @if($unpaidAmount > 0)
-                                <span class="c-box-badge">{{ $totalDueFormatted }}</span>
-                            @endif
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.pay_due_amount') }}</span>
-                    </button>
-
-                    <!-- Add Balance App Button -->
-                    <a href="{{ url('/financial/add-balance') }}" class="c-app-item">
-                        <div class="c-app-box c-app-box-emerald">
-                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.add_balance') }}</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- ② MARKETPLACE ─────────────────────────────────────── -->
-        <div class="c-panel c-panel-market">
-            <div class="c-panel-head">
-                <div class="c-panel-head-icon">
-                    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                </div>
-                <span class="c-panel-title">{{ __('dashboard.marketplace') }}</span>
-                <span class="c-panel-sub">{{ __('dashboard.browse_sell') }}</span>
-            </div>
-            <div class="c-panel-body">
-                <div class="c-app-grid">
-                    <a href="{{ url('/marketplace/services') }}" class="c-app-item">
-                        <div class="c-app-box c-app-box-amber">
-                            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.browse_marketplace') }}</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- ③ MY SERVICES ─────────────────────────────────────── -->
-        <div class="c-panel c-panel-services">
-            <div class="c-panel-head">
-                <div class="c-panel-head-icon">
-                    <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-                </div>
-                <span class="c-panel-title">{{ __('dashboard.my_services') }}</span>
-                <span class="c-panel-sub">{{ __('dashboard.platforms_subs') }}</span>
-            </div>
-            <div class="c-panel-body">
-                <div class="c-app-grid">
-                    <a href="{{ url('/sso/erp') }}" class="c-app-item">
-                        <div class="c-app-box c-app-box-cyan">
-                            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.erp_system') }}</span>
-                    </a>
-                    <a href="{{ url('/sso/crm') }}" class="c-app-item">
-                        <div class="c-app-box c-app-box-pink">
-                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.crm_system') }}</span>
-                    </a>
-                    <a href="{{ url('/sms-payment-gateway') }}" class="c-app-item">
-                        <div class="c-app-box c-app-box-amber">
-                            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 7h6M9 11h4"/></svg>
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.sms_gateway') }}</span>
-                    </a>
-                    <a href="{{ url('/sso/goldsaversys') }}" class="c-app-item">
-                        <div class="c-app-box c-app-box-amber">
-                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.gold_saver_sys') }}</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- ④ MY PROJECTS ─────────────────────────────────────── -->
-        <div class="c-panel c-panel-projects">
-            <div class="c-panel-head">
-                <div class="c-panel-head-icon">
-                    <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <span class="c-panel-title">{{ __('dashboard.my_projects') }}</span>
-                <span class="c-panel-sub">{{ __('dashboard.work_collab') }}</span>
-            </div>
-            <div class="c-panel-body">
-                <div class="c-app-grid">
-                    <a href="{{ url('/projects') }}" class="c-app-item">
-                        <div class="c-app-box c-app-box-pink">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v7m4-7v4m4-4v9"/></svg>
-                        </div>
-                        <span class="c-app-label">{{ __('dashboard.my_projects_btn') }}</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-    </div><!-- /console-grid -->
-
-</div><!-- /console-viewport -->
+</div>
 
 <!-- Fancy Sci-Fi Glass Payment Modal -->
 <div class="modal fade modal-scifi-glass" id="payDueModal" tabindex="-1" role="dialog" aria-labelledby="payDueModalLabel" aria-hidden="true">

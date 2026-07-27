@@ -46,7 +46,7 @@ return [
     'sms_gateway'        => 'بوابة SMS',
     'gold_saver_sys'     => 'نظام حافظة الذهب',
     'booking_system'     => 'نظام الحجز',
-    'browse_marketplace' => 'تصفح المتجر',
+    'browse_marketplace' => 'المتجر',
     'seller_portal'      => 'بوابة البائع',
     'points_rewards'     => 'نقاطي ومكافآتي',
     'my_projects_btn'    => 'مشاريعي',

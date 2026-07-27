@@ -46,7 +46,7 @@ return [
     'sms_gateway'        => 'SMS Gateway',
     'gold_saver_sys'     => 'Gold Saver System',
     'booking_system'     => 'Booking System',
-    'browse_marketplace' => 'Browse Marketplace',
+    'browse_marketplace' => 'Store',
     'seller_portal'      => 'Seller Portal',
     'points_rewards'     => 'My Points & Rewards',
     'my_projects_btn'    => 'My Projects',
