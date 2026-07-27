@@ -180,15 +180,17 @@
                     </div>
 
                     <!-- Streamlined User Profile Capsule with Dropdown Financial Summary -->
-                    <div class="user-data d-flex align-items-center px-2 py-1 dropdown-toggle dropdown pointer"
-                         id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div class="dropdown">
+                        <div class="user-data d-flex align-items-center px-2 py-1 dropdown-toggle pointer"
+                             id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
 
-                        <div class="profile-pic d-flex mr-1">
-                            <img src="{{ Auth::user()->avatar_url ?? asset('v8main/img/user.jpg') }}" alt="" class="user-img m-auto" style="border-radius: 50%; object-fit: cover;">
-                        </div>
-                        <div class="d-none d-md-flex flex-column user-text px-2 mr-1 position-relative text-left font-weight-bold">
-                            <div class="username text-capitalize">{{ Auth::user()->name ?? 'User' }}</div>
-                            <div class="user-level text-uppercase">{{ Auth::user()->role ?? 'Admin' }}</div>
+                            <div class="profile-pic d-flex mr-1">
+                                <img src="{{ Auth::user()->avatar_url ?? asset('v8main/img/user.jpg') }}" alt="" class="user-img m-auto" style="border-radius: 50%; object-fit: cover;">
+                            </div>
+                            <div class="d-none d-md-flex flex-column user-text px-2 mr-1 position-relative text-left font-weight-bold">
+                                <div class="username text-capitalize">{{ Auth::user()->name ?? 'User' }}</div>
+                                <div class="user-level text-uppercase">{{ Auth::user()->role ?? 'Admin' }}</div>
+                            </div>
                         </div>
 
                         <!-- Dropdown Menu with Integrated Financial Summary -->
@@ -623,11 +625,17 @@
 
 <script>
     $('a[href]').each(function (i, l) {
-        l.setAttribute('data-href', l.getAttribute('href'));
+        var h = l.getAttribute('href');
+        if (h && h !== '#') {
+            l.setAttribute('data-href', h);
+        }
     });
 
-    $('*[data-href]').click(function () {
-        location.assign($(this).data('href'));
+    $(document).on('click', '*[data-href]', function (e) {
+        var href = $(this).data('href');
+        if (href && href !== '#') {
+            location.assign(href);
+        }
     });
 
     /* ==========================================================================
