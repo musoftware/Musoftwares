@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" style="overflow: overlay;">
 
 <head>
@@ -25,7 +25,7 @@
 
         #logo-it {
             zoom: 1.3;
-            margin-top: 45px;
+            margin: 0 auto;
         }
 
         @media only screen and (max-width: 768px) {
@@ -78,6 +78,47 @@
             color: #E0AAFF !important;
             text-shadow: 0 0 8px rgba(199, 125, 255, 0.6);
         }
+
+        /* ── Override legacy class icons & wrapper styles ──────── */
+        /* Remove wrong SVG background icons from all section titles  */
+        .content .academy .item-title,
+        .content .notification .item-title,
+        .content .services .item-title,
+        .content .site .item-title,
+        .content .academy .item-title.active,
+        .content .notification .item-title.active,
+        .content .services .item-title.active,
+        .content .site .item-title.active,
+        .content .academy .item-title:hover,
+        .content .notification .item-title:hover,
+        .content .services .item-title:hover,
+        .content .site .item-title:hover {
+            background-image: none !important;
+            padding-left: 0 !important;
+        }
+
+        /* Kill wrapper ghost bg - no double border */
+        .content .wrapper,
+        .content .wrapper .head { background: transparent !important; }
+        .content .wrapper .item,
+        .content .wrapper .item:hover {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            height: auto !important;
+        }
+        /* Remove bullet dot pseudo-element from .head > span */
+        .content .wrapper .head > span:first-child::before {
+            display: none !important;
+        }
+        /* Fix .head subtitle style */
+        .content .wrapper .head {
+            font-size: 10px !important;
+            color: rgba(168, 85, 247, 0.7) !important;
+            padding: 0 0 6px 0 !important;
+            margin-bottom: 8px !important;
+            letter-spacing: 0.5px !important;
+        }
     </style>
 </head>
 
@@ -86,7 +127,7 @@
 <!-- Preloader -->
 <div class="preloader-wrapper">
     <button class="btn btn-outline-info btn-sm skip-intro-now-btn position-absolute" style="top: 25px; right: 25px; z-index: 99999; border-radius: 20px; font-size: 11px; backdrop-filter: blur(10px); color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);">
-        Skip Intro ⚡
+        Skip Intro &#9889;
     </button>
     <div class="preloader">
         <div class="audio-test text-light hidden">
@@ -134,7 +175,7 @@
                     <div class="command-bar-trigger mr-2 d-flex align-items-center pointer" data-toggle="modal" data-target="#commandBarModal" title="Universal Search & Actions (Ctrl + K)">
                         <span class="status-dot-led mr-2" title="System Operational"></span>
                         <i class="icon-search mr-1" style="font-size: 12px; color: #8A4FFF;"></i>
-                        <span class="mr-2 d-none d-sm-inline" style="color: #f3e8ff;">Search...</span>
+                        <span class="mr-2 d-none d-sm-inline" style="color: #f3e8ff;">{{ __('dashboard.search') }}</span>
                         <kbd class="command-bar-kbd">Ctrl K</kbd>
                     </div>
 
@@ -154,9 +195,9 @@
                             <!-- Header -->
                             <div class="d-flex align-items-center justify-content-between pb-2 mb-2" style="border-bottom: 1px solid rgba(138,79,255,0.25);">
                                 <div class="font-weight-bold" style="color: #f3e8ff; font-size: 13px;">
-                                    <i class="icon-bell mr-1" style="color: #8A4FFF;"></i> Notifications
+                                    <i class="icon-bell mr-1" style="color: #8A4FFF;"></i> {{ __('dashboard.notifications') }}
                                 </div>
-                                <a href="{{ url('/notifications') }}" class="small font-weight-bold" style="color: #a855f7;">View All</a>
+                                <a href="{{ url('/notifications') }}" class="small font-weight-bold" style="color: #a855f7;">{{ __('dashboard.view_all') }}</a>
                             </div>
 
                             <!-- Real Notification Feed -->
@@ -171,55 +212,69 @@
                                     </a>
                                 @empty
                                     <div class="p-3 text-center text-muted" style="font-size: 11px;">
-                                        No new notifications at this time.
+                                        {{ __('dashboard.no_notifications') }}
                                     </div>
                                 @endforelse
                             </div>
                         </div>
                     </div>
 
-                    <!-- Streamlined User Profile Capsule with Dropdown Financial Summary -->
+                    <!-- Language Switcher -->
+                    <div class="dropdown mr-2">
+                        <div class="d-flex align-items-center justify-content-center pointer dropdown-toggle"
+                             id="langDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                             style="width: 36px; height: 32px; padding: 0; background: rgba(22,10,42,0.6); border: 1px solid rgba(138,79,255,0.4); border-radius: 8px; font-size: 13px;">
+                            {{ strtoupper(app()->getLocale()) }}
+                        </div>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="langDropdown"
+                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 10px; min-width: 130px; box-shadow: 0 10px 30px rgba(0,0,0,0.9);">
+                            <a class="dropdown-item py-2 {{ app()->getLocale() === 'en' ? 'font-weight-bold' : '' }}"
+                               href="{{ url()->current() }}?lang=en"
+                               style="color: {{ app()->getLocale() === 'en' ? '#a855f7' : '#d8b4fe' }}; font-size: 12px;">
+                                EN &nbsp; {{ __('dashboard.lang_en') }}
+                            </a>
+                            <a class="dropdown-item py-2 {{ app()->getLocale() === 'ar' ? 'font-weight-bold' : '' }}"
+                               href="{{ url()->current() }}?lang=ar"
+                               style="color: {{ app()->getLocale() === 'ar' ? '#a855f7' : '#d8b4fe' }}; font-size: 12px;">
+                                AR &nbsp; {{ __('dashboard.lang_ar') }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- User Profile Capsule -->
                     <div class="dropdown">
                         <div class="user-data d-flex align-items-center px-2 py-1 dropdown-toggle pointer"
                              id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
-
                             <div class="profile-pic d-flex mr-1">
                                 <img src="{{ Auth::user()->avatar_url ?? asset('v8main/img/user.jpg') }}" alt="" class="user-img m-auto" style="border-radius: 50%; object-fit: cover;">
                             </div>
                             <div class="d-none d-md-flex flex-column user-text px-2 mr-1 position-relative text-left font-weight-bold">
                                 <div class="username text-capitalize">{{ Auth::user()->name ?? 'User' }}</div>
-                                <div class="user-level text-uppercase">{{ Auth::user()->role ?? 'Admin' }}</div>
+                                <div class="user-level text-uppercase">{{ Auth::user()->role ?? 'Client' }}</div>
                             </div>
                         </div>
-
-                        <!-- Dropdown Menu with Integrated Financial Summary -->
                         <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="dropdownMenuOffset"
                              style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); min-width: 250px;">
-                            
-                            <!-- Financial Summary Section -->
                             <div class="mb-3 p-2 text-left" style="background: #180c30; border: 1px solid rgba(138,79,255,0.3); border-radius: 8px;">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="small" style="color: #d8b4fe;">Wallet:</span>
+                                    <span class="small" style="color: #d8b4fe;">{{ __('dashboard.wallet') }}:</span>
                                     <span class="font-weight-bold" style="color: #a855f7;">{{ $userBalanceFormatted }}</span>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <span class="small" style="color: #d8b4fe;">Points:</span>
-                                    <span class="font-weight-bold" style="color: #ffb703;">{{ number_format($userPoints) }} Pts</span>
+                                    <span class="small" style="color: #d8b4fe;">{{ __('dashboard.points') }}:</span>
+                                    <span class="font-weight-bold" style="color: #ffb703;">{{ number_format($userPoints) }} {{ __('dashboard.pts') }}</span>
                                 </div>
                                 <button class="btn btn-pay-due btn-block btn-sm mt-1" data-toggle="modal" data-target="#payDueModal">
-                                    <i class="icon-basket mr-1"></i> دفع الفلوس ({{ $totalDueFormatted }})
+                                    <i class="icon-basket mr-1"></i> {{ __('dashboard.pay_due_amount') }} ({{ $totalDueFormatted }})
                                 </button>
                             </div>
-
-                            <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}"><i class="icon-user mr-2"></i>Admin Panel</a>
-                            <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>My Profile</a>
-                            <a class="dropdown-item py-2" href="{{ url('/billing/invoices') }}"><i class="icon-doc mr-2"></i>Billing &amp; Invoices</a>
-                            <a class="dropdown-item py-2" href="{{ url('/financial/transactions') }}"><i class="icon-credit-card mr-2"></i>Wallet &amp; Transactions</a>
-                            <a class="dropdown-item py-2" href="#" id="resetWelcomeIntroBtn"><i class="icon-bell mr-2"></i>Reset Welcome Intro</a>
-                            <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">
-                                @csrf
-                            </form>
-                            <a class="dropdown-item py-2 text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                            @if(Auth::user() && (Auth::user()->role === 'Admin' || Auth::user()->is_admin))
+                                <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.admin_panel') }}</a>
+                            @endif
+                            <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.my_profile') }}</a>
+                            <div class="dropdown-divider" style="border-color: rgba(138,79,255,0.2);"></div>
+                            <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">@csrf</form>
+                            <a class="dropdown-item py-2 text-danger font-weight-bold" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('dashboard.logout') }}</a>
                         </div>
                     </div>
 
@@ -228,320 +283,447 @@
         </div>
     </div>
 </header>
+<!-- ════════════════════════════════════════════════════════════
+     CAR CONSOLE DASHBOARD — Android Square App Icon Style
+     Target: 1366×768  |  Zero-Scroll Layout  |  8 Android App Tiles
+════════════════════════════════════════════════════════════ -->
+<style>
+    /* ── No-Scroll Car Console Reset ───────────────────────────── */
+    html, body {
+        overflow: hidden !important;
+        height: 100% !important;
+        max-height: 100% !important;
+    }
+    .console-viewport {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 56px); /* subtract header */
+        overflow: hidden;
+        padding: 8px 12px 6px;
+        gap: 8px;
+        box-sizing: border-box;
+    }
 
-<!-- Main Content -->
-<section class="content mb-5">
-    <div class="container-fluid">
-        <div class="row m-0">
+    /* ── Hologram Strip (top row) ───────────────────────────────── */
+    .console-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        flex: 0 0 auto;
+        height: 170px;
+    }
+    .console-top #logo-it {
+        zoom: 0.75 !important;
+        width: 200px !important;
+        height: 170px !important;
+        flex-shrink: 0;
+    }
+    .console-identity {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    .console-identity .c-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #a855f7;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    .console-identity .c-role {
+        font-size: 9px;
+        color: #ff7c20;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .console-wallet-pill {
+        display: flex;
+        gap: 10px;
+        margin-top: 4px;
+    }
+    .console-wallet-pill .cpill {
+        background: rgba(22,10,42,0.85);
+        border: 1px solid rgba(138,79,255,0.3);
+        border-radius: 8px;
+        padding: 5px 14px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .console-wallet-pill .cpill span { color: #a78bfa; display: block; font-size: 8px; font-weight: 400; }
+    .console-wallet-pill .cpill strong { color: #c084fc; }
+    .console-wallet-pill .cpill.cpill-due { border-color: rgba(244,63,94,0.4); }
+    .console-wallet-pill .cpill.cpill-due strong { color: #f43f5e; }
+    .console-wallet-pill .cpill.cpill-pts { border-color: rgba(251,191,36,0.35); }
+    .console-wallet-pill .cpill.cpill-pts strong { color: #fbbf24; }
+    .c-dir-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+        padding: 6px 14px;
+        border: 1px solid rgba(138,79,255,0.5);
+        background: rgba(138,79,255,0.18);
+        border-radius: 8px;
+        color: #d8b4fe;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none !important;
+        letter-spacing: 0.4px;
+        transition: all 0.2s;
+    }
+    .c-dir-btn:hover { background: rgba(138,79,255,0.35); color: #fff; text-decoration: none !important; box-shadow: 0 0 14px rgba(138,79,255,0.4); }
 
-            <!-- LEFT COLUMN (MY ISAAS & MY WORKFLOW) -->
-            <div class="col-lg-4 col-12 mt-5 p-0 left">
-                <div class="row">
+    /* ── 2×2 Panel Grid (bottom fill) ──────────────────────────── */
+    .console-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 8px;
+        flex: 1 1 auto;
+        overflow: hidden;
+        min-height: 0;
+    }
+    .c-panel {
+        background: rgba(14, 6, 30, 0.88);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
 
-                    <!-- MY ISAAS -->
-                    <div class="academy col-md-6 col-lg-12">
-                        <h2 class="item-title pointer" onclick="toggler('.academy>.wrapper')">
-                            MY ISAAS
-                        </h2>
-                        <div class="wrapper pb-2">
-                            <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Core SaaS Platforms &amp; Tools</span>
-                            </div>
-                            <div class="row m-0">
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/erp') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M6 8h4m-4 4h8"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">ERP System</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/crm') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">CRM System</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/whatsapp-sender') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">WhatsApp</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/fbmb') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">FB Marketing</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sms-payment-gateway') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 7h6m-6 4h4"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">SMS Gateway</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/bookingsys') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Booking System</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/goldsaversys') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Gold POS</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/sso/affsys') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Affiliate POS</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/isaas/contracts') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Contracts</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    /* Panel Headers */
+    .c-panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        background: rgba(138, 79, 255, 0.12);
+        border-bottom: 1px solid rgba(138, 79, 255, 0.18);
+        flex-shrink: 0;
+    }
+    .c-panel-head-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .c-panel-head-icon svg {
+        width: 14px;
+        height: 14px;
+        fill: none;
+    }
 
-                    <!-- MY WORKFLOW -->
-                    <div class="notification mt-5 mt-md-0 mt-lg-5 col-md-6 col-lg-12">
-                        <h2 class="item-title pointer" onclick="toggler('.notification>.wrapper')">
-                            MY WORKFLOW
-                        </h2>
-                        <div class="wrapper pb-2">
-                            <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Tasks &amp; Communication</span>
-                            </div>
-                            <div class="row m-0">
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/projects') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v7m4-7v4m4-4v9"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Projects</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/isaas/proposals') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Proposals</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/notifications') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Notifications</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/messages') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Messages</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    /* Distinct Accents per Panel */
+    .c-panel-finances .c-panel-head-icon { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); }
+    .c-panel-finances .c-panel-head-icon svg { stroke: #10b981; }
 
+    .c-panel-market .c-panel-head-icon { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); }
+    .c-panel-market .c-panel-head-icon svg { stroke: #f59e0b; }
+
+    .c-panel-services .c-panel-head-icon { background: rgba(0, 240, 255, 0.2); border: 1px solid rgba(0, 240, 255, 0.4); }
+    .c-panel-services .c-panel-head-icon svg { stroke: #00f0ff; }
+
+    .c-panel-projects .c-panel-head-icon { background: rgba(236, 72, 153, 0.2); border: 1px solid rgba(236, 72, 153, 0.4); }
+    .c-panel-projects .c-panel-head-icon svg { stroke: #ec4899; }
+
+    .c-panel-head .c-panel-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        color: #e2d4f7;
+        text-transform: uppercase;
+    }
+    .c-panel-head .c-panel-sub {
+        margin-left: auto;
+        font-size: 9px;
+        color: rgba(168,85,247,0.6);
+        letter-spacing: 0.5px;
+    }
+
+    .c-panel-body {
+        flex: 1 1 auto;
+        overflow: hidden;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+    }
+
+    /* ── Android Square App Icon Grid System ──────────────────────── */
+    .c-app-grid {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        width: 100%;
+    }
+
+    .c-app-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none !important;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .c-app-item:hover {
+        transform: translateY(-3px) scale(1.05);
+    }
+
+    /* Square App Box with Centered Icon */
+    .c-app-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: rgba(22, 10, 42, 0.85);
+        border: 1.5px solid rgba(138, 79, 255, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(138, 79, 255, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.2s ease;
+    }
+
+    .c-app-box svg {
+        width: 24px;
+        height: 24px;
+        stroke: #c084fc;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .c-app-item:hover .c-app-box {
+        border-color: #a855f7;
+        background: rgba(138, 79, 255, 0.25);
+        box-shadow: 0 0 18px rgba(168, 85, 247, 0.5), inset 0 0 12px rgba(138, 79, 255, 0.3);
+    }
+
+    /* Text Outside (Underneath Icon) */
+    .c-app-label {
+        margin-top: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #e2d4f7;
+        text-align: center;
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+    }
+    .c-app-item:hover .c-app-label {
+        color: #fff;
+    }
+
+    /* Color Accents per App Box */
+    .c-app-box-red { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.5); }
+    .c-app-box-red svg { stroke: #f43f5e; }
+    .c-app-item:hover .c-app-box-red { background: rgba(244, 63, 94, 0.3); border-color: #f43f5e; box-shadow: 0 0 18px rgba(244, 63, 94, 0.6); }
+
+    .c-app-box-emerald { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); }
+    .c-app-box-emerald svg { stroke: #10b981; }
+
+    .c-app-box-amber { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); }
+    .c-app-box-amber svg { stroke: #f59e0b; }
+
+    .c-app-box-cyan { background: rgba(0, 240, 255, 0.15); border-color: rgba(0, 240, 255, 0.4); }
+    .c-app-box-cyan svg { stroke: #00f0ff; }
+
+    .c-app-box-pink { background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); }
+    .c-app-box-pink svg { stroke: #ec4899; }
+
+    /* Notification / Due Badge on Corner of Box */
+    .c-box-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        font-size: 8px;
+        font-weight: 700;
+        color: #fff;
+        background: #f43f5e;
+        padding: 1px 5px;
+        border-radius: 10px;
+        box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
+    }
+</style>
+
+<div class="console-viewport">
+
+    <!-- ══ TOP: Hologram + Identity ══ -->
+    <div class="console-top">
+
+        <!-- Left identity text -->
+        <div class="console-identity text-right" style="align-items: flex-end;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" style="margin-bottom:3px;">
+                <path fill-rule="evenodd" fill="#8A4FFF" d="M15.842,4.424 C15.594,4.424 15.361,4.379 15.145,4.304 L14.212,5.261 C15.088,6.359 15.604,7.753 15.604,9.268 C15.604,10.783 15.088,12.177 14.212,13.275 L15.145,14.232 C15.361,14.157 15.594,14.112 15.842,14.112 C17.010,14.112 17.957,15.082 17.957,16.278 C17.957,17.474 17.010,18.444 15.842,18.444 C14.674,18.444 13.727,17.474 13.727,16.278 C13.727,16.026 13.769,15.785 13.845,15.562 L12.906,14.600 C11.880,15.346 10.619,15.790 9.253,15.790 C7.887,15.790 6.626,15.346 5.600,14.600 L4.661,15.562 C4.737,15.785 4.779,16.026 4.779,16.278 C4.779,17.474 3.832,18.444 2.664,18.444 C1.496,18.444 0.549,17.474 0.549,16.278 C0.549,15.082 1.496,14.112 2.664,14.112 C2.912,14.112 3.145,14.157 3.361,14.232 L4.294,13.275 C3.418,12.177 2.902,10.783 2.902,9.268 C2.902,7.753 3.418,6.359 4.294,5.261 L3.361,4.304 C3.145,4.379 2.912,4.424 2.664,4.424 C1.496,4.424 0.549,3.454 0.549,2.258 C0.549,1.062 1.496,0.092 2.664,0.092 C3.832,0.092 4.779,1.062 4.779,2.258 C4.779,2.510 4.737,2.751 4.661,2.974 L5.600,3.936 C6.626,3.190 7.887,2.746 9.253,2.746 C10.619,2.746 11.880,3.190 12.906,3.936 L13.845,2.974 C13.769,2.751 13.727,2.510 13.727,2.258 C13.727,1.062 14.674,0.092 15.842,0.092 C17.010,0.092 17.957,1.062 17.957,2.258 C17.957,3.454 17.010,4.424 15.842,4.424 Z"/>
+            </svg>
+            <div class="c-name">{{ Auth::user()->name ?? 'User' }}</div>
+            <div class="c-role">{{ Auth::user()->role ?? 'Client' }}</div>
+        </div>
+
+        <!-- Hologram orb -->
+        <div id="logo-it" style="flex-shrink:0;"></div>
+
+        <!-- Right wallet + directory -->
+        <div class="console-identity" style="align-items: flex-start;">
+            <div class="console-wallet-pill">
+                <div class="cpill">
+                    <span>{{ __('dashboard.wallet') }}</span>
+                    <strong>{{ $userBalanceFormatted }}</strong>
+                </div>
+                @if($unpaidCount > 0)
+                <div class="cpill cpill-due">
+                    <span>{{ __('dashboard.due') }}</span>
+                    <strong>{{ $totalDueFormatted }}</strong>
+                </div>
+                @endif
+                <div class="cpill cpill-pts">
+                    <span>{{ __('dashboard.points') }}</span>
+                    <strong>{{ number_format($userPoints) }}</strong>
                 </div>
             </div>
-
-            <!-- CENTER COLUMN (PURE THREE.JS 3D HOLOGRAM RADAR) -->
-            <div class="col-lg-4 col-12 mt-5 position-relative center-logo">
-                <div id="logo-it" style="width: 286px; height: 285px; margin: 0 auto; background: none !important;"></div>
-
-                <!-- Username SVG & Title -->
-                <div class="end-icon mt-4" id="incenter_username" style="display: block;">
-                    <svg class="mx-auto d-block" xmlns="http://www.w3.org/2000/svg" width="22px" height="23px">
-                        <path fill-rule="evenodd" fill="#8A4FFF"
-                              d="M19.263,5.321 C18.960,5.321 18.669,5.267 18.399,5.169 C18.399,5.169 18.399,5.169 17.269,6.329 C18.315,7.690 18.939,9.406 18.939,11.268 C18.939,13.131 18.314,14.847 17.269,16.208 C17.269,16.208 17.269,16.208 18.399,17.367 C18.669,17.270 18.960,17.216 19.263,17.216 C20.697,17.216 21.859,18.408 21.859,19.880 C21.859,21.351 20.697,22.544 19.263,22.544 C17.830,22.544 16.667,21.351 16.667,19.880 C16.667,19.569 16.720,19.271 16.815,19.993 C16.815,18.993 16.815,18.993 15.645,17.792 C14.375,18.717 12.824,19.261 11.152,19.261 C9.479,19.261 7.928,18.717 6.658,17.792 C6.658,17.792 6.658,17.792 5.488,18.993 C5.583,19.270 5.636,19.569 5.636,19.880 C5.636,21.351 4.474,22.544 3.040,22.544 C1.607,22.544 0.445,21.351 0.445,19.880 C0.445,18.408 1.607,17.216 3.040,17.216 C3.343,17.216 3.634,17.270 3.904,17.368 C3.904,17.368 3.904,17.368 5.034,16.208 C3.989,14.847 3.365,13.131 3.365,11.269 C3.365,9.406 3.989,7.690 5.034,6.329 C5.034,6.329 5.034,6.329 3.904,5.170 C3.634,5.267 3.343,5.321 3.040,5.321 C1.607,5.321 0.445,4.129 0.445,2.657 C0.445,1.186 1.607,-0.007 3.040,-0.007 C4.474,-0.007 5.636,1.186 5.636,2.657 C5.636,2.968 5.583,3.267 5.488,3.544 C5.488,3.544 5.488,3.544 6.658,4.745 C7.928,3.820 9.479,3.276 11.152,3.276 C12.824,3.276 14.375,3.820 15.645,4.745 C15.645,4.745 15.645,4.745 16.815,3.544 C16.720,3.267 16.667,2.968 16.667,2.657 C16.667,1.186 17.830,-0.007 19.263,-0.007 C20.697,-0.007 21.859,1.186 21.859,2.657 C21.859,4.129 20.697,5.321 19.263,5.321 ZM11.152,4.813 C7.678,4.813 4.862,7.704 4.862,11.269 C4.862,12.834 5.405,14.270 6.309,15.387 C6.396,14.523 6.577,13.485 7.023,13.303 L9.354,12.349 C9.354,12.349 9.354,12.349 9.900,11.876 C10.044,11.752 10.257,11.760 10.391,11.897 L11.152,12.672 C11.152,12.672 11.152,12.672 11.911,11.897 C12.045,11.760 12.258,11.751 12.402,11.876 L12.948,12.349 C12.948,12.349 12.948,12.349 15.280,13.303 C15.726,13.485 15.907,14.523 15.994,15.388 C16.898,14.270 17.441,12.834 17.441,11.269 C17.441,7.704 14.625,4.813 11.152,4.813 ZM11.152,11.691 C9.719,11.714 8.840,10.426 8.818,8.303 C8.803,6.753 9.640,5.948 11.152,5.948 C12.697,5.948 13.486,6.753 13.486,8.303 C13.486,11.788 11.152,11.691 11.152,11.691 Z"/>
-                    </svg>
-                    <svg class="mx-auto d-block" xmlns="http://www.w3.org/2000/svg" width="169px" height="14px">
-                        <path fill-rule="evenodd" fill="#8A4FFF"
-                              d="M165.698,5.676 C164.323,5.676 163.184,4.687 162.953,3.386 L115.214,3.386 L108.007,12.328 L108.146,12.328 L107.182,13.259 C107.123,13.235 107.032,13.182 106.920,13.105 L62.564,13.105 C62.531,13.105 62.500,13.098 62.469,13.093 C62.286,13.221 62.146,13.296 62.124,13.270 L61.976,13.086 L61.897,13.086 L60.781,11.712 L60.869,11.712 L54.158,3.386 L6.436,3.386 C6.204,4.687 5.058,5.676 3.677,5.676 C2.129,5.676 0.874,4.433 0.874,2.901 C0.874,1.368 2.129,0.125 3.677,0.125 C4.901,0.125 5.939,0.903 6.321,1.985 L54.193,1.985 C54.375,1.985 54.538,2.055 54.663,2.168 C54.785,2.092 54.872,2.051 54.889,2.071 L62.659,11.712 L106.713,11.712 L114.483,2.071 C114.500,2.050 114.592,2.094 114.719,2.174 C114.844,2.057 115.011,1.985 115.195,1.985 L163.066,1.985 C163.447,0.903 164.480,0.125 165.698,0.125 C167.239,0.125 168.488,1.368 168.488,2.901 C168.488,4.433 167.239,5.676 165.698,5.676 Z"/>
-                    </svg>
-                    <h2 class="item-title text-center d-block pb-0 mt-2 text-uppercase" style="font-size: 17px;">
-                        {{ Auth::user()->name ?? 'User' }}
-                    </h2>
-                    <h6 class="text-center d-block pb-0 mt-2 text-uppercase" style="color: #ff7c20; font-size: 9px;">
-                        {{ Auth::user()->role ?? 'Admin' }}
-                    </h6>
+            <a href="{{ url('/dashboard/directory') }}" class="c-dir-btn">
+                <div class="c-app-box c-app-box-cyan" style="width:18px; height:18px; border-radius:4px; border:none; background:transparent;">
+                    <svg viewBox="0 0 24 24" style="width:14px; height:14px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
                 </div>
-            </div>
+                {{ __('dashboard.all_apps_dir') }} &rsaquo;
+            </a>
+        </div>
 
-            <!-- RIGHT COLUMN (MY TOOLS & MY FINANCE) -->
-            <div class="col-lg-4 col-12 mt-5 p-0 right">
-                <div class="row">
+    </div>
 
-                    <!-- MY TOOLS -->
-                    <div class="site clearfix col-md-6 col-lg-12">
-                        <h2 class="item-title float-right pointer" onclick="toggler('.site>.main')">
-                            MY TOOLS
-                        </h2>
-                        <div class="clearfix"></div>
-                        <div class="wrapper main clearfix pb-2 float-right">
-                            <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Marketplace &amp; Apps</span>
-                            </div>
-                            <div class="row m-0">
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/marketplace/services') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Marketplace</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/marketplace/dashboard') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Seller Portal</div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- ══ BOTTOM: 2×2 Panel Grid (Android App Icons Style) ══ -->
+    <div class="console-grid">
 
-                    </div>
-
-                    <!-- MY FINANCE -->
-                    <div class="services clearfix mt-5 mt-md-0 mt-lg-5 col-md-6 col-lg-12">
-                        <h2 class="item-title float-right pointer" onclick="toggler('.services>.main')">
-                            MY FINANCE
-                        </h2>
-                        <div class="clearfix"></div>
-                        <div class="wrapper main clearfix pb-2 float-right">
-                            <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Wallet &amp; Subscriptions</span>
-                            </div>
-                            <div class="row m-0">
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/financial/add-balance') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M12 14v4m-2-2h4"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Add Balance</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/billing/invoices') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Invoices</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/subscriptions/plans') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Plans</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/financial/transactions') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Transactions</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/vouchers') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="13" y1="6" x2="11" y2="18"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Vouchers</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/financial/withdrawals') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/><path d="M5 21h14"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Withdrawals</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/points') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Points</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/referrals') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Referrals</div>
-                                </div>
-                                <div class="col-4 px-0 pointer hud-item" data-href="{{ url('/kyc') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="hud-icon-box">
-                                            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2m-2 4h2m-6 4h6M7 16c0-1 1-2 2-2s2 1 2 2"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">KYC Verification</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+        <!-- ① MY FINANCES ─────────────────────────────────────── -->
+        <div class="c-panel c-panel-finances">
+            <div class="c-panel-head">
+                <div class="c-panel-head-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M16 14h.01"/></svg>
                 </div>
+                <span class="c-panel-title">{{ __('dashboard.my_finances') }}</span>
+                <span class="c-panel-sub">{{ __('dashboard.dues_payments') }}</span>
             </div>
+            <div class="c-panel-body">
+                <div class="c-app-grid">
+                    <!-- Pay Due App Button -->
+                    <button class="c-app-item" data-toggle="modal" data-target="#payDueModal">
+                        <div class="c-app-box c-app-box-red">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            @if($unpaidAmount > 0)
+                                <span class="c-box-badge">{{ $totalDueFormatted }}</span>
+                            @endif
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.pay_due_amount') }}</span>
+                    </button>
 
+                    <!-- Add Balance App Button -->
+                    <a href="{{ url('/financial/add-balance') }}" class="c-app-item">
+                        <div class="c-app-box c-app-box-emerald">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.add_balance') }}</span>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Pause Button -->
-<svg class="col-xs-12 ml-3 mb-3 pause-btn active pointer hidden" version="1.1" xmlns="http://www.w3.org/2000/svg"
-     xmlns:xlink="http://www.w3.org/1999/xlink" width="34" height="34" viewBox="0 0 34 34"
-     style="bottom: 5px;display: inline;position: absolute;">
-    <g id="Group-1">
-        <path id="fill"
-              d="M16.588,22.274 C16.489,22.322 16.383,22.345 16.279,22.345 C16.112,22.345 15.948,22.287 15.815,22.174 C11.842,18.807 11.842,18.807 11.842,18.807 C11.842,18.807 9.727,18.807 9.727,18.807 C9.325,18.808 9.000,18.475 9.000,18.064 C9.000,15.103 9.000,15.103 9.000,15.103 C9.000,14.693 9.325,14.360 9.727,14.360 C11.843,14.360 11.843,14.360 11.843,14.360 C11.843,14.360 15.815,10.993 15.815,10.993 C16.032,10.809 16.333,10.770 16.588,10.893 C16.843,11.016 17.006,11.278 17.006,11.566 C17.005,21.602 17.005,21.602 17.005,21.602 C17.005,21.602 17.005,21.602 17.005,21.602 C17.005,21.890 16.843,22.152 16.588,22.274 zM19.746,20.443 C19.554,20.443 19.369,20.365 19.232,20.225 C19.135,20.125 19.135,20.125 19.135,20.125 C18.880,19.865 18.850,19.453 19.065,19.157 C19.609,18.407 19.896,17.517 19.896,16.584 C19.896,15.580 19.570,14.639 18.953,13.862 C18.718,13.566 18.740,13.137 19.003,12.868 C19.100,12.768 19.100,12.768 19.100,12.768 C19.245,12.620 19.440,12.539 19.650,12.552 C19.855,12.562 20.046,12.661 20.176,12.824 C21.032,13.895 21.485,15.195 21.485,16.584 C21.485,17.878 21.085,19.109 20.328,20.145 C20.202,20.317 20.008,20.425 19.798,20.441 C19.780,20.442 19.763,20.443 19.746,20.443 zM22.277,23.000 C22.267,23.001 22.257,23.001 22.247,23.001 C22.054,23.001 21.870,22.923 21.733,22.784 C21.637,22.686 21.637,22.686 21.637,22.686 C21.371,22.413 21.353,21.977 21.595,21.682 C22.767,20.257 23.413,18.446 23.413,16.584 C23.413,14.647 22.721,12.783 21.467,11.334 C21.212,11.040 21.225,10.595 21.496,10.317 C21.591,10.219 21.591,10.219 21.591,10.219 C21.733,10.074 21.916,9.994 22.127,10.001 C22.327,10.007 22.516,10.097 22.649,10.250 C24.166,11.996 25.001,14.246 25.001,16.584 C25.002,18.834 24.221,21.019 22.802,22.737 C22.671,22.896 22.481,22.992 22.277,23.000 z"
-              fill="rgb(33, 151, 154)"/>
-        <g id="Ellipse-1">
-            <path id="stroke"
-                  d="M17.000,1.192 C25.730,1.192 32.808,8.270 32.808,17.000 C32.808,25.730 25.730,32.808 17.000,32.808 C8.270,32.808 1.192,25.730 1.192,17.000 C1.192,8.270 8.270,1.192 17.000,1.192 z"
-                  fill="none" stroke="rgb(33, 151, 154)" stroke-width="2.51"/>
-        </g>
-    </g>
-</svg>
+        <!-- ② MARKETPLACE ─────────────────────────────────────── -->
+        <div class="c-panel c-panel-market">
+            <div class="c-panel-head">
+                <div class="c-panel-head-icon">
+                    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <span class="c-panel-title">{{ __('dashboard.marketplace') }}</span>
+                <span class="c-panel-sub">{{ __('dashboard.browse_sell') }}</span>
+            </div>
+            <div class="c-panel-body">
+                <div class="c-app-grid">
+                    <a href="{{ url('/marketplace/services') }}" class="c-app-item">
+                        <div class="c-app-box c-app-box-amber">
+                            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.browse_marketplace') }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ③ MY SERVICES ─────────────────────────────────────── -->
+        <div class="c-panel c-panel-services">
+            <div class="c-panel-head">
+                <div class="c-panel-head-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                </div>
+                <span class="c-panel-title">{{ __('dashboard.my_services') }}</span>
+                <span class="c-panel-sub">{{ __('dashboard.platforms_subs') }}</span>
+            </div>
+            <div class="c-panel-body">
+                <div class="c-app-grid">
+                    <a href="{{ url('/sso/erp') }}" class="c-app-item">
+                        <div class="c-app-box c-app-box-cyan">
+                            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.erp_system') }}</span>
+                    </a>
+                    <a href="{{ url('/sso/crm') }}" class="c-app-item">
+                        <div class="c-app-box c-app-box-pink">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.crm_system') }}</span>
+                    </a>
+                    <a href="{{ url('/sms-payment-gateway') }}" class="c-app-item">
+                        <div class="c-app-box c-app-box-amber">
+                            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 7h6M9 11h4"/></svg>
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.sms_gateway') }}</span>
+                    </a>
+                    <a href="{{ url('/sso/goldsaversys') }}" class="c-app-item">
+                        <div class="c-app-box c-app-box-amber">
+                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.gold_saver_sys') }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ④ MY PROJECTS ─────────────────────────────────────── -->
+        <div class="c-panel c-panel-projects">
+            <div class="c-panel-head">
+                <div class="c-panel-head-icon">
+                    <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span class="c-panel-title">{{ __('dashboard.my_projects') }}</span>
+                <span class="c-panel-sub">{{ __('dashboard.work_collab') }}</span>
+            </div>
+            <div class="c-panel-body">
+                <div class="c-app-grid">
+                    <a href="{{ url('/projects') }}" class="c-app-item">
+                        <div class="c-app-box c-app-box-pink">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v7m4-7v4m4-4v9"/></svg>
+                        </div>
+                        <span class="c-app-label">{{ __('dashboard.my_projects_btn') }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /console-grid -->
+
+</div><!-- /console-viewport -->
 
 <!-- Fancy Sci-Fi Glass Payment Modal -->
 <div class="modal fade modal-scifi-glass" id="payDueModal" tabindex="-1" role="dialog" aria-labelledby="payDueModalLabel" aria-hidden="true">
@@ -549,21 +731,20 @@
         <div class="modal-content" style="background: rgba(14, 9, 32, 0.96); backdrop-filter: blur(25px); border: 1.5px solid #00f0ff; border-radius: 20px;">
             <div class="modal-header d-flex align-items-center justify-content-between p-3" style="border-bottom: 1px solid rgba(0, 240, 255, 0.2);">
                 <h4 class="modal-title font-weight-bold text-cyan" id="payDueModalLabel">
-                    <i class="icon-basket mr-2"></i>دفع الفلوس والمستحقات المترتبة
+                    <i class="icon-basket mr-2"></i>{{ __('dashboard.modal_title') }}
                 </h4>
                 <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" style="font-size: 28px; color: #00f0ff;">&times;</span>
                 </button>
             </div>
             <div class="modal-body p-4 text-left">
-                <!-- Summary Header Card -->
                 <div class="p-3 mb-4 rounded d-flex align-items-center justify-content-between" style="background: rgba(244, 63, 94, 0.12); border: 1px solid #f43f5e; border-radius: 14px;">
                     <div>
-                        <span class="text-uppercase text-muted d-block" style="font-size: 11px;">إجمالي المبالغ المستحقة</span>
+                        <span class="text-uppercase text-muted d-block" style="font-size: 11px;">{{ __('dashboard.total_due') }}</span>
                         <h2 class="m-0 font-weight-bold" style="color: #f43f5e;">{{ $totalDueFormatted }}</h2>
                     </div>
                     <div class="text-right">
-                        <span class="text-uppercase text-muted d-block" style="font-size: 11px;">الرصيد المتاح بالمحفظة</span>
+                        <span class="text-uppercase text-muted d-block" style="font-size: 11px;">{{ __('dashboard.wallet_balance') }}</span>
                         <h4 class="m-0 font-weight-bold text-cyan">{{ $userBalanceFormatted }}</h4>
                     </div>
                 </div>
@@ -571,44 +752,43 @@
                 @if($userBalanceVal >= $totalDueAmount && $totalDueAmount > 0)
                     <div class="alert alert-success d-flex align-items-center mb-4" style="background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #10b981; border-radius: 12px;">
                         <i class="icon-check mr-2" style="font-size: 20px;"></i>
-                        <span>رصيد المحفظة يغطي المستحقات بالكامل. يمكنك الدفع مباشرة من الرصيد.</span>
+                        <span>{{ __('dashboard.balance_covers') }}</span>
                     </div>
                 @elseif($totalDueAmount > 0)
                     <div class="alert alert-warning d-flex align-items-center mb-4" style="background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #f59e0b; border-radius: 12px;">
                         <i class="icon-attention mr-2" style="font-size: 20px;"></i>
-                        <span>رصيد المحفظة الحالي غير كافٍ لتغطية كل المستحقات. يرجى شحن الرصيد أو الدفع عبر بوابة الدفع الإلكتروني.</span>
+                        <span>{{ __('dashboard.balance_short') }}</span>
                     </div>
                 @endif
 
-                <!-- Unpaid Invoices Table -->
-                <h5 class="font-weight-bold text-light mb-3">فواتير المستحقات المترتبة:</h5>
+                <h5 class="font-weight-bold text-light mb-3">{{ __('dashboard.outstanding_inv') }}</h5>
                 <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
                     <table class="table table-hover table-dark mb-0" style="background: transparent;">
                         <thead>
                             <tr class="text-cyan">
-                                <th>رقم الفاتورة</th>
-                                <th>البيان</th>
-                                <th>الحالة</th>
-                                <th>المبلغ المستحق</th>
-                                <th>الإجراء</th>
+                                <th>{{ __('dashboard.invoice_num') }}</th>
+                                <th>{{ __('dashboard.description') }}</th>
+                                <th>{{ __('dashboard.status') }}</th>
+                                <th>{{ __('dashboard.amount_due') }}</th>
+                                <th>{{ __('dashboard.action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($unpaidInvoices as $invoice)
                                 <tr>
                                     <td>#{{ $invoice->id }}</td>
-                                    <td>{{ $invoice->title ?? $invoice->description ?? 'فاتورة خدمات' }}</td>
-                                    <td><span class="badge badge-warning">غير مدفوعة</span></td>
+                                    <td>{{ $invoice->title ?? $invoice->description ?? __('dashboard.service_invoice') }}</td>
+                                    <td><span class="badge badge-warning">{{ __('dashboard.unpaid_badge') }}</span></td>
                                     <td class="font-weight-bold text-danger">{{ number_format($invoice->unpaid, 2) }} {{ $currencySymbol }}</td>
                                     <td>
-                                        <a href="{{ url('/billing/invoices/' . $invoice->id) }}" class="btn btn-outline-info btn-sm" style="border-radius: 8px;">دفع الفاتورة</a>
+                                        <a href="{{ url('/billing/invoices/' . $invoice->id) }}" class="btn btn-outline-info btn-sm" style="border-radius: 8px;">{{ __('dashboard.pay_invoice') }}</a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="5" class="text-center text-muted py-4">
                                         <i class="icon-check d-block mb-2" style="font-size: 30px; color: #10b981;"></i>
-                                        لا توجد أي فواتير مستحقة الدفع حالياً. حسابك في حالة ممتازة!
+                                        {{ __('dashboard.no_invoices') }}
                                     </td>
                                 </tr>
                             @endforelse
@@ -617,18 +797,19 @@
                 </div>
             </div>
             <div class="modal-footer d-flex align-items-center justify-content-between p-3" style="border-top: 1px solid rgba(0, 240, 255, 0.2);">
-                <a href="{{ url('/financial/transactions') }}" class="btn btn-outline-light btn-sm" style="border-radius: 10px;">
-                    <i class="icon-plus mr-1"></i>شحن المحفظة
+                <a href="{{ url('/financial/add-balance') }}" class="btn btn-outline-light btn-sm" style="border-radius: 10px;">
+                    <i class="icon-plus mr-1"></i>{{ __('dashboard.add_balance') }}
                 </a>
                 <div>
-                    <button type="button" class="btn btn-secondary btn-sm mr-2" data-dismiss="modal" style="border-radius: 10px;">إغلاق</button>
+                    <button type="button" class="btn btn-secondary btn-sm mr-2" data-dismiss="modal" style="border-radius: 10px;">{{ __('dashboard.cancel') }}</button>
                     <a href="{{ url('/billing/invoices') }}" class="btn btn-primary btn-sm px-4" style="border-radius: 10px; background: linear-gradient(135deg, #00f0ff, #d946ef); border: none; font-weight: bold;">
-                        الانتقال لصفحة الفواتير
+                        {{ __('dashboard.view_all_invoices') }}
                     </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- UX FEATURE 1: Universal Command Bar (Ctrl + K) Modal -->
@@ -673,12 +854,12 @@
                         <span class="badge badge-outline-info">Open</span>
                     </div>
                     <div class="command-result-item d-flex align-items-center justify-content-between" data-target="#payDueModal" data-toggle="modal" data-dismiss="modal">
-                        <div><i class="icon-basket text-amber mr-2"></i><strong>Pay Due Amount (دفع الفلوس)</strong> <span class="text-muted small ml-2">- Quick Settlement Modal</span></div>
+                        <div><i class="icon-basket text-amber mr-2"></i><strong>{{ __('dashboard.pay_due_amount') }}</strong></div>
                         <span class="badge badge-outline-warning">Action</span>
                     </div>
                 </div>
                 <div class="d-flex align-items-center justify-content-between text-muted small mt-3 pt-2 border-top border-secondary">
-                    <span>Navigation: <kbd class="command-bar-kbd">↑</kbd> <kbd class="command-bar-kbd">↓</kbd> to select, <kbd class="command-bar-kbd">Enter</kbd> to open</span>
+                    <span>Navigation: <kbd class="command-bar-kbd">â†‘</kbd> <kbd class="command-bar-kbd">â†“</kbd> to select, <kbd class="command-bar-kbd">Enter</kbd> to open</span>
                     <span>Close: <kbd class="command-bar-kbd">Esc</kbd></span>
                 </div>
             </div>

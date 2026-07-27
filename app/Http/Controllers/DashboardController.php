@@ -16,6 +16,15 @@ class DashboardController extends Controller
         return $this->clientDashboard($user);
     }
 
+    public function directory(Request $request)
+    {
+        $user = Auth::user();
+        $dashboardService = app(DashboardService::class);
+        $data = $dashboardService->getClientDashboardData($user);
+
+        return view('dashboard.v8_directory', $data);
+    }
+
     private function clientDashboard($user)
     {
         $dashboardService = app(DashboardService::class);

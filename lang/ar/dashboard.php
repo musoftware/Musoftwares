@@ -44,6 +44,7 @@ return [
     'whatsapp_sender'    => 'مرسل واتساب',
     'fb_marketing'       => 'تسويق فيسبوك',
     'sms_gateway'        => 'بوابة SMS',
+    'gold_saver_sys'     => 'نظام حافظة الذهب',
     'booking_system'     => 'نظام الحجز',
     'browse_marketplace' => 'تصفح المتجر',
     'seller_portal'      => 'بوابة البائع',

@@ -44,6 +44,7 @@ return [
     'whatsapp_sender'    => 'WhatsApp Sender',
     'fb_marketing'       => 'FB Marketing',
     'sms_gateway'        => 'SMS Gateway',
+    'gold_saver_sys'     => 'Gold Saver System',
     'booking_system'     => 'Booking System',
     'browse_marketplace' => 'Browse Marketplace',
     'seller_portal'      => 'Seller Portal',

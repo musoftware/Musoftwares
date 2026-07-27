@@ -205,6 +205,9 @@ Route::prefix('/shared-board/{token}')->name('public.comments.')->group(function
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 
+Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
+    ->middleware(['auth', 'verified'])->name('dashboard.directory');
+
 // ── Client Projects Portal ────────────────────────────────────────
 // Platform users (clients) view the admin-managed projects assigned to them, including a
 // per-day visual workflow board. Ownership is enforced per-route via ProjectPolicy.
