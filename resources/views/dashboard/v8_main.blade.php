@@ -764,7 +764,7 @@
     })();
 
     /* ==========================================================================
-       THREE.JS WEBGL PURE LIVING 3D HOLOGRAM CORE (CALM TEAL & CYAN)
+       THREE.JS WEBGL 3D CYBERPUNK ARC REACTOR CORE (VIOLET HUD EDITION)
        ========================================================================== */
     (function () {
         var container = document.getElementById('logo-it');
@@ -797,137 +797,204 @@
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        var globeGroup = new THREE.Group();
-        scene.add(globeGroup);
+        var coreGroup = new THREE.Group();
+        scene.add(coreGroup);
 
-        // 1. 3D Holographic Tech Earth Globe Core
-        var globeGeo = new THREE.SphereGeometry(50, 64, 64);
-        var textureLoader = new THREE.TextureLoader();
-        
-        var earthTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg');
-        
-        var globeMat = new THREE.MeshPhongMaterial({
-            map: earthTexture,
-            bumpScale: 0.05,
-            specular: new THREE.Color(0x00e5ff),
-            shininess: 30,
-            emissive: new THREE.Color(0x02162e),
+        // 1. Central Intense Reactor Light & Inner Bright Sphere Core
+        var innerCoreGeo = new THREE.SphereGeometry(18, 32, 32);
+        var innerCoreMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
             transparent: true,
-            opacity: 0.92
+            opacity: 0.95
         });
-        var globeMesh = new THREE.Mesh(globeGeo, globeMat);
-        globeGroup.add(globeMesh);
+        var innerCoreMesh = new THREE.Mesh(innerCoreGeo, innerCoreMat);
+        coreGroup.add(innerCoreMesh);
 
-        // 2. Cyan Sci-Fi Tech Wireframe Overlay
-        var wireGeo = new THREE.SphereGeometry(50.8, 32, 32);
-        var wireMat = new THREE.MeshBasicMaterial({
-            color: 0x00e5ff,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.18
-        });
-        var wireMesh = new THREE.Mesh(wireGeo, wireMat);
-        globeGroup.add(wireMesh);
+        var corePointLight = new THREE.PointLight(0xa855f7, 4.5, 300);
+        coreGroup.add(corePointLight);
 
-        // 3. Atmosphere Halo Glow
-        var atmosGeo = new THREE.SphereGeometry(54, 32, 32);
-        var atmosMat = new THREE.MeshBasicMaterial({
-            color: 0x00a8ff,
+        // 2. Inner Glowing Energy Aura
+        var auraGeo = new THREE.SphereGeometry(25, 32, 32);
+        var auraMat = new THREE.MeshBasicMaterial({
+            color: 0x8a4fff,
             transparent: true,
-            opacity: 0.28,
+            opacity: 0.45,
             blending: THREE.AdditiveBlending,
             side: THREE.BackSide
         });
-        var atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
-        globeGroup.add(atmosMesh);
+        var auraMesh = new THREE.Mesh(auraGeo, auraMat);
+        coreGroup.add(auraMesh);
 
-        // 4. Orbital Sci-Fi Tech HUD Ring 1
-        var ringGeo1 = new THREE.TorusGeometry(68, 1.2, 16, 64);
-        var ringMat1 = new THREE.MeshBasicMaterial({ color: 0x00a8ff, transparent: true, opacity: 0.65 });
-        var ringMesh1 = new THREE.Mesh(ringGeo1, ringMat1);
-        ringMesh1.rotation.x = Math.PI / 3;
-        globeGroup.add(ringMesh1);
+        // 3. Geodesic Triangular Wireframe Mesh (Matching Image Inner Sphere)
+        var wireGeo = new THREE.IcosahedronGeometry(45, 2);
+        var wireMat = new THREE.MeshBasicMaterial({
+            color: 0x8a4fff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.85
+        });
+        var wireMesh = new THREE.Mesh(wireGeo, wireMat);
+        coreGroup.add(wireMesh);
 
-        // 5. Counter-Rotating Orbital HUD Ring 2
-        var ringGeo2 = new THREE.TorusGeometry(82, 0.9, 16, 48);
-        var ringMat2 = new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.45 });
-        var ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
-        ringMesh2.rotation.y = Math.PI / 4;
-        globeGroup.add(ringMesh2);
+        // Geodesic Vertices Glowing Nodes
+        var wirePositions = wireGeo.attributes.position.array;
+        var vertexCount = wirePositions.length / 3;
+        var vertexGeo = new THREE.BufferGeometry();
+        vertexGeo.setAttribute('position', new THREE.BufferAttribute(wirePositions, 3));
+        var vertexMat = new THREE.PointsMaterial({
+            color: 0xc084fc,
+            size: 3.2,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending
+        });
+        var vertexNodes = new THREE.Points(vertexGeo, vertexMat);
+        wireMesh.add(vertexNodes);
 
-        // Directional & Ambient Lighting for Realistic 3D Earth
-        var ambientLight = new THREE.AmbientLight(0x0a2540, 1.5);
+        // 4. Concentric Mechanical Outer Armor Rings (Segmented Metallic Shells)
+        var metallicMat = new THREE.MeshPhongMaterial({
+            color: 0x160c29,
+            specular: 0x8a4fff,
+            shininess: 80,
+            emissive: 0x1a0c33,
+            side: THREE.DoubleSide
+        });
+
+        var neonAccentMat = new THREE.MeshBasicMaterial({
+            color: 0x8a4fff,
+            transparent: true,
+            opacity: 0.85,
+            blending: THREE.AdditiveBlending
+        });
+
+        // Mechanical Segmented Ring 1 (Inner Shell)
+        var ring1Group = new THREE.Group();
+        var torusGeo1 = new THREE.TorusGeometry(54, 2.2, 16, 48);
+        var torusMesh1 = new THREE.Mesh(torusGeo1, metallicMat);
+        ring1Group.add(torusMesh1);
+
+        // Add 6 Segmented Notch Clamps around Ring 1
+        for (var i = 0; i < 6; i++) {
+            var clampGeo = new THREE.BoxGeometry(4, 7, 7);
+            var clampMesh = new THREE.Mesh(clampGeo, metallicMat);
+            var angle = (i / 6) * Math.PI * 2;
+            clampMesh.position.set(Math.cos(angle) * 54, Math.sin(angle) * 54, 0);
+            clampMesh.rotation.z = angle;
+            ring1Group.add(clampMesh);
+
+            // Neon Light Slot on Clamps
+            var slotGeo = new THREE.BoxGeometry(2, 5, 7.5);
+            var slotMesh = new THREE.Mesh(slotGeo, neonAccentMat);
+            slotMesh.position.copy(clampMesh.position);
+            slotMesh.rotation.z = angle;
+            ring1Group.add(slotMesh);
+        }
+        coreGroup.add(ring1Group);
+
+        // Mechanical Segmented Ring 2 (Outer Heavy Armor Shell - Counter Rotating)
+        var ring2Group = new THREE.Group();
+        var torusGeo2 = new THREE.TorusGeometry(63, 3.5, 16, 36);
+        var torusMesh2 = new THREE.Mesh(torusGeo2, metallicMat);
+        ring2Group.add(torusMesh2);
+
+        // Add 8 Heavy Armor Segment Brackets around Ring 2
+        for (var j = 0; j < 8; j++) {
+            var armorGeo = new THREE.BoxGeometry(6, 9, 9);
+            var armorMesh = new THREE.Mesh(armorGeo, metallicMat);
+            var angle2 = (j / 8) * Math.PI * 2;
+            armorMesh.position.set(Math.cos(angle2) * 63, Math.sin(angle2) * 63, 0);
+            armorMesh.rotation.z = angle2;
+            ring2Group.add(armorMesh);
+
+            // Glowing Notch Strip
+            var stripGeo = new THREE.BoxGeometry(3, 7, 9.6);
+            var stripMesh = new THREE.Mesh(stripGeo, neonAccentMat);
+            stripMesh.position.copy(armorMesh.position);
+            stripMesh.rotation.z = angle2;
+            ring2Group.add(stripMesh);
+        }
+        ring2Group.rotation.x = Math.PI / 3;
+        ring2Group.rotation.y = Math.PI / 6;
+        coreGroup.add(ring2Group);
+
+        // Orbital Precision HUD Ring 3
+        var ring3Geo = new THREE.TorusGeometry(72, 1.0, 16, 64);
+        var ring3Mat = new THREE.MeshBasicMaterial({ color: 0xc084fc, transparent: true, opacity: 0.5 });
+        var ring3Mesh = new THREE.Mesh(ring3Geo, ring3Mat);
+        ring3Mesh.rotation.x = -Math.PI / 4;
+        coreGroup.add(ring3Mesh);
+
+        // 5. Floating Levitation Underglow Shadow Disc
+        var underglowGeo = new THREE.RingGeometry(0, 42, 32);
+        var underglowMat = new THREE.MeshBasicMaterial({
+            color: 0x8a4fff,
+            transparent: true,
+            opacity: 0.35,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide
+        });
+        var underglowMesh = new THREE.Mesh(underglowGeo, underglowMat);
+        underglowMesh.position.y = -68;
+        underglowMesh.rotation.x = Math.PI / 2;
+        scene.add(underglowMesh);
+
+        // Lighting Configuration
+        var ambientLight = new THREE.AmbientLight(0x1a0c33, 2.0);
         scene.add(ambientLight);
 
-        var dirLight = new THREE.DirectionalLight(0x00e5ff, 2.0);
-        dirLight.position.set(100, 100, 100);
-        scene.add(dirLight);
+        var dirLight1 = new THREE.DirectionalLight(0x8a4fff, 2.5);
+        dirLight1.position.set(120, 120, 150);
+        scene.add(dirLight1);
 
-        // 6. Particle Swarm (450 Particles)
-        var particleCount = 450;
-        var particleGeo = new THREE.BufferGeometry();
-        var positions = new Float32Array(particleCount * 3);
-        var colors = new Float32Array(particleCount * 3);
+        var dirLight2 = new THREE.DirectionalLight(0xc084fc, 1.5);
+        dirLight2.position.set(-120, -80, -100);
+        scene.add(dirLight2);
 
-        var colorBlue = new THREE.Color(0x00a8ff);
-        var colorCyan = new THREE.Color(0x00e5ff);
-
-        for (var i = 0; i < particleCount; i++) {
-            var u = Math.random();
-            var v = Math.random();
-            var theta = u * 2.0 * Math.PI;
-            var phi = Math.acos(2.0 * v - 1.0);
-            var r = 56 + Math.random() * 26;
-
-            positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-            positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-            positions[i * 3 + 2] = r * Math.cos(phi);
-
-            var mixColor = Math.random() > 0.5 ? colorBlue : colorCyan;
-            colors[i * 3] = mixColor.r;
-            colors[i * 3 + 1] = mixColor.g;
-            colors[i * 3 + 2] = mixColor.b;
-        }
-
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-        var particleMat = new THREE.PointsMaterial({
-            size: 2.0,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.75
-        });
-        var particleSystem = new THREE.Points(particleGeo, particleMat);
-        globeGroup.add(particleSystem);
-
+        // Mouse Parallax Interaction
         var mouseX = 0, mouseY = 0;
         document.addEventListener('mousemove', function (e) {
             var windowHalfX = window.innerWidth / 2;
             var windowHalfY = window.innerHeight / 2;
-            mouseX = (e.clientX - windowHalfX) * 0.0006;
-            mouseY = (e.clientY - windowHalfY) * 0.0006;
+            mouseX = (e.clientX - windowHalfX) * 0.0007;
+            mouseY = (e.clientY - windowHalfY) * 0.0007;
         });
 
-        // Hover Interactions
+        // Hover Scaling Interaction
         $('.item, .btn-pay-due, header .user-reference ul li').hover(function () {
-            ringMat1.opacity = 0.9;
-            globeGroup.scale.set(1.06, 1.06, 1.06);
+            neonAccentMat.opacity = 1.0;
+            coreGroup.scale.set(1.08, 1.08, 1.08);
         }, function () {
-            ringMat1.opacity = 0.65;
-            globeGroup.scale.set(1.0, 1.0, 1.0);
+            neonAccentMat.opacity = 0.85;
+            coreGroup.scale.set(1.0, 1.0, 1.0);
         });
+
+        // Main Animation Loop
+        var clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
 
-            globeMesh.rotation.y += 0.004;
-            globeGroup.rotation.y += mouseX * 0.04;
-            globeGroup.rotation.x += (mouseY - globeGroup.rotation.x) * 0.04;
+            var elapsedTime = clock.getElapsedTime();
 
-            ringMesh1.rotation.z += 0.008;
-            ringMesh2.rotation.z -= 0.01;
-            particleSystem.rotation.y -= 0.003;
+            // Inner Core Pulse
+            var pulse = 3.8 + Math.sin(elapsedTime * 3.5) * 0.8;
+            corePointLight.intensity = pulse;
+            auraMesh.scale.setScalar(1.0 + Math.sin(elapsedTime * 2.5) * 0.05);
+
+            // Rotations
+            wireMesh.rotation.y += 0.005;
+            wireMesh.rotation.z += 0.002;
+
+            ring1Group.rotation.z += 0.009;
+            ring2Group.rotation.z -= 0.012;
+            ring3Mesh.rotation.z += 0.006;
+
+            // Parallax Smooth Tilt
+            coreGroup.rotation.y += (mouseX - coreGroup.rotation.y) * 0.05;
+            coreGroup.rotation.x += (mouseY - coreGroup.rotation.x) * 0.05;
+
+            // Floating bobbing effect
+            coreGroup.position.y = Math.sin(elapsedTime * 1.8) * 3;
 
             renderer.render(scene, camera);
         }
