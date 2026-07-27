@@ -1,30 +1,12 @@
 import React from 'react';
-import SciFiDashboard from './Dashboard/SciFiDashboard';
-import type { DashboardStats, RecentTransaction, ChartData, UserProject, ActiveTool } from './Dashboard/types';
+import V8Dashboard from './Dashboard/V8Dashboard';
+import type { DashboardStats } from './Dashboard/types';
 
 interface DashboardProps {
     stats?: DashboardStats;
-    recentTransactions?: RecentTransaction[];
-    chartData?: ChartData[];
-    userProjects?: UserProject[];
-    activeToolLicenses?: ActiveTool[];
 }
 
-export default function Dashboard({ 
-    stats, 
-    recentTransactions = [],
-    chartData = [],
-    userProjects = [],
-    activeToolLicenses = [],
-}: DashboardProps) {
-    return (
-        <SciFiDashboard
-            stats={stats}
-            recentTransactions={recentTransactions}
-            chartData={chartData}
-            userProjects={userProjects}
-            activeToolLicenses={activeToolLicenses}
-        />
-    );
+export default function Dashboard({ stats }: DashboardProps) {
+    return <V8Dashboard stats={stats} />;
 }
 

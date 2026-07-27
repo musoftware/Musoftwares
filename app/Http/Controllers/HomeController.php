@@ -27,7 +27,7 @@ class HomeController extends Controller
             $dashboardService = app(\App\Services\DashboardService::class);
             $data = $dashboardService->getClientDashboardData($user);
 
-            return Inertia::render('Client/Dashboard', $data);
+            return view('dashboard.v8_main', $data);
         }
 
         $dbProjects = Project::landingPortfolio()->get()->map(function($project) {
