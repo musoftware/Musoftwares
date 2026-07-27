@@ -63,7 +63,7 @@
         <div class="intro text-light"></div>
         <div class="welcome-wrap">
             <div class="welcome hidden">
-                <img src="{{ asset('v8main/img/user.jpg') }}" class="position-relative hidden" alt="">
+                <img src="{{ Auth::user()->avatar_url ?? asset('v8main/img/user.jpg') }}" class="position-relative hidden" alt="">
             </div>
         </div>
         <div class="out text-light mt-3" style="margin-left: 14px;"></div>
@@ -86,7 +86,7 @@
             <!-- Center two icons -->
             <div class="center-icons text-center col-lg-2 col-md-2 text-light col-6">
                 <div class="row d-flex align-items-lg-end align-items-center justify-content-end justify-content-lg-center">
-                    <div class="px-2 hover" data-href="{{ url('/marketplace') }}">
+                    <div class="px-2 hover" data-href="{{ url('/marketplace/services') }}">
                         <i class="icon-social d-block"></i>
                         <h3 class="m-auto">Market</h3>
                     </div>
@@ -102,7 +102,7 @@
                 <div class="text-light flex-row d-flex align-items-center justify-content-between justify-content-md-end text-center">
                     <ul class="d-flex align-items-center mb-0 mr-3 pl-0">
                         <li class="hover active list-inline-item d-flex align-items-center justify-content-center"
-                            data-href="{{ url('/friends') }}">
+                            data-href="{{ url('/referrals') }}">
                             <i class="icon-users"></i>
                         </li>
                         <li class="hover active list-inline-item d-flex align-items-center justify-content-center"
@@ -119,7 +119,7 @@
                          id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
                         <div class="profile-pic d-flex mr-1">
-                            <img src="{{ asset('v8main/img/user.jpg') }}" alt="" class="user-img m-auto">
+                            <img src="{{ Auth::user()->avatar_url ?? asset('v8main/img/user.jpg') }}" alt="" class="user-img m-auto" style="border-radius: 50%; object-fit: cover;">
                         </div>
                         <div class="d-none d-md-flex flex-column user-text px-2 mr-1 position-relative text-left font-weight-bold">
                             <div class="username text-capitalize">{{ Auth::user()->name ?? 'User' }}</div>
@@ -127,11 +127,11 @@
                         </div>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuOffset"
                              style="background-color: rgb(0, 0, 0);color: rgb(33, 151, 154);border-bottom: rgb(33, 151, 154) 1px solid;border-left: 1px solid rgb(33, 151, 154);border-right: 1px solid rgb(33, 151, 154);position: absolute;will-change: transform;top: 0px;left: 0px;transform: translate3d(1px, 56px, 0px);">
-                            <a class="dropdown-item" href="{{ url('/admin') }}">Admin Panel</a>
+                            <a class="dropdown-item" href="{{ url('/admin/dashboard') }}">Admin Panel</a>
                             <a class="dropdown-item" href="{{ url('/profile') }}">My Profile</a>
-                            <a class="dropdown-item" href="{{ url('/billing') }}">Billing</a>
-                            <a class="dropdown-item" href="{{ url('/wallet') }}">Wallet</a>
-                            <a class="dropdown-item" href="{{ url('/settings') }}">Settings</a>
+                            <a class="dropdown-item" href="{{ url('/billing/invoices') }}">Billing</a>
+                            <a class="dropdown-item" href="{{ url('/financial/transactions') }}">Wallet</a>
+                            <a class="dropdown-item" href="{{ url('/settings/backup') }}">Settings</a>
                             <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">
                                 @csrf
                             </form>
@@ -154,101 +154,101 @@
             <div class="col-lg-4 col-12 mt-5 p-0 left">
                 <div class="row">
 
-                    <!-- MY ISAAS (was MY ACADEMY) -->
+                    <!-- MY ISAAS -->
                     <div class="academy col-md-6 col-lg-12">
                         <h2 class="item-title pointer" onclick="toggler('.academy>.wrapper')">
                             MY ISAAS
                         </h2>
                         <div class="wrapper pb-2">
                             <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">iSaaS Contracts &amp; Projects</span>
+                                <span class="position-relative">iSaaS Platforms &amp; SSO Systems</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/contracts') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="monster"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Contracts</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/isaas') }}">
-                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
-                                        <div class="courses"></div>
-                                    </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">iSaaS</div>
-                                </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/erp') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/erp') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="dowloads"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">ERP</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">ERP System</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/crm') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/crm') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="ad"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">CRM</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">CRM System</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/invoices') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/goldsaversys') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="courses"></div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Gold POS</div>
+                                </div>
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/affsys') }}">
+                                    <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
+                                        <div class="monster"></div>
+                                    </div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Affiliate POS</div>
+                                </div>
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/sso/bookingsys') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="events"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Invoices</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Booking System</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/tasks') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/isaas/contracts') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="books"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Tasks</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Contracts</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- MY WORKFLOW (was MY NOTIFICATION) -->
+                    <!-- MY WORKFLOW -->
                     <div class="notification mt-5 mt-md-0 mt-lg-5 col-md-6 col-lg-12">
                         <h2 class="item-title pointer" onclick="toggler('.notification>.wrapper')">
                             MY WORKFLOW
                         </h2>
                         <div class="wrapper pb-2">
                             <div class="mb-3 head pl-4 d-flex align-items-center">
-                                <span class="position-relative">Automation &amp; AI Agents</span>
+                                <span class="position-relative">Automation &amp; System Tools</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/ai-agents') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/runtime/download') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="add-browser"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">AI Agents</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Runtime Agent</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/automation') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/automations') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="mange-browser"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Automation</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Automations</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/scheduling') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/backup') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="add"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Schedule</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Backup</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/templates') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/points') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="mange-noti"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Templates</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Points</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/analytics') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/notifications') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="search"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Analytics</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Notifications</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/reports') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/messages') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="all"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Reports</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Messages</div>
                                 </div>
                             </div>
                         </div>
@@ -266,7 +266,7 @@
                 <div class="end-icon mt-5" id="incenter_username" style="display: none;">
                     <svg class="mx-auto d-block" xmlns="http://www.w3.org/2000/svg" width="22px" height="23px">
                         <path fill-rule="evenodd" fill="rgb(41, 186, 189)"
-                              d="M19.263,5.321 C18.960,5.321 18.669,5.267 18.399,5.169 C18.399,5.169 18.399,5.169 17.269,6.329 C18.315,7.690 18.939,9.406 18.939,11.268 C18.939,13.131 18.314,14.847 17.269,16.208 C17.269,16.208 17.269,16.208 18.399,17.367 C18.669,17.270 18.960,17.216 19.263,17.216 C20.697,17.216 21.859,18.408 21.859,19.880 C21.859,21.351 20.697,22.544 19.263,22.544 C17.830,22.544 16.667,21.351 16.667,19.880 C16.667,19.569 16.720,19.271 16.815,18.993 C16.815,18.993 16.815,18.993 15.645,17.792 C14.375,18.717 12.824,19.261 11.152,19.261 C9.479,19.261 7.928,18.717 6.658,17.792 C6.658,17.792 6.658,17.792 5.488,18.993 C5.583,19.270 5.636,19.569 5.636,19.880 C5.636,21.351 4.474,22.544 3.040,22.544 C1.607,22.544 0.445,21.351 0.445,19.880 C0.445,18.408 1.607,17.216 3.040,17.216 C3.343,17.216 3.634,17.270 3.904,17.368 C3.904,17.368 3.904,17.368 5.034,16.208 C3.989,14.847 3.365,13.131 3.365,11.269 C3.365,9.406 3.989,7.690 5.034,6.329 C5.034,6.329 5.034,6.329 3.904,5.170 C3.634,5.267 3.343,5.321 3.040,5.321 C1.607,5.321 0.445,4.129 0.445,2.657 C0.445,1.186 1.607,-0.007 3.040,-0.007 C4.474,-0.007 5.636,1.186 5.636,2.657 C5.636,2.968 5.583,3.267 5.488,3.544 C5.488,3.544 5.488,3.544 6.658,4.745 C7.928,3.820 9.479,3.276 11.152,3.276 C12.824,3.276 14.375,3.820 15.645,4.745 C15.645,4.745 15.645,4.745 16.815,3.544 C16.720,3.267 16.667,2.968 16.667,2.657 C16.667,1.186 17.830,-0.007 19.263,-0.007 C20.697,-0.007 21.859,1.186 21.859,2.657 C21.859,4.129 20.697,5.321 19.263,5.321 ZM11.152,4.813 C7.678,4.813 4.862,7.704 4.862,11.269 C4.862,12.834 5.405,14.270 6.309,15.387 C6.396,14.523 6.577,13.485 7.023,13.303 L9.354,12.349 C9.354,12.349 9.354,12.349 9.900,11.876 C10.044,11.752 10.257,11.760 10.391,11.897 L11.152,12.672 C11.152,12.672 11.152,12.672 11.911,11.897 C12.045,11.760 12.258,11.751 12.402,11.876 L12.948,12.349 C12.948,12.349 12.948,12.349 15.280,13.303 C15.726,13.485 15.907,14.523 15.994,15.388 C16.898,14.270 17.441,12.834 17.441,11.269 C17.441,7.704 14.625,4.813 11.152,4.813 ZM11.152,11.691 C9.719,11.714 8.840,10.426 8.818,8.303 C8.803,6.753 9.640,5.948 11.152,5.948 C12.697,5.948 13.486,6.753 13.486,8.303 C13.486,11.788 11.152,11.691 11.152,11.691 Z"/>
+                              d="M19.263,5.321 C18.960,5.321 18.669,5.267 18.399,5.169 C18.399,5.169 18.399,5.169 17.269,6.329 C18.315,7.690 18.939,9.406 18.939,11.268 C18.939,13.131 18.314,14.847 17.269,16.208 C17.269,16.208 17.269,16.208 18.399,17.367 C18.669,17.270 18.960,17.216 19.263,17.216 C20.697,17.216 21.859,18.408 21.859,19.880 C21.859,21.351 20.697,22.544 19.263,22.544 C17.830,22.544 16.667,21.351 16.667,19.880 C16.667,19.569 16.720,19.271 16.815,19.993 C16.815,18.993 16.815,18.993 15.645,17.792 C14.375,18.717 12.824,19.261 11.152,19.261 C9.479,19.261 7.928,18.717 6.658,17.792 C6.658,17.792 6.658,17.792 5.488,18.993 C5.583,19.270 5.636,19.569 5.636,19.880 C5.636,21.351 4.474,22.544 3.040,22.544 C1.607,22.544 0.445,21.351 0.445,19.880 C0.445,18.408 1.607,17.216 3.040,17.216 C3.343,17.216 3.634,17.270 3.904,17.368 C3.904,17.368 3.904,17.368 5.034,16.208 C3.989,14.847 3.365,13.131 3.365,11.269 C3.365,9.406 3.989,7.690 5.034,6.329 C5.034,6.329 5.034,6.329 3.904,5.170 C3.634,5.267 3.343,5.321 3.040,5.321 C1.607,5.321 0.445,4.129 0.445,2.657 C0.445,1.186 1.607,-0.007 3.040,-0.007 C4.474,-0.007 5.636,1.186 5.636,2.657 C5.636,2.968 5.583,3.267 5.488,3.544 C5.488,3.544 5.488,3.544 6.658,4.745 C7.928,3.820 9.479,3.276 11.152,3.276 C12.824,3.276 14.375,3.820 15.645,4.745 C15.645,4.745 15.645,4.745 16.815,3.544 C16.720,3.267 16.667,2.968 16.667,2.657 C16.667,1.186 17.830,-0.007 19.263,-0.007 C20.697,-0.007 21.859,1.186 21.859,2.657 C21.859,4.129 20.697,5.321 19.263,5.321 ZM11.152,4.813 C7.678,4.813 4.862,7.704 4.862,11.269 C4.862,12.834 5.405,14.270 6.309,15.387 C6.396,14.523 6.577,13.485 7.023,13.303 L9.354,12.349 C9.354,12.349 9.354,12.349 9.900,11.876 C10.044,11.752 10.257,11.760 10.391,11.897 L11.152,12.672 C11.152,12.672 11.152,12.672 11.911,11.897 C12.045,11.760 12.258,11.751 12.402,11.876 L12.948,12.349 C12.948,12.349 12.948,12.349 15.280,13.303 C15.726,13.485 15.907,14.523 15.994,15.388 C16.898,14.270 17.441,12.834 17.441,11.269 C17.441,7.704 14.625,4.813 11.152,4.813 ZM11.152,11.691 C9.719,11.714 8.840,10.426 8.818,8.303 C8.803,6.753 9.640,5.948 11.152,5.948 C12.697,5.948 13.486,6.753 13.486,8.303 C13.486,11.788 11.152,11.691 11.152,11.691 Z"/>
                     </svg>
                     <svg class="mx-auto d-block" xmlns="http://www.w3.org/2000/svg" width="169px" height="14px">
                         <path fill-rule="evenodd" fill="rgb(41, 186, 189)"
@@ -285,7 +285,7 @@
             <div class="col-lg-4 col-12 mt-5 p-0 right">
                 <div class="row">
 
-                    <!-- MY TOOLS (was MY SITES) -->
+                    <!-- MY TOOLS -->
                     <div class="site clearfix col-md-6 col-lg-12">
                         <h2 class="item-title float-right pointer" onclick="toggler('.site>.main')">
                             MY TOOLS
@@ -302,11 +302,11 @@
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Marketplace</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/tools/scrapers') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/marketplace/dashboard') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="sales"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Scrapers</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Seller Portal</div>
                                 </div>
                                 <div class="col-4 px-0 pointer" onclick="toggler('.site>.popup-wrap')">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
@@ -314,19 +314,19 @@
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">WhatsApp</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/tools/facebook') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/fbmb') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="post"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Facebook</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">FB Marketing</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/tools/sms') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/sms-payment-gateway') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="gl"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">SMS</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">SMS Gateway</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/settings/backup') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="shorten"></div>
                                     </div>
@@ -351,29 +351,29 @@
                                 </span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/tools/whatsapp/send') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="add-popup"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Send</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Sender</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/tools/whatsapp/numbers') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="mange-pop"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Numbers</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Accounts</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/tools/whatsapp/campaigns') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/whatsapp-sender') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="pop-balance"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Campaigns</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Messages</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- MY FINANCE (was MY SERVICES) -->
+                    <!-- MY FINANCE -->
                     <div class="services clearfix mt-5 mt-md-0 mt-lg-5 col-md-6 col-lg-12">
                         <h2 class="item-title float-right pointer" onclick="toggler('.services>.main')">
                             MY FINANCE
@@ -384,25 +384,25 @@
                                 <span class="position-relative">Wallet, Billing &amp; Subscriptions</span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/wallet') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/add-balance') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="camp"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Wallet</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Add Balance</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/billing') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/billing/invoices') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="sales"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Billing</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Invoices</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/subscriptions') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/subscriptions/plans') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="reports"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Subscriptions</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Plans</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" onclick="toggler('.services>.campaings-wrap')">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/transactions') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="full"></div>
                                     </div>
@@ -414,11 +414,11 @@
                                     </div>
                                     <div class="item-captian text-light text-center text-capitalize py-2">Vouchers</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/reports/financial') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/withdrawals') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="setting"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Reports</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Withdrawals</div>
                                 </div>
                             </div>
                         </div>
@@ -439,13 +439,13 @@
                                 </span>
                             </div>
                             <div class="row m-0">
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/transactions/deposits') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/add-balance') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="add-camp"></div>
                                     </div>
-                                    <div class="item-captian text-light text-center text-capitalize py-2">Deposits</div>
+                                    <div class="item-captian text-light text-center text-capitalize py-2">Add Balance</div>
                                 </div>
-                                <div class="col-4 px-0 pointer" data-href="{{ url('/transactions/withdrawals') }}">
+                                <div class="col-4 px-0 pointer" data-href="{{ url('/financial/withdrawals') }}">
                                     <div class="py-2 mx-2 d-flex flex-fill item align-items-center justify-content-center">
                                         <div class="mange-camp"></div>
                                     </div>
@@ -453,7 +453,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 

@@ -894,16 +894,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/points/kashier/success', [PointPurchaseController::class, 'success'])->name('points.kashier.success');
     Route::get('/points/kashier/failure', [PointPurchaseController::class, 'failure'])->name('points.kashier.failure');
 
-    // Contracts (Generated from Proposals or Wizard)
-    Route::get('/contracts', [ContractController::class, 'index'])->name('contracts.index');
-    Route::get('/contracts/create', [ContractController::class, 'create'])->name('contracts.create');
-    Route::post('/contracts', [ContractController::class, 'store'])->name('contracts.store');
-    Route::get('/contracts/{contract}/edit', [ContractController::class, 'edit'])->name('contracts.edit');
-    Route::put('/contracts/{contract}', [ContractController::class, 'update'])->name('contracts.update');
-    Route::delete('/contracts/{contract}', [ContractController::class, 'destroy'])->name('contracts.destroy');
-    Route::post('/contracts/{contract}/status', [ContractController::class, 'updateStatus'])->name('contracts.update-status');
-    Route::post('/contracts/ai-generate', [ContractController::class, 'aiGenerate'])->name('contracts.ai-generate');
-    Route::post('/contracts/ai-review', [ContractController::class, 'aiReview'])->name('contracts.ai-review');
+    Route::redirect('/contracts', '/isaas/contracts');
 
     Route::get('/subscriptions/plans', [SubscriptionController::class, 'plans'])->name('subscriptions.plans');
     Route::post('/subscriptions/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
@@ -956,9 +947,6 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
 
     // P2P Wallet Transfer Routes
     Route::get('/transfer', [WalletTransferController::class, 'create'])->name('transfer.create');
-    // Route::get('/conversations/{id}', [\App\Http\Controllers\ConversationController::class, 'show']);
-    // Route::get('/conversations/{id}/messages', [\App\Http\Controllers\ConversationController::class, 'messages']);
-    // Route::post('/conversations/{id}/read', [\App\Http\Controllers\ConversationController::class, 'markAsRead']);
 
     Route::get('/messages', function () {
         return Inertia::render('Client/Messages/Index');
@@ -968,24 +956,35 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
         return Inertia::render('Client/Notifications/Index');
     })->name('notifications.index');
 
-    // iSAAS Connected Apps Routes
-    Route::prefix('isaas')->name('isaas.')->group(function () {
-        // Project Proposals (AI Estimator)
-        Route::get('/proposals', [ProjectProposalController::class, 'index'])->name('proposals.index');
-        Route::get('/proposals/create', [ProjectProposalController::class, 'create'])->name('proposals.create');
-        Route::post('/proposals/estimate', [ProjectProposalController::class, 'estimate'])->name('proposals.estimate');
-        Route::get('/proposals/{id}', [ProjectProposalController::class, 'show'])->name('proposals.show');
-        Route::put('/proposals/{id}', [ProjectProposalController::class, 'update'])->name('proposals.update');
-        Route::post('/proposals/{id}/convert', [ProjectProposalController::class, 'convert'])->name('proposals.convert');
-        Route::delete('/proposals/{id}', [ProjectProposalController::class, 'destroy'])->name('proposals.destroy');
-    });
-
-    // Route::get('/conversations', [\App\Http\Controllers\ConversationController::class, 'index']);
     Route::get('/transfer-api/calculate-fee', [WalletTransferController::class, 'calculateFee'])->name('transfer.calculate-fee');
     Route::get('/transfer-api/search-users', [WalletTransferController::class, 'searchUsers'])->name('transfer.search-users');
     Route::post('/transfer', [WalletTransferController::class, 'store'])->name('transfer.store');
     Route::get('/transfer/history', [WalletTransferController::class, 'history'])->name('transfer.history');
     Route::get('/transfer/{id}', [WalletTransferController::class, 'show'])->name('transfer.show');
+});
+
+// iSAAS Connected Apps Routes
+Route::middleware(['auth', 'verified'])->prefix('isaas')->name('isaas.')->group(function () {
+    // Project Proposals (AI Estimator)
+    Route::get('/proposals', [ProjectProposalController::class, 'index'])->name('proposals.index');
+    Route::get('/proposals/create', [ProjectProposalController::class, 'create'])->name('proposals.create');
+    Route::post('/proposals/estimate', [ProjectProposalController::class, 'estimate'])->name('proposals.estimate');
+    Route::get('/proposals/{id}', [ProjectProposalController::class, 'show'])->name('proposals.show');
+    Route::put('/proposals/{id}', [ProjectProposalController::class, 'update'])->name('proposals.update');
+    Route::post('/proposals/{id}/convert', [ProjectProposalController::class, 'convert'])->name('proposals.convert');
+    Route::delete('/proposals/{id}', [ProjectProposalController::class, 'destroy'])->name('proposals.destroy');
+
+    // Contracts
+    Route::get('/contracts', [ContractController::class, 'index'])->name('contracts.index');
+    Route::get('/contracts/create', [ContractController::class, 'create'])->name('contracts.create');
+    Route::post('/contracts', [ContractController::class, 'store'])->name('contracts.store');
+    Route::get('/contracts/search-users', [ContractController::class, 'searchUsers'])->name('contracts.search-users');
+    Route::get('/contracts/{contract}/edit', [ContractController::class, 'edit'])->name('contracts.edit');
+    Route::put('/contracts/{contract}', [ContractController::class, 'update'])->name('contracts.update');
+    Route::delete('/contracts/{contract}', [ContractController::class, 'destroy'])->name('contracts.destroy');
+    Route::post('/contracts/{contract}/status', [ContractController::class, 'updateStatus'])->name('contracts.update-status');
+    Route::post('/contracts/ai-generate', [ContractController::class, 'aiGenerate'])->name('contracts.ai.generate');
+    Route::post('/contracts/ai-review', [ContractController::class, 'aiReview'])->name('contracts.ai.review');
 });
 
 // Chat API Routes
