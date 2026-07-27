@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en" style="overflow: overlay;">
 
 <head>
@@ -117,7 +117,39 @@
             color: rgba(168, 85, 247, 0.7) !important;
             padding: 0 0 6px 0 !important;
             margin-bottom: 8px !important;
-            letter-spacing: 0.5px !important;
+        /* ── Minimalist Holographic Top-HUD Header ─────────── */
+        header.nav.sci-fi-hud-header {
+            background: rgba(13, 6, 26, 0.45) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.3) !important;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+            padding: 8px 16px !important;
+            position: relative;
+            z-index: 100;
+        }
+
+        /* HUD Ticks / Corner Accents */
+        header.nav.sci-fi-hud-header::before {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 30px;
+            width: 50px;
+            height: 2px;
+            background: #00f0ff;
+            box-shadow: 0 0 10px #00f0ff;
+        }
+        header.nav.sci-fi-hud-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            right: 30px;
+            width: 50px;
+            height: 2px;
+            background: #a855f7;
+            box-shadow: 0 0 10px #a855f7;
         }
     </style>
 </head>
@@ -154,133 +186,149 @@
     </div>
 </div>
 
-<!-- Header -->
-<header class="nav">
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Logo -->
-            <div class="col-lg-3 col-md-3 col-6">
-                <div class="logo-parent d-flex align-items-center">
-                    <img class="logo pointer" src="{{ asset('v8main/img/amc8.png') }}"
-                         data-href="{{ url('/dashboard') }}"
-                         alt="Musoftwares">
+<!-- Minimalist Holographic Top-HUD Header -->
+<header class="nav sci-fi-hud-header">
+    <div class="container-fluid px-3">
+        <div class="d-flex align-items-center justify-content-between">
+            
+            <!-- ◀ LEFT: Brand Logo & System Status Pulse -->
+            <div class="d-flex align-items-center">
+                <div class="logo-parent d-flex align-items-center mr-3 pointer" data-href="{{ url('/dashboard') }}" onclick="window.location.href='{{ url('/dashboard') }}'" style="cursor: pointer;">
+                    <img class="logo pointer" src="{{ asset('favicon.svg') }}"
+                         alt="Musoftware"
+                         style="height: 28px; width: 28px; filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.8));">
+                    <span class="brand-name-text ml-2" style="font-size: 17px; font-weight: 800; color: #f3e8ff; letter-spacing: 0.5px; text-shadow: 0 0 14px rgba(168, 85, 247, 0.7); font-family: system-ui, -apple-system, sans-serif;">Musoftware</span>
                 </div>
             </div>
 
-            <!-- User Data & Streamlined Financial Controls -->
-            <div class="user-reference col-lg-9 col-md-9 col-6 mt-0">
-                <div class="text-light flex-row d-flex align-items-center justify-content-end text-center">
+            <!-- ✦ CENTER: Live Holographic Telemetry Badges (Wallet & Points) -->
+            <div class="d-none d-lg-flex align-items-center justify-content-center gap-3">
+                <a href="{{ url('/financial/add-balance') }}" class="d-flex align-items-center px-3 py-1 text-decoration-none rounded-pill" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); backdrop-filter: blur(8px); transition: all 0.3s ease;">
+                    <i class="icon-wallet mr-2" style="color: #10b981; font-size: 13px;"></i>
+                    <span style="font-size: 11px; font-weight: 600; color: #d1fae5; margin-right: 4px;">{{ __('dashboard.wallet') }}:</span>
+                    <span style="font-size: 12px; font-weight: 800; color: #10b981; letter-spacing: 0.5px;">{{ $userBalanceFormatted }}</span>
+                </a>
 
-                    <!-- Search (Ctrl + K) & Embedded Live Operational LED -->
-                    <div class="command-bar-trigger mr-2 d-flex align-items-center pointer" data-toggle="modal" data-target="#commandBarModal" title="Universal Search & Actions (Ctrl + K)">
-                        <span class="status-dot-led mr-2" title="System Operational"></span>
-                        <i class="icon-search mr-1" style="font-size: 12px; color: #8A4FFF;"></i>
-                        <span class="mr-2 d-none d-sm-inline" style="color: #f3e8ff;">{{ __('dashboard.search') }}</span>
-                        <kbd class="command-bar-kbd">Ctrl K</kbd>
+                <div class="d-flex align-items-center px-3 py-1 rounded-pill ml-2" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); backdrop-filter: blur(8px);">
+                    <i class="icon-star mr-2" style="color: #f59e0b; font-size: 13px;"></i>
+                    <span style="font-size: 11px; font-weight: 600; color: #fef3c7; margin-right: 4px;">{{ __('dashboard.points') }}:</span>
+                    <span style="font-size: 12px; font-weight: 800; color: #f59e0b; letter-spacing: 0.5px;">{{ number_format($userPoints) }} {{ __('dashboard.pts') }}</span>
+                </div>
+            </div>
+
+            <!-- ▶ RIGHT: Command Bar, Notifications, Lang & User Capsule -->
+            <div class="d-flex align-items-center">
+
+                <!-- Search (Ctrl + K) Trigger -->
+                <div class="command-bar-trigger mr-2 d-flex align-items-center pointer px-2 py-1 rounded-pill" 
+                     data-toggle="modal" data-target="#commandBarModal" title="Universal Search & Actions (Ctrl + K)"
+                     style="background: rgba(35, 16, 70, 0.6); border: 1px solid rgba(168, 85, 247, 0.4); backdrop-filter: blur(8px); transition: all 0.3s ease;">
+                    <i class="icon-search mr-1" style="font-size: 12px; color: #00f0ff;"></i>
+                    <span class="mr-2 d-none d-sm-inline" style="color: #f3e8ff; font-size: 11px; font-weight: 600;">{{ __('dashboard.search') }}</span>
+                    <kbd class="command-bar-kbd" style="background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4); font-size: 9px; padding: 1px 5px; border-radius: 4px;">Ctrl K</kbd>
+                </div>
+
+                <!-- Notifications Dropdown -->
+                <div class="dropdown mr-2">
+                    <div class="d-flex align-items-center justify-content-center pointer position-relative dropdown-toggle"
+                         id="notificationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                         title="Notifications & Messages" 
+                         style="width: 34px; height: 34px; background: rgba(35, 16, 70, 0.6); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 50%; transition: all 0.3s ease;">
+                        <i class="icon-bell" style="color: #a855f7; font-size: 13px;"></i>
+                        <span class="status-dot-led position-absolute" style="top: 3px; right: 3px; width: 6px; height: 6px; background-color: #00f0ff; box-shadow: 0 0 8px #00f0ff;"></span>
                     </div>
 
-                    <!-- Streamlined Notification Hub Dropdown -->
-                    <div class="dropdown mr-2">
-                        <div class="d-flex align-items-center justify-content-center pointer position-relative dropdown-toggle"
-                             id="notificationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                             title="Notifications & Messages" style="width: 36px; height: 32px; padding: 0; background: rgba(22, 10, 42, 0.6); border: 1px solid rgba(138, 79, 255, 0.4); border-radius: 8px;">
-                            <i class="icon-bell" style="color: #8A4FFF; font-size: 14px;"></i>
-                            <span class="status-dot-led position-absolute" style="top: 4px; right: 4px; width: 6px; height: 6px; background-color: #8A4FFF; box-shadow: 0 0 6px #8A4FFF;"></span>
-                        </div>
-
-                        <!-- Notification Dropdown Menu -->
-                        <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="notificationDropdown"
-                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); width: 290px;">
-                            
-                            <!-- Header -->
-                            <div class="d-flex align-items-center justify-content-between pb-2 mb-2" style="border-bottom: 1px solid rgba(138,79,255,0.25);">
-                                <div class="font-weight-bold" style="color: #f3e8ff; font-size: 13px;">
-                                    <i class="icon-bell mr-1" style="color: #8A4FFF;"></i> {{ __('dashboard.notifications') }}
-                                </div>
-                                <a href="{{ url('/notifications') }}" class="small font-weight-bold" style="color: #a855f7;">{{ __('dashboard.view_all') }}</a>
+                    <!-- Notification Feed Menu -->
+                    <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="notificationDropdown"
+                         style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); width: 290px;">
+                        <div class="d-flex align-items-center justify-content-between pb-2 mb-2" style="border-bottom: 1px solid rgba(138,79,255,0.25);">
+                            <div class="font-weight-bold" style="color: #f3e8ff; font-size: 13px;">
+                                <i class="icon-bell mr-1" style="color: #8A4FFF;"></i> {{ __('dashboard.notifications') }}
                             </div>
-
-                            <!-- Real Notification Feed -->
-                            <div class="notification-list text-left" style="max-height: 240px; overflow-y: auto;">
-                                @forelse($realNotifications as $notif)
-                                    <a href="{{ $notif['link'] ?? url('/notifications') }}" class="d-block p-2 mb-2 rounded position-relative text-decoration-none" style="background: rgba(138,79,255,0.08); border-left: 3px solid #8A4FFF; transition: all 0.2s ease;">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="small font-weight-bold" style="color: #f3e8ff; font-size: 11px;">{{ $notif['title'] }}</div>
-                                            <span style="color: #a855f7; font-size: 8px;">{{ $notif['time'] }}</span>
-                                        </div>
-                                        <div style="color: #d8b4fe; font-size: 10px; line-height: 1.3;" class="mt-1">{{ $notif['desc'] }}</div>
-                                    </a>
-                                @empty
-                                    <div class="p-3 text-center text-muted" style="font-size: 11px;">
-                                        {{ __('dashboard.no_notifications') }}
+                            <a href="{{ url('/notifications') }}" class="small font-weight-bold" style="color: #a855f7;">{{ __('dashboard.view_all') }}</a>
+                        </div>
+                        <div class="notification-list text-left" style="max-height: 240px; overflow-y: auto;">
+                            @forelse($realNotifications as $notif)
+                                <a href="{{ $notif['link'] ?? url('/notifications') }}" class="d-block p-2 mb-2 rounded position-relative text-decoration-none" style="background: rgba(138,79,255,0.08); border-left: 3px solid #8A4FFF; transition: all 0.2s ease;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="small font-weight-bold" style="color: #f3e8ff; font-size: 11px;">{{ $notif['title'] }}</div>
+                                        <span style="color: #a855f7; font-size: 8px;">{{ $notif['time'] }}</span>
                                     </div>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Language Switcher -->
-                    <div class="dropdown mr-2">
-                        <div class="d-flex align-items-center justify-content-center pointer dropdown-toggle"
-                             id="langDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                             style="width: 36px; height: 32px; padding: 0; background: rgba(22,10,42,0.6); border: 1px solid rgba(138,79,255,0.4); border-radius: 8px; font-size: 13px;">
-                            {{ strtoupper(app()->getLocale()) }}
-                        </div>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="langDropdown"
-                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 10px; min-width: 130px; box-shadow: 0 10px 30px rgba(0,0,0,0.9);">
-                            <a class="dropdown-item py-2 {{ app()->getLocale() === 'en' ? 'font-weight-bold' : '' }}"
-                               href="{{ url()->current() }}?lang=en"
-                               style="color: {{ app()->getLocale() === 'en' ? '#a855f7' : '#d8b4fe' }}; font-size: 12px;">
-                                EN &nbsp; {{ __('dashboard.lang_en') }}
-                            </a>
-                            <a class="dropdown-item py-2 {{ app()->getLocale() === 'ar' ? 'font-weight-bold' : '' }}"
-                               href="{{ url()->current() }}?lang=ar"
-                               style="color: {{ app()->getLocale() === 'ar' ? '#a855f7' : '#d8b4fe' }}; font-size: 12px;">
-                                AR &nbsp; {{ __('dashboard.lang_ar') }}
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- User Profile Capsule -->
-                    <div class="dropdown">
-                        <div class="user-data d-flex align-items-center px-2 py-1 dropdown-toggle pointer"
-                             id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
-                            <div class="profile-pic d-flex mr-1">
-                                <img src="{{ Auth::user()->avatar_url ?? asset('v8main/img/user.jpg') }}" alt="" class="user-img m-auto" style="border-radius: 50%; object-fit: cover;">
-                            </div>
-                            <div class="d-none d-md-flex flex-column user-text px-2 mr-1 position-relative text-left font-weight-bold">
-                                <div class="username text-capitalize">{{ Auth::user()->name ?? 'User' }}</div>
-                                <div class="user-level text-uppercase">{{ Auth::user()->role ?? 'Client' }}</div>
-                            </div>
-                        </div>
-                        <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="dropdownMenuOffset"
-                             style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); min-width: 250px;">
-                            <div class="mb-3 p-2 text-left" style="background: #180c30; border: 1px solid rgba(138,79,255,0.3); border-radius: 8px;">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="small" style="color: #d8b4fe;">{{ __('dashboard.wallet') }}:</span>
-                                    <span class="font-weight-bold" style="color: #a855f7;">{{ $userBalanceFormatted }}</span>
+                                    <div style="color: #d8b4fe; font-size: 10px; line-height: 1.3;" class="mt-1">{{ $notif['desc'] }}</div>
+                                </a>
+                            @empty
+                                <div class="p-3 text-center text-muted" style="font-size: 11px;">
+                                    {{ __('dashboard.no_notifications') }}
                                 </div>
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <span class="small" style="color: #d8b4fe;">{{ __('dashboard.points') }}:</span>
-                                    <span class="font-weight-bold" style="color: #ffb703;">{{ number_format($userPoints) }} {{ __('dashboard.pts') }}</span>
-                                </div>
-                                <button class="btn btn-pay-due btn-block btn-sm mt-1" data-toggle="modal" data-target="#payDueModal">
-                                    <i class="icon-basket mr-1"></i> {{ __('dashboard.pay_due_amount') }} ({{ $totalDueFormatted }})
-                                </button>
-                            </div>
-                            @if(Auth::user() && (method_exists(Auth::user(), 'isAdmin') ? Auth::user()->isAdmin() : false) || in_array(strtolower(Auth::user()->role ?? ''), ['admin', 'super_admin', 'superadmin']) || Auth::user()->is_admin)
-                                <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}" style="color: #00f0ff; font-weight: 600;"><i class="icon-user mr-2" style="color: #00f0ff;"></i>{{ __('dashboard.admin_panel') }}</a>
-                            @endif
-                            <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.my_profile') }}</a>
-                            <a class="dropdown-item py-2" href="{{ url('/dashboard/directory') }}"><i class="icon-grid mr-2" style="color: #a855f7;"></i>{{ __('dashboard.all_apps_dir') }}</a>
-                            <div class="dropdown-divider" style="border-color: rgba(138,79,255,0.2);"></div>
-                            <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">@csrf</form>
-                            <a class="dropdown-item py-2 text-danger font-weight-bold" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('dashboard.logout') }}</a>
+                            @endforelse
                         </div>
                     </div>
-
                 </div>
+
+                <!-- Language Switcher Pill -->
+                <div class="dropdown mr-2">
+                    <div class="d-flex align-items-center justify-content-center pointer dropdown-toggle"
+                         id="langDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                         style="width: 34px; height: 34px; background: rgba(35, 16, 70, 0.6); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 50%; font-size: 11px; font-weight: 800; color: #f3e8ff;">
+                        {{ strtoupper(app()->getLocale()) }}
+                    </div>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="langDropdown"
+                         style="background: #130924; border: 1px solid #8A4FFF; border-radius: 10px; min-width: 130px; box-shadow: 0 10px 30px rgba(0,0,0,0.9);">
+                        <a class="dropdown-item py-2 {{ app()->getLocale() === 'en' ? 'font-weight-bold' : '' }}"
+                           href="{{ url()->current() }}?lang=en"
+                           style="color: {{ app()->getLocale() === 'en' ? '#a855f7' : '#d8b4fe' }}; font-size: 12px;">
+                            EN &nbsp; {{ __('dashboard.lang_en') }}
+                        </a>
+                        <a class="dropdown-item py-2 {{ app()->getLocale() === 'ar' ? 'font-weight-bold' : '' }}"
+                           href="{{ url()->current() }}?lang=ar"
+                           style="color: {{ app()->getLocale() === 'ar' ? '#a855f7' : '#d8b4fe' }}; font-size: 12px;">
+                            AR &nbsp; {{ __('dashboard.lang_ar') }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- User Profile Hologram Capsule -->
+                <div class="dropdown">
+                    <div class="user-data d-flex align-items-center px-2 py-1 dropdown-toggle pointer"
+                         id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                         style="cursor: pointer; background: rgba(35, 16, 70, 0.6); border: 1px solid rgba(168, 85, 247, 0.45); border-radius: 20px; backdrop-filter: blur(8px);">
+                        <div class="profile-pic d-flex mr-2">
+                            <img src="{{ Auth::user()->avatar_url ?? asset('v8main/img/user.jpg') }}" alt="" class="user-img m-auto" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1.5px solid #a855f7;">
+                        </div>
+                        <div class="d-none d-md-flex flex-column user-text pr-1 text-left font-weight-bold">
+                            <div class="username text-capitalize" style="font-size: 11px; color: #f3e8ff; line-height: 1.2;">{{ Auth::user()->name ?? 'User' }}</div>
+                            <div class="user-level text-uppercase" style="font-size: 8px; color: #ff7c20; letter-spacing: 1px;">{{ Auth::user()->role ?? 'Client' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="dropdownMenuOffset"
+                         style="background: #130924; border: 1px solid #8A4FFF; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35); min-width: 250px;">
+                        <div class="mb-3 p-2 text-left" style="background: #180c30; border: 1px solid rgba(138,79,255,0.3); border-radius: 8px;">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="small" style="color: #d8b4fe;">{{ __('dashboard.wallet') }}:</span>
+                                <span class="font-weight-bold" style="color: #a855f7;">{{ $userBalanceFormatted }}</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="small" style="color: #d8b4fe;">{{ __('dashboard.points') }}:</span>
+                                <span class="font-weight-bold" style="color: #ffb703;">{{ number_format($userPoints) }} {{ __('dashboard.pts') }}</span>
+                            </div>
+                            <button class="btn btn-pay-due btn-block btn-sm mt-1" data-toggle="modal" data-target="#payDueModal">
+                                <i class="icon-basket mr-1"></i> {{ __('dashboard.pay_due_amount') }} ({{ $totalDueFormatted }})
+                            </button>
+                        </div>
+                        @if(Auth::user() && (method_exists(Auth::user(), 'isAdmin') ? Auth::user()->isAdmin() : false) || in_array(strtolower(Auth::user()->role ?? ''), ['admin', 'super_admin', 'superadmin']) || Auth::user()->is_admin)
+                            <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}" style="color: #00f0ff; font-weight: 600;"><i class="icon-user mr-2" style="color: #00f0ff;"></i>{{ __('dashboard.admin_panel') }}</a>
+                        @endif
+                        <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.my_profile') }}</a>
+                        <a class="dropdown-item py-2" href="{{ url('/dashboard/directory') }}"><i class="icon-grid mr-2" style="color: #a855f7;"></i>{{ __('dashboard.all_apps_dir') }}</a>
+                        <div class="dropdown-divider" style="border-color: rgba(138,79,255,0.2);"></div>
+                        <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">@csrf</form>
+                        <a class="dropdown-item py-2 text-danger font-weight-bold" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('dashboard.logout') }}</a>
+                    </div>
+                </div>
+
             </div>
+
         </div>
     </div>
 </header>
