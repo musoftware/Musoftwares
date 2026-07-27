@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en" style="overflow: overlay;">
 
 <head>
@@ -268,8 +268,8 @@
                                     <i class="icon-basket mr-1"></i> {{ __('dashboard.pay_due_amount') }} ({{ $totalDueFormatted }})
                                 </button>
                             </div>
-                            @if(Auth::user() && (Auth::user()->role === 'Admin' || Auth::user()->is_admin))
-                                <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.admin_panel') }}</a>
+                            @if(Auth::user() && (method_exists(Auth::user(), 'isAdmin') ? Auth::user()->isAdmin() : false) || in_array(strtolower(Auth::user()->role ?? ''), ['admin', 'super_admin', 'superadmin']) || Auth::user()->is_admin)
+                                <a class="dropdown-item py-2" href="{{ url('/admin/dashboard') }}" style="color: #00f0ff; font-weight: 600;"><i class="icon-user mr-2" style="color: #00f0ff;"></i>{{ __('dashboard.admin_panel') }}</a>
                             @endif
                             <a class="dropdown-item py-2" href="{{ url('/profile') }}"><i class="icon-user mr-2"></i>{{ __('dashboard.my_profile') }}</a>
                             <a class="dropdown-item py-2" href="{{ url('/dashboard/directory') }}"><i class="icon-grid mr-2" style="color: #a855f7;"></i>{{ __('dashboard.all_apps_dir') }}</a>
@@ -285,8 +285,8 @@
     </div>
 </header>
 <!-- ════════════════════════════════════════════════════════════
-     CAR CONSOLE DASHBOARD — 🎲 Liquid Smooth Scale & 3D Cursor Tracking
-     Target: 1366×768  |  Zero-Scroll  |  Separated Smooth Scale Layer
+     CAR CONSOLE DASHBOARD — 🔮 Magnificent Enlarged 3D Hologram Core
+     Target: 1366×768  |  Zero-Scroll  |  High-Impact Sci-Fi Presence
 ════════════════════════════════════════════════════════════ -->
 <style>
     /* ── No-Scroll Viewport Reset ───────────────────────────── */
@@ -304,13 +304,13 @@
         position: relative;
         padding: 10px 20px;
         box-sizing: border-box;
-        background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.16) 0%, rgba(13, 6, 26, 0.98) 75%);
+        background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.18) 0%, rgba(13, 6, 26, 0.98) 75%);
     }
 
-    /* ── Pure Sci-Fi Center Hologram Core ───────────────────────── */
+    /* ── MAGNIFICENT ENLARGED CENTER HOLOGRAM CORE ──────────────── */
     .orbital-center-core {
         position: absolute;
-        top: 48%;
+        top: 46%;
         left: 50%;
         transform: translate(-50%, -50%);
         display: flex;
@@ -326,41 +326,42 @@
     }
 
     .orbital-center-core #logo-it {
-        zoom: 0.95 !important;
-        width: 240px !important;
-        height: 220px !important;
-        filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.65));
+        zoom: 1.45 !important;
+        width: 320px !important;
+        height: 290px !important;
+        filter: drop-shadow(0 0 65px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 25px rgba(0, 240, 255, 0.4));
     }
 
-    /* User identity below hologram */
+    /* User identity below enlarged hologram */
     .orbital-identity {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: -5px;
-        gap: 2px;
+        margin-top: -15px;
+        gap: 3px;
     }
     .orbital-identity .c-name {
-        font-size: 18px;
+        font-size: 22px;
         font-weight: 800;
         color: #f3e8ff;
         text-transform: uppercase;
-        letter-spacing: 3px;
-        text-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
+        letter-spacing: 4px;
+        text-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 8px rgba(255, 255, 255, 0.6);
     }
     .orbital-identity .c-role {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         color: #ff7c20;
         text-transform: uppercase;
-        letter-spacing: 2.5px;
+        letter-spacing: 3px;
+        text-shadow: 0 0 10px rgba(255, 124, 32, 0.6);
     }
 
     /* ── Floating Orbital Arc Nodes Layout (CLOSER TO CORE) ──────── */
     .orbital-arc-container {
         position: relative;
         width: 100%;
-        max-width: 960px;
+        max-width: 980px;
         margin: 0 auto;
         height: 100%;
         display: flex;
@@ -578,11 +579,11 @@
         border: 1px solid rgba(255, 255, 255, 0.45);
     }
 
-    /* BOTTOM FACE (Shadow) */
+    /* BOTTOM FACE (Seamless Glass Shading - Harsh Black Strip Removed) */
     .cube-face-bottom {
         transform: rotateX(-90deg) translateZ(42.5px);
-        background: rgba(0, 0, 0, 0.85);
-        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.9);
+        background: linear-gradient(180deg, rgba(22, 10, 44, 0.9), rgba(10, 4, 20, 0.95));
+        border: 1px solid rgba(138, 79, 255, 0.3);
     }
 
     /* 🎨 3D CUBE THEME COLOR ACCENTS WITH ULTRA SMOOTH GLOW */
@@ -591,6 +592,7 @@
     .cube-theme-red .cube-face-front { background: linear-gradient(135deg, rgba(244, 63, 94, 0.38), rgba(30, 10, 20, 0.98)); border-color: #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.45), inset 0 0 14px rgba(244, 63, 94, 0.35); }
     .cube-theme-red .cube-face-front svg { stroke: #f43f5e; filter: drop-shadow(0 0 10px #f43f5e); }
     .cube-theme-red .cube-face-top { background: linear-gradient(135deg, rgba(244, 63, 94, 0.65), rgba(255, 255, 255, 0.35)); }
+    .cube-theme-red .cube-face-bottom { border-color: rgba(244, 63, 94, 0.4); }
     .orbital-node:hover .cube-theme-red .cube-face-front { box-shadow: 0 0 40px rgba(244, 63, 94, 0.95); }
 
     /* 🟢 Emerald Add Balance Cube */
@@ -598,6 +600,7 @@
     .cube-theme-emerald .cube-face-front { background: linear-gradient(135deg, rgba(16, 185, 129, 0.38), rgba(10, 30, 20, 0.98)); border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
     .cube-theme-emerald .cube-face-front svg { stroke: #10b981; filter: drop-shadow(0 0 10px #10b981); }
     .cube-theme-emerald .cube-face-top { background: linear-gradient(135deg, rgba(16, 185, 129, 0.65), rgba(255, 255, 255, 0.35)); }
+    .cube-theme-emerald .cube-face-bottom { border-color: rgba(16, 185, 129, 0.4); }
     .orbital-node:hover .cube-theme-emerald .cube-face-front { box-shadow: 0 0 40px rgba(16, 185, 129, 0.95); }
 
     /* 🩵 Cyan ERP Cube */
@@ -605,6 +608,7 @@
     .cube-theme-cyan .cube-face-front { background: linear-gradient(135deg, rgba(0, 240, 255, 0.38), rgba(10, 25, 40, 0.98)); border-color: #00f0ff; box-shadow: 0 0 20px rgba(0, 240, 255, 0.45); }
     .cube-theme-cyan .cube-face-front svg { stroke: #00f0ff; filter: drop-shadow(0 0 10px #00f0ff); }
     .cube-theme-cyan .cube-face-top { background: linear-gradient(135deg, rgba(0, 240, 255, 0.65), rgba(255, 255, 255, 0.35)); }
+    .cube-theme-cyan .cube-face-bottom { border-color: rgba(0, 240, 255, 0.4); }
     .orbital-node:hover .cube-theme-cyan .cube-face-front { box-shadow: 0 0 40px rgba(0, 240, 255, 0.95); }
 
     /* 🩷 Pink CRM / Projects Cube */
@@ -612,6 +616,7 @@
     .cube-theme-pink .cube-face-front { background: linear-gradient(135deg, rgba(236, 72, 153, 0.38), rgba(35, 10, 30, 0.98)); border-color: #ec4899; box-shadow: 0 0 20px rgba(236, 72, 153, 0.45); }
     .cube-theme-pink .cube-face-front svg { stroke: #ec4899; filter: drop-shadow(0 0 10px #ec4899); }
     .cube-theme-pink .cube-face-top { background: linear-gradient(135deg, rgba(236, 72, 153, 0.65), rgba(255, 255, 255, 0.35)); }
+    .cube-theme-pink .cube-face-bottom { border-color: rgba(236, 72, 153, 0.4); }
     .orbital-node:hover .cube-theme-pink .cube-face-front { box-shadow: 0 0 40px rgba(236, 72, 153, 0.95); }
 
     /* 🟧 Amber Marketplace / SMS Cube */
@@ -619,6 +624,7 @@
     .cube-theme-amber .cube-face-front { background: linear-gradient(135deg, rgba(245, 158, 11, 0.38), rgba(35, 20, 10, 0.98)); border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.45); }
     .cube-theme-amber .cube-face-front svg { stroke: #f59e0b; filter: drop-shadow(0 0 10px #f59e0b); }
     .cube-theme-amber .cube-face-top { background: linear-gradient(135deg, rgba(245, 158, 11, 0.65), rgba(255, 255, 255, 0.35)); }
+    .cube-theme-amber .cube-face-bottom { border-color: rgba(245, 158, 11, 0.4); }
     .orbital-node:hover .cube-theme-amber .cube-face-front { box-shadow: 0 0 40px rgba(245, 158, 11, 0.95); }
 
     /* 🪙 Gold Saver Cube */
@@ -626,6 +632,7 @@
     .cube-theme-gold .cube-face-front { background: linear-gradient(135deg, rgba(251, 191, 36, 0.45), rgba(40, 30, 10, 0.98)); border-color: #fbbf24; box-shadow: 0 0 20px rgba(251, 191, 36, 0.45); }
     .cube-theme-gold .cube-face-front svg { stroke: #fbbf24; filter: drop-shadow(0 0 10px #fbbf24); }
     .cube-theme-gold .cube-face-top { background: linear-gradient(135deg, rgba(251, 191, 36, 0.75), rgba(255, 255, 255, 0.45)); }
+    .cube-theme-gold .cube-face-bottom { border-color: rgba(251, 191, 36, 0.4); }
     .orbital-node:hover .cube-theme-gold .cube-face-front { box-shadow: 0 0 40px rgba(251, 191, 36, 0.95); }
 
     /* Notification / Due Badge on Corner of Cube */
@@ -646,7 +653,7 @@
 
 <div class="orbital-viewport" id="orbitalViewport">
 
-    <!-- ══ PURE SCI-FI CENTER CORE: 3D Hologram + User Identity ══ -->
+    <!-- ══ MAGNIFICENT ENLARGED 3D HOLOGRAM CENTER CORE ══ -->
     <div class="orbital-center-core" id="orbitalCenter">
         <div id="logo-it"></div>
 
