@@ -433,8 +433,9 @@ Route::post('/billing/invoices/payment/webhook', [InvoiceController::class, 'pay
 
 // Marketplace Routes — literal routes BEFORE wildcards
 Route::prefix('marketplace')->name('marketplace.')->group(function () {
-    // Public: browse list
+    // Public: browse list & async API
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+    Route::get('/api/services', [ServiceController::class, 'apiIndex'])->name('services.api');
 
     // Auth-only: dashboard + create wizard (MUST be before /{id} wildcard)
     Route::middleware(['auth', 'verified', 'onboarding', 'subscription:marketplace'])->group(function () {

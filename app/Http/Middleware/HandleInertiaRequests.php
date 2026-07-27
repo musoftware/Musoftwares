@@ -47,11 +47,19 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $user ? array_merge($user->toArray(), [
-                    'role' => strtolower($user->roles->first()->name ?? 'user'),
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'avatar_url' => $user->avatar_url,
+                    'user_balance' => $user->user_balance,
+                    'currency_id' => $user->currency_id,
+                    'onboarding_completed' => (bool)$user->onboarding_completed,
+                    'role' => strtolower($user->roles->first()->name ?? $user->role ?? 'user'),
                     'roles' => $user->roles->pluck('name')->map(fn ($r) => strtolower($r))->toArray(),
                     'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
-                ]) : null,
+                    'is_admin' => method_exists($user, 'isAdmin') ? $user->isAdmin() : false,
+                ] : null,
                 'team_member' => null,
                 'crm_team_member' => Auth::guard('crm_team')->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
@@ -188,10 +196,14 @@ class HandleInertiaRequests extends Middleware
                     }
                 }
 
-                // Resolve via IpGeolocationService and cache in session for guest
-                /** @var \App\Services\IpGeolocationService $geoService */
-                $geoService = app(\App\Services\IpGeolocationService::class);
-                $c = $geoService->getCurrencyForIp($request->ip()) ?? Currency::getDefault();
+                // Resolve via IpGeolocationService and cache by IP to prevent external HTTP delays
+                $ip = $request->ip();
+                $cId = \Illuminate\Support\Facades\Cache::remember('ip_curr_id_' . md5((string)$ip), 86400, function () use ($request) {
+                    /** @var \App\Services\IpGeolocationService $geoService */
+                    $geoService = app(\App\Services\IpGeolocationService::class);
+                    return $geoService->getCurrencyForIp($request->ip())?->id ?? Currency::getDefault()?->id;
+                });
+                $c = $cId ? Currency::find($cId) : Currency::getDefault();
 
                 if ($c) {
                     session(['guest_currency_id' => $c->id]);
@@ -212,15 +224,15 @@ class HandleInertiaRequests extends Middleware
                     'is_default' => true,
                 ];
             },
-            'currencies' => fn () => Currency::all()->map(fn ($c) => [
+            'currencies' => fn () => \Illuminate\Support\Facades\Cache::remember('global_currencies_list', 86400, fn () => Currency::all()->map(fn ($c) => [
                 'id' => $c->id,
                 'currency' => $c->currency,
                 'symbol' => $c->symbol,
                 'string_format' => $c->string_format,
                 'country_codes' => $c->country_codes ?? [],
                 'is_default' => (bool) $c->is_default,
-            ])->toArray(),
-            'website_services' => fn () => class_exists(WebsiteService::class) ? WebsiteService::all()->toArray() : [],
+            ])->toArray()),
+            'website_services' => fn () => \Illuminate\Support\Facades\Cache::remember('global_website_services', 86400, fn () => class_exists(WebsiteService::class) ? WebsiteService::all()->toArray() : []),
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),

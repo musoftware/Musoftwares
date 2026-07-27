@@ -883,9 +883,11 @@ class FinanceHelper
             }
         }
 
-        // 2. IP Geolocation (Guest or User with no preference)
-        $ipService = app(IpGeolocationService::class);
-        $currencyCode = $ipService->getCurrencyCodeForIp($request->ip());
+        // 2. IP Geolocation (Guest or User with no preference) — Cached to prevent external HTTP delays
+        $ip = $request->ip();
+        $currencyCode = \Illuminate\Support\Facades\Cache::remember('ip_curr_' . md5((string)$ip), 86400, function () use ($request) {
+            return app(IpGeolocationService::class)->getCurrencyCodeForIp($request->ip());
+        });
 
         if ($currencyCode) {
             $currency = Currency::where('currency', $currencyCode)->first();

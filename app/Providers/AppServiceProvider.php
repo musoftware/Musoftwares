@@ -31,7 +31,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Vite::prefetch(concurrency: 3);
+        // Disabled Vite global prefetch to prevent massive HTML inline asset manifest bloat
+        // Vite::prefetch(concurrency: 3);
 
         \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
             'App\Models\ServiceOrder' => \Modules\Marketplace\Models\ServiceOrder::class,

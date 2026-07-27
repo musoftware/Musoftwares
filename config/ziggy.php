@@ -18,5 +18,11 @@ return [
         'debugbar.*',
         'ignition.*',
         '_debugbar.*',
+        'api.tracker.*',
+        'api.v1.whatsapp.*',
+        'api.passwordsync.*',
+        'sms-payment-gateway.*',
+        'whatsapp.*',
+        'storage.local.*',
     ],
 ];

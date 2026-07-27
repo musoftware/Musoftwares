@@ -34,22 +34,38 @@ export default function Browse({ services, categories, filters }: any) {
         })) || []
     };
 
+    const [loading, setLoading] = useState(false);
+    const [servicesData, setServicesData] = useState(services);
+
+    const fetchApiServices = async (searchTerm: string, catId: string) => {
+        setLoading(true);
+        try {
+            const url = new URL('/marketplace/api/services', window.location.origin);
+            if (searchTerm) url.searchParams.set('search', searchTerm);
+            if (catId) url.searchParams.set('category', catId);
+            
+            const res = await fetch(url.toString(), {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.services) {
+                setServicesData(data.services);
+            }
+        } catch (err) {
+            console.error('Error fetching services API:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSearch = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        router.get(
-            route('marketplace.services.index'),
-            { search, category: categoryId },
-            { preserveState: true },
-        );
+        fetchApiServices(search, categoryId);
     };
 
     const selectCategory = (id: string) => {
         setCategoryId(id);
-        router.get(
-            route('marketplace.services.index'),
-            { search, category: id },
-            { preserveState: true },
-        );
+        fetchApiServices(search, id);
     };
 
 
@@ -195,11 +211,30 @@ export default function Browse({ services, categories, filters }: any) {
             )}
 
 
-            {/* Services Grid */}
+            {/* Services Grid with Skeleton Loader */}
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {(services.data as any).map((service: any) => {
+                    {loading ? (
+                        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                            {[1, 2, 3, 4, 5, 6].map((n) => (
+                                <div key={n} className="flex h-96 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse">
+                                    <div className="h-48 w-full rounded-lg bg-gray-200" />
+                                    <div className="mt-4 flex items-center gap-2">
+                                        <div className="h-6 w-6 rounded-full bg-indigo-100" />
+                                        <div className="h-4 w-28 rounded bg-gray-200" />
+                                    </div>
+                                    <div className="mt-3 h-5 w-3/4 rounded bg-gray-200" />
+                                    <div className="mt-2 h-4 w-1/2 rounded bg-gray-200" />
+                                    <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+                                        <div className="h-4 w-16 rounded bg-gray-200" />
+                                        <div className="h-6 w-20 rounded bg-gray-200" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                            {((servicesData?.data || services?.data || []) as any).map((service: any) => {
                             // Determine starting price package
                             const startingPackage =
                                 service.packages && service.packages.length > 0
@@ -341,8 +376,9 @@ export default function Browse({ services, categories, filters }: any) {
                             );
                         })}
                     </div>
+                    )}
 
-                    {(services.data as any).length === 0 && (
+                    {!loading && ((servicesData?.data || services?.data || []) as any).length === 0 && (
                         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-12 text-center text-gray-500 shadow-sm">
                             <svg
                                 className="mx-auto mb-4 h-12 w-12 text-gray-400"

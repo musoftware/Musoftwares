@@ -92,7 +92,9 @@ class ServiceController extends Controller
         }
 
         $services = $query->latest()->paginate(15);
-        $categories = ServiceCategory::orderBy('name')->get();
+        $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
+            return ServiceCategory::orderBy('name')->get();
+        });
 
         $currentLocale = app()->getLocale();
         $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
@@ -103,6 +105,10 @@ class ServiceController extends Controller
         $services->getCollection()->transform(function ($service) use ($viewerCurrency, $userFavoriteIds, $currentLocale) {
             $service->is_favorited = in_array($service->id, $userFavoriteIds);
             $service = $this->localizeService($service, $currentLocale);
+            
+            // Strip massive unused text/JSON blobs on listing page to dramatically speed up Inertia rendering
+            $service->makeHidden(['description', 'description_translations', 'auto_reply', 'auto_reply_translations', 'faq', 'requirements']);
+
             $service->packages->transform(function ($package) use ($viewerCurrency) {
                 if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
                     $package->price = CurrenciesExchange::RateToday(

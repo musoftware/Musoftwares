@@ -54,6 +54,9 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'autosms_verification_secret',
+        'openai_api_key',
+        'fcm_token',
+        'workspace_settings',
     ];
 
     protected $appends = [
