@@ -34,3 +34,24 @@ export interface RecentTransaction {
     method: string;
     currency: Currency | null;
 }
+
+export interface UserProject {
+    id: number;
+    name: string;
+    status: string;
+    total_tasks: number;
+    completed_tasks: number;
+    progress: number;
+    reports_count: number;
+    files_count: number;
+    updated_at: string;
+}
+
+export interface ActiveTool {
+    id: number;
+    tool_slug: string;
+    tool_name: string;
+    expires_at: string | null;
+    status: string;
+}
+

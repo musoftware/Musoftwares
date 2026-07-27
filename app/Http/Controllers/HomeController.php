@@ -22,6 +22,14 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $dashboardService = app(\App\Services\DashboardService::class);
+            $data = $dashboardService->getClientDashboardData($user);
+
+            return Inertia::render('Client/Dashboard', $data);
+        }
+
         $dbProjects = Project::landingPortfolio()->get()->map(function($project) {
             return [
                 'slug' => Str::slug($project->portfolio_title ?? $project->project_name),

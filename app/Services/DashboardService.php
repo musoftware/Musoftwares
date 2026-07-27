@@ -292,6 +292,7 @@ class DashboardService extends BaseService
             'recentTransactions' => $this->getRecentTransactions($user),
             'chartData' => $this->getWalletChartData($user),
             'activeToolLicenses' => $this->getActiveToolLicenses($user),
+            'userProjects' => $this->getUserProjects($user),
         ];
     }
 
@@ -461,6 +462,58 @@ class DashboardService extends BaseService
 
     private function getActiveToolLicenses(User $user): array
     {
-        return [];
+        try {
+            return DB::table('tool_subscriptions')
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->get()
+                ->map(fn ($ts) => [
+                    'id' => $ts->id,
+                    'tool_slug' => $ts->tool_slug ?? 'tool',
+                    'tool_name' => ucwords(str_replace(['_', '-'], ' ', $ts->tool_slug ?? 'Tool Subscription')),
+                    'expires_at' => isset($ts->expires_at) ? Carbon::parse($ts->expires_at)->format('Y-m-d') : null,
+                    'status' => $ts->status ?? 'active',
+                ])
+                ->toArray();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    private function getUserProjects(User $user): array
+    {
+        try {
+            $projects = Project::where('user_id', $user->id)
+                ->where('archived', 0)
+                ->withCount([
+                    'tasks',
+                    'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'done'),
+                    'publishedReports',
+                    'files',
+                ])
+                ->latest()
+                ->take(5)
+                ->get();
+
+            return $projects->map(function ($p) {
+                $totalTasks = (int) $p->tasks_count;
+                $completedTasks = (int) $p->completed_tasks_count;
+                $progress = $totalTasks > 0 ? (int) round(($completedTasks / $totalTasks) * 100) : 0;
+
+                return [
+                    'id' => $p->id,
+                    'name' => $p->project_name,
+                    'status' => $p->status ?? 'in_progress',
+                    'total_tasks' => $totalTasks,
+                    'completed_tasks' => $completedTasks,
+                    'progress' => $progress,
+                    'reports_count' => (int) $p->published_reports_count,
+                    'files_count' => (int) $p->files_count,
+                    'updated_at' => $p->updated_at?->diffForHumans() ?? '-',
+                ];
+            })->toArray();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 }
