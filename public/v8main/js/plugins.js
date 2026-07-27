@@ -15,12 +15,35 @@ function toggler(selector) {
 }
 
 localStorage.setItem('theme', 'dark');
-// preloader
+
+/* ==========================================================================
+   30-DAY WELCOME INTRO SKIP & EXPIRATION ENGINE
+   ========================================================================== */
+function checkWelcomeSuppressed() {
+    var skipUntil = parseInt(localStorage.getItem('v8_skip_welcome_until') || '0', 10);
+    return Date.now() < skipUntil;
+}
+
+function bypassPreloaderNow() {
+    $('.preloader-wrapper').stop(true, true).hide();
+    $(".animation-start").stop(true, true).show().addClass('basic');
+}
+
+// Early check on DOM ready
+if (checkWelcomeSuppressed()) {
+    $(document).ready(function () {
+        bypassPreloaderNow();
+    });
+}
 
 var play;
 
-
 $(window).on('load', function () {
+    if (checkWelcomeSuppressed()) {
+        bypassPreloaderNow();
+        return;
+    }
+
     $('.preloader-wrapper .preloader .loading-Recovered').fadeOut(300, function () {
         $(".audio-test").fadeIn();
         if ((sessionStorage.getItem('audio') === 'true') || (sessionStorage.getItem('audio') === 'false')) {
@@ -30,13 +53,17 @@ $(window).on('load', function () {
             } else {
                 type();
             }
-        } else {
-            $(".audio-test button").parent().parent().hide();
-            type('yes');
         }
 
         $(".audio-test button").click(function () {
             $(this).parent().parent().hide();
+
+            // Save 30-day skip preference if checkbox checked
+            if ($('#dontShowWelcome30Days').is(':checked')) {
+                var thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+                localStorage.setItem('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
+            }
+
             if ($(this).hasClass('yes')) {
                 type('yes');
                 sessionStorage.setItem('audio', 'true');
@@ -44,10 +71,23 @@ $(window).on('load', function () {
                 type();
                 sessionStorage.setItem('audio', 'false');
             }
+        });
+    });
+});
 
-        })
+// Skip Intro Button Handler
+$(document).on('click', '.skip-intro-now-btn', function (e) {
+    e.preventDefault();
+    var thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+    localStorage.setItem('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
+    bypassPreloaderNow();
+});
 
-    })
+// Reset Welcome Intro Handler
+$(document).on('click', '#resetWelcomeIntroBtn', function (e) {
+    e.preventDefault();
+    localStorage.removeItem('v8_skip_welcome_until');
+    alert('Welcome intro re-enabled! It will play on your next visit.');
 });
 
 

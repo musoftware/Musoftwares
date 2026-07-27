@@ -77,36 +77,35 @@
     width: 284px;
     height: 285px;
     background: url('../img/animation-start.png') left center;
-    animation: start .8s steps(7);
+    animation: start .8s steps(7) infinite;
     margin: auto;
 }
 
 @keyframes start {
     100% {
-        background-position: 1988px;
+        background-position: -1988px;
     }
 }
 
 .basic {
     background: url('../img/basic.png') left center;
-    animation: basic .5s steps(6) infinite;
+    animation: basic .6s steps(6) infinite;
 }
 
 @keyframes basic {
     100% {
-        background-position: 1716px;
+        background-position: -1716px;
     }
 }
 
 .hover-icon-basic {
-
-    background: url('../img/hover-icon-basic.png') left center;
-    animation: hover-icon .8s steps(7);
+    background: url('../img/hover-icon-basic.png') left center !important;
+    animation: hover-icon .7s steps(7) infinite !important;
 }
 
 @keyframes hover-icon {
     100% {
-        background-position: 2002px;
+        background-position: -2002px;
     }
 }
 /* .center-logo {
@@ -1266,3 +1265,426 @@ height:21px;
 .dropdown-item{
     color: rgb(33, 151, 154);
 }
+
+/* ==========================================================================
+   FUTURISTIC GLASS UI THEME - INSPIRED BY USER NEON GLASS DESIGN
+   ========================================================================== */
+
+body {
+    background: radial-gradient(circle at 20% 20%, #170936 0%, #0a051b 50%, #03040c 100%) !important;
+    background-attachment: fixed !important;
+    color: #e2e8f0;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background Cosmic Nebula Glow Flares */
+body::before {
+    content: '';
+    position: fixed;
+    top: -10%;
+    left: -10%;
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, rgba(139, 92, 246, 0.1) 50%, transparent 70%);
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    bottom: -10%;
+    right: -10%;
+    width: 750px;
+    height: 750px;
+    background: radial-gradient(circle, rgba(217, 70, 239, 0.2) 0%, rgba(244, 63, 94, 0.12) 50%, transparent 70%);
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Header Glassmorphism */
+header {
+    background: rgba(10, 6, 27, 0.55) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    position: relative;
+    z-index: 10;
+}
+
+header .user-data {
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(0, 240, 255, 0.35) !important;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 12px rgba(217, 70, 239, 0.15) !important;
+    border-radius: 16px !important;
+}
+
+header .user-reference ul li {
+    border: 1.5px solid rgba(0, 240, 255, 0.5) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+header .user-reference ul li:hover {
+    border-color: #f43f5e !important;
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.6) !important;
+    transform: translateY(-2px);
+}
+
+/* Section Headings */
+.content .item-title {
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    color: #00f0ff !important;
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.5), 0 0 30px rgba(217, 70, 239, 0.3) !important;
+}
+
+/* Glass Card Panel Wrappers with Sci-Fi HUD Tech Corners */
+.content .wrapper {
+    background: rgba(18, 12, 38, 0.68) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    border: 1px solid rgba(0, 240, 255, 0.25) !important;
+    border-top: 1.5px solid rgba(0, 240, 255, 0.5) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65), 0 0 15px rgba(0, 240, 255, 0.15), inset 0 0 25px rgba(217, 70, 239, 0.12) !important;
+    overflow: hidden;
+    padding: 14px !important;
+    position: relative;
+}
+
+.content .wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 14px;
+    height: 14px;
+    border-top: 2px solid #00f0ff;
+    border-left: 2px solid #00f0ff;
+    box-shadow: 0 0 8px #00f0ff;
+    pointer-events: none;
+}
+
+.content .wrapper .head {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #00f0ff !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+}
+
+.content .wrapper .head > span:first-child::before {
+    background-color: #00f0ff !important;
+    box-shadow: 0 0 10px #00f0ff !important;
+}
+
+/* Tile Grid Items */
+.content .wrapper .item {
+    background: rgba(32, 22, 58, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 14px !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.content .wrapper .item:hover {
+    border-color: #00f0ff !important;
+    background: linear-gradient(135deg, rgba(217, 70, 239, 0.25) 0%, rgba(0, 240, 255, 0.25) 100%) !important;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.45), inset 0 0 15px rgba(217, 70, 239, 0.3) !important;
+    transform: translateY(-3px) scale(1.02) !important;
+}
+
+.content .item-captian {
+    color: #e2e8f0 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.3px !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Hover Accent Effects */
+.hover:hover h3,
+.hover.active,
+.content .item-title:hover {
+    color: #f43f5e !important;
+    text-shadow: 0 0 20px rgba(244, 63, 94, 0.7) !important;
+}
+
+/* Dropdown Menu Glass */
+header .user-data .dropdown-menu {
+    background: rgba(14, 9, 32, 0.95) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(0, 240, 255, 0.35) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.25) !important;
+    border-radius: 14px !important;
+}
+
+header .user-data .dropdown-menu .dropdown-item {
+    color: #e2e8f0 !important;
+    transition: all 0.25s ease !important;
+}
+
+header .user-data .dropdown-menu .dropdown-item:hover {
+    background: rgba(0, 240, 255, 0.15) !important;
+    color: #00f0ff !important;
+    padding-left: 1.5rem !important;
+}
+
+/* ==========================================================================
+   DYNAMIC CSS NEON COLOR GLOWS & FILTERS FOR 3D HOLOGRAM GLOBE & HUD
+   ========================================================================== */
+
+@keyframes globe-pulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 22px rgba(0, 240, 255, 0.65)) drop-shadow(0 0 40px rgba(217, 70, 239, 0.4)) saturate(150%);
+        transform: scale(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 35px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 60px rgba(244, 63, 94, 0.75)) saturate(195%);
+        transform: scale(1.02);
+    }
+}
+
+.basic {
+    animation: basic .6s steps(6) infinite, globe-pulse 4s ease-in-out infinite !important;
+    transition: filter 0.4s ease, transform 0.4s ease !important;
+}
+
+.hover-icon-basic {
+    animation: hover-icon .8s steps(7) infinite, globe-pulse 4s ease-in-out infinite !important;
+}
+
+.animation-start {
+    animation: start .8s steps(7) infinite, globe-pulse 4s ease-in-out infinite !important;
+}
+
+.basic:hover,
+.hover-icon-basic:hover,
+.animation-start:hover,
+.center-logo:hover .basic {
+    filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.85)) drop-shadow(0 0 50px rgba(244, 63, 94, 0.7)) saturate(180%) hue-rotate(-15deg) !important;
+    transform: scale(1.03) !important;
+}
+
+.loading-Recovered,
+.welcome {
+    filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.6)) drop-shadow(0 0 28px rgba(217, 70, 239, 0.45)) saturate(150%) !important;
+}
+
+header .logo {
+    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 18px rgba(217, 70, 239, 0.3)) !important;
+    transition: filter 0.3s ease, transform 0.3s ease !important;
+}
+
+header .logo:hover {
+    filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 30px rgba(244, 63, 94, 0.75)) brightness(1.2) !important;
+    transform: scale(1.05) !important;
+}
+
+.content .wrapper .item div[class] {
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.45)) !important;
+    transition: filter 0.3s ease, transform 0.3s ease !important;
+}
+
+.content .wrapper .item:hover div[class] {
+    filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 22px rgba(217, 70, 239, 0.75)) saturate(160%) !important;
+    transform: scale(1.08) !important;
+}
+
+/* ==========================================================================
+   DYNAMIC LARGE-SCREEN RESPONSIVE SCALING & GAP FILL ENGINE
+   ========================================================================== */
+
+.content .wrapper {
+    transition: width 0.4s ease, left 0.4s ease, right 0.4s ease, padding 0.4s ease !important;
+}
+
+@media (min-width: 1400px) {
+    .content .wrapper {
+        width: 320px !important;
+    }
+    .content .left .wrapper {
+        left: 12% !important;
+    }
+    .content .right .wrapper {
+        right: 12% !important;
+    }
+    .content .wrapper .item {
+        height: 64px !important;
+    }
+    .content .wrapper .item div[class] {
+        transform: scale(1.15);
+    }
+    .content .item-captian {
+        font-size: 9.5px !important;
+    }
+    #logo-it {
+        zoom: 1.45 !important;
+    }
+}
+
+@media (min-width: 1750px) {
+    .content .wrapper {
+        width: 370px !important;
+    }
+    .content .left .wrapper {
+        left: 8% !important;
+    }
+    .content .right .wrapper {
+        right: 8% !important;
+    }
+    .content .wrapper .item {
+        height: 72px !important;
+    }
+    .content .wrapper .item div[class] {
+        transform: scale(1.25);
+    }
+    .content .item-captian {
+        font-size: 11px !important;
+    }
+    .content .item-title {
+        font-size: 28px !important;
+    }
+    #logo-it {
+        zoom: 1.6 !important;
+    }
+}
+
+@media (min-width: 2200px) {
+    .content .wrapper {
+        width: 420px !important;
+    }
+    .content .left .wrapper {
+        left: 5% !important;
+    }
+    .content .right .wrapper {
+        right: 5% !important;
+    }
+    .content .wrapper .item {
+        height: 80px !important;
+    }
+    .content .wrapper .item div[class] {
+        transform: scale(1.35);
+    }
+    .content .item-captian {
+        font-size: 12.5px !important;
+    }
+    .content .item-title {
+        font-size: 32px !important;
+    }
+/* ==========================================================================
+   HEADER FINANCIAL WIDGETS & FANCY SCI-FI GLASS PAYMENT MODAL
+   ========================================================================== */
+
+.financial-pill {
+    background: rgba(18, 12, 38, 0.75) !important;
+    border: 1px solid rgba(0, 240, 255, 0.35) !important;
+    border-radius: 14px !important;
+    backdrop-filter: blur(16px) !important;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15), inset 0 0 10px rgba(217, 70, 239, 0.12) !important;
+    transition: all 0.3s ease !important;
+}
+
+.financial-pill:hover {
+    border-color: #00f0ff !important;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+.financial-pill .pill-label {
+    font-size: 8.5px !important;
+    color: #94a3b8 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    line-height: 1.1 !important;
+}
+
+.financial-pill .pill-value {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+}
+
+.text-cyan {
+    color: #00f0ff !important;
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5) !important;
+}
+
+.text-amber {
+    color: #f59e0b !important;
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.5) !important;
+}
+
+.btn-pay-due {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.3) 0%, rgba(217, 70, 239, 0.3) 100%) !important;
+    border: 1.5px solid #f43f5e !important;
+    border-radius: 14px !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.45) !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.btn-pay-due:hover {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.55) 0%, rgba(217, 70, 239, 0.55) 100%) !important;
+    border-color: #00f0ff !important;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.7), 0 0 35px rgba(244, 63, 94, 0.5) !important;
+    transform: translateY(-2px) scale(1.03) !important;
+    color: #ffffff !important;
+}
+
+.pulse-badge {
+    animation: badge-pulse 2s infinite ease-in-out;
+}
+
+@keyframes badge-pulse {
+    0%, 100% {
+        box-shadow: 0 0 6px #f43f5e;
+    }
+    50% {
+        box-shadow: 0 0 15px #f43f5e, 0 0 20px #00f0ff;
+    }
+}
+
+/* Sci-Fi Glass Modal */
+.modal-scifi-glass .modal-content {
+    background: rgba(14, 9, 32, 0.95) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border: 1px solid rgba(0, 240, 255, 0.35) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.25) !important;
+    color: #e2e8f0 !important;
+}
+
+.modal-scifi-glass .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-scifi-glass .modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-scifi-glass .table {
+    color: #e2e8f0 !important;
+}
+
+.modal-scifi-glass .table td,
+.modal-scifi-glass .table th {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+

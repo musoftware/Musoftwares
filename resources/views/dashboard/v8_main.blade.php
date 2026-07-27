@@ -1,3 +1,22 @@
+@php
+    $authUser = Auth::user();
+    $userBalanceVal = $authUser->user_balance ?? 0;
+    $currencySymbol = optional($authUser->currencyRelation)->symbol ?? 'EGP';
+    $userBalanceFormatted = number_format($userBalanceVal, 2) . ' ' . $currencySymbol;
+    $userPoints = $authUser->points ?? $authUser->reward_points ?? 0;
+
+    $unpaidInvoices = collect();
+    $totalDueAmount = 0;
+
+    if ($authUser && method_exists($authUser, 'invoices')) {
+        $unpaidInvoices = $authUser->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->get();
+        $totalDueAmount = $unpaidInvoices->sum('unpaid');
+    }
+    $totalDueFormatted = number_format($totalDueAmount, 2) . ' ' . $currencySymbol;
+@endphp
 <!doctype html>
 <html lang="en" style="overflow: overlay;">
 
@@ -21,7 +40,6 @@
     <style>
         body {
             zoom: 0.75;
-            background-color: #030e11;
         }
 
         #logo-it {
@@ -51,12 +69,21 @@
 
 <!-- Preloader -->
 <div class="preloader-wrapper">
+    <button class="btn btn-outline-info btn-sm skip-intro-now-btn position-absolute" style="top: 25px; right: 25px; z-index: 99999; border-radius: 20px; font-size: 11px; backdrop-filter: blur(10px); color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);">
+        Skip Intro ⚡
+    </button>
     <div class="preloader">
         <div class="audio-test text-light hidden">
             <h3>Play site with sound effects?</h3>
-            <div class="buttons mt-5 text-center">
-                <button class="btn btn-primary btn-sm mr-5 yes">Yes</button>
+            <div class="buttons mt-4 text-center">
+                <button class="btn btn-primary btn-sm mr-4 yes">Yes</button>
                 <button class="btn btn-danger btn-sm no">No</button>
+            </div>
+            <div class="mt-4 text-center">
+                <label class="pointer text-light" style="font-size: 11px; cursor: pointer; user-select: none; color: #a0aec0 !important;">
+                    <input type="checkbox" id="dontShowWelcome30Days" style="cursor: pointer; vertical-align: middle;" class="mr-1">
+                    Don't show welcome intro for 30 days
+                </label>
             </div>
         </div>
         <div class="loading-Recovered"></div>
@@ -75,7 +102,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Logo -->
-            <div class="col-lg-5 col-md-3 col-6">
+            <div class="col-lg-2 col-md-2 col-4">
                 <div class="logo-parent d-flex align-items-center">
                     <img class="logo pointer" src="{{ asset('v8main/img/amc8.png') }}"
                          data-href="{{ url('/dashboard') }}"
@@ -83,9 +110,9 @@
                 </div>
             </div>
 
-            <!-- Center two icons -->
-            <div class="center-icons text-center col-lg-2 col-md-2 text-light col-6">
-                <div class="row d-flex align-items-lg-end align-items-center justify-content-end justify-content-lg-center">
+            <!-- Center icons -->
+            <div class="center-icons text-center col-lg-2 col-md-2 text-light col-4">
+                <div class="row d-flex align-items-center justify-content-center">
                     <div class="px-2 hover" data-href="{{ url('/marketplace/services') }}">
                         <i class="icon-social d-block"></i>
                         <h3 class="m-auto">Market</h3>
@@ -97,10 +124,10 @@
                 </div>
             </div>
 
-            <!-- User Data -->
-            <div class="user-reference col-lg-5 col-md-7 mt-3 mt-md-0">
-                <div class="text-light flex-row d-flex align-items-center justify-content-between justify-content-md-end text-center">
-                    <ul class="d-flex align-items-center mb-0 mr-3 pl-0">
+            <!-- User Data & Financial Widgets -->
+            <div class="user-reference col-lg-8 col-md-8 col-12 mt-2 mt-md-0">
+                <div class="text-light flex-row d-flex align-items-center justify-content-end text-center">
+                    <ul class="d-flex align-items-center mb-0 mr-4 pl-0">
                         <li class="hover active list-inline-item d-flex align-items-center justify-content-center"
                             data-href="{{ url('/referrals') }}">
                             <i class="icon-users"></i>
@@ -114,6 +141,35 @@
                             <i class="icon-bell"></i>
                         </li>
                     </ul>
+
+                    <!-- Financial Widgets & Pay Due Button -->
+                    <div class="d-flex align-items-center mr-4 header-financial-widgets">
+                        <div class="financial-pill wallet-pill mr-3 d-flex align-items-center px-3 py-1" title="Wallet Balance">
+                            <i class="icon-credit-card text-cyan mr-2" style="font-size: 16px;"></i>
+                            <div class="text-left">
+                                <span class="d-block pill-label">Wallet</span>
+                                <strong class="pill-value text-cyan">{{ $userBalanceFormatted }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="financial-pill points-pill mr-3 d-flex align-items-center px-3 py-1" title="Reward Points">
+                            <i class="icon-star text-amber mr-2" style="font-size: 16px;"></i>
+                            <div class="text-left">
+                                <span class="d-block pill-label">Points</span>
+                                <strong class="pill-value text-amber">{{ number_format($userPoints) }} Pts</strong>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-pay-due btn-sm d-flex align-items-center px-3 py-2" data-toggle="modal" data-target="#payDueModal">
+                            <i class="icon-basket mr-1" style="font-size: 14px;"></i>
+                            <span>دفع الفلوس</span>
+                            @if($totalDueAmount > 0)
+                                <span class="badge badge-danger ml-2 px-2 py-1 pulse-badge">{{ $totalDueFormatted }}</span>
+                            @else
+                                <span class="badge badge-success ml-2 px-2 py-1" style="font-size: 10px;">0 مستحقات</span>
+                            @endif
+                        </button>
+                    </div>
 
                     <div class="user-data d-flex align-items-center px-2 py-1 dropdown-toggle dropdown pointer"
                          id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -132,6 +188,7 @@
                             <a class="dropdown-item" href="{{ url('/billing/invoices') }}">Billing</a>
                             <a class="dropdown-item" href="{{ url('/financial/transactions') }}">Wallet</a>
                             <a class="dropdown-item" href="{{ url('/settings/backup') }}">Settings</a>
+                            <a class="dropdown-item" href="#" id="resetWelcomeIntroBtn">Reset Welcome Intro</a>
                             <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">
                                 @csrf
                             </form>
@@ -477,7 +534,96 @@
     </g>
 </svg>
 
+<!-- Fancy Sci-Fi Glass Payment Modal -->
+<div class="modal fade modal-scifi-glass" id="payDueModal" tabindex="-1" role="dialog" aria-labelledby="payDueModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content" style="background: rgba(14, 9, 32, 0.96); backdrop-filter: blur(25px); border: 1.5px solid #00f0ff; border-radius: 20px;">
+            <div class="modal-header d-flex align-items-center justify-content-between p-3" style="border-bottom: 1px solid rgba(0, 240, 255, 0.2);">
+                <h4 class="modal-title font-weight-bold text-cyan" id="payDueModalLabel">
+                    <i class="icon-basket mr-2"></i>دفع الفلوس والمستحقات المترتبة
+                </h4>
+                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="font-size: 28px; color: #00f0ff;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4 text-left">
+                <!-- Summary Header Card -->
+                <div class="p-3 mb-4 rounded d-flex align-items-center justify-content-between" style="background: rgba(244, 63, 94, 0.12); border: 1px solid #f43f5e; border-radius: 14px;">
+                    <div>
+                        <span class="text-uppercase text-muted d-block" style="font-size: 11px;">إجمالي المبالغ المستحقة</span>
+                        <h2 class="m-0 font-weight-bold" style="color: #f43f5e;">{{ $totalDueFormatted }}</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-uppercase text-muted d-block" style="font-size: 11px;">الرصيد المتاح بالمحفظة</span>
+                        <h4 class="m-0 font-weight-bold text-cyan">{{ $userBalanceFormatted }}</h4>
+                    </div>
+                </div>
+
+                @if($userBalanceVal >= $totalDueAmount && $totalDueAmount > 0)
+                    <div class="alert alert-success d-flex align-items-center mb-4" style="background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #10b981; border-radius: 12px;">
+                        <i class="icon-check mr-2" style="font-size: 20px;"></i>
+                        <span>رصيد المحفظة يغطي المستحقات بالكامل. يمكنك الدفع مباشرة من الرصيد.</span>
+                    </div>
+                @elseif($totalDueAmount > 0)
+                    <div class="alert alert-warning d-flex align-items-center mb-4" style="background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #f59e0b; border-radius: 12px;">
+                        <i class="icon-attention mr-2" style="font-size: 20px;"></i>
+                        <span>رصيد المحفظة الحالي غير كافٍ لتغطية كل المستحقات. يرجى شحن الرصيد أو الدفع عبر بوابة الدفع الإلكتروني.</span>
+                    </div>
+                @endif
+
+                <!-- Unpaid Invoices Table -->
+                <h5 class="font-weight-bold text-light mb-3">فواتير المستحقات المترتبة:</h5>
+                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                    <table class="table table-hover table-dark mb-0" style="background: transparent;">
+                        <thead>
+                            <tr class="text-cyan">
+                                <th>رقم الفاتورة</th>
+                                <th>البيان</th>
+                                <th>الحالة</th>
+                                <th>المبلغ المستحق</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($unpaidInvoices as $invoice)
+                                <tr>
+                                    <td>#{{ $invoice->id }}</td>
+                                    <td>{{ $invoice->title ?? $invoice->description ?? 'فاتورة خدمات' }}</td>
+                                    <td><span class="badge badge-warning">غير مدفوعة</span></td>
+                                    <td class="font-weight-bold text-danger">{{ number_format($invoice->unpaid, 2) }} {{ $currencySymbol }}</td>
+                                    <td>
+                                        <a href="{{ url('/billing/invoices/' . $invoice->id) }}" class="btn btn-outline-info btn-sm" style="border-radius: 8px;">دفع الفاتورة</a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="icon-check d-block mb-2" style="font-size: 30px; color: #10b981;"></i>
+                                        لا توجد أي فواتير مستحقة الدفع حالياً. حسابك في حالة ممتازة!
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer d-flex align-items-center justify-content-between p-3" style="border-top: 1px solid rgba(0, 240, 255, 0.2);">
+                <a href="{{ url('/financial/transactions') }}" class="btn btn-outline-light btn-sm" style="border-radius: 10px;">
+                    <i class="icon-plus mr-1"></i>شحن المحفظة
+                </a>
+                <div>
+                    <button type="button" class="btn btn-secondary btn-sm mr-2" data-dismiss="modal" style="border-radius: 10px;">إغلاق</button>
+                    <a href="{{ url('/billing/invoices') }}" class="btn btn-primary btn-sm px-4" style="border-radius: 10px; background: linear-gradient(135deg, #00f0ff, #d946ef); border: none; font-weight: bold;">
+                        الانتقال لصفحة الفواتير
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- JS files -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="{{ asset('v8main/js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ asset('v8main/js/popper.min.js') }}"></script>
 <script src="{{ asset('v8main/js/bootstrap.min.js') }}"></script>
@@ -492,6 +638,176 @@
     $('*[data-href]').click(function () {
         location.assign($(this).data('href'));
     });
+
+    /* ==========================================================================
+       100% AUTOMATIC FLUID VIEWPORT SCALER FOR LARGE & ULTRA-WIDE SCREENS
+       ========================================================================== */
+    (function () {
+        function applySmartViewportScaling() {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            if (w <= 768) {
+                document.body.style.zoom = '0.70';
+                return;
+            }
+
+            if (w <= 1365) {
+                document.body.style.zoom = '0.80';
+                return;
+            }
+
+            var scaleX = w / 1366;
+            var scaleY = h / 850;
+            var computedScale = Math.min(scaleX, scaleY) * 0.90;
+
+            var finalZoom = Math.min(1.45, Math.max(0.90, computedScale)).toFixed(3);
+            document.body.style.zoom = finalZoom;
+        }
+
+        var resizeTimer;
+        $(window).on('resize orientationchange load', function () {
+            cancelAnimationFrame(resizeTimer);
+            resizeTimer = requestAnimationFrame(applySmartViewportScaling);
+        });
+    })();
+
+    /* ==========================================================================
+       THREE.JS WEBGL LIVING REACTIVE 3D HOLOGRAM CORE
+       ========================================================================== */
+    (function () {
+        var container = document.getElementById('logo-it');
+        if (!container || typeof THREE === 'undefined') return;
+
+        var canvas = document.createElement('canvas');
+        canvas.id = 'three-hologram-canvas';
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = '5';
+        container.style.position = 'relative';
+        container.appendChild(canvas);
+
+        var width = container.clientWidth || 286;
+        var height = container.clientHeight || 285;
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.z = 210;
+
+        var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        var globeGroup = new THREE.Group();
+        scene.add(globeGroup);
+
+        var sphereGeo = new THREE.SphereGeometry(52, 22, 22);
+        var sphereMat = new THREE.MeshBasicMaterial({
+            color: 0x00f0ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.35
+        });
+        var sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+        globeGroup.add(sphereMesh);
+
+        var ringGeo1 = new THREE.TorusGeometry(70, 1.2, 16, 64);
+        var ringMat1 = new THREE.MeshBasicMaterial({ color: 0xd946ef, transparent: true, opacity: 0.65 });
+        var ringMesh1 = new THREE.Mesh(ringGeo1, ringMat1);
+        ringMesh1.rotation.x = Math.PI / 3;
+        globeGroup.add(ringMesh1);
+
+        var ringGeo2 = new THREE.TorusGeometry(82, 1.0, 16, 48);
+        var ringMat2 = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.5 });
+        var ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
+        ringMesh2.rotation.y = Math.PI / 4;
+        globeGroup.add(ringMesh2);
+
+        var particleCount = 500;
+        var particleGeo = new THREE.BufferGeometry();
+        var positions = new Float32Array(particleCount * 3);
+        var colors = new Float32Array(particleCount * 3);
+
+        var colorCyan = new THREE.Color(0x00f0ff);
+        var colorMagenta = new THREE.Color(0xd946ef);
+
+        for (var i = 0; i < particleCount; i++) {
+            var u = Math.random();
+            var v = Math.random();
+            var theta = u * 2.0 * Math.PI;
+            var phi = Math.acos(2.0 * v - 1.0);
+            var r = 56 + Math.random() * 26;
+
+            positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+            positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+            positions[i * 3 + 2] = r * Math.cos(phi);
+
+            var mixColor = Math.random() > 0.5 ? colorCyan : colorMagenta;
+            colors[i * 3] = mixColor.r;
+            colors[i * 3 + 1] = mixColor.g;
+            colors[i * 3 + 2] = mixColor.b;
+        }
+
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        var particleMat = new THREE.PointsMaterial({
+            size: 2.2,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85
+        });
+        var particleSystem = new THREE.Points(particleGeo, particleMat);
+        globeGroup.add(particleSystem);
+
+        var mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', function (e) {
+            var windowHalfX = window.innerWidth / 2;
+            var windowHalfY = window.innerHeight / 2;
+            mouseX = (e.clientX - windowHalfX) * 0.0008;
+            mouseY = (e.clientY - windowHalfY) * 0.0008;
+        });
+
+        $('.item, .btn-pay-due, header .user-reference ul li').hover(function () {
+            var targetColorHex = 0x00f0ff;
+            if ($(this).hasClass('btn-pay-due')) {
+                targetColorHex = 0xf43f5e;
+            } else if ($(this).parents('.left').length) {
+                targetColorHex = 0x00f0ff;
+            } else if ($(this).parents('.right').length) {
+                targetColorHex = 0xd946ef;
+            } else {
+                targetColorHex = 0x8b5cf6;
+            }
+            sphereMat.color.setHex(targetColorHex);
+            sphereMat.opacity = 0.75;
+            ringMat1.opacity = 0.95;
+            globeGroup.scale.set(1.1, 1.1, 1.1);
+        }, function () {
+            sphereMat.color.setHex(0x00f0ff);
+            sphereMat.opacity = 0.35;
+            ringMat1.opacity = 0.65;
+            globeGroup.scale.set(1.0, 1.0, 1.0);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            globeGroup.rotation.y += 0.008 + mouseX * 0.1;
+            globeGroup.rotation.x += (mouseY - globeGroup.rotation.x) * 0.05;
+
+            ringMesh1.rotation.z += 0.012;
+            ringMesh2.rotation.z -= 0.015;
+            particleSystem.rotation.y -= 0.004;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    })();
 </script>
 
 </body>
