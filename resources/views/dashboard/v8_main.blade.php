@@ -388,7 +388,7 @@
         zoom: 1.45 !important;
         width: 320px !important;
         height: 260px !important;
-        filter: drop-shadow(0 0 65px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 25px rgba(0, 240, 255, 0.4));
+        filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 8px rgba(168, 85, 247, 0.2));
         transition: filter 0.5s ease-out, transform 0.5s ease-out;
     }
 
@@ -1431,10 +1431,10 @@
         coreGroup.add(logo3DGroup);
 
         var chromeMaterial = new THREE.MeshPhongMaterial({
-            color: 0xf8fafc,       // Sleek Titanium Chrome
-            emissive: 0x1e1b4b,    // Deep Cyberpunk Shadow Reflection
-            specular: 0xffffff,    // Pure Glossy Chrome Specular Highlight
-            shininess: 140,
+            color: 0x3a3f4d,       // Polished Dark Gunmetal Metallic Base (Car Emblem Finish)
+            emissive: 0x090814,    // Subtle dark purple shadow reflection
+            specular: 0xffffff,    // Pure Mirror Chrome Specular Highlight
+            shininess: 240,        // Luxury High Gloss Metallic Reflections
             side: THREE.DoubleSide
         });
 
@@ -1526,7 +1526,7 @@
             createFallback3DMULogo();
         }
 
-        var corePointLight = new THREE.PointLight(0xa855f7, 4.5, 300);
+        var corePointLight = new THREE.PointLight(0xa855f7, 1.2, 300);
         coreGroup.add(corePointLight);
 
         // 2. Geodesic Triangular Wireframe Ring Mesh
@@ -1680,8 +1680,8 @@
 
             var elapsedTime = clock.getElapsedTime();
 
-            // Inner Core Pulse
-            var pulse = 3.8 + Math.sin(elapsedTime * 3.5) * 0.8;
+            // Inner Core Toned Down Idle Pulse (Zero Overexposure)
+            var pulse = 1.0 + Math.sin(elapsedTime * 2.0) * 0.25;
             corePointLight.intensity = pulse;
 
             // Rotations
