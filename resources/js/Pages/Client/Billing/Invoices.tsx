@@ -203,16 +203,29 @@ export default function Invoices({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Wallet Balance */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-                        <div className="space-y-1.5">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('erp.wallet_balance')}</span>
-                            <span className="text-3xl font-bold text-slate-900 tracking-tight">
-                                <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
-                            </span>
-                            <p className="text-xs text-slate-400 leading-normal">
-                                {__('erp.your_current_available_balance_which')}
-                            </p>
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('erp.wallet_balance')}</span>
+                                <span className="text-3xl font-bold text-slate-900 tracking-tight block">
+                                    <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
+                                </span>
+                                <p className="text-xs text-slate-400 leading-normal">
+                                    {__('erp.your_current_available_balance_which')}
+                                </p>
+                            </div>
+                            <Link
+                                href={route('add-balance')}
+                                className={buttonVariants({
+                                    variant: 'default',
+                                    size: 'sm',
+                                    className: 'bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3.5 shadow-sm h-8 inline-flex items-center gap-1.5 rounded-xl transition'
+                                })}
+                            >
+                                <Wallet className="h-3.5 w-3.5" />
+                                {__('general.charge_balance')}
+                            </Link>
                         </div>
-                        <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 ms-4">
                             <Wallet className="w-6 h-6" />
                         </div>
                     </div>

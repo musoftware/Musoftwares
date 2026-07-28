@@ -1,10 +1,10 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useRef } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { motion } from 'framer-motion';
-import { Calendar, User, ArrowRight, BookOpen, Globe } from 'lucide-react';
+import { Calendar, User, ArrowRight, BookOpen, Globe, Search, X } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 interface BlogArticle {
@@ -40,9 +40,31 @@ interface PaginatedData {
 
 interface IndexProps {
     articles: PaginatedData;
+    filters: {
+        search: string;
+    };
 }
 
-export default function Index({ articles }: IndexProps) {
+export default function Index({ articles, filters }: IndexProps) {
+    const [search, setSearch] = React.useState(filters?.search || '');
+    const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+    const handleSearch = (value: string) => {
+        setSearch(value);
+
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+
+        debounceTimeout.current = setTimeout(() => {
+            router.get('/blog', { search: value }, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true
+            });
+        }, 300);
+    };
+
     return (
         <PublicLayout>
             <Head>
@@ -58,7 +80,7 @@ export default function Index({ articles }: IndexProps) {
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     
                     {/* Hero Section */}
-                    <div className="text-center max-w-7xl mx-auto mb-16 lg:mb-24">
+                    <div className="text-center max-w-7xl mx-auto mb-12">
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -85,6 +107,36 @@ export default function Index({ articles }: IndexProps) {
                         >
                             {__('general.discover_the_latest_ideas_and_best_pract')}</motion.p>
                     </div>
+
+                    {/* Search Bar */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                        className="max-w-md mx-auto mb-16 relative"
+                    >
+                        <div className="relative flex items-center">
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                placeholder={__('general.search_articles') || "Search articles..."}
+                                className="w-full px-5 py-3.5 ps-12 rounded-2xl bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all duration-300 text-slate-800 shadow-sm text-sm placeholder:text-slate-400 outline-none"
+                            />
+                            <div className="absolute start-4 text-slate-400">
+                                <Search className="h-5 w-5" />
+                            </div>
+                            {search && (
+                                <button
+                                    onClick={() => handleSearch('')}
+                                    className="absolute end-4 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-all"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            )}
+                        </div>
+                    </motion.div>
+
 
                     {/* Articles Grid */}
                     {articles.data.length > 0 ? (

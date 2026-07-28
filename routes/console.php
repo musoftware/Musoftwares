@@ -36,6 +36,10 @@ Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::clas
 // Background translation of untranslated marketplace services hourly
 Schedule::command(\App\Console\Commands\TranslateMarketplaceServices::class)->hourly()->withoutOverlapping(10);
 
+// Automatically generate AI blog articles daily at 02:00
+Schedule::command(\App\Console\Commands\GenerateBlogArticles::class, ['--limit' => 5])->dailyAt('02:00')->withoutOverlapping(10);
+
 // Poll IMAP every two minutes for guest ticket replies
 Schedule::command('imap:pull')->everyTwoMinutes()->withoutOverlapping(5);
+
 

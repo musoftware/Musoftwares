@@ -4,10 +4,21 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { ArrowLeft, Calendar, User, Clock, Globe, Share2, Bookmark } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, User, Clock, Globe, Share2, Bookmark } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
+
+interface ServicePackage {
+    id: number;
+    name: string;
+    price: number;
+    currency?: {
+        symbol: string;
+        currency: string;
+    };
+}
 
 interface BlogArticle {
     id: number;
@@ -18,11 +29,19 @@ interface BlogArticle {
     featured_image?: string;
     language?: string;
     created_at: string;
+    service_id?: number;
     service?: {
+        id: number;
+        title: string;
+        slug: string;
         cover_image?: string;
+        thumbnail?: string;
+        url?: string;
+        is_free?: boolean;
         seller?: {
             name: string;
         };
+        packages?: ServicePackage[];
     };
 }
 
@@ -187,9 +206,74 @@ export default function Show({ article }: ShowProps) {
                                 dangerouslySetInnerHTML={{ __html: cleanHtml }}
                             />
                         </div>
+
+                        {/* Related Service Section */}
+                        {article.service && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                                className="bg-gradient-to-br from-indigo-950 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-indigo-500/25 mb-12 overflow-hidden relative"
+                            >
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
+                                
+                                <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 sm:gap-8">
+                                    {/* Service Image */}
+                                    <div className="w-full md:w-1/3 aspect-[16/10] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-md shrink-0">
+                                        <img 
+                                            src={article.service.cover_image} 
+                                            alt={article.service.title}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+
+                                    {/* Service Info */}
+                                    <div className="flex-grow text-center md:text-start space-y-3">
+                                        <Badge className="bg-indigo-500/20 text-indigo-300 border-none shadow-sm uppercase font-bold tracking-widest text-xs px-2.5 py-1">
+                                            {__('general.related_service') || 'Related Service'}
+                                        </Badge>
+                                        <h3 className="text-xl sm:text-2xl font-extrabold text-white leading-snug tracking-tight">
+                                            {article.service.title}
+                                        </h3>
+                                        <p className="text-slate-300 text-sm font-light max-w-xl leading-relaxed">
+                                            {article.service.seller?.name ? `${__('general.by')} ${article.service.seller.name}` : ''}
+                                        </p>
+                                    </div>
+
+                                    {/* Price & CTA */}
+                                    <div className="w-full md:w-auto shrink-0 flex flex-col items-center md:items-end gap-3.5 pt-4 md:pt-0 md:ps-6 border-t md:border-t-0 md:border-s border-white/10">
+                                        <div className="text-center md:text-end">
+                                            <span className="block text-xs uppercase tracking-widest text-slate-400 font-medium mb-1">
+                                                {__('general.starting_from') || 'Starting Price'}
+                                            </span>
+                                            <span className="text-2xl sm:text-3xl font-black text-indigo-300">
+                                                {(() => {
+                                                    const pkgs = article.service.packages;
+                                                    if (article.service.is_free) return __('general.free') || 'Free';
+                                                    if (!pkgs || pkgs.length === 0) return '$5';
+                                                    const cheapest = pkgs.reduce((min, p) => Number(p.price) < Number(min.price) ? p : min, pkgs[0]);
+                                                    return formatCurrency(cheapest.price, cheapest.currency || 'USD');
+                                                })()}
+                                            </span>
+                                        </div>
+                                        <a 
+                                            href={article.service.url || `/marketplace/services/${article.service.id}-${article.service.slug}`}
+                                            className="w-full md:w-auto"
+                                        >
+                                            <Button className="w-full md:w-auto px-6 py-5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group border-none">
+                                                <span>{__('general.order_now') || 'Order Now'}</span>
+                                                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                            </Button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
                     </motion.article>
                 </div>
             </div>
         </PublicLayout>
     );
 }
+

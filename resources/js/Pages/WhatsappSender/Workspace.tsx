@@ -135,6 +135,8 @@ export default function Workspace({
     const [selectedSubscriberGroup, setSelectedSubscriberGroup] = useState<any | null>(null);
 
     const [showEditModal, setShowEditModal] = useState(false);
+    const [editingWabaAccountId, setEditingWabaAccountId] = useState<number | null>(null);
+    const [tempWabaId, setTempWabaId] = useState('');
 
     const editForm = useForm({
         name: business.name,
@@ -775,7 +777,65 @@ export default function Workspace({
                                                         {acc.status}
                                                     </span>
                                                 </div>
-                                                <div className="text-xs text-zinc-500 mt-1">Phone ID: {acc.phone_number_id} | WABA ID: {acc.waba_id}</div>
+                                                <div className="text-xs text-zinc-500 mt-1 flex items-center gap-2 flex-wrap">
+                                                    <span>Phone ID: <strong className="font-mono">{acc.phone_number_id}</strong></span>
+                                                    <span className="text-zinc-300 dark:text-zinc-800">|</span>
+                                                    <span>WABA ID:</span>
+                                                    {acc.waba_id ? (
+                                                        <strong className="font-mono text-zinc-700 dark:text-zinc-300">{acc.waba_id}</strong>
+                                                    ) : (
+                                                        editingWabaAccountId === acc.id ? (
+                                                            <form
+                                                                onSubmit={(e) => {
+                                                                    e.preventDefault();
+                                                                    if (!tempWabaId.trim()) return;
+                                                                    router.put(`/whatsapp-sender/accounts/${acc.id}/waba`, {
+                                                                        waba_id: tempWabaId.trim()
+                                                                    }, {
+                                                                        onSuccess: () => setEditingWabaAccountId(null)
+                                                                    });
+                                                                }}
+                                                                className="inline-flex items-center gap-2"
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    placeholder="WABA ID"
+                                                                    value={tempWabaId}
+                                                                    onChange={e => setTempWabaId(e.target.value)}
+                                                                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 w-36 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                                                    autoFocus
+                                                                />
+                                                                <button
+                                                                    type="submit"
+                                                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xxs font-bold px-2 py-0.5 rounded-md transition"
+                                                                >
+                                                                    Save
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setEditingWabaAccountId(null)}
+                                                                    className="text-zinc-400 hover:text-zinc-600 text-xxs"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            </form>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-2">
+                                                                <span className="text-amber-600 dark:text-amber-400 font-medium text-xxs bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded-sm">Missing</span>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEditingWabaAccountId(acc.id);
+                                                                        setTempWabaId('');
+                                                                    }}
+                                                                    className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold"
+                                                                >
+                                                                    Set WABA ID
+                                                                </button>
+                                                            </span>
+                                                        )
+                                                    )}
+                                                </div>
                                             </div>
                                             <button
                                                 onClick={() => {

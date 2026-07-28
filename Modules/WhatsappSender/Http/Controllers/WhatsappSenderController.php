@@ -302,6 +302,26 @@ class WhatsappSenderController extends Controller
     }
 
     /**
+     * Update/Set WABA ID for a WhatsApp account.
+     */
+    public function updateWabaId(Request $request, int $id): RedirectResponse
+    {
+        $validated = $request->validate([
+            'waba_id' => ['required', 'string', 'max:255'],
+        ]);
+
+        $account = WhatsappAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $account->update([
+            'waba_id' => trim($validated['waba_id']),
+        ]);
+
+        return redirect()->back()->with('success', 'WABA ID updated successfully.');
+    }
+
+    /**
      * Register/activate a phone number via Meta API with a 6-digit PIN.
      */
     public function registerAccount(Request $request, int $id): RedirectResponse

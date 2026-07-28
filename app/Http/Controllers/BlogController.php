@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogArticle;
+use App\Models\CurrenciesExchange;
+use App\Helpers\FinanceHelper;
 use Inertia\Inertia;
 
 class BlogController extends Controller
@@ -12,13 +14,26 @@ class BlogController extends Controller
      */
     public function index()
     {
+        $search = request('search');
+
         $articles = BlogArticle::with('service.seller')
             ->published()
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('excerpt', 'like', "%{$search}%")
+                      ->orWhere('content', 'like', "%{$search}%");
+                });
+            })
             ->orderBy('published_at', 'desc')
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
         return Inertia::render('Public/Blog/Index', [
             'articles' => $articles,
+            'filters' => [
+                'search' => $search ?? '',
+            ],
         ])->withViewData([
             'meta' => [
                 'title' => 'Blog | Musoftware',
@@ -33,10 +48,27 @@ class BlogController extends Controller
      */
     public function show(string $slug)
     {
-        $article = BlogArticle::with('service.seller')
+        $article = BlogArticle::with(['service.seller', 'service.packages.currency'])
             ->published()
             ->where('slug', $slug)
             ->firstOrFail();
+
+        if ($article->service) {
+            $viewerCurrency = FinanceHelper::instance()->getViewerCurrency(request());
+            $article->service->packages->transform(function ($package) use ($viewerCurrency) {
+                if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
+                    $package->price = CurrenciesExchange::RateToday(
+                        $package->price,
+                        $package->currency_id,
+                        $viewerCurrency->id
+                    );
+                    $package->currency_id = $viewerCurrency->id;
+                    $package->setRelation('currency', $viewerCurrency);
+                }
+
+                return $package;
+            });
+        }
 
         return Inertia::render('Public/Blog/Show', [
             'article' => $article,
@@ -52,3 +84,4 @@ class BlogController extends Controller
         ]);
     }
 }
+
