@@ -140,8 +140,12 @@ class WhatsappSenderController extends Controller
         );
 
         $metadata = [];
+        $status = 'active';
         if ($verification['valid']) {
             $metadata = $verification['data'];
+            if (isset($metadata['status']) && $metadata['status'] !== 'CONNECTED') {
+                $status = 'unregistered';
+            }
         }
 
         WhatsappAccount::updateOrCreate(
@@ -154,12 +158,12 @@ class WhatsappSenderController extends Controller
                 'name' => $validated['name'],
                 'waba_id' => $validated['waba_id'] ?? null,
                 'access_token' => $validated['access_token'],
-                'status' => 'active',
+                'status' => $status,
                 'metadata' => $metadata,
             ]
         );
 
-        return redirect()->route('whatsapp.index')->with('success', __('whatsapp-sender::messages.account_saved_successfully'));
+        return redirect()->route('whatsapp.index')->with('success', __('whatsapp-sender::messages.account_saved_successfully') ?? 'Account credentials saved successfully.');
     }
 
     /**
@@ -214,6 +218,61 @@ class WhatsappSenderController extends Controller
 
         $account->delete();
 
-        return redirect()->route('whatsapp.index')->with('success', __('whatsapp-sender::messages.account_deleted_successfully'));
+        return redirect()->route('whatsapp.index')->with('success', __('whatsapp-sender::messages.account_deleted_successfully') ?? 'Account disconnected successfully.');
+    }
+
+    /**
+     * Register/activate a phone number via Meta API with a 6-digit PIN.
+     */
+    public function registerAccount(Request $request, int $id): RedirectResponse
+    {
+        $validated = $request->validate([
+            'pin' => ['required', 'string', 'size:6', 'regex:/^[0-9]+$/'],
+        ]);
+
+        $account = WhatsappAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $result = $this->whatsappService->registerPhoneNumber($account, $validated['pin']);
+
+        if ($result['success']) {
+            return redirect()->route('whatsapp.index')->with('success', $result['message'] ?? 'Phone number registered and activated on Meta Cloud API successfully!');
+        }
+
+        return redirect()->route('whatsapp.index')->with('error', $result['error'] ?? 'Failed to register phone number.');
+    }
+
+    /**
+     * Sync WhatsApp account status and metadata from Meta Graph API.
+     */
+    public function syncAccountStatus(Request $request, int $id): RedirectResponse
+    {
+        $account = WhatsappAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $verification = $this->whatsappService->verifyAccountCredentials(
+            $account->phone_number_id,
+            $account->access_token
+        );
+
+        if ($verification['valid']) {
+            $metadata = $verification['data'];
+            $status = 'active';
+            if (isset($metadata['status']) && $metadata['status'] !== 'CONNECTED') {
+                $status = 'unregistered';
+            }
+
+            $account->update([
+                'status' => $status,
+                'metadata' => $metadata,
+            ]);
+
+            $statusText = isset($metadata['status']) ? $metadata['status'] : 'active';
+            return redirect()->route('whatsapp.index')->with('success', "Account status synced successfully! Current Meta status: {$statusText}.");
+        }
+
+        return redirect()->route('whatsapp.index')->with('error', $verification['error'] ?? 'Failed to sync account status from Meta.');
     }
 }

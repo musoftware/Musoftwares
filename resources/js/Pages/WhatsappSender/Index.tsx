@@ -62,6 +62,10 @@ interface WhatsappAccount {
     waba_id: string | null;
     status: string;
     facebook_user_id: string | null;
+    metadata?: {
+        status?: string;
+        [key: string]: any;
+    } | null;
     created_at: string;
 }
 
@@ -177,6 +181,12 @@ export default function Index({
     // Recharge Wallet Form state
     const rechargeForm = useForm({
         amount: '10.00',
+    });
+
+    // Account registration state
+    const [registerAccount, setRegisterAccount] = useState<WhatsappAccount | null>(null);
+    const registerForm = useForm({
+        pin: '',
     });
 
     useEffect(() => {
@@ -320,6 +330,47 @@ export default function Index({
                 },
             });
         }
+    };
+
+    const handleSyncAccount = (id: number) => {
+        router.post(route('whatsapp.accounts.sync', id), {}, {
+            onSuccess: () => {
+                toast({
+                    title: 'Account Synced',
+                    description: 'WhatsApp account status synced from Meta.',
+                });
+            },
+            onError: (errors) => {
+                toast({
+                    title: 'Sync Failed',
+                    description: Object.values(errors)[0] as string || 'Failed to sync account status.',
+                    variant: 'destructive',
+                });
+            },
+        });
+    };
+
+    const handleRegisterSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!registerAccount) return;
+
+        registerForm.post(route('whatsapp.accounts.register', registerAccount.id), {
+            onSuccess: () => {
+                setRegisterAccount(null);
+                registerForm.reset();
+                toast({
+                    title: 'Registration Successful',
+                    description: 'WhatsApp number registered and activated successfully.',
+                });
+            },
+            onError: (errors) => {
+                toast({
+                    title: 'Registration Failed',
+                    description: Object.values(errors)[0] as string || 'Failed to register phone number.',
+                    variant: 'destructive',
+                });
+            },
+        });
     };
 
     const copyApiToken = () => {
@@ -513,19 +564,72 @@ export default function Index({
                                     </div>
                                 ) : (
                                     activeAccounts.map((acc) => (
-                                        <div key={acc.id} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-1 text-xs">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-semibold text-slate-900">{acc.name}</span>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleDeleteAccount(acc.id)}
-                                                    className="h-6 w-6 p-0 text-rose-500 hover:text-rose-700"
-                                                >
-                                                    <Trash2 className="w-3 h-3" />
-                                                </Button>
+                                        <div key={acc.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-semibold text-slate-900 truncate" title={acc.name}>{acc.name}</span>
+                                                <div className="flex items-center gap-1 shrink-0">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        title="Sync status from Meta"
+                                                        onClick={() => handleSyncAccount(acc.id)}
+                                                        className="h-6 w-6 p-0 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded"
+                                                    >
+                                                        <Activity className="w-3.5 h-3.5" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        title="Disconnect Account"
+                                                        onClick={() => handleDeleteAccount(acc.id)}
+                                                        className="h-6 w-6 p-0 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </Button>
+                                                </div>
                                             </div>
-                                            <p className="text-[11px] text-slate-500 font-mono">ID: {acc.phone_number_id}</p>
+                                            <div className="space-y-0.5">
+                                                <p className="text-[10px] text-slate-500 font-mono">Phone ID: {acc.phone_number_id}</p>
+                                                {acc.waba_id && <p className="text-[10px] text-slate-500 font-mono">WABA ID: {acc.waba_id}</p>}
+                                            </div>
+                                            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-200/60">
+                                                <div className="flex items-center gap-1">
+                                                    {acc.status === 'unregistered' ? (
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200" title="This number needs to be registered with a 6-digit PIN on Meta API">
+                                                            <AlertCircle className="w-2.5 h-2.5 shrink-0" /> Needs Activation
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                            <CheckCircle2 className="w-2.5 h-2.5 shrink-0" /> Connected
+                                                        </span>
+                                                    )}
+                                                    {acc.metadata?.status && acc.metadata.status !== 'CONNECTED' && (
+                                                        <span className="text-[10px] text-rose-600 font-semibold font-mono truncate max-w-[80px]" title={`Meta Status: ${acc.metadata.status}`}>
+                                                            ({acc.metadata.status})
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center gap-1">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => handleSyncAccount(acc.id)}
+                                                        className="h-6 text-[10px] px-2 rounded font-medium border-slate-300 text-slate-700 hover:bg-slate-100 shrink-0"
+                                                        title="Sync status and validate credentials from Meta"
+                                                    >
+                                                        Validate
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => setRegisterAccount(acc)}
+                                                        className="h-6 bg-slate-900 hover:bg-slate-800 text-white text-[10px] px-2 rounded font-medium shrink-0"
+                                                        title="Register this phone number on Meta Cloud API using a 6-digit PIN"
+                                                    >
+                                                        Register/Fix
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         </div>
                                     ))
                                 )}
@@ -1125,6 +1229,61 @@ export default function Index({
                     isOpen={showGuideModal}
                     onClose={() => setShowGuideModal(false)}
                 />
+
+                {/* REGISTER PHONE NUMBER MODAL */}
+                <Dialog open={!!registerAccount} onOpenChange={(open) => !open && setRegisterAccount(null)}>
+                    <DialogContent className="sm:max-w-md bg-white text-slate-900 border-slate-200 rounded-2xl">
+                        <DialogHeader>
+                            <DialogTitle className="text-lg font-bold flex items-center gap-2 text-slate-900">
+                                <ShieldCheck className="w-5 h-5 text-amber-600" /> Register Phone Number on Meta
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-500 text-sm">
+                                Registering the phone number <span className="font-bold text-slate-800">{registerAccount?.name}</span> (ID: {registerAccount?.phone_number_id}) to activate it for sending messages on the WhatsApp Cloud API.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="register_pin" className="text-slate-700 font-medium">
+                                    Two-Step Verification PIN (6-digit)
+                                </Label>
+                                <Input
+                                    id="register_pin"
+                                    type="password"
+                                    pattern="[0-9]*"
+                                    inputMode="numeric"
+                                    maxLength={6}
+                                    placeholder="Enter 6-digit PIN"
+                                    value={registerForm.data.pin}
+                                    onChange={(e) => registerForm.setData('pin', e.target.value.replace(/[^0-9]/g, ''))}
+                                    className="bg-white border-slate-300 text-slate-900 font-mono text-center text-lg tracking-widest"
+                                    required
+                                />
+                                <p className="text-xs text-slate-500">
+                                    Enter the 6-digit PIN set up during two-step verification in your Meta WhatsApp Manager.
+                                </p>
+                            </div>
+
+                            <DialogFooter className="pt-2 flex gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setRegisterAccount(null)}
+                                    className="border-slate-300 text-slate-700 hover:bg-slate-100"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={registerForm.processing || registerForm.data.pin.length !== 6}
+                                    className="bg-amber-600 hover:bg-amber-700 text-white font-medium"
+                                >
+                                    {registerForm.processing ? 'Registering...' : 'Register Phone Number'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AuthenticatedLayout>
     );

@@ -136,4 +136,67 @@ class WhatsappSenderTest extends TestCase
                 'count' => 1,
             ]);
     }
+
+    public function test_user_can_register_whatsapp_account_with_pin()
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'graph.facebook.com/*/register' => \Illuminate\Support\Facades\Http::response(['success' => true], 200),
+        ]);
+
+        $user = User::factory()->create();
+        $account = WhatsappAccount::create([
+            'user_id' => $user->id,
+            'name' => 'To Register Account',
+            'phone_number_id' => '123456789',
+            'access_token' => 'EAATestToken',
+            'status' => 'unregistered',
+        ]);
+
+        $response = $this->actingAs($user)->post("/whatsapp-sender/accounts/{$account->id}/register", [
+            'pin' => '123456',
+        ]);
+
+        $response->assertRedirect('/whatsapp-sender');
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('whatsapp_accounts', [
+            'id' => $account->id,
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_user_can_sync_whatsapp_account_status()
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'graph.facebook.com/*' => \Illuminate\Support\Facades\Http::response([
+                'id' => '123456789',
+                'verified_name' => 'Test Phone',
+                'display_phone_number' => '+123456789',
+                'quality_rating' => 'GREEN',
+                'status' => 'CONNECTED',
+            ], 200),
+        ]);
+
+        $user = User::factory()->create();
+        $account = WhatsappAccount::create([
+            'user_id' => $user->id,
+            'name' => 'To Sync Account',
+            'phone_number_id' => '123456789',
+            'access_token' => 'EAATestToken',
+            'status' => 'unregistered',
+        ]);
+
+        $response = $this->actingAs($user)->post("/whatsapp-sender/accounts/{$account->id}/sync");
+
+        $response->assertRedirect('/whatsapp-sender');
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('whatsapp_accounts', [
+            'id' => $account->id,
+            'status' => 'active',
+        ]);
+
+        $updatedAccount = WhatsappAccount::find($account->id);
+        $this->assertEquals('CONNECTED', $updatedAccount->metadata['status']);
+    }
 }

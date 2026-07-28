@@ -121,6 +121,11 @@ class MetaWhatsappService
             }
 
             $errorMessage = $responseData['error']['message'] ?? $response->body();
+            $errorCode = $responseData['error']['code'] ?? null;
+
+            if ($errorCode === 133010) {
+                $account->update(['status' => 'unregistered']);
+            }
 
             $log = WhatsappLog::create([
                 'user_id' => $account->user_id,
@@ -176,7 +181,7 @@ class MetaWhatsappService
             $response = Http::withToken($accessToken)
                 ->acceptJson()
                 ->get($url, [
-                    'fields' => 'id,verified_name,display_phone_number,quality_rating',
+                    'fields' => 'id,verified_name,display_phone_number,quality_rating,status',
                 ]);
 
             if ($response->successful()) {
@@ -193,6 +198,55 @@ class MetaWhatsappService
         } catch (\Throwable $e) {
             return [
                 'valid' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Register a phone number with Meta Cloud API using a 6-digit PIN.
+     */
+    public function registerPhoneNumber(WhatsappAccount $account, string $pin): array
+    {
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/register";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->post($url, [
+                    'messaging_product' => 'whatsapp',
+                    'pin' => $pin,
+                ]);
+
+            $responseData = $response->json();
+
+            if ($response->successful() && isset($responseData['success']) && $responseData['success'] === true) {
+                // Update status of the account to active
+                $account->update(['status' => 'active']);
+
+                // Also update status in metadata
+                $metadata = $account->metadata ?? [];
+                $metadata['status'] = 'CONNECTED';
+                $account->update(['metadata' => $metadata]);
+
+                return [
+                    'success' => true,
+                    'message' => 'Phone number successfully registered and activated on Meta Cloud API.',
+                    'response' => $responseData,
+                ];
+            }
+
+            $errorMessage = $responseData['error']['message'] ?? 'Failed to register phone number with Meta API.';
+            return [
+                'success' => false,
+                'error' => $errorMessage,
+                'response' => $responseData,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] Register Exception: ' . $e->getMessage());
+
+            return [
+                'success' => false,
                 'error' => $e->getMessage(),
             ];
         }

@@ -13,6 +13,8 @@ Route::middleware(['auth'])
         Route::get('/', [WhatsappSenderController::class, 'index'])->name('index');
         Route::post('/accounts', [WhatsappSenderController::class, 'storeAccount'])->name('accounts.store');
         Route::delete('/accounts/{id}', [WhatsappSenderController::class, 'destroyAccount'])->name('accounts.destroy');
+        Route::post('/accounts/{id}/register', [WhatsappSenderController::class, 'registerAccount'])->name('accounts.register');
+        Route::post('/accounts/{id}/sync', [WhatsappSenderController::class, 'syncAccountStatus'])->name('accounts.sync');
         Route::post('/send', [WhatsappSenderController::class, 'sendMessage'])->name('send');
 
         // Business Client Profiles & Wallet Recharge routes
