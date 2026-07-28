@@ -27,6 +27,8 @@ class WhatsappBusinessController extends Controller
             'client_mobile' => ['nullable', 'string', 'max:255'],
             'client_whatsapp' => ['nullable', 'string', 'max:255'],
             'initial_balance' => ['nullable', 'numeric', 'min:0', 'max:10000'],
+            'facebook_client_id' => ['nullable', 'string', 'max:255'],
+            'facebook_client_secret' => ['nullable', 'string', 'max:255'],
         ];
 
         if ($user->isAdmin()) {
@@ -73,6 +75,8 @@ class WhatsappBusinessController extends Controller
                 'bot_reply_fee' => $user->isAdmin() ? (float) ($validated['bot_reply_fee'] ?? 0.0005) : 0.0005,
                 'status' => 'active',
                 'webhook_verify_token' => 'biz_wt_' . \Illuminate\Support\Str::random(24),
+                'facebook_client_id' => $validated['facebook_client_id'] ?? null,
+                'facebook_client_secret' => $validated['facebook_client_secret'] ?? null,
             ]);
 
             if ($initialBalance > 0) {
@@ -108,6 +112,8 @@ class WhatsappBusinessController extends Controller
             'client_email' => ['nullable', 'email', 'max:255'],
             'client_mobile' => ['nullable', 'string', 'max:255'],
             'client_whatsapp' => ['nullable', 'string', 'max:255'],
+            'facebook_client_id' => ['nullable', 'string', 'max:255'],
+            'facebook_client_secret' => ['nullable', 'string', 'max:255'],
         ];
 
         if ($user->isAdmin()) {
@@ -123,6 +129,8 @@ class WhatsappBusinessController extends Controller
             'client_email' => $validated['client_email'] ?? null,
             'client_mobile' => $validated['client_mobile'] ?? null,
             'client_whatsapp' => $validated['client_whatsapp'] ?? null,
+            'facebook_client_id' => $validated['facebook_client_id'] ?? null,
+            'facebook_client_secret' => $validated['facebook_client_secret'] ?? null,
         ];
 
         if ($user->isAdmin()) {

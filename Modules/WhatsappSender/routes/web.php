@@ -18,6 +18,7 @@ Route::middleware(['auth'])
     ->name('whatsapp.')
     ->group(function () {
         Route::get('/', [WhatsappSenderController::class, 'index'])->name('index');
+        Route::get('/meta-app-guide', [WhatsappSenderController::class, 'showMetaAppGuide'])->name('meta-app-guide');
         Route::get('/businesses/{id}', [WhatsappSenderController::class, 'showBusinessWorkspace'])->name('businesses.workspace');
         Route::post('/accounts', [WhatsappSenderController::class, 'storeAccount'])->name('accounts.store');
         Route::delete('/accounts/{id}', [WhatsappSenderController::class, 'destroyAccount'])->name('accounts.destroy');

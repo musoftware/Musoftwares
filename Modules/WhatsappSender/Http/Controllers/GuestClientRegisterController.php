@@ -41,15 +41,22 @@ class GuestClientRegisterController extends Controller
     public function redirectFacebook(string $uuid): RedirectResponse
     {
         $business = WhatsappBusiness::where('uuid', $uuid)->firstOrFail();
-        $clientId = config('services.facebook.client_id');
-        $clientSecret = config('services.facebook.client_secret');
+        
+        $clientId = $business->facebook_client_id;
+        $clientSecret = $business->facebook_client_secret;
 
         if (empty($clientId) || empty($clientSecret)) {
             return redirect()->route('whatsapp.guest.register', ['uuid' => $uuid])->with(
                 'error',
-                'Facebook configuration is missing. Contact the site administrator.'
+                'Facebook App integration settings are not configured for this business client. Please contact the administrator.'
             );
         }
+
+        config([
+            'services.facebook.client_id' => $clientId,
+            'services.facebook.client_secret' => $clientSecret,
+            'services.facebook.redirect' => route('whatsapp.guest.facebook.callback'),
+        ]);
 
         session(['guest_register_business_uuid' => $uuid]);
 
@@ -81,6 +88,19 @@ class GuestClientRegisterController extends Controller
         if (!$business) {
             return redirect()->route('whatsapp.index')->with('error', 'Business profile not found.');
         }
+
+        $clientId = $business->facebook_client_id;
+        $clientSecret = $business->facebook_client_secret;
+
+        if (empty($clientId) || empty($clientSecret)) {
+            return redirect()->route('whatsapp.index')->with('error', 'Facebook App integration settings are not configured for this business client.');
+        }
+
+        config([
+            'services.facebook.client_id' => $clientId,
+            'services.facebook.client_secret' => $clientSecret,
+            'services.facebook.redirect' => route('whatsapp.guest.facebook.callback'),
+        ]);
 
         try {
             /** @var \Laravel\Socialite\Two\FacebookProvider $driver */

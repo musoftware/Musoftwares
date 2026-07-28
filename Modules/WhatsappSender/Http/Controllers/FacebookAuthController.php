@@ -21,15 +21,31 @@ class FacebookAuthController extends Controller
      */
     public function redirect(Request $request): RedirectResponse
     {
-        $clientId = config('services.facebook.client_id');
-        $clientSecret = config('services.facebook.client_secret');
+        $businessId = $request->query('business_id');
+        if ($businessId) {
+            session(['facebook_oauth_business_id' => $businessId]);
+        }
+
+        $business = null;
+        if ($businessId) {
+            $business = \Modules\WhatsappSender\Models\WhatsappBusiness::find($businessId);
+        }
+
+        $clientId = $business?->facebook_client_id;
+        $clientSecret = $business?->facebook_client_secret;
 
         if (empty($clientId) || empty($clientSecret)) {
             return redirect()->route('whatsapp.index')->with(
                 'error',
-                'Facebook App ID or App Secret is not configured in .env (FACEBOOK_CLIENT_ID / FACEBOOK_CLIENT_SECRET).'
+                'يرجى إعداد معرف تطبيق فيسبوك (Facebook App ID) والمفتاح السري (App Secret) أولاً من الإعدادات للتمكن من ربط الحساب.'
             );
         }
+
+        config([
+            'services.facebook.client_id' => $clientId,
+            'services.facebook.client_secret' => $clientSecret,
+            'services.facebook.redirect' => route('whatsapp.auth.facebook.callback'),
+        ]);
 
         try {
             /** @var \Laravel\Socialite\Two\FacebookProvider $driver */
@@ -48,6 +64,28 @@ class FacebookAuthController extends Controller
      */
     public function callback(Request $request): RedirectResponse
     {
+        $businessId = session('facebook_oauth_business_id');
+        $business = null;
+        if ($businessId) {
+            $business = \Modules\WhatsappSender\Models\WhatsappBusiness::find($businessId);
+        }
+
+        $clientId = $business?->facebook_client_id;
+        $clientSecret = $business?->facebook_client_secret;
+
+        if (empty($clientId) || empty($clientSecret)) {
+            return redirect()->route('whatsapp.index')->with(
+                'error',
+                'بيانات تطبيق فيسبوك غير متوفرة أو غير مكتملة لهذا البيزنس.'
+            );
+        }
+
+        config([
+            'services.facebook.client_id' => $clientId,
+            'services.facebook.client_secret' => $clientSecret,
+            'services.facebook.redirect' => route('whatsapp.auth.facebook.callback'),
+        ]);
+
         try {
             /** @var \Laravel\Socialite\Two\FacebookProvider $driver */
             $driver = Socialite::driver('facebook');
@@ -82,6 +120,7 @@ class FacebookAuthController extends Controller
                         'phone_number_id' => $acc['phone_number_id'],
                     ],
                     [
+                        'whatsapp_business_id' => $businessId,
                         'name' => $acc['verified_name'] ?? $acc['waba_name'] ?? $name,
                         'waba_id' => $acc['waba_id'],
                         'access_token' => $token,

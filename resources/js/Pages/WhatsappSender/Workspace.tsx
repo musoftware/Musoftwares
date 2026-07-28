@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import FlowBuilder from './FlowBuilder';
 
@@ -15,6 +15,8 @@ interface Business {
     currency: string;
     per_message_fee: string;
     bot_reply_fee: string;
+    facebook_client_id?: string | null;
+    facebook_client_secret?: string | null;
 }
 
 interface Account {
@@ -102,6 +104,7 @@ interface Props {
     telegramSubscribers: any[];
     telegramSubscriberGroups: any[];
     flows: any[];
+    isAdmin: boolean;
 }
 
 export default function Workspace({
@@ -120,7 +123,8 @@ export default function Workspace({
     fbOauthToken,
     telegramSubscribers,
     telegramSubscriberGroups,
-    flows
+    flows,
+    isAdmin
 }: Props) {
     const [activeChannel, setActiveChannel] = useState<'whatsapp' | 'telegram'>('whatsapp');
     const [activeTab, setActiveTab] = useState<'send' | 'connectors' | 'templates' | 'groups' | 'schedules' | 'logs' | 'flows' | 'bots' | 'subscribers'>('connectors');
@@ -129,6 +133,43 @@ export default function Workspace({
     const [editingFlow, setEditingFlow] = useState<any | null>(null);
     const [isCreatingFlow, setIsCreatingFlow] = useState(false);
     const [selectedSubscriberGroup, setSelectedSubscriberGroup] = useState<any | null>(null);
+
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    const editForm = useForm({
+        name: business.name,
+        client_name: business.client_name || '',
+        client_email: business.client_email || '',
+        client_mobile: business.client_mobile || '',
+        client_whatsapp: business.client_whatsapp || '',
+        per_message_fee: business.per_message_fee,
+        bot_reply_fee: business.bot_reply_fee || '0.0005',
+        facebook_client_id: business.facebook_client_id || '',
+        facebook_client_secret: business.facebook_client_secret || '',
+    });
+
+    const handleEditBusiness = (e: React.FormEvent) => {
+        e.preventDefault();
+        editForm.put(`/whatsapp-sender/businesses/${business.id}`, {
+            onSuccess: () => {
+                setShowEditModal(false);
+            }
+        });
+    };
+
+    useEffect(() => {
+        editForm.setData({
+            name: business.name,
+            client_name: business.client_name || '',
+            client_email: business.client_email || '',
+            client_mobile: business.client_mobile || '',
+            client_whatsapp: business.client_whatsapp || '',
+            per_message_fee: business.per_message_fee,
+            bot_reply_fee: business.bot_reply_fee || '0.0005',
+            facebook_client_id: business.facebook_client_id || '',
+            facebook_client_secret: business.facebook_client_secret || '',
+        });
+    }, [business]);
 
     const tgGroupForm = useForm({
         telegram_bot_id: bots[0]?.id || '',
@@ -348,6 +389,16 @@ export default function Workspace({
                                 <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs px-2.5 py-1 rounded-full font-medium border border-emerald-200/50 dark:border-emerald-900/30">
                                     Active Workspace
                                 </span>
+                                <button
+                                    onClick={() => setShowEditModal(true)}
+                                    className="p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition duration-200 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center justify-center shrink-0"
+                                    title="Edit Business Settings"
+                                >
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                                        <circle cx="12" cy="12" r="3" />
+                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                                    </svg>
+                                </button>
                             </div>
                             <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-sm">
                                 Client: <span className="font-semibold text-zinc-700 dark:text-zinc-300">{business.client_name || 'N/A'}</span>
@@ -679,13 +730,38 @@ export default function Workspace({
                                         <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">WhatsApp Accounts</h3>
                                         <p className="text-xs text-zinc-500 mt-1">Direct API integration endpoints powered by Facebook WABA.</p>
                                     </div>
-                                    <a
-                                        href={facebookLoginUrl}
-                                        className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
-                                    >
-                                        Log in with Facebook
-                                    </a>
+                                    {(business.facebook_client_id && business.facebook_client_secret) && (
+                                        <a
+                                            href={facebookLoginUrl}
+                                            className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
+                                        >
+                                            Log in with Facebook
+                                        </a>
+                                    )}
                                 </div>
+
+                                {(!business.facebook_client_id || !business.facebook_client_secret) && (
+                                    <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div className="space-y-1">
+                                            <p className="text-xs font-bold text-amber-800 dark:text-amber-300">لم يتم إعداد تطبيق فيسبوك (Meta App) لهذا البيزنس</p>
+                                            <p className="text-xxs text-zinc-500 leading-relaxed">يجب إضافة App ID و App Secret للبيزنس من إعدادات الأعمال بالخارج لتفعيل تسجيل الدخول.</p>
+                                        </div>
+                                        <div className="flex gap-2 shrink-0">
+                                            <Link
+                                                href="/whatsapp-sender"
+                                                className="bg-amber-600 hover:bg-amber-700 text-white text-xxs font-bold px-3 py-2 rounded-xl transition"
+                                            >
+                                                تعديل البيزنس
+                                            </Link>
+                                            <Link
+                                                href="/whatsapp-sender/meta-app-guide"
+                                                className="border border-amber-300 dark:border-amber-800 text-amber-850 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/30 text-xxs font-bold px-3 py-2 rounded-xl transition"
+                                            >
+                                                دليل الإعداد 📖
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="space-y-4 mt-6">
                                     {accounts.map(acc => (
@@ -724,9 +800,16 @@ export default function Workspace({
                                 <p className="text-xs text-zinc-500 leading-relaxed">
                                     Click "Log in with Facebook" to pair your Meta WhatsApp Business Account. Make sure you have admin rights on the Meta Business Suite portfolio.
                                 </p>
+                                <Link
+                                    href="/whatsapp-sender/meta-app-guide"
+                                    className="text-emerald-500 hover:text-emerald-600 text-xs font-semibold block mt-2 underline"
+                                >
+                                    شرح إعداد تطبيق Meta Developer وكيفية الحصول على الصلاحيات 📖
+                                </Link>
                             </div>
                         </div>
                     )}
+
 
                     {activeTab === 'bots' && (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1460,6 +1543,135 @@ export default function Workspace({
                     setEditingFlow(null);
                 }}
             />
+        )}
+
+        {/* Edit Business Modal inside workspace */}
+        {showEditModal && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-6">
+                    <div>
+                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Edit Client Business Profile</h3>
+                        <p className="text-xs text-zinc-400 mt-1">Modify company properties and custom app credentials.</p>
+                    </div>
+                    <form onSubmit={handleEditBusiness} className="space-y-4">
+                        <div>
+                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Company / Business Name</label>
+                            <input
+                                type="text"
+                                required
+                                value={editForm.data.name}
+                                onChange={e => editForm.setData('name', e.target.value)}
+                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Contact Name</label>
+                                <input
+                                    type="text"
+                                    value={editForm.data.client_name}
+                                    onChange={e => editForm.setData('client_name', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Email Address</label>
+                                <input
+                                    type="email"
+                                    value={editForm.data.client_email}
+                                    onChange={e => editForm.setData('client_email', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Mobile Number</label>
+                                <input
+                                    type="text"
+                                    value={editForm.data.client_mobile}
+                                    onChange={e => editForm.setData('client_mobile', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client WhatsApp Number</label>
+                                <input
+                                    type="text"
+                                    value={editForm.data.client_whatsapp}
+                                    onChange={e => editForm.setData('client_whatsapp', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={editForm.data.facebook_client_id}
+                                    onChange={e => editForm.setData('facebook_client_id', e.target.value)}
+                                    placeholder="e.g. 104829384920"
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
+                                <input
+                                    type="password"
+                                    value={editForm.data.facebook_client_secret}
+                                    onChange={e => editForm.setData('facebook_client_secret', e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+                        </div>
+
+                        {isAdmin && (
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Per Message Fee ($ USD)</label>
+                                    <input
+                                        type="number"
+                                        step="0.0001"
+                                        value={editForm.data.per_message_fee}
+                                        onChange={e => editForm.setData('per_message_fee', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Bot Reply Fee ($ USD)</label>
+                                    <input
+                                        type="number"
+                                        step="0.0001"
+                                        value={editForm.data.bot_reply_fee}
+                                        onChange={e => editForm.setData('bot_reply_fee', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                            <button
+                                type="button"
+                                onClick={() => setShowEditModal(false)}
+                                className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={editForm.processing}
+                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         )}
     </AuthenticatedLayout>
 );

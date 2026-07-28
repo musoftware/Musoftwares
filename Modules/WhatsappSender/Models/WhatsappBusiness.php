@@ -26,6 +26,8 @@ class WhatsappBusiness extends Model
         'bot_reply_fee',
         'status',
         'webhook_verify_token',
+        'facebook_client_id',
+        'facebook_client_secret',
         'uuid',
     ];
 

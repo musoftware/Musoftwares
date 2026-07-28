@@ -174,7 +174,7 @@ class WhatsappSenderController extends Controller
             'apiToken' => $apiToken,
             'webhookUrl' => $webhookUrl,
             'webhookVerifyToken' => $webhookVerifyToken,
-            'facebookLoginUrl' => route('whatsapp.auth.facebook'),
+            'facebookLoginUrl' => route('whatsapp.auth.facebook', ['business_id' => $business->id]),
             'fbOauthToken' => $fbOauthToken,
             'telegramSubscribers' => $telegramSubscribers,
             'telegramSubscriberGroups' => $telegramSubscriberGroups,
@@ -392,5 +392,13 @@ class WhatsappSenderController extends Controller
         );
 
         return redirect()->route('whatsapp.index')->with('success', 'Bulk campaign sending job has been dispatched to the queue.');
+    }
+
+    /**
+     * Show Meta Developer App Setup Guide.
+     */
+    public function showMetaAppGuide(Request $request)
+    {
+        return \Inertia\Inertia::render('WhatsappSender/MetaAppGuide');
     }
 }

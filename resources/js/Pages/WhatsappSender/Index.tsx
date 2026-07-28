@@ -15,6 +15,8 @@ interface Business {
     per_message_fee: string;
     bot_reply_fee?: string;
     accounts_count?: number;
+    facebook_client_id?: string | null;
+    facebook_client_secret?: string | null;
 }
 
 interface Props {
@@ -42,6 +44,8 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
         initial_balance: '10.00',
         per_message_fee: '0.0010',
         bot_reply_fee: '0.0005',
+        facebook_client_id: '',
+        facebook_client_secret: '',
     });
 
     const handleCreateBusiness = (e: React.FormEvent) => {
@@ -63,6 +67,8 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
         client_whatsapp: '',
         per_message_fee: '0.0010',
         bot_reply_fee: '0.0005',
+        facebook_client_id: '',
+        facebook_client_secret: '',
     });
 
     const triggerEditModal = (biz: Business) => {
@@ -75,6 +81,8 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
             client_whatsapp: biz.client_whatsapp || '',
             per_message_fee: biz.per_message_fee,
             bot_reply_fee: biz.bot_reply_fee || '0.0005',
+            facebook_client_id: biz.facebook_client_id || '',
+            facebook_client_secret: biz.facebook_client_secret || '',
         });
     };
 
@@ -343,6 +351,29 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                     )}
                                 </div>
 
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
+                                        <input
+                                            type="text"
+                                            value={createForm.data.facebook_client_id}
+                                            onChange={e => createForm.setData('facebook_client_id', e.target.value)}
+                                            placeholder="e.g. 104829384920"
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
+                                        <input
+                                            type="password"
+                                            value={createForm.data.facebook_client_secret}
+                                            onChange={e => createForm.setData('facebook_client_secret', e.target.value)}
+                                            placeholder="••••••••"
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                </div>
+
                                 {isAdmin && (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -488,6 +519,29 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                             type="text"
                                             value={editForm.data.client_whatsapp}
                                             onChange={e => editForm.setData('client_whatsapp', e.target.value)}
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
+                                        <input
+                                            type="text"
+                                            value={editForm.data.facebook_client_id}
+                                            onChange={e => editForm.setData('facebook_client_id', e.target.value)}
+                                            placeholder="e.g. 104829384920"
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
+                                        <input
+                                            type="password"
+                                            value={editForm.data.facebook_client_secret}
+                                            onChange={e => editForm.setData('facebook_client_secret', e.target.value)}
+                                            placeholder="••••••••"
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                         />
                                     </div>
