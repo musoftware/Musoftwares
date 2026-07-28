@@ -104,14 +104,19 @@ class SupportTicketController extends Controller
 
     public function guestStore(Request $request, GuestTicketCreator $creator): RedirectResponse
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:50',
             'description' => 'required|string',
             'subject' => 'nullable|string|max:255',
-            'g-recaptcha-response' => ['required', new Recaptcha],
-        ], [
+        ];
+
+        if (config('services.recaptcha.secret_key') || config('services.recaptcha.secret') || config('services.recaptcha.site_key')) {
+            $rules['g-recaptcha-response'] = ['required', new Recaptcha];
+        }
+
+        $validated = $request->validate($rules, [
             'g-recaptcha-response.required' => __('general.recaptcha_required') ?? 'يرجى التحقق من الكابتشا (Google reCAPTCHA).',
         ]);
 

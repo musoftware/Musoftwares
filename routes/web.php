@@ -431,47 +431,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('billing')->name('
 // Platform invoice payment webhook (unprotected)
 Route::post('/billing/invoices/payment/webhook', [InvoiceController::class, 'paymentWebhook'])->name('billing.invoices.payment.webhook');
 
-// Marketplace Routes — literal routes BEFORE wildcards
-Route::prefix('marketplace')->name('marketplace.')->group(function () {
-    // Public: browse list & async API
-    Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-    Route::get('/api/services', [ServiceController::class, 'apiIndex'])->name('services.api');
-
-    // Auth-only: dashboard + create wizard (MUST be before /{id} wildcard)
-    Route::middleware(['auth', 'verified', 'onboarding', 'subscription:marketplace'])->group(function () {
-        Route::get('/dashboard', [Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-
-        Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
-        Route::get('/services/create-ai', [ServiceController::class, 'createAi'])->name('services.create_ai');
-        Route::post('/services/store-ai', [ServiceController::class, 'storeAi'])->name('services.store_ai');
-        Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
-        Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
-        Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
-
-        // Packages
-        Route::post('/services/{service}/packages', [ServicePackageController::class, 'store'])->name('packages.store');
-        Route::put('/services/{service}/packages/{package}', [ServicePackageController::class, 'update'])->name('packages.update')->scopeBindings();
-        Route::delete('/services/{service}/packages/{package}', [ServicePackageController::class, 'destroy'])->name('packages.destroy')->scopeBindings();
-
-        // Orders
-        Route::get('/orders', [ServiceOrderController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{order}', [ServiceOrderController::class, 'show'])->name('orders.show');
-        Route::post('/orders', [ServiceOrderController::class, 'store'])->name('orders.store');
-        Route::post('/orders/{order}/deliver', [ServiceOrderController::class, 'deliver'])->name('orders.deliver');
-        Route::post('/orders/{order}/complete', [ServiceOrderController::class, 'complete'])->name('orders.complete');
-        Route::post('/orders/{order}/dispute', [ServiceOrderController::class, 'dispute'])->name('orders.dispute');
-
-        // Messages
-        Route::post('/orders/{order}/messages', [OrderMessageController::class, 'store'])->name('orders.messages.store');
-
-        // Reviews
-        Route::post('/orders/{order}/review', [ServiceReviewController::class, 'store'])->name('orders.review.store');
-        Route::delete('/reviews/{review}', [ServiceReviewController::class, 'destroy'])->name('reviews.destroy');
-    });
-
-    // Public: show single service — wildcard LAST
-    Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services.show');
-});
+// Marketplace Routes defined in Modules/Marketplace/routes/web.php
 
 // -- Seller Landing Pages ------------------------------------------
 Route::middleware(['web', 'auth'])

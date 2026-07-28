@@ -157,29 +157,19 @@
         @inertiaHead
 
         <!-- Service Worker registration -->
+        <!-- Service Worker Unregistration (Fixes SW fetch delay) -->
         <script>
             if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                        .then(reg => {
-                            console.debug('[SW] registered', reg.scope);
-                            
-                            // Check for updates periodically
-                            setInterval(() => {
-                                reg.update();
-                            }, 60 * 60 * 1000); // Check hourly
-                        })
-                        .catch(err => console.warn('[SW] registration failed', err));
-                });
-
-                // Reload the page when the new Service Worker takes control
-                let refreshing = false;
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    if (!refreshing) {
-                        refreshing = true;
-                        window.location.reload();
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
                     }
                 });
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) caches.delete(name);
+                    });
+                }
             }
         </script>
     </head>

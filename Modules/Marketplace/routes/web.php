@@ -21,6 +21,7 @@ Route::middleware('web')
 
         // ── Public ────────────────────────────────────────────────────────
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+        Route::get('/api/services', [ServiceController::class, 'apiIndex'])->name('services.api');
         
         // Navigation API (using controller action instead of route closure)
         Route::get('/api/categories', [ServiceCategoryController::class, 'apiIndex'])->name('categories.api');
@@ -33,11 +34,13 @@ Route::middleware('web')
         Route::middleware('auth')->group(function () {
 
             // Dashboard
-            Route::get('/',         [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/',         [DashboardController::class, 'index'])->name('home');
             Route::get('/dashboard',[DashboardController::class, 'index'])->name('dashboard.alias');
 
             // Services CRUD
             Route::get('/services/create',        [ServiceController::class, 'create'])->name('services.create');
+            Route::get('/services/create-ai',     [ServiceController::class, 'createAi'])->name('services.create_ai');
+            Route::post('/services/store-ai',    [ServiceController::class, 'storeAi'])->name('services.store_ai');
             Route::post('/services',              [ServiceController::class, 'store'])->name('services.store');
             Route::post('/services/generate-ai-image', [ServiceController::class, 'generateAiImage'])->name('services.generate-ai-image');
             Route::post('/services/get-ai-image-prompt', [ServiceController::class, 'getAiImagePrompt'])->name('services.get-ai-image-prompt');

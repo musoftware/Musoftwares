@@ -105,7 +105,7 @@ class ServiceController extends Controller
         $services->getCollection()->transform(function ($service) use ($viewerCurrency, $userFavoriteIds, $currentLocale) {
             $service->is_favorited = in_array($service->id, $userFavoriteIds);
             $service = $this->localizeService($service, $currentLocale);
-            
+
             // Strip massive unused text/JSON blobs on listing page to dramatically speed up Inertia rendering
             $service->makeHidden(['description', 'description_translations', 'auto_reply', 'auto_reply_translations', 'faq', 'requirements']);
 
@@ -180,12 +180,10 @@ class ServiceController extends Controller
         }
 
         if (! $service) {
-            // Search by title slug fallback
-            $service = $query->get()->first(function ($s) use ($id, $slug, $extractedSlug) {
-                $sSlug = Str::slug($s->title);
-
-                return $sSlug === $id || $sSlug === $slug || $sSlug === $extractedSlug;
-            });
+            $searchSlug = $extractedSlug ?: $slug ?: $id;
+            if ($searchSlug) {
+                $service = (clone $query)->where('slug', 'like', "%{$searchSlug}%")->first();
+            }
         }
 
         if (! $service) {
@@ -346,92 +344,29 @@ class ServiceController extends Controller
                 'canonical_url' => $canonicalUrl,
                 'en_url' => $canonicalUrl.'?lang=en',
                 'ar_url' => $canonicalUrl.'?lang=ar',
-                'type' => 'product',
-                'schema_json' => $schemaJson,
             ],
         ]);
     }
 
-    /**
-     * Auto-translate service fields if missing for current locale and cache in DB.
-     */
     protected function localizeService(Service $service, string $targetLocale): Service
     {
         if (! in_array($targetLocale, ['en', 'ar'])) {
             return $service;
         }
 
-        try {
-            /** @var TranslationService $translator */
-            $translator = app(TranslationService::class);
-            $updated = false;
+        $titleTrans = $service->title_translations ?? [];
+        if (! empty($titleTrans[$targetLocale])) {
+            $service->title = $titleTrans[$targetLocale];
+        }
 
-            $titleTrans = $service->title_translations ?? [];
-            if (empty($titleTrans[$targetLocale]) && ! empty($service->title)) {
-                $sourceLang = $translator->detectLanguage($service->title);
-                if ($sourceLang !== $targetLocale) {
-                    $translatedTitle = $translator->translate($service->title, $targetLocale, $sourceLang);
-                    if (! empty($translatedTitle)) {
-                        $titleTrans[$targetLocale] = $translatedTitle;
-                        $service->title_translations = $titleTrans;
-                        $updated = true;
-                    }
-                } else {
-                    $titleTrans[$targetLocale] = $service->title;
-                    $service->title_translations = $titleTrans;
-                    $updated = true;
-                }
-            }
+        $taglineTrans = $service->tagline_translations ?? [];
+        if (! empty($taglineTrans[$targetLocale])) {
+            $service->tagline = $taglineTrans[$targetLocale];
+        }
 
-            $taglineTrans = $service->tagline_translations ?? [];
-            if (empty($taglineTrans[$targetLocale]) && ! empty($service->tagline)) {
-                $sourceLang = $translator->detectLanguage($service->tagline);
-                if ($sourceLang !== $targetLocale) {
-                    $translatedTagline = $translator->translate($service->tagline, $targetLocale, $sourceLang);
-                    if (! empty($translatedTagline)) {
-                        $taglineTrans[$targetLocale] = $translatedTagline;
-                        $service->tagline_translations = $taglineTrans;
-                        $updated = true;
-                    }
-                } else {
-                    $taglineTrans[$targetLocale] = $service->tagline;
-                    $service->tagline_translations = $taglineTrans;
-                    $updated = true;
-                }
-            }
-
-            $descTrans = $service->description_translations ?? [];
-            if (empty($descTrans[$targetLocale]) && ! empty($service->description)) {
-                $sourceLang = $translator->detectLanguage($service->description);
-                if ($sourceLang !== $targetLocale) {
-                    $translatedDesc = $translator->translate($service->description, $targetLocale, $sourceLang);
-                    if (! empty($translatedDesc)) {
-                        $descTrans[$targetLocale] = $translatedDesc;
-                        $service->description_translations = $descTrans;
-                        $updated = true;
-                    }
-                } else {
-                    $descTrans[$targetLocale] = $service->description;
-                    $service->description_translations = $descTrans;
-                    $updated = true;
-                }
-            }
-
-            if ($updated) {
-                $service->save();
-            }
-
-            if (! empty($titleTrans[$targetLocale])) {
-                $service->title = $titleTrans[$targetLocale];
-            }
-            if (! empty($taglineTrans[$targetLocale])) {
-                $service->tagline = $taglineTrans[$targetLocale];
-            }
-            if (! empty($descTrans[$targetLocale])) {
-                $service->description = $descTrans[$targetLocale];
-            }
-        } catch (\Throwable $e) {
-            Log::warning("localizeService failed for service {$service->id}: ".$e->getMessage());
+        $descTrans = $service->description_translations ?? [];
+        if (! empty($descTrans[$targetLocale])) {
+            $service->description = $descTrans[$targetLocale];
         }
 
         return $service;
