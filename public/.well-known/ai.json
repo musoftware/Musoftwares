@@ -1,0 +1,19 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "Musoftwares Marketplace",
+    "name_for_model": "musoftwares_marketplace",
+    "description_for_human": "Discover and order software development, automation, and SaaS services.",
+    "description_for_model": "Plugin for discovering software services, pricing, and placing orders on Musoftwares Marketplace.",
+    "auth": {
+        "type": "user_http",
+        "authorization_type": "bearer"
+    },
+    "api": {
+        "type": "openapi",
+        "url": "https://www.musoftwares.com/marketplace/api/v1/openapi.json",
+        "is_user_authenticated": false
+    },
+    "logo_url": "https://www.musoftwares.com/v8main/img/logo.png",
+    "contact_email": "support@musoftwares.com",
+    "legal_info_url": "https://www.musoftwares.com/terms"
+}
