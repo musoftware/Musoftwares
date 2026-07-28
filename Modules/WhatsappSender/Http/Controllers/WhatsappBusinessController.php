@@ -19,13 +19,24 @@ class WhatsappBusinessController extends Controller
      */
     public function storeBusiness(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $user = $request->user();
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
+            'client_name' => ['nullable', 'string', 'max:255'],
+            'client_email' => ['nullable', 'email', 'max:255'],
+            'client_mobile' => ['nullable', 'string', 'max:255'],
+            'client_whatsapp' => ['nullable', 'string', 'max:255'],
             'initial_balance' => ['nullable', 'numeric', 'min:0', 'max:10000'],
-        ]);
+        ];
+
+        if ($user->isAdmin()) {
+            $rules['per_message_fee'] = ['nullable', 'numeric', 'min:0', 'max:10'];
+            $rules['bot_reply_fee'] = ['nullable', 'numeric', 'min:0', 'max:10'];
+        }
+
+        $validated = $request->validate($rules);
 
         $initialBalance = (float) ($validated['initial_balance'] ?? 0.0000);
-        $user = $request->user();
 
         if ($initialBalance > 0) {
             $usdCurrency = Currency::where('currency', 'USD')->first();
@@ -52,10 +63,16 @@ class WhatsappBusinessController extends Controller
             $business = WhatsappBusiness::create([
                 'user_id' => $user->id,
                 'name' => $validated['name'],
+                'client_name' => $validated['client_name'] ?? null,
+                'client_email' => $validated['client_email'] ?? null,
+                'client_mobile' => $validated['client_mobile'] ?? null,
+                'client_whatsapp' => $validated['client_whatsapp'] ?? null,
                 'wallet_balance' => $initialBalance,
                 'currency' => 'USD',
-                'per_message_fee' => 0.0010,
+                'per_message_fee' => $user->isAdmin() ? (float) ($validated['per_message_fee'] ?? 0.0010) : 0.0010,
+                'bot_reply_fee' => $user->isAdmin() ? (float) ($validated['bot_reply_fee'] ?? 0.0005) : 0.0005,
                 'status' => 'active',
+                'webhook_verify_token' => 'biz_wt_' . \Illuminate\Support\Str::random(24),
             ]);
 
             if ($initialBalance > 0) {
@@ -74,6 +91,51 @@ class WhatsappBusinessController extends Controller
     }
 
     /**
+     * Update an existing Business Client profile and/or pricing fees.
+     */
+    public function updateBusiness(Request $request, int $id): RedirectResponse
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'client_name' => ['nullable', 'string', 'max:255'],
+            'client_email' => ['nullable', 'email', 'max:255'],
+            'client_mobile' => ['nullable', 'string', 'max:255'],
+            'client_whatsapp' => ['nullable', 'string', 'max:255'],
+        ];
+
+        if ($user->isAdmin()) {
+            $rules['per_message_fee'] = ['required', 'numeric', 'min:0', 'max:10'];
+            $rules['bot_reply_fee'] = ['required', 'numeric', 'min:0', 'max:10'];
+        }
+
+        $validated = $request->validate($rules);
+
+        $updateData = [
+            'name' => $validated['name'],
+            'client_name' => $validated['client_name'] ?? null,
+            'client_email' => $validated['client_email'] ?? null,
+            'client_mobile' => $validated['client_mobile'] ?? null,
+            'client_whatsapp' => $validated['client_whatsapp'] ?? null,
+        ];
+
+        if ($user->isAdmin()) {
+            $updateData['per_message_fee'] = (float) $validated['per_message_fee'];
+            $updateData['bot_reply_fee'] = (float) $validated['bot_reply_fee'];
+        }
+
+        $business->update($updateData);
+
+        return redirect()->route('whatsapp.index')->with('success', 'Business profile updated successfully.');
+    }
+
+    /**
      * Top-up business wallet balance.
      */
     public function rechargeWallet(Request $request, int $id): RedirectResponse
@@ -84,9 +146,11 @@ class WhatsappBusinessController extends Controller
 
         $user = $request->user();
 
-        $business = WhatsappBusiness::where('user_id', $user->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         $amount = (float) $validated['amount'];
 
@@ -103,18 +167,15 @@ class WhatsappBusinessController extends Controller
 
         DB::transaction(function () use ($user, $business, $amount, $usdCurrencyId) {
             $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
-            $lockedBiz = WhatsappBusiness::where('id', $business->id)->lockForUpdate()->first();
+            $lockedUser->add_balance(-$amount, "Business wallet recharge ({$business->name})", 'used', $usdCurrencyId);
 
-            // Deduct from main user balance (converted automatically by add_balance if user currency is non-USD)
-            $lockedUser->add_balance(-$amount, "WhatsApp Business Wallet Top-up ({$lockedBiz->name})", 'used', $usdCurrencyId);
-
-            // Add to business wallet balance
-            $newBalance = (float) $lockedBiz->wallet_balance + $amount;
-            $lockedBiz->update(['wallet_balance' => $newBalance]);
+            $lockedBusiness = WhatsappBusiness::where('id', $business->id)->lockForUpdate()->first();
+            $newBalance = (float) $lockedBusiness->wallet_balance + $amount;
+            $lockedBusiness->update(['wallet_balance' => $newBalance]);
 
             // Create record in business transactions ledger
             WhatsappTransaction::create([
-                'whatsapp_business_id' => $lockedBiz->id,
+                'whatsapp_business_id' => $lockedBusiness->id,
                 'user_id' => $user->id,
                 'type' => 'credit_recharge',
                 'amount' => $amount,
@@ -131,9 +192,12 @@ class WhatsappBusinessController extends Controller
      */
     public function updateWebhookToken(Request $request, int $id): RedirectResponse
     {
-        $business = WhatsappBusiness::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         $validated = $request->validate([
             'webhook_verify_token' => ['required', 'string', 'max:255'],
@@ -151,13 +215,15 @@ class WhatsappBusinessController extends Controller
      */
     public function destroyBusiness(Request $request, int $id): RedirectResponse
     {
-        $business = WhatsappBusiness::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         $business->delete();
 
         return redirect()->route('whatsapp.index')->with('success', 'Business client profile deleted successfully.');
     }
 }
-

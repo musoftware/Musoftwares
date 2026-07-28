@@ -13,6 +13,10 @@ class WhatsappSenderServiceProvider extends ServiceProvider
         $this->app->singleton(MetaWhatsappService::class, function ($app) {
             return new MetaWhatsappService();
         });
+
+        $this->commands([
+            \Modules\WhatsappSender\Console\ProcessScheduledMessagesCommand::class,
+        ]);
     }
 
     public function boot(): void
@@ -26,5 +30,10 @@ class WhatsappSenderServiceProvider extends ServiceProvider
         Route::middleware('api')
             ->prefix('api/v1')
             ->group(module_path('WhatsappSender', 'routes/api.php'));
+
+        $this->app->booted(function () {
+            $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+            $schedule->command('whatsapp:process-scheduled')->everyMinute();
+        });
     }
 }

@@ -9,6 +9,7 @@ use Modules\WhatsappSender\Models\WhatsappAccount;
 use Modules\WhatsappSender\Models\WhatsappBusiness;
 use Modules\WhatsappSender\Models\WhatsappLog;
 use Modules\WhatsappSender\Models\WhatsappTransaction;
+use Modules\WhatsappSender\Models\WhatsappTemplate;
 
 class MetaWhatsappService
 {
@@ -330,6 +331,140 @@ class MetaWhatsappService
         } catch (\Throwable $e) {
             Log::error('[MetaWhatsappService] fetchWhatsAppAccountsFromMetaToken error: ' . $e->getMessage());
             return array_values($foundAccounts);
+        }
+    }
+
+    /**
+     * Create a message template on Facebook.
+     */
+    public function createMetaTemplate(WhatsappAccount $account, WhatsappTemplate $template): array
+    {
+        if (empty($account->waba_id)) {
+            return ['success' => false, 'error' => 'WABA ID is not connected to this account. Cannot create template.'];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->waba_id}/message_templates";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->post($url, [
+                    'name' => $template->name,
+                    'category' => $template->category,
+                    'language' => $template->language,
+                    'components' => $template->components,
+                ]);
+
+            $data = $response->json();
+
+            if ($response->successful()) {
+                return [
+                    'success' => true,
+                    'id' => $data['id'] ?? null,
+                    'status' => $data['status'] ?? 'PENDING',
+                ];
+            }
+
+            return [
+                'success' => false,
+                'error' => $data['error']['message'] ?? $response->body(),
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] createMetaTemplate exception: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Sync message templates from Facebook WABA.
+     */
+    public function syncMetaTemplates(WhatsappAccount $account): array
+    {
+        if (empty($account->waba_id)) {
+            return ['success' => false, 'error' => 'WABA ID is not connected to this account. Cannot sync templates.'];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->waba_id}/message_templates";
+        $businessId = $account->whatsapp_business_id;
+
+        if (!$businessId) {
+            return ['success' => false, 'error' => 'Account is not linked to any business client.'];
+        }
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->get($url, ['limit' => 1000]);
+
+            if ($response->successful()) {
+                $templates = $response->json()['data'] ?? [];
+
+                foreach ($templates as $tpl) {
+                    WhatsappTemplate::updateOrCreate(
+                        [
+                            'whatsapp_business_id' => $businessId,
+                            'name' => $tpl['name'],
+                        ],
+                        [
+                            'category' => $tpl['category'] ?? 'UTILITY',
+                            'language' => $tpl['language'] ?? 'en_US',
+                            'components' => $tpl['components'] ?? [],
+                            'status' => $tpl['status'] ?? 'PENDING',
+                            'meta_template_id' => $tpl['id'] ?? null,
+                        ]
+                    );
+                }
+
+                return [
+                    'success' => true,
+                    'count' => count($templates),
+                ];
+            }
+
+            $error = $response->json()['error']['message'] ?? $response->body();
+            return ['success' => false, 'error' => $error];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] syncMetaTemplates exception: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Delete a message template from Facebook WABA.
+     */
+    public function deleteMetaTemplate(WhatsappAccount $account, string $name): array
+    {
+        if (empty($account->waba_id)) {
+            return ['success' => false, 'error' => 'WABA ID is not connected to this account. Cannot delete template.'];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->waba_id}/message_templates";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->delete($url, [
+                    'name' => $name,
+                ]);
+
+            $data = $response->json();
+
+            if ($response->successful() && isset($data['success']) && $data['success'] === true) {
+                // Delete locally
+                WhatsappTemplate::where('whatsapp_business_id', $account->whatsapp_business_id)
+                    ->where('name', $name)
+                    ->delete();
+
+                return ['success' => true];
+            }
+
+            return [
+                'success' => false,
+                'error' => $data['error']['message'] ?? $response->body(),
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] deleteMetaTemplate exception: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
 }

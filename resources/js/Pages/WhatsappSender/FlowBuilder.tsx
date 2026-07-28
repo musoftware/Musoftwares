@@ -17,6 +17,7 @@ interface Node {
         action_type?: 'set_field' | 'webhook';
         field_name_action?: string;
         field_value_action?: string;
+        field_value?: string;
         webhook_url?: string;
     };
 }
@@ -237,7 +238,7 @@ export default function FlowBuilder({
     };
 
     // Node component helpers
-    const selectedNode = data.nodes.find(n => n.id === selectedNodeId);
+    const selectedNode = data.nodes.find(n => n.id === selectedNodeId) as Node | undefined;
 
     // Calculate curve paths
     const getEdgePath = (edge: Edge) => {
@@ -247,7 +248,7 @@ export default function FlowBuilder({
         if (!sourceNode || !targetNode) return '';
 
         // Node card dimensions: width=260px, height varies roughly 140px
-        let startX = sourceNode.x + 260;
+        const startX = sourceNode.x + 260;
         let startY = sourceNode.y + 70;
 
         if (edge.sourceHandle === 'true') {

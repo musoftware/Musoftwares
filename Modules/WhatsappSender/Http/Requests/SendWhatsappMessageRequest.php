@@ -23,12 +23,18 @@ class SendWhatsappMessageRequest extends FormRequest
     {
         return [
             'recipient_phone' => [
-                'required',
+                'required_without:whatsapp_contact_group_id',
+                'nullable',
                 'string',
-                'regex:/^\+?[1-9]\d{6,14}$/',
+            ],
+            'whatsapp_contact_group_id' => [
+                'nullable',
+                'integer',
+                'exists:whatsapp_contact_groups,id',
             ],
             'message_body' => [
-                'required',
+                'required_if:message_type,text',
+                'nullable',
                 'string',
                 'min:1',
                 'max:4096',
@@ -37,6 +43,16 @@ class SendWhatsappMessageRequest extends FormRequest
                 'nullable',
                 'integer',
                 'exists:whatsapp_accounts,id',
+            ],
+            'telegram_bot_id' => [
+                'nullable',
+                'integer',
+                'exists:telegram_bots,id',
+            ],
+            'channel' => [
+                'nullable',
+                'string',
+                'in:whatsapp,telegram',
             ],
             'message_type' => [
                 'nullable',

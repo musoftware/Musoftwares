@@ -101,13 +101,29 @@ class WhatsappWebhookController extends Controller
 
                 // 2. Process Inbound Customer Messages
                 if (! empty($value['messages'])) {
+                    $botFlowEngine = app(\Modules\WhatsappSender\Services\BotFlowEngineService::class);
                     foreach ($value['messages'] as $msg) {
-                        Log::info("WhatsApp Inbound Customer Message Received for Business #{$businessId}", [
+                        $senderPhone = $msg['from'] ?? null;
+                        if (!$senderPhone) continue;
+
+                        $text = '';
+                        if (isset($msg['interactive']) && $msg['interactive']['type'] === 'button_reply') {
+                            // Extract quick reply button ID (which is the target node ID)
+                            $text = $msg['interactive']['button_reply']['id'] ?? '';
+                        } elseif (isset($msg['text']['body'])) {
+                            $text = $msg['text']['body'];
+                        }
+
+                        Log::info("WhatsApp Inbound Customer Message for Business #{$businessId}", [
                             'business_id' => $businessId,
-                            'from' => $msg['from'] ?? null,
+                            'from' => $senderPhone,
                             'type' => $msg['type'] ?? null,
-                            'body' => $msg['text']['body'] ?? null,
+                            'body' => $text,
                         ]);
+
+                        if ($text !== '') {
+                            $botFlowEngine->handleIncomingMessage('whatsapp', $businessId, $senderPhone, $text);
+                        }
                     }
                 }
             }

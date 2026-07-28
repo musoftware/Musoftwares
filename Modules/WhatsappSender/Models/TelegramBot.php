@@ -34,4 +34,14 @@ class TelegramBot extends Model
     {
         return $this->hasMany(WhatsappSchedule::class, 'telegram_bot_id');
     }
+
+    public function subscribers(): HasMany
+    {
+        return $this->hasMany(TelegramSubscriber::class, 'telegram_bot_id');
+    }
+
+    public function subscriberGroups(): HasMany
+    {
+        return $this->hasMany(TelegramSubscriberGroup::class, 'telegram_bot_id');
+    }
 }

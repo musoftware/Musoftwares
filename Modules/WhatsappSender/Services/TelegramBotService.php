@@ -180,7 +180,7 @@ class TelegramBotService
                 'message_body' => $text,
                 'status' => 'failed',
                 'error_message' => $errorMessage,
-                'payload' => $payload ?? null,
+                'payload' => $payload,
             ]);
 
             return [

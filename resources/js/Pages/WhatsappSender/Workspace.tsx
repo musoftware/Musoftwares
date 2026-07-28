@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import FlowBuilder from './FlowBuilder';
 
 interface Business {
     id: number;
@@ -13,6 +14,7 @@ interface Business {
     wallet_balance: string;
     currency: string;
     per_message_fee: string;
+    bot_reply_fee: string;
 }
 
 interface Account {
@@ -97,6 +99,9 @@ interface Props {
     webhookVerifyToken: string;
     facebookLoginUrl: string;
     fbOauthToken?: string | null;
+    telegramSubscribers: any[];
+    telegramSubscriberGroups: any[];
+    flows: any[];
 }
 
 export default function Workspace({
@@ -112,10 +117,30 @@ export default function Workspace({
     webhookUrl,
     webhookVerifyToken,
     facebookLoginUrl,
-    fbOauthToken
+    fbOauthToken,
+    telegramSubscribers,
+    telegramSubscriberGroups,
+    flows
 }: Props) {
-    const [activeTab, setActiveTab] = useState<'send' | 'connectors' | 'templates' | 'groups' | 'schedules' | 'logs'>('send');
+    const [activeChannel, setActiveChannel] = useState<'whatsapp' | 'telegram'>('whatsapp');
+    const [activeTab, setActiveTab] = useState<'send' | 'connectors' | 'templates' | 'groups' | 'schedules' | 'logs' | 'flows' | 'bots' | 'subscribers'>('connectors');
     const [selectedGroup, setSelectedGroup] = useState<ContactGroup | null>(null);
+
+    const [editingFlow, setEditingFlow] = useState<any | null>(null);
+    const [isCreatingFlow, setIsCreatingFlow] = useState(false);
+    const [selectedSubscriberGroup, setSelectedSubscriberGroup] = useState<any | null>(null);
+
+    const tgGroupForm = useForm({
+        telegram_bot_id: bots[0]?.id || '',
+        name: '',
+        description: '',
+    });
+    const handleCreateTgGroup = (e: React.FormEvent) => {
+        e.preventDefault();
+        tgGroupForm.post('/whatsapp-sender/telegram-subscriber-groups', {
+            onSuccess: () => tgGroupForm.reset('name', 'description'),
+        });
+    };
 
     // Copy link helper
     const guestLink = `${window.location.origin}/whatsapp-sender/guest/connect/${business.uuid}`;
@@ -165,6 +190,16 @@ export default function Workspace({
         is_scheduled: false,
         scheduled_at: '',
     });
+
+    useEffect(() => {
+        sendForm.setData(data => ({
+            ...data,
+            channel: activeChannel,
+            whatsapp_account_id: accounts[0]?.id || '',
+            telegram_bot_id: bots[0]?.id || '',
+            message_type: activeChannel === 'telegram' ? 'text' : data.message_type
+        }));
+    }, [activeChannel, accounts, bots]);
 
     const [mappedVariables, setMappedVariables] = useState<{ [key: string]: string }>({});
 
@@ -255,94 +290,152 @@ export default function Workspace({
         <AuthenticatedLayout>
             <Head title={`${business.name} - Hub Workspace`} />
 
-            <div className="py-8 px-4 max-w-7xl mx-auto space-y-8">
-                {/* Header Information Dashboard Card */}
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{business.name}</h1>
-                            <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs px-2.5 py-1 rounded-full font-medium border border-emerald-200/50 dark:border-emerald-900/30">
-                                Active Workspace
-                            </span>
-                        </div>
-                        <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-sm">
-                            Client: <span className="font-semibold text-zinc-700 dark:text-zinc-300">{business.client_name || 'N/A'}</span>
-                            {business.client_email && ` | Email: ${business.client_email}`}
-                            {business.client_mobile && ` | Mobile: ${business.client_mobile}`}
-                            {business.client_whatsapp && ` | WhatsApp: ${business.client_whatsapp}`}
-                        </p>
-                    </div>
+            <div className="flex min-h-[calc(100vh-64px)] bg-zinc-50 dark:bg-zinc-950 font-sans">
+                {/* Left Mini Sidebar with Icons only */}
+                <div className="w-16 flex flex-col items-center py-6 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 gap-6 shrink-0 z-10">
+                    {/* WhatsApp Icon */}
+                    <button
+                        onClick={() => {
+                            setActiveChannel('whatsapp');
+                            setActiveTab('connectors');
+                        }}
+                        className={`p-2.5 rounded-2xl transition duration-200 relative group border-2 ${
+                            activeChannel === 'whatsapp'
+                                ? 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-950/20 shadow-md shadow-emerald-500/10'
+                                : 'border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                        }`}
+                        title="WhatsApp Hub"
+                    >
+                        <svg viewBox="0 0 24 24" width="24" height="24" className="w-6 h-6">
+                            <circle cx="12" cy="12" r="12" fill="#25D366" />
+                            <path d="M12.012 5.5c-3.585 0-6.5 2.915-6.5 6.5 0 1.144.298 2.257.865 3.242L5.5 18.5l3.429-.9c.945.516 2.012.79 3.083.79 3.585 0 6.5-2.915 6.5-6.5s-2.915-6.5-6.5-6.5zm3.834 8.763c-.168.473-.97.857-1.338.91-.334.05-.765.09-2.32-.54-1.99-.8-3.264-2.812-3.363-2.946-.098-.133-.796-1.062-.796-2.025 0-.963.502-1.435.684-1.624.18-.188.397-.236.53-.236.133 0 .266.002.38.006.122.006.286-.05.447.35.168.412.574 1.402.624 1.504.05.102.083.222.014.358-.067.137-.102.222-.205.34-.103.12-.216.266-.308.358-.103.102-.21.214-.09.42.12.205.53 1.077 1.138 1.617.608.54 1.118.708 1.318.808.2.102.318.082.437-.055.12-.137.502-.587.637-.787.135-.2.268-.17.45-.102.184.068 1.17.55 1.37.646.2.1.336.143.38.222.05.078.05.454-.12.928z" fill="#FFFFFF" />
+                        </svg>
+                        <span className="absolute left-20 bg-zinc-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-30 shadow-lg">
+                            WhatsApp Hub
+                        </span>
+                    </button>
 
-                    <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
-                        {/* Balance display */}
-                        <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl px-5 py-3 text-right">
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-medium">Business Balance</span>
-                            <span className="text-2xl font-black text-zinc-900 dark:text-zinc-50">
-                                ${parseFloat(business.wallet_balance).toFixed(4)} <span className="text-xs font-normal text-zinc-500">{business.currency}</span>
-                            </span>
-                        </div>
+                    {/* Telegram Icon */}
+                    <button
+                        onClick={() => {
+                            setActiveChannel('telegram');
+                            setActiveTab('bots');
+                        }}
+                        className={`p-2.5 rounded-2xl transition duration-200 relative group border-2 ${
+                            activeChannel === 'telegram'
+                                ? 'border-sky-500 bg-sky-500/10 dark:bg-sky-950/20 shadow-md shadow-sky-500/10'
+                                : 'border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                        }`}
+                        title="Telegram Hub"
+                    >
+                        <svg viewBox="0 0 24 24" width="24" height="24" className="w-6 h-6">
+                            <circle cx="12" cy="12" r="12" fill="#0088CC" />
+                            <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.47-.52-.17l-9.49 5.96-4.11-1.28c-.9-.28-.92-.9.19-1.33l16.1-6.2c.74-.27 1.39.17 1.13 1.25l-2.73 12.87c-.2.93-.76 1.16-1.54.73l-4.17-3.07-2.01 1.94c-.22.22-.41.41-.83.41z" fill="#FFFFFF" />
+                        </svg>
+                        <span className="absolute left-20 bg-zinc-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-30 shadow-lg">
+                            Telegram Hub
+                        </span>
+                    </button>
+                </div>
 
-                        {/* Top-up Form */}
-                        <form onSubmit={handleRecharge} className="flex items-center gap-2">
-                            <div className="relative">
-                                <span className="absolute left-3 top-2.5 text-zinc-400 text-sm">$</span>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={rechargeForm.data.amount}
-                                    onChange={e => rechargeForm.setData('amount', e.target.value)}
-                                    className="pl-7 pr-3 py-2 w-24 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-200"
-                                />
+                {/* Main panel content */}
+                <div className="flex-1 py-8 px-6 space-y-8 overflow-y-auto">
+                    {/* Header Information Dashboard Card */}
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{business.name}</h1>
+                                <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs px-2.5 py-1 rounded-full font-medium border border-emerald-200/50 dark:border-emerald-900/30">
+                                    Active Workspace
+                                </span>
                             </div>
+                            <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-sm">
+                                Client: <span className="font-semibold text-zinc-700 dark:text-zinc-300">{business.client_name || 'N/A'}</span>
+                                {business.client_email && ` | Email: ${business.client_email}`}
+                                {business.client_mobile && ` | Mobile: ${business.client_mobile}`}
+                                {business.client_whatsapp && ` | WhatsApp: ${business.client_whatsapp}`}
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
+                            {/* Balance display */}
+                            <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl px-5 py-3 text-right">
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-medium">Business Balance</span>
+                                <span className="text-2xl font-black text-zinc-900 dark:text-zinc-50">
+                                    ${parseFloat(business.wallet_balance).toFixed(4)} <span className="text-xs font-normal text-zinc-500">{business.currency}</span>
+                                </span>
+                            </div>
+
+                            {/* Top-up Form */}
+                            <form onSubmit={handleRecharge} className="flex items-center gap-2">
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-zinc-400 text-sm">$</span>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        value={rechargeForm.data.amount}
+                                        onChange={e => rechargeForm.setData('amount', e.target.value)}
+                                        className="pl-7 pr-3 py-2 w-24 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-200"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={rechargeForm.processing}
+                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-sm px-4 py-2 rounded-xl font-medium transition duration-200"
+                                >
+                                    Recharge
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {/* Invite guest link Card */}
+                    <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Guest Client Connect Invite Link</h2>
+                            <p className="text-xs text-zinc-500 mt-1">Send this invitation link to your client so they can easily pair their Meta WhatsApp Business account directly.</p>
+                        </div>
+                        <div className="flex items-center gap-2 w-full md:w-auto">
+                            <input
+                                type="text"
+                                readOnly
+                                value={guestLink}
+                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2.5 rounded-xl w-full md:w-80 text-zinc-600 dark:text-zinc-300"
+                            />
                             <button
-                                type="submit"
-                                disabled={rechargeForm.processing}
-                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-sm px-4 py-2 rounded-xl font-medium transition duration-200"
+                                onClick={() => copyToClipboard(guestLink)}
+                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/80 px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition"
                             >
-                                Recharge
+                                {copied ? 'Copied!' : 'Copy'}
                             </button>
-                        </form>
+                        </div>
                     </div>
-                </div>
 
-                {/* Invite guest link Card */}
-                <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Guest Client Connect Invite Link</h2>
-                        <p className="text-xs text-zinc-500 mt-1">Send this invitation link to your client so they can easily pair their Meta WhatsApp Business account directly.</p>
+                    {/* Tabs selection */}
+                    <div className="flex border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-px gap-6">
+                        {(activeChannel === 'whatsapp'
+                            ? ['connectors', 'send', 'templates', 'groups', 'schedules', 'logs', 'flows'] as const
+                            : ['bots', 'subscribers', 'send', 'schedules', 'logs', 'flows'] as const
+                        ).map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab as any)}
+                                className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize ${
+                                    activeTab === tab
+                                        ? 'border-zinc-900 dark:border-zinc-50 text-zinc-900 dark:text-zinc-50'
+                                        : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
+                                }`}
+                            >
+                                {tab === 'send' ? 'Campaign / Quick Send' :
+                                 tab === 'connectors' ? 'Meta Accounts' :
+                                 tab === 'groups' ? 'WhatsApp Groups' :
+                                 tab === 'bots' ? 'Telegram Bots' :
+                                 tab === 'flows' ? 'Chat Flows (Bot Builder)' :
+                                 tab === 'subscribers' ? 'Telegram Subscribers' :
+                                 tab}
+                            </button>
+                        ))}
                     </div>
-                    <div className="flex items-center gap-2 w-full md:w-auto">
-                        <input
-                            type="text"
-                            readOnly
-                            value={guestLink}
-                            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2.5 rounded-xl w-full md:w-80 text-zinc-600 dark:text-zinc-300"
-                        />
-                        <button
-                            onClick={() => copyToClipboard(guestLink)}
-                            className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/80 px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition"
-                        >
-                            {copied ? 'Copied!' : 'Copy'}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Tabs selection */}
-                <div className="flex border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-px gap-6">
-                    {(['send', 'connectors', 'templates', 'groups', 'schedules', 'logs'] as const).map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize ${
-                                activeTab === tab
-                                    ? 'border-zinc-900 dark:border-zinc-50 text-zinc-900 dark:text-zinc-50'
-                                    : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
-                            }`}
-                        >
-                            {tab === 'send' ? 'Quick Send & Scheduler' : tab}
-                        </button>
-                    ))}
-                </div>
 
                 {/* Tab Contents */}
                 <div>
@@ -354,30 +447,14 @@ export default function Workspace({
                                 <form onSubmit={handleSend} className="space-y-5">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Channel</label>
-                                            <select
-                                                value={sendForm.data.channel}
-                                                onChange={e => {
-                                                    sendForm.setData(data => ({
-                                                        ...data,
-                                                        channel: e.target.value,
-                                                        message_type: e.target.value === 'telegram' ? 'text' : data.message_type
-                                                    }));
-                                                }}
-                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
-                                            >
-                                                <option value="whatsapp">WhatsApp Sender</option>
-                                                <option value="telegram">Telegram Bot</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Select Sender Device / Bot</label>
-                                            {sendForm.data.channel === 'whatsapp' ? (
+                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
+                                                {activeChannel === 'telegram' ? 'Select Sender Bot' : 'Select Sender Device'}
+                                            </label>
+                                            {activeChannel === 'whatsapp' ? (
                                                 <select
                                                     value={sendForm.data.whatsapp_account_id}
                                                     onChange={e => sendForm.setData('whatsapp_account_id', e.target.value)}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                 >
                                                     {accounts.map(acc => (
                                                         <option key={acc.id} value={acc.id}>{acc.name} ({acc.phone_number_id})</option>
@@ -388,7 +465,7 @@ export default function Workspace({
                                                 <select
                                                     value={sendForm.data.telegram_bot_id}
                                                     onChange={e => sendForm.setData('telegram_bot_id', e.target.value)}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                 >
                                                     {bots.map(bot => (
                                                         <option key={bot.id} value={bot.id}>{bot.name} (@{bot.username})</option>
@@ -397,32 +474,32 @@ export default function Workspace({
                                                 </select>
                                             )}
                                         </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Recipient Source</label>
                                             <select
                                                 value={sendForm.data.recipient_source}
                                                 onChange={e => sendForm.setData('recipient_source', e.target.value)}
-                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                             >
                                                 <option value="single">Single Recipient</option>
                                                 <option value="group">Bulk Contact Group</option>
                                             </select>
                                         </div>
+                                    </div>
 
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {sendForm.data.recipient_source === 'single' ? (
                                             <div>
                                                 <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
-                                                    {sendForm.data.channel === 'telegram' ? 'Recipient Chat ID' : 'Recipient Phone Number'}
+                                                    {activeChannel === 'telegram' ? 'Recipient Chat ID' : 'Recipient Phone Number'}
                                                 </label>
                                                 <input
                                                     type="text"
                                                     value={sendForm.data.recipient_phone}
                                                     onChange={e => sendForm.setData('recipient_phone', e.target.value)}
-                                                    placeholder={sendForm.data.channel === 'telegram' ? 'e.g. 123456789' : 'e.g. 201001234567'}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                                    placeholder={activeChannel === 'telegram' ? 'e.g. 123456789' : 'e.g. 201001234567'}
+                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                 />
                                             </div>
                                         ) : (
@@ -431,7 +508,7 @@ export default function Workspace({
                                                 <select
                                                     value={sendForm.data.whatsapp_contact_group_id}
                                                     onChange={e => sendForm.setData('whatsapp_contact_group_id', e.target.value)}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                 >
                                                     {contactGroups.map(gp => (
                                                         <option key={gp.id} value={gp.id}>{gp.name} ({gp.contacts_count} contacts)</option>
@@ -441,6 +518,7 @@ export default function Workspace({
                                             </div>
                                         )}
                                     </div>
+
 
                                     <div>
                                         <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Format</label>
@@ -594,17 +672,16 @@ export default function Workspace({
                     )}
 
                     {activeTab === 'connectors' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* WhatsApp Accounts List */}
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">WhatsApp Accounts</h3>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">WhatsApp Accounts</h3>
                                         <p className="text-xs text-zinc-500 mt-1">Direct API integration endpoints powered by Facebook WABA.</p>
                                     </div>
                                     <a
                                         href={facebookLoginUrl}
-                                        className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200"
+                                        className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
                                     >
                                         Log in with Facebook
                                     </a>
@@ -630,7 +707,7 @@ export default function Workspace({
                                                         router.delete(`/whatsapp-sender/accounts/${acc.id}`);
                                                     }
                                                 }}
-                                                className="text-red-500 hover:text-red-600 text-xs font-semibold"
+                                                className="text-red-500 hover:text-red-650 text-xs font-semibold"
                                             >
                                                 Disconnect
                                             </button>
@@ -642,37 +719,28 @@ export default function Workspace({
                                 </div>
                             </div>
 
-                            {/* Telegram Bots List */}
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div>
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Telegram Bots</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Register bot tokens to send notifications. Webhook setup will trigger automatically.</p>
-                                </div>
+                            <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-4">
+                                <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg font-sans">WABA Connection Guide</h3>
+                                <p className="text-xs text-zinc-500 leading-relaxed">
+                                    Click "Log in with Facebook" to pair your Meta WhatsApp Business Account. Make sure you have admin rights on the Meta Business Suite portfolio.
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
-                                <form onSubmit={handleAddBot} className="bg-zinc-50 dark:bg-zinc-950 p-4 border border-zinc-200 dark:border-zinc-800 rounded-2xl space-y-4">
+                    {activeTab === 'bots' && (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                <div className="flex justify-between items-center">
                                     <div>
-                                        <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Telegram Bot Token</label>
-                                        <input
-                                            type="text"
-                                            value={botForm.data.token}
-                                            onChange={e => botForm.setData('token', e.target.value)}
-                                            placeholder="Enter token from @BotFather"
-                                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-xs"
-                                        />
-                                        {botForm.errors.token && <span className="text-xs text-red-500 mt-1 block">{botForm.errors.token}</span>}
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Telegram Bots</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Register bot tokens to send notifications. Webhook setup will trigger automatically.</p>
                                     </div>
-                                    <button
-                                        type="submit"
-                                        disabled={botForm.processing}
-                                        className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-250 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-semibold transition"
-                                    >
-                                        Verify & Register Bot
-                                    </button>
-                                </form>
+                                </div>
 
                                 <div className="space-y-4 mt-6">
                                     {bots.map(bot => (
-                                        <div key={bot.id} className="border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl flex justify-between items-center">
+                                        <div key={bot.id} className="border border-zinc-100 dark:border-zinc-800/80 p-4 rounded-2xl flex justify-between items-center">
                                             <div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{bot.name}</span>
@@ -686,7 +754,7 @@ export default function Workspace({
                                                         router.delete(`/whatsapp-sender/telegram-bots/${bot.id}`);
                                                     }
                                                 }}
-                                                className="text-red-500 hover:text-red-600 text-xs font-semibold"
+                                                className="text-red-500 hover:text-red-650 text-xs font-semibold"
                                             >
                                                 Remove
                                             </button>
@@ -696,6 +764,33 @@ export default function Workspace({
                                         <p className="text-sm text-zinc-400 text-center py-6">No Telegram bots registered yet.</p>
                                     )}
                                 </div>
+                            </div>
+
+                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">Register New Bot</h3>
+                                    <p className="text-xs text-zinc-500 mt-1">Provide your bot's FatherToken to link it to this business workspace.</p>
+                                </div>
+                                <form onSubmit={handleAddBot} className="space-y-4">
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Telegram Bot Token</label>
+                                        <input
+                                            type="text"
+                                            value={botForm.data.token}
+                                            onChange={e => botForm.setData('token', e.target.value)}
+                                            placeholder="Enter token from @BotFather"
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        />
+                                        {botForm.errors.token && <span className="text-xs text-red-500 mt-1 block">{botForm.errors.token}</span>}
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={botForm.processing}
+                                        className="w-full bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
+                                    >
+                                        Verify & Register Bot
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     )}
@@ -1110,8 +1205,262 @@ export default function Workspace({
                             </div>
                         </div>
                     )}
+
+                    {activeTab === 'flows' && (
+                        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6 font-sans">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Visual Chat Flows</h3>
+                                    <p className="text-xs text-zinc-500 mt-1">Configure automated chatbot response flows for triggers, keywords, delay pacers, and conditions.</p>
+                                </div>
+                                <button
+                                    onClick={() => setIsCreatingFlow(true)}
+                                    className="bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200"
+                                >
+                                    + New Chat Flow
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {flows.map(flow => (
+                                    <div key={flow.id} className="border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl bg-zinc-50/30 dark:bg-zinc-955/20 flex flex-col justify-between h-48 relative overflow-hidden group">
+                                        <div className="absolute right-4 top-4 flex items-center space-x-2">
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                                                flow.channel === 'telegram' ? 'bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-400' : 'bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400'
+                                            }`}>
+                                                {flow.channel}
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h4 className="font-bold text-base text-zinc-900 dark:text-zinc-100">{flow.name}</h4>
+                                            <p className="text-xs text-zinc-500 mt-1 font-medium">
+                                                Trigger: <span className="font-semibold text-zinc-700 dark:text-zinc-300 capitalize">{flow.trigger_type}</span>
+                                            </p>
+                                            {flow.trigger_type === 'keyword' && (
+                                                <p className="text-xxs text-zinc-400 mt-1 truncate max-w-xs">
+                                                    Keywords: {flow.trigger_keywords?.join(', ')}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="flex justify-between items-center border-t border-zinc-100 dark:border-zinc-800/80 pt-4 mt-4">
+                                            <div className="flex items-center space-x-2">
+                                                <button
+                                                    onClick={() => router.post(`/whatsapp-sender/bot-flows/${flow.id}/toggle`)}
+                                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition ${
+                                                        flow.is_active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-zinc-150 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                                                    }`}
+                                                >
+                                                    {flow.is_active ? 'Active' : 'Inactive'}
+                                                </button>
+                                            </div>
+
+                                            <div className="flex items-center space-x-2">
+                                                <button
+                                                    onClick={() => setEditingFlow(flow)}
+                                                    className="text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 text-xs font-semibold px-2 py-1"
+                                                >
+                                                    Edit Canvas
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        if(confirm('Are you sure you want to delete this flow?')) {
+                                                            router.delete(`/whatsapp-sender/bot-flows/${flow.id}`);
+                                                        }
+                                                    }}
+                                                    className="text-red-500 hover:text-red-650 text-xs font-semibold px-2 py-1"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {flows.length === 0 && (
+                                    <div className="col-span-full py-12 text-center text-zinc-400 text-sm">
+                                        No chatbot response flows configured yet. Click "+ New Chat Flow" to design your first conversation logic.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'subscribers' && (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
+                            {/* Create subscriber group */}
+                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                <div>
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Subscriber Group</h3>
+                                    <p className="text-xs text-zinc-500 mt-1">Organize bot subscribers into custom target cohorts.</p>
+                                </div>
+                                
+                                <form onSubmit={handleCreateTgGroup} className="space-y-4">
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Select Bot</label>
+                                        <select
+                                            value={tgGroupForm.data.telegram_bot_id}
+                                            onChange={e => tgGroupForm.setData('telegram_bot_id', e.target.value)}
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        >
+                                            {bots.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                                            {bots.length === 0 && <option value="">No bots registered</option>}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Group Name</label>
+                                        <input
+                                            type="text"
+                                            value={tgGroupForm.data.name}
+                                            onChange={e => tgGroupForm.setData('name', e.target.value)}
+                                            placeholder="e.g. Daily Subscribers"
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Description</label>
+                                        <textarea
+                                            rows={2}
+                                            value={tgGroupForm.data.description}
+                                            onChange={e => tgGroupForm.setData('description', e.target.value)}
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={tgGroupForm.processing}
+                                        className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
+                                    >
+                                        Create Subscriber Group
+                                    </button>
+                                </form>
+
+                                <div className="space-y-3 mt-6 border-t border-zinc-100 dark:border-zinc-800 pt-6">
+                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Subscriber Segments</h4>
+                                    {telegramSubscriberGroups.map(gp => (
+                                        <div
+                                            key={gp.id}
+                                            onClick={() => setSelectedSubscriberGroup(selectedSubscriberGroup?.id === gp.id ? null : gp)}
+                                            className={`p-4 border rounded-2xl cursor-pointer transition ${
+                                                selectedSubscriberGroup?.id === gp.id
+                                                    ? 'border-zinc-900 dark:border-zinc-50 bg-zinc-50/50 dark:bg-zinc-850/40'
+                                                    : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/40'
+                                            }`}
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{gp.name}</span>
+                                                <span className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300 px-2.5 py-0.5 rounded-full font-semibold">
+                                                    {gp.subscribers_count} members
+                                                </span>
+                                            </div>
+                                            {gp.description && <p className="text-xs text-zinc-400 mt-2 line-clamp-1">{gp.description}</p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Subscribers listing */}
+                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                                    <div>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+                                            {selectedSubscriberGroup ? `${selectedSubscriberGroup.name} Members` : 'All Telegram Subscribers'}
+                                        </h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Subscribers who have initiated communication with registered bots.</p>
+                                    </div>
+                                    {selectedSubscriberGroup && (
+                                        <button
+                                            onClick={() => {
+                                                if(confirm('Are you sure you want to delete this subscriber group?')) {
+                                                    router.delete(`/whatsapp-sender/telegram-subscriber-groups/${selectedSubscriberGroup.id}`);
+                                                    setSelectedSubscriberGroup(null);
+                                                }
+                                            }}
+                                            className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                        >
+                                            Delete Group
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-sm border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
+                                                <th className="py-3 px-2 font-semibold">Chat ID</th>
+                                                <th className="py-3 px-2 font-semibold">Username</th>
+                                                <th className="py-3 px-2 font-semibold">Name</th>
+                                                <th className="py-3 px-2 font-semibold">Assigned Cohort</th>
+                                                <th className="py-3 px-2 font-semibold text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {telegramSubscribers
+                                                .filter(sub => !selectedSubscriberGroup || sub.telegram_subscriber_group_id === selectedSubscriberGroup.id)
+                                                .map(sub => (
+                                                    <tr key={sub.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
+                                                        <td className="py-3 px-2 font-mono text-xs text-zinc-700 dark:text-zinc-300 font-bold">{sub.chat_id}</td>
+                                                        <td className="py-3 px-2 text-zinc-500 text-xs">@{sub.username || 'n/a'}</td>
+                                                        <td className="py-3 px-2 text-zinc-700 dark:text-zinc-200 font-medium">
+                                                            {sub.first_name} {sub.last_name}
+                                                        </td>
+                                                        <td className="py-3 px-2 text-zinc-500 text-xs">
+                                                            <select
+                                                                value={sub.telegram_subscriber_group_id || ''}
+                                                                onChange={e => router.put(`/whatsapp-sender/telegram-subscribers/${sub.id}/group`, {
+                                                                    telegram_subscriber_group_id: e.target.value || null
+                                                                })}
+                                                                className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg py-1 px-2 text-xs focus:outline-none text-zinc-700 dark:text-zinc-300"
+                                                            >
+                                                                <option value="">Unassigned</option>
+                                                                {telegramSubscriberGroups.map(g => (
+                                                                    <option key={g.id} value={g.id}>{g.name}</option>
+                                                                ))}
+                                                            </select>
+                                                        </td>
+                                                        <td className="py-3 px-2 text-right">
+                                                            <button
+                                                                onClick={() => {
+                                                                    if(confirm('Are you sure you want to remove this subscriber?')) {
+                                                                        router.delete(`/whatsapp-sender/telegram-subscribers/${sub.id}`);
+                                                                    }
+                                                                }}
+                                                                className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            {telegramSubscribers.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={5} className="py-6 text-center text-zinc-400">No active subscribers discovered yet.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
-        </AuthenticatedLayout>
-    );
+        </div>
+
+        {/* Visual Chat Flow Builder Screen Overlay */}
+        {(isCreatingFlow || editingFlow) && (
+            <FlowBuilder
+                flow={editingFlow}
+                whatsappBusinessId={business.id}
+                channel={activeChannel}
+                telegramBotId={bots[0]?.id || null}
+                bots={bots}
+                onClose={() => {
+                    setIsCreatingFlow(false);
+                    setEditingFlow(null);
+                }}
+            />
+        )}
+    </AuthenticatedLayout>
+);
 }

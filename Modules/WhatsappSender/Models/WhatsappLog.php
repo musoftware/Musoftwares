@@ -14,8 +14,10 @@ class WhatsappLog extends Model
     protected $fillable = [
         'user_id',
         'whatsapp_account_id',
+        'telegram_bot_id',
         'whatsapp_business_id',
         'recipient_phone',
+        'channel',
         'cost_charged',
         'message_type',
         'message_body',
@@ -38,6 +40,11 @@ class WhatsappLog extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(WhatsappAccount::class, 'whatsapp_account_id');
+    }
+
+    public function telegramBot(): BelongsTo
+    {
+        return $this->belongsTo(TelegramBot::class, 'telegram_bot_id');
     }
 
     public function business(): BelongsTo
