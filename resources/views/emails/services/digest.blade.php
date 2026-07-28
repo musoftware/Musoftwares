@@ -132,7 +132,7 @@
         <!-- Website Services Section -->
         @if($websiteServices->isNotEmpty())
             <div class="section-title">
-                {{ __('services.explore_website_services') }} / {{ __('services.explore_website_services', [], 'ar') }}
+                {{ __('services.explore_website_services') }}
             </div>
             @foreach($websiteServices as $service)
                 <div class="card">
@@ -140,15 +140,13 @@
                         <img src="{{ asset($service->primary_image_en) }}" alt="Service Image" class="card-image">
                     @endif
                     <div class="title-group">
-                        <h3 class="title-en">{{ $service->title_en }}</h3>
-                        <h3 class="title-ar">{{ $service->title_ar }}</h3>
+                        <h3 class="title-en">{{ $service->title_en ?: $service->title_ar }}</h3>
                     </div>
-                    <p class="desc-en">{{ Str::limit(strip_tags($service->description_en), 180) }}</p>
-                    <p class="desc-ar">{{ Str::limit(strip_tags($service->description_ar), 180) }}</p>
+                    <p class="desc-en">{{ Str::limit(strip_tags($service->description_en ?: $service->description_ar), 180) }}</p>
                     
                     <div class="btn-group">
                         <a href="{{ route('website-services.show', ['slug' => $service->slug]) }}" class="btn">
-                            {{ __('services.explore_button') }} / {{ __('services.explore_button', [], 'ar') }}
+                            {{ __('services.explore_button') }}
                         </a>
                     </div>
                 </div>
@@ -158,14 +156,12 @@
         <!-- Marketplace Services Section -->
         @if($marketplaceServices->isNotEmpty())
             <div class="section-title">
-                {{ __('services.explore_marketplace_services') }} / {{ __('services.explore_marketplace_services', [], 'ar') }}
+                {{ __('services.explore_marketplace_services') }}
             </div>
             @foreach($marketplaceServices as $service)
                 @php
                     $titleEn = ($service->title_translations['en'] ?? '') ?: $service->title;
-                    $titleAr = ($service->title_translations['ar'] ?? '') ?: $service->title;
                     $descEn = ($service->description_translations['en'] ?? '') ?: $service->description;
-                    $descAr = ($service->description_translations['ar'] ?? '') ?: $service->description;
                 @endphp
                 <div class="card">
                     @if($service->cover_image)
@@ -173,14 +169,12 @@
                     @endif
                     <div class="title-group">
                         <h3 class="title-en">{{ $titleEn }}</h3>
-                        <h3 class="title-ar">{{ $titleAr }}</h3>
                     </div>
                     <p class="desc-en">{{ Str::limit(strip_tags($descEn), 180) }}</p>
-                    <p class="desc-ar">{{ Str::limit(strip_tags($descAr), 180) }}</p>
                     
                     <div class="btn-group">
                         <a href="{{ $service->url }}" class="btn">
-                            {{ __('services.explore_button') }} / {{ __('services.explore_button', [], 'ar') }}
+                            {{ __('services.explore_button') }}
                         </a>
                     </div>
                 </div>

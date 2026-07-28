@@ -44,7 +44,8 @@ class DailyNewServicesDigestNotification extends Notification implements ShouldQ
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject(__('services.daily_digest_subject'))
+            ->locale('en')
+            ->subject(__('services.daily_digest_subject', [], 'en'))
             ->view('emails.services.digest', [
                 'websiteServices' => $this->websiteServices,
                 'marketplaceServices' => $this->marketplaceServices,

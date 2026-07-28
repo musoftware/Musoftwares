@@ -182,5 +182,11 @@ return [
         'actions' => [
             'explore_services' => 'استكشف الخدمات'
         ]
-    ]
+    ],
+    'daily_digest_subject' => 'خدمات جديدة مضافة اليوم! - ميوسوفت ويرز',
+    'daily_digest_fcm_title' => 'خدمات جديدة مضافة اليوم!',
+    'daily_digest_fcm_body' => 'اكتشف الخدمات والميزات الجديدة التي تمت إضافتها إلى ميوسوفت ويرز اليوم.',
+    'explore_website_services' => 'خدمات ميوسوفت ويرز الرسمية',
+    'explore_marketplace_services' => 'خدمات العمل الحر الجديدة',
+    'explore_button' => 'استكشف الخدمة'
 ];

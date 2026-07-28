@@ -214,7 +214,7 @@ export default function Invoices({
                                 </p>
                             </div>
                             <Link
-                                href={route('add-balance')}
+                                href={route('financial.add-balance')}
                                 className={buttonVariants({
                                     variant: 'default',
                                     size: 'sm',

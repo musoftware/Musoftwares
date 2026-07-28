@@ -319,9 +319,14 @@ export default function Index({ clients, filters, stats }) {
 
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">{__('general.clients_list') || 'Clients List'}</h2>
-                <Link href="/admin/users/create">
-                    <Button>{__('general.create_account') || 'Create User'}</Button>
-                </Link>
+                <div className="flex items-center gap-2">
+                    <Link href="/admin/users/bulk-create">
+                        <Button variant="outline">{__('general.bulk_create') || 'Bulk Create'}</Button>
+                    </Link>
+                    <Link href="/admin/users/create">
+                        <Button>{__('general.create_account') || 'Create User'}</Button>
+                    </Link>
+                </div>
             </div>
             
             <div className="mb-6">

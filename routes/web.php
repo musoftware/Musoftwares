@@ -671,6 +671,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Recovered from old project: Admin/UsersController
     Route::get('/users', [UsersController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UsersController::class, 'create'])->name('users.create');
+    Route::get('/users/bulk-create', [UsersController::class, 'bulkCreate'])->name('users.bulk-create');
+    Route::post('/users/bulk-create', [UsersController::class, 'bulkStore'])->name('users.bulk-store');
     Route::post('/users', [UsersController::class, 'store'])->name('users.store');
     Route::get('/users/problematic', [UsersController::class, 'problematic'])->name('users.problematic');
     Route::get('/users/co-work', [UsersController::class, 'coWork'])->name('users.co-work');

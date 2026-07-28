@@ -1619,6 +1619,8 @@ return [
     'create_a_themed_board_to_organize_your_swipes' => 'Create a themed board to organize your swipes.',
     'create_account' => 'Create account',
     'create_account_1' => 'Create account',
+    'bulk_create' => 'Bulk Create',
+    'bulk_create_accounts' => 'Bulk Create Accounts',
     'create_ai_sales_agent' => 'Create an AI Sales Agent',
     'create_an_account_instantly_and_receive' => 'Create An Account Instantly And Receive',
     'create_an_erp_task_for_this_client' => 'Create an ERP Task for this client.',

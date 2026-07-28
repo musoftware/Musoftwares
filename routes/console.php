@@ -39,6 +39,9 @@ Schedule::command(\App\Console\Commands\TranslateMarketplaceServices::class)->ho
 // Automatically generate AI blog articles daily at 02:00
 Schedule::command(\App\Console\Commands\GenerateBlogArticles::class, ['--limit' => 5])->dailyAt('02:00')->withoutOverlapping(10);
 
+// Send daily new services digest daily at 23:30 Cairo Time
+Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dailyAt('23:30')->timezone('Africa/Cairo');
+
 // Poll IMAP every two minutes for guest ticket replies
 Schedule::command('imap:pull')->everyTwoMinutes()->withoutOverlapping(5);
 

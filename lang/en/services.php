@@ -182,5 +182,11 @@ return [
     'total_net_pay' => 'Total Net Pay',
     'total_value' => 'Total Value',
     'view_in_admin_panel' => 'View In Admin Panel',
-    'yes_the_android_app_only' => 'Yes The Android App Only'
+    'yes_the_android_app_only' => 'Yes The Android App Only',
+    'daily_digest_subject' => 'New Services Added Today! - Musoftwares',
+    'daily_digest_fcm_title' => 'New Services Added Today!',
+    'daily_digest_fcm_body' => 'Check out the new services and features added to Musoftwares today.',
+    'explore_website_services' => 'Official Musoftwares Services',
+    'explore_marketplace_services' => 'New Freelance Services',
+    'explore_button' => 'Explore Service'
 ];

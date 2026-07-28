@@ -1619,6 +1619,8 @@ return [
     'create_a_themed_board_to_organize_your_swipes' => 'إنشاء a themed board to organize your swipes.',
     'create_account' => 'إنشاء Account',
     'create_account_1' => 'إنشاء account',
+    'bulk_create' => 'إنشاء جماعي',
+    'bulk_create_accounts' => 'إنشاء حسابات جماعي',
     'create_ai_sales_agent' => 'إنشاء AI Sales Agent',
     'create_an_account_instantly_and_receive' => 'إنشاء An Account Instantly And Receive',
     'create_an_erp_task_for_this_client' => 'إنشاء an ERP Task for this client.',

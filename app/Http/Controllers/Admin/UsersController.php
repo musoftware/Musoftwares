@@ -234,6 +234,138 @@ class UsersController extends Controller
     }
 
     /**
+     * Show bulk creation page.
+     */
+    public function bulkCreate(): InertiaResponse
+    {
+        return Inertia::render('Admin/Users/BulkCreate');
+    }
+
+    /**
+     * Store bulk users.
+     */
+    public function bulkStore(Request $request)
+    {
+        $request->validate([
+            'entries' => 'required|string',
+        ]);
+
+        $rawEntries = $request->input('entries');
+        $lines = preg_split('/\r\n|\r|\n/', $rawEntries);
+        $results = [];
+
+        // Find EGP currency
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
+        $currencyId = $egpCurrency ? $egpCurrency->id : (Currency::getDefault()?->id ?? 2);
+
+        foreach ($lines as $lineIndex => $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            // Parse line using multiple possible delimiters
+            $name = '';
+            $email = '';
+            $parts = explode(',', $line);
+            if (count($parts) >= 2) {
+                $email = trim(array_pop($parts));
+                $name = trim(implode(',', $parts));
+            } else {
+                $parts = explode(';', $line);
+                if (count($parts) >= 2) {
+                    $email = trim(array_pop($parts));
+                    $name = trim(implode(';', $parts));
+                } else {
+                    $lastSpacePos = strrpos($line, ' ');
+                    if ($lastSpacePos !== false) {
+                        $name = trim(substr($line, 0, $lastSpacePos));
+                        $email = trim(substr($line, $lastSpacePos + 1));
+                    }
+                }
+            }
+
+            if (empty($name) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $results[] = [
+                    'line' => $lineIndex + 1,
+                    'input' => $line,
+                    'name' => $name ?: 'Unknown',
+                    'email' => $email ?: 'Invalid Email',
+                    'status' => 'failed',
+                    'reason' => 'Invalid format. Expected "Name, Email".',
+                ];
+                continue;
+            }
+
+            // Check if email already exists (primary or alias)
+            $existingUser = User::findForLogin($email);
+            if ($existingUser) {
+                $results[] = [
+                    'line' => $lineIndex + 1,
+                    'input' => $line,
+                    'name' => $name,
+                    'email' => $email,
+                    'status' => 'skipped',
+                    'reason' => "Email/alias already exists (associated with user #{$existingUser->id}: {$existingUser->name}).",
+                ];
+                continue;
+            }
+
+            // Adjust name format: must have a last name (space)
+            $processedName = $name;
+            if (!str_contains($processedName, ' ')) {
+                // Split CamelCase or PascalCase (e.g. MuSoftware -> Mu Software)
+                $split = preg_replace('/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', ' $1', $processedName);
+                $split = preg_replace('/\s+/', ' ', $split);
+                
+                if (str_contains($split, ' ')) {
+                    $processedName = $split;
+                } else {
+                    // Fallback to "Account"
+                    $processedName = $processedName . ' Account';
+                }
+            }
+
+            try {
+                // Create user
+                $user = new User();
+                $user->name = $processedName;
+                $user->email = $email;
+                $user->currency_id = $currencyId;
+                $user->password = Hash::make(Str::random(16));
+                $user->account_status = 'active';
+                $user->save();
+
+                // Assign role client
+                $user->syncRoles(['client']);
+
+                $results[] = [
+                    'line' => $lineIndex + 1,
+                    'input' => $line,
+                    'name' => $processedName,
+                    'email' => $email,
+                    'status' => 'created',
+                    'reason' => 'Account created successfully with EGP currency.',
+                ];
+            } catch (\Exception $e) {
+                $results[] = [
+                    'line' => $lineIndex + 1,
+                    'input' => $line,
+                    'name' => $processedName,
+                    'email' => $email,
+                    'status' => 'failed',
+                    'reason' => 'Database error: ' . $e->getMessage(),
+                ];
+            }
+        }
+
+        return Inertia::render('Admin/Users/BulkCreate', [
+            'bulk_results' => $results,
+            'success' => 'Bulk processing completed.'
+        ]);
+    }
+
+    /**
      * Store a new user.
      * Business rule: name must include a last name.
      */
