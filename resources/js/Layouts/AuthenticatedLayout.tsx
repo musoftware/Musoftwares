@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Toaster } from '@/Components/ui/toaster';
@@ -225,8 +226,8 @@ function AuthenticatedContent({
                                                         <LayoutDashboard className="w-5 h-5 text-slate-400" /> {__('general.dashboard')}</Link>
                                                 ) : (
                                                     <>
-                                                        <Link href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                            <LayoutDashboard className="w-5 h-5 text-slate-400" /> {__('general.dashboard')}</Link>
+                                                        <SafeLink href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                            <LayoutDashboard className="w-5 h-5 text-slate-400" /> {__('general.dashboard')}</SafeLink>
                                                         <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50 text-emerald-700 font-medium">
                                                             <Plus className="w-5 h-5 text-emerald-500" />{__('general.add_balance')}
                                                         </Link>

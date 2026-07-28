@@ -1,6 +1,7 @@
 import { __ } from '@/lib/i18n';
 import { Button } from '@/Components/ui/button';
 import { Link, usePage, useForm, Head } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin, Send, Briefcase } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -47,6 +48,16 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     };
 
     useEffect(() => {
+        // Iframe prevention: redirect the TOP frame to this URL so the page breaks out of any iframe
+        try {
+            if (window.self !== window.top && window.top !== null) {
+                window.top.location.href = window.location.href;
+                return;
+            }
+        } catch {
+            // Sandboxed iframe without allow-top-navigation — can't break out, do nothing
+        }
+
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
@@ -182,10 +193,10 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     {/* Right-Side Authentication CTAs */}
                     <div className="hidden lg:flex items-center gap-4">
                         {auth?.user ? (
-                            <Link href="/dashboard">
+                            <SafeLink href="/dashboard">
                                 <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold h-10 px-6">
                                     {__('general.dashboard')}</Button>
-                            </Link>
+                            </SafeLink>
                         ) : (
                             <>
                                 <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 px-3 py-2 transition-all">
@@ -281,9 +292,9 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
 
                     <div className="p-6 border-t border-slate-100 bg-slate-50 space-y-4">
                         {auth?.user ? (
-                            <Link href="/dashboard" className="block w-full">
+                            <SafeLink href="/dashboard" className="block w-full">
                                 <Button className="w-full bg-slate-900 text-white rounded-full h-12">{__('general.dashboard')}</Button>
-                            </Link>
+                            </SafeLink>
                         ) : (
                             <>
                                 <Link href="/login" className="block w-full">

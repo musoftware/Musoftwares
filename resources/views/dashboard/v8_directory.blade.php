@@ -2,6 +2,13 @@
 <html lang="en" style="overflow: overlay;">
 
 <head>
+    <script>
+        try {
+            if (window.self !== window.top) {
+                window.top.location.href = window.location.href;
+            }
+        } catch(e) { /* sandboxed iframe: can't break out, page stays hidden */ }
+    </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Musoftwares Full System Tools & Services Directory">

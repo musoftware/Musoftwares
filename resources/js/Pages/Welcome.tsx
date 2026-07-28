@@ -1,5 +1,6 @@
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import { __ } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
@@ -100,11 +101,11 @@ export default function Welcome({
 
                         <div className="flex items-center space-x-4">
                             {auth.user ? (
-                                <Link href={route('dashboard')}>
+                                <SafeLink href={route('dashboard')}>
                                     <Button variant="outline" className="rounded-full px-6 font-medium border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800">
                                         {__('general.dashboard') || 'Dashboard'}
                                     </Button>
-                                </Link>
+                                </SafeLink>
                             ) : (
                                 <>
                                     <Link href={route('login')} className="hidden sm:block text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
@@ -147,11 +148,11 @@ export default function Welcome({
                                 className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
                             >
                                 {auth.user ? (
-                                    <Link href={route('dashboard')}>
+                                    <SafeLink href={route('dashboard')}>
                                         <Button size="lg" className="h-12 px-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-base font-medium w-full sm:w-auto shadow-sm">
                                             Go to Dashboard
                                         </Button>
-                                    </Link>
+                                    </SafeLink>
                                 ) : (
                                     <>
                                         <Link href={route('register')}>

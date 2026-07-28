@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Globe, MessageCircle, Share2, Mail, Users, ShieldCheck, Lock, ExternalLink } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
@@ -75,10 +76,10 @@ export default function MarketplaceFooter() {
                         <h4 className="font-bold text-slate-900 mb-6 text-sm uppercase tracking-wider">{__('general.ecosystem') || 'Musoftware Ecosystem'}</h4>
                         <ul className="space-y-3.5 text-sm text-slate-500">
                             <li>
-                                <Link href="/dashboard" className="inline-flex items-center gap-1.5 hover:text-indigo-600 font-medium text-slate-700 transition-colors">
+                                <SafeLink href="/dashboard" className="inline-flex items-center gap-1.5 hover:text-indigo-600 font-medium text-slate-700 transition-colors">
                                     <span>{__('general.main_saas_app') || 'Main SaaS App'}</span>
                                     <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                                </Link>
+                                </SafeLink>
                             </li>
                             <li><Link href="/erp" className="hover:text-indigo-600 transition-colors">ERP Suite</Link></li>
                             <li><Link href="/crm" className="hover:text-indigo-600 transition-colors">CRM Portal</Link></li>

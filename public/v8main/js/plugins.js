@@ -14,14 +14,16 @@ function toggler(selector) {
     $(selector).slideToggle();
 }
 
-localStorage.setItem('theme', 'dark');
+try { localStorage.setItem('theme', 'dark'); } catch(e) {}
 
 /* ==========================================================================
    30-DAY WELCOME INTRO SKIP & EXPIRATION ENGINE
    ========================================================================== */
 function checkWelcomeSuppressed() {
-    var skipUntil = parseInt(localStorage.getItem('v8_skip_welcome_until') || '0', 10);
-    return Date.now() < skipUntil;
+    try {
+        var skipUntil = parseInt(localStorage.getItem('v8_skip_welcome_until') || '0', 10);
+        return Date.now() < skipUntil;
+    } catch(e) { return false; }
 }
 
 function bypassPreloaderNow() {

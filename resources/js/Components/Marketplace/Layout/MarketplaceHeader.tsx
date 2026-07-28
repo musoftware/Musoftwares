@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import { Search, Menu, Globe, Heart, Plus, LayoutGrid, ExternalLink, Store, Sparkles, User, LogOut, ChevronDown } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
@@ -202,10 +203,10 @@ export default function MarketplaceHeader() {
 
                                         {/* Switch back to Main SaaS App */}
                                         <DropdownMenuItem asChild>
-                                            <Link href="/dashboard" className="cursor-pointer w-full flex items-center gap-2.5 p-2 text-slate-700 font-medium">
+                                            <SafeLink href="/dashboard" className="cursor-pointer w-full flex items-center gap-2.5 p-2 text-slate-700 font-medium">
                                                 <LayoutGrid className="h-4 w-4 text-indigo-500" />
                                                 <span>{__('general.return_to_main_app') || 'Main Business App'}</span>
-                                            </Link>
+                                            </SafeLink>
                                         </DropdownMenuItem>
 
                                         <DropdownMenuItem asChild>

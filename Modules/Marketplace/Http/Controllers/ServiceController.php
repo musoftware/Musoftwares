@@ -790,4 +790,103 @@ class ServiceController extends Controller
             'prompt' => $refinedPrompt,
         ], 500);
     }
+
+    /**
+     * Display services for a specific Technology / Tag.
+     */
+    public function showTechnology(string $tag, Request $request)
+    {
+        $tagClean = trim(urldecode($tag));
+        $query = Service::with(['seller', 'category', 'packages.currency'])
+            ->where('status', 'active')
+            ->whereJsonContains('tags', $tagClean);
+
+        $services = $query->latest()->paginate(15);
+        $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
+            return ServiceCategory::orderBy('name')->get();
+        });
+
+        $services->getCollection()->transform(function ($service) {
+            $service->makeHidden(['description', 'description_translations', 'auto_reply', 'auto_reply_translations', 'faq', 'requirements']);
+            return $service;
+        });
+
+        $title = "Services built with " . ucfirst($tagClean);
+        $canonicalUrl = route('marketplace.technologies.show', ['tag' => $tagClean]);
+
+        $schemaJson = \Modules\Marketplace\Helpers\MarketplaceSchemaHelper::forBreadcrumbs([
+            ['name' => 'Home', 'url' => url('/')],
+            ['name' => 'Marketplace', 'url' => route('marketplace.services.index')],
+            ['name' => "Technology: {$tagClean}", 'url' => $canonicalUrl],
+        ]);
+
+        return Inertia::render('Marketplace/Browse', [
+            'services' => $services,
+            'categories' => $categories,
+            'schemaJson' => $schemaJson,
+            'filters' => [
+                'tag' => $tagClean,
+                'technology' => $tagClean,
+            ],
+        ])->withViewData([
+            'meta' => [
+                'title' => "{$title} | MuSoftwares Marketplace",
+                'description' => "Find best freelancers and services specialized in {$tagClean} on MuSoftwares Marketplace.",
+                'url' => $canonicalUrl,
+                'schemaJson' => $schemaJson,
+            ],
+        ]);
+    }
+
+    /**
+     * Display services for a specific Integration.
+     */
+    public function showIntegration(string $tag, Request $request)
+    {
+        $tagClean = trim(urldecode($tag));
+        $query = Service::with(['seller', 'category', 'packages.currency'])
+            ->where('status', 'active')
+            ->where(function ($q) use ($tagClean) {
+                $q->whereJsonContains('tags', $tagClean)
+                  ->orWhere('title', 'like', "%{$tagClean}%")
+                  ->orWhere('description', 'like', "%{$tagClean}%");
+            });
+
+        $services = $query->latest()->paginate(15);
+        $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
+            return ServiceCategory::orderBy('name')->get();
+        });
+
+        $services->getCollection()->transform(function ($service) {
+            $service->makeHidden(['description', 'description_translations', 'auto_reply', 'auto_reply_translations', 'faq', 'requirements']);
+            return $service;
+        });
+
+        $title = "{$tagClean} Integrations & Solutions";
+        $canonicalUrl = route('marketplace.integrations.show', ['tag' => $tagClean]);
+
+        $schemaJson = \Modules\Marketplace\Helpers\MarketplaceSchemaHelper::forBreadcrumbs([
+            ['name' => 'Home', 'url' => url('/')],
+            ['name' => 'Marketplace', 'url' => route('marketplace.services.index')],
+            ['name' => "Integration: {$tagClean}", 'url' => $canonicalUrl],
+        ]);
+
+        return Inertia::render('Marketplace/Browse', [
+            'services' => $services,
+            'categories' => $categories,
+            'schemaJson' => $schemaJson,
+            'filters' => [
+                'tag' => $tagClean,
+                'integration' => $tagClean,
+            ],
+        ])->withViewData([
+            'meta' => [
+                'title' => "{$title} | MuSoftwares Marketplace",
+                'description' => "Explore {$tagClean} integrations, tools, and automated services on MuSoftwares Marketplace.",
+                'url' => $canonicalUrl,
+                'schemaJson' => $schemaJson,
+            ],
+        ]);
+    }
 }
+

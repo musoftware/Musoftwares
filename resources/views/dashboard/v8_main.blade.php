@@ -2,6 +2,13 @@
 <html lang="en" style="overflow: overlay;">
 
 <head>
+    <script>
+        try {
+            if (window.self !== window.top) {
+                window.top.location.href = window.location.href;
+            }
+        } catch(e) { /* sandboxed iframe: can't break out, page stays hidden */ }
+    </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Musoftwares Dashboard">
@@ -725,6 +732,191 @@
         box-shadow: 0 0 10px rgba(244, 63, 94, 0.9);
         z-index: 10;
     }
+
+    /* ── MOBILE / SPACE-DEPENDENT RESPONSIVE TOP & BOTTOM BUTTON LAYOUT ── */
+    @media only screen and (max-width: 768px) {
+        .orbital-viewport {
+            height: calc(100vh - 56px) !important;
+            padding: 8px 4px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+
+        .orbital-center-core {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 10 !important;
+            width: 100% !important;
+            pointer-events: none !important;
+        }
+
+        .orbital-center-core #logo-it {
+            zoom: 0.8 !important;
+            width: 220px !important;
+            height: 180px !important;
+        }
+
+        .orbital-identity {
+            margin-top: -10px !important;
+        }
+
+        .orbital-identity .c-name {
+            font-size: 16px !important;
+            letter-spacing: 2px !important;
+        }
+
+        .orbital-identity .c-role {
+            font-size: 9px !important;
+            letter-spacing: 2px !important;
+        }
+
+        .orbital-arc-container {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            height: 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 6px 2px !important;
+            z-index: 15 !important;
+            position: relative !important;
+            box-sizing: border-box !important;
+        }
+
+        .orbital-col {
+            width: 100% !important;
+            height: auto !important;
+            flex-direction: row !important;
+            justify-content: space-around !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            padding: 0 4px !important;
+            margin: 0 !important;
+        }
+
+        .orbital-col.orbital-left {
+            align-items: center !important;
+            margin-top: 4px !important;
+        }
+
+        .orbital-col.orbital-right {
+            align-items: center !important;
+            margin-bottom: 8px !important;
+        }
+
+        .cube-3d-scene {
+            width: 68px !important;
+            height: 68px !important;
+            perspective: 500px !important;
+        }
+
+        .cube-3d-scene::before {
+            width: 68px !important;
+            height: 68px !important;
+        }
+
+        .cube-face {
+            width: 68px !important;
+            height: 68px !important;
+            border-radius: 10px !important;
+        }
+
+        .cube-face-front { transform: translateZ(34px) !important; padding: 4px !important; }
+        .cube-face-back { transform: rotateY(180deg) translateZ(34px) !important; }
+        .orbital-left .cube-face-right, .orbital-right .cube-face-right { transform: rotateY(90deg) translateZ(34px) !important; }
+        .orbital-left .cube-face-left, .orbital-right .cube-face-left { transform: rotateY(-90deg) translateZ(34px) !important; }
+        .cube-face-top { transform: rotateX(90deg) translateZ(34px) !important; }
+        .cube-face-bottom { transform: rotateX(-90deg) translateZ(34px) !important; }
+
+        .cube-face-front svg {
+            width: 24px !important;
+            height: 24px !important;
+        }
+
+        .cube-face-front .cube-inner-label {
+            font-size: 8px !important;
+            margin-top: 2px !important;
+            line-height: 1.05 !important;
+            letter-spacing: 0.1px !important;
+        }
+
+        .c-box-badge {
+            font-size: 7px !important;
+            padding: 1px 4px !important;
+            top: -4px !important;
+            right: -4px !important;
+        }
+    }
+
+    @media only screen and (max-width: 380px) {
+        .cube-3d-scene {
+            width: 60px !important;
+            height: 60px !important;
+        }
+        .cube-3d-scene::before {
+            width: 60px !important;
+            height: 60px !important;
+        }
+        .cube-face {
+            width: 60px !important;
+            height: 60px !important;
+        }
+        .cube-face-front { transform: translateZ(30px) !important; }
+        .cube-face-back { transform: rotateY(180deg) translateZ(30px) !important; }
+        .orbital-left .cube-face-right, .orbital-right .cube-face-right { transform: rotateY(90deg) translateZ(30px) !important; }
+        .orbital-left .cube-face-left, .orbital-right .cube-face-left { transform: rotateY(-90deg) translateZ(30px) !important; }
+        .cube-face-top { transform: rotateX(90deg) translateZ(30px) !important; }
+        .cube-face-bottom { transform: rotateX(-90deg) translateZ(30px) !important; }
+
+        .cube-face-front svg {
+            width: 20px !important;
+            height: 20px !important;
+        }
+        .cube-face-front .cube-inner-label {
+            font-size: 7px !important;
+        }
+        .orbital-center-core #logo-it {
+            zoom: 0.65 !important;
+            width: 180px !important;
+            height: 150px !important;
+        }
+    }
+
+    @media only screen and (max-height: 520px) {
+        .orbital-viewport {
+            overflow-y: auto !important;
+        }
+        .orbital-center-core #logo-it {
+            zoom: 0.55 !important;
+            width: 150px !important;
+            height: 120px !important;
+        }
+        .cube-3d-scene {
+            width: 55px !important;
+            height: 55px !important;
+        }
+        .cube-3d-scene::before {
+            width: 55px !important;
+            height: 55px !important;
+        }
+        .cube-face {
+            width: 55px !important;
+            height: 55px !important;
+        }
+        .cube-face-front { transform: translateZ(27.5px) !important; }
+        .cube-face-back { transform: rotateY(180deg) translateZ(27.5px) !important; }
+        .orbital-left .cube-face-right, .orbital-right .cube-face-right { transform: rotateY(90deg) translateZ(27.5px) !important; }
+        .orbital-left .cube-face-left, .orbital-right .cube-face-left { transform: rotateY(-90deg) translateZ(27.5px) !important; }
+        .cube-face-top { transform: rotateX(90deg) translateZ(27.5px) !important; }
+        .cube-face-bottom { transform: rotateX(-90deg) translateZ(27.5px) !important; }
+    }
 </style>
 
 <div class="orbital-viewport" id="orbitalViewport">
@@ -804,7 +996,7 @@
                 <div class="cube-3d-scene cube-theme-pink">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                             <span class="cube-inner-label">{{ __('dashboard.crm_system') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>

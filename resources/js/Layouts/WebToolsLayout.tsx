@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
+import SafeLink from '@/Components/SafeLink';
 import { __ } from '@/lib/i18n';
 import {
     Calculator, 
@@ -106,10 +107,10 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                         {/* Auth actions */}
                         <div className="flex items-center gap-3">
                             {isAuthed ? (
-                                <Link href="/dashboard">
+                                <SafeLink href="/dashboard">
                                     <Button variant="outline" className="rounded-full text-sm font-medium">
                                         {__('general.dashboard')}</Button>
-                                </Link>
+                                </SafeLink>
                             ) : (
                                 <>
                                     <Link href={route('login')} className="hidden sm:block text-sm font-medium text-slate-600 hover:text-slate-900">

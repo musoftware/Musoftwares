@@ -74,30 +74,31 @@ class Service extends Model
         return $this->hasOne(ServiceLandingPage::class, 'service_id');
     }
 
-    public function orders()
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(ServiceOrder::class, ServicePackage::class, 'service_id', 'package_id');
     }
 
-    public function reviews()
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ServiceReview::class, 'service_id');
     }
 
-    public function extras()
+    public function extras(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ServiceExtra::class, 'service_id');
     }
 
-    public function discounts()
+    public function discounts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ServiceDiscount::class, 'service_id');
     }
 
-    public function serials()
+    public function serials(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ServiceSerial::class, 'service_id');
     }
+
 
     public function getCoverImageAttribute()
     {

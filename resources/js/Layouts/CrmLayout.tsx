@@ -1,5 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import {
     ChevronRight, ArrowLeft, LayoutDashboard, Users, Mail, PlayCircle, Settings,
     Search, Tag, MessageCircle, Smartphone, Bookmark, Zap, Clock, BarChart2,
@@ -133,14 +134,14 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                                 <span>{__('general.logout')}</span>
                             </Link>
                         ) : (
-                            <Link
+                            <SafeLink
                                 href={route('dashboard')}
                                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 <span className="hidden sm:inline">{__('general.exit_to_main_hub')}</span>
                                 <span className="sm:hidden">{__('general.exit')}</span>
-                            </Link>
+                            </SafeLink>
                         )}
                     </div>
                 </div>

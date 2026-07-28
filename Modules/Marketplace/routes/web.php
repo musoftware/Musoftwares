@@ -19,16 +19,34 @@ Route::middleware('web')
     ->name('marketplace.')
     ->group(function () {
 
-        // ── Public ────────────────────────────────────────────────────────
+        // ── Public Pages & Semantic Routes ───────────────────────────────
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+        Route::get('/categories/{slug}', [ServiceCategoryController::class, 'showCategory'])->name('categories.show');
+        Route::get('/technologies/{tag}', [ServiceController::class, 'showTechnology'])->name('technologies.show');
+        Route::get('/integrations/{tag}', [ServiceController::class, 'showIntegration'])->name('integrations.show');
+
+        // ── Machine Readable APIs v1 ───────────────────────────────────────
+        Route::prefix('api/v1')->name('api.v1.')->group(function () {
+            Route::get('/services', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'services'])->name('services');
+            Route::get('/categories', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'categories'])->name('categories');
+            Route::get('/search', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'search'])->name('search');
+            Route::get('/search/autocomplete', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'autocomplete'])->name('autocomplete');
+            Route::get('/pricing', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'pricing'])->name('pricing');
+            Route::get('/openapi.json', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'openapi'])->name('openapi');
+
+            Route::middleware('auth')->group(function () {
+                Route::post('/orders', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'createOrder'])->name('orders.create');
+                Route::get('/orders/{order}/status', [\Modules\Marketplace\Http\Controllers\Api\MarketplaceApiController::class, 'orderStatus'])->name('orders.status');
+            });
+        });
+
         Route::get('/api/services', [ServiceController::class, 'apiIndex'])->name('services.api');
-        
-        // Navigation API (using controller action instead of route closure)
         Route::get('/api/categories', [ServiceCategoryController::class, 'apiIndex'])->name('categories.api');
 
         // Free downloads
         Route::post('/downloads/{service}/request', [FreeDownloadController::class, 'requestDownload'])->name('downloads.request');
         Route::get('/downloads/claim/{token}', [FreeDownloadController::class, 'claimDownload'])->name('downloads.claim');
+
 
         // ── Auth-only ─────────────────────────────────────────────────────
         Route::middleware('auth')->group(function () {

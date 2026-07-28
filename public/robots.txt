@@ -1,15 +1,7 @@
 User-agent: *
+Allow: /
 Disallow: /admin/
-Disallow: /dashboard/
-Disallow: /marketplace/dashboard
-Disallow: /marketplace/orders/
-Disallow: /marketplace/downloads/
-Disallow: /marketplace/coupons/
-Disallow: /marketplace/referral/
 Disallow: /seller/
-Disallow: /cart/
-Disallow: /checkout/
-Disallow: /api/
-Disallow: /sso/
+Disallow: /marketplace/dashboard
 
-Sitemap: https://musoftwares.com/sitemap.xml
+Sitemap: https://www.musoftwares.com/sitemap.xml

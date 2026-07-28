@@ -1,4 +1,5 @@
-import { InertiaLinkProps, Link } from '@inertiajs/react';
+import { InertiaLinkProps } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 
 export default function NavLink({
     active = false,
@@ -7,8 +8,8 @@ export default function NavLink({
     ...props
 }: InertiaLinkProps & { active: boolean }) {
     return (
-        <Link
-            {...props}
+        <SafeLink
+            {...(props as any)}
             className={
                 'inline-flex items-center border-b-2 px-1 pt-1 text-sm leading-5 font-medium transition duration-150 ease-in-out focus:outline-none ' +
                 (active
@@ -18,6 +19,6 @@ export default function NavLink({
             }
         >
             {children}
-        </Link>
+        </SafeLink>
     );
 }

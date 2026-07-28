@@ -2,6 +2,7 @@ import React, { PropsWithChildren, ReactNode } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/Admin/AppSidebar';
 import { Head, Link, usePage } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 
@@ -66,7 +67,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                                 <p className="text-xs text-slate-500 truncate">{displayEmail}</p>
                             </div>
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm mb-1" asChild>
-                                <Link href={route().has('dashboard') ? route('dashboard') : '#'}>{__('general.dashboard')}</Link>
+                                <SafeLink href={route().has('dashboard') ? route('dashboard') : '#'}>{__('general.dashboard')}</SafeLink>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm mb-1" asChild>
                                 <Link href={route().has('profile.edit') ? route('profile.edit') : '#'}>{__('general.profile')}</Link>

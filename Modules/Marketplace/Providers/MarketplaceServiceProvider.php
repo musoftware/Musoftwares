@@ -25,5 +25,12 @@ class MarketplaceServiceProvider extends ServiceProvider
         // Register Policies
         Gate::policy(ServiceOrder::class, ServiceOrderPolicy::class);
         Gate::policy(Service::class, ServicePolicy::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Modules\Marketplace\Console\GenerateAiFilesCommand::class,
+            ]);
+        }
     }
 }
+

@@ -149,6 +149,53 @@ class ServiceCategoryController extends Controller
     }
 
     /**
+     * Display public page for a specific category.
+     */
+    public function showCategory(string $slug, Request $request): Response
+    {
+        $category = ServiceCategory::where('slug', $slug)
+            ->orWhere('id', is_numeric($slug) ? (int)$slug : 0)
+            ->firstOrFail();
+
+        $services = \Modules\Marketplace\Models\Service::with(['seller', 'category', 'packages.currency'])
+            ->where('category_id', $category->id)
+            ->where('status', 'active')
+            ->latest()
+            ->paginate(15);
+
+        $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
+            return ServiceCategory::orderBy('name')->get();
+        });
+
+        $services->getCollection()->transform(function ($service) {
+            $service->makeHidden(['description', 'description_translations', 'auto_reply', 'auto_reply_translations', 'faq', 'requirements']);
+            return $service;
+        });
+
+
+        $schemaJson = \Modules\Marketplace\Helpers\MarketplaceSchemaHelper::forCategory($category, $services->items());
+
+        return Inertia::render('Marketplace/Browse', [
+            'services' => $services,
+            'categories' => $categories,
+            'currentCategory' => $category,
+            'schemaJson' => $schemaJson,
+            'filters' => [
+                'category' => $category->slug,
+                'category_id' => $category->id,
+                'category_name' => $category->name,
+            ],
+        ])->withViewData([
+            'meta' => [
+                'title' => "{$category->name} Services | MuSoftwares Marketplace",
+                'description' => $category->description ?? "Explore {$category->name} services and digital solutions on MuSoftwares Marketplace.",
+                'url' => route('marketplace.categories.show', ['slug' => $category->slug]),
+                'schemaJson' => $schemaJson,
+            ],
+        ]);
+    }
+
+    /**
      * Generate a unique, collision-free URL slug.
      */
     private function generateUniqueSlug(string $name, ?int $ignoreId = null): string
@@ -172,5 +219,6 @@ class ServiceCategoryController extends Controller
         return $slug;
     }
 }
+
 
 

@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, ReactNode, useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
+import SafeLink from '@/Components/SafeLink';
 import { ChevronRight, ArrowLeft, Lock, Menu, X } from 'lucide-react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { __ } from '@/lib/i18n';
@@ -237,14 +238,14 @@ export default function ERPLayout({
                                 <span>{__('general.logout')}</span>
                             </Link>
                         ) : (
-                            <Link 
+                            <SafeLink 
                                 href={route('dashboard')} 
                                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" /> 
                                 <span className="hidden sm:inline">{__('general.exit_to_main_hub')}</span>
                                 <span className="sm:hidden">{__('general.exit')}</span>
-                            </Link>
+                            </SafeLink>
                         )}
                     </div>
                 </div>
