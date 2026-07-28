@@ -387,7 +387,7 @@
     .orbital-center-core #logo-it {
         zoom: 1.45 !important;
         width: 320px !important;
-        height: 290px !important;
+        height: 260px !important;
         filter: drop-shadow(0 0 65px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 25px rgba(0, 240, 255, 0.4));
         transition: filter 0.5s ease-out, transform 0.5s ease-out;
     }
@@ -418,29 +418,38 @@
         transform: scale(1.05);
     }
 
-    /* User identity below enlarged hologram */
+    /* User identity below enlarged hologram - Clean Capsule & Zero Overlap */
     .orbital-identity {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: -15px;
-        gap: 3px;
+        margin-top: 45px !important;
+        padding: 5px 22px;
+        background: rgba(13, 6, 26, 0.85);
+        border: 1.5px solid rgba(168, 85, 247, 0.45);
+        border-radius: 20px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.3);
+        z-index: 12;
+        gap: 2px;
+        position: relative;
     }
     .orbital-identity .c-name {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
         color: #f3e8ff;
         text-transform: uppercase;
-        letter-spacing: 4px;
+        letter-spacing: 3.5px;
         text-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 8px rgba(255, 255, 255, 0.6);
         transition: text-shadow 0.5s ease;
     }
     .orbital-identity .c-role {
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         color: #ff7c20;
         text-transform: uppercase;
-        letter-spacing: 3px;
+        letter-spacing: 2.5px;
         text-shadow: 0 0 10px rgba(255, 124, 32, 0.6);
     }
 
@@ -737,7 +746,7 @@
     @media only screen and (max-width: 768px) {
         .orbital-viewport {
             height: calc(100vh - 56px) !important;
-            padding: 8px 4px !important;
+            padding: 14px 4px 8px 4px !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important;
@@ -748,32 +757,37 @@
 
         .orbital-center-core {
             position: absolute !important;
-            top: 50% !important;
+            top: 48% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
             z-index: 10 !important;
             width: 100% !important;
             pointer-events: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
         .orbital-center-core #logo-it {
-            zoom: 0.8 !important;
-            width: 220px !important;
+            zoom: 0.95 !important;
+            width: 230px !important;
             height: 180px !important;
         }
 
         .orbital-identity {
-            margin-top: -10px !important;
+            margin-top: 32px !important;
+            padding: 3px 16px !important;
         }
 
         .orbital-identity .c-name {
-            font-size: 16px !important;
+            font-size: 14px !important;
             letter-spacing: 2px !important;
         }
 
         .orbital-identity .c-role {
-            font-size: 9px !important;
-            letter-spacing: 2px !important;
+            font-size: 8px !important;
+            letter-spacing: 1.5px !important;
         }
 
         .orbital-arc-container {
@@ -803,12 +817,13 @@
 
         .orbital-col.orbital-left {
             align-items: center !important;
-            margin-top: 4px !important;
+            margin-top: 18px !important;
+            margin-bottom: 10px !important;
         }
 
         .orbital-col.orbital-right {
             align-items: center !important;
-            margin-bottom: 8px !important;
+            margin-bottom: 12px !important;
         }
 
         .cube-3d-scene {
@@ -1275,6 +1290,7 @@
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/SVGLoader.js"></script>
 <script src="{{ asset('v8main/js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ asset('v8main/js/popper.min.js') }}"></script>
 <script src="{{ asset('v8main/js/bootstrap.min.js') }}"></script>
@@ -1410,32 +1426,110 @@
         var coreGroup = new THREE.Group();
         scene.add(coreGroup);
 
-        // 1. Central Intense Reactor Light & Inner Bright Sphere Core
-        var innerCoreGeo = new THREE.SphereGeometry(18, 32, 32);
-        var innerCoreMat = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.95
+        // 1. STANDALONE 3D EXTRUDED LOGO (MU - Titanium Chrome Finish, Zero Disc)
+        var logo3DGroup = new THREE.Group();
+        coreGroup.add(logo3DGroup);
+
+        var chromeMaterial = new THREE.MeshPhongMaterial({
+            color: 0xf8fafc,       // Sleek Titanium Chrome
+            emissive: 0x1e1b4b,    // Deep Cyberpunk Shadow Reflection
+            specular: 0xffffff,    // Pure Glossy Chrome Specular Highlight
+            shininess: 140,
+            side: THREE.DoubleSide
         });
-        var innerCoreMesh = new THREE.Mesh(innerCoreGeo, innerCoreMat);
-        coreGroup.add(innerCoreMesh);
+
+        // Fallback 3D Extruded Connected MU Shape (Zero Disc)
+        function createFallback3DMULogo() {
+            var mShape = new THREE.Shape();
+            mShape.moveTo(-36, 30);
+            mShape.lineTo(-36, -30);
+            mShape.lineTo(-24, -30);
+            mShape.lineTo(-24, 8);
+            mShape.lineTo(-12, -18);
+            mShape.lineTo(0, 8);
+            mShape.lineTo(0, -30);
+            mShape.lineTo(12, -30);
+            mShape.lineTo(12, 30);
+            mShape.lineTo(0, 30);
+            mShape.lineTo(-12, 4);
+            mShape.lineTo(-24, 30);
+            mShape.closePath();
+
+            // Stylized V-like U Shape connected right next to M
+            var uShape = new THREE.Shape();
+            uShape.moveTo(14, 30);
+            uShape.lineTo(24, -22);
+            uShape.lineTo(34, -30); // V-style bottom
+            uShape.lineTo(44, -22);
+            uShape.lineTo(54, 30);
+            uShape.lineTo(42, 30);
+            uShape.lineTo(34, -10);
+            uShape.lineTo(26, 30);
+            uShape.closePath();
+
+            var settings = { depth: 14, bevelEnabled: true, bevelThickness: 3, bevelSize: 1.5, bevelSegments: 4 };
+            var mGeo = new THREE.ExtrudeGeometry(mShape, settings);
+            var uGeo = new THREE.ExtrudeGeometry(uShape, settings);
+            mGeo.center();
+            uGeo.center();
+
+            var mMesh = new THREE.Mesh(mGeo, chromeMaterial);
+            var uMesh = new THREE.Mesh(uGeo, chromeMaterial);
+            mMesh.position.x = -16;
+            uMesh.position.x = 22;
+
+            logo3DGroup.add(mMesh);
+            logo3DGroup.add(uMesh);
+        }
+
+        // SVGLoader: Filter out background circle disc so ONLY standalone 3D MU logo renders
+        if (typeof THREE.SVGLoader !== 'undefined') {
+            var svgLoader = new THREE.SVGLoader();
+            svgLoader.load("{{ asset('favicon.svg') }}", function(data) {
+                var paths = data.paths;
+                var svgGroup = new THREE.Group();
+
+                for (var i = 0; i < paths.length; i++) {
+                    var path = paths[i];
+
+                    // SKIP background circle disc element completely
+                    if (path.userData && path.userData.node && path.userData.node.tagName === 'circle') {
+                        continue;
+                    }
+                    if (i === 0 && paths.length > 1) {
+                        continue; // Skip 1st background circle path in favicon.svg
+                    }
+
+                    var shapes = THREE.SVGLoader.createShapes(path);
+                    for (var j = 0; j < shapes.length; j++) {
+                        var shape = shapes[j];
+                        var extrudeGeo = new THREE.ExtrudeGeometry(shape, {
+                            depth: 16, // Solid standalone 3D depth
+                            bevelEnabled: true,
+                            bevelThickness: 3.5,
+                            bevelSize: 1.5,
+                            bevelSegments: 4
+                        });
+                        extrudeGeo.center();
+
+                        var mesh = new THREE.Mesh(extrudeGeo, chromeMaterial);
+                        svgGroup.add(mesh);
+                    }
+                }
+
+                svgGroup.scale.set(0.32, -0.32, 0.32);
+                logo3DGroup.add(svgGroup);
+            }, undefined, function(err) {
+                createFallback3DMULogo();
+            });
+        } else {
+            createFallback3DMULogo();
+        }
 
         var corePointLight = new THREE.PointLight(0xa855f7, 4.5, 300);
         coreGroup.add(corePointLight);
 
-        // 2. Inner Glowing Energy Aura
-        var auraGeo = new THREE.SphereGeometry(25, 32, 32);
-        var auraMat = new THREE.MeshBasicMaterial({
-            color: 0x8a4fff,
-            transparent: true,
-            opacity: 0.45,
-            blending: THREE.AdditiveBlending,
-            side: THREE.BackSide
-        });
-        var auraMesh = new THREE.Mesh(auraGeo, auraMat);
-        coreGroup.add(auraMesh);
-
-        // 3. Geodesic Triangular Wireframe Mesh (Matching Image Inner Sphere)
+        // 2. Geodesic Triangular Wireframe Ring Mesh
         var wireGeo = new THREE.IcosahedronGeometry(45, 2);
         var wireMat = new THREE.MeshBasicMaterial({
             color: 0x8a4fff,
@@ -1589,9 +1683,9 @@
             // Inner Core Pulse
             var pulse = 3.8 + Math.sin(elapsedTime * 3.5) * 0.8;
             corePointLight.intensity = pulse;
-            auraMesh.scale.setScalar(1.0 + Math.sin(elapsedTime * 2.5) * 0.05);
 
             // Rotations
+            if (typeof logo3DGroup !== 'undefined') logo3DGroup.rotation.y += 0.008;
             wireMesh.rotation.y += 0.005;
             wireMesh.rotation.z += 0.002;
 
