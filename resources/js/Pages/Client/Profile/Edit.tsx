@@ -5,6 +5,7 @@ import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import UserEmailsForm from './Partials/UserEmailsForm';
+import SystemPreferencesForm from './Partials/SystemPreferencesForm';
 import { __ } from '@/lib/i18n';
 
 interface SecondaryEmail {
@@ -44,6 +45,10 @@ export default function Edit({
                             status={status}
                             className="w-full max-w-7xl"
                         />
+                    </div>
+
+                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
+                        <SystemPreferencesForm className="w-full max-w-7xl" />
                     </div>
 
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">

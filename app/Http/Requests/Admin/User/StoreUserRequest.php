@@ -30,6 +30,7 @@ class StoreUserRequest extends FormRequest
             'currency_id' => 'nullable|integer|exists:currencies,id',
             'enable_notifications' => 'nullable|boolean',
             'enable_custom_hour_rate' => 'nullable|boolean',
+            'enable_3d_dashboard' => 'nullable|boolean',
         ];
     }
 

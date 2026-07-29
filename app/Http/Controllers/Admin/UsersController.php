@@ -429,6 +429,7 @@ class UsersController extends Controller
                 'allow_view_times' => (bool) ($user->allow_view_times ?? false),
                 'allow_postpaid' => (bool) ($user->allow_postpaid ?? false),
                 'enable_notifications' => (bool) ($user->enable_notifications ?? true),
+                'enable_3d_dashboard' => (bool) ($user->enable_3d_dashboard ?? true),
 
                 'account_status' => $user->account_status ?? 'active',
                 'block_reason' => $user->block_reason ?? '',

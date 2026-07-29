@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'system_preferences' => 'تفضيلات النظام',
+    'enable_3d_dashboard' => 'تفعيل لوحة التحكم ثلاثية الأبعاد المجسمة',
+    'dashboard_layout_description' => 'التبديل بين لوحة التحكم ثلاثية الأبعاد التفاعلية وواجهة قائمة المشاريع البسيطة.',
+    'preferences_updated_successfully' => 'تم تحديث التفضيلات بنجاح.',
     'marketplace_seo_description' => 'تصفح أفضل خدمات تطوير البرمجيات، وخدمات تقنية المعلومات، والسكربتات المخصصة، والحلول الرقمية على سوق ميوسوفت ويرز.',
     'software_services_marketplace' => 'سوق خدمات البرمجيات وتقنية المعلومات',
     'download_file' => 'تحميل الملف',

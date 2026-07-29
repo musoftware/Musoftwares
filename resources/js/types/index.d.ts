@@ -7,6 +7,7 @@ export interface User {
     roles?: string[];
     permissions?: string[];
     crm_features?: string[];
+    enable_3d_dashboard?: boolean;
 }
 
 export type PageProps<

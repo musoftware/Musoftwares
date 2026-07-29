@@ -55,6 +55,7 @@ class UpdateUserRequest extends FormRequest
             'allow_view_times' => 'nullable|boolean',
             'allow_postpaid' => 'nullable|boolean',
             'enable_notifications' => 'nullable|boolean',
+            'enable_3d_dashboard' => 'nullable|boolean',
 
             'kyc_verified' => 'nullable|boolean',
             'kyc_notes' => 'nullable|string',

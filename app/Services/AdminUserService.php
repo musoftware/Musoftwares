@@ -178,6 +178,9 @@ class AdminUserService extends BaseService
         if ($request->has('enable_notifications')) {
             $user->enable_notifications = $request->boolean('enable_notifications');
         }
+        if ($request->has('enable_3d_dashboard')) {
+            $user->enable_3d_dashboard = $request->boolean('enable_3d_dashboard');
+        }
 
         // Referral configuration fields
         if ($request->filled('affiliate_commission_percentage')) {

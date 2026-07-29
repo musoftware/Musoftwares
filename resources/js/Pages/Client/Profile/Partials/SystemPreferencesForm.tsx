@@ -14,7 +14,9 @@ export default function SystemPreferencesForm({
     const user = usePage().props.auth.user;
 
     const { data, setData, patch, processing, recentlySuccessful } =
-        useForm({
+        useForm<{
+            enable_3d_dashboard: boolean;
+        }>({
             enable_3d_dashboard: user.enable_3d_dashboard ?? true,
         });
 

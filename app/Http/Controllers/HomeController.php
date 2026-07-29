@@ -24,6 +24,9 @@ class HomeController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
+            if (! ($user->enable_3d_dashboard ?? true)) {
+                return redirect()->route('client.projects.index');
+            }
             $dashboardService = app(\App\Services\DashboardService::class);
             $data = $dashboardService->getClientDashboardData($user);
 

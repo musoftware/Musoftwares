@@ -53,6 +53,7 @@ class User extends Authenticatable
         'hour_rate_currency_id',
         'booking_rate',
         'booking_rate_currency_id',
+        'enable_3d_dashboard',
     ];
 
     protected $hidden = [
@@ -96,6 +97,7 @@ class User extends Authenticatable
             'max_devices' => 'integer',
             'enable_notifications' => 'boolean',
             'enable_custom_hour_rate' => 'boolean',
+            'enable_3d_dashboard' => 'boolean',
         ];
     }
 

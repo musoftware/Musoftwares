@@ -53,6 +53,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
         account_status: 'active',
         block_reason: '',
         max_devices: '',
+        enable_3d_dashboard: true,
     });
 
     const handleSubmit = (e) => {
@@ -325,6 +326,10 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="enable_notifications" name="enable_notifications" checked={data.enable_notifications} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="enable_notifications" className="cursor-pointer font-medium">{__('general.enable_notifications')}</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        <input type="checkbox" id="enable_3d_dashboard" name="enable_3d_dashboard" checked={data.enable_3d_dashboard} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
+                                        <Label htmlFor="enable_3d_dashboard" className="cursor-pointer font-medium">{__('general.enable_3d_dashboard') || 'Enable 3D Holographic Dashboard'}</Label>
                                     </div>
                                 </div>
                             </div>

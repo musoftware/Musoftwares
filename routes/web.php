@@ -261,6 +261,7 @@ Route::middleware([\App\Http\Middleware\VerifyBoardAccess::class])->name('client
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/emails', [ProfileController::class, 'storeEmail'])->name('profile.emails.store');
     Route::delete('/profile/emails/{userEmail}', [ProfileController::class, 'destroyEmail'])->name('profile.emails.destroy');

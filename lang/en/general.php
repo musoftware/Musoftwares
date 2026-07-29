@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'system_preferences' => 'System Preferences',
+    'enable_3d_dashboard' => 'Enable 3D Holographic Dashboard',
+    'dashboard_layout_description' => 'Switch between the 3D holographic dashboard with interactive animations and the clean projects portal layout.',
+    'preferences_updated_successfully' => 'Preferences updated successfully.',
     'marketplace_seo_description' => 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
     'software_services_marketplace' => 'Software Development & IT Services Marketplace',
     'download_file' => 'Download File',

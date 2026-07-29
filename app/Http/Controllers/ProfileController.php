@@ -129,6 +129,22 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's preferences (e.g., dashboard style).
+     */
+    public function updatePreferences(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'enable_3d_dashboard' => ['required', 'boolean'],
+        ]);
+
+        $request->user()->forceFill([
+            'enable_3d_dashboard' => $request->boolean('enable_3d_dashboard'),
+        ])->save();
+
+        return Redirect::route('profile.edit')->with('status', __('general.preferences_updated_successfully'));
+    }
+
+    /**
      * Update the user's profile information.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
