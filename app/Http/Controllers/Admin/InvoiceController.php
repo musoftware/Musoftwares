@@ -800,7 +800,7 @@ class InvoiceController extends Controller
      */
     public function shareLink(Request $request, Invoice $invoice)
     {
-        $duration = $request->input('duration', '24_hours');
+        $duration = $request->input('duration', '1_month');
 
         $expiresAt = now();
         if ($duration === '3_days') {
@@ -1002,6 +1002,7 @@ class InvoiceController extends Controller
             $item->save();
         }
 
+        $newSessionsCount = 0;
         foreach ($request->sessions as $session) {
             InvoiceItemTimer::create([
                 'invoice_item_id' => $item->id,
@@ -1012,6 +1013,22 @@ class InvoiceController extends Controller
                 'user_id' => $item->invoice->user_id ?? auth()->id(),
                 'currency_id' => $item->invoice->currency_id,
             ]);
+            $newSessionsCount++;
+        }
+
+        // Notify client ONCE with single queued summary notification for total updated invoice timers
+        if ($newSessionsCount > 0 && $item->invoice) {
+            try {
+                $client = $item->invoice->user ?? $item->invoice->client;
+                if ($client && ! $client->hasAnyRole(['admin', 'super-admin', 'employee'])) {
+                    $item->invoice->load(['items.timers']);
+                    $client->notify(new \App\Notifications\TimerSavedNotification($item->invoice));
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed to dispatch TimerSavedNotification: '.$e->getMessage(), [
+                    'invoice_id' => $item->invoice->id,
+                ]);
+            }
         }
 
         return redirect()->back()->with('success', __('admin.timer_sessions_saved'));

@@ -15,21 +15,7 @@ class InvoiceItemTimer extends Model
 
     protected static function booted()
     {
-        static::saved(function (InvoiceItemTimer $timer) {
-            try {
-                $client = $timer->invoiceItem?->invoice?->user
-                    ?? $timer->invoiceItem?->invoice?->client
-                    ?? $timer->user;
-
-                if ($client && ! $client->hasAnyRole(['admin', 'super-admin', 'employee'])) {
-                    $client->notify(new \App\Notifications\TimerSavedNotification($timer));
-                }
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Failed to dispatch TimerSavedNotification: '.$e->getMessage(), [
-                    'timer_id' => $timer->id,
-                ]);
-            }
-        });
+        // Model event hook removed in favor of single queued batch notification in controller
     }
 
     public function invoiceItem()

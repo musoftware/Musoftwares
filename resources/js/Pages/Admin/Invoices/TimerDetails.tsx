@@ -19,6 +19,7 @@ interface Timer {
     amount: number;
     duration_seconds: number;
     isNew?: boolean;
+    isPseudo?: boolean;
 }
 
 interface Currency {
@@ -63,11 +64,25 @@ function parseDateTime(dateStr: string | null) {
 
 interface TimerCache {
     isRunning: boolean;
+    isPseudoMode?: boolean;
     activeSessionStart: string | null;
-    timers: Timer[];
+    draftSessions: Timer[];
     reason: string;
-    rate: number;
 }
+
+const normalizeDateString = (dStr: string) => {
+    if (!dStr) return '';
+    try {
+        const d = new Date(dStr);
+        return isNaN(d.getTime()) ? dStr.trim() : d.toISOString().slice(0, 19).replace('T', ' ');
+    } catch {
+        return dStr.trim();
+    }
+};
+
+const isSameDateStr = (d1: string, d2: string) => {
+    return normalizeDateString(d1) === normalizeDateString(d2);
+};
 
 export default function TimerDetails({
     item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds,
@@ -80,8 +95,19 @@ export default function TimerDetails({
         try {
             const raw = localStorage.getItem(storageKey);
             if (!raw) return null;
-            const parsed = JSON.parse(raw) as TimerCache;
-            if (parsed && Array.isArray(parsed.timers)) return parsed;
+            const parsed = JSON.parse(raw);
+            if (parsed) {
+                const drafts = Array.isArray(parsed.draftSessions)
+                    ? parsed.draftSessions
+                    : (Array.isArray(parsed.timers) ? parsed.timers.filter((t: Timer) => t.isNew) : []);
+                return {
+                    isRunning: !!parsed.isRunning,
+                    isPseudoMode: !!parsed.isPseudoMode,
+                    activeSessionStart: parsed.activeSessionStart || null,
+                    draftSessions: drafts,
+                    reason: parsed.reason || '',
+                };
+            }
         } catch {
             return null;
         }
@@ -89,11 +115,27 @@ export default function TimerDetails({
     };
 
     const cache = loadCache();
-
-    const [timers, setTimers] = useState<Timer[]>(
-        cache?.timers && cache.timers.length > 0 ? cache.timers : (initialTimers || [])
+    const initialDrafts = (cache?.draftSessions || []).filter(
+        (draft) => !(initialTimers || []).some((db) => isSameDateStr(db.start_date, draft.start_date) && isSameDateStr(db.end_date, draft.end_date))
     );
+
+    const [timers, setTimers] = useState<Timer[]>([
+        ...(initialTimers || []),
+        ...initialDrafts,
+    ]);
+
+    useEffect(() => {
+        setTimers((currentTimers) => {
+            const currentDrafts = currentTimers.filter((t) => t.isNew);
+            const validDrafts = currentDrafts.filter(
+                (draft) => !(initialTimers || []).some((db) => isSameDateStr(db.start_date, draft.start_date) && isSameDateStr(db.end_date, draft.end_date))
+            );
+            return [...(initialTimers || []), ...validDrafts];
+        });
+    }, [initialTimers]);
+
     const [isRunning, setIsRunning] = useState<boolean>(cache?.isRunning ?? false);
+    const [isPseudoMode, setIsPseudoMode] = useState<boolean>(cache?.isPseudoMode ?? false);
     const [activeSessionStart, setActiveSessionStart] = useState<Date | null>(
         cache?.activeSessionStart ? new Date(cache.activeSessionStart) : null
     );
@@ -101,26 +143,31 @@ export default function TimerDetails({
 
     const [manualHours, setManualHours] = useState('');
     const [manualMinutes, setManualMinutes] = useState('');
-    const [rate, setRate] = useState<number>(cache?.rate ? cache.rate : (hour_rate || system_base_rate));
+    const [rate, setRate] = useState<number>(hour_rate || system_base_rate);
     const [rateVisible, setRateVisible] = useState(false);
     const [reason, setReason] = useState(cache?.reason ?? (item.item_title || ''));
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
+        setRate(hour_rate || system_base_rate);
+    }, [hour_rate, system_base_rate]);
+
+    useEffect(() => {
         if (typeof window === 'undefined') return;
+        const draftSessions = timers.filter((t) => t.isNew);
         const payload: TimerCache = {
             isRunning,
+            isPseudoMode,
             activeSessionStart: activeSessionStart ? activeSessionStart.toISOString() : null,
-            timers,
+            draftSessions,
             reason,
-            rate,
         };
         try {
             localStorage.setItem(storageKey, JSON.stringify(payload));
         } catch {
             // ignore quota errors
         }
-    }, [storageKey, isRunning, activeSessionStart, timers, reason, rate]);
+    }, [storageKey, isRunning, isPseudoMode, activeSessionStart, timers, reason]);
 
     useEffect(() => {
         if (!isRunning || !activeSessionStart) return;
@@ -135,6 +182,15 @@ export default function TimerDetails({
 
     const handleStart = () => {
         if (isRunning) return;
+        setIsPseudoMode(false);
+        setIsRunning(true);
+        setActiveSessionStart(new Date());
+        setLiveSeconds(0);
+    };
+
+    const handlePseudoStart = () => {
+        if (isRunning) return;
+        setIsPseudoMode(true);
         setIsRunning(true);
         setActiveSessionStart(new Date());
         setLiveSeconds(0);
@@ -144,7 +200,8 @@ export default function TimerDetails({
         if (!isRunning || !activeSessionStart) return;
         const end = new Date();
         const duration = (end.getTime() - activeSessionStart.getTime()) / 1000;
-        const amount = (duration / 3600) * rate;
+        const multiplier = isPseudoMode ? 0.05 : 1;
+        const amount = (duration / 3600) * rate * multiplier;
 
         const newSession: Timer = {
             id: 'new-' + crypto.randomUUID(),
@@ -153,10 +210,12 @@ export default function TimerDetails({
             duration_seconds: duration,
             amount: parseFloat(amount.toFixed(3)),
             isNew: true,
+            isPseudo: isPseudoMode,
         };
 
         setTimers((prev) => [...prev, newSession]);
         setIsRunning(false);
+        setIsPseudoMode(false);
         setActiveSessionStart(null);
         setLiveSeconds(0);
     };
@@ -222,14 +281,22 @@ export default function TimerDetails({
             onSuccess: () => {
                 setIsSaving(false);
                 try { localStorage.removeItem(storageKey); } catch { /* empty */ }
+                setTimers((prev) => prev.filter((t) => !t.isNew));
                 toast.success(__('general.saved') || 'Saved');
             },
             onError: () => setIsSaving(false),
         });
     };
 
-    const currentTotalSeconds = timers.reduce((sum, t) => sum + t.duration_seconds, 0) + liveSeconds;
-    const currentTotalBillable = timers.reduce((sum, t) => sum + t.amount, 0) + ((liveSeconds / 3600) * rate);
+    const currentTotalSeconds = timers.reduce((sum, t) => sum + t.duration_seconds, 0) + (isRunning ? liveSeconds : 0);
+    const currentTotalBillable = timers.reduce((sum, t) => sum + t.amount, 0) + (isRunning ? ((liveSeconds / 3600) * rate * (isPseudoMode ? 0.05 : 1)) : 0);
+    const currentFullRealValue = (currentTotalSeconds / 3600) * rate;
+    const currentDiscountSavings = Math.max(0, currentFullRealValue - currentTotalBillable);
+
+    const totalHours = currentTotalSeconds > 0 ? (currentTotalSeconds / 3600) : 0;
+    const currentAvgBilledRate = totalHours > 0 ? (currentTotalBillable / totalHours) : 0;
+    const currentAvgRealRate = totalHours > 0 ? (currentFullRealValue / totalHours) : 0;
+    const currentEffectiveDiscountPercent = currentFullRealValue > 0 ? Math.round(((currentFullRealValue - currentTotalBillable) / currentFullRealValue) * 100) : 0;
 
     const firstStartDate = timers.length > 0
         ? parseDateTime(timers[0].start_date).full
@@ -354,6 +421,7 @@ export default function TimerDetails({
                                             <td className="px-4 py-2.5 font-mono text-xs font-medium">
                                                 {formatDurationMS(timer.duration_seconds)}
                                                 {timer.isNew && <span className="ms-2 text-[9px] font-bold bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
+                                                {timer.isPseudo && <span className="ms-2 text-[9px] font-bold bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">{__('general.pseudo_badge') || 'تجريبي (خصم 95%)'}</span>}
                                             </td>
                                             <td className="px-4 py-2.5 font-bold text-gray-900">{formatMoney(timer.amount, invoice_currency)}</td>
                                             <td className="px-4 py-2.5 text-center">
@@ -379,11 +447,19 @@ export default function TimerDetails({
 
                         <div className="mb-6">
                             {isRunning && (
-                                <div className="flex items-center gap-3 bg-red-50 text-red-900 px-4 py-3 rounded-lg mb-4 border border-red-100 font-mono text-sm motion-reduce:animate-none">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500 motion-reduce:animate-none" />
-                                    <span className="font-semibold uppercase tracking-wider text-xs">{__('general.timer_running')}</span>
+                                <div className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-4 border font-mono text-sm motion-reduce:animate-none ${isPseudoMode
+                                        ? 'bg-purple-50 text-purple-900 border-purple-200'
+                                        : 'bg-red-50 text-red-900 border-red-100'
+                                    }`}>
+                                    <div className={`w-2.5 h-2.5 rounded-full motion-reduce:animate-none ${isPseudoMode ? 'bg-purple-600 animate-pulse' : 'bg-red-500'
+                                        }`} />
+                                    <span className="font-semibold uppercase tracking-wider text-xs">
+                                        {isPseudoMode ? (__('general.pseudo_timer_running') || 'مؤقت تجريبي يعمل (خصم 95%)') : __('general.timer_running')}
+                                    </span>
                                     <span className="font-bold text-base">{formatDurationMS(liveSeconds)}</span>
-                                    <span className="ms-auto font-bold">{formatMoney((liveSeconds / 3600) * rate, invoice_currency)}</span>
+                                    <span className="ms-auto font-bold">
+                                        {formatMoney((liveSeconds / 3600) * rate * (isPseudoMode ? 0.05 : 1), invoice_currency)}
+                                    </span>
                                 </div>
                             )}
 
@@ -391,9 +467,16 @@ export default function TimerDetails({
                                 <Button
                                     onClick={handleStart}
                                     disabled={isRunning || item.invoice_status !== 'unpaid'}
-                                    className="bg-slate-900 hover:bg-slate-900 shadow-sm"
+                                    className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
                                 >
                                     <Play className="w-4 h-4 me-2" /> {__('general.start')}
+                                </Button>
+                                <Button
+                                    onClick={handlePseudoStart}
+                                    disabled={isRunning || item.invoice_status !== 'unpaid'}
+                                    className="bg-purple-700 hover:bg-purple-800 text-white shadow-sm"
+                                >
+                                    <Play className="w-4 h-4 me-2" /> {__('general.pseudo_start') || 'تشغيل تجريبي (خصم 95%)'}
                                 </Button>
                                 <Button
                                     onClick={handleStop}
@@ -416,22 +499,63 @@ export default function TimerDetails({
                             </div>
                         </div>
 
-                        <div className="bg-gray-50 rounded-xl p-4 flex flex-wrap gap-4 sm:gap-8 border border-gray-100">
-                            <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{__('general.start_date')}</span>
-                                <div className="font-mono text-sm text-gray-800 break-words">{firstStartDate}</div>
+                        <div className="space-y-3 mt-4">
+                            {/* Row 1: Primary Metrics */}
+                            <div className="bg-gray-50 rounded-xl p-4 flex flex-wrap gap-4 sm:gap-6 border border-gray-100">
+                                <div className="flex-1 min-w-[120px]">
+                                    <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{__('general.start_date')}</span>
+                                    <div className="font-mono text-xs text-gray-800 break-words">{firstStartDate}</div>
+                                </div>
+                                <div className="flex-1 min-w-[120px]">
+                                    <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{__('general.end_date')}</span>
+                                    <div className="font-mono text-xs text-gray-800 break-words">{lastEndDate}</div>
+                                </div>
+                                <div className="flex-1 min-w-[120px]">
+                                    <span className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">{__('general.total_time')}</span>
+                                    <div className="font-mono text-base font-extrabold text-slate-900">{formatDurationMS(currentTotalSeconds)}</div>
+                                </div>
+                                <div className="flex-1 min-w-[130px]">
+                                    <span className="block text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">{__('general.full_real_value') || 'القيمة الفعلية بسعر الساعة'}</span>
+                                    <div className="text-base font-black text-blue-700">{formatMoney(currentFullRealValue, invoice_currency)}</div>
+                                </div>
+                                <div className="flex-1 min-w-[130px]">
+                                    <span className="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">{__('general.billed_amount') || 'المبلغ الصافي بالفاتورة'}</span>
+                                    <div className="text-base font-black text-emerald-700">{formatMoney(currentTotalBillable, invoice_currency)}</div>
+                                </div>
+                                {currentDiscountSavings > 0.01 && (
+                                    <div className="flex-1 min-w-[120px]">
+                                        <span className="block text-[10px] font-bold text-purple-600 uppercase tracking-wider mb-1">{__('general.discount_savings') || 'إجمالي الخصم / الوفر'}</span>
+                                        <div className="text-base font-black text-purple-700">-{formatMoney(currentDiscountSavings, invoice_currency)}</div>
+                                    </div>
+                                )}
                             </div>
-                            <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{__('general.end_date')}</span>
-                                <div className="font-mono text-sm text-gray-800 break-words">{lastEndDate}</div>
-                            </div>
-                            <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">{__('general.total_time')}</span>
-                                <div className="font-mono text-lg font-bold text-slate-900">{formatDurationMS(currentTotalSeconds)}</div>
-                            </div>
-                            <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">{invoice_currency?.currency || 'Amount'}</span>
-                                <div className="text-lg font-black text-green-700">{formatMoney(currentTotalBillable, invoice_currency)}</div>
+
+                            {/* Row 2: Average Rate Insights */}
+                            <div className="bg-slate-900 text-white rounded-xl p-4 flex flex-wrap gap-4 sm:gap-6 border border-slate-800 shadow-sm">
+                                <div className="flex-1 min-w-[130px]">
+                                    <span className="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1">{__('general.avg_billed_rate') || 'متوسط سعر الساعة المفوترة'}</span>
+                                    <div className="text-base font-black text-emerald-300 font-mono">
+                                        {formatMoney(currentAvgBilledRate, invoice_currency)} <span className="text-xs font-normal text-emerald-400">{__('general.per_hour') || '/ hr'}</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-w-[130px]">
+                                    <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">{__('general.avg_real_rate') || 'متوسط سعر الساعة الفعلي'}</span>
+                                    <div className="text-base font-black text-blue-300 font-mono">
+                                        {formatMoney(currentAvgRealRate, invoice_currency)} <span className="text-xs font-normal text-blue-400">{__('general.per_hour') || '/ hr'}</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-w-[120px]">
+                                    <span className="block text-[10px] font-bold text-purple-400 uppercase tracking-wider mb-1">{__('general.effective_discount') || 'معدل الخصم الفعلي'}</span>
+                                    <div className="text-base font-black text-purple-300 font-mono">
+                                        {currentEffectiveDiscountPercent}%
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-w-[120px]">
+                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{__('general.total_billable_hours')}</span>
+                                    <div className="text-base font-extrabold text-gray-200 font-mono">
+                                        {totalHours.toFixed(2)} hrs
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </CardContent>

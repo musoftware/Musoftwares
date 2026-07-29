@@ -50,6 +50,7 @@ class InvoiceResource extends JsonResource
             'archive' => $this->archive ?? 0,
             'scheduled_start_date' => $this->scheduled_start_date,
             'total_timer_str' => method_exists($this->resource, 'total_timer_str') ? $this->total_timer_str() : '00:00:00',
+            'timer_metrics' => $this->calculateTimerMetrics(),
             'revenue' => method_exists($this->resource, 'revenue') ? $this->revenue() : ($this->total() - $this->cost),
             'cost' => $this->cost ?? 0,
 
@@ -161,5 +162,77 @@ class InvoiceResource extends JsonResource
         $current_total = $this->total();
 
         return $current_total > 0 ? round((($current_total - ($this->cost ?? 0)) / $current_total) * 100, 2) : 0;
+    }
+
+    protected function calculateTimerMetrics(): array
+    {
+        $invoice = $this->resource;
+        $currencyId = (int) ($invoice->currency ?? 2);
+        $user = $invoice->user;
+
+        $baseRate = FinanceHelper::calculateOverheadHourlyRate();
+        $systemBaseRate = CurrenciesExchange::RateToday(
+            $baseRate,
+            AdminSettings::GetValue('business_currency', 2),
+            $currencyId
+        );
+
+        $clientRate = 0;
+        $isCustomRateEnabled = false;
+        if ($user) {
+            $isCustomRateEnabled = (bool) ($user->enable_custom_hour_rate ?? false);
+            if ((float) ($user->hour_rate ?? 0) > 0) {
+                $clientRate = CurrenciesExchange::RateToday(
+                    $user->hour_rate,
+                    $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
+                    $currencyId
+                );
+            }
+        }
+
+        $effectiveRate = ($isCustomRateEnabled && $clientRate > 0) ? $clientRate : $systemBaseRate;
+
+        $totalSeconds = 0;
+        $billedAmount = 0.0;
+
+        if ($invoice->relationLoaded('items')) {
+            foreach ($invoice->items as $item) {
+                $timers = $item->relationLoaded('timers') ? $item->timers : $item->timers()->get();
+                foreach ($timers as $timer) {
+                    $secs = (int) $timer->diff();
+                    if ($secs <= 0 && ! empty($timer->date_start) && ! empty($timer->date_end)) {
+                        $secs = abs(strtotime($timer->date_end) - strtotime($timer->date_start));
+                    }
+                    $totalSeconds += $secs;
+                    $billedAmount += (float) ($timer->amount ?? 0);
+                }
+            }
+        }
+
+        $fullRealValue = ($totalSeconds / 3600) * $effectiveRate;
+        $discountSavings = max(0, $fullRealValue - $billedAmount);
+
+        $totalHours = $totalSeconds > 0 ? ($totalSeconds / 3600) : 0;
+        $avgBilledRate = $totalHours > 0 ? ($billedAmount / $totalHours) : 0;
+        $avgRealRate = $totalHours > 0 ? ($fullRealValue / $totalHours) : 0;
+        $effectiveDiscountPercent = $fullRealValue > 0 ? round((($fullRealValue - $billedAmount) / $fullRealValue) * 100, 1) : 0;
+
+        return [
+            'total_seconds' => $totalSeconds,
+            'total_hours' => round($totalHours, 2),
+            'total_timer_str' => \App\Helpers\TextHelper::secondsToTime($totalSeconds),
+            'full_real_value' => round($fullRealValue, 2),
+            'full_real_value_str' => FinanceHelper::instance()->format_money($fullRealValue, $currencyId),
+            'billed_amount' => round($billedAmount, 2),
+            'billed_amount_str' => FinanceHelper::instance()->format_money($billedAmount, $currencyId),
+            'discount_savings' => round($discountSavings, 2),
+            'discount_savings_str' => FinanceHelper::instance()->format_money($discountSavings, $currencyId),
+            'has_discount' => $discountSavings > 0.01,
+            'avg_billed_rate' => round($avgBilledRate, 2),
+            'avg_billed_rate_str' => FinanceHelper::instance()->format_money($avgBilledRate, $currencyId),
+            'avg_real_rate' => round($avgRealRate, 2),
+            'avg_real_rate_str' => FinanceHelper::instance()->format_money($avgRealRate, $currencyId),
+            'effective_discount_percent' => max(0, $effectiveDiscountPercent),
+        ];
     }
 }

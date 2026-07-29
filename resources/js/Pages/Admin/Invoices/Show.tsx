@@ -599,15 +599,34 @@ export default function Show({ invoice }: { invoice: any }) {
                         <CardTitle className="text-base flex items-center text-gray-700">
                             <Clock className="w-4 h-4 me-2 text-gray-400" />{__('general.time_tracking')}</CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-4 flex flex-col items-center justify-center h-full min-h-[140px]">
+                    <CardContent className="pt-4 flex flex-col items-center justify-center">
                         <div className="text-3xl font-black text-gray-900 mb-1 flex items-center">
                             <Clock className="w-6 h-6 text-slate-900 opacity-20 me-2" />
-                            {invoice.total_timer_str || '00:00:00'}
+                            {invoice.timer_metrics?.total_timer_str || invoice.total_timer_str || '00:00:00'}
                         </div>
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{__('general.total_billable_hours')}</div>
+                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center mb-4">{__('general.total_billable_hours')}</div>
+
+                        {invoice.timer_metrics && (
+                            <div className="w-full bg-gray-50 rounded-lg p-3 space-y-2 text-xs border border-gray-100 mb-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-500 font-medium">{__('general.full_real_value') || 'القيمة الفعلية بسعر الساعة'}</span>
+                                    <span className="font-bold text-blue-700">{invoice.timer_metrics.full_real_value_str}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-500 font-medium">{__('general.billed_amount') || 'المبلغ الصافي بالفاتورة'}</span>
+                                    <span className="font-bold text-emerald-700">{invoice.timer_metrics.billed_amount_str}</span>
+                                </div>
+                                {invoice.timer_metrics.has_discount && (
+                                    <div className="flex justify-between items-center pt-1 border-t border-gray-200">
+                                        <span className="text-purple-700 font-bold">{__('general.discount_savings') || 'إجمالي الخصم / الوفر'}</span>
+                                        <span className="font-black text-purple-700">-{invoice.timer_metrics.discount_savings_str}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         
                         {isUnpaid && (
-                            <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-slate-900 font-bold hover:text-slate-900">
+                            <Button onClick={handleAddTimerItem} variant="link" className="mt-2 text-slate-900 font-bold hover:text-slate-900">
                                 <Plus className="w-3 h-3 me-1" />{__('general.add_manual_entry')}
                             </Button>
                         )}

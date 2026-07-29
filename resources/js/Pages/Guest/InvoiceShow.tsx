@@ -6,7 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
-import { CreditCard, Receipt, Clock, MapPin, User, FileText, Folder } from 'lucide-react';
+import { CreditCard, Receipt, Clock, MapPin, User, FileText, Folder, ChevronDown, ChevronUp } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 
 export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_url: string }) {
@@ -15,10 +15,26 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
         guest_email: invoice.user?.email || '',
     });
 
+    const [isTimersExpanded, setIsTimersExpanded] = useState(false);
+
     const handlePayment = (e: React.FormEvent) => {
         e.preventDefault();
         post(pay_url);
     };
+
+    const itemsList = Array.isArray(invoice.items)
+        ? invoice.items
+        : (Array.isArray(invoice.items?.data) ? invoice.items.data : []);
+
+    const allTimers = itemsList.flatMap((item: any) => {
+        const timersList = Array.isArray(item.timers)
+            ? item.timers
+            : (Array.isArray(item.timers?.data) ? item.timers.data : []);
+        return timersList.map((t: any) => ({
+            ...t,
+            item_title: item.item_title || item.name || __('general.time_tracking'),
+        }));
+    });
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -45,17 +61,17 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    {invoice.items?.map((item: any) => (
+                                    {itemsList.map((item: any) => (
                                         <div key={item.id} className="flex justify-between items-center py-3 border-b last:border-0 border-gray-100">
                                             <div>
-                                                <h4 className="font-medium text-gray-900">{item.name}</h4>
+                                                <h4 className="font-medium text-gray-900">{item.item_title || item.name}</h4>
                                                 {item.description && <p className="text-sm text-gray-500">{item.description}</p>}
                                                 <p className="text-xs text-gray-400 mt-1">
-                                                    {item.quantity} x {formatCurrency(item.rate, invoice.currency)}
+                                                    {item.quantity || 1} x {formatCurrency(item.amount || item.rate || 0, invoice.currency)}
                                                 </p>
                                             </div>
                                             <div className="font-semibold text-gray-900">
-                                                {formatCurrency(item.total, invoice.currency)}
+                                                {formatCurrency(item.total_amount || item.total || 0, invoice.currency)}
                                             </div>
                                         </div>
                                     ))}
@@ -64,10 +80,120 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                             <CardFooter className="bg-gray-50 border-t flex justify-between items-center py-4">
                                 <span className="font-medium text-gray-700">{__('general.total')}</span>
                                 <span className="text-2xl font-bold text-blue-600">
-                                    {formatCurrency(invoice.total, invoice.currency)}
+                                    {formatCurrency(invoice.total || invoice.amount, invoice.currency)}
                                 </span>
                             </CardFooter>
                         </Card>
+
+                        {/* Timer Summary & Detailed Accordion */}
+                        {invoice.timer_metrics && (
+                            <Card className="border-gray-200 shadow-sm">
+                                <CardHeader className="bg-gray-50/50 pb-3 border-b border-gray-100">
+                                    <CardTitle className="text-lg flex items-center justify-between text-gray-800">
+                                        <span className="flex items-center">
+                                            <Clock className="w-5 h-5 me-2 text-slate-700" />
+                                            {__('general.time_tracking')} & {__('general.summary')}
+                                        </span>
+                                        <span className="font-mono text-sm font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-md">
+                                            {invoice.timer_metrics.total_timer_str}
+                                        </span>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-5 space-y-4">
+                                    {/* 4 Summary Metrics Cards */}
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                        <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                            <span className="block text-[10px] font-bold text-gray-500 uppercase mb-1">{__('general.total_time')}</span>
+                                            <span className="font-mono text-sm font-extrabold text-slate-900">{invoice.timer_metrics.total_timer_str}</span>
+                                        </div>
+                                        <div className="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                                            <span className="block text-[10px] font-bold text-blue-600 uppercase mb-1">{__('general.full_real_value') || 'القيمة الفعلية'}</span>
+                                            <span className="font-mono text-sm font-bold text-blue-700">{invoice.timer_metrics.full_real_value_str}</span>
+                                        </div>
+                                        <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
+                                            <span className="block text-[10px] font-bold text-emerald-600 uppercase mb-1">{__('general.billed_amount') || 'المبلغ الصافي'}</span>
+                                            <span className="font-mono text-sm font-bold text-emerald-700">{invoice.timer_metrics.billed_amount_str}</span>
+                                        </div>
+                                        {invoice.timer_metrics.has_discount ? (
+                                            <div className="bg-purple-50/50 p-3 rounded-xl border border-purple-100">
+                                                <span className="block text-[10px] font-bold text-purple-600 uppercase mb-1">{__('general.discount_savings') || 'إجمالي الخصم'}</span>
+                                                <span className="font-mono text-sm font-bold text-purple-700">-{invoice.timer_metrics.discount_savings_str}</span>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                                <span className="block text-[10px] font-bold text-gray-500 uppercase mb-1">{__('general.sessions')}</span>
+                                                <span className="font-mono text-sm font-bold text-gray-800">{allTimers.length}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Row 2: Average Rate Insights */}
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                                        <div className="bg-slate-900 text-white p-3 rounded-xl">
+                                            <span className="block text-[10px] font-bold text-emerald-400 uppercase mb-1">{__('general.avg_billed_rate') || 'متوسط الساعة المفوترة'}</span>
+                                            <span className="font-mono text-sm font-bold text-emerald-300">
+                                                {invoice.timer_metrics.avg_billed_rate_str} <span className="text-[10px] font-normal text-emerald-400">{__('general.per_hour') || '/ hr'}</span>
+                                            </span>
+                                        </div>
+                                        <div className="bg-slate-900 text-white p-3 rounded-xl">
+                                            <span className="block text-[10px] font-bold text-blue-400 uppercase mb-1">{__('general.avg_real_rate') || 'متوسط الساعة الفعلي'}</span>
+                                            <span className="font-mono text-sm font-bold text-blue-300">
+                                                {invoice.timer_metrics.avg_real_rate_str} <span className="text-[10px] font-normal text-blue-400">{__('general.per_hour') || '/ hr'}</span>
+                                            </span>
+                                        </div>
+                                        <div className="bg-slate-900 text-white p-3 rounded-xl col-span-2 sm:col-span-1">
+                                            <span className="block text-[10px] font-bold text-purple-400 uppercase mb-1">{__('general.effective_discount') || 'معدل الخصم الفعلي'}</span>
+                                            <span className="font-mono text-sm font-bold text-purple-300">
+                                                {invoice.timer_metrics.effective_discount_percent}%
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Expandable Accordion Button */}
+                                    {allTimers.length > 0 && (
+                                        <div className="pt-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => setIsTimersExpanded(!isTimersExpanded)}
+                                                className="w-full flex items-center justify-between border-gray-200 hover:bg-gray-50 text-slate-800 text-xs font-semibold py-2.5"
+                                            >
+                                                <span>
+                                                    {__('general.view_detailed_time_sessions') || 'عرض تفاصيل جلسات العمل المسجلة'} ({allTimers.length})
+                                                </span>
+                                                {isTimersExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                            </Button>
+
+                                            {/* Detailed Timers Table */}
+                                            {isTimersExpanded && (
+                                                <div className="mt-3 border rounded-xl overflow-hidden">
+                                                    <table className="w-full text-xs">
+                                                        <thead className="bg-gray-50 border-b border-gray-200">
+                                                            <tr>
+                                                                <th className="px-3 py-2 text-start font-semibold text-gray-600">{__('general.start')}</th>
+                                                                <th className="px-3 py-2 text-start font-semibold text-gray-600">End</th>
+                                                                <th className="px-3 py-2 text-start font-semibold text-gray-600">{__('general.duration')}</th>
+                                                                <th className="px-3 py-2 text-end font-semibold text-gray-600">{invoice.currency_symbol || invoice.currency}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-gray-100">
+                                                            {allTimers.map((timer: any, idx: number) => (
+                                                                <tr key={timer.id || idx} className="hover:bg-gray-50/50">
+                                                                    <td className="px-3 py-2 font-mono text-[11px] text-gray-600">{timer.date_start}</td>
+                                                                    <td className="px-3 py-2 font-mono text-[11px] text-gray-600">{timer.date_end}</td>
+                                                                    <td className="px-3 py-2 font-mono font-medium text-gray-900">{timer.duration_str}</td>
+                                                                    <td className="px-3 py-2 text-end font-bold text-gray-900">{formatCurrency(timer.amount, invoice.currency)}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
 
                         {/* Client Info */}
                         <Card>

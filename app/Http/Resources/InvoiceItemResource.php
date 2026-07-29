@@ -26,6 +26,20 @@ class InvoiceItemResource extends JsonResource
             'amount' => $this->amount,
             'currency' => Currency::find($this->invoice?->currency)?->currency,
             'total_amount' => $this->total(),
+            'timers' => $this->whenLoaded('timers', fn () => $this->resource->timers->map(function ($timer) {
+                $secs = (int) $timer->diff();
+                if ($secs <= 0 && ! empty($timer->date_start) && ! empty($timer->date_end)) {
+                    $secs = abs(strtotime($timer->date_end) - strtotime($timer->date_start));
+                }
+                return [
+                    'id' => $timer->id,
+                    'date_start' => $timer->date_start,
+                    'date_end' => $timer->date_end,
+                    'duration_seconds' => $secs,
+                    'duration_str' => \App\Helpers\TextHelper::secondsToTime($secs),
+                    'amount' => (float) $timer->amount,
+                ];
+            })),
             'created_at' => $this->created_at,
         ];
     }

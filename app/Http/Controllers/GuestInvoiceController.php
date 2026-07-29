@@ -23,7 +23,7 @@ class GuestInvoiceController extends Controller
             abort(403, 'Invalid or expired signature.');
         }
 
-        $invoice->load(['user', 'project', 'items', 'currency']);
+        $invoice->load(['user', 'project', 'items.timers', 'currency']);
 
         return Inertia::render('Guest/InvoiceShow', [
             'invoice' => (new InvoiceResource($invoice))->resolve(),
