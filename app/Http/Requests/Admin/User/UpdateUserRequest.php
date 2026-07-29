@@ -32,6 +32,7 @@ class UpdateUserRequest extends FormRequest
             'job' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
 
+            'enable_custom_hour_rate' => 'nullable|boolean',
             'hour_rate_currency' => 'nullable|integer',
             'hour_rate' => 'nullable|numeric|min:0',
             'booking_rate_currency' => 'nullable|integer',

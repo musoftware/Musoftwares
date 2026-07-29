@@ -407,6 +407,7 @@ class UsersController extends Controller
                 'city' => $user->city ?? '',
                 'currency' => $user->currency_id ?? $user->currency ?? '',
 
+                'enable_custom_hour_rate' => (bool) ($user->enable_custom_hour_rate ?? false),
                 'hour_rate_currency' => $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? '',
                 'hour_rate' => $user->hour_rate ?? '',
                 'booking_rate_currency' => $user->booking_rate_currency_id ?? $user->booking_rate_currency ?? '',

@@ -9937,7 +9937,11 @@
             "open_support_tickets": "تذاكر الدعم المفتوحة",
             "outstanding_balance": "المبلغ المتبقي",
             "pending_withdrawal_requests": "طلبات السحب المعلقة",
-            "support_ticket_response_guaranteed": "استجابة الدعم مضمونة"
+            "support_ticket_response_guaranteed": "استجابة الدعم مضمونة",
+            "enable_custom_hour_rate": "تفعيل سعر ساعة مخصص",
+            "custom_hour_rate_active_desc": "سيتم استخدام سعر الساعة المخصص أدناه في الفواتير والمؤقتات بدلاً من سعر النظام.",
+            "custom_hour_rate_inactive_desc": "عند الإيقاف، سيتم استخدام سعر النظام الأساسي تلقائيًا.",
+            "custom_client_rate": "سعر الساعة المخصص للعميل"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -21721,7 +21725,11 @@
             "open_support_tickets": "Open Support Tickets",
             "outstanding_balance": "Outstanding Balance",
             "pending_withdrawal_requests": "Pending Withdrawal Requests",
-            "support_ticket_response_guaranteed": "Support Ticket Response Guaranteed"
+            "support_ticket_response_guaranteed": "Support Ticket Response Guaranteed",
+            "enable_custom_hour_rate": "Enable custom hour rate",
+            "custom_hour_rate_active_desc": "The custom hourly rate below will be used in invoices and timers instead of the system base rate.",
+            "custom_hour_rate_inactive_desc": "When disabled, the system base rate will be used automatically.",
+            "custom_client_rate": "Custom Client Rate"
         },
         "gold_saver": {
             "achieved": "Achieved",

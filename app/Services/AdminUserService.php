@@ -113,11 +113,15 @@ class AdminUserService extends BaseService
             $user->address = $request->input('address');
         }
 
+        if ($request->has('enable_custom_hour_rate')) {
+            $user->enable_custom_hour_rate = $request->boolean('enable_custom_hour_rate');
+        }
+
         if ($request->has('hour_rate_currency')) {
             $val = $request->input('hour_rate_currency');
             $user->hour_rate_currency_id = $val ?: ($user->currency_id ?? 1);
         }
-        if ($request->filled('hour_rate')) {
+        if ($request->has('hour_rate')) {
             $user->hour_rate = $request->input('hour_rate');
         }
 

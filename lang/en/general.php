@@ -7858,4 +7858,8 @@ return [
     'outstanding_balance' => 'Outstanding Balance',
     'pending_withdrawal_requests' => 'Pending Withdrawal Requests',
     'support_ticket_response_guaranteed' => 'Support Ticket Response Guaranteed',
+    'enable_custom_hour_rate' => 'Enable custom hour rate',
+    'custom_hour_rate_active_desc' => 'The custom hourly rate below will be used in invoices and timers instead of the system base rate.',
+    'custom_hour_rate_inactive_desc' => 'When disabled, the system base rate will be used automatically.',
+    'custom_client_rate' => 'Custom Client Rate',
 ];

@@ -6,6 +6,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { CurrencySelect } from '@/Components/CurrencySelect';
+import { Switch } from '@/Components/ui/switch';
 import { __ } from '@/lib/i18n';
 
 export default function Create({ currencies = [], plans = [], statuses = [], roles = [] }) {
@@ -22,6 +23,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
         disable_unpaid_balance_whatsapp: false,
         job: '',
         address: '',
+        enable_custom_hour_rate: false,
         hour_rate_currency: '',
         hour_rate: '',
         booking_rate_currency: '',
@@ -165,7 +167,25 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                         {/* Financial / Rates */}
                         <div className="mb-10 border-t pt-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="flex items-center justify-between p-4 mb-6 rounded-xl border bg-slate-50/50">
+                                <div>
+                                    <Label htmlFor="enable_custom_hour_rate" className="font-semibold text-sm cursor-pointer">
+                                        {__('general.enable_custom_hour_rate') || 'تفعيل سعر ساعة مخصص'}
+                                    </Label>
+                                    <p className="text-xs text-gray-500 mt-0.5">
+                                        {data.enable_custom_hour_rate
+                                            ? (__('general.custom_hour_rate_active_desc') || 'سيتم استخدام سعر الساعة المخصص أدناه في الفواتير والمؤقتات بدلاً من سعر النظام.')
+                                            : (__('general.custom_hour_rate_inactive_desc') || 'عند الإيقاف، سيتم استخدام سعر النظام الأساسي تلقائيًا.')}
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="enable_custom_hour_rate"
+                                    checked={data.enable_custom_hour_rate}
+                                    onCheckedChange={checked => setData('enable_custom_hour_rate', checked)}
+                                />
+                            </div>
+
+                            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 transition-all ${data.enable_custom_hour_rate ? 'opacity-100' : 'opacity-60'}`}>
                                 <div className="space-y-2">
                                     <Label htmlFor="hour_rate_currency">{__('general.hour_rate_currency')}</Label>
                                     <CurrencySelect

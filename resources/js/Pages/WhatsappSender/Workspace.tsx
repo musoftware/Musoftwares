@@ -171,6 +171,7 @@ export default function Workspace({
             facebook_client_id: business.facebook_client_id || '',
             facebook_client_secret: business.facebook_client_secret || '',
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [business]);
 
     const tgGroupForm = useForm({
@@ -242,6 +243,7 @@ export default function Workspace({
             telegram_bot_id: bots[0]?.id || '',
             message_type: activeChannel === 'telegram' ? 'text' : data.message_type
         }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeChannel, accounts, bots]);
 
     const [mappedVariables, setMappedVariables] = useState<{ [key: string]: string }>({});

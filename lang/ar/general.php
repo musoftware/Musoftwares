@@ -7858,4 +7858,8 @@ return [
     'outstanding_balance' => 'المبلغ المتبقي',
     'pending_withdrawal_requests' => 'طلبات السحب المعلقة',
     'support_ticket_response_guaranteed' => 'استجابة الدعم مضمونة',
+    'enable_custom_hour_rate' => 'تفعيل سعر ساعة مخصص',
+    'custom_hour_rate_active_desc' => 'سيتم استخدام سعر الساعة المخصص أدناه في الفواتير والمؤقتات بدلاً من سعر النظام.',
+    'custom_hour_rate_inactive_desc' => 'عند الإيقاف، سيتم استخدام سعر النظام الأساسي تلقائيًا.',
+    'custom_client_rate' => 'سعر الساعة المخصص للعميل',
 ];

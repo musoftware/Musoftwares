@@ -48,6 +48,11 @@ class User extends Authenticatable
         'workspace_settings',
         'max_devices',
         'temp_valid_until',
+        'enable_custom_hour_rate',
+        'hour_rate',
+        'hour_rate_currency_id',
+        'booking_rate',
+        'booking_rate_currency_id',
     ];
 
     protected $hidden = [
@@ -90,6 +95,7 @@ class User extends Authenticatable
             'workspace_settings' => 'array',
             'max_devices' => 'integer',
             'enable_notifications' => 'boolean',
+            'enable_custom_hour_rate' => 'boolean',
         ];
     }
 

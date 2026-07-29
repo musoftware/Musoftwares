@@ -49,13 +49,24 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
 
     useEffect(() => {
         // Iframe prevention: redirect the TOP frame to this URL so the page breaks out of any iframe
-        try {
-            if (window.self !== window.top && window.top !== null) {
-                window.top.location.href = window.location.href;
-                return;
+        if (window.self !== window.top) {
+            const targetUrl = (window.location.pathname && window.location.pathname !== 'blank')
+                ? window.location.pathname
+                : '/dashboard';
+            const isSandboxed = !window.location.href || window.location.href.startsWith('about:') || window.origin === 'null';
+            if (isSandboxed) {
+                try {
+                    window.parent.postMessage({ type: 'FORCE_TOP_REDIRECT', url: targetUrl }, '*');
+                } catch { /* empty */ }
+            } else {
+                try {
+                    if (window.top) window.top.location.href = targetUrl;
+                } catch {
+                    try {
+                        window.parent.postMessage({ type: 'FORCE_TOP_REDIRECT', url: targetUrl }, '*');
+                    } catch { /* empty */ }
+                }
             }
-        } catch {
-            // Sandboxed iframe without allow-top-navigation — can't break out, do nothing
         }
 
         const handleScroll = () => {

@@ -3,11 +3,25 @@
 
 <head>
     <script>
-        try {
+        (function() {
             if (window.self !== window.top) {
-                window.top.location.href = window.location.href;
+                var targetUrl = @json(url('/dashboard'));
+                var isSandboxed = !window.location.href || window.location.href.startsWith('about:') || window.origin === 'null';
+                if (isSandboxed) {
+                    try {
+                        window.parent.postMessage({ type: 'FORCE_TOP_REDIRECT', url: targetUrl }, '*');
+                    } catch(e) {}
+                } else {
+                    try {
+                        window.top.location.href = targetUrl;
+                    } catch(e) {
+                        try {
+                            window.parent.postMessage({ type: 'FORCE_TOP_REDIRECT', url: targetUrl }, '*');
+                        } catch(e2) {}
+                    }
+                }
             }
-        } catch(e) { /* sandboxed iframe: can't break out, page stays hidden */ }
+        })();
     </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -1241,7 +1255,7 @@
         <div class="modal-content">
             <div class="modal-body p-4 text-left">
                 <div class="d-flex align-items-center mb-3">
-                    <input type="text" id="commandSearchInput" class="command-search-input" placeholder="Search systems, tools, invoices, actions... (e.g. ERP, CRM, Gold, Wallet)" autofocus autocomplete="off">
+                    <input type="text" id="commandSearchInput" class="command-search-input" placeholder="Search systems, tools, invoices, actions... (e.g. ERP, CRM, Gold, Wallet)" autocomplete="off">
                 </div>
                 <div id="commandResultsList" class="command-results-container" style="max-height: 360px; overflow-y: auto; overflow-x: hidden; padding-right: 6px;">
                     <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/erp') }}">

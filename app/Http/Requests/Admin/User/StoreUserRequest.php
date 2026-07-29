@@ -29,6 +29,7 @@ class StoreUserRequest extends FormRequest
             'role' => 'required|in:admin,client,user,employee,manager,moderator',
             'currency_id' => 'nullable|integer|exists:currencies,id',
             'enable_notifications' => 'nullable|boolean',
+            'enable_custom_hour_rate' => 'nullable|boolean',
         ];
     }
 

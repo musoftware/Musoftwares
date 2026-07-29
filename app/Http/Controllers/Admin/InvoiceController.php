@@ -937,14 +937,20 @@ class InvoiceController extends Controller
         );
 
         $client_rate = 0;
+        $is_custom_rate_enabled = false;
         $user = $item->invoice->user;
-        if ($user && (float) ($user->hour_rate ?? 0) > 0) {
-            $client_rate = CurrenciesExchange::RateToday(
-                $user->hour_rate,
-                $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
-                $item->invoice->currency_id
-            );
+        if ($user) {
+            $is_custom_rate_enabled = (bool) ($user->enable_custom_hour_rate ?? false);
+            if ((float) ($user->hour_rate ?? 0) > 0) {
+                $client_rate = CurrenciesExchange::RateToday(
+                    $user->hour_rate,
+                    $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
+                    $item->invoice->currency_id
+                );
+            }
         }
+
+        $effectiveRate = ($is_custom_rate_enabled && $client_rate > 0) ? $client_rate : $system_base_rate;
 
         return Inertia::render('Admin/Invoices/TimerDetails', [
             'item' => [
@@ -970,7 +976,8 @@ class InvoiceController extends Controller
             'span_seconds' => $spanSeconds,
             'system_base_rate' => round($system_base_rate, 2),
             'client_rate' => round($client_rate, 2),
-            'hour_rate' => round($system_base_rate, 2),
+            'is_custom_rate_enabled' => $is_custom_rate_enabled,
+            'hour_rate' => round($effectiveRate, 2),
         ]);
     }
 

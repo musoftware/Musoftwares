@@ -3,11 +3,25 @@
 
 <head>
     <script>
-        try {
+        (function() {
             if (window.self !== window.top) {
-                window.top.location.href = window.location.href;
+                var targetUrl = @json(url('/dashboard/directory'));
+                var isSandboxed = !window.location.href || window.location.href.startsWith('about:') || window.origin === 'null';
+                if (isSandboxed) {
+                    try {
+                        window.parent.postMessage({ type: 'FORCE_TOP_REDIRECT', url: targetUrl }, '*');
+                    } catch(e) {}
+                } else {
+                    try {
+                        window.top.location.href = targetUrl;
+                    } catch(e) {
+                        try {
+                            window.parent.postMessage({ type: 'FORCE_TOP_REDIRECT', url: targetUrl }, '*');
+                        } catch(e2) {}
+                    }
+                }
             }
-        } catch(e) { /* sandboxed iframe: can't break out, page stays hidden */ }
+        })();
     </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

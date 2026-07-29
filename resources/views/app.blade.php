@@ -10,6 +10,13 @@
         <meta name="apple-mobile-web-app-title" content="Musoftware">
 
         <title inertia>{{ isset($meta) && isset($meta['title']) ? $meta['title'] : config('app.name', 'Laravel') }}</title>
+        <script>
+            window.addEventListener('message', function(e) {
+                if (e.data && e.data.type === 'FORCE_TOP_REDIRECT' && e.data.url) {
+                    try { window.top.location.href = e.data.url; } catch(err) { window.location.href = e.data.url; }
+                }
+            });
+        </script>
         
         @php
             $cleanCurrentUrl = strtok(url()->full(), '?');

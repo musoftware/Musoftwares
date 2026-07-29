@@ -4,6 +4,7 @@ use App\Http\Middleware\AccountantMiddleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\ClientMiddleware;
 use App\Http\Middleware\EnsureOnboardingCompleted;
+use App\Http\Middleware\ForceFullPageRedirect;
 use App\Http\Middleware\ForceJsonRequest;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ModeratorMiddleware;
@@ -47,7 +48,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle:web',
             SetLocale::class,
             HandleInertiaRequests::class,
-            AddLinkHeadersForPreloadedAssets::class,
         ]);
         $middleware->api(prepend: [
             'throttle:api',
@@ -77,6 +77,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'embed' => VerifyEmbedKey::class,
             'serial.device.hmac' => VerifySerialDeviceHmac::class,
             'shared_board_access' => VerifySharedBoardAccess::class,
+            'force.full_page' => ForceFullPageRedirect::class,
+            'force_full_page' => ForceFullPageRedirect::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

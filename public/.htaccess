@@ -20,11 +20,13 @@
 </IfModule>
 
 <IfModule mod_headers.c>
-    <FilesMatch "\.(js|css|xml|gz|html|svg|woff|woff2|ttf)$">
+    <FilesMatch "\.(js|css|xml|gz|html|svg|woff|woff2|ttf|eot|otf)$">
         Header append Vary: Accept-Encoding
+        Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
-    <FilesMatch "\.(ico|jpe?g|png|gif|swf|css|js|woff|woff2|ttf|svg)$">
+    <FilesMatch "\.(ico|jpe?g|png|gif|swf|css|js|woff|woff2|ttf|eot|otf|svg|json)$">
         Header set Cache-Control "max-age=31536000, public, immutable"
+        Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
     SetEnvIf Request_URI "^/sms-pay/.*$" ALLOW_FRAMING
     Header always unset X-Frame-Options env=ALLOW_FRAMING

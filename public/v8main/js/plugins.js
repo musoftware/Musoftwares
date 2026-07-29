@@ -14,14 +14,20 @@ function toggler(selector) {
     $(selector).slideToggle();
 }
 
-try { localStorage.setItem('theme', 'dark'); } catch(e) {}
+function getSafeSession(k) { try { return sessionStorage.getItem(k); } catch(e) { return null; } }
+function setSafeSession(k, v) { try { sessionStorage.setItem(k, v); } catch(e) {} }
+function getSafeLocal(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+function setSafeLocal(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+function removeSafeLocal(k) { try { localStorage.removeItem(k); } catch(e) {} }
+
+try { setSafeLocal('theme', 'dark'); } catch(e) {}
 
 /* ==========================================================================
    30-DAY WELCOME INTRO SKIP & EXPIRATION ENGINE
    ========================================================================== */
 function checkWelcomeSuppressed() {
     try {
-        var skipUntil = parseInt(localStorage.getItem('v8_skip_welcome_until') || '0', 10);
+        var skipUntil = parseInt(getSafeLocal('v8_skip_welcome_until') || '0', 10);
         return Date.now() < skipUntil;
     } catch(e) { return false; }
 }
@@ -50,9 +56,9 @@ $(window).on('load', function () {
 
     $('.preloader-wrapper .preloader .loading-Recovered').fadeOut(300, function () {
         $(".audio-test").fadeIn();
-        if ((sessionStorage.getItem('audio') === 'true') || (sessionStorage.getItem('audio') === 'false')) {
+        if ((getSafeSession('audio') === 'true') || (getSafeSession('audio') === 'false')) {
             $(".audio-test button").parent().parent().hide();
-            if ((sessionStorage.getItem('audio') === 'true')) {
+            if ((getSafeSession('audio') === 'true')) {
                 type('yes');
             } else {
                 type();
@@ -65,15 +71,15 @@ $(window).on('load', function () {
             // Save 30-day skip preference if checkbox checked
             if ($('#dontShowWelcome30Days').is(':checked')) {
                 var thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-                localStorage.setItem('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
+                setSafeLocal('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
             }
 
             if ($(this).hasClass('yes')) {
                 type('yes');
-                sessionStorage.setItem('audio', 'true');
+                setSafeSession('audio', 'true');
             } else {
                 type();
-                sessionStorage.setItem('audio', 'false');
+                setSafeSession('audio', 'false');
             }
         });
     });
@@ -83,14 +89,14 @@ $(window).on('load', function () {
 $(document).on('click', '.skip-intro-now-btn', function (e) {
     e.preventDefault();
     var thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-    localStorage.setItem('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
+    setSafeLocal('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
     bypassPreloaderNow();
 });
 
 // Reset Welcome Intro Handler
 $(document).on('click', '#resetWelcomeIntroBtn', function (e) {
     e.preventDefault();
-    localStorage.removeItem('v8_skip_welcome_until');
+    removeSafeLocal('v8_skip_welcome_until');
     alert('Welcome intro re-enabled! It will play on your next visit.');
 });
 
@@ -137,10 +143,10 @@ function type(playAudio) {
 
                 if ($(this).hasClass('active')) {
                     togglePlay(true)
-                    sessionStorage.setItem('audio', 'true');
+                    setSafeSession('audio', 'true');
                 } else {
                     togglePlay(false)
-                    sessionStorage.setItem('audio', 'false');
+                    setSafeSession('audio', 'false');
                 }
             });
 

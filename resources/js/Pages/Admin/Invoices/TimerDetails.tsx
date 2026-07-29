@@ -36,6 +36,7 @@ interface Props {
     span_seconds: number;
     system_base_rate: number;
     client_rate: number;
+    is_custom_rate_enabled?: boolean;
     hour_rate: number;
 }
 
@@ -70,7 +71,7 @@ interface TimerCache {
 
 export default function TimerDetails({
     item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds,
-    system_base_rate, client_rate, hour_rate,
+    system_base_rate, client_rate, is_custom_rate_enabled, hour_rate,
 }: Props) {
     const storageKey = `timer-details-${item.id}`;
 
@@ -100,7 +101,7 @@ export default function TimerDetails({
 
     const [manualHours, setManualHours] = useState('');
     const [manualMinutes, setManualMinutes] = useState('');
-    const [rate, setRate] = useState<number>(cache?.rate && cache.rate !== client_rate ? cache.rate : (system_base_rate || hour_rate));
+    const [rate, setRate] = useState<number>(cache?.rate ? cache.rate : (hour_rate || system_base_rate));
     const [rateVisible, setRateVisible] = useState(false);
     const [reason, setReason] = useState(cache?.reason ?? (item.item_title || ''));
     const [isSaving, setIsSaving] = useState(false);
@@ -272,8 +273,16 @@ export default function TimerDetails({
                                     {__('general.hour_rate')}
                                 </label>
                                 <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 mb-2.5">
-                                    <span className="font-semibold">{__('admin.base_system_rate')}</span>
-                                    <span className="text-gray-500">({system_base_rate})</span>
+                                    {is_custom_rate_enabled ? (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            {__('general.custom_client_rate') || 'سعر الساعة المخصص للعميل'} ({client_rate})
+                                        </span>
+                                    ) : (
+                                        <>
+                                            <span className="font-semibold">{__('admin.base_system_rate')}</span>
+                                            <span className="text-gray-500">({system_base_rate})</span>
+                                        </>
+                                    )}
                                 </div>
                                 <div className="flex shadow-sm rounded-md">
                                     <Input
