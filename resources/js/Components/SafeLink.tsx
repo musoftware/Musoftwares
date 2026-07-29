@@ -4,7 +4,7 @@ import { Link, InertiaLinkProps, router } from '@inertiajs/react';
 /**
  * List of non-Inertia (Blade) routes in the application that require full page loads.
  */
-const BLADE_ROUTES = ['/dashboard', '/dashboard/directory'];
+const BLADE_ROUTES = ['/', '/dashboard', '/dashboard/directory'];
 
 /**
  * Determines whether a given URL is a Blade (non-Inertia) or external route.
@@ -16,7 +16,9 @@ export function isExternalRoute(href?: string): boolean {
         href.startsWith('https://') ||
         href.startsWith('//') ||
         href.startsWith('mailto:') ||
-        href.startsWith('tel:')
+        href.startsWith('tel:') ||
+        href.includes('/sso/redirect') ||
+        href.includes('/sso/')
     ) {
         return true;
     }

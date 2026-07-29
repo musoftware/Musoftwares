@@ -211,19 +211,19 @@ function AuthenticatedContent({
                                 <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 bg-white">
                                     <div className="flex flex-col h-full">
                                         <div className="p-4 border-b border-slate-100">
-                                            <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
+                                            <SafeLink href="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
                                                 <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
                                                     <ApplicationLogo className="w-5 h-5 text-white" />
                                                 </div>
                                                 <span className="font-semibold text-lg">musoftware</span>
-                                            </Link>
+                                            </SafeLink>
                                         </div>
                                         <div className="flex-1 overflow-y-auto p-4 space-y-6">
                                             {/* Mobile Nav Links */}
                                             <div className="space-y-1">
                                                 {auth?.team_member ? (
-                                                    <Link href={safeRoute('sso.redirect', { system: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                        <LayoutDashboard className="w-5 h-5 text-slate-400" /> {__('general.dashboard')}</Link>
+                                                    <SafeLink href={safeRoute('sso.redirect', { system: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                        <LayoutDashboard className="w-5 h-5 text-slate-400" /> {__('general.dashboard')}</SafeLink>
                                                 ) : (
                                                     <>
                                                         <SafeLink href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
@@ -283,23 +283,23 @@ function AuthenticatedContent({
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
-                                                                            <Link href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
+                                                                            <SafeLink href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
                                                                                 <div className="flex items-center gap-3">
                                                                                     <Building2 className="w-4 h-4 text-indigo-500" /> ERP
                                                                                 </div>
                                                                                 {!activeModules.erp && <Lock className="w-3 h-3 text-slate-400" />}
-                                                                            </Link>
-                                                                            <Link href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
+                                                                            </SafeLink>
+                                                                            <SafeLink href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
                                                                                 <div className="flex items-center gap-3">
                                                                                     <Megaphone className="w-4 h-4 text-indigo-500" /> {__('general.lead_gen_crm')}
                                                                                 </div>
                                                                                 {!activeModules.crm && <Lock className="w-3 h-3 text-slate-400" />}
-                                                                            </Link>
-                                                                            <Link href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-amber-50/50 text-slate-600 font-medium">
+                                                                            </SafeLink>
+                                                                            <SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-amber-50/50 text-slate-600 font-medium">
                                                                                 <div className="flex items-center gap-3">
                                                                                     <Calendar className="w-4 h-4 text-amber-500" /> {__('general.booking')}</div>
                                                                                 {!activeModules.booking && <Lock className="w-3 h-3 text-slate-400" />}
-                                                                            </Link>
+                                                                            </SafeLink>
                                                                             <Link href={safeRoute('fbmb.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-teal-50/50 text-slate-600 font-medium">
                                                                                 <Activity className="w-4 h-4 text-teal-500" /> {__('general.isaas_fb_lookup')}
                                                                             </Link>
@@ -309,12 +309,12 @@ function AuthenticatedContent({
                                                                             <Link href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-rose-50/50 text-slate-600 font-medium">
                                                                                 <MessageSquare className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway')}
                                                                             </Link>
-                                                                            <Link href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-yellow-50/50 text-slate-600 font-medium">
+                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-yellow-50/50 text-slate-600 font-medium">
                                                                                 <Coins className="w-4 h-4 text-yellow-500" /> {__('general.gold_savers')}
-                                                                            </Link>
-                                                                            <Link href={safeRoute('sso.redirect', { system: 'toolsys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-fuchsia-50/50 text-slate-600 font-medium">
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-fuchsia-50/50 text-slate-600 font-medium">
                                                                                 <Wrench className="w-4 h-4 text-fuchsia-500" /> {__('general.tools_amp_plugins')}
-                                                                            </Link>
+                                                                            </SafeLink>
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
@@ -322,8 +322,8 @@ function AuthenticatedContent({
                                                             </Accordion>
                                                         </div>
 
-                                                        <Link href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 mt-2 rounded-lg hover:bg-amber-50 text-amber-700 font-medium">
-                                                            <CreditCard className="w-5 h-5 text-amber-500" /> {__('general.subscription')}</Link>
+                                                        <SafeLink href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 mt-2 rounded-lg hover:bg-amber-50 text-amber-700 font-medium">
+                                                            <CreditCard className="w-5 h-5 text-amber-500" /> {__('general.subscription')}</SafeLink>
                                                     </>
                                                 )}
                                             </div>
@@ -332,12 +332,12 @@ function AuthenticatedContent({
                                 </SheetContent>
                             </Sheet>
 
-                            <Link href="/" className="flex items-center gap-2">
+                            <SafeLink href="/" className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
                                     <ApplicationLogo className="w-5 h-5 text-white fill-current" />
                                 </div>
                                 <span className="font-medium text-lg hidden sm:block tracking-tight">musoftware</span>
-                            </Link>
+                            </SafeLink>
 
                             <nav className="hidden md:flex items-center gap-1">
                                 <div className="relative">
@@ -597,7 +597,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isErpActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
@@ -622,7 +622,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
@@ -647,7 +647,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isBookingActive ? "bg-amber-50/80 border-amber-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
@@ -745,7 +745,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isRouteActive('isaas.gold-savers.index') ? "bg-yellow-50/80 border-yellow-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={safeRoute('sso.redirect', { system: 'goldsaversys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
@@ -767,7 +767,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={safeRoute('sso.redirect', { system: 'toolsys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
