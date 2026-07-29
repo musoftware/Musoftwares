@@ -1663,6 +1663,59 @@
             mouseY = (e.clientY - windowHalfY) * 0.0007;
         });
 
+        // ══ INTERACTIVE 3D MOUSE DRAG & SPIN ENGINE WITH PHYSICS MOMENTUM ══
+        canvas.style.pointerEvents = 'auto';
+        canvas.style.cursor = 'grab';
+
+        var isDragging = false;
+        var previousMousePosition = { x: 0, y: 0 };
+        var spinVelocity = { x: 0, y: 0 };
+
+        function onPointerDown(e) {
+            isDragging = true;
+            canvas.style.cursor = 'grabbing';
+            var pageX = e.touches ? e.touches[0].clientX : e.clientX;
+            var pageY = e.touches ? e.touches[0].clientY : e.clientY;
+            previousMousePosition = { x: pageX, y: pageY };
+            spinVelocity = { x: 0, y: 0 };
+        }
+
+        function onPointerMove(e) {
+            if (!isDragging) return;
+
+            var pageX = e.touches ? e.touches[0].clientX : e.clientX;
+            var pageY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            var deltaX = pageX - previousMousePosition.x;
+            var deltaY = pageY - previousMousePosition.y;
+
+            // Free 3D Drag Rotation
+            coreGroup.rotation.y += deltaX * 0.015;
+            coreGroup.rotation.x += deltaY * 0.015;
+
+            // Throw velocity for physics momentum inertia
+            spinVelocity.y = deltaX * 0.008;
+            spinVelocity.x = deltaY * 0.008;
+
+            previousMousePosition = { x: pageX, y: pageY };
+        }
+
+        function onPointerUp() {
+            if (isDragging) {
+                isDragging = false;
+                canvas.style.cursor = 'grab';
+            }
+        }
+
+        canvas.addEventListener('mousedown', onPointerDown);
+        canvas.addEventListener('touchstart', onPointerDown, { passive: true });
+
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('touchmove', onPointerMove, { passive: true });
+
+        window.addEventListener('mouseup', onPointerUp);
+        window.addEventListener('touchend', onPointerUp);
+
         // Hover Scaling Interaction
         $('.item, .btn-pay-due, header .user-reference ul li').hover(function () {
             neonAccentMat.opacity = 1.0;
@@ -1693,9 +1746,19 @@
             ring2Group.rotation.z -= 0.012;
             ring3Mesh.rotation.z += 0.006;
 
-            // Parallax Smooth Tilt
-            coreGroup.rotation.y += (mouseX - coreGroup.rotation.y) * 0.05;
-            coreGroup.rotation.x += (mouseY - coreGroup.rotation.x) * 0.05;
+            // 3D Drag Physics Momentum & Friction Damping
+            if (!isDragging) {
+                coreGroup.rotation.y += spinVelocity.y;
+                coreGroup.rotation.x += spinVelocity.x;
+
+                // Friction decay towards 0
+                spinVelocity.y *= 0.95;
+                spinVelocity.x *= 0.95;
+
+                // Baseline parallax mouse response when idle
+                coreGroup.rotation.y += (mouseX - coreGroup.rotation.y) * 0.03;
+                coreGroup.rotation.x += (mouseY - coreGroup.rotation.x) * 0.03;
+            }
 
             // Floating bobbing effect
             coreGroup.position.y = Math.sin(elapsedTime * 1.8) * 3;
