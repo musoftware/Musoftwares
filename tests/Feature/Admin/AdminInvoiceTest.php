@@ -191,4 +191,55 @@ class AdminInvoiceTest extends TestCase
         $this->assertEquals(150, $receivedTrx->amount);
         $this->assertEquals(-150, $usedTrx->amount);
     }
+
+    public function test_admin_cannot_bulk_bill_invoice_if_older_invoice_is_unpaid(): void
+    {
+        $currency = Currency::first() ?? Currency::factory()->create();
+        $client = User::factory()->create([
+            'onboarding_completed' => true,
+            'currency_id' => $currency->id,
+            'user_balance' => 1000,
+        ]);
+        $client->assignRole('client');
+
+        // Create older invoice
+        $olderInvoice = Invoice::createInvoice($client, null, null);
+        $olderInvoice->items()->create([
+            'item_title' => 'Older Invoice Item',
+            'amount' => 100,
+            'qty' => 1,
+            'item_type' => 'simple',
+        ]);
+        $olderInvoice->unpaid = 100;
+        $olderInvoice->status = 'unpaid';
+        $olderInvoice->save();
+
+        // Create newer invoice
+        $newerInvoice = Invoice::createInvoice($client, null, null);
+        $newerInvoice->items()->create([
+            'item_title' => 'Newer Invoice Item',
+            'amount' => 200,
+            'qty' => 1,
+            'item_type' => 'simple',
+        ]);
+        $newerInvoice->unpaid = 200;
+        $newerInvoice->status = 'unpaid';
+        $newerInvoice->save();
+
+        // Admin attempts bulk billing on the newer invoice
+        $response = $this->actingAs($this->admin)->post(route('admin.invoices.bulk-action'), [
+            'action' => 'bill_invoice',
+            'invoices' => [$newerInvoice->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        
+        $sessionError = session('error');
+        $this->assertStringContainsString('older invoice', $sessionError);
+        $this->assertStringContainsString('is still unpaid', $sessionError);
+
+        $this->assertEquals('unpaid', $newerInvoice->fresh()->status);
+        $this->assertEquals(1000, $client->fresh()->user_balance);
+    }
 }

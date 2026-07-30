@@ -553,7 +553,11 @@ class InvoiceController extends Controller
                 $invoice_total = $inv->unpaid_total();
 
                 if (((float) $client_balance >= (float) $inv->unpaid_total()) && ((float) $inv->unpaid_total() > 0)) {
-                    $inv->bill_invoice();
+                    try {
+                        $inv->bill_invoice();
+                    } catch (\Exception $e) {
+                        return redirect()->back()->with('error', $e->getMessage());
+                    }
                 } else {
                     if (((float) $inv->total() == 0)) {
                         return redirect()->back()->with('error', __('admin.invoice_total_zero'));
