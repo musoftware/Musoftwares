@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Plus, Youtube, BookOpen, Video, CheckCircle, ArrowRight, Play, Loader2 } from 'lucide-react';
+import { Plus, BookOpen, Video, CheckCircle, ArrowRight, Play, Loader2 } from 'lucide-react';
 
 interface Playlist {
     id: number;
@@ -64,7 +64,7 @@ export default function Index({ playlists }: IndexProps) {
                     {showSyncForm && (
                         <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-right animate-in fade-in slide-in-from-top-4 duration-350">
                             <div className="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
-                                <Youtube className="h-6 w-6 text-red-500" />
+                                <Video className="h-6 w-6 text-red-500" />
                                 <h3 className="text-lg font-bold text-slate-200">استيراد كورس برمجي جديد من يوتيوب</h3>
                             </div>
                             <form onSubmit={handleSubmit} className="space-y-4">

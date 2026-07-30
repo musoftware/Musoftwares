@@ -16,7 +16,7 @@ class YouTubeSyncService
     public function syncPlaylist(int $userId, string $playlistIdOrUrl): SeriesPlaylist
     {
         $playlistId = $this->parsePlaylistId($playlistIdOrUrl);
-        $apiKey = env('YOUTUBE_API_KEY');
+        $apiKey = config('services.youtube.key');
 
         if (empty($apiKey)) {
             Log::info("[YouTubeSyncService] No YOUTUBE_API_KEY found. Falling back to Mock Sync Mode.");

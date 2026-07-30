@@ -7,5 +7,7 @@
     "PaymentGateway": true,
     "PasswordSync": true,
     "Shortlink": true,
-    "WhatsappSender": true
+    "WhatsappSender": true,
+    "Listing": true,
+    "Series": true
 }

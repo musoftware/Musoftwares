@@ -45,4 +45,11 @@ Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dail
 // Poll IMAP every two minutes for guest ticket replies
 Schedule::command('imap:pull')->everyTwoMinutes()->withoutOverlapping(5);
 
+// Scrape Waseet Egypt jobs listings daily at 02:00 Cairo Time
+Schedule::command('listing:scrape-waseet')
+    ->dailyAt('02:00')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(10);
+
+
 

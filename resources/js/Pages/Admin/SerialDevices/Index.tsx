@@ -691,7 +691,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     </DialogHeader>
                     {detail && (
                         <div className="mt-6 space-y-4 text-sm">
-                            <Row label={__('general.device_id')}    value={<span className="font-mono text-xs">{detail.device_id}</span>} />
+                            <Row label={__('general.device_id')}    value={<span className="font-mono text-xs break-all">{detail.device_id}</span>} />
                             <Row label={__('general.machine_name')} value={detail.machine_name} />
                             <Row label={__('general.user_name')}    value={detail.user_name} />
                             <Row label={__('general.user_domain')}  value={detail.user_domain} />
@@ -768,17 +768,17 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     {assignUserDevice && (
                         <div className="space-y-4 pt-4 text-sm">
                             <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border space-y-1.5">
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{__('general.device_id')}:</span>
-                                    <span className="font-mono text-xs font-bold">{assignUserDevice.device_id}</span>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground shrink-0">{__('general.device_id')}:</span>
+                                    <span className="font-mono text-xs font-bold break-all text-end">{assignUserDevice.device_id}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{__('general.machine')}:</span>
-                                    <span className="font-medium">{assignUserDevice.machine_name}</span>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground shrink-0">{__('general.machine')}:</span>
+                                    <span className="font-medium text-end break-all">{assignUserDevice.machine_name}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{__('general.software')}:</span>
-                                    <span className="font-medium text-slate-700 dark:text-slate-300">{assignUserDevice.software?.name ?? '—'}</span>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground shrink-0">{__('general.software')}:</span>
+                                    <span className="font-medium text-slate-700 dark:text-slate-300 text-end break-all">{assignUserDevice.software?.name ?? '—'}</span>
                                 </div>
                             </div>
                             
