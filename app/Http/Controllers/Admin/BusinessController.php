@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\BalancesHelper;
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
+use App\Models\AdminSettings;
 use App\Models\CostTransaction;
 use App\Models\Currency;
 use App\Models\Invoice;
+use App\Models\InvoiceItemTimer;
 use App\Models\Project;
 use App\Models\RecurringCost;
 use App\Models\Transaction;
@@ -1239,11 +1241,15 @@ class BusinessController extends Controller
 
             $mExpenses = $mExpensesQ->sum('business_amount') ?? 0;
 
+            $mProfit = $mIncome - abs($mExpenses);
+            $mMargin = $mIncome > 0 ? round($mProfit / $mIncome * 100, 1) : 0;
+
             $monthlyTrends[] = [
-                'name' => $temp->format('M Y'),
-                'income' => round($mIncome, 2),
-                'costs' => round(abs($mExpenses), 2),
-                'profit' => round($mIncome - abs($mExpenses), 2),
+                'name'          => $temp->format('M Y'),
+                'income'        => round($mIncome, 2),
+                'costs'         => round(abs($mExpenses), 2),
+                'profit'        => round($mProfit, 2),
+                'profit_margin' => $mMargin,
             ];
 
             $temp->addMonth();
@@ -1252,30 +1258,133 @@ class BusinessController extends Controller
 
         $bCurrency = CurrencyHelper::getBusinessCurrency();
 
+        // Compute monthly averages from the trends
+        $trendCount = count($monthlyTrends);
+        $avgIncome  = $trendCount > 0 ? round(array_sum(array_column($monthlyTrends, 'income')) / $trendCount, 2) : 0;
+        $avgCosts   = $trendCount > 0 ? round(array_sum(array_column($monthlyTrends, 'costs'))  / $trendCount, 2) : 0;
+        $avgProfit  = $trendCount > 0 ? round(array_sum(array_column($monthlyTrends, 'profit')) / $trendCount, 2) : 0;
+        $avgMargin  = $trendCount > 0 ? round(array_sum(array_column($monthlyTrends, 'profit_margin')) / $trendCount, 1) : 0;
+
+        // ── 1. Worked Hours & Effective Hourly Rate (EHR) Calculations ───────
+        $timerQuery = InvoiceItemTimer::query();
+        if ($startUtc && $endUtc) {
+            $timerQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+        }
+        if ($projectId) {
+            $timerQuery->where('project_id', $projectId);
+        }
+        $timerEntries = $timerQuery->whereNotNull('date_end')->whereNotNull('date_start')->get();
+        $totalWorkedSeconds = 0;
+        foreach ($timerEntries as $t) {
+            $totalWorkedSeconds += $t->diff();
+        }
+        $totalWorkedHours = round($totalWorkedSeconds / 3600, 2);
+
+        $marketHourlyRate    = (float) AdminSettings::GetValue('market_hourly_rate', 0);
+        $effectiveHourlyRate = $totalWorkedHours > 0 ? round($lifetimeIncome / $totalWorkedHours, 2) : 0;
+        $costPerWorkedHour   = $totalWorkedHours > 0 ? round(abs($lifetimeExpenses) / $totalWorkedHours, 2) : 0;
+        $rateVariance        = round($effectiveHourlyRate - $marketHourlyRate, 2);
+
+        // ── 2. Invoices & DSO & AR Aging Calculations ─────────────────────────
+        $invAnalyticsQuery = Invoice::query();
+        if ($startUtc && $endUtc) {
+            $invAnalyticsQuery->whereBetween('created_at', [$startUtc, $endUtc]);
+        }
+        if ($projectId) {
+            $invAnalyticsQuery->where('project_id', $projectId);
+        }
+
+        $invoicesList        = $invAnalyticsQuery->get();
+        $totalInvoicedAmount = 0;
+        $totalPaidAmount     = 0;
+        $totalUnpaidAmount   = 0;
+
+        $arAging = [
+            '0_30'    => 0,
+            '31_60'   => 0,
+            '61_90'   => 0,
+            '90_plus' => 0,
+        ];
+
+        $now = now('Africa/Cairo');
+
+        foreach ($invoicesList as $inv) {
+            $invTotal = abs($inv->total ?? 0);
+            $totalInvoicedAmount += $invTotal;
+
+            $paid = abs($inv->amount_paid ?? 0);
+            $totalPaidAmount += $paid;
+
+            $unpaid = max(0, $invTotal - $paid);
+            if ($inv->status !== 'paid' && $inv->status !== 'cancelled' && $unpaid > 0) {
+                $totalUnpaidAmount += $unpaid;
+
+                $dueDate = $inv->due_date ? Carbon::parse($inv->due_date) : Carbon::parse($inv->created_at);
+                $daysOverdue = max(0, (int) $dueDate->diffInDays($now, false));
+
+                if ($daysOverdue <= 30) {
+                    $arAging['0_30'] += round($unpaid, 2);
+                } elseif ($daysOverdue <= 60) {
+                    $arAging['31_60'] += round($unpaid, 2);
+                } elseif ($daysOverdue <= 90) {
+                    $arAging['61_90'] += round($unpaid, 2);
+                } else {
+                    $arAging['90_plus'] += round($unpaid, 2);
+                }
+            }
+        }
+
+        $collectionRatePercent = $totalInvoicedAmount > 0 ? round(($totalPaidAmount / $totalInvoicedAmount) * 100, 1) : 0;
+        $daysInPeriod          = ($startUtc && $endUtc) ? max(1, (int) Carbon::parse($from)->diffInDays(Carbon::parse($to)) + 1) : 30;
+        $dsoDays               = $totalInvoicedAmount > 0 ? round(($totalUnpaidAmount / $totalInvoicedAmount) * $daysInPeriod, 1) : 0;
+
+        // ── 3. Academic Margins & Break-Even ──────────────────────────────────
+        $operatingMarginPercent  = $lifetimeIncome > 0 ? round(($netProfit / $lifetimeIncome) * 100, 1) : 0;
+        $monthlyBreakEvenRevenue = $avgCosts;
+
         return Inertia::render('Admin/Business/Reports', [
             'stats' => [
-                'total_users' => $usersQuery->count(),
-                'total_projects' => $projectsQuery->count(),
-                'total_invoices' => $invoicesQuery->count(),
-                'total_transactions' => $txnsQuery->count(),
-                'lifetime_income' => $lifetimeIncome,
-                'lifetime_expenses' => abs($lifetimeExpenses),
-                'net_profit' => $netProfit,
-                'business_currency_code' => $bCurrency['currency'] ?? 'USD',
+                'total_users'               => $usersQuery->count(),
+                'total_projects'            => $projectsQuery->count(),
+                'total_invoices'            => $invoicesQuery->count(),
+                'total_transactions'        => $txnsQuery->count(),
+                'lifetime_income'           => $lifetimeIncome,
+                'lifetime_expenses'         => abs($lifetimeExpenses),
+                'net_profit'                => $netProfit,
+                'business_currency_code'   => $bCurrency['currency'] ?? 'USD',
                 'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
+                // Monthly averages
+                'avg_monthly_income'        => $avgIncome,
+                'avg_monthly_costs'         => $avgCosts,
+                'avg_monthly_profit'        => $avgProfit,
+                'avg_profit_margin'         => $avgMargin,
+                // Academic & Financial Metrics
+                'total_worked_hours'        => $totalWorkedHours,
+                'effective_hourly_rate'     => $effectiveHourlyRate,
+                'cost_per_worked_hour'      => $costPerWorkedHour,
+                'market_hourly_rate'        => $marketHourlyRate,
+                'rate_variance'             => $rateVariance,
+                'total_invoiced_amount'     => round($totalInvoicedAmount, 2),
+                'total_paid_invoices'       => round($totalPaidAmount, 2),
+                'total_unpaid_invoices'     => round($totalUnpaidAmount, 2),
+                'collection_rate_percent'   => $collectionRatePercent,
+                'dso_days'                  => $dsoDays,
+                'ar_aging'                  => $arAging,
+                'operating_margin_percent'  => $operatingMarginPercent,
+                'monthly_break_even_revenue'=> $monthlyBreakEvenRevenue,
             ],
             'charts' => [
-                'monthly_trends' => $monthlyTrends,
-                'income_by_category' => $incomeByCategory,
-                'expenses_by_category' => $expensesByCategory,
+                'monthly_trends'      => $monthlyTrends,
+                'income_by_category'  => $incomeByCategory,
+                'expenses_by_category'=> $expensesByCategory,
             ],
-            'projects' => $projects,
+            'projects'   => $projects,
             'categories' => $availableCategories,
-            'filters' => [
-                'from' => $from,
-                'to' => $to,
+            'filters'    => [
+                'from'       => $from,
+                'to'         => $to,
                 'project_id' => $projectId,
-                'category' => $category,
+                'category'   => $category,
             ],
         ]);
     }

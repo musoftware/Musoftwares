@@ -32,6 +32,7 @@ import {
     User,
     Building2,
     Tag,
+    Activity,
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -202,6 +203,14 @@ export default function Income() {
         <AdminSidebarLayout
             title={__('general.business_income')}
             header={__('general.business_income')}
+            actions={
+                <Link href={route('admin.business.reports')}>
+                    <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
+                        <Activity className="h-4 w-4 text-slate-800" />
+                        <span>{__('general.business_reports') || 'Business Reports'}</span>
+                    </Button>
+                </Link>
+            }
         >
             <Head title={__('general.business_income')} />
 
