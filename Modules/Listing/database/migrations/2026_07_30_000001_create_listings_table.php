@@ -1,0 +1,50 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        if (Schema::hasTable('listings')) {
+            return;
+        }
+
+        Schema::create('listings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+            $table->unsignedBigInteger('waseet_id')->nullable()->unique();
+            $table->string('title');
+            $table->text('description');
+            $table->decimal('price', 12, 2)->default(0);
+            $table->string('currency', 16)->default('ج.م');
+            $table->string('phone');
+            $table->string('email');
+            $table->text('original_url');
+            $table->json('images')->nullable();
+            $table->string('city')->nullable();
+            $table->string('status', 32)->default('active'); // active, draft, archived
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->index('user_id');
+            $table->index('status');
+            $table->index('waseet_id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('listings');
+    }
+};
