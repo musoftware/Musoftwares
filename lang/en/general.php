@@ -7730,7 +7730,7 @@ return [
     'you_cannot_order_your_own' => 'You cannot order your own service',
     'you_currently_do_not_have_access_to_any_specialized_workspaces_please_contact_your_administrator_to_assign_a_role_to_your_account' => 'You currently do not have access to any specialized workspaces. Please contact your administrator to assign a role to your account.',
     'you_do_not_have_permission_to_view_this_resource' => 'You do not have permission to view this resource.',
-    'you_earn_this_percentage_from_all_paymen' => 'You Earn This Percentage From All Paymen',
+    'you_earn_this_percentage_from_all_paymen' => 'You Earn This Percentage From All Payment',
     'you_have_access_to_multiple_action_centers_choose_the_workspace_that_matches_your_task_for_today' => 'You have access to multiple action centers. Choose the workspace that matches your task for today.',
     'you_have_already_reviewed_this_order' => 'You have already reviewed this order.',
     'you_have_an_outstanding_balance_of' => 'You owe',
