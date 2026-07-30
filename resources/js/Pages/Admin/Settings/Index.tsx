@@ -66,6 +66,7 @@ interface SettingsData {
     custom_body_scripts: string | null;
     notif_channels_invoice_created: string | null;
     invoice_notification_channels?: string[];
+    market_hourly_rate?: string | null;
 }
 
 interface Props {
@@ -171,6 +172,11 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
     const flash = props.flash as { success?: string } | undefined;
 
     const [form, setForm] = useState<SettingsData>({ ...settings });
+
+    const businessCurrencyObj = currencies.find(c => String(c.id) === String(form.business_currency)) 
+        || currencies.find(c => String(c.currency) === String(form.business_currency))
+        || currencies[0];
+    const businessCurrencyCode = businessCurrencyObj?.currency ?? 'EGP';
 
     // Invoice-created notification channels (globally configured; defaults to mail+fcm).
     const availableChannels: string[] =
@@ -334,6 +340,25 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     />
                                     <p className="text-xs font-semibold text-green-600 mt-1">
                                         Current Derived Rate: {overheadHourlyRateEgp} EGP / Hour
+                                    </p>
+                                </Field>
+                                <Field label={__('general.market_hourly_rate')}>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                            id="market_hourly_rate"
+                                            type="number"
+                                            step="0.01"
+                                            value={form.market_hourly_rate ?? ''}
+                                            onChange={(e) => set('market_hourly_rate', e.target.value)}
+                                            placeholder="50"
+                                            className="pr-12"
+                                        />
+                                        <span className="absolute right-3 text-xs font-bold text-gray-400 uppercase">
+                                            {businessCurrencyCode}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Used to calculate actual discount compared to market hourly rate.
                                     </p>
                                 </Field>
                                 <Field label={__('general.max_devices_per_tenant_default')}>

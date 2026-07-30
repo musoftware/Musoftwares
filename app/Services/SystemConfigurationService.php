@@ -26,7 +26,7 @@ class SystemConfigurationService extends BaseService
             'expected_monthly_income', 'work_days_per_month', 'hours_per_day',
             'google_analytics_id', 'google_tag_manager_id', 'meta_pixel_id',
             'custom_head_scripts', 'custom_body_scripts',
-            'notif_channels_invoice_created',
+            'notif_channels_invoice_created', 'market_hourly_rate',
         ];
 
         foreach ($supportedKeys as $key) {

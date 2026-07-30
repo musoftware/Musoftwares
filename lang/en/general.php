@@ -7877,4 +7877,10 @@ return [
     'avg_real_rate' => 'Avg Real Rate / hr',
     'effective_discount' => 'Effective Discount %',
     'per_hour' => '/ hr',
+    'market_hourly_rate' => 'Market Hourly Rate',
+    'market_value' => 'Market Value',
+    'actual_savings_vs_market' => 'Actual Savings vs Market',
+    'market_discount_savings' => 'Savings compared to Market',
+    'market_comparison' => 'Market Rate Comparison',
+    'market_discount_percent' => 'Market Discount %',
 ];

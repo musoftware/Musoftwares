@@ -7877,4 +7877,10 @@ return [
     'avg_real_rate' => 'متوسط سعر الساعة الفعلي',
     'effective_discount' => 'معدل الخصم الفعلي',
     'per_hour' => '/ ساعة',
+    'market_hourly_rate' => 'سعر ساعة السوق',
+    'market_value' => 'القيمة بسعر السوق',
+    'actual_savings_vs_market' => 'الوفر الفعلي مقارنة بالسوق',
+    'market_discount_savings' => 'الخصم مقارنة بالسوق',
+    'market_comparison' => 'مقارنة سعر السوق',
+    'market_discount_percent' => 'نسبة الخصم من السوق',
 ];

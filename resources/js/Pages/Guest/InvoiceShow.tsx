@@ -149,6 +149,37 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                         </div>
                                     </div>
 
+                                    {/* Row 3: Market Rate Comparison (Optional) */}
+                                    {invoice.timer_metrics.market_hourly_rate > 0 && (
+                                        <div className="border-t border-dashed border-gray-200 pt-4 mt-2">
+                                            <h4 className="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-1.5">
+                                                <span>{__('general.market_comparison')}</span>
+                                            </h4>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                                <div className="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                                                    <span className="block text-[10px] font-bold text-indigo-600 uppercase mb-1">{__('general.market_hourly_rate')}</span>
+                                                    <span className="font-mono text-sm font-bold text-indigo-700">
+                                                        {invoice.timer_metrics.market_hourly_rate_str} <span className="text-[10px] font-normal text-indigo-500">{__('general.per_hour')}</span>
+                                                    </span>
+                                                </div>
+                                                <div className="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                                                    <span className="block text-[10px] font-bold text-indigo-600 uppercase mb-1">{__('general.market_value')}</span>
+                                                    <span className="font-mono text-sm font-bold text-indigo-700">
+                                                        {invoice.timer_metrics.market_value_str}
+                                                    </span>
+                                                </div>
+                                                {invoice.timer_metrics.has_market_discount && (
+                                                    <div className="bg-emerald-50 text-emerald-800 p-3 rounded-xl border border-emerald-100 col-span-2 sm:col-span-1">
+                                                        <span className="block text-[10px] font-bold text-emerald-600 uppercase mb-1">{__('general.actual_savings_vs_market')}</span>
+                                                        <span className="font-mono text-sm font-bold text-emerald-700">
+                                                            {invoice.timer_metrics.market_discount_savings_str} ({invoice.timer_metrics.market_discount_percent}%)
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Expandable Accordion Button */}
                                     {allTimers.length > 0 && (
                                         <div className="pt-2">

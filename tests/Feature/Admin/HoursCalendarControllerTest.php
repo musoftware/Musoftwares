@@ -47,7 +47,14 @@ class HoursCalendarControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $response->assertJsonIsArray();
+        $response->assertJsonStructure([
+            'heatmap',
+            'chart_30_days',
+            'market_hourly_rate',
+            'recommended_hourly_rate',
+            'business_currency',
+            'last_30_days_timers',
+        ]);
     }
 
     public function test_non_admin_cannot_get_hours_calendar_data(): void

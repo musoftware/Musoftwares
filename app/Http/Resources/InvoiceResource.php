@@ -217,6 +217,19 @@ class InvoiceResource extends JsonResource
         $avgRealRate = $totalHours > 0 ? ($fullRealValue / $totalHours) : 0;
         $effectiveDiscountPercent = $fullRealValue > 0 ? round((($fullRealValue - $billedAmount) / $fullRealValue) * 100, 1) : 0;
 
+        $rawMarketRate = (float) AdminSettings::GetValue('market_hourly_rate', 0);
+        $marketHourlyRateInInvoiceCurrency = 0.0;
+        if ($rawMarketRate > 0) {
+            $marketHourlyRateInInvoiceCurrency = CurrenciesExchange::RateToday(
+                $rawMarketRate,
+                AdminSettings::GetValue('business_currency', 2),
+                $currencyId
+            );
+        }
+        $marketValue = $totalHours * $marketHourlyRateInInvoiceCurrency;
+        $marketDiscountSavings = max(0, $marketValue - $billedAmount);
+        $marketDiscountPercent = $marketValue > 0 ? round((($marketValue - $billedAmount) / $marketValue) * 100, 1) : 0;
+
         return [
             'total_seconds' => $totalSeconds,
             'total_hours' => round($totalHours, 2),
@@ -233,6 +246,14 @@ class InvoiceResource extends JsonResource
             'avg_real_rate' => round($avgRealRate, 2),
             'avg_real_rate_str' => FinanceHelper::instance()->format_money($avgRealRate, $currencyId),
             'effective_discount_percent' => max(0, $effectiveDiscountPercent),
+            'market_hourly_rate' => round($marketHourlyRateInInvoiceCurrency, 2),
+            'market_hourly_rate_str' => FinanceHelper::instance()->format_money($marketHourlyRateInInvoiceCurrency, $currencyId),
+            'market_value' => round($marketValue, 2),
+            'market_value_str' => FinanceHelper::instance()->format_money($marketValue, $currencyId),
+            'market_discount_savings' => round($marketDiscountSavings, 2),
+            'market_discount_savings_str' => FinanceHelper::instance()->format_money($marketDiscountSavings, $currencyId),
+            'market_discount_percent' => max(0, $marketDiscountPercent),
+            'has_market_discount' => $marketDiscountSavings > 0.01 && $marketHourlyRateInInvoiceCurrency > 0,
         ];
     }
 }

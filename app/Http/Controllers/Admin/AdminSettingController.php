@@ -77,6 +77,7 @@ class AdminSettingController extends Controller
             // Recurring invoice notification channel toggles (one place; default mail+fcm).
             'notif_channels_invoice_created' => AdminSettings::GetValue('notif_channels_invoice_created', 'mail,fcm'),
             'invoice_notification_channels' => AdminSettings::INVOICE_NOTIFICATION_CHANNELS,
+            'market_hourly_rate' => AdminSettings::GetValue('market_hourly_rate'),
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -148,6 +149,7 @@ class AdminSettingController extends Controller
                     $fail('Invalid channel(s): '.implode(', ', $bad).'. Allowed: '.implode(', ', $allowed));
                 }
             }],
+            'market_hourly_rate' => 'nullable|numeric|min:0',
         ]);
 
         $this->configService->updateSettings($validated);

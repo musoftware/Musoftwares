@@ -9956,7 +9956,13 @@
             "avg_billed_rate": "متوسط سعر الساعة المفوترة",
             "avg_real_rate": "متوسط سعر الساعة الفعلي",
             "effective_discount": "معدل الخصم الفعلي",
-            "per_hour": "\/ ساعة"
+            "per_hour": "\/ ساعة",
+            "market_hourly_rate": "سعر ساعة السوق",
+            "market_value": "القيمة بسعر السوق",
+            "actual_savings_vs_market": "الوفر الفعلي مقارنة بالسوق",
+            "market_discount_savings": "الخصم مقارنة بالسوق",
+            "market_comparison": "مقارنة سعر السوق",
+            "market_discount_percent": "نسبة الخصم من السوق"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -21759,7 +21765,13 @@
             "avg_billed_rate": "Avg Billed Rate \/ hr",
             "avg_real_rate": "Avg Real Rate \/ hr",
             "effective_discount": "Effective Discount %",
-            "per_hour": "\/ hr"
+            "per_hour": "\/ hr",
+            "market_hourly_rate": "Market Hourly Rate",
+            "market_value": "Market Value",
+            "actual_savings_vs_market": "Actual Savings vs Market",
+            "market_discount_savings": "Savings compared to Market",
+            "market_comparison": "Market Rate Comparison",
+            "market_discount_percent": "Market Discount %"
         },
         "gold_saver": {
             "achieved": "Achieved",

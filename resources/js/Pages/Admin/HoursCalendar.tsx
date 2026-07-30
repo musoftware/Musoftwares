@@ -2,9 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
-import { Clock, CalendarCheck, BarChart2 } from 'lucide-react';
+import { 
+    Clock, 
+    CalendarCheck, 
+    BarChart2, 
+    DollarSign, 
+    TrendingUp, 
+    Download, 
+    Activity, 
+    FileText,
+    ArrowUpRight
+} from 'lucide-react';
 import axios from 'axios';
 import { __ } from '@/lib/i18n';
+import { IsoCurrencyAmount } from '@/lib/currencyDisplay';
+import { 
+    ResponsiveContainer, 
+    AreaChart, 
+    Area, 
+    XAxis, 
+    YAxis, 
+    CartesianGrid, 
+    Tooltip as RechartsTooltip, 
+    Legend,
+    ComposedChart,
+    Line
+} from 'recharts';
 
 export default function HoursCalendar({ years, auth }: any) {
     const [selectedYear, setSelectedYear] = useState<number>(years[0] || new Date().getFullYear());
@@ -15,6 +38,14 @@ export default function HoursCalendar({ years, auth }: any) {
     const [totalHours, setTotalHours] = useState<number>(0);
     const [activeDays, setActiveDays] = useState<number>(0);
     const [averageHours, setAverageHours] = useState<number>(0);
+
+    // 30 Days stats and details
+    const [chartData, setChartData] = useState<any[]>([]);
+    const [marketHourlyRate, setMarketHourlyRate] = useState<number>(0);
+    const [recommendedHourlyRate, setRecommendedHourlyRate] = useState<number>(0);
+    const [businessCurrency, setBusinessCurrency] = useState<string>('USD');
+    const [last30DaysTimers, setLast30DaysTimers] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     // Grid data
     const [calendarDays, setCalendarDays] = useState<any[]>([]);
@@ -35,13 +66,46 @@ export default function HoursCalendar({ years, auth }: any) {
         try {
             const response = await axios.post('/admin/hours-calendar/data', { year });
             const responseData = response.data;
-            setData(responseData);
-            generateCalendar(year, responseData);
+            if (responseData && !Array.isArray(responseData)) {
+                setData(responseData.heatmap || []);
+                generateCalendar(year, responseData.heatmap || []);
+                setChartData(responseData.chart_30_days || []);
+                setMarketHourlyRate(responseData.market_hourly_rate || 0);
+                setRecommendedHourlyRate(responseData.recommended_hourly_rate || 0);
+                setBusinessCurrency(responseData.business_currency || 'USD');
+                setLast30DaysTimers(responseData.last_30_days_timers || []);
+            } else {
+                setData(responseData);
+                generateCalendar(year, responseData);
+            }
         } catch (error: any) {
             console.error('Failed to load hours calendar data', error);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const exportToCSV = () => {
+        if (!last30DaysTimers.length) return;
+        const headers = ['Date', 'Client', 'Project', 'Duration', 'Client Amount', 'Business Amount', 'Actual Yield'];
+        const rows = last30DaysTimers.map(t => [
+            t.date,
+            t.client_name,
+            t.project_name,
+            t.duration_str,
+            `${t.amount} ${t.amount_str.replace(/[^a-zA-Z\s]/g, '')}`,
+            t.business_amount_str.replace(/[^\d.,]/g, '') + ' ' + businessCurrency,
+            t.business_rate_str.replace(/[^\d.,]/g, '') + ' ' + businessCurrency
+        ]);
+        const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(e => e.map(val => `"${val}"`).join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `work_hours_export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const generateCalendar = (year: number, dateYearsData: any[]) => {
@@ -145,6 +209,23 @@ export default function HoursCalendar({ years, auth }: any) {
         if (count < 8) return 'bg-green-600 hover:bg-green-700 border-green-700';
         return 'bg-green-800 hover:bg-green-900 border-green-900';
     };
+
+    // 30 Days Computed Stats
+    const totalHours30 = last30DaysTimers.reduce((sum, t) => sum + Number(t.hours), 0);
+    const totalBilled30 = last30DaysTimers.reduce((sum, t) => sum + Number(t.business_amount), 0);
+    const avgYield30 = totalHours30 > 0 ? totalBilled30 / totalHours30 : 0;
+    const marketSavings30 = last30DaysTimers.reduce((sum, t) => {
+        const marketValue = Number(t.hours) * marketHourlyRate;
+        const diff = Math.max(0, marketValue - Number(t.business_amount));
+        return sum + diff;
+    }, 0);
+
+    const filteredTimers = last30DaysTimers.filter(t => {
+        const matchSearch = (t.project_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (t.client_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (t.date || '').toLowerCase().includes(searchQuery.toLowerCase());
+        return matchSearch;
+    });
 
     return (
         <AdminSidebarLayout 
@@ -273,6 +354,207 @@ export default function HoursCalendar({ years, auth }: any) {
                             <div className="absolute w-2 h-2 bg-slate-900 rotate-45 -bottom-1 start-1/2 transform -translate-x-1/2"></div>
                         </div>
                     )}
+                </OperationalCard>
+
+                {/* Last 30 Days Dashboard Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left: KPI Stats Cards */}
+                    <div className="space-y-4">
+                        <h2 className="text-lg font-bold text-slate-900 px-1 flex items-center gap-2">
+                            <Activity className="w-5 h-5 text-indigo-600" />
+                            {__('general.productivity')} (آخر 30 يوم)
+                        </h2>
+                        
+                        {/* KPI 1: Market Hourly Rate */}
+                        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.market_hourly_rate')}</span>
+                                <span className="p-1.5 bg-rose-50 text-rose-600 rounded-lg"><DollarSign className="w-4 h-4" /></span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <IsoCurrencyAmount amount={marketHourlyRate} currency={{ currency: businessCurrency }} size="lg" />
+                                <span className="text-xs text-slate-400">/ {__('general.per_hour')}</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-2">سعر الساعة التقديري في السوق حالياً</p>
+                        </div>
+
+                        {/* KPI 2: Average Hourly Yield */}
+                        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.avg_billed_rate')}</span>
+                                <span className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><TrendingUp className="w-4 h-4" /></span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <IsoCurrencyAmount amount={avgYield30} currency={{ currency: businessCurrency }} size="lg" />
+                                <span className="text-xs text-slate-400">/ {__('general.per_hour')}</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-2">متوسط العائد الفعلي المحقق لكل ساعة عمل</p>
+                        </div>
+
+                        {/* KPI 3: Market Savings */}
+                        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.market_discount_savings')}</span>
+                                <span className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><ArrowUpRight className="w-4 h-4" /></span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <IsoCurrencyAmount amount={marketSavings30} currency={{ currency: businessCurrency }} size="lg" />
+                            </div>
+                            <p className="text-xs text-slate-400 mt-2">الوفر والخصومات المقدمة للعملاء مقارنة بالسوق</p>
+                        </div>
+                    </div>
+
+                    {/* Right: Chart Comparison */}
+                    <div className="lg:col-span-2">
+                        <OperationalCard title="مقارنة سعر الساعة الفعلي وسعر السوق (آخر 30 يوم)" className="h-full">
+                            <div className="h-[280px] w-full mt-4">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <defs>
+                                            <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
+                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                        <XAxis 
+                                            dataKey="date" 
+                                            tickLine={false} 
+                                            axisLine={false} 
+                                            tickFormatter={(str) => {
+                                                try {
+                                                    const d = new Date(str);
+                                                    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                                                } catch (e) {
+                                                    return str;
+                                                }
+                                            }}
+                                            tick={{ fill: '#64748b', fontSize: 10 }} 
+                                        />
+                                        <YAxis 
+                                            tickLine={false} 
+                                            axisLine={false} 
+                                            tick={{ fill: '#64748b', fontSize: 10 }}
+                                            unit={` ${businessCurrency}`}
+                                        />
+                                        <RechartsTooltip 
+                                            contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px', border: 'none', color: '#fff', fontSize: '12px' }}
+                                            labelStyle={{ fontWeight: 'bold', color: '#94a3b8' }}
+                                        />
+                                        <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', color: '#64748b' }} />
+                                        
+                                        {/* actual hourly rate filled area */}
+                                        <Area 
+                                            type="monotone" 
+                                            dataKey="actual_rate" 
+                                            stroke="#4f46e5" 
+                                            strokeWidth={2} 
+                                            fillOpacity={1} 
+                                            fill="url(#colorActual)" 
+                                            name="العائد الفعلي لساعتك" 
+                                        />
+                                        
+                                        {/* market hourly rate baseline */}
+                                        <Line 
+                                            type="monotone" 
+                                            dataKey="market_rate" 
+                                            stroke="#ef4444" 
+                                            strokeWidth={1.5} 
+                                            strokeDasharray="4 4" 
+                                            dot={false} 
+                                            name="سعر ساعة السوق" 
+                                        />
+
+                                        {/* recommended hourly rate baseline */}
+                                        <Line 
+                                            type="monotone" 
+                                            dataKey="recommended_rate" 
+                                            stroke="#f59e0b" 
+                                            strokeWidth={1.5} 
+                                            strokeDasharray="3 3" 
+                                            dot={false} 
+                                            name="السعر الموصى به" 
+                                        />
+                                    </ComposedChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </OperationalCard>
+                    </div>
+                </div>
+
+                {/* Detailed Session Activity Log Table */}
+                <OperationalCard 
+                    title={__('general.view_detailed_time_sessions')} 
+                    action={
+                        <div className="flex items-center gap-3">
+                            <input 
+                                type="text"
+                                placeholder="بحث عن عميل أو مشروع..."
+                                className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-500 w-48 md:w-64"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <button
+                                onClick={exportToCSV}
+                                disabled={!last30DaysTimers.length}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Download className="w-3.5 h-3.5" />
+                                تصدير CSV
+                            </button>
+                        </div>
+                    }
+                >
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left rtl:text-right text-slate-500">
+                            <thead className="text-xs text-slate-700 bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('general.date')}</th>
+                                    <th className="px-6 py-3 font-semibold text-center">العميل</th>
+                                    <th className="px-6 py-3 font-semibold text-center">المشروع</th>
+                                    <th className="px-6 py-3 font-semibold text-center">المدة</th>
+                                    <th className="px-6 py-3 font-semibold text-center">معدل الساعة الفعلي</th>
+                                    <th className="px-6 py-3 font-semibold text-center">قيمة الجلسة</th>
+                                    <th className="px-6 py-3 font-semibold text-center">معدل الساعة بالـ Business</th>
+                                    <th className="px-6 py-3 font-semibold text-center">الفاتورة</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {filteredTimers.length > 0 ? (
+                                    filteredTimers.map((timer) => (
+                                        <tr key={timer.id} className="hover:bg-slate-50/80 transition-colors">
+                                            <td className="px-6 py-4 text-center font-medium text-slate-900 whitespace-nowrap">{timer.date}</td>
+                                            <td className="px-6 py-4 text-center">{timer.client_name}</td>
+                                            <td className="px-6 py-4 text-center">{timer.project_name}</td>
+                                            <td className="px-6 py-4 text-center font-semibold text-slate-700 whitespace-nowrap">{timer.duration_str} ({timer.hours}h)</td>
+                                            <td className="px-6 py-4 text-center text-slate-700 font-medium whitespace-nowrap">{timer.actual_rate_str} / ساعة</td>
+                                            <td className="px-6 py-4 text-center font-semibold text-slate-900 whitespace-nowrap">{timer.amount_str}</td>
+                                            <td className="px-6 py-4 text-center text-indigo-600 font-semibold whitespace-nowrap">{timer.business_rate_str} / ساعة</td>
+                                            <td className="px-6 py-4 text-center whitespace-nowrap">
+                                                {timer.invoice_id ? (
+                                                    <Link 
+                                                        href={`/admin/invoices/${timer.invoice_id}`}
+                                                        className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-900 hover:underline"
+                                                    >
+                                                        <FileText className="w-3.5 h-3.5" />
+                                                        #{timer.invoice_number}
+                                                    </Link>
+                                                ) : (
+                                                    <span className="text-slate-400 text-xs">—</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={8} className="px-6 py-10 text-center text-slate-400">
+                                            لا توجد جلسات عمل مسجلة في الـ 30 يومًا الماضية تطابق البحث.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </OperationalCard>
             </div>
         </AdminSidebarLayout>
