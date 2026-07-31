@@ -96,19 +96,9 @@ return Application::configure(basePath: dirname(__DIR__))
                     : $exception->getMessage();
 
                 if ($exception instanceof QueryException) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Database Error: ' . $exception->getMessage(),
-                        'exception' => get_class($exception),
-                        'file' => $exception->getFile(),
-                        'line' => $exception->getLine(),
-                        'trace' => collect($exception->getTrace())->take(5)->map(fn($t) => [
-                            'file' => $t['file'] ?? null,
-                            'line' => $t['line'] ?? null,
-                            'function' => $t['function'] ?? null,
-                            'class' => $t['class'] ?? null,
-                        ]),
-                    ], in_array($statusCode, [200, 0]) ? 500 : $statusCode);
+                    $message = __('errors.database_error') === 'errors.database_error'
+                        ? 'A database error occurred.'
+                        : __('errors.database_error');
                 }
 
                 if ($exception instanceof ThrottleRequestsException) {

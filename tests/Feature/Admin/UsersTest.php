@@ -125,11 +125,18 @@ class UsersTest extends TestCase
     {
         $userToDelete = User::factory()->create();
 
-        \App\Models\Invoice::create([
+        $invoice = \App\Models\Invoice::create([
             'user_id' => $userToDelete->id,
             'status' => 'unpaid',
-            'unpaid' => 150,
-            'paid' => 0,
+            'currency_id' => 1,
+        ]);
+
+        \App\Models\InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'item_title' => 'Unpaid Item',
+            'amount' => 150,
+            'qty' => 1,
+            'item_type' => 'simple',
         ]);
 
         $response = $this->actingAs($this->admin)->delete("/admin/users/{$userToDelete->id}");

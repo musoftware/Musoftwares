@@ -65,8 +65,8 @@ interface SettingsData {
     custom_head_scripts: string | null;
     custom_body_scripts: string | null;
     notif_channels_invoice_created: string | null;
-    invoice_notification_channels?: string[];
     market_hourly_rate?: string | null;
+    auto_pay_after_days?: string | number | null;
 }
 
 interface Props {
@@ -380,6 +380,26 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     onChange={(v) => set('friday_work_allowed', v)}
                                     description={__('general.when_disabled_friday_is_treated_as_a_non_working_day_for_timers_and_scheduling')}
                                 />
+                            </div>
+                        </SectionCard>
+
+                        {/* Invoicing & Auto-Pay Settings */}
+                        <SectionCard title={__('general.invoicing_and_autopay_settings') || 'Invoicing & Auto-Pay Settings'} icon={CreditCard}>
+                            <div className="space-y-4">
+                                <Field label={__('general.auto_pay_after_days') || 'Auto-Pay Unpaid Invoices After (Days)'}>
+                                    <Input
+                                        id="auto_pay_after_days"
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        value={form.auto_pay_after_days ?? ''}
+                                        onChange={(e) => set('auto_pay_after_days', e.target.value)}
+                                        placeholder="3"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {__('general.auto_pay_after_days_help') || 'Automatically pay unpaid invoices using the client\'s balance after this many days (for invoices with amount > 0).'}
+                                    </p>
+                                </Field>
                             </div>
                         </SectionCard>
 

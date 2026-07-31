@@ -78,6 +78,7 @@ class AdminSettingController extends Controller
             'notif_channels_invoice_created' => AdminSettings::GetValue('notif_channels_invoice_created', 'mail,fcm'),
             'invoice_notification_channels' => AdminSettings::INVOICE_NOTIFICATION_CHANNELS,
             'market_hourly_rate' => AdminSettings::GetValue('market_hourly_rate'),
+            'auto_pay_after_days' => AdminSettings::GetValue('auto_pay_after_days', 3),
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -150,6 +151,7 @@ class AdminSettingController extends Controller
                 }
             }],
             'market_hourly_rate' => 'nullable|numeric|min:0',
+            'auto_pay_after_days' => 'nullable|integer|min:0',
         ]);
 
         $this->configService->updateSettings($validated);

@@ -31,6 +31,7 @@ class Invoice extends Model
 
     protected $casts = [
         'schedule' => 'array',
+        'paid_at' => 'datetime',
     ];
 
     protected static function booted()
@@ -45,6 +46,14 @@ class Invoice extends Model
             unset($invoice->start_day);
             $invoice->final_total = $invoice->total(true);
             $invoice->unpaid = $invoice->unpaid_total(true);
+
+            if ($invoice->status === 'paid') {
+                if (empty($invoice->paid_at)) {
+                    $invoice->paid_at = now();
+                }
+            } else {
+                $invoice->paid_at = null;
+            }
         });
 
         static::updating(function (Invoice $invoice) {
@@ -725,13 +734,13 @@ class Invoice extends Model
         return FinanceHelper::instance()->format_money($total, AdminSettings::GetValue('business_currency', 2));
     }
 
-    public function bill_invoice()
+    public function bill_invoice(bool $autoPaid = false)
     {
         if ($older = $this->getOlderUnpaidInvoice()) {
             throw new \Exception("Cannot bill invoice #{$this->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
         }
 
-        DB::transaction(function () {
+        DB::transaction(function () use ($autoPaid) {
             $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
             if (! $locked || $locked->status === 'paid') {
@@ -739,12 +748,13 @@ class Invoice extends Model
             }
 
             $transaction_id = null;
+            $reason = 'Invoice #'.$this->id . ($autoPaid ? ' (Auto-Paid)' : '');
 
             if (! empty($this->project_id)) {
                 $client = User::find($this->user_id);
                 $project = Project::find($this->project_id);
                 if ($project) {
-                    $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+                    $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), $reason, 'used', $this->currency_id);
                 }
                 if ($this->user) {
                     $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
@@ -752,7 +762,7 @@ class Invoice extends Model
             } else {
                 $client = User::find($this->user_id);
                 if ($client) {
-                    $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
+                    $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), $reason, 'used', $this->currency_id);
                 }
                 if ($this->user) {
                     $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);

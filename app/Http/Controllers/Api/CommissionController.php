@@ -32,39 +32,25 @@ class CommissionController extends Controller
 {
     public function checkStatus(Request $request): JsonResponse
     {
-        try {
-            $validated = $request->validate([
-                'appname' => ['required', 'string', 'max:255'],
-                'packagename' => ['nullable', 'string', 'max:255'],
-            ]);
+        $validated = $request->validate([
+            'appname' => ['required', 'string', 'max:255'],
+            'packagename' => ['nullable', 'string', 'max:255'],
+        ]);
 
-            $appName = $validated['appname'];
+        $appName = $validated['appname'];
 
-            $paid = InvoiceItem::query()
+        $paid = retry(3, function () use ($appName) {
+            return InvoiceItem::query()
                 ->where('item_title', '=', $appName)
                 ->whereHas('invoice', function ($query) {
                     $query->where('status', 'paid');
                 })
                 ->exists();
+        }, 1000);
 
-            return response()->json([
-                'status' => 'success',
-                'paid' => (bool) $paid,
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Database/Query Error: ' . $e->getMessage(),
-                'exception' => get_class($e),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => collect($e->getTrace())->take(5)->map(fn($t) => [
-                    'file' => $t['file'] ?? null,
-                    'line' => $t['line'] ?? null,
-                    'function' => $t['function'] ?? null,
-                    'class' => $t['class'] ?? null,
-                ]),
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'paid' => (bool) $paid,
+        ]);
     }
 }

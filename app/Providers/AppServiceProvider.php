@@ -71,29 +71,31 @@ class AppServiceProvider extends ServiceProvider
             $cacheKey = "rate_limit:{$module}:{$tenantId}:{$ip}";
 
             $config = Cache::remember($cacheKey, 60, function () use ($module, $tenantId, $ip) {
-                if ($tenantId) {
+                return retry(3, function () use ($module, $tenantId, $ip) {
+                    if ($tenantId) {
+                        $limit = RateLimit::where('module', $module)
+                            ->where('tenant_id', $tenantId)
+                            ->where('is_active', true)
+                            ->first();
+                        if ($limit) {
+                            return $limit;
+                        }
+                    }
+
                     $limit = RateLimit::where('module', $module)
-                        ->where('tenant_id', $tenantId)
+                        ->where('ip_address', $ip)
                         ->where('is_active', true)
                         ->first();
                     if ($limit) {
                         return $limit;
                     }
-                }
 
-                $limit = RateLimit::where('module', $module)
-                    ->where('ip_address', $ip)
-                    ->where('is_active', true)
-                    ->first();
-                if ($limit) {
-                    return $limit;
-                }
-
-                return RateLimit::where('module', $module)
-                    ->whereNull('tenant_id')
-                    ->whereNull('ip_address')
-                    ->where('is_active', true)
-                    ->first();
+                    return RateLimit::where('module', $module)
+                        ->whereNull('tenant_id')
+                        ->whereNull('ip_address')
+                        ->where('is_active', true)
+                        ->first();
+                }, 1000);
             });
 
             $maxRequests = $config ? $config->max_requests : $defaultRequests;

@@ -63,6 +63,7 @@ class InvoiceRaceConditionTest extends TestCase
         ]);
 
         // Call mark_as_paid twice sequentially to simulate race condition / retries
+        $invoice->refresh();
         $invoice->mark_as_paid();
         $invoice->mark_as_paid();
 
@@ -108,6 +109,7 @@ class InvoiceRaceConditionTest extends TestCase
         ]);
 
         // Bill invoice twice
+        $invoice->refresh();
         $invoice->bill_invoice();
         $invoice->bill_invoice();
 

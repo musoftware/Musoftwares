@@ -189,4 +189,51 @@ class InvoiceServiceTest extends TestCase
         $this->assertEquals(139.46, round($mergedItem->total(), 2));
         $this->assertEquals(139.46, round($invoice->fresh()->total(), 2));
     }
+
+    public function test_update_invoice_updates_existing_item()
+    {
+        $user = User::factory()->create();
+
+        $invoice = Invoice::create([
+            'user_id' => $user->id,
+            'status' => 'unpaid',
+            'currency_id' => 1,
+        ]);
+
+        $item = InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'item_title' => 'Original Title',
+            'item_type' => 'simple',
+            'amount' => 50,
+            'qty' => 1,
+            'currency' => 'USD',
+        ]);
+
+        $service = new InvoiceService;
+
+        $data = [
+            'discount' => 0,
+            'items' => [
+                [
+                    'id' => $item->id,
+                    'item_title' => 'Renamed Title',
+                    'amount' => 60,
+                    'qty' => 2,
+                    'item_type' => 'quantity',
+                ],
+            ],
+            'deleted_items' => [],
+            'cost_lines' => [],
+            'deleted_cost_lines' => [],
+        ];
+
+        $service->updateInvoice($invoice, $data);
+
+        $item->refresh();
+        $this->assertEquals('Renamed Title', $item->item_title);
+        $this->assertEquals(60.0, (float) $item->amount);
+        $this->assertEquals(2.0, (float) $item->qty);
+        $this->assertEquals('quantity', $item->item_type);
+        $this->assertEquals(120.0, $invoice->fresh()->total());
+    }
 }

@@ -42,6 +42,9 @@ Schedule::command(\App\Console\Commands\GenerateBlogArticles::class, ['--limit' 
 // Send daily new services digest daily at 23:30 Cairo Time
 Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dailyAt('23:30')->timezone('Africa/Cairo');
 
+// Auto-pay unpaid invoices daily at 04:30 Cairo Time
+Schedule::command(\App\Console\Commands\AutoPayInvoices::class)->dailyAt('04:30')->timezone('Africa/Cairo');
+
 // Poll IMAP every two minutes for guest ticket replies
 Schedule::command('imap:pull')->everyTwoMinutes()->withoutOverlapping(5);
 

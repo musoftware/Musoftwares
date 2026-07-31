@@ -27,6 +27,7 @@ class SystemConfigurationService extends BaseService
             'google_analytics_id', 'google_tag_manager_id', 'meta_pixel_id',
             'custom_head_scripts', 'custom_body_scripts',
             'notif_channels_invoice_created', 'market_hourly_rate',
+            'auto_pay_after_days',
         ];
 
         foreach ($supportedKeys as $key) {

@@ -1285,7 +1285,7 @@ class BusinessController extends Controller
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
-            ->select(['id', 'status', 'final_total', 'paid', 'unpaid', 'created_at'])
+            ->select(['id', 'status', 'final_total', 'paid', 'unpaid', 'created_at', 'paid_at'])
             ->get();
 
         $totalInvoicedAmount = 0;
@@ -1338,7 +1338,16 @@ class BusinessController extends Controller
             $daysInPeriod = max(1, (int) Carbon::parse($to)->diffInDays(now('Africa/Cairo')) + 1);
         }
 
-        $dsoDays = $totalInvoicedAmount > 0 ? round(($totalUnpaidAmount / $totalInvoicedAmount) * $daysInPeriod, 1) : 0;
+        $paidInvoices = $invoicesList->filter(fn($inv) => $inv->status === 'paid' && !empty($inv->paid_at));
+        $totalPaidDays = 0;
+        $paidCount = $paidInvoices->count();
+        foreach ($paidInvoices as $inv) {
+            $createdAt = Carbon::parse($inv->created_at);
+            $paidAt = Carbon::parse($inv->paid_at);
+            $seconds = max(0, $createdAt->diffInSeconds($paidAt));
+            $totalPaidDays += $seconds / 86400.0;
+        }
+        $dsoDays = $paidCount > 0 ? round($totalPaidDays / $paidCount, 1) : 0;
 
         // ── 3. Academic Margins & Break-Even ──────────────────────────────────
         $operatingMarginPercent  = $lifetimeIncome > 0 ? round(($netProfit / $lifetimeIncome) * 100, 1) : 0;
