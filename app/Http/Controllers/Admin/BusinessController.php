@@ -1285,6 +1285,7 @@ class BusinessController extends Controller
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
+            ->select(['id', 'status', 'final_total', 'paid', 'unpaid', 'created_at'])
             ->get();
 
         $totalInvoicedAmount = 0;

@@ -204,6 +204,14 @@ class ClientCurrencyConverterService extends BaseService
                 }
             });
 
+            if (!empty($invoiceIds)) {
+                \App\Models\Invoice::whereIn('id', $invoiceIds)->chunk(self::CHUNK_SIZE, function ($invoices) {
+                    foreach ($invoices as $invoice) {
+                        $invoice->updateCachedTotal();
+                    }
+                });
+            }
+
             return ['counts' => $counts, 'fallback_warnings' => $fallbackWarnings];
         }, 'Client currency conversion failed');
 

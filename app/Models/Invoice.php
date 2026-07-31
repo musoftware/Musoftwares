@@ -43,6 +43,8 @@ class Invoice extends Model
 
         static::saving(function ($invoice) {
             unset($invoice->start_day);
+            $invoice->final_total = $invoice->total(true);
+            $invoice->unpaid = $invoice->unpaid_total(true);
         });
 
         static::updating(function (Invoice $invoice) {
@@ -408,9 +410,38 @@ class Invoice extends Model
         return round(($this->sub_total() + $this->tax()) - ($this->discount + $this->second_discount), 2);
     }
 
-    public function total(): float
+    public function total(bool $forceRecalculate = false): float
     {
+        if (!$forceRecalculate && array_key_exists('final_total', $this->attributes) && $this->attributes['final_total'] !== null) {
+            if ($this->isDirty(['discount', 'second_discount', 'currency_id'])) {
+                return $this->getTotalAttribute();
+            }
+            return (float) $this->attributes['final_total'];
+        }
         return $this->getTotalAttribute();
+    }
+
+    public function getFinalTotalAttribute($value)
+    {
+        if ($this->isDirty(['discount', 'second_discount', 'currency_id'])) {
+            return $this->total(true);
+        }
+        return $value !== null ? (float) $value : $this->total();
+    }
+
+    public function getUnpaidAttribute($value)
+    {
+        if ($this->isDirty(['paid', 'discount', 'second_discount', 'currency_id'])) {
+            return $this->unpaid_total(true);
+        }
+        return $value !== null ? (float) $value : $this->unpaid_total();
+    }
+
+    public function updateCachedTotal()
+    {
+        $this->final_total = $this->total(true);
+        $this->unpaid = $this->unpaid_total(true);
+        $this->saveQuietly();
     }
 
     public function total_min_cost()
@@ -478,9 +509,9 @@ class Invoice extends Model
         return FinanceHelper::instance()->format_money($this->total_with_commission(), $this->currency_id);
     }
 
-    public function unpaid_total()
+    public function unpaid_total(bool $forceRecalculate = false): float
     {
-        return round($this->total() - $this->paid, 2);
+        return round($this->total($forceRecalculate) - $this->paid, 2);
     }
 
     public function unpaid_amount()

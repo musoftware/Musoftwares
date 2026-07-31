@@ -14,6 +14,21 @@ class InvoiceItem extends Model
 
     protected $fillable = ['item_title', 'amount', 'qty', 'item_type', 'invoice_id'];
 
+    protected static function booted()
+    {
+        static::saved(function ($item) {
+            if ($item->invoice) {
+                $item->invoice->updateCachedTotal();
+            }
+        });
+
+        static::deleted(function ($item) {
+            if ($item->invoice) {
+                $item->invoice->updateCachedTotal();
+            }
+        });
+    }
+
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');

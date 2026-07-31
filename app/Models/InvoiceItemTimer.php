@@ -16,6 +16,17 @@ class InvoiceItemTimer extends Model
     protected static function booted()
     {
         // Model event hook removed in favor of single queued batch notification in controller
+        static::saved(function ($timer) {
+            if ($timer->invoiceItem && $timer->invoiceItem->invoice) {
+                $timer->invoiceItem->invoice->updateCachedTotal();
+            }
+        });
+
+        static::deleted(function ($timer) {
+            if ($timer->invoiceItem && $timer->invoiceItem->invoice) {
+                $timer->invoiceItem->invoice->updateCachedTotal();
+            }
+        });
     }
 
     public function invoiceItem(): \Illuminate\Database\Eloquent\Relations\BelongsTo
