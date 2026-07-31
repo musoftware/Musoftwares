@@ -10,6 +10,7 @@ return [
     'erp_smtp_addon_required' => 'إضافة خادم SMTP لـ ERP مطلوبة',
     'insufficient_client_balance' => 'رصيد العميل غير كافٍ',
     'invoice_already_paid' => 'الفاتورة مدفوعة بالفعل',
+    'invoice_belongs_to_another_user' => 'هذه الفاتورة تابعة لحساب آخر.',
     'invoice_must_be_issued' => 'يجب إصدار الفاتورة أولاً',
     'invoice_must_be_sent' => 'يجب إرسال الفاتورة أولاً',
     'invoice_must_be_sent_partial' => 'يجب إرسال الفاتورة الجزئية أولاً',

@@ -145,6 +145,24 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's workspace settings.
+     */
+    public function updateWorkspaceSettings(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $settings = $user->workspace_settings ?? [];
+
+        if ($request->has('hide_values')) {
+            $settings['hide_values'] = $request->boolean('hide_values');
+        }
+
+        $user->workspace_settings = $settings;
+        $user->save();
+
+        return back();
+    }
+
+    /**
      * Update the user's profile information.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse

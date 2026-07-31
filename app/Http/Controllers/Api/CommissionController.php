@@ -32,23 +32,39 @@ class CommissionController extends Controller
 {
     public function checkStatus(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'appname' => ['required', 'string', 'max:255'],
-            'packagename' => ['nullable', 'string', 'max:255'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'appname' => ['required', 'string', 'max:255'],
+                'packagename' => ['nullable', 'string', 'max:255'],
+            ]);
 
-        $appName = $validated['appname'];
+            $appName = $validated['appname'];
 
-        $paid = InvoiceItem::query()
-            ->where('item_title', '=', $appName)
-            ->whereHas('invoice', function ($query) {
-                $query->where('status', 'paid');
-            })
-            ->exists();
+            $paid = InvoiceItem::query()
+                ->where('item_title', '=', $appName)
+                ->whereHas('invoice', function ($query) {
+                    $query->where('status', 'paid');
+                })
+                ->exists();
 
-        return response()->json([
-            'status' => 'success',
-            'paid' => (bool) $paid,
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'paid' => (bool) $paid,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Database/Query Error: ' . $e->getMessage(),
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => collect($e->getTrace())->take(5)->map(fn($t) => [
+                    'file' => $t['file'] ?? null,
+                    'line' => $t['line'] ?? null,
+                    'function' => $t['function'] ?? null,
+                    'class' => $t['class'] ?? null,
+                ]),
+            ], 500);
+        }
     }
 }

@@ -59,6 +59,7 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $user->roles->pluck('name')->map(fn ($r) => strtolower($r))->toArray(),
                     'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
                     'is_admin' => method_exists($user, 'isAdmin') ? $user->isAdmin() : false,
+                    'workspace_settings' => $user->workspace_settings ?? [],
                 ] : null,
                 'team_member' => null,
                 'crm_team_member' => Auth::guard('crm_team')->user(),

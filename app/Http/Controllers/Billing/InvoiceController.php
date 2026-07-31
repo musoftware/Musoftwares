@@ -274,4 +274,39 @@ class InvoiceController extends Controller
 
         return $pdf->download(str_replace(' ', '-', $clientName).'-'.$invoice->id.'.pdf');
     }
+
+    /**
+     * Redirect legacy /app/invoices/{id} routes to the proper client billing /billing/invoices/{uuid}/pay route,
+     * ensuring proper authentication and authorization.
+     */
+    public function redirectAppInvoice(Request $request, Invoice $invoice)
+    {
+        // 1. Check if user is authenticated
+        if (! Auth::check()) {
+            // Store the intended URL in session so that after login they are redirected back
+            session(['url.intended' => $request->fullUrl()]);
+
+            return redirect()->route('login')
+                ->with('error', __('errors.log_in_to_continue_payment') ?: 'Please log in to continue payment.');
+        }
+
+        $user = Auth::user();
+
+        // 2. Check if the authenticated user is an administrator or accountant
+        if ($user->isAdmin() || $user->hasAnyRole(['admin', 'Admin', 'super_admin', 'superadmin', 'accountant'])) {
+            return redirect()->route('admin.invoices.show', $invoice->id);
+        }
+
+        // 3. Check if the invoice belongs to the authenticated user using the standard InvoicePolicy
+        if ($user->cannot('view', $invoice)) {
+            // Render Inertia Error page with 403 status code
+            return Inertia::render('Error', [
+                'status' => 403,
+                'message' => __('errors.invoice_belongs_to_another_user') ?: 'This invoice belongs to another account.',
+            ])->toResponse($request)->setStatusCode(403);
+        }
+
+        // 4. Redirect the client to the correct billing page
+        return redirect()->route('billing.invoices.pay', $invoice->uuid);
+    }
 }

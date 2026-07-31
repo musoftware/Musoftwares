@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
+import { toast } from 'sonner';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
@@ -15,13 +16,116 @@ import {
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt,
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
     ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown,
-    Bell, Mail
+    Bell, Mail, FolderKanban, ListTodo, StickyNote
 } from 'lucide-react';
 
-export default function Show({ invoice }: { invoice: any }) {
+const NOTE_COLORS: Record<string, { bg: string; border: string; text: string; swatch: string }> = {
+    yellow: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-950', swatch: 'bg-amber-400' },
+    green: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-950', swatch: 'bg-emerald-400' },
+    blue: { bg: 'bg-sky-50', border: 'border-sky-200', text: 'text-sky-950', swatch: 'bg-sky-400' },
+    red: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-950', swatch: 'bg-rose-400' },
+    purple: { bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-950', swatch: 'bg-violet-400' },
+    pink: { bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-950', swatch: 'bg-pink-400' },
+    slate: { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-900', swatch: 'bg-slate-400' },
+};
+
+const LANE_META: Record<string, { labelKey: string; bg: string; text: string; border: string }> = {
+    backlog: { labelKey: 'general.lane_backlog', bg: 'bg-indigo-50 text-indigo-700', text: 'text-indigo-700', border: 'border-indigo-100' },
+    in_progress: { labelKey: 'general.lane_in_progress', bg: 'bg-amber-50 text-amber-700', text: 'text-amber-700', border: 'border-amber-100' },
+    review: { labelKey: 'general.lane_review', bg: 'bg-purple-50 text-purple-700', text: 'text-purple-700', border: 'border-purple-100' },
+    done: { labelKey: 'general.lane_done', bg: 'bg-emerald-50 text-emerald-700', text: 'text-emerald-700', border: 'border-emerald-100' },
+};
+
+const TYPE_META: Record<string, { icon: React.ElementType; color: string }> = {
+    note: { icon: StickyNote, color: 'text-amber-700 bg-amber-50 ring-amber-200' },
+    task: { icon: ListTodo, color: 'text-sky-700 bg-sky-50 ring-sky-200' },
+    todo: { icon: List, color: 'text-violet-700 bg-violet-50 ring-violet-200' },
+};
+
+const PRIORITY_STYLES: Record<string, string> = {
+    high: 'bg-rose-100 text-rose-700 ring-rose-200',
+    urgent: 'bg-orange-100 text-orange-700 ring-orange-200',
+    normal: 'bg-amber-100 text-amber-700 ring-amber-200',
+    low: 'bg-slate-100 text-slate-600 ring-slate-200',
+};
+
+export default function Show({ 
+    invoice, 
+    boardCards = [], 
+    categories = [], 
+    lanes = [] 
+}: { 
+    invoice: any; 
+    boardCards?: any[]; 
+    categories?: any[]; 
+    lanes?: string[]; 
+}) {
     // Editable state
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    const [activeTab, setActiveTab] = useState<'details' | 'board'>('details');
+    const [localBoardCards, setLocalBoardCards] = useState<any[]>(boardCards);
+    const [cardModal, setCardModal] = useState<{
+        isOpen: boolean;
+        mode: 'create' | 'edit';
+        type: 'note' | 'task' | 'todo' | null;
+        card?: any;
+        initialLane?: string;
+    }>({
+        isOpen: false,
+        mode: 'create',
+        type: null
+    });
+
+    const handleMoveCard = async (card: any, targetLane: string) => {
+        try {
+            await axios.post(route('admin.invoices.board.move-card', { invoice: invoice.id }), {
+                type: card.type,
+                id: card.id,
+                lane: targetLane
+            });
+            setLocalBoardCards(prev => prev.map(c => c.type === card.type && c.id === card.id ? { ...c, lane: targetLane } : c));
+            toast.success('Card moved successfully');
+        } catch (err) {
+            toast.error('Failed to move card');
+        }
+    };
+
+    const handleAddCard = async (type: 'note' | 'task' | 'todo', payload: any) => {
+        try {
+            const res = await axios.post(route(`admin.invoices.board.store-${type}`, { invoice: invoice.id }), payload);
+            if (res.data?.ok && res.data?.card) {
+                setLocalBoardCards(prev => [...prev, res.data.card]);
+                toast.success(`${type} added successfully`);
+                setCardModal({ isOpen: false, mode: 'create', type: null });
+            }
+        } catch (err) {
+            toast.error(`Failed to add ${type}`);
+        }
+    };
+
+    const handleUpdateCard = async (type: 'note' | 'task' | 'todo', id: number, payload: any) => {
+        try {
+            await axios.put(route(`admin.invoices.board.update-${type}`, { invoice: invoice.id, [type]: id }), payload);
+            setLocalBoardCards(prev => prev.map(c => c.type === type && c.id === id ? { ...c, ...payload, title: payload.title || payload.task_name || c.title } : c));
+            toast.success(`${type} updated successfully`);
+            setCardModal({ isOpen: false, mode: 'create', type: null });
+        } catch (err) {
+            toast.error(`Failed to update ${type}`);
+        }
+    };
+
+    const handleDeleteCard = async (card: any) => {
+        if (!confirm(`Are you sure you want to delete this ${card.type}?`)) return;
+        try {
+            await axios.delete(route(`admin.invoices.board.destroy-${card.type}`, { invoice: invoice.id, [card.type]: card.id }));
+            setLocalBoardCards(prev => prev.filter(c => !(c.type === card.type && c.id === card.id)));
+            toast.success(`${card.type} deleted successfully`);
+        } catch (err) {
+            toast.error(`Failed to delete ${card.type}`);
+        }
+    };
     
     // Local copy of items for inline editing
     const [items, setItems] = useState<any[]>([]);
@@ -459,8 +563,46 @@ export default function Show({ invoice }: { invoice: any }) {
                 </div>
             </div>
 
-            {/* Info Cards Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Tabs Navigation */}
+            <div className="mb-6 border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                    <button
+                        onClick={() => setActiveTab('details')}
+                        className={cn(
+                            "border-b-2 py-4 px-1 text-sm font-medium transition-colors cursor-pointer",
+                            activeTab === 'details'
+                                ? "border-slate-900 text-slate-950 font-semibold"
+                                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                        )}
+                    >
+                        {__('admin.invoice_details') || 'Invoice Details'}
+                    </button>
+                    {invoice.project_id && (
+                        <button
+                            onClick={() => setActiveTab('board')}
+                            className={cn(
+                                "border-b-2 py-4 px-1 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer",
+                                activeTab === 'board'
+                                    ? "border-slate-900 text-slate-950 font-semibold"
+                                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                            )}
+                        >
+                            <FolderKanban className="w-4 h-4" />
+                            {__('admin.invoice_board') || 'Invoice Board'}
+                            {localBoardCards.length > 0 && (
+                                <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                                    {localBoardCards.length}
+                                </span>
+                            )}
+                        </button>
+                    )}
+                </nav>
+            </div>
+
+            {activeTab === 'details' && (
+                <>
+                    {/* Info Cards Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 {/* Client Card */}
                 <Card className="shadow-sm border-gray-200">
                     <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
@@ -1262,7 +1404,256 @@ export default function Show({ invoice }: { invoice: any }) {
                     </div>
                 </div>
             )}
-            
+                </>
+            )}
+
+            {activeTab === 'board' && invoice.project_id && (
+                <div className="space-y-6">
+                    {/* Board Header / Controls */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-lg border shadow-sm">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900">{__('admin.invoice_board') || 'Invoice Board'}</h3>
+                            <p className="text-xs text-gray-500 mt-1">
+                                {__('admin.invoice_board_desc') || 'Manage sticky notes, tasks, and todos linked to this invoice. These items will also appear on the project board.'}
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button onClick={() => setCardModal({ isOpen: true, mode: 'create', type: 'note', initialLane: 'backlog' })} variant="outline" size="sm" className="cursor-pointer">
+                                <StickyNote className="w-4 h-4 me-1.5" /> + {__('general.sticky_note')}
+                            </Button>
+                            <Button onClick={() => setCardModal({ isOpen: true, mode: 'create', type: 'task', initialLane: 'backlog' })} variant="outline" size="sm" className="cursor-pointer">
+                                <ListTodo className="w-4 h-4 me-1.5" /> + {__('general.task')}
+                            </Button>
+                            <Button onClick={() => setCardModal({ isOpen: true, mode: 'create', type: 'todo', initialLane: 'backlog' })} variant="outline" size="sm" className="cursor-pointer">
+                                <Plus className="w-4 h-4 me-1.5" /> + {__('general.todo')}
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Board Grid Layout (4 columns) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {lanes.map((lane) => {
+                            const laneCards = localBoardCards.filter((c) => c.lane === lane);
+                            return (
+                                <div key={lane} className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col min-h-[500px]">
+                                    {/* Lane Header */}
+                                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-200">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-bold text-sm text-slate-700 uppercase tracking-wider">
+                                                {__(LANE_META[lane]?.labelKey) || lane.replace('_', ' ')}
+                                            </span>
+                                            <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                                                {laneCards.length}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Cards Container */}
+                                    <div className="space-y-3 flex-1 overflow-y-auto">
+                                        {laneCards.length === 0 ? (
+                                            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center text-xs text-slate-400">
+                                                {__('general.no_items') || 'No items'}
+                                            </div>
+                                        ) : (
+                                            laneCards.map((card) => {
+                                                const typeMeta = TYPE_META[card.type];
+                                                const Icon = typeMeta?.icon || StickyNote;
+                                                return (
+                                                    <div 
+                                                        key={`${card.type}-${card.id}`}
+                                                        className={cn(
+                                                            "bg-white border rounded-xl p-4 shadow-sm hover:shadow transition-shadow flex flex-col gap-2 relative group",
+                                                            card.type === 'note' && NOTE_COLORS[card.color || 'yellow']?.bg,
+                                                            card.type === 'note' && NOTE_COLORS[card.color || 'yellow']?.border
+                                                        )}
+                                                    >
+                                                        {/* Card Header */}
+                                                        <div className="flex items-center justify-between">
+                                                            <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1", typeMeta?.color)}>
+                                                                <Icon className="w-3 h-3" />
+                                                                {card.type}
+                                                            </span>
+                                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <button 
+                                                                    onClick={() => setCardModal({ isOpen: true, mode: 'edit', type: card.type, card })}
+                                                                    className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-700 cursor-pointer"
+                                                                >
+                                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => handleDeleteCard(card)}
+                                                                    className="p-1 hover:bg-red-50 rounded text-red-500 hover:text-red-700 cursor-pointer"
+                                                                >
+                                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Card Body */}
+                                                        <div>
+                                                            <h4 className="font-bold text-sm text-slate-900 line-clamp-2">
+                                                                {card.title}
+                                                            </h4>
+                                                            {card.description && (
+                                                                <p className="text-xs text-slate-500 mt-1 line-clamp-3">
+                                                                    {card.description}
+                                                                </p>
+                                                            )}
+                                                            {card.type === 'note' && card.content && (
+                                                                <p className="text-xs text-slate-800 mt-1 whitespace-pre-wrap line-clamp-4">
+                                                                    {card.content}
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Card Footer: Metadata / Lane Switcher */}
+                                                        <div className="mt-2 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                                                            {card.type === 'task' && card.priority && (
+                                                                <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider", PRIORITY_STYLES[card.priority])}>
+                                                                    {card.priority}
+                                                                </span>
+                                                            )}
+                                                            {card.type === 'todo' && (
+                                                                <span className="text-[10px] font-medium text-slate-500">
+                                                                    {card.completed ? '✓ Completed' : 'Pending'}
+                                                                </span>
+                                                            )}
+                                                            
+                                                            {/* Simple Lane Switcher */}
+                                                            <select
+                                                                value={card.lane}
+                                                                onChange={(e) => handleMoveCard(card, e.target.value)}
+                                                                className="text-xs border border-slate-200 bg-slate-50 hover:bg-slate-100 rounded px-1.5 py-1 text-slate-600 focus:ring-0 focus:outline-none cursor-pointer"
+                                                            >
+                                                                {lanes.map(l => (
+                                                                    <option key={l} value={l}>
+                                                                        {__(LANE_META[l]?.labelKey) || l.replace('_', ' ')}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Board Card Modal */}
+            <Dialog open={cardModal.isOpen} onOpenChange={(open) => setCardModal(prev => ({ ...prev, isOpen: open }))}>
+                <DialogContent className="sm:max-w-md bg-white">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {cardModal.mode === 'create' 
+                                ? `${__('general.create') || 'Create'} ${cardModal.type}`
+                                : `${__('general.edit') || 'Edit'} ${cardModal.type}`
+                            }
+                        </DialogTitle>
+                        <DialogDescription>
+                            {__('admin.invoice_board_modal_desc') || 'Enter the details for this board card.'}
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.currentTarget);
+                        const payload: Record<string, any> = {};
+                        formData.forEach((value, key) => {
+                            payload[key] = value;
+                        });
+                        
+                        if (cardModal.mode === 'create') {
+                            handleAddCard(cardModal.type!, { ...payload, lane: cardModal.initialLane });
+                        } else {
+                            handleUpdateCard(cardModal.type!, cardModal.card.id, payload);
+                        }
+                    }} className="space-y-4">
+                        {/* Note Fields */}
+                        {cardModal.type === 'note' && (
+                            <>
+                                <div className="space-y-1">
+                                    <Label htmlFor="title">{__('general.title') || 'Title'}</Label>
+                                    <Input id="title" name="title" defaultValue={cardModal.card?.title || ''} placeholder="e.g. Note title" className="focus-visible:ring-slate-900" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="content">{__('general.content') || 'Content'}</Label>
+                                    <textarea id="content" name="content" defaultValue={cardModal.card?.content || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Sticky note content..." required />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="color">{__('general.color') || 'Color'}</Label>
+                                    <select id="color" name="color" defaultValue={cardModal.card?.color || 'yellow'} className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 cursor-pointer">
+                                        <option value="yellow">Yellow</option>
+                                        <option value="green">Green</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="red">Red</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="pink">Pink</option>
+                                        <option value="slate">Slate</option>
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Task Fields */}
+                        {cardModal.type === 'task' && (
+                            <>
+                                <div className="space-y-1">
+                                    <Label htmlFor="task_name">{__('general.task_name') || 'Task Name'}</Label>
+                                    <Input id="task_name" name="task_name" defaultValue={cardModal.card?.title || ''} placeholder="e.g. Implement feature" required className="focus-visible:ring-slate-900" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="task_description">{__('general.task_description') || 'Description'}</Label>
+                                    <textarea id="task_description" name="task_description" defaultValue={cardModal.card?.description || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Task details..." />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="priority">{__('general.priority') || 'Priority'}</Label>
+                                    <select id="priority" name="priority" defaultValue={cardModal.card?.priority || 'normal'} className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 cursor-pointer">
+                                        <option value="low">Low</option>
+                                        <option value="normal">Normal</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Todo Fields */}
+                        {cardModal.type === 'todo' && (
+                            <>
+                                <div className="space-y-1">
+                                    <Label htmlFor="title">{__('general.title') || 'Title'}</Label>
+                                    <Input id="title" name="title" defaultValue={cardModal.card?.title || ''} placeholder="e.g. Check list item" required className="focus-visible:ring-slate-900" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="description">{__('general.description') || 'Description'}</Label>
+                                    <textarea id="description" name="description" defaultValue={cardModal.card?.description || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Todo details..." />
+                                </div>
+                                {cardModal.mode === 'edit' && (
+                                    <div className="flex items-center space-x-2">
+                                        <input type="checkbox" id="completed" name="completed" defaultChecked={cardModal.card?.completed} className="rounded border-gray-300 text-slate-900 focus:ring-slate-900 cursor-pointer" value="1" />
+                                        <Label htmlFor="completed">{__('general.completed') || 'Completed'}</Label>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        <DialogFooter className="pt-4">
+                            <Button type="button" variant="outline" onClick={() => setCardModal({ isOpen: false, mode: 'create', type: null })}>
+                                {__('general.cancel') || 'Cancel'}
+                            </Button>
+                            <Button type="submit" className="bg-slate-900 hover:bg-slate-900 text-white font-semibold cursor-pointer">
+                                {cardModal.mode === 'create' ? (__('general.create') || 'Create') : (__('general.save') || 'Save')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             {/* Pay Service Modal */}
             <Dialog open={showPayServiceModal} onOpenChange={setShowPayServiceModal}>
                 <DialogContent className="sm:max-w-[600px] bg-white">

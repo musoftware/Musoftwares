@@ -40,6 +40,7 @@ class Todo extends Model
         'end_at',
         'completed_at',
         'sort_index',
+        'invoice_id',
     ];
 
     protected $casts = [
@@ -110,6 +111,11 @@ class Todo extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function checklistItems()

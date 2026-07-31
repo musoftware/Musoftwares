@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { 
     DollarSign, Building2, Users, ArrowDownCircle, Inbox, Plus, 
@@ -28,7 +28,11 @@ export default function Dashboard({
 }: any) {
     const businessCurrency = stats?.businessCurrency;
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-    const [showValues, setShowValues] = useState(true);
+    const [showValues, setShowValues] = useState(!auth?.user?.workspace_settings?.hide_values);
+
+    useEffect(() => {
+        setShowValues(!auth?.user?.workspace_settings?.hide_values);
+    }, [auth?.user?.workspace_settings?.hide_values]);
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date().toLocaleTimeString()), 1000);
@@ -56,7 +60,16 @@ export default function Dashboard({
         { key: 'status', label: 'Status', render: (row: any) => <StatusBadge status={row.status === 'closed' ? 'success' : 'warning'} label={row.status} size="sm" /> },
     ];
 
-    const toggleValues = () => setShowValues(!showValues);
+    const toggleValues = () => {
+        const newValue = !showValues;
+        setShowValues(newValue);
+        router.patch(route('profile.workspace-settings.update'), {
+            hide_values: !newValue
+        }, {
+            preserveScroll: true,
+            preserveState: true
+        });
+    };
 
     const maskValue = (val: string | number) => showValues ? val : '****';
 

@@ -1704,6 +1704,7 @@
             "erp_smtp_addon_required": "إضافة خادم SMTP لـ ERP مطلوبة",
             "insufficient_client_balance": "رصيد العميل غير كافٍ",
             "invoice_already_paid": "الفاتورة مدفوعة بالفعل",
+            "invoice_belongs_to_another_user": "هذه الفاتورة تابعة لحساب آخر.",
             "invoice_must_be_issued": "يجب إصدار الفاتورة أولاً",
             "invoice_must_be_sent": "يجب إرسال الفاتورة أولاً",
             "invoice_must_be_sent_partial": "يجب إرسال الفاتورة الجزئية أولاً",
@@ -5542,7 +5543,7 @@
             "item_name": "اسم Item",
             "item_name_e_g_ui_design": "عنصر الاسم (e.g., UI Design]",
             "item_renamed_successfully": "تمت إعادة تسمية العنصر بنجاح",
-            "item_title": "عنصر العنوان",
+            "item_title": "عنوان البند",
             "item_updated": "تم تحديث العنصر بنجاح",
             "items": "عناصر",
             "items_deleted_successfully": "تم حذف العناصر بنجاح",
@@ -7466,7 +7467,7 @@
             "project_files": "مشروع ملفات",
             "project_leader": "مشروع Leader",
             "project_milestones": "مشروع Milestones",
-            "project_name": "اسم Project",
+            "project_name": "اسم المشروع",
             "project_over_budget": "تجاوز المشروع للميزانية",
             "project_profitability": "مشروع Profitability",
             "project_proposal_scope": "مشروع Proposal Scope",
@@ -10007,7 +10008,8 @@
             "paid_vs_invoiced": "الفواتير المحصلة ÷ إجمالي المفوتر",
             "realized_income_per_hr": "صافي الإيراد ÷ ساعات العمل",
             "system_benchmark_rate": "معيار النظام القياسي",
-            "unpaid_invoices_grouped_by_days": "المبالغ غير المحصلة مقسمة حسب أيام التأخير"
+            "unpaid_invoices_grouped_by_days": "المبالغ غير المحصلة مقسمة حسب أيام التأخير",
+            "customer_or_username": "العميل \/ اسم المستخدم"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -13579,6 +13581,7 @@
             "insufficient_client_balance": "Insufficient Client Balance",
             "invalid_currency": "Invalid currency.",
             "invoice_already_paid": "Invoice Already Paid",
+            "invoice_belongs_to_another_user": "This invoice belongs to another account.",
             "invoice_must_be_issued": "Invoice Must Be Issued",
             "invoice_must_be_sent": "Invoice Must Be Sent",
             "invoice_must_be_sent_partial": "Invoice Must Be Sent Partial",
@@ -17396,7 +17399,7 @@
             "item_name": "Item name",
             "item_name_e_g_ui_design": "Name element (e.g., UI Design]",
             "item_renamed_successfully": "Item renamed successfully",
-            "item_title": "Title element",
+            "item_title": "Item Title",
             "item_updated": "An item was updated successfully.",
             "items": "Items",
             "items_deleted_successfully": "Items were deleted successfully.",
@@ -19320,7 +19323,7 @@
             "project_files": "Project files",
             "project_leader": "Leader project",
             "project_milestones": "Milestones Project",
-            "project_name": "Project name",
+            "project_name": "Project Name",
             "project_over_budget": "Over budget project",
             "project_profitability": "Profitability project",
             "project_proposal_scope": "Proposal Scope project",
@@ -21861,7 +21864,8 @@
             "paid_vs_invoiced": "Paid Invoices ÷ Total Invoiced Amount",
             "realized_income_per_hr": "Net Income ÷ Worked Hrs",
             "system_benchmark_rate": "System standard benchmark",
-            "unpaid_invoices_grouped_by_days": "Unpaid balance categorized by days overdue"
+            "unpaid_invoices_grouped_by_days": "Unpaid balance categorized by days overdue",
+            "customer_or_username": "Customer \/ Username"
         },
         "gold_saver": {
             "achieved": "Achieved",

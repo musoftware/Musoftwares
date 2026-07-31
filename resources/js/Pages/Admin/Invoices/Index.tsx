@@ -37,17 +37,6 @@ import {
 } from '@/Components/ui/dialog';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { toast } from 'sonner';
-
-const filterByOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'id', label: 'ID' },
-    { value: 'client_name', label: 'Customer Name' },
-    { value: 'date', label: 'Date' },
-
-    { value: 'status', label: 'Invoice Status' },
-    { value: 'unlinked', label: 'Unlinked Projects' }
-];
-
 const perPageOptions = [
     { value: '12', label: '12' },
     { value: '20', label: '20' },
@@ -69,6 +58,17 @@ const bulkActionOptions = [
 ];
 
 export default function Index({ invoices, currentTab, filters = {}, stats, projects = [] }: any) {
+    const filterByOptions = [
+        { value: 'all', label: __('general.all') || 'All' },
+        { value: 'id', label: 'ID' },
+        { value: 'client_name', label: __('general.customer_or_username') || 'Customer / Username' },
+        { value: 'item_title', label: __('general.item_title') || 'Item Title' },
+        { value: 'project_name', label: __('general.project_name') || 'Project Name' },
+        { value: 'date', label: __('general.date') || 'Date' },
+        { value: 'status', label: __('general.invoice_status') || 'Invoice Status' },
+        { value: 'unlinked', label: __('general.unlinked_projects') || 'Unlinked Projects' }
+    ];
+
     const [selectedClient, setSelectedClient] = React.useState(null);
     const paginationLinks = invoices.meta?.links || invoices.links;
 

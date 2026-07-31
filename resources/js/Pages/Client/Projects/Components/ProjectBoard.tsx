@@ -5,7 +5,7 @@ import {
     Filter, StickyNote as NoteIcon, AlertCircle, ChevronDown, RotateCcw, Search, Paperclip,
     ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye,
     ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon, Tag,
-    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList, Sparkles, Clock
+    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList, Sparkles, Clock, Folder
 } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -84,6 +84,8 @@ export interface BoardCard {
     is_important?: boolean;
     /** When set and in the future, the card is hidden from guests/clients (admin-only) */
     board_published_at?: string | null;
+    project_id?: number;
+    project_name?: string;
 }
 
 interface ProjectBoardProps {
@@ -105,6 +107,8 @@ interface ProjectBoardProps {
      * (it falls back to local defaults) but the toolbar only persists changes when
      * this prop is provided by the parent. */
     preferences?: BoardPreferences;
+    isConsolidated?: boolean;
+    projects?: { id: number; name: string }[];
 }
 
 const NOTE_COLORS: Record<string, { bg: string; border: string; text: string; swatch: string }> = {
@@ -187,7 +191,7 @@ function persistPreferences(projectId: number | string, patch: Partial<BoardPref
 export default function ProjectBoard({
     projectId, date, lanes, initialCards, hideFuture, readOnly = false,
     externalFilter, guestMode = false, shareToken = null, categories,
-    preferences,
+    preferences, isConsolidated = false, projects = [],
 }: ProjectBoardProps) {
     const { auth } = usePage().props as any;
     const userRoles: string[] = auth?.user?.roles ?? [];
@@ -196,6 +200,13 @@ export default function ProjectBoard({
     const [cards, setCards] = useState<BoardCard[]>(initialCards);
     const [query, setQuery] = useState('');
     const [categoryFilter, setCategoryFilter] = useState<'all' | 'uncategorized' | number>('all');
+    const [selectedProjectId, setSelectedProjectId] = useState<number | string>('');
+
+    useEffect(() => {
+        if (isConsolidated && projects && projects.length > 0) {
+            setSelectedProjectId(projects[0].id);
+        }
+    }, [projects, isConsolidated]);
 
     // View/sort state hydrates from server preference when provided. We still
     // allow unsynced local toggles (e.g. in guest read-only mode) but only fire
@@ -469,7 +480,8 @@ export default function ProjectBoard({
 
     const updateCardLane = useCallback((type: CardType, id: number, nextLane: string) => {
         if (readOnly) return;
-        axios.post(route('client.projects.board.move-card', { project: projectId }), {
+        const targetProject = cards.find(c => c.type === type && c.id === id)?.project_id || projectId;
+        axios.post(route('client.projects.board.move-card', { project: targetProject }), {
             for_date: date,
             type,
             id,
@@ -482,7 +494,7 @@ export default function ProjectBoard({
         }).catch(() => {
             toast.error(__('general.could_not_save_card_position') || 'Failed to update status.');
         });
-    }, [projectId, date, readOnly]);
+    }, [projectId, date, readOnly, cards]);
 
     /**
      * Persist a brand-new sort order for the visible lane after a drag-drop interaction.
@@ -493,11 +505,20 @@ export default function ProjectBoard({
         if (readOnly) return;
         if (order.length === 0) return;
         try {
-            await axios.post(route('client.projects.board.reorder-cards', { project: projectId }), {
-                for_date: date,
-                lane,
-                order,
+            const ordersByProject = new Map<number, { type: CardType; id: number }[]>();
+            order.forEach(item => {
+                const card = cards.find(c => c.type === item.type && c.id === item.id);
+                const pId = Number(card?.project_id || projectId);
+                if (!ordersByProject.has(pId)) ordersByProject.set(pId, []);
+                ordersByProject.get(pId)!.push(item);
             });
+            for (const [pId, projectOrder] of ordersByProject.entries()) {
+                await axios.post(route('client.projects.board.reorder-cards', { project: pId }), {
+                    for_date: date,
+                    lane,
+                    order: projectOrder,
+                });
+            }
             // The server is the source of truth — rebuild the sort field from the new order
             // so a refresh keeps the user's drag sequence even if the API response carries no payload.
             const orderIndex = new Map<string, number>();
@@ -511,7 +532,7 @@ export default function ProjectBoard({
         } catch (err) {
             toast.error(__('general.board_reorder_failed') || 'Could not save the new order.');
         }
-    }, [projectId, date, readOnly]);
+    }, [projectId, date, readOnly, cards]);
 
     /**
      * Update only a card's category; we don't change lane or order. The card payload is returned
@@ -520,8 +541,9 @@ export default function ProjectBoard({
     const updateCardCategory = useCallback(async (type: CardType, id: number, categoryId: number | null) => {
         if (readOnly) return;
         try {
+            const targetProject = cards.find(c => c.type === type && c.id === id)?.project_id || projectId;
             const res = await axios.post(
-                route('client.projects.board.move-card', { project: projectId }),
+                route('client.projects.board.move-card', { project: targetProject }),
                 { for_date: date, type, id, lane: undefined, category_id: categoryId },
             );
             const meta = res.data;
@@ -539,7 +561,7 @@ export default function ProjectBoard({
         } catch (err) {
             toast.error(__('general.board_category_assign_failed') || 'Could not assign the category.');
         }
-    }, [projectId, date, readOnly, effectiveCategories]);
+    }, [projectId, date, readOnly, effectiveCategories, cards]);
 
     /**
      * `DragDropContext` callback. Because the board renders only the filter-selected lane
@@ -596,9 +618,10 @@ export default function ProjectBoard({
             toast.error(__('general.card_reschedule_not_supported'));
             return;
         }
+        const targetProject = card.project_id || projectId;
         try {
             await axios.post(
-                route('client.projects.board.reschedule-card', { project: projectId }),
+                route('client.projects.board.reschedule-card', { project: targetProject }),
                 { for_date: targetDate, type: card.type, id: card.id },
             );
             setCards((prev) => prev.filter((c) => !(c.type === card.type && c.id === card.id)));
@@ -608,7 +631,7 @@ export default function ProjectBoard({
                     action: {
                         label: __('general.view') || 'View',
                         onClick: () => router.visit(
-                            route('admin.projects.board', { project: projectId, date: targetDate }),
+                            route('admin.projects.board', { project: targetProject, date: targetDate }),
                             { preserveScroll: true, preserveState: false },
                         ),
                     },
@@ -760,9 +783,13 @@ export default function ProjectBoard({
 
     const handleSaveNote = () => {
         const isEdit = activeModal?.action === 'edit';
+        const targetProjectId = isEdit
+            ? (cards.find(c => c.type === 'note' && c.id === activeModal?.cardId)?.project_id || projectId)
+            : (isConsolidated ? selectedProjectId : projectId);
+
         const url = isEdit
-            ? route('client.projects.board.update-note', { project: projectId, note: activeModal?.cardId })
-            : route('client.projects.board.store-note', { project: projectId });
+            ? route('client.projects.board.update-note', { project: targetProjectId, note: activeModal?.cardId })
+            : route('client.projects.board.store-note', { project: targetProjectId });
 
         const payload = isEdit
             ? { title: noteForm.title, content: noteForm.content, color: noteForm.color, published_at: noteForm.board_published_at || null }
@@ -784,9 +811,13 @@ export default function ProjectBoard({
 
     const handleSaveTask = () => {
         const isEdit = activeModal?.action === 'edit';
+        const targetProjectId = isEdit
+            ? (cards.find(c => c.type === 'task' && c.id === activeModal?.cardId)?.project_id || projectId)
+            : (isConsolidated ? selectedProjectId : projectId);
+
         const url = isEdit
-            ? route('client.projects.board.update-task', { project: projectId, task: activeModal?.cardId })
-            : route('client.projects.board.store-task', { project: projectId });
+            ? route('client.projects.board.update-task', { project: targetProjectId, task: activeModal?.cardId })
+            : route('client.projects.board.store-task', { project: targetProjectId });
 
         const payload = isEdit 
             ? { ...taskForm, published_at: taskForm.board_published_at || null }
@@ -808,9 +839,13 @@ export default function ProjectBoard({
 
     const handleSaveTodo = () => {
         const isEdit = activeModal?.action === 'edit';
+        const targetProjectId = isEdit
+            ? (cards.find(c => c.type === 'todo' && c.id === activeModal?.cardId)?.project_id || projectId)
+            : (isConsolidated ? selectedProjectId : projectId);
+
         const url = isEdit
-            ? route('client.projects.board.update-todo', { project: projectId, todo: activeModal?.cardId })
-            : route('client.projects.board.store-todo', { project: projectId });
+            ? route('client.projects.board.update-todo', { project: targetProjectId, todo: activeModal?.cardId })
+            : route('client.projects.board.store-todo', { project: targetProjectId });
 
         const payload = isEdit 
             ? { ...todoForm, published_at: todoForm.board_published_at || null }
@@ -833,13 +868,14 @@ export default function ProjectBoard({
     const handleUploadFile = () => {
         if (!fileForm) return;
         setUploading(true);
+        const targetProjectId = isConsolidated ? selectedProjectId : projectId;
         const formData = new FormData();
         formData.append('file', fileForm);
         formData.append('for_date', date);
         formData.append('lane', 'done');
         if (fileBoardPublishedAt) formData.append('published_at', fileBoardPublishedAt);
 
-        axios.post(route('client.projects.board.store-file', { project: projectId }), formData, {
+        axios.post(route('client.projects.board.store-file', { project: targetProjectId }), formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         }).then(({ data }) => {
             if (data.card) {
@@ -857,9 +893,13 @@ export default function ProjectBoard({
 
     const handleSaveReport = () => {
         const isEdit = activeModal?.action === 'edit';
+        const targetProjectId = isEdit
+            ? (cards.find(c => c.type === 'report' && c.id === activeModal?.cardId)?.project_id || projectId)
+            : (isConsolidated ? selectedProjectId : projectId);
+
         const url = isEdit
-            ? route('client.projects.board.update-report', { project: projectId, report: activeModal?.cardId })
-            : route('client.projects.board.store-report', { project: projectId });
+            ? route('client.projects.board.update-report', { project: targetProjectId, report: activeModal?.cardId })
+            : route('client.projects.board.store-report', { project: targetProjectId });
 
         const payload = isEdit 
             ? reportForm
@@ -885,7 +925,8 @@ export default function ProjectBoard({
             return;
         }
         setGeneratingReportDraft(true);
-        axios.post(route('board.reports.generate-draft', { project: projectId }), {
+        const targetProjectId = isConsolidated ? selectedProjectId : projectId;
+        axios.post(route('board.reports.generate-draft', { project: targetProjectId }), {
             period_start: reportForm.period_start,
             period_end: reportForm.period_end,
         })
@@ -912,12 +953,13 @@ export default function ProjectBoard({
         if (readOnly) return;
         if (!confirm(__('general.delete_confirm') || 'Are you sure you want to delete this item?')) return;
         
+        const targetProject = card.project_id || projectId;
         let url = '';
-        if (card.type === 'note') url = route('client.projects.board.destroy-note', { project: projectId, note: card.id });
-        else if (card.type === 'task') url = route('client.projects.board.destroy-task', { project: projectId, task: card.id });
-        else if (card.type === 'todo') url = route('client.projects.board.destroy-todo', { project: projectId, todo: card.id });
-        else if (card.type === 'file') url = route('client.projects.board.destroy-file', { project: projectId, file: card.id });
-        else if (card.type === 'report') url = route('client.projects.board.destroy-report', { project: projectId, report: card.id });
+        if (card.type === 'note') url = route('client.projects.board.destroy-note', { project: targetProject, note: card.id });
+        else if (card.type === 'task') url = route('client.projects.board.destroy-task', { project: targetProject, task: card.id });
+        else if (card.type === 'todo') url = route('client.projects.board.destroy-todo', { project: targetProject, todo: card.id });
+        else if (card.type === 'file') url = route('client.projects.board.destroy-file', { project: targetProject, file: card.id });
+        else if (card.type === 'report') url = route('client.projects.board.destroy-report', { project: targetProject, report: card.id });
 
         axios.delete(url)
             .then(() => {
@@ -1138,6 +1180,12 @@ export default function ProjectBoard({
                                                                 )
                                                             )}
                                                             <div className="flex items-center gap-1.5 flex-wrap">
+                                                                {isConsolidated && card.project_name && (
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-slate-700 ring-1 ring-slate-200">
+                                                                        <Folder className="h-2.5 w-2.5 text-slate-500" />
+                                                                        {card.project_name}
+                                                                    </span>
+                                                                )}
                                                                 <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring)}>
                                                                     <TypeIcon className="h-2.5 w-2.5" />
                                                                     {meta.label}
@@ -1525,6 +1573,20 @@ export default function ProjectBoard({
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
+                        {isConsolidated && activeModal?.action === 'create' && (
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <select
+                                    value={selectedProjectId}
+                                    onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+                                    className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-slate-300 focus-visible:outline-none cursor-pointer"
+                                >
+                                    {projects.map((p) => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <div className="space-y-1">
                             <Label className="text-xs font-bold text-slate-600">{__('general.note_title') || 'Title'}</Label>
                             <Input
@@ -1601,6 +1663,20 @@ export default function ProjectBoard({
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
+                        {isConsolidated && activeModal?.action === 'create' && (
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <select
+                                    value={selectedProjectId}
+                                    onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+                                    className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-slate-300 focus-visible:outline-none cursor-pointer"
+                                >
+                                    {projects.map((p) => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <div className="space-y-1">
                             <Label className="text-xs font-bold text-slate-600">Task Name</Label>
                             <Input
@@ -1670,6 +1746,20 @@ export default function ProjectBoard({
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
+                        {isConsolidated && activeModal?.action === 'create' && (
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <select
+                                    value={selectedProjectId}
+                                    onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+                                    className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-slate-300 focus-visible:outline-none cursor-pointer"
+                                >
+                                    {projects.map((p) => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <div className="space-y-1">
                             <Label className="text-xs font-bold text-slate-600">Todo Title</Label>
                             <Input
@@ -2051,6 +2141,20 @@ export default function ProjectBoard({
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
+                        {isConsolidated && activeModal?.action === 'create' && (
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <select
+                                    value={selectedProjectId}
+                                    onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+                                    className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-slate-300 focus-visible:outline-none cursor-pointer"
+                                >
+                                    {projects.map((p) => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-slate-400 bg-slate-50 rounded-2xl py-12 px-4 text-center cursor-pointer transition-colors relative">
                             <input
                                 type="file"
@@ -2107,6 +2211,20 @@ export default function ProjectBoard({
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
+                        {isConsolidated && activeModal?.action === 'create' && (
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <select
+                                    value={selectedProjectId}
+                                    onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+                                    className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-slate-300 focus-visible:outline-none cursor-pointer"
+                                >
+                                    {projects.map((p) => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <div className="space-y-1">
                             <Label className="text-xs font-bold text-slate-600">Report Title</Label>
                             <Input
@@ -2571,6 +2689,12 @@ const CardChrome: React.FC<{
 
     return (
         <div className={cn('flex items-center gap-1.5', onClick && 'cursor-pointer')} onClick={onClick}>
+            {card.project_name && (
+                <span className={cn('inline-flex items-center gap-1 rounded-full bg-slate-100 font-extrabold uppercase tracking-wide text-slate-700 ring-1 ring-slate-200', sizeCls)}>
+                    <Folder className="h-2.5 w-2.5 text-slate-500" />
+                    {card.project_name}
+                </span>
+            )}
             <span className={cn('inline-flex items-center gap-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring, sizeCls)}>
                 <TypeIcon className="h-2.5 w-2.5" />
                 {meta.label}

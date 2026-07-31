@@ -31,6 +31,7 @@ return [
     'insufficient_client_balance' => 'Insufficient Client Balance',
     'invalid_currency' => 'Invalid currency.',
     'invoice_already_paid' => 'Invoice Already Paid',
+    'invoice_belongs_to_another_user' => 'This invoice belongs to another account.',
     'invoice_must_be_issued' => 'Invoice Must Be Issued',
     'invoice_must_be_sent' => 'Invoice Must Be Sent',
     'invoice_must_be_sent_partial' => 'Invoice Must Be Sent Partial',

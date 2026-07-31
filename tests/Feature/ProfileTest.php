@@ -127,12 +127,14 @@ class ProfileTest extends TestCase
     {
         $user = User::factory()->create();
 
-        \App\Models\Invoice::create([
+        $invoice = new \App\Models\Invoice([
+            'uuid' => (string) \Illuminate\Support\Str::uuid(),
             'user_id' => $user->id,
             'status' => 'unpaid',
             'unpaid' => 100,
             'paid' => 0,
         ]);
+        $invoice->saveQuietly();
 
         $response = $this
             ->actingAs($user)
@@ -146,5 +148,34 @@ class ProfileTest extends TestCase
             ->assertRedirect('/profile');
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_user_can_update_workspace_settings(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile/workspace-settings', [
+                'hide_values' => true,
+            ]);
+
+        $response->assertRedirect();
+        
+        $user->refresh();
+        $this->assertIsArray($user->workspace_settings);
+        $this->assertTrue($user->workspace_settings['hide_values']);
+
+        // Toggle back to false
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile/workspace-settings', [
+                'hide_values' => false,
+            ]);
+
+        $response->assertRedirect();
+        
+        $user->refresh();
+        $this->assertFalse($user->workspace_settings['hide_values']);
     }
 }

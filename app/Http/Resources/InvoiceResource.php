@@ -38,10 +38,10 @@ class InvoiceResource extends JsonResource
             'discount' => $this->discount,
             'tax' => $this->tax(),
             'paid_amount' => $this->paid,
-            'currency' => Currency::find($this->currency)?->currency,
-            'currency_symbol' => Currency::find($this->currency)?->symbol,
+            'currency' => Currency::findCached($this->currency)?->currency,
+            'currency_symbol' => Currency::findCached($this->currency)?->symbol,
             'business_amount' => $this->business_total(),
-            'business_currency' => Currency::find(AdminSettings::GetValue('business_currency', 2))?->currency,
+            'business_currency' => Currency::findCached(AdminSettings::GetValue('business_currency', 2))?->currency,
             'status' => $this->status,
             'job_status' => $this->job_status ?? 'pending',
             'created_at' => $this->created_at,
@@ -53,9 +53,9 @@ class InvoiceResource extends JsonResource
             'timer_metrics' => $this->calculateTimerMetrics(),
             'revenue' => method_exists($this->resource, 'revenue') ? $this->revenue() : ($this->total() - $this->cost),
             'cost' => $this->cost ?? 0,
-
+ 
             // Reference Data
-            'currencies' => (object) Currency::all()->pluck('currency', 'id')->toArray(),
+            'currencies' => (object) Currency::cachedAll()->pluck('currency', 'id')->toArray(),
 
             // Pricing Insights
             'fair_price' => $this->calculateFairPrice(),

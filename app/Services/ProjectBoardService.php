@@ -443,4 +443,104 @@ class ProjectBoardService
 
         return $cards;
     }
+
+    /**
+     * Get all board cards linked to a specific Invoice.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function cardsForInvoice(\App\Models\Invoice $invoice): array
+    {
+        $placements = ProjectBoardItem::where('invoice_id', $invoice->id)
+            ->with(['category', 'itemable'])
+            ->get();
+
+        $cards = [];
+        $autoIndex = 0;
+
+        foreach ($placements as $placement) {
+            $itemable = $placement->itemable;
+            if (!$itemable) {
+                continue;
+            }
+
+            $type = array_search(get_class($itemable), ProjectBoardItem::MORPH_MAP, true);
+            if ($type === false) {
+                continue;
+            }
+
+            $extra = [
+                'comments_count' => (int) ($itemable->comments_count ?? 0),
+                'sort' => (int) ($placement->sort ?? 0),
+                'category_id' => $placement->category_id ?? null,
+                'is_ai' => (bool)$placement->is_ai,
+                'is_important' => (bool)$placement->is_important,
+                'published_at' => $placement->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
+                'board_published_at' => $placement->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
+                'category' => $placement->category ? [
+                    'id' => $placement->category->id,
+                    'slug' => $placement->category->slug,
+                    'name' => $placement->category->localizedName(),
+                    'color' => $placement->category->color,
+                    'text_color' => $placement->category->text_color,
+                ] : null,
+            ];
+
+            $title = '';
+            if ($type === 'note') {
+                $title = $itemable->title ?: ($itemable->content ? mb_strimwidth($itemable->content, 0, 80, '…') : __('general.sticky_note'));
+                $extra['color'] = $itemable->color;
+                $extra['content'] = $itemable->content;
+            } elseif ($type === 'task') {
+                $title = $itemable->task_name;
+                $extra['description'] = $itemable->task_description;
+                $extra['priority'] = $itemable->priority;
+                $extra['done'] = method_exists($itemable, 'completed') ? $itemable->completed() : false;
+            } elseif ($type === 'report') {
+                $title = $itemable->title;
+                $extra['description'] = $itemable->body;
+                $extra['body'] = $itemable->body;
+                $extra['period_start'] = $itemable->period_start ? $itemable->period_start->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null;
+                $extra['period_end'] = $itemable->period_end ? $itemable->period_end->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null;
+            } elseif ($type === 'todo') {
+                $title = $itemable->title ?: __('general.todo');
+                $extra['description'] = $itemable->description;
+                $extra['completed'] = (bool) $itemable->completed;
+                $extra['checklist'] = $itemable->checklistItems()->get()->map(fn ($item) => [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'is_completed' => (bool) $item->is_completed,
+                ])->toArray();
+            } elseif ($type === 'file') {
+                $title = $itemable->original_name ?: __('general.file');
+                $extra['size'] = $itemable->size;
+                $extra['human_size'] = $itemable->humanSize();
+                $extra['mime'] = $itemable->mime;
+                $extra['download_url'] = route('client.projects.files.download', [$placement->project_id, $itemable->id]);
+            }
+
+            $cards[] = array_merge([
+                'type' => $type,
+                'id' => $itemable->id,
+                'title' => $title,
+                'lane' => $placement->lane ?? 'backlog',
+                'pos_x' => $placement->pos_x ?? 24,
+                'pos_y' => $placement->pos_y ?? (24 + ($autoIndex * 12)),
+            ], $extra);
+
+            $autoIndex++;
+        }
+
+        $laneOrder = ['backlog' => 0, 'in_progress' => 1, 'review' => 2, 'done' => 3];
+        usort($cards, function ($a, $b) use ($laneOrder) {
+            $la = $laneOrder[$a['lane']] ?? 99;
+            $lb = $laneOrder[$b['lane']] ?? 99;
+            if ($la !== $lb) {
+                return $la <=> $lb;
+            }
+            return ($a['sort'] ?? 0) <=> ($b['sort'] ?? 0);
+        });
+
+        return $cards;
+    }
 }

@@ -24,6 +24,11 @@ class ProjectBoardNote extends Model
         return $this->belongsTo(Project::class, 'project_id');
     }
 
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');

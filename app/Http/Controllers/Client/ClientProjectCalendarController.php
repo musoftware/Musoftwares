@@ -64,6 +64,58 @@ class ClientProjectCalendarController extends Controller
         ]);
     }
 
+    public function allProjectsBoardIndex(Request $request)
+    {
+        return redirect()->route('client.projects.all-projects-board.date', [
+            'date' => Carbon::today('Africa/Cairo')->toDateString(),
+        ]);
+    }
+
+    public function allProjectsBoardDate(Request $request, string $date)
+    {
+        $user = $request->user();
+        $dateCarbon = $this->parseDate($date) ?? Carbon::today('Africa/Cairo');
+        $isAdmin = $user->isAdmin() === true;
+
+        $projects = Project::where('user_id', $user->id)
+            ->where('archived', 0)
+            ->get();
+
+        $cards = [];
+        foreach ($projects as $project) {
+            $projectCards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
+            foreach ($projectCards as &$card) {
+                $card['project_name'] = $project->project_name;
+                $card['project_id'] = $project->id;
+            }
+            $cards = array_merge($cards, $projectCards);
+        }
+
+        $categories = collect();
+        foreach ($projects as $project) {
+            $categories = $categories->concat($this->boardService->categoriesFor($project));
+        }
+        $categories = $categories->unique('slug')->values();
+
+        return Inertia::render('Client/Projects/AllProjectsBoard', [
+            'date' => $dateCarbon->toDateString(),
+            'lanes' => $this->boardService->lanes(),
+            'cards' => fn () => $cards,
+            'categories' => fn () => $categories->map(fn ($c) => [
+                'id' => $c->id,
+                'slug' => $c->slug,
+                'name' => $c->localizedName(),
+                'name_ar' => $c->name_ar,
+                'color' => $c->color,
+                'text_color' => $c->text_color,
+                'is_system' => (bool) $c->is_system,
+                'sort' => (int) $c->sort,
+            ])->values(),
+            'isAdmin' => $isAdmin,
+            'projects' => $projects->map(fn ($p) => ['id' => $p->id, 'name' => $p->project_name])->values()->toArray(),
+        ]);
+    }
+
     private function parseDate(string $date): ?Carbon
     {
         try {

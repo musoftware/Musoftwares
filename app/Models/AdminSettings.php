@@ -115,15 +115,21 @@ class AdminSettings extends Model
      * Matches the logic in ProjectPriceCalculator's Overhead Cost section.
      * Cached per currency for 10 minutes to avoid heavy queries on every invoice show.
      */
+    protected static $recommendedHourlyRates = [];
+
     public static function GetRecommendedHourlyRate($currencyId = null)
     {
         if ($currencyId === null) {
             $currencyId = static::business_currency();
         }
 
+        if (array_key_exists($currencyId, static::$recommendedHourlyRates)) {
+            return static::$recommendedHourlyRates[$currencyId];
+        }
+
         $cacheKey = 'admin_recommended_hourly_rate_'.$currencyId;
 
-        return (float) Cache::remember($cacheKey, 600, function () use ($currencyId) {
+        return static::$recommendedHourlyRates[$currencyId] = (float) Cache::remember($cacheKey, 600, function () use ($currencyId) {
             // Calculate average monthly cost from last 6 months (As in ProjectPriceCalculator)
             $startDate = now()->subMonths(6)->startOfMonth();
             $endDate = now()->endOfMonth();

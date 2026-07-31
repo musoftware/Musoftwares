@@ -7932,4 +7932,7 @@ return [
     'realized_income_per_hr' => 'صافي الإيراد ÷ ساعات العمل',
     'system_benchmark_rate' => 'معيار النظام القياسي',
     'unpaid_invoices_grouped_by_days' => 'المبالغ غير المحصلة مقسمة حسب أيام التأخير',
+    'customer_or_username' => 'العميل / اسم المستخدم',
+    'item_title' => 'عنوان البند',
+    'project_name' => 'اسم المشروع',
 ];

@@ -365,16 +365,20 @@ class Invoice extends Model
     public function tax()
     {
         if ($this->status == 'unpaid') {
-            if ($this->user->invoice_taxable == '1') {
+            if ($this->user && $this->user->invoice_taxable == '1') {
                 $business_tax = AdminSettings::GetValue('business_tax', 22.5);
                 $tax_calc = $business_tax * $this->sub_total() / 100;
-                $this->tax_value = $tax_calc;
-                $this->save();
+                if ($this->tax_value != $tax_calc) {
+                    $this->tax_value = $tax_calc;
+                    $this->saveQuietly();
+                }
 
                 return $tax_calc;
             } else {
-                $this->tax_value = 0;
-                $this->save();
+                if ($this->tax_value != 0) {
+                    $this->tax_value = 0;
+                    $this->saveQuietly();
+                }
 
                 return 0;
             }
@@ -1038,10 +1042,19 @@ class Invoice extends Model
         // Find the latest comment that looks like a schedule configuration
         // We look for a special prefix or structure.
         // Assuming we store it as JSON with a specific key.
-        $comment = $this->comments()
-            ->where('comment', 'like', '{"type":"schedule"%')
-            ->orderBy('created_at', 'desc')
-            ->first();
+        if ($this->relationLoaded('comments')) {
+            $comment = $this->comments
+                ->filter(function ($c) {
+                    return str_starts_with($c->comment, '{"type":"schedule"');
+                })
+                ->sortByDesc('created_at')
+                ->first();
+        } else {
+            $comment = $this->comments()
+                ->where('comment', 'like', '{"type":"schedule"%')
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
 
         if ($comment) {
             return json_decode($comment->comment, true);

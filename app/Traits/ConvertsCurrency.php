@@ -40,7 +40,7 @@ trait ConvertsCurrency
     protected function getCurrencyModel(int $id): ?Currency
     {
         if (! isset($this->_currencyModelCache[$id])) {
-            $this->_currencyModelCache[$id] = Currency::find($id);
+            $this->_currencyModelCache[$id] = Currency::findCached($id);
         }
 
         return $this->_currencyModelCache[$id];

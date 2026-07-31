@@ -7932,4 +7932,7 @@ return [
     'realized_income_per_hr' => 'Net Income ÷ Worked Hrs',
     'system_benchmark_rate' => 'System standard benchmark',
     'unpaid_invoices_grouped_by_days' => 'Unpaid balance categorized by days overdue',
+    'customer_or_username' => 'Customer / Username',
+    'item_title' => 'Item Title',
+    'project_name' => 'Project Name',
 ];

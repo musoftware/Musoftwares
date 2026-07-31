@@ -14,7 +14,7 @@ class Task extends Model
 
     protected $guarded = [];
 
-    protected $fillable = ['task_name', 'task_description', 'project_id', 'user_id', 'swimlane_id', 'assigned_to_admin', 'due_date', 'priority', 'archived'];
+    protected $fillable = ['task_name', 'task_description', 'project_id', 'user_id', 'swimlane_id', 'assigned_to_admin', 'due_date', 'priority', 'archived', 'invoice_id'];
 
     protected static function booted(): void
     {
@@ -230,6 +230,11 @@ class Task extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function comments()

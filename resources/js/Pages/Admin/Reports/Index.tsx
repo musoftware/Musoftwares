@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Head, useForm, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import {
@@ -27,7 +27,11 @@ export default function ReportsIndex({
   auth
 }: any) {
   const businessCurrency = stats?.businessCurrency;
-  const [showValues, setShowValues] = useState(true);
+  const [showValues, setShowValues] = useState(!auth?.user?.workspace_settings?.hide_values);
+
+  useEffect(() => {
+    setShowValues(!auth?.user?.workspace_settings?.hide_values);
+  }, [auth?.user?.workspace_settings?.hide_values]);
 
   // P&L form state
   const { data: pnlData, setData: setPnlData, get: pnlGet } = useForm({
@@ -43,7 +47,16 @@ export default function ReportsIndex({
   const chartData = revenueChartData || [];
   const pieData = moduleBreakdown || [{ name: 'No data', value: 0, color: '#94a3b8' }];
 
-  const toggleValues = () => setShowValues(!showValues);
+  const toggleValues = () => {
+    const newValue = !showValues;
+    setShowValues(newValue);
+    router.patch(route('profile.workspace-settings.update'), {
+      hide_values: !newValue
+    }, {
+      preserveScroll: true,
+      preserveState: true
+    });
+  };
   const maskValue = (val: string | number) => showValues ? val : '****';
 
   return (

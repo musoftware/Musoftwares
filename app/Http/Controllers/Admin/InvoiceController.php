@@ -75,13 +75,31 @@ class InvoiceController extends Controller
                     $q->orWhere('id', $decodedSearch)
                         ->orWhere('status', $search)
                         ->orWhereHas('user', function ($uq) use ($search) {
-                            $uq->where('name', 'like', '%'.$search.'%');
+                            $uq->where('name', 'like', '%'.$search.'%')
+                                ->orWhere('telegram_username', 'like', '%'.$search.'%')
+                                ->orWhere('email', 'like', '%'.$search.'%');
+                        })
+                        ->orWhereHas('project', function ($pq) use ($search) {
+                            $pq->where('project_name', 'like', '%'.$search.'%');
+                        })
+                        ->orWhereHas('items', function ($iq) use ($search) {
+                            $iq->where('item_title', 'like', '%'.$search.'%');
                         });
                 } elseif ($filterBy === 'id') {
                     $q->where('id', $decodedSearch);
-                } elseif ($filterBy === 'client_name') {
+                } elseif ($filterBy === 'client_name' || $filterBy === 'username') {
                     $q->whereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', '%'.$search.'%');
+                        $uq->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('telegram_username', 'like', '%'.$search.'%')
+                            ->orWhere('email', 'like', '%'.$search.'%');
+                    });
+                } elseif ($filterBy === 'item_title') {
+                    $q->whereHas('items', function ($iq) use ($search) {
+                        $iq->where('item_title', 'like', '%'.$search.'%');
+                    });
+                } elseif ($filterBy === 'project_name') {
+                    $q->whereHas('project', function ($pq) use ($search) {
+                        $pq->where('project_name', 'like', '%'.$search.'%');
                     });
                 } elseif ($filterBy === 'status') {
                     if ($search === 'unpaid_partial') {
@@ -127,13 +145,13 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Invoice::with(['user', 'project'])->latest();
+        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])->latest();
         $query = $this->applyFilters($query, $request);
-
+ 
         $invoices = $query->paginate($request->input('per_page', 20))
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
-
+ 
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'all',
@@ -142,25 +160,25 @@ class InvoiceController extends Controller
             'projects' => $this->getFilteredProjects($request),
         ]);
     }
-
+ 
     /**
      * Display unpaid invoices.
      */
     public function unpaid(Request $request)
     {
-        $query = Invoice::with(['user', 'project'])->whereIn('status', ['unpaid', 'partially_paid'])->latest();
+        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])->whereIn('status', ['unpaid', 'partially_paid'])->latest();
         $query = $this->applyFilters($query, $request);
-
+ 
         $invoices = $query->paginate($request->input('per_page', 20))
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
-
+ 
         if ($request->wantsJson()) {
             return response()->json([
                 'invoices' => $invoices,
             ]);
         }
-
+ 
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'unpaid',
@@ -169,13 +187,13 @@ class InvoiceController extends Controller
             'projects' => $this->getFilteredProjects($request),
         ]);
     }
-
+ 
     /**
      * Display archived/cancelled invoices.
      */
     public function archive(Request $request)
     {
-        $query = Invoice::with(['user', 'project'])->where('status', 'cancelled')->latest();
+        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])->where('status', 'cancelled')->latest();
         $query = $this->applyFilters($query, $request);
 
         $invoices = $query->paginate($request->input('per_page', 20))
@@ -194,8 +212,8 @@ class InvoiceController extends Controller
     private function getFilteredProjects(Request $request)
     {
         return $request->filled('client_id')
-            ? Project::where('user_id', $request->client_id)->get()
-            : Project::all();
+            ? Project::where('user_id', $request->client_id)->select(['id', 'project_name'])->get()
+            : Project::select(['id', 'project_name'])->get();
     }
 
     /**
@@ -240,8 +258,24 @@ class InvoiceController extends Controller
     {
         $invoice->load(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
 
+        $boardService = app(\App\Services\ProjectBoardService::class);
+        $boardCards = $boardService->cardsForInvoice($invoice);
+        $categories = $invoice->project_id ? $boardService->categoriesFor($invoice->project) : collect();
+
         return Inertia::render('Admin/Invoices/Show', [
             'invoice' => (new InvoiceResource($invoice))->resolve(),
+            'boardCards' => $boardCards,
+            'categories' => $categories->map(fn ($c) => [
+                'id' => $c->id,
+                'slug' => $c->slug,
+                'name' => $c->localizedName(),
+                'name_ar' => $c->name_ar,
+                'color' => $c->color,
+                'text_color' => $c->text_color,
+                'is_system' => (bool) $c->is_system,
+                'sort' => (int) $c->sort,
+            ])->values(),
+            'lanes' => $boardService->lanes(),
         ]);
     }
 

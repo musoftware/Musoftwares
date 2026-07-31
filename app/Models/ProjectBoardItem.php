@@ -43,12 +43,18 @@ class ProjectBoardItem extends Model
         'pos_y' => 'integer',
         'sort' => 'integer',
         'category_id' => 'integer',
+        'invoice_id' => 'integer',
         'published_at' => 'datetime',
     ];
 
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
     }
 
     public function itemable(): MorphTo

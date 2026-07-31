@@ -20,10 +20,20 @@ class Currency extends Model
         'is_default' => 'boolean',
     ];
 
+    public static function cachedAll()
+    {
+        return once(fn () => static::all());
+    }
+
+    public static function findCached($id)
+    {
+        return static::cachedAll()->firstWhere('id', $id);
+    }
+
     public static function as_array()
     {
         $as_array = [];
-        foreach (static::all() as $item) {
+        foreach (static::cachedAll() as $item) {
             $as_array[$item->id] = $item;
         }
 

@@ -50,6 +50,25 @@ export default function ProjectsIndex({ projects }: Props) {
                     <p className="mt-1 text-sm text-slate-500">{__('general.projects_portal_intro')}</p>
                 </div>
 
+                {/* Tabs Navigation */}
+                <div className="border-b border-slate-200">
+                    <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                        <Link
+                            href={route('client.projects.index')}
+                            className="border-b-2 border-slate-900 py-4 px-1 text-sm font-semibold text-slate-950 transition-colors"
+                        >
+                            {__('general.projects_list') || 'Projects List'}
+                        </Link>
+                        <Link
+                            href={route('client.projects.all-projects-board.index')}
+                            className="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-slate-500 hover:border-slate-300 hover:text-slate-700 transition-colors flex items-center gap-2"
+                        >
+                            <CalendarDays className="w-4 h-4" />
+                            {__('general.all_projects_board') || 'All Projects Board'}
+                        </Link>
+                    </nav>
+                </div>
+
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <MetricCard label={__('general.total_projects')} value={list.length} icon={FolderKanban} />
                     <MetricCard label={__('general.open_tasks')} value={totalTasks} icon={ListTodo} />

@@ -44,7 +44,7 @@ Route::post('serial/device',
 // without any authentication. DO NOT TOUCH or re-add auth middleware to this route.
 Route::post('paid-commision-play',
     [\App\Http\Controllers\Api\CommissionController::class, 'checkStatus']
-)->middleware(['force.json', 'throttle:60,1']);
+)->middleware(['force.json', 'throttle:300,1']);
 
 // ── Runtime Version Manifest (public) ─────────────────────────────────────────
 // Polled by local runtime agents to check for updates.

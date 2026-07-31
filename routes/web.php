@@ -214,6 +214,8 @@ Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
 Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')->group(function () {
     Route::get('/projects', [ClientProjectController::class, 'index'])->name('index');
     Route::get('/projects/tasks', [ClientTasksAggregatorController::class, 'index'])->name('all-tasks');
+    Route::get('/projects/board', [ClientProjectCalendarController::class, 'allProjectsBoardIndex'])->name('all-projects-board.index');
+    Route::get('/projects/board/{date}', [ClientProjectCalendarController::class, 'allProjectsBoardDate'])->name('all-projects-board.date');
     Route::get('/projects/{project}', [ClientProjectController::class, 'show'])->name('show');
     Route::get('/projects/{project}/tasks', [ClientProjectTaskController::class, 'tasksIndex'])->name('tasks.index');
     Route::get('/projects/{project}/reports/{report}', [ClientProjectReportController::class, 'show'])->name('reports.show');
@@ -262,6 +264,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences.update');
+    Route::patch('/profile/workspace-settings', [ProfileController::class, 'updateWorkspaceSettings'])->name('profile.workspace-settings.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/emails', [ProfileController::class, 'storeEmail'])->name('profile.emails.store');
     Route::delete('/profile/emails/{userEmail}', [ProfileController::class, 'destroyEmail'])->name('profile.emails.destroy');
@@ -949,6 +952,9 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::post('/conversations/{id}/messages', [ConversationController::class, 'storeMessage']);
 });
 
+// ── App Invoice Redirect Route ─────────────────
+Route::get('/app/invoices/{invoice}', [InvoiceController::class, 'redirectAppInvoice'])->name('invoices.view-app');
+
 // ── Guest Invoice Pay ─────────────────────────
 Route::get('/guest/invoices/{invoice}', [GuestInvoiceController::class, 'show'])->name('guest.invoices.show')->middleware('signed');
 Route::post('/guest/invoices/{invoice}/pay', [GuestInvoiceController::class, 'initiatePay'])->name('guest.invoices.pay')->middleware('signed');
@@ -1056,6 +1062,19 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/invoices/{invoice}/share-link', [App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
     Route::post('/invoices/{invoice}/reschedule', [App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
     Route::post('/invoices/{invoice}/assign-project', [App\Http\Controllers\Admin\InvoiceController::class, 'assignProject'])->name('invoices.assign-project');
+
+    // ── Admin Invoice Board ───────────────────────────────────────
+    Route::post('/invoices/{invoice}/board/notes', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'storeNote'])->name('invoices.board.store-note');
+    Route::put('/invoices/{invoice}/board/notes/{note}', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'updateNote'])->name('invoices.board.update-note');
+    Route::delete('/invoices/{invoice}/board/notes/{note}', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'destroyNote'])->name('invoices.board.destroy-note');
+    Route::post('/invoices/{invoice}/board/tasks', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'storeTask'])->name('invoices.board.store-task');
+    Route::put('/invoices/{invoice}/board/tasks/{task}', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'updateTask'])->name('invoices.board.update-task');
+    Route::delete('/invoices/{invoice}/board/tasks/{task}', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'destroyTask'])->name('invoices.board.destroy-task');
+    Route::post('/invoices/{invoice}/board/todos', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'storeTodo'])->name('invoices.board.store-todo');
+    Route::put('/invoices/{invoice}/board/todos/{todo}', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'updateTodo'])->name('invoices.board.update-todo');
+    Route::delete('/invoices/{invoice}/board/todos/{todo}', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'destroyTodo'])->name('invoices.board.destroy-todo');
+    Route::post('/invoices/{invoice}/board/move', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'moveCard'])->name('invoices.board.move-card');
+    Route::post('/invoices/{invoice}/board/reorder', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'reorderCards'])->name('invoices.board.reorder-cards');
 
     // ── Platform Users Transactions ───────────────────────────────
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
