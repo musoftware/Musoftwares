@@ -79,6 +79,8 @@ class AdminSettingController extends Controller
             'invoice_notification_channels' => AdminSettings::INVOICE_NOTIFICATION_CHANNELS,
             'market_hourly_rate' => AdminSettings::GetValue('market_hourly_rate'),
             'auto_pay_after_days' => AdminSettings::GetValue('auto_pay_after_days', 3),
+            'enable_dso_decrement' => AdminSettings::GetValue('enable_dso_decrement') === '1',
+            'global_dso_limit' => (int) AdminSettings::GetValue('global_dso_limit', 30),
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -133,6 +135,8 @@ class AdminSettingController extends Controller
             'gumroad' => 'nullable|string',
             'whatsapp_default_channel_id' => 'nullable|string',
             'friday_work_allowed' => 'boolean',
+            'enable_dso_decrement' => 'boolean',
+            'global_dso_limit' => 'nullable|integer|min:1',
             'max_devices_per_tenant' => 'nullable|integer|min:1',
             'gemini_api_keys' => 'nullable|string',
             'expected_monthly_income' => 'nullable|numeric|min:0',

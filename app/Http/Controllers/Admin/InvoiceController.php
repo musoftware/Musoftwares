@@ -1027,6 +1027,10 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
         }
 
+        if ($item->invoice && Carbon::parse($item->invoice->created_at)->timezone('Africa/Cairo')->startOfDay()->diffInDays(now('Africa/Cairo')->startOfDay()) > 3) {
+            return redirect()->back()->with('error', __('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
+        }
+
         $request->validate([
             'reason' => 'nullable|string|max:255',
             'sessions' => 'present|array',

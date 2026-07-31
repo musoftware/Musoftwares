@@ -353,6 +353,7 @@ return [
     'only_unpaid_can_be_split' => 'يمكن تقسيم الفواتير غير المدفوعة فقط.',
     'only_unpaid_for_whatsapp' => 'يمكن إرسال تذكيرات واتساب للفواتير غير المدفوعة أو المدفوعة جزئياً فقط.',
     'only_unpaid_invoices_can_be_edited' => 'يمكن تعديل الفواتير غير المدفوعة فقط',
+    'cannot_add_timers_to_old_invoices' => 'لا يمكن إضافة جلسات وقت إلى فواتير تم إنشاؤها منذ أكثر من :days أيام.',
     'open_in_playstore' => 'افتح في متجر بلاي',
     'orders' => 'الطلبات',
     'outstanding' => 'المستحق',

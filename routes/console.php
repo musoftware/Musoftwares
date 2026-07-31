@@ -54,5 +54,15 @@ Schedule::command('listing:scrape-waseet')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(10);
 
+// Check DSO limits daily at 01:00 Cairo Time
+Schedule::command(\App\Console\Commands\CheckDsoLimits::class)
+    ->dailyAt('01:00')
+    ->timezone('Africa/Cairo');
+
+// Decrement global DSO limit monthly on the 1st at 00:00 Cairo Time
+Schedule::command(\App\Console\Commands\DecrementDsoLimit::class)
+    ->monthlyOn(1, '00:00')
+    ->timezone('Africa/Cairo');
+
 
 

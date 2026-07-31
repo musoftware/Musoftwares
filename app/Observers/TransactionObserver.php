@@ -25,6 +25,26 @@ class TransactionObserver
         }
 
         try {
+            // Skip reactivation if the user still has an invoice that exceeds the DSO limit
+            $user = $transaction->user;
+            if ($user) {
+                $oldestUnpaid = $user->oldestUnpaidInvoice();
+                if ($oldestUnpaid) {
+                    $age = (int) $oldestUnpaid->created_at->timezone('Africa/Cairo')->startOfDay()->diffInDays(now('Africa/Cairo')->startOfDay());
+                    $limit = (int) \App\Models\AdminSettings::GetValue('global_dso_limit', 30);
+                    if ($age >= $limit) {
+                        Log::info('Serials NOT auto-reactivated because client is still over DSO limit', [
+                            'user_id' => $transaction->user_id,
+                            'transaction_id' => $transaction->id,
+                            'oldest_invoice_id' => $oldestUnpaid->id,
+                            'oldest_invoice_age_days' => $age,
+                            'dso_limit_days' => $limit,
+                        ]);
+                        return;
+                    }
+                }
+            }
+
             // Find all inactive serials for this user
             $inactiveSerials = SerialUserDevice::query()
                 ->where('user_id', $transaction->user_id)

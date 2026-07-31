@@ -24,6 +24,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'lang',
         'password',
         'role',
         'avatar',
@@ -698,6 +699,40 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Get the client's oldest unpaid or partially paid invoice.
+     */
+    public function oldestUnpaidInvoice(): ?Invoice
+    {
+        return $this->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->orderBy('id', 'asc')
+            ->first();
+    }
+
+    /**
+     * Get total unpaid amount across all invoices, converted to the client's currency.
+     */
+    public function totalUnpaidAmount(): float
+    {
+        $unpaidInvoices = $this->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->get();
+
+        $total = 0;
+        foreach ($unpaidInvoices as $invoice) {
+            $total += \App\Models\CurrenciesExchange::RateToday(
+                $invoice->unpaid,
+                $invoice->currency_id ?? $invoice->currency,
+                $this->currency_id
+            );
+        }
+
+        return (float) $total;
     }
 
     /**

@@ -353,6 +353,7 @@ return [
     'only_unpaid_can_be_split' => 'Only unpaid invoices can be split.',
     'only_unpaid_for_whatsapp' => 'Only unpaid or partially paid invoices can receive WhatsApp reminders.',
     'only_unpaid_invoices_can_be_edited' => 'Only Unpaid Invoices Can Be Edited',
+    'cannot_add_timers_to_old_invoices' => 'Cannot add timer sessions to invoices created more than :days days ago.',
     'open_in_playstore' => 'Open in Play Store',
     'orders' => 'Orders',
     'outstanding' => 'Outstanding',

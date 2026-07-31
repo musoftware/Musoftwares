@@ -67,6 +67,8 @@ interface SettingsData {
     notif_channels_invoice_created: string | null;
     market_hourly_rate?: string | null;
     auto_pay_after_days?: string | number | null;
+    enable_dso_decrement: boolean;
+    global_dso_limit?: string | number | null;
 }
 
 interface Props {
@@ -400,6 +402,31 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         {__('general.auto_pay_after_days_help') || 'Automatically pay unpaid invoices using the client\'s balance after this many days (for invoices with amount > 0).'}
                                     </p>
                                 </Field>
+
+                                <div className="border-t border-gray-100 my-4 pt-4"></div>
+
+                                <Field label={__('general.global_dso_limit') || 'Global DSO Limit (Days)'}>
+                                    <Input
+                                        id="global_dso_limit"
+                                        type="number"
+                                        min="1"
+                                        step="1"
+                                        value={form.global_dso_limit ?? ''}
+                                        onChange={(e) => set('global_dso_limit', e.target.value)}
+                                        placeholder="30"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {__('general.global_dso_limit_help') || 'Maximum Days Sales Outstanding allowed for a client before automatically suspending their serial keys and programs.'}
+                                    </p>
+                                </Field>
+
+                                <Toggle
+                                    id="enable_dso_decrement"
+                                    label={__('general.enable_dso_decrement') || 'Enable Monthly DSO Limit Decrement'}
+                                    checked={form.enable_dso_decrement}
+                                    onChange={(v) => set('enable_dso_decrement', v)}
+                                    description={__('general.enable_dso_decrement_help') || 'If enabled, the global DSO limit will automatically decrease by 1 day on the 1st of every month down to a minimum of 1 day.'}
+                                />
                             </div>
                         </SectionCard>
 
