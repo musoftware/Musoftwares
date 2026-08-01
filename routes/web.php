@@ -1028,6 +1028,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     // ── Admin Invoices (Platform Billing) ─────────────────────────
     Route::get('/invoices', [App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/unpaid', [App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
+    Route::get('/invoices/dues', [App\Http\Controllers\Admin\InvoiceController::class, 'duesBoard'])->name('invoices.dues');
+    Route::post('/invoices/dues/{user}/send-reminder', [App\Http\Controllers\Admin\InvoiceController::class, 'sendDuesReminder'])->name('invoices.dues.send-reminder');
     Route::get('/invoices/archive', [App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
     Route::get('/invoices/create', [App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
     Route::get('/invoices/timer-details/{item_id}', [App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');

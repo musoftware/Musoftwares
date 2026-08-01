@@ -58,6 +58,7 @@ const items: MenuItem[] = [
     url: "/admin/invoices", 
     icon: DollarSign,
     subItems: [
+        { title: "Clients Dues Board", url: "/admin/invoices/dues" },
         { title: "Unpaid Invoices", url: "/admin/invoices/unpaid" },
         { title: "Archived Invoices", url: "/admin/invoices/archive" },
         { title: "All Invoices", url: "/admin/invoices" },

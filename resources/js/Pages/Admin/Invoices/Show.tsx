@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
-import { formatMoney as formatCurrency } from '@/lib/utils';
+import { formatMoney as formatCurrency, cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import {
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt,
@@ -187,7 +187,8 @@ export default function Show({
         currency: String(invoice.currency_id || 1), // Default to invoice's currency
         service_pay_source: 'wallet',
         service_pay_dest: 'cib_swype',
-        service_revenue: '0'
+        service_revenue: '0',
+        tasks_details: ''
     });
     const [payServicePreview, setPayServicePreview] = useState<{ cost: number, total: number, total_usd: number, invoice_currency?: string, business_currency?: string } | null>(null);
     const [isCalculatingPayService, setIsCalculatingPayService] = useState(false);
@@ -382,7 +383,8 @@ export default function Show({
                     currency: String(invoice.currency_id),
                     service_pay_source: 'wallet',
                     service_pay_dest: 'cib_swype',
-                    service_revenue: '0'
+                    service_revenue: '0',
+                    tasks_details: ''
                 });
             },
             onFinish: () => setIsSubmittingPayService(false)
@@ -1732,6 +1734,17 @@ export default function Show({
                                 min="0"
                                 value={payServiceForm.service_revenue}
                                 onChange={e => setPayServiceForm({...payServiceForm, service_revenue: e.target.value})}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>{__('general.tasks_details') || 'Tasks Details (Optional)'}</Label>
+                            <textarea 
+                                className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={(payServiceForm as any).tasks_details || ''}
+                                onChange={e => setPayServiceForm({...payServiceForm, tasks_details: e.target.value})}
+                                placeholder="Task A: 5 points&#10;Task B: 10 points"
+                                rows={4}
                             />
                         </div>
 

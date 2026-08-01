@@ -186,7 +186,7 @@ class User extends Authenticatable
         return $this->hasMany(DeviceToken::class);
     }
 
-    public function invoices()
+    public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
     }
@@ -397,17 +397,35 @@ class User extends Authenticatable
 
     public function try_pay_unpaid_invoices()
     {
-        foreach (
-            $this->invoices()
-                ->where('unpaid', '>', '0')
-                ->where('unpaid', '<=', $this->user_balance)
-                ->orderBy('id')
-                ->get() as $invoice
-        ) {
-            $client_balance = $this->user_balance;
-            $invoice_total = $invoice->total();
-            if ((float) $client_balance >= (float) $invoice_total) {
-                $invoice->bill_invoice();
+        while (true) {
+            $this->refresh();
+            $balance = (float) $this->user_balance;
+            
+            $oldestUnpaid = $this->invoices()
+                ->where('unpaid', '>', 0)
+                ->whereIn('status', ['unpaid', 'partially_paid'])
+                ->orderBy('id', 'asc')
+                ->first();
+                
+            if (!$oldestUnpaid) {
+                break;
+            }
+            
+            $unpaidInUserCurrency = (float) \App\Models\CurrenciesExchange::RateToday(
+                $oldestUnpaid->unpaid,
+                $oldestUnpaid->currency_id ?? $oldestUnpaid->currency,
+                $this->currency_id
+            );
+            
+            if ($balance >= $unpaidInUserCurrency) {
+                try {
+                    $oldestUnpaid->bill_invoice(true);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to auto-pay invoice #{$oldestUnpaid->id} in try_pay_unpaid_invoices: " . $e->getMessage());
+                    break;
+                }
+            } else {
+                break;
             }
         }
     }
@@ -450,8 +468,6 @@ class User extends Authenticatable
         }
 
         DB::transaction(function () use ($client_balance, $project, $amount, $type) {
-            $client_balance->save();
-
             if (in_array($type, ['received', 'sent', 'refunded'])) {
                 $this->increment('total_paid', $amount);
                 optional($project)->increment('total_paid', $amount);
@@ -459,6 +475,8 @@ class User extends Authenticatable
 
             $this->increment('user_balance', $amount);
             optional($project)->increment('project_balance', $amount);
+
+            $client_balance->save();
 
             if ($type != 'used') {
                 // ActionHelper::add_action_coins(...) // Omitted for now unless requested

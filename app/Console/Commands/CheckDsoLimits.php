@@ -34,6 +34,12 @@ class CheckDsoLimits extends Command
      */
     public function handle()
     {
+        $isEnabled = AdminSettings::GetValue('enable_dso_system', '1') === '1';
+        if (! $isEnabled) {
+            $this->info("Global DSO system is disabled in admin settings. Skipping checks.");
+            return;
+        }
+
         $limit = (int) AdminSettings::GetValue('global_dso_limit', 30);
         $this->info("Current global DSO limit: {$limit} days.");
 

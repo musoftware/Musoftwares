@@ -27,7 +27,7 @@ class SystemConfigurationService extends BaseService
             'google_analytics_id', 'google_tag_manager_id', 'meta_pixel_id',
             'custom_head_scripts', 'custom_body_scripts',
             'notif_channels_invoice_created', 'market_hourly_rate',
-            'auto_pay_after_days', 'enable_dso_decrement', 'global_dso_limit',
+            'auto_pay_after_days', 'enable_dso_decrement', 'global_dso_limit', 'enable_dso_system',
         ];
 
         foreach ($supportedKeys as $key) {
@@ -35,7 +35,7 @@ class SystemConfigurationService extends BaseService
                 $value = $settings[$key];
 
                 // Handle booleans/checkboxes correctly
-                if (in_array($key, ['ownwallet', 'payoneer_active', 'paymob_active', 'friday_work_allowed', 'enable_dso_decrement'])) {
+                if (in_array($key, ['ownwallet', 'payoneer_active', 'paymob_active', 'friday_work_allowed', 'enable_dso_decrement', 'enable_dso_system'])) {
                     $value = $value ? '1' : '0';
                 }
 

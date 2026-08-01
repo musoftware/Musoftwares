@@ -81,6 +81,7 @@ class AdminSettingController extends Controller
             'auto_pay_after_days' => AdminSettings::GetValue('auto_pay_after_days', 3),
             'enable_dso_decrement' => AdminSettings::GetValue('enable_dso_decrement') === '1',
             'global_dso_limit' => (int) AdminSettings::GetValue('global_dso_limit', 30),
+            'enable_dso_system' => AdminSettings::GetValue('enable_dso_system', '1') === '1',
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -137,6 +138,7 @@ class AdminSettingController extends Controller
             'friday_work_allowed' => 'boolean',
             'enable_dso_decrement' => 'boolean',
             'global_dso_limit' => 'nullable|integer|min:1',
+            'enable_dso_system' => 'boolean',
             'max_devices_per_tenant' => 'nullable|integer|min:1',
             'gemini_api_keys' => 'nullable|string',
             'expected_monthly_income' => 'nullable|numeric|min:0',

@@ -1039,7 +1039,7 @@ class Invoice extends Model
     /**
      * Get the comments for the invoice.
      */
-    public function comments()
+    public function comments(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
     }

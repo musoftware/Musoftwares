@@ -1243,6 +1243,7 @@ class InvoiceController extends Controller
             'service_pay_source' => 'required|string',
             'service_pay_dest' => 'required|string',
             'service_revenue' => 'required|integer',
+            'tasks_details' => 'nullable|string',
         ]);
 
         if ($invoice->status != 'unpaid') {
@@ -1261,28 +1262,228 @@ class InvoiceController extends Controller
         $cost = round((float) $calc['cost'], 3);
         $total = round((float) $calc['total'], 2);
 
-        $item = new InvoiceItem;
-        $item->invoice_id = $invoice->id;
-        $item->item_title = 'Service Payment - '.$request->service_pay_source;
-        $item->qty = 1;
-        $item->amount = $total;
-        $item->item_type = 'simple';
-        $item->save();
+        $tasksDetails = $request->input('tasks_details');
 
-        $nextSort = (int) InvoiceCostLine::where('invoice_id', $invoice->id)->max('sort_order') + 1;
+        if (!empty($tasksDetails)) {
+            $lines = explode("\n", $tasksDetails);
+            $parsedTasks = [];
+            $totalPoints = 0.0;
 
-        $costLine = new InvoiceCostLine;
-        $costLine->invoice_id = $invoice->id;
-        $costLine->line_type = 'direct';
-        $costLine->amount = $cost;
-        $costLine->description = 'Service Payment - '.$request->service_pay_source;
-        $costLine->sort_order = $nextSort;
-        $costLine->save();
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+
+                // Match: "Task name: 5 points", "Task name (5 pts)", "Task name 5", etc.
+                if (preg_match('/(?:^|.*?)\s*[\(: -]?\s*(\d+(?:\.\d+)?)\s*(?:pts|points|نقطة|نقطه|نقاط|point|pt)?\s*\)?$/iu', $line, $matches)) {
+                    $points = (float) $matches[1];
+                    $title = trim(preg_replace('/[\(: -]?\s*(\d+(?:\.\d+)?)\s*(?:pts|points|نقطة|نقطه|نقاط|point|pt)?\s*\)?$/iu', '', $line));
+                    if (empty($title)) {
+                        $title = $line;
+                    }
+                } else {
+                    $points = 1.0; // Default
+                    $title = $line;
+                }
+
+                $parsedTasks[] = [
+                    'title' => $title,
+                    'points' => $points,
+                ];
+                $totalPoints += $points;
+            }
+
+            if ($totalPoints > 0) {
+                $remainingTotal = $total;
+                $remainingCost = $cost;
+                $count = count($parsedTasks);
+
+                for ($i = 0; $i < $count; $i++) {
+                    $task = $parsedTasks[$i];
+                    if ($i === $count - 1) {
+                        $taskTotal = $remainingTotal;
+                        $taskCost = $remainingCost;
+                    } else {
+                        $taskTotal = round(($task['points'] / $totalPoints) * $total, 2);
+                        $taskCost = round(($task['points'] / $totalPoints) * $cost, 3);
+                        $remainingTotal = round($remainingTotal - $taskTotal, 2);
+                        $remainingCost = round($remainingCost - $taskCost, 3);
+                    }
+
+                    // Create InvoiceItem
+                    $item = new InvoiceItem;
+                    $item->invoice_id = $invoice->id;
+                    $item->item_title = $task['title'];
+                    $item->qty = 1;
+                    $item->amount = $taskTotal;
+                    $item->points = $task['points'];
+                    $item->item_type = 'simple';
+                    $item->save();
+
+                    // Create InvoiceCostLine
+                    $nextSort = (int) InvoiceCostLine::where('invoice_id', $invoice->id)->max('sort_order') + 1;
+                    $costLine = new InvoiceCostLine;
+                    $costLine->invoice_id = $invoice->id;
+                    $costLine->line_type = 'direct';
+                    $costLine->amount = $taskCost;
+                    $costLine->description = $task['title'] . ' (Cost)';
+                    $costLine->sort_order = $nextSort;
+                    $costLine->save();
+                }
+            } else {
+                $item = new InvoiceItem;
+                $item->invoice_id = $invoice->id;
+                $item->item_title = 'Service Payment - '.$request->service_pay_source;
+                $item->qty = 1;
+                $item->amount = $total;
+                $item->item_type = 'simple';
+                $item->save();
+
+                $nextSort = (int) InvoiceCostLine::where('invoice_id', $invoice->id)->max('sort_order') + 1;
+                $costLine = new InvoiceCostLine;
+                $costLine->invoice_id = $invoice->id;
+                $costLine->line_type = 'direct';
+                $costLine->amount = $cost;
+                $costLine->description = 'Service Payment - '.$request->service_pay_source;
+                $costLine->sort_order = $nextSort;
+                $costLine->save();
+            }
+        } else {
+            $item = new InvoiceItem;
+            $item->invoice_id = $invoice->id;
+            $item->item_title = 'Service Payment - '.$request->service_pay_source;
+            $item->qty = 1;
+            $item->amount = $total;
+            $item->item_type = 'simple';
+            $item->save();
+
+            $nextSort = (int) InvoiceCostLine::where('invoice_id', $invoice->id)->max('sort_order') + 1;
+            $costLine = new InvoiceCostLine;
+            $costLine->invoice_id = $invoice->id;
+            $costLine->line_type = 'direct';
+            $costLine->amount = $cost;
+            $costLine->description = 'Service Payment - '.$request->service_pay_source;
+            $costLine->sort_order = $nextSort;
+            $costLine->save();
+        }
 
         $invoice->update([
             'cost' => (float) InvoiceCostLine::where('invoice_id', $invoice->id)->sum('amount'),
         ]);
 
         return redirect()->back()->with('success', __('admin.service_payment_added_successfully'));
+    }
+
+    /**
+     * Show the Unpaid Invoices Dues Board.
+     */
+    public function duesBoard(Request $request)
+    {
+        // Query all users who have unpaid or partially paid invoices that are not archived
+        $users = User::whereHas('invoices', function ($q) {
+            $q->whereIn('status', ['unpaid', 'partially_paid'])
+              ->where('archive', '0');
+        })->with(['invoices' => function ($q) {
+            $q->whereIn('status', ['unpaid', 'partially_paid'])
+              ->where('archive', '0')
+              ->with('items');
+        }])->get();
+
+        $clientDues = $users->map(function ($client) {
+            // Group unpaid amounts by currency
+            $totals = [];
+            foreach ($client->invoices as $invoice) {
+                $currencyId = $invoice->currency_id ?? $invoice->currency ?? 1;
+                $totals[$currencyId] = ($totals[$currencyId] ?? 0.0) + (float) $invoice->unpaid;
+            }
+
+            // Format totals broken down by currency
+            $formattedTotals = [];
+            foreach ($totals as $currencyId => $amt) {
+                $formattedTotals[] = FinanceHelper::instance()->format_money($amt, $currencyId);
+            }
+            $duesSummary = implode(' | ', $formattedTotals);
+
+            // Generate template subject and body dynamically based on client preferred language
+            $isArabic = ($client->lang === 'ar');
+            if ($isArabic) {
+                $defaultSubject = "تذكير: الفواتير المستحقة";
+                $defaultBody = "عزيزي {$client->name}،\n\nنود تذكيركم بالفواتير المستحقة على حسابكم. يرجى سدادها في أقرب وقت لتفادي انقطاع الخدمة:\n\n";
+                foreach ($client->invoices as $invoice) {
+                    $formattedAmt = FinanceHelper::instance()->format_money($invoice->unpaid, $invoice->currency_id ?? $invoice->currency ?? 1);
+                    $itemsList = $invoice->items->pluck('item_title')->implode(', ');
+                    $defaultBody .= "• فاتورة #{$invoice->id} بمبلغ {$formattedAmt} ({$itemsList})\n";
+                }
+                $defaultBody .= "\nالمستحقات الإجمالية:\n";
+                foreach ($formattedTotals as $t) {
+                    $defaultBody .= "- {$t}\n";
+                }
+                $defaultBody .= "\nشكراً لكم،\nفريق Musoftware";
+            } else {
+                $defaultSubject = "Reminder: Unpaid Invoices";
+                $defaultBody = "Dear {$client->name},\n\nThis is a friendly reminder that you have outstanding invoices on your account. Please settle them to avoid any service interruption:\n\n";
+                foreach ($client->invoices as $invoice) {
+                    $formattedAmt = FinanceHelper::instance()->format_money($invoice->unpaid, $invoice->currency_id ?? $invoice->currency ?? 1);
+                    $itemsList = $invoice->items->pluck('item_title')->implode(', ');
+                    $defaultBody .= "• Invoice #{$invoice->id}: {$formattedAmt} ({$itemsList})\n";
+                }
+                $defaultBody .= "\nTotal Due Balance:\n";
+                foreach ($formattedTotals as $t) {
+                    $defaultBody .= "- {$t}\n";
+                }
+                $defaultBody .= "\nThank you,\nMusoftware Team";
+            }
+
+            return [
+                'id' => $client->id,
+                'name' => $client->name,
+                'email' => $client->email,
+                'lang' => $client->lang,
+                'unpaid_count' => $client->invoices->count(),
+                'dues_summary' => $duesSummary,
+                'default_subject' => $defaultSubject,
+                'default_body' => $defaultBody,
+                'invoices' => $client->invoices->map(function ($inv) {
+                    return [
+                        'id' => $inv->id,
+                        'unpaid' => $inv->unpaid,
+                        'currency_id' => $inv->currency_id ?? $inv->currency,
+                        'formatted_unpaid' => FinanceHelper::instance()->format_money($inv->unpaid, $inv->currency_id ?? $inv->currency ?? 1),
+                        'created_at' => $inv->created_at->format('Y-m-d'),
+                        'items' => $inv->items->map(function ($item) {
+                            return [
+                                'title' => $item->item_title,
+                                'amount' => $item->amount,
+                                'qty' => $item->qty,
+                            ];
+                        }),
+                    ];
+                }),
+            ];
+        });
+
+        return Inertia::render('Admin/Invoices/DuesBoard', [
+            'clients' => $clientDues,
+        ]);
+    }
+
+    /**
+     * Send a custom email reminder to a client about outstanding dues.
+     */
+    public function sendDuesReminder(Request $request, User $user)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+
+        try {
+            $user->notify(new \App\Notifications\CustomDuesReminderNotification(
+                $request->subject,
+                $request->body
+            ));
+            return redirect()->back()->with('success', __('admin.notification_sent'));
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 }

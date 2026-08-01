@@ -122,20 +122,17 @@ export default function AllProjectsBoard({ date, lanes, cards, categories, isAdm
                     </div>
                 </div>
 
-                {/* Calendar Dropdown */}
-                {calendarOpen && (
-                    <div className="flex justify-start">
-                        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-md">
-                            <CalendarSelector
-                                initialDate={date}
-                                onSelect={(d) => {
-                                    goToDate(d);
-                                    setCalendarOpen(false);
-                                }}
-                            />
-                        </div>
-                    </div>
-                )}
+                {/* Calendar Dialog */}
+                <CalendarSelector
+                    open={calendarOpen}
+                    onOpenChange={setCalendarOpen}
+                    activeDates={[]}
+                    selectedDate={date}
+                    onSelectDate={(d) => {
+                        goToDate(d);
+                        setCalendarOpen(false);
+                    }}
+                />
 
                 {/* Consolidated Board */}
                 <div className="relative">

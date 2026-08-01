@@ -12,7 +12,7 @@ class InvoiceItem extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['item_title', 'amount', 'qty', 'item_type', 'invoice_id'];
+    protected $fillable = ['item_title', 'amount', 'qty', 'item_type', 'invoice_id', 'points'];
 
     protected static function booted()
     {
