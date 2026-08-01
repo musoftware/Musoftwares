@@ -376,8 +376,24 @@
         position: relative;
         padding: 0 20px;
         box-sizing: border-box;
-        background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.18) 0%, rgba(13, 6, 26, 0.98) 75%) !important;
+        background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.15) 0%, rgba(13, 6, 26, 0.99) 75%) !important;
         transition: background 0.6s ease;
+    }
+
+    /* Subtle digital HUD grid overlay */
+    .orbital-viewport::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(138, 79, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(138, 79, 255, 0.03) 1px, transparent 1px);
+        background-size: 45px 45px;
+        pointer-events: none;
+        z-index: 1;
     }
 
     /* ── MAGNIFICENT ENLARGED CENTER HOLOGRAM CORE ──────────────── */
@@ -392,6 +408,7 @@
         justify-content: center;
         z-index: 10;
         pointer-events: none;
+        width: 480px;
     }
 
     .orbital-center-core * {
@@ -399,11 +416,126 @@
     }
 
     .orbital-center-core #logo-it {
-        zoom: 1.45 !important;
+        zoom: 1.15 !important;
         width: 320px !important;
         height: 260px !important;
         filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 8px rgba(168, 85, 247, 0.2));
         transition: filter 0.5s ease-out, transform 0.5s ease-out;
+        z-index: 5;
+    }
+
+    /* ── SUPERCAR LCD GAUGE HUD CLUSTER ── */
+    .hud-dashboard-gauge {
+        position: absolute;
+        top: 42%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        width: 360px;
+        height: 360px;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .hud-ring-outer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px dashed rgba(0, 240, 255, 0.2);
+        box-shadow: 0 0 25px rgba(0, 240, 255, 0.05);
+        animation: spin-clockwise 24s linear infinite;
+    }
+
+    .hud-ring-inner {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        width: calc(100% - 30px);
+        height: calc(100% - 30px);
+        border-radius: 50%;
+        border: 1.5px solid rgba(168, 85, 247, 0.15);
+        border-left-color: rgba(0, 240, 255, 0.65);
+        border-right-color: rgba(244, 63, 94, 0.65);
+        box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.1);
+        animation: spin-counter-clockwise 18s linear infinite;
+    }
+
+    .hud-ticks {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        width: calc(100% - 60px);
+        height: calc(100% - 60px);
+        border-radius: 50%;
+        border: 1px dotted rgba(255, 255, 255, 0.15);
+        background: radial-gradient(circle, transparent 60%, rgba(13, 6, 26, 0.7) 100%);
+    }
+
+    .dashboard-side-gauges {
+        display: flex;
+        justify-content: space-between;
+        width: 440px;
+        margin-top: 15px;
+        z-index: 12;
+        pointer-events: auto;
+    }
+
+    .side-gauge-left, .side-gauge-right {
+        display: flex;
+        flex-direction: column;
+        width: 140px;
+        background: rgba(13, 6, 26, 0.9);
+        border: 1px solid rgba(168, 85, 247, 0.25);
+        border-radius: 10px;
+        padding: 8px 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+    }
+
+    .side-gauge-left { border-left: 3px solid #10b981; }
+    .side-gauge-right { border-left: 3px solid #f43f5e; }
+
+    .side-gauge-left .label, .side-gauge-right .label {
+        font-size: 8px;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+
+    .gauge-bar-bg {
+        height: 5px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 3px;
+        margin: 5px 0;
+        overflow: hidden;
+    }
+
+    .gauge-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+    }
+
+    .gauge-bar-fill.emerald { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
+    .gauge-bar-fill.red { background: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.6); }
+
+    .side-gauge-left .value, .side-gauge-right .value {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+    
+    .text-emerald { color: #10b981 !important; }
+    .text-red { color: #f43f5e !important; }
+
+    @keyframes spin-clockwise {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spin-counter-clockwise {
+        0% { transform: rotate(360deg); }
+        100% { transform: rotate(0deg); }
     }
 
     /* 🌟 Dynamic Core Glow Reaction when hovering any 3D button */
@@ -543,6 +675,11 @@
         perspective: 900px;
         flex-shrink: 0;
         position: relative;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .orbital-node:hover .cube-3d-scene {
+        transform: translateY(-5px);
     }
 
     /* Ambient Glowing Aura Ring behind each Cube */
@@ -567,38 +704,14 @@
         opacity: 0.9;
     }
 
-    /* ── LEFT FLANK 3D CUBES ── */
-    @keyframes orbitHoverWaveLeft {
-        0%   { transform: rotateX(-16deg) rotateY(20deg) rotateZ(-5deg) translateY(0px); }
-        50%  { transform: rotateX(-12deg) rotateY(28deg) rotateZ(5deg) translateY(-10px); }
-        100% { transform: rotateX(-16deg) rotateY(20deg) rotateZ(-5deg) translateY(0px); }
-    }
-
-    .orbital-left .cube-3d {
+    .orbital-left .cube-3d, .orbital-right .cube-3d {
         width: 100%;
         height: 100%;
         position: relative;
-        transform-style: preserve-3d;
-        transform: rotateX(-16deg) rotateY(20deg);
-        animation: orbitHoverWaveLeft 5.5s ease-in-out infinite;
-        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* ── RIGHT FLANK 3D CUBES ── */
-    @keyframes orbitHoverWaveRight {
-        0%   { transform: rotateX(-16deg) rotateY(-20deg) rotateZ(5deg) translateY(0px); }
-        50%  { transform: rotateX(-12deg) rotateY(-28deg) rotateZ(-5deg) translateY(-10px); }
-        100% { transform: rotateX(-16deg) rotateY(-20deg) rotateZ(5deg) translateY(0px); }
-    }
-
-    .orbital-right .cube-3d {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        transform-style: preserve-3d;
-        transform: rotateX(-16deg) rotateY(-20deg);
-        animation: orbitHoverWaveRight 5.5s ease-in-out infinite;
-        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: none !important;
+        transform-style: flat !important;
+        animation: none !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Staggered Floating Delays */
@@ -636,14 +749,28 @@
         transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
     }
 
+    .cube-face:not(.cube-face-front) {
+        display: none !important;
+    }
+
     /* FRONT FACE: SVG Icon + Text Label INSIDE */
     .cube-face-front {
-        transform: translateZ(42.5px);
-        background: linear-gradient(135deg, rgba(35, 16, 70, 0.96), rgba(16, 7, 34, 0.98));
-        border: 1.5px solid rgba(168, 85, 247, 0.55);
-        box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.25);
-        padding: 8px 6px;
-        text-align: center;
+        transform: none !important;
+        position: absolute !important;
+        width: 100% !important;
+        height: 100% !important;
+        top: 0 !important;
+        left: 0 !important;
+        background: linear-gradient(135deg, rgba(35, 16, 70, 0.96), rgba(16, 7, 34, 0.98)) !important;
+        border: 1.5px solid rgba(168, 85, 247, 0.55) !important;
+        box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.25) !important;
+        padding: 8px 6px !important;
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 12px !important;
     }
     .cube-face-front svg {
         width: 32px;
@@ -995,11 +1122,36 @@
 
     <!-- ══ MAGNIFICENT ENLARGED 3D HOLOGRAM CENTER CORE ══ -->
     <div class="orbital-center-core" id="orbitalCenter">
+        <!-- Dashboard Gauge HUD Background -->
+        <div class="hud-dashboard-gauge">
+            <div class="hud-ring-outer"></div>
+            <div class="hud-ring-inner"></div>
+            <div class="hud-ticks"></div>
+        </div>
+
         <div id="logo-it"></div>
 
         <div class="orbital-identity">
             <div class="c-name">{{ Auth::user()->name ?? 'User' }}</div>
             <div class="c-role">{{ Auth::user()->role ?? 'Client' }}</div>
+        </div>
+
+        <!-- Curved Digital Gauges (Speedometer Style) -->
+        <div class="dashboard-side-gauges">
+            <div class="side-gauge-left">
+                <span class="label">WALLET LEVEL</span>
+                <div class="gauge-bar-bg">
+                    <div class="gauge-bar-fill emerald" data-target-width="85%" style="width: 0%;"></div>
+                </div>
+                <span class="value text-emerald">{{ $userBalanceFormatted }}</span>
+            </div>
+            <div class="side-gauge-right">
+                <span class="label">DUES STATUS</span>
+                <div class="gauge-bar-bg">
+                    <div class="gauge-bar-fill red" data-target-width="{{ $unpaidAmount > 0 ? '75%' : '0%' }}" style="width: 0%;"></div>
+                </div>
+                <span class="value text-red">{{ $totalDueFormatted }}</span>
+            </div>
         </div>
     </div>
 
@@ -1277,11 +1429,8 @@
             var dx = (e.clientX - cx) / (rect.width / 2);
             var dy = (e.clientY - cy) / (rect.height / 2);
 
-            // Smooth pitch (rotateX) & yaw (rotateY) pointing towards cursor
-            var rotX = -dy * 24; // max ±24deg pitch
-            var rotY = dx * 28;  // max ±28deg yaw
-
-            cube.style.transform = 'rotateX(' + rotX.toFixed(1) + 'deg) rotateY(' + rotY.toFixed(1) + 'deg) translateZ(22px)';
+            // Subtle 2D parallax offset translation
+            cube.style.transform = 'translate(' + (dx * 4).toFixed(1) + 'px, ' + (dy * 4).toFixed(1) + 'px)';
         });
 
         node.addEventListener('mouseleave', function() {
@@ -1675,18 +1824,8 @@
         var corePointLight = new THREE.PointLight(0xa855f7, 1.2, 300);
         coreGroup.add(corePointLight);
 
-        // 2. Geodesic Triangular Wireframe Ring Mesh
+        // 2. Geodesic Vertices Glowing Nodes (Floating Stars)
         var wireGeo = new THREE.IcosahedronGeometry(45, 2);
-        var wireMat = new THREE.MeshBasicMaterial({
-            color: 0x8a4fff,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.85
-        });
-        var wireMesh = new THREE.Mesh(wireGeo, wireMat);
-        coreGroup.add(wireMesh);
-
-        // Geodesic Vertices Glowing Nodes
         var wirePositions = wireGeo.attributes.position.array;
         var vertexCount = wirePositions.length / 3;
         var vertexGeo = new THREE.BufferGeometry();
@@ -1699,7 +1838,7 @@
             blending: THREE.AdditiveBlending
         });
         var vertexNodes = new THREE.Points(vertexGeo, vertexMat);
-        wireMesh.add(vertexNodes);
+        coreGroup.add(vertexNodes);
 
         // 4. Concentric Mechanical Outer Armor Rings (Segmented Metallic Shells)
         var metallicMat = new THREE.MeshPhongMaterial({
@@ -1885,8 +2024,11 @@
 
             // Rotations
             if (typeof logo3DGroup !== 'undefined') logo3DGroup.rotation.y += 0.008;
-            wireMesh.rotation.y += 0.005;
-            wireMesh.rotation.z += 0.002;
+
+            if (typeof vertexNodes !== 'undefined') {
+                vertexNodes.rotation.y += 0.005;
+                vertexNodes.rotation.z += 0.002;
+            }
 
             ring1Group.rotation.z += 0.009;
             ring2Group.rotation.z -= 0.012;
@@ -1913,6 +2055,38 @@
         }
         animate();
     })();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Supercar LCD dashboard system start choreography
+        var tl = gsap.timeline();
+
+        // 1. Initial states to avoid layout flash
+        gsap.set(".hud-dashboard-gauge", { opacity: 0, scale: 0.1, rotation: -180 });
+        gsap.set(".dashboard-side-gauges", { opacity: 0, y: 20 });
+        gsap.set(".orbital-left .orbital-node", { opacity: 0, x: -60 });
+        gsap.set(".orbital-right .orbital-node", { opacity: 0, x: 60 });
+        gsap.set(".orbital-identity", { opacity: 0, scale: 0.8 });
+
+        // 2. Play timeline
+        tl.to(".hud-dashboard-gauge", { opacity: 1, scale: 0.9, rotation: 0, duration: 1.0, ease: "back.out(1.7)" })
+          .to(".orbital-identity", { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, "-=0.6")
+          .to(".dashboard-side-gauges", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.4")
+          // Animate left/right level bars swipe from 0 to target width
+          .to(".gauge-bar-fill", {
+              width: function(index, target) {
+                  return target.getAttribute('data-target-width') || "0%";
+              },
+              duration: 1.0,
+              ease: "power2.out"
+          }, "-=0.3")
+          // Stagger show left flank buttons
+          .to(".orbital-left .orbital-node", { opacity: 1, x: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }, "-=0.8")
+          // Stagger show right flank buttons
+          .to(".orbital-right .orbital-node", { opacity: 1, x: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }, "-=0.8");
+    });
 </script>
 
 </body>
