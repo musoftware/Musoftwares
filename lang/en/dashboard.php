@@ -37,7 +37,7 @@ return [
     'pay_due_amount'     => 'Pay Due Amount',
     'add_balance'        => 'Add Balance',
     'invoices'           => 'Invoices',
-    'transactions'       => 'Transactions',
+    'transactions'       => 'Txns',
     'subscription_plans' => 'Subscription Plans',
     'erp_system'         => 'ERP System',
     'crm_system'         => 'CRM System',
@@ -61,6 +61,12 @@ return [
     'services'           => 'iSaaS & Marketplace',
     'whatsapp'           => 'WhatsApp',
     'fb_lookup'          => 'FB Lookup',
+    'invoices'           => 'Invoices',
+    'support'            => 'Support',
+    'referrals'          => 'Referral',
+    'payout_methods'     => 'Payouts',
+    'subscriptions'      => 'Subs',
+    'profile'            => 'Profile',
 
     // ── Wallet Capsule ──────────────────────────────────────
     'wallet'             => 'Wallet',

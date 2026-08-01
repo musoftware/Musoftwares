@@ -37,7 +37,7 @@ return [
     'pay_due_amount'     => 'دفع المستحقات',
     'add_balance'        => 'إضافة رصيد',
     'invoices'           => 'الفواتير',
-    'transactions'       => 'المعاملات',
+    'transactions'       => 'العمليات',
     'subscription_plans' => 'خطط الاشتراك',
     'erp_system'         => 'نظام ERP',
     'crm_system'         => 'نظام CRM',
@@ -61,6 +61,12 @@ return [
     'services'           => 'منصات iSaaS والمتجر',
     'whatsapp'           => 'الواتساب',
     'fb_lookup'          => 'بحث فيسبوك',
+    'invoices'           => 'الفواتير',
+    'support'            => 'الدعم',
+    'referrals'          => 'الإحالات',
+    'payout_methods'     => 'طرق السحب',
+    'subscriptions'      => 'الاشتراكات',
+    'profile'            => 'حسابي',
 
     // ── Wallet Capsule ──────────────────────────────────────
     'wallet'             => 'المحفظة',

@@ -629,7 +629,8 @@
         grid-template-columns: repeat(2, 85px) !important;
         gap: 25px 45px !important;
         max-width: 240px !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
+        justify-items: center !important;
     }
 
     .orbital-col.orbital-right {
@@ -637,8 +638,8 @@
         grid-template-columns: repeat(2, 85px) !important;
         gap: 25px 45px !important;
         max-width: 240px !important;
-        justify-content: flex-end !important;
-        justify-items: end !important;
+        justify-content: center !important;
+        justify-items: center !important;
     }
 
     .orbital-col-header {
@@ -794,7 +795,9 @@
         text-transform: uppercase;
         line-height: 1.1;
         white-space: normal;
-        word-break: break-word;
+        word-break: keep-all;
+        overflow-wrap: normal;
+        hyphens: none;
         transition: color 0.45s ease, text-shadow 0.45s ease;
     }
     .orbital-node:hover .cube-face-front .cube-inner-label {
@@ -1164,11 +1167,11 @@
             <div class="orbital-col-header">{{ __('dashboard.general_links') }}</div>
 
             <!-- Cube 1: Wallet Balance -->
-            <a href="{{ url('/financial') }}" class="orbital-node" data-node="1">
+            <a href="{{ url('/financial/transactions') }}" class="orbital-node" data-node="1">
                 <div class="cube-3d-scene cube-theme-emerald">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <i data-lucide="wallet"></i>
                             <span class="cube-inner-label">{{ __('dashboard.wallet') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1185,7 +1188,7 @@
                 <div class="cube-3d-scene cube-theme-emerald">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                            <i data-lucide="plus-circle"></i>
                             <span class="cube-inner-label">{{ __('dashboard.add_balance') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1202,7 +1205,7 @@
                 <div class="cube-3d-scene cube-theme-red">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <i data-lucide="banknote"></i>
                             <span class="cube-inner-label">{{ __('dashboard.pay_due_amount') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1222,8 +1225,110 @@
                 <div class="cube-3d-scene cube-theme-pink">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v7m4-7v4m4-4v9"/></svg>
+                            <i data-lucide="folder"></i>
                             <span class="cube-inner-label">{{ __('dashboard.my_projects_btn') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 14: Invoices -->
+            <a href="{{ url('/billing/invoices') }}" class="orbital-node" data-node="14">
+                <div class="cube-3d-scene cube-theme-pink">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="receipt"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.invoices') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 15: Transactions -->
+            <a href="{{ url('/financial/transactions') }}" class="orbital-node" data-node="15">
+                <div class="cube-3d-scene cube-theme-emerald">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="history"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.transactions') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 16: Support -->
+            <a href="{{ url('/tickets') }}" class="orbital-node" data-node="16">
+                <div class="cube-3d-scene cube-theme-amber">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="headset"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.support') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 17: Referral -->
+            <a href="{{ url('/referrals') }}" class="orbital-node" data-node="17">
+                <div class="cube-3d-scene cube-theme-cyan">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="users"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.referrals') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 18: Payout Methods -->
+            <a href="{{ url('/financial/payout-methods') }}" class="orbital-node" data-node="18">
+                <div class="cube-3d-scene cube-theme-emerald">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="landmark"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.payout_methods') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 20: Profile -->
+            <a href="{{ url('/profile') }}" class="orbital-node" data-node="20">
+                <div class="cube-3d-scene cube-theme-gold">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="user"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.profile') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
                         <div class="cube-face cube-face-right"></div>
@@ -1246,7 +1351,7 @@
                 <div class="cube-3d-scene cube-theme-cyan">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M14.752 11.108a3.5 3.5 0 1 1-6.944 0L6.5 17.5h11l-.748-6.392z"/><path d="M12 2v4m0 0L9 9m3-3l3 3"/></svg>
+                            <i data-lucide="file-signature"></i>
                             <span class="cube-inner-label">{{ __('dashboard.contracts') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1263,7 +1368,7 @@
                 <div class="cube-3d-scene cube-theme-cyan">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                            <i data-lucide="database"></i>
                             <span class="cube-inner-label">{{ __('dashboard.erp_system') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1280,7 +1385,7 @@
                 <div class="cube-3d-scene cube-theme-pink">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <i data-lucide="contact"></i>
                             <span class="cube-inner-label">{{ __('dashboard.crm_system') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1297,7 +1402,7 @@
                 <div class="cube-3d-scene cube-theme-gold">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <i data-lucide="coins"></i>
                             <span class="cube-inner-label">{{ __('dashboard.gold_saver_sys') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1314,7 +1419,7 @@
                 <div class="cube-3d-scene cube-theme-amber">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 7h6M9 11h4"/></svg>
+                            <i data-lucide="smartphone"></i>
                             <span class="cube-inner-label">{{ __('dashboard.sms_gateway') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1331,7 +1436,7 @@
                 <div class="cube-3d-scene cube-theme-cyan">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/><circle cx="12" cy="8" r="2"/><path d="M12 14v6"/></svg>
+                            <i data-lucide="terminal"></i>
                             <span class="cube-inner-label">{{ __('dashboard.runtime_tools') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1348,7 +1453,7 @@
                 <div class="cube-3d-scene cube-theme-emerald">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-.37 15.43L7.5 16c-.38-.22-.64-.55-.75-.96-.03-.1-.05-.21-.05-.31 0-.25.09-.48.27-.66.18-.18.42-.27.67-.27.19 0 .38.08.53.21.15.13.36.36.47.56.12.21.3.42.3.64v.76c0 .22-.02.44-.02.66 0 .18.01.37.03.55.02.18.06.36.13.52.08.19.21.36.36.48.17.14.38.23.59.29.21.07.43.09.65.07.22-.02.44-.12.57-.32.13-.19.19-.43.19-.67v-.76c0-.22-.03-.44-.08-.66-.05-.21-.13-.42-.22-.61-.09-.19-.23-.36-.38-.47-.15-.11-.33-.19-.52-.23-.18-.04-.37-.06-.56-.04-.18.02-.36.08-.51.19-.15.11-.28.25-.37.41-.08.15-.12.32-.12.5 0 .18.03.37.07.55.04.18.1.36.19.52.08.15.18.29.3.4.12.12.26.2.41.25.15.05.31.07.47.05.16-.02.32-.1.42-.24.11-.13.17-.3.18-.47.01-.16-.02-.32-.06-.48-.03-.15-.08-.3-.13-.44-.05-.15-.11-.29-.18-.42-.07-.12-.15-.23-.24-.33-.08-.1-.19-.18-.29-.25-.1-.07-.21-.11-.33-.13-.11-.02-.23 0-.33.06-.1.06-.2.15-.27.27-.08.11-.16.22-.22.33-.07.12-.13.25-.17.38-.04.13-.06.26-.06.39 0 .13.02.27.06.4.03.13.08.27.14.4.06.11.13.22.2.33.08.1.17.19.27.27.1.08.21.15.31.2.11.06.22.11.32.15.11.04.23.07.34.09.11.02.22 0 .33-.02.11-.02.22-.04.33-.06.11-.02.22-0.03.33-0.03zm2.57 4.47c-.06.13-.12.25-.24.35-.11.09-.25.18-.39.22-.13.04-.27.06-.41.03-.14-.03-.28-.12-.39-.25-.11-.13-.18-.3-.23-.47-.04-.15-.06-.3-.06-.47 0-.17.02-.33.06-.5.04-.16.1-.32.18-.47.08-.15.2-.28.32-.38.12-.1.27-.18.42-.21.15-.03.3-.04.45-.02.15.02.3.09.41.19.11.1.2.23.27.37.07.14.11.3.13.45.02.16.02.32 0 .47z"/></svg>
+                            <i data-lucide="message-square"></i>
                             <span class="cube-inner-label">{{ __('dashboard.whatsapp') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1365,7 +1470,7 @@
                 <div class="cube-3d-scene cube-theme-pink">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                            <i data-lucide="facebook"></i>
                             <span class="cube-inner-label">{{ __('dashboard.fb_lookup') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
@@ -1382,8 +1487,25 @@
                 <div class="cube-3d-scene cube-theme-amber">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                            <i data-lucide="store"></i>
                             <span class="cube-inner-label">{{ __('dashboard.browse_marketplace') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 19: Subscriptions -->
+            <a href="{{ url('/subscriptions/manage') }}" class="orbital-node" data-node="19">
+                <div class="cube-3d-scene cube-theme-pink">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="shield-check"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.subscriptions') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
                         <div class="cube-face cube-face-right"></div>
@@ -2057,9 +2179,13 @@
     })();
 </script>
 
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // Render Lucide icons
+        lucide.createIcons();
+
         // Supercar LCD dashboard system start choreography
         var tl = gsap.timeline();
 
