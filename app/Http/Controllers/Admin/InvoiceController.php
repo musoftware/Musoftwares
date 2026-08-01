@@ -1378,17 +1378,22 @@ class InvoiceController extends Controller
      */
     public function duesBoard(Request $request)
     {
+        $isEnabled = \App\Models\AdminSettings::GetValue('enable_dso_system', '1') === '1';
+        $limit = (int) \App\Models\AdminSettings::GetValue('global_dso_limit', 30);
+
         // Query all users who have unpaid or partially paid invoices that are not archived
         $users = User::whereHas('invoices', function ($q) {
-            $q->whereIn('status', ['unpaid', 'partially_paid'])
+            $q->where('unpaid', '>', 0)
+              ->whereIn('status', ['unpaid', 'partially_paid'])
               ->where('archive', '0');
         })->with(['invoices' => function ($q) {
-            $q->whereIn('status', ['unpaid', 'partially_paid'])
+            $q->where('unpaid', '>', 0)
+              ->whereIn('status', ['unpaid', 'partially_paid'])
               ->where('archive', '0')
               ->with('items');
         }])->get();
 
-        $clientDues = $users->map(function ($client) {
+        $clientDues = $users->map(function ($client) use ($isEnabled, $limit) {
             // Group unpaid amounts by currency
             $totals = [];
             foreach ($client->invoices as $invoice) {
@@ -1433,6 +1438,35 @@ class InvoiceController extends Controller
                 $defaultBody .= "\nThank you,\nMusoftware Team";
             }
 
+            // Calculate DSO data
+            $oldestInvoice = $client->invoices->sortBy('id')->first();
+            $dsoData = null;
+            if ($oldestInvoice) {
+                $createdAt = \Carbon\Carbon::parse($oldestInvoice->created_at)->timezone('Africa/Cairo');
+                $nowCairo = \Carbon\Carbon::now('Africa/Cairo');
+                $ageDays = (int) $createdAt->copy()->startOfDay()->diffInDays($nowCairo->copy()->startOfDay());
+                $deadline = $createdAt->copy()->startOfDay()->addDays($limit)->setTime(1, 0, 0); // 01:00 Cairo Time
+                
+                $daysRemaining = $limit - $ageDays;
+                $status = 'safe';
+                if ($ageDays >= $limit) {
+                    $status = 'suspended';
+                } elseif ($ageDays >= ($limit - 1)) {
+                    $status = 'warning_2';
+                } elseif ($ageDays >= ($limit - 2)) {
+                    $status = 'warning_1';
+                }
+
+                $dsoData = [
+                    'oldest_invoice_id' => $oldestInvoice->id,
+                    'oldest_invoice_created_at' => $oldestInvoice->created_at->toIso8601String(),
+                    'age_days' => $ageDays,
+                    'deadline_iso' => $deadline->toIso8601String(),
+                    'days_remaining' => $daysRemaining,
+                    'status' => $status,
+                ];
+            }
+
             return [
                 'id' => $client->id,
                 'name' => $client->name,
@@ -1442,6 +1476,7 @@ class InvoiceController extends Controller
                 'dues_summary' => $duesSummary,
                 'default_subject' => $defaultSubject,
                 'default_body' => $defaultBody,
+                'dso_data' => $dsoData,
                 'invoices' => $client->invoices->map(function ($inv) {
                     return [
                         'id' => $inv->id,
@@ -1463,6 +1498,8 @@ class InvoiceController extends Controller
 
         return Inertia::render('Admin/Invoices/DuesBoard', [
             'clients' => $clientDues,
+            'dso_enabled' => $isEnabled,
+            'global_dso_limit' => $limit,
         ]);
     }
 

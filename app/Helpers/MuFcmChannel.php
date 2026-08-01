@@ -35,10 +35,9 @@ class MuFcmChannel
 
         $fcmMessage = $notification->toFcm($notifiable);
 
-        return Collection::make($tokens)
-            ->chunk(self::TOKENS_PER_REQUEST)
-            ->map(fn ($tokens) => $this->messaging->sendMulticast($fcmMessage, $tokens->all()))
-            ->map(fn (MulticastSendReport $report) => $this->checkReportForFailures($notifiable, $notification, $report));
+        \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $fcmMessage->toArray());
+
+        return null;
     }
 
     protected function checkReportForFailures(mixed $notifiable, Notification $notification, MulticastSendReport $report): MulticastSendReport

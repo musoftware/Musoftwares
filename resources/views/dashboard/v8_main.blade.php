@@ -467,11 +467,11 @@
         text-shadow: 0 0 10px rgba(255, 124, 32, 0.6);
     }
 
-    /* ── Floating Orbital Arc Nodes Layout (NO SCALE UP ON HOVER) ──────── */
+    /* ── Two-Column Dashboard Layout (General Left, Services Right) ──────── */
     .orbital-arc-container {
         position: relative;
         width: 100%;
-        max-width: 980px;
+        max-width: 1100px;
         margin: 0 auto;
         height: 100%;
         display: flex;
@@ -480,19 +480,46 @@
         box-sizing: border-box;
         padding: 0 20px;
         z-index: 5;
+        gap: 60px;
     }
 
-    /* Left & Right Node Columns */
     .orbital-col {
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-        height: 84%;
-        width: 110px;
+        align-items: center;
+        flex: 1;
+        max-width: 480px;
+        gap: 12px !important;
     }
 
-    .orbital-col.orbital-left { align-items: flex-start; }
-    .orbital-col.orbital-right { align-items: flex-end; }
+    .orbital-col.orbital-left {
+        display: grid !important;
+        grid-template-columns: repeat(2, 85px) !important;
+        gap: 25px 45px !important;
+        max-width: 240px !important;
+        justify-content: flex-start !important;
+    }
+
+    .orbital-col.orbital-right {
+        display: grid !important;
+        grid-template-columns: repeat(2, 85px) !important;
+        gap: 25px 45px !important;
+        max-width: 240px !important;
+        justify-content: flex-end !important;
+        justify-items: end !important;
+    }
+
+    .orbital-col-header {
+        grid-column: span 2;
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba(168, 85, 247, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 12px;
+        text-align: center;
+        width: 100%;
+    }
 
     /* Orbital App Node Item - SCALE UP REMOVED AS REQUESTED */
     .orbital-node {
@@ -583,6 +610,11 @@
     .orbital-node[data-node="6"] .cube-3d { animation-delay: 1.05s; }
     .orbital-node[data-node="7"] .cube-3d { animation-delay: 1.75s; }
     .orbital-node[data-node="8"] .cube-3d { animation-delay: 2.45s; }
+    .orbital-node[data-node="9"] .cube-3d { animation-delay: 0.5s; }
+    .orbital-node[data-node="10"] .cube-3d { animation-delay: 1.2s; }
+    .orbital-node[data-node="11"] .cube-3d { animation-delay: 1.9s; }
+    .orbital-node[data-node="12"] .cube-3d { animation-delay: 2.6s; }
+    .orbital-node[data-node="13"] .cube-3d { animation-delay: 3.0s; }
 
     /* Pause animation on active hover */
     .orbital-node.is-hovered .cube-3d {
@@ -610,7 +642,7 @@
         background: linear-gradient(135deg, rgba(35, 16, 70, 0.96), rgba(16, 7, 34, 0.98));
         border: 1.5px solid rgba(168, 85, 247, 0.55);
         box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.25);
-        padding: 6px;
+        padding: 8px 6px;
         text-align: center;
     }
     .cube-face-front svg {
@@ -756,24 +788,24 @@
         z-index: 10;
     }
 
-    /* ── MOBILE / SPACE-DEPENDENT RESPONSIVE TOP & BOTTOM BUTTON LAYOUT ── */
+    /* ── MOBILE: Two-column dashboard with stacked cubes ── */
     @media only screen and (max-width: 768px) {
         .orbital-viewport {
-            height: calc(100vh - 56px) !important;
-            padding: 14px 4px 8px 4px !important;
+            height: auto !important;
+            padding: 16px 4px 8px 4px !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
             align-items: center !important;
             position: relative !important;
-            overflow: hidden !important;
+            overflow: visible !important;
+            min-height: 100vh !important;
         }
 
         .orbital-center-core {
-            position: absolute !important;
-            top: 48% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
+            position: relative !important;
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
             z-index: 10 !important;
             width: 100% !important;
             pointer-events: none !important;
@@ -781,6 +813,7 @@
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
+            margin-bottom: 16px !important;
         }
 
         .orbital-center-core #logo-it {
@@ -807,12 +840,12 @@
         .orbital-arc-container {
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
             align-items: center !important;
-            height: 100% !important;
+            height: auto !important;
             width: 100% !important;
             max-width: 100% !important;
-            padding: 6px 2px !important;
+            padding: 0 4px !important;
+            gap: 12px !important;
             z-index: 15 !important;
             position: relative !important;
             box-sizing: border-box !important;
@@ -822,22 +855,32 @@
             width: 100% !important;
             height: auto !important;
             flex-direction: row !important;
-            justify-content: space-around !important;
             align-items: center !important;
-            flex-wrap: nowrap !important;
-            padding: 0 4px !important;
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+            padding: 0 !important;
             margin: 0 !important;
         }
 
+        .orbital-col-header {
+            display: none !important;
+        }
+
         .orbital-col.orbital-left {
+            display: flex !important;
+            grid-template-columns: none !important;
+            max-width: 100% !important;
             align-items: center !important;
-            margin-top: 18px !important;
-            margin-bottom: 10px !important;
+            margin: 0 !important;
         }
 
         .orbital-col.orbital-right {
+            display: flex !important;
+            grid-template-columns: none !important;
+            max-width: 100% !important;
             align-items: center !important;
-            margin-bottom: 12px !important;
+            margin: 0 !important;
         }
 
         .cube-3d-scene {
@@ -960,14 +1003,50 @@
         </div>
     </div>
 
-    <!-- ══ FLOATING 85px 3D CUBES WITH DYNAMIC MOUSE CURSOR LOOK-AT ══ -->
+    <!-- ══ TWO-COLUMN DASHBOARD: GENERAL (LEFT) + SERVICES (RIGHT) ══ -->
     <div class="orbital-arc-container">
 
-        <!-- ◀ LEFT ORBITAL FLANK -->
+        <!-- ◀ LEFT COLUMN: GENERAL LINKS -->
         <div class="orbital-col orbital-left">
 
-            <!-- 3D Cube Node 1: Pay Due Amount -->
-            <button class="orbital-node" data-node="1" data-toggle="modal" data-target="#payDueModal">
+            <div class="orbital-col-header">{{ __('dashboard.general_links') }}</div>
+
+            <!-- Cube 1: Wallet Balance -->
+            <a href="{{ url('/financial') }}" class="orbital-node" data-node="1">
+                <div class="cube-3d-scene cube-theme-emerald">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.wallet') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 2: Add Balance -->
+            <a href="{{ url('/financial/add-balance') }}" class="orbital-node" data-node="2">
+                <div class="cube-3d-scene cube-theme-emerald">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.add_balance') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 3: Pay Due Amount -->
+            <button class="orbital-node" data-node="3" data-toggle="modal" data-target="#payDueModal">
                 <div class="cube-3d-scene cube-theme-red">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
@@ -986,81 +1065,8 @@
                 </div>
             </button>
 
-            <!-- 3D Cube Node 2: Add Balance -->
-            <a href="{{ url('/financial/add-balance') }}" class="orbital-node" data-node="2">
-                <div class="cube-3d-scene cube-theme-emerald">
-                    <div class="cube-3d">
-                        <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                            <span class="cube-inner-label">{{ __('dashboard.add_balance') }}</span>
-                        </div>
-                        <div class="cube-face cube-face-back"></div>
-                        <div class="cube-face cube-face-right"></div>
-                        <div class="cube-face cube-face-left"></div>
-                        <div class="cube-face cube-face-top"></div>
-                        <div class="cube-face cube-face-bottom"></div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 3D Cube Node 3: ERP System -->
-            <a href="{{ url('/sso/erp') }}" class="orbital-node" data-node="3">
-                <div class="cube-3d-scene cube-theme-cyan">
-                    <div class="cube-3d">
-                        <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-                            <span class="cube-inner-label">{{ __('dashboard.erp_system') }}</span>
-                        </div>
-                        <div class="cube-face cube-face-back"></div>
-                        <div class="cube-face cube-face-right"></div>
-                        <div class="cube-face cube-face-left"></div>
-                        <div class="cube-face cube-face-top"></div>
-                        <div class="cube-face cube-face-bottom"></div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 3D Cube Node 4: CRM System -->
-            <a href="{{ url('/sso/crm') }}" class="orbital-node" data-node="4">
-                <div class="cube-3d-scene cube-theme-pink">
-                    <div class="cube-3d">
-                        <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                            <span class="cube-inner-label">{{ __('dashboard.crm_system') }}</span>
-                        </div>
-                        <div class="cube-face cube-face-back"></div>
-                        <div class="cube-face cube-face-right"></div>
-                        <div class="cube-face cube-face-left"></div>
-                        <div class="cube-face cube-face-top"></div>
-                        <div class="cube-face cube-face-bottom"></div>
-                    </div>
-                </div>
-            </a>
-
-        </div>
-
-        <!-- ▶ RIGHT ORBITAL FLANK -->
-        <div class="orbital-col orbital-right">
-
-            <!-- 3D Cube Node 5: Store -->
-            <a href="{{ url('/marketplace/services') }}" class="orbital-node" data-node="5">
-                <div class="cube-3d-scene cube-theme-amber">
-                    <div class="cube-3d">
-                        <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                            <span class="cube-inner-label">{{ __('dashboard.browse_marketplace') }}</span>
-                        </div>
-                        <div class="cube-face cube-face-back"></div>
-                        <div class="cube-face cube-face-right"></div>
-                        <div class="cube-face cube-face-left"></div>
-                        <div class="cube-face cube-face-top"></div>
-                        <div class="cube-face cube-face-bottom"></div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 3D Cube Node 6: My Projects -->
-            <a href="{{ url('/projects') }}" class="orbital-node" data-node="6">
+            <!-- Cube 4: My Projects -->
+            <a href="{{ url('/projects') }}" class="orbital-node" data-node="4">
                 <div class="cube-3d-scene cube-theme-pink">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
@@ -1076,8 +1082,83 @@
                 </div>
             </a>
 
-            <!-- 3D Cube Node 7: SMS Gateway -->
-            <a href="{{ url('/sms-payment-gateway') }}" class="orbital-node" data-node="7">
+        </div>
+
+        <!-- ▶ RIGHT COLUMN: SERVICES -->
+        <div class="orbital-col orbital-right">
+
+            <div class="orbital-col-header">{{ __('dashboard.services') }}</div>
+
+            <!-- Cube 5: Contracts -->
+            <a href="{{ url('/isaas/contracts') }}" class="orbital-node" data-node="5">
+                <div class="cube-3d-scene cube-theme-cyan">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M14.752 11.108a3.5 3.5 0 1 1-6.944 0L6.5 17.5h11l-.748-6.392z"/><path d="M12 2v4m0 0L9 9m3-3l3 3"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.contracts') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 6: ERP -->
+            <a href="{{ url('/sso/erp') }}" class="orbital-node" data-node="6">
+                <div class="cube-3d-scene cube-theme-cyan">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.erp_system') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 7: CRM -->
+            <a href="{{ url('/sso/crm') }}" class="orbital-node" data-node="7">
+                <div class="cube-3d-scene cube-theme-pink">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.crm_system') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 8: Gold Saver System -->
+            <a href="{{ url('/sso/goldsaversys') }}" class="orbital-node" data-node="8">
+                <div class="cube-3d-scene cube-theme-gold">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.gold_saver_sys') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 9: SMS Payment Gateway -->
+            <a href="{{ url('/sms-payment-gateway') }}" class="orbital-node" data-node="9">
                 <div class="cube-3d-scene cube-theme-amber">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
@@ -1093,13 +1174,64 @@
                 </div>
             </a>
 
-            <!-- 3D Cube Node 8: Gold Saver System -->
-            <a href="{{ url('/sso/goldsaversys') }}" class="orbital-node" data-node="8">
-                <div class="cube-3d-scene cube-theme-gold">
+            <!-- Cube 10: Runtime Agent Tools -->
+            <a href="{{ url('/sso/toolsys') }}" class="orbital-node" data-node="10">
+                <div class="cube-3d-scene cube-theme-cyan">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            <span class="cube-inner-label">{{ __('dashboard.gold_saver_sys') }}</span>
+                            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/><circle cx="12" cy="8" r="2"/><path d="M12 14v6"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.runtime_tools') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 11: WhatsApp Sender -->
+            <a href="{{ url('/whatsapp-sender') }}" class="orbital-node" data-node="11">
+                <div class="cube-3d-scene cube-theme-emerald">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-.37 15.43L7.5 16c-.38-.22-.64-.55-.75-.96-.03-.1-.05-.21-.05-.31 0-.25.09-.48.27-.66.18-.18.42-.27.67-.27.19 0 .38.08.53.21.15.13.36.36.47.56.12.21.3.42.3.64v.76c0 .22-.02.44-.02.66 0 .18.01.37.03.55.02.18.06.36.13.52.08.19.21.36.36.48.17.14.38.23.59.29.21.07.43.09.65.07.22-.02.44-.12.57-.32.13-.19.19-.43.19-.67v-.76c0-.22-.03-.44-.08-.66-.05-.21-.13-.42-.22-.61-.09-.19-.23-.36-.38-.47-.15-.11-.33-.19-.52-.23-.18-.04-.37-.06-.56-.04-.18.02-.36.08-.51.19-.15.11-.28.25-.37.41-.08.15-.12.32-.12.5 0 .18.03.37.07.55.04.18.1.36.19.52.08.15.18.29.3.4.12.12.26.2.41.25.15.05.31.07.47.05.16-.02.32-.1.42-.24.11-.13.17-.3.18-.47.01-.16-.02-.32-.06-.48-.03-.15-.08-.3-.13-.44-.05-.15-.11-.29-.18-.42-.07-.12-.15-.23-.24-.33-.08-.1-.19-.18-.29-.25-.1-.07-.21-.11-.33-.13-.11-.02-.23 0-.33.06-.1.06-.2.15-.27.27-.08.11-.16.22-.22.33-.07.12-.13.25-.17.38-.04.13-.06.26-.06.39 0 .13.02.27.06.4.03.13.08.27.14.4.06.11.13.22.2.33.08.1.17.19.27.27.1.08.21.15.31.2.11.06.22.11.32.15.11.04.23.07.34.09.11.02.22 0 .33-.02.11-.02.22-.04.33-.06.11-.02.22-0.03.33-0.03zm2.57 4.47c-.06.13-.12.25-.24.35-.11.09-.25.18-.39.22-.13.04-.27.06-.41.03-.14-.03-.28-.12-.39-.25-.11-.13-.18-.3-.23-.47-.04-.15-.06-.3-.06-.47 0-.17.02-.33.06-.5.04-.16.1-.32.18-.47.08-.15.2-.28.32-.38.12-.1.27-.18.42-.21.15-.03.3-.04.45-.02.15.02.3.09.41.19.11.1.2.23.27.37.07.14.11.3.13.45.02.16.02.32 0 .47z"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.whatsapp') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 12: FB Lookup -->
+            <a href="{{ url('/fbmb') }}" class="orbital-node" data-node="12">
+                <div class="cube-3d-scene cube-theme-pink">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.fb_lookup') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cube 13: Marketplace / Store -->
+            <a href="{{ url('/marketplace/services') }}" class="orbital-node" data-node="13">
+                <div class="cube-3d-scene cube-theme-amber">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                            <span class="cube-inner-label">{{ __('dashboard.browse_marketplace') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
                         <div class="cube-face cube-face-right"></div>

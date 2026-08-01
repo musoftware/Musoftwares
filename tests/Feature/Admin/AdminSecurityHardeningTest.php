@@ -171,6 +171,36 @@ class AdminSecurityHardeningTest extends TestCase
         ])->assertStatus(409);
     }
 
+    public function test_broadcast_global_dispatches_campaign_job_with_matching_token(): void
+    {
+        \Illuminate\Support\Facades\Queue::fake();
+
+        $first = $this->actingAs($this->admin)->postJson('/admin/notifications/broadcast/send', [
+            'title' => 'Valid Title',
+            'body' => 'Valid body',
+            'audience_type' => 'global',
+        ]);
+        $token = $first->json('confirm_token');
+
+        $response = $this->actingAs($this->admin)->postJson('/admin/notifications/broadcast/send', [
+            'title' => 'Valid Title',
+            'body' => 'Valid body',
+            'audience_type' => 'global',
+            'confirm_token' => $token,
+        ]);
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('notification_campaigns', [
+            'title' => 'Valid Title',
+            'body' => 'Valid body',
+            'status' => 'sending',
+            'audience_type' => 'global',
+        ]);
+
+        \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\SendCampaignBroadcastJob::class);
+    }
+
     // ── serial device HMAC ─────────────────────────────────────────────────
 
     public function test_serial_device_rejects_unsigned_request(): void

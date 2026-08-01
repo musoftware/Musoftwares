@@ -55,6 +55,12 @@ return [
     'messages'           => 'الرسائل',
     'notifications_btn'  => 'الإشعارات',
     'all_apps_dir'       => 'دليل جميع التطبيقات والأدوات',
+    'isaas'              => 'ما منصات برمجيات',
+    'runtime_tools'      => 'أدوات التشغيل',
+    'general_links'      => 'الروابط العامة',
+    'services'           => 'منصات iSaaS والمتجر',
+    'whatsapp'           => 'الواتساب',
+    'fb_lookup'          => 'بحث فيسبوك',
 
     // ── Wallet Capsule ──────────────────────────────────────
     'wallet'             => 'المحفظة',

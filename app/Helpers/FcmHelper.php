@@ -31,14 +31,10 @@ class FcmHelper
         $message = self::buildMessage($data, $webPushLink, withOrderId: true);
 
         try {
-            if (count($tokens) === 1) {
-                self::messaging()->send($message->withTarget('token', $tokens[0]));
-            } else {
-                self::messaging()->sendMulticast($message, $tokens);
-            }
+            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->toArray());
 
             return true;
-        } catch (MessagingException) {
+        } catch (\Throwable) {
             return false;
         }
     }
@@ -58,10 +54,10 @@ class FcmHelper
             ->withTopic($topic);
 
         try {
-            self::messaging()->send($message);
+            \App\Jobs\SendFcmNotificationJob::dispatch([], $message->toArray());
 
             return true;
-        } catch (MessagingException) {
+        } catch (\Throwable) {
             return false;
         }
     }

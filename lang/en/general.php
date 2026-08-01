@@ -7963,4 +7963,13 @@ return [
     'customer_or_username' => 'Customer / Username',
     'item_title' => 'Item Title',
     'project_name' => 'Project Name',
+    'dso_time_remaining' => 'DSO Time Remaining',
+    'oldest_invoice' => 'Oldest Unpaid Invoice',
+    'dso_suspended' => 'DSO Limit Exceeded (Serials Automatically Suspended)',
+    'dso_limit_warning_1' => 'Warning: 2 days left before automatic suspension',
+    'dso_limit_warning_2' => 'Urgent: 1 day left before automatic suspension',
+    'dso_safe' => 'DSO Status: Safe',
+    'dso_deadline' => 'Deactivation Deadline',
+    'dso_days' => 'Days',
+    'dso_system_disabled' => 'DSO System is disabled',
 ];

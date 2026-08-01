@@ -55,6 +55,12 @@ return [
     'messages'           => 'Messages',
     'notifications_btn'  => 'Notifications',
     'all_apps_dir'       => 'All Apps & Tools Directory',
+    'isaas'              => 'iSAAS',
+    'runtime_tools'      => 'Runtime Tools',
+    'general_links'      => 'General Links',
+    'services'           => 'iSaaS & Marketplace',
+    'whatsapp'           => 'WhatsApp',
+    'fb_lookup'          => 'FB Lookup',
 
     // ── Wallet Capsule ──────────────────────────────────────
     'wallet'             => 'Wallet',

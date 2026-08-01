@@ -81,7 +81,16 @@ class FcmNotificationsTest extends TestCase
                 'date_end' => '2026-07-23 11:30:00',
                 'amount' => 150.00,
                 'currency_id' => 1,
-                'invoiceItem' => (object) ['item_title' => 'Consulting Session', 'invoice_id' => 10],
+                'invoiceItem' => (object) [
+                    'item_title' => 'Consulting Session',
+                    'invoice_id' => 10,
+                    'invoice' => (object) [
+                        'id' => 10,
+                        'user_id' => 99,
+                        'currency_id' => 1,
+                        'user' => (object) ['id' => 99, 'name' => 'Test Client'],
+                    ]
+                ],
             ])],
             'new_message' => [new \App\Notifications\NewMessageNotification(new \App\Models\Message([
                 'id' => 1,

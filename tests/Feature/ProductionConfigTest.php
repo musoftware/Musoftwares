@@ -17,8 +17,8 @@ class ProductionConfigTest extends TestCase
 
         $content = file_get_contents($path);
 
-        // Assert critical Redis drivers are correctly set
-        $this->assertStringContainsString('QUEUE_CONNECTION=redis', $content);
+        // Assert critical drivers are correctly set
+        $this->assertStringContainsString('QUEUE_CONNECTION=database', $content);
         $this->assertStringContainsString('SESSION_DRIVER=redis', $content);
 
         // Verify Mail configuration

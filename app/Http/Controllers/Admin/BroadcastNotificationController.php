@@ -127,62 +127,7 @@ class BroadcastNotificationController extends Controller
                 'audience_type' => $validated['audience_type'],
             ]);
 
-            $messaging = app('firebase.messaging');
-            $notification = Notification::create($validated['title'], $validated['body']);
-
-            if ($validated['audience_type'] === 'global') {
-                $notification = $notification->withImageUrl(route('track.campaign.view', ['id' => $campaign->id]));
-
-                $message = CloudMessage::new()
-                    ->withTopic('global')
-                    ->withNotification($notification);
-
-                $trackingUrl = route('track.campaign', ['id' => $campaign->id]);
-                if (! empty($validated['url'])) {
-                    $trackingUrl .= '?redirect='.urlencode($validated['url']);
-                }
-
-                $message = $this->configureMessageData($message, $trackingUrl);
-                $messaging->send($message);
-            } else {
-                // Personal targeting
-                $query = User::query();
-
-                if ($validated['personal_target'] === 'roles') {
-                    $query->role($validated['roles']);
-                } elseif ($validated['personal_target'] === 'specific') {
-                    $query->whereIn('id', $validated['user_ids']);
-                }
-
-                // Chunking to handle large datasets
-                $query->chunk(500, function ($users) use ($messaging, $notification, $campaign, $validated) {
-                    $messages = [];
-
-                    foreach ($users as $user) {
-                        if ($user->fcm_token) {
-                            $viewUrl = route('track.campaign.view', ['id' => $campaign->id, 'user_id' => $user->id]);
-                            $personalNotification = $notification->withImageUrl($viewUrl);
-
-                            $trackingUrl = route('track.campaign', ['id' => $campaign->id, 'user_id' => $user->id]);
-                            if (! empty($validated['url'])) {
-                                $trackingUrl .= '&redirect='.urlencode($validated['url']);
-                            }
-
-                            $message = CloudMessage::new()
-                                ->withTarget('token', $user->fcm_token)
-                                ->withNotification($personalNotification);
-
-                            $messages[] = $this->configureMessageData($message, $trackingUrl);
-                        }
-                    }
-
-                    if (! empty($messages)) {
-                        $messaging->sendAll($messages);
-                    }
-                });
-            }
-
-            $campaign->update(['status' => 'completed']);
+            \App\Jobs\SendCampaignBroadcastJob::dispatch($campaign, $validated);
 
             return back()->with('success', __('admin.notification_sent_successfully'));
 

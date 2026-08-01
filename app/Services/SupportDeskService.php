@@ -163,7 +163,6 @@ class SupportDeskService extends BaseService
             Notification::send($admins, new NewGuestTicketNotification($ticket));
 
             try {
-                $messaging = app('firebase.messaging');
                 $notification = \Kreait\Firebase\Messaging\Notification::create(
                     'طلب خدمة حصرية جديد',
                     'طلب جديد من '.$data['name']
@@ -177,7 +176,7 @@ class SupportDeskService extends BaseService
                             'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                             'url' => route('admin.tickets.show', $ticket->id),
                         ]);
-                    $messaging->sendMulticast($messageObj, $tokens);
+                    \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $messageObj->toArray());
                 }
             } catch (\Exception $e) {
                 Log::error('Firebase Notification Failed: '.$e->getMessage());

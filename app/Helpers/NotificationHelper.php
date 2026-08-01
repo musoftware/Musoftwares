@@ -107,8 +107,6 @@ class NotificationHelper
             return false;
         }
 
-        $messaging = $this->messaging();
-
         $message = $notification->toFcm($user);
 
         if ($link !== null && $link !== '') {
@@ -116,10 +114,10 @@ class NotificationHelper
         }
 
         try {
-            $messaging->sendMulticast($message, $tokens);
+            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->toArray());
 
             return true;
-        } catch (MessagingException) {
+        } catch (\Throwable) {
             return false;
         }
     }
@@ -180,10 +178,10 @@ class NotificationHelper
         ]);
 
         try {
-            $report = $this->messaging()->sendMulticast($message, $tokens);
+            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->toArray());
 
-            return $report instanceof MulticastSendReport;
-        } catch (MessagingException) {
+            return true;
+        } catch (\Throwable) {
             return false;
         }
     }
