@@ -318,7 +318,7 @@
                         </div>
                         <div class="d-none d-md-flex flex-column user-text pr-1 text-left font-weight-bold">
                             <div class="username text-capitalize" style="font-size: 11px; color: #f3e8ff; line-height: 1.2;">{{ Auth::user()->name ?? 'User' }}</div>
-                            <div class="user-level text-uppercase" style="font-size: 8px; color: #ff7c20; letter-spacing: 1px;">{{ Auth::user()->role ?? 'Client' }}</div>
+                            <div class="user-level text-uppercase" style="font-size: 8px; color: #ff7c20; letter-spacing: 1px;">{{ Auth::user()->getRoleNames()->first() ? ucfirst(str_replace('_', ' ', Auth::user()->getRoleNames()->first())) : (Auth::user()->role ?? 'Client') }}</div>
                         </div>
                     </div>
                     
@@ -1136,7 +1136,7 @@
 
         <div class="orbital-identity">
             <div class="c-name">{{ Auth::user()->name ?? 'User' }}</div>
-            <div class="c-role">{{ Auth::user()->role ?? 'Client' }}</div>
+            <div class="c-role">{{ Auth::user()->getRoleNames()->first() ? ucfirst(str_replace('_', ' ', Auth::user()->getRoleNames()->first())) : (Auth::user()->role ?? 'Client') }}</div>
         </div>
 
         <!-- Curved Digital Gauges (Speedometer Style) -->
@@ -1470,7 +1470,9 @@
                 <div class="cube-3d-scene cube-theme-pink">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">
-                            <i data-lucide="facebook"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-custom-fb">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
                             <span class="cube-inner-label">{{ __('dashboard.fb_lookup') }}</span>
                         </div>
                         <div class="cube-face cube-face-back"></div>
