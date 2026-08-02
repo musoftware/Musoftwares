@@ -124,7 +124,7 @@ PROMPT;
             return null;
         }
 
-        $model = AdminSettings::GetValue('openai_model') ?: 'gpt-4o';
+        $model = AdminSettings::GetValue('openai_model') ?: 'gpt-4o-mini';
 
         try {
             $response = Http::timeout(45)

@@ -55,33 +55,41 @@ $(window).on('load', function () {
     }
 
     $('.preloader-wrapper .preloader .loading-Recovered').fadeOut(300, function () {
-        $(".audio-test").fadeIn();
-        if ((getSafeSession('audio') === 'true') || (getSafeSession('audio') === 'false')) {
-            $(".audio-test button").parent().parent().hide();
-            if ((getSafeSession('audio') === 'true')) {
+        if ($(".audio-test").length > 0) {
+            $(".audio-test").fadeIn();
+            if ((getSafeSession('audio') === 'true') || (getSafeSession('audio') === 'false')) {
+                $(".audio-test button").parent().parent().hide();
+                if ((getSafeSession('audio') === 'true')) {
+                    type('yes');
+                } else {
+                    type();
+                }
+            }
+
+            $(".audio-test button").click(function () {
+                $(this).parent().parent().hide();
+
+                // Save 30-day skip preference if checkbox checked
+                if ($('#dontShowWelcome30Days').is(':checked')) {
+                    var thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+                    setSafeLocal('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
+                }
+
+                if ($(this).hasClass('yes')) {
+                    type('yes');
+                    setSafeSession('audio', 'true');
+                } else {
+                    type();
+                    setSafeSession('audio', 'false');
+                }
+            });
+        } else {
+            if (getSafeSession('audio') === 'true') {
                 type('yes');
             } else {
                 type();
             }
         }
-
-        $(".audio-test button").click(function () {
-            $(this).parent().parent().hide();
-
-            // Save 30-day skip preference if checkbox checked
-            if ($('#dontShowWelcome30Days').is(':checked')) {
-                var thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-                setSafeLocal('v8_skip_welcome_until', Date.now() + thirtyDaysMs);
-            }
-
-            if ($(this).hasClass('yes')) {
-                type('yes');
-                setSafeSession('audio', 'true');
-            } else {
-                type();
-                setSafeSession('audio', 'false');
-            }
-        });
     });
 });
 

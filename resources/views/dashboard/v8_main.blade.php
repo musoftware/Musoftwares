@@ -183,19 +183,6 @@
         Skip Intro &#9889;
     </button>
     <div class="preloader">
-        <div class="audio-test text-light hidden">
-            <h3>Play site with sound effects?</h3>
-            <div class="buttons mt-4 text-center">
-                <button class="btn btn-primary btn-sm mr-4 yes">Yes</button>
-                <button class="btn btn-danger btn-sm no">No</button>
-            </div>
-            <div class="mt-4 text-center">
-                <label class="pointer text-light" style="font-size: 11px; cursor: pointer; user-select: none; color: #a0aec0 !important;">
-                    <input type="checkbox" id="dontShowWelcome30Days" style="cursor: pointer; vertical-align: middle;" class="mr-1">
-                    Don't show welcome intro for 30 days
-                </label>
-            </div>
-        </div>
         <div class="loading-Recovered"></div>
         <div class="intro text-light"></div>
         <div class="welcome-wrap">

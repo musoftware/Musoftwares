@@ -30,11 +30,12 @@ class WhatsappSenderController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
+        $scope = $request->input('scope', 'my');
 
         $query = WhatsappBusiness::withCount('accounts')
             ->orderBy('created_at', 'asc');
 
-        if (!$user->isAdmin()) {
+        if (!$user->isAdmin() || $scope === 'my') {
             $query->where('user_id', $user->id);
         }
 
@@ -49,9 +50,8 @@ class WhatsappSenderController extends Controller
             });
         }
 
-        $businesses = $query->get();
-
-        if ($businesses->isEmpty() && !$user->isAdmin()) {
+        $userHasBusiness = WhatsappBusiness::where('user_id', $user->id)->exists();
+        if (!$userHasBusiness) {
             $defaultBiz = WhatsappBusiness::create([
                 'user_id' => $user->id,
                 'name' => 'Default Business Client',
@@ -73,9 +73,9 @@ class WhatsappSenderController extends Controller
                 'balance_after' => 10.0000,
                 'description' => 'Welcome initial balance credit ($10.00 USD)',
             ]);
-
-            $businesses = collect([$defaultBiz]);
         }
+
+        $businesses = $query->get();
 
         // Get or create API token for the user
         $apiToken = $user->tokens()->where('name', 'whatsapp-sender-api')->first()?->token
@@ -84,7 +84,10 @@ class WhatsappSenderController extends Controller
         return Inertia::render('WhatsappSender/Index', [
             'businesses' => $businesses,
             'apiToken' => $apiToken,
-            'filters' => $request->only('search'),
+            'filters' => [
+                'search' => $request->input('search', ''),
+                'scope' => $scope,
+            ],
             'isAdmin' => $user->isAdmin(),
         ]);
     }
@@ -194,7 +197,7 @@ class WhatsappSenderController extends Controller
 
         \App\Models\AdminSettings::SetValue('whatsapp_webhook_verify_token', trim($validated['webhook_verify_token']));
 
-        return redirect()->route('whatsapp.index')->with('success', __('general.webhook_settings_saved_successfully') ?? 'Webhook verify token updated successfully!');
+        return redirect()->back()->with('success', __('general.webhook_settings_saved_successfully') ?? 'Webhook verify token updated successfully!');
     }
 
     /**
@@ -243,7 +246,7 @@ class WhatsappSenderController extends Controller
             ]
         );
 
-        return redirect()->route('whatsapp.index')->with('success', __('whatsapp-sender::messages.account_saved_successfully') ?? 'Account credentials saved successfully.');
+        return redirect()->back()->with('success', __('whatsapp-sender::messages.account_saved_successfully') ?? 'Account credentials saved successfully.');
     }
 
     /**
@@ -254,10 +257,12 @@ class WhatsappSenderController extends Controller
         $validated = $request->validate([
             'whatsapp_account_id' => ['required', 'exists:whatsapp_accounts,id'],
             'recipient_phone' => ['required', 'string', 'max:50'],
-            'message_body' => ['required', 'string', 'max:4096'],
+            'message_body' => ['nullable', 'required_unless:message_type,template', 'string', 'max:4096'],
             'message_type' => ['nullable', 'string', 'in:text,template'],
             'template_name' => ['nullable', 'string'],
             'template_language' => ['nullable', 'string'],
+            'template_components' => ['nullable', 'array'],
+            'template_parameters' => ['nullable'],
         ]);
 
         $account = WhatsappAccount::where('user_id', $request->user()->id)
@@ -270,21 +275,59 @@ class WhatsappSenderController extends Controller
                 'name' => $validated['template_name'] ?? 'hello_world',
                 'language' => $validated['template_language'] ?? 'en_US',
             ];
+
+            if (!empty($validated['template_components'])) {
+                $templateData['components'] = $validated['template_components'];
+            } elseif (!empty($validated['template_parameters'])) {
+                $params = is_string($validated['template_parameters'])
+                    ? (json_decode($validated['template_parameters'], true) ?? explode(',', $validated['template_parameters']))
+                    : (array) $validated['template_parameters'];
+
+                $templateData['components'] = [
+                    [
+                        'type' => 'body',
+                        'parameters' => array_map(fn($v) => ['type' => 'text', 'text' => trim((string) $v)], array_values($params)),
+                    ],
+                ];
+            }
+        }
+
+        $messageBody = $validated['message_body'] ?? '';
+        if (($validated['message_type'] ?? 'text') === 'template' && empty($messageBody)) {
+            $messageBody = $validated['template_name'] ?? 'Template Message';
         }
 
         $result = $this->whatsappService->sendMessage(
             $account,
             $validated['recipient_phone'],
-            $validated['message_body'],
+            $messageBody,
             $validated['message_type'] ?? 'text',
             $templateData
         );
 
         if ($result['success']) {
-            return redirect()->route('whatsapp.index')->with('success', "Message sent successfully! (Charged \${$result['cost_charged']} USD platform fee)");
+            return redirect()->back()
+                ->with('success', "Message sent successfully! (Charged \${$result['cost_charged']} USD platform fee)")
+                ->with('meta_response', $result['response'] ?? [
+                    'messaging_product' => 'whatsapp',
+                    'contacts' => [
+                        ['input' => $validated['recipient_phone'], 'wa_id' => preg_replace('/[^0-9]/', '', $validated['recipient_phone'])],
+                    ],
+                    'messages' => [
+                        ['id' => $result['meta_message_id'] ?? 'wamid.sandbox.demo'],
+                    ],
+                ]);
         }
 
-        return redirect()->route('whatsapp.index')->with('error', $result['error'] ?? __('whatsapp-sender::messages.message_failed'));
+        return redirect()->back()
+            ->with('error', $result['error'] ?? __('whatsapp-sender::messages.message_failed'))
+            ->with('meta_response', $result['response'] ?? [
+                'error' => [
+                    'message' => $result['error'] ?? 'Message delivery failed',
+                    'type' => 'MetaGraphApiException',
+                    'code' => 400,
+                ],
+            ]);
     }
 
     /**
@@ -298,7 +341,7 @@ class WhatsappSenderController extends Controller
 
         $account->delete();
 
-        return redirect()->route('whatsapp.index')->with('success', __('whatsapp-sender::messages.account_deleted_successfully') ?? 'Account disconnected successfully.');
+        return redirect()->back()->with('success', __('whatsapp-sender::messages.account_deleted_successfully') ?? 'Account disconnected successfully.');
     }
 
     /**
@@ -337,10 +380,10 @@ class WhatsappSenderController extends Controller
         $result = $this->whatsappService->registerPhoneNumber($account, $validated['pin']);
 
         if ($result['success']) {
-            return redirect()->route('whatsapp.index')->with('success', $result['message'] ?? 'Phone number registered and activated on Meta Cloud API successfully!');
+            return redirect()->back()->with('success', $result['message'] ?? 'Phone number registered and activated on Meta Cloud API successfully!');
         }
 
-        return redirect()->route('whatsapp.index')->with('error', $result['error'] ?? 'Failed to register phone number.');
+        return redirect()->back()->with('error', $result['error'] ?? 'Failed to register phone number.');
     }
 
     /**
@@ -370,10 +413,10 @@ class WhatsappSenderController extends Controller
             ]);
 
             $statusText = isset($metadata['status']) ? $metadata['status'] : 'active';
-            return redirect()->route('whatsapp.index')->with('success', "Account status synced successfully! Current Meta status: {$statusText}.");
+            return redirect()->back()->with('success', "Account status synced successfully! Current Meta status: {$statusText}.");
         }
 
-        return redirect()->route('whatsapp.index')->with('error', $verification['error'] ?? 'Failed to sync account status from Meta.');
+        return redirect()->back()->with('error', $verification['error'] ?? 'Failed to sync account status from Meta.');
     }
 
     /**
@@ -385,7 +428,7 @@ class WhatsappSenderController extends Controller
             'whatsapp_account_id' => ['required', 'exists:whatsapp_accounts,id'],
             'whatsapp_contact_group_id' => ['required', 'exists:whatsapp_contact_groups,id'],
             'message_type' => ['required', 'string', 'in:text,template'],
-            'message_body' => ['required_if:message_type,text', 'nullable', 'string', 'max:4096'],
+            'message_body' => ['nullable', 'required_unless:message_type,template', 'string', 'max:4096'],
             'template_name' => ['required_if:message_type,template', 'nullable', 'string', 'max:255'],
             'template_language' => ['nullable', 'string', 'max:10'],
             'template_components' => ['nullable', 'array'],
@@ -411,7 +454,7 @@ class WhatsappSenderController extends Controller
             $validated['template_components'] ?? null
         );
 
-        return redirect()->route('whatsapp.index')->with('success', 'Bulk campaign sending job has been dispatched to the queue.');
+        return redirect()->back()->with('success', 'Bulk campaign sending job has been dispatched to the queue.');
     }
 
     /**

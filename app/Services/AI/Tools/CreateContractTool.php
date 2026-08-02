@@ -67,24 +67,40 @@ class CreateContractTool implements AiToolInterface
 
         $depositAmount = round($amountInUserCurrency * 0.50, 2);
 
-        $contract = Contract::create([
-            'uuid'                => (string) Str::uuid(),
-            'project_id'          => $project->id,
-            'user_id'             => $project->user_id,
-            'project_name'        => $project->project_name,
-            'project_description' => $desc,
-            'reference'           => 'CNT-' . strtoupper(Str::random(8)),
-            'prepared_by'         => 'AI Project Manager',
-            'total_amount'        => $amountInUserCurrency,
-            'deposit_amount'      => $depositAmount,
-            'deposit_paid'        => false,
-            'currency_id'         => $userCurr,
-            'status'              => 'sent',
-            'features'            => $features,
-            'description'         => $desc,
-            'payment_terms'       => '50% upfront deposit required upon contract signature, 50% upon final delivery.',
-            'terms'               => 'Standard software agency terms and conditions apply. All IP transferred upon full payment.',
-        ]);
+        $contract = Contract::where('project_id', $project->id)
+            ->where('deposit_paid', false)
+            ->first();
+
+        if ($contract) {
+            $contract->update([
+                'total_amount'        => $amountInUserCurrency,
+                'deposit_amount'      => $depositAmount,
+                'project_description' => $desc,
+                'features'            => $features,
+                'description'         => $desc,
+            ]);
+        } else {
+            $contract = Contract::create([
+                'uuid'                => (string) Str::uuid(),
+                'project_id'          => $project->id,
+                'user_id'             => $project->user_id,
+                'project_name'        => $project->project_name,
+                'project_description' => $desc,
+                'reference'           => 'CNT-' . strtoupper(Str::random(8)),
+                'prepared_by'         => 'AI Project Manager',
+                'total_amount'        => $amountInUserCurrency,
+                'deposit_amount'      => $depositAmount,
+                'deposit_paid'        => false,
+                'currency_id'         => $userCurr,
+                'status'              => 'sent',
+                'features'            => $features,
+                'description'         => $desc,
+                'payment_terms'       => '50% upfront deposit required upon contract signature, 50% upon final delivery.',
+                'terms'               => 'Standard software agency terms and conditions apply. All IP transferred upon full payment.',
+            ]);
+        }
+
+        $project->update(['budget' => $amountInUserCurrency]);
 
         $contractUrl = url('/c/' . $contract->uuid);
 
@@ -92,6 +108,7 @@ class CreateContractTool implements AiToolInterface
             'current_contract_id'   => $contract->id,
             'current_contract_uuid' => $contract->uuid,
             'current_contract_url'  => $contractUrl,
+            'agreed_budget'         => $amountInUserCurrency,
             'current_stage'         => 'PROPOSAL',
         ]);
 

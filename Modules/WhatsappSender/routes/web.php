@@ -36,6 +36,7 @@ Route::middleware(['auth'])
         Route::put('/businesses/{id}', [WhatsappBusinessController::class, 'updateBusiness'])->name('businesses.update');
         Route::post('/businesses/{id}/recharge', [WhatsappBusinessController::class, 'rechargeWallet'])->name('businesses.recharge');
         Route::post('/businesses/{id}/webhook-token', [WhatsappBusinessController::class, 'updateWebhookToken'])->name('businesses.webhook-token');
+        Route::post('/businesses/{id}/toggle-test-mode', [WhatsappBusinessController::class, 'toggleTestMode'])->name('businesses.toggle-test-mode');
         Route::delete('/businesses/{id}', [WhatsappBusinessController::class, 'destroyBusiness'])->name('businesses.destroy');
 
         // Facebook Login OAuth routes

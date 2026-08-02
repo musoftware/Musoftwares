@@ -91,7 +91,7 @@ class WhatsappBusinessController extends Controller
             }
         });
 
-        return redirect()->route('whatsapp.index')->with('success', 'Business profile created successfully.');
+        return redirect()->back()->with('success', 'Business profile created successfully.');
     }
 
     /**
@@ -140,7 +140,7 @@ class WhatsappBusinessController extends Controller
 
         $business->update($updateData);
 
-        return redirect()->route('whatsapp.index')->with('success', 'Business profile updated successfully.');
+        return redirect()->back()->with('success', 'Business profile updated successfully.');
     }
 
     /**
@@ -192,7 +192,7 @@ class WhatsappBusinessController extends Controller
             ]);
         });
 
-        return redirect()->route('whatsapp.index')->with('success', "Wallet balance recharged by \${$amount} USD successfully.");
+        return redirect()->back()->with('success', "Wallet balance recharged by \${$amount} USD successfully.");
     }
 
     /**
@@ -215,7 +215,7 @@ class WhatsappBusinessController extends Controller
             'webhook_verify_token' => trim($validated['webhook_verify_token']),
         ]);
 
-        return redirect()->route('whatsapp.index')->with('success', __('general.webhook_settings_saved_successfully') ?? 'Business Webhook verify token updated successfully.');
+        return redirect()->back()->with('success', __('general.webhook_settings_saved_successfully') ?? 'Business Webhook verify token updated successfully.');
     }
 
     /**
@@ -233,5 +233,59 @@ class WhatsappBusinessController extends Controller
         $business->delete();
 
         return redirect()->route('whatsapp.index')->with('success', 'Business client profile deleted successfully.');
+    }
+
+    /**
+     * Toggle Stripe-like Test Mode (Sandbox) for a business workspace.
+     */
+    public function toggleTestMode(Request $request, int $id): RedirectResponse
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $newTestMode = !$business->is_test_mode;
+
+        $updateData = [
+            'is_test_mode' => $newTestMode,
+        ];
+
+        if ($newTestMode) {
+            $updateData['test_phone_number_id'] = $business->test_phone_number_id ?? config('services.facebook.test_phone_number_id', '114811102562039');
+            $updateData['test_waba_id'] = $business->test_waba_id ?? config('services.facebook.test_waba_id', '109283748291029');
+            $updateData['test_access_token'] = $business->test_access_token ?? config('services.facebook.test_access_token', 'EAAG_META_TEST_SANDBOX_TOKEN_DEMO');
+
+            // Auto-create Meta Sandbox Test Account if it doesn't exist for this business
+            $hasTestAccount = \Modules\WhatsappSender\Models\WhatsappAccount::where('whatsapp_business_id', $business->id)
+                ->where('phone_number_id', $updateData['test_phone_number_id'])
+                ->exists();
+
+            if (!$hasTestAccount) {
+                \Modules\WhatsappSender\Models\WhatsappAccount::create([
+                    'user_id' => $user->id,
+                    'whatsapp_business_id' => $business->id,
+                    'name' => 'Meta Sandbox Test Number (+1 555-0199)',
+                    'phone_number_id' => $updateData['test_phone_number_id'],
+                    'waba_id' => $updateData['test_waba_id'],
+                    'access_token' => $updateData['test_access_token'],
+                    'status' => 'active',
+                    'metadata' => [
+                        'is_sandbox' => true,
+                        'description' => 'Meta Official WhatsApp Test Phone Number for App Reviewers & Sandbox Testing',
+                    ],
+                ]);
+            }
+        }
+
+        $business->update($updateData);
+
+        $statusMsg = $newTestMode
+            ? 'Test Mode (Sandbox) enabled successfully! Meta Sandbox Test Account auto-loaded.'
+            : 'Live Mode enabled. Real WhatsApp Business Account active.';
+
+        return redirect()->back()->with('success', $statusMsg);
     }
 }

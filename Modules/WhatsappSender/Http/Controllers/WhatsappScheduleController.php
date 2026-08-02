@@ -28,7 +28,7 @@ class WhatsappScheduleController extends Controller
             'whatsapp_contact_group_id' => ['nullable', 'exists:whatsapp_contact_groups,id'],
             'recipient_phone' => ['nullable', 'string'],
             'message_type' => ['required', 'string', 'in:text,template'],
-            'message_body' => ['required_if:message_type,text', 'nullable', 'string', 'max:4096'],
+            'message_body' => ['nullable', 'required_unless:message_type,template', 'string', 'max:4096'],
             'template_name' => ['required_if:message_type,template', 'nullable', 'string', 'max:255'],
             'template_language' => ['nullable', 'string', 'max:10'],
             'template_components' => ['nullable', 'array'],

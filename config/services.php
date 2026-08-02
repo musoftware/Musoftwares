@@ -70,6 +70,9 @@ return [
         'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
         'redirect' => env('FACEBOOK_REDIRECT_URI', '/whatsapp-sender/auth/facebook/callback'),
+        'test_phone_number_id' => env('META_TEST_PHONE_NUMBER_ID', '114811102562039'),
+        'test_waba_id' => env('META_TEST_WABA_ID', '109283748291029'),
+        'test_access_token' => env('META_TEST_ACCESS_TOKEN', 'EAAG_META_TEST_SANDBOX_TOKEN_DEMO'),
     ],
 
     /*

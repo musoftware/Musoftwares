@@ -28,6 +28,10 @@ class WhatsappBusiness extends Model
         'webhook_verify_token',
         'facebook_client_id',
         'facebook_client_secret',
+        'is_test_mode',
+        'test_phone_number_id',
+        'test_waba_id',
+        'test_access_token',
         'uuid',
     ];
 
@@ -49,6 +53,7 @@ class WhatsappBusiness extends Model
         'wallet_balance' => 'decimal:4',
         'per_message_fee' => 'decimal:4',
         'bot_reply_fee' => 'decimal:4',
+        'is_test_mode' => 'boolean',
     ];
 
     public function user(): BelongsTo

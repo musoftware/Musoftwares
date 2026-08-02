@@ -191,7 +191,7 @@ export default function ProjectShow({
 
                 // Display Token Deduction Toast Notification
                 if (res.data.billed_amount && parseFloat(res.data.billed_amount) > 0) {
-                    toast.info(`خصم ${res.data.billed_amount} ${res.data.currency_symbol} (تكلفة الـ AI الحقيقية)`);
+                    toast.info(`تم خصم ${res.data.billed_amount} ${res.data.currency_symbol || 'EGP'} (تكلفة الـ AI الفعالية)`);
                 }
 
                 // Reload to fetch updated stage, context & discussions in background

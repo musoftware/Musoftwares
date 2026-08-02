@@ -24,6 +24,7 @@ interface Props {
     apiToken: string;
     filters: {
         search?: string;
+        scope?: string;
     };
     isAdmin: boolean;
 }
@@ -113,10 +114,17 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
         });
     };
 
+    const handleScopeChange = (newScope: 'my' | 'all') => {
+        router.get('/whatsapp-sender', { search, scope: newScope }, {
+            preserveState: true,
+            replace: true,
+        });
+    };
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
-        router.get('/whatsapp-sender', { search: value }, {
+        router.get('/whatsapp-sender', { search: value, scope: filters.scope || 'my' }, {
             preserveState: true,
             replace: true,
         });
@@ -186,15 +194,42 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
 
                 {/* Main Directory searchable table */}
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                    <div className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 px-4 py-3 rounded-2xl max-w-md">
-                        <span className="text-zinc-400">🔍</span>
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={handleSearchChange}
-                            placeholder="Search client name, email, mobile, whatsapp, company..."
-                            className="bg-transparent border-0 focus:ring-0 text-sm w-full p-0 text-zinc-700 dark:text-zinc-300"
-                        />
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 px-4 py-3 rounded-2xl max-w-md w-full">
+                            <span className="text-zinc-400">🔍</span>
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={handleSearchChange}
+                                placeholder="Search client name, email, mobile, whatsapp, company..."
+                                className="bg-transparent border-0 focus:ring-0 text-sm w-full p-0 text-zinc-700 dark:text-zinc-300"
+                            />
+                        </div>
+
+                        {isAdmin && (
+                            <div className="flex items-center bg-zinc-100 dark:bg-zinc-800/60 p-1.5 rounded-2xl text-xs font-semibold self-stretch sm:self-auto">
+                                <button
+                                    onClick={() => handleScopeChange('my')}
+                                    className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl transition ${
+                                        (filters.scope || 'my') === 'my'
+                                            ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-bold'
+                                            : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                    }`}
+                                >
+                                    حساباتي الخاصة (My Workspaces)
+                                </button>
+                                <button
+                                    onClick={() => handleScopeChange('all')}
+                                    className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl transition ${
+                                        filters.scope === 'all'
+                                            ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs font-bold'
+                                            : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                    }`}
+                                >
+                                    جميع حسابات النظام (All System)
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="overflow-x-auto">

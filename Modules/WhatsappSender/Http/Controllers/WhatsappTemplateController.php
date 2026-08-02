@@ -24,6 +24,18 @@ class WhatsappTemplateController extends Controller
     {
         $user = $request->user();
 
+        if ($request->has('name')) {
+            $name = (string) $request->input('name');
+            $slug = \Illuminate\Support\Str::slug($name, '_');
+            $slug = preg_replace('/[^a-z0-9_]/', '', strtolower($slug));
+            if (empty($slug)) {
+                $slug = 'template_' . time();
+            }
+            $request->merge([
+                'name' => $slug,
+            ]);
+        }
+
         $validated = $request->validate([
             'whatsapp_business_id' => ['required', 'exists:whatsapp_businesses,id'],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9_]+$/'], // Meta template names must be lowercase letters, numbers and underscores only
@@ -66,7 +78,7 @@ class WhatsappTemplateController extends Controller
                 'meta_template_id' => $result['id'] ?? null,
             ]);
 
-            return redirect()->route('whatsapp.index')->with('success', 'Template created and submitted to Facebook successfully.');
+            return redirect()->back()->with('success', 'Template created and submitted to Facebook successfully.');
         }
 
         // Clean up local record if Meta submission fails
@@ -94,13 +106,13 @@ class WhatsappTemplateController extends Controller
         if ($account) {
             $result = $this->whatsappService->deleteMetaTemplate($account, $template->name);
             if (!$result['success']) {
-                return redirect()->route('whatsapp.index')->with('error', 'Failed to delete template from Meta: ' . $result['error']);
+                return redirect()->back()->with('error', 'Failed to delete template from Meta: ' . $result['error']);
             }
         }
 
         $template->delete();
 
-        return redirect()->route('whatsapp.index')->with('success', 'Template deleted successfully.');
+        return redirect()->back()->with('success', 'Template deleted successfully.');
     }
 
     /**
@@ -117,15 +129,15 @@ class WhatsappTemplateController extends Controller
             ->first();
 
         if (!$account) {
-            return redirect()->route('whatsapp.index')->with('error', 'No active WhatsApp account connected to this business to sync templates.');
+            return redirect()->back()->with('error', 'No active WhatsApp account connected to this business to sync templates.');
         }
 
         $result = $this->whatsappService->syncMetaTemplates($account);
 
         if ($result['success']) {
-            return redirect()->route('whatsapp.index')->with('success', "Synchronized {$result['count']} templates from Meta successfully.");
+            return redirect()->back()->with('success', "Synchronized {$result['count']} templates from Meta successfully.");
         }
 
-        return redirect()->route('whatsapp.index')->with('error', 'Failed to sync templates from Meta: ' . $result['error']);
+        return redirect()->back()->with('error', 'Failed to sync templates from Meta: ' . $result['error']);
     }
 }

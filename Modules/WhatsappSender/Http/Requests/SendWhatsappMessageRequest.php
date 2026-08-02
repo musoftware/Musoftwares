@@ -33,10 +33,9 @@ class SendWhatsappMessageRequest extends FormRequest
                 'exists:whatsapp_contact_groups,id',
             ],
             'message_body' => [
-                'required_if:message_type,text',
                 'nullable',
+                'required_unless:message_type,template',
                 'string',
-                'min:1',
                 'max:4096',
             ],
             'whatsapp_account_id' => [

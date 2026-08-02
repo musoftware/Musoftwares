@@ -16,6 +16,21 @@ class MetaWhatsappService
     protected string $graphApiVersion = 'v21.0';
 
     /**
+     * Check if access token is a Sandbox / Test mode placeholder token.
+     */
+    public function isSandboxToken(?string $token): bool
+    {
+        if (empty($token)) {
+            return false;
+        }
+
+        return $token === 'EAAG_META_TEST_SANDBOX_TOKEN_DEMO'
+            || str_contains($token, 'EAAG_META_TEST')
+            || str_contains($token, 'TEST_SANDBOX')
+            || $token === config('services.facebook.test_access_token');
+    }
+
+    /**
      * Send a WhatsApp message via Meta Cloud API with wallet fee deduction.
      */
     public function sendMessage(
@@ -66,6 +81,48 @@ class MetaWhatsappService
                     'preview_url' => false,
                     'body' => $body,
                 ],
+            ];
+        }
+
+        if ($this->isSandboxToken($account->access_token)) {
+            $metaMessageId = 'wamid.sandbox.' . uniqid();
+
+            if ($business) {
+                DB::transaction(function () use ($business, $fee, $cleanPhone) {
+                    $lockedBiz = WhatsappBusiness::where('id', $business->id)->lockForUpdate()->first();
+                    $newBalance = max(0, (float) $lockedBiz->wallet_balance - $fee);
+                    $lockedBiz->update(['wallet_balance' => $newBalance]);
+
+                    WhatsappTransaction::create([
+                        'whatsapp_business_id' => $lockedBiz->id,
+                        'user_id' => $lockedBiz->user_id,
+                        'type' => 'debit_message_fee',
+                        'amount' => $fee,
+                        'balance_after' => $newBalance,
+                        'description' => "Platform message fee ($0.0010) for recipient {$cleanPhone} (Sandbox Test)",
+                    ]);
+                });
+            }
+
+            $log = WhatsappLog::create([
+                'user_id' => $account->user_id,
+                'whatsapp_account_id' => $account->id,
+                'whatsapp_business_id' => $business?->id,
+                'recipient_phone' => $cleanPhone,
+                'cost_charged' => $fee,
+                'message_type' => $type,
+                'message_body' => $body,
+                'status' => 'sent',
+                'meta_message_id' => $metaMessageId,
+                'payload' => $payload,
+            ]);
+
+            return [
+                'success' => true,
+                'meta_message_id' => $metaMessageId,
+                'log_id' => $log->id,
+                'cost_charged' => $fee,
+                'response' => ['messages' => [['id' => $metaMessageId]]],
             ];
         }
 
@@ -176,6 +233,19 @@ class MetaWhatsappService
      */
     public function verifyAccountCredentials(string $phoneNumberId, string $accessToken): array
     {
+        if ($this->isSandboxToken($accessToken)) {
+            return [
+                'valid' => true,
+                'data' => [
+                    'id' => $phoneNumberId,
+                    'verified_name' => 'Meta Sandbox Test Number',
+                    'display_phone_number' => '+1 555-0199',
+                    'quality_rating' => 'GREEN',
+                    'status' => 'APPROVED',
+                ],
+            ];
+        }
+
         $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$phoneNumberId}";
 
         try {
@@ -209,6 +279,19 @@ class MetaWhatsappService
      */
     public function registerPhoneNumber(WhatsappAccount $account, string $pin): array
     {
+        if ($this->isSandboxToken($account->access_token)) {
+            $account->update(['status' => 'active']);
+            $metadata = $account->metadata ?? [];
+            $metadata['status'] = 'CONNECTED';
+            $account->update(['metadata' => $metadata]);
+
+            return [
+                'success' => true,
+                'message' => 'Phone number successfully registered in Meta Sandbox mode.',
+                'response' => ['success' => true],
+            ];
+        }
+
         $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/register";
 
         try {
@@ -258,6 +341,18 @@ class MetaWhatsappService
      */
     public function fetchWhatsAppAccountsFromMetaToken(string $accessToken): array
     {
+        if ($this->isSandboxToken($accessToken)) {
+            return [
+                [
+                    'waba_id' => config('services.facebook.test_waba_id', '109283748291029'),
+                    'waba_name' => 'Meta Sandbox WABA Test',
+                    'phone_number_id' => config('services.facebook.test_phone_number_id', '114811102562039'),
+                    'display_phone_number' => '+1 555-0199',
+                    'verified_name' => 'Sandbox Test Number',
+                ]
+            ];
+        }
+
         $foundAccounts = [];
 
         try {
@@ -339,6 +434,19 @@ class MetaWhatsappService
      */
     public function createMetaTemplate(WhatsappAccount $account, WhatsappTemplate $template): array
     {
+        if ($this->isSandboxToken($account->access_token)) {
+            $template->update([
+                'status' => 'APPROVED',
+                'meta_template_id' => 'sandbox_tpl_' . rand(100000, 999999),
+            ]);
+
+            return [
+                'success' => true,
+                'id' => $template->meta_template_id,
+                'status' => 'APPROVED',
+            ];
+        }
+
         if (empty($account->waba_id)) {
             return ['success' => false, 'error' => 'WABA ID is not connected to this account. Cannot create template.'];
         }
@@ -380,16 +488,75 @@ class MetaWhatsappService
      */
     public function syncMetaTemplates(WhatsappAccount $account): array
     {
-        if (empty($account->waba_id)) {
-            return ['success' => false, 'error' => 'WABA ID is not connected to this account. Cannot sync templates.'];
-        }
-
-        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->waba_id}/message_templates";
         $businessId = $account->whatsapp_business_id;
 
         if (!$businessId) {
             return ['success' => false, 'error' => 'Account is not linked to any business client.'];
         }
+
+        if ($this->isSandboxToken($account->access_token)) {
+            $sampleTemplates = [
+                [
+                    'name' => 'hello_world',
+                    'category' => 'UTILITY',
+                    'language' => 'en_US',
+                    'components' => [
+                        ['type' => 'HEADER', 'format' => 'TEXT', 'text' => 'Welcome'],
+                        ['type' => 'BODY', 'text' => 'Hello World! Welcome to Meta WhatsApp Sandbox mode.'],
+                        ['type' => 'FOOTER', 'text' => 'Sent via Musoftware WhatsApp Sender'],
+                    ],
+                    'status' => 'APPROVED',
+                    'meta_template_id' => 'sandbox_tpl_101',
+                ],
+                [
+                    'name' => 'order_confirmation',
+                    'category' => 'UTILITY',
+                    'language' => 'ar',
+                    'components' => [
+                        ['type' => 'BODY', 'text' => 'مرحباً، تم تأكيد طلبك بنجاح. شكراً لتواصلك معنا!'],
+                    ],
+                    'status' => 'APPROVED',
+                    'meta_template_id' => 'sandbox_tpl_102',
+                ],
+                [
+                    'name' => '3p_direct_integration_test_template',
+                    'category' => 'UTILITY',
+                    'language' => 'en_US',
+                    'components' => [
+                        ['type' => 'BODY', 'text' => 'Welcome and congratulations!! This message demonstrates your ability to send a WhatsApp message notification from the Cloud API, hosted by Meta.'],
+                    ],
+                    'status' => 'APPROVED',
+                    'meta_template_id' => 'sandbox_tpl_103',
+                ],
+            ];
+
+            foreach ($sampleTemplates as $tpl) {
+                WhatsappTemplate::updateOrCreate(
+                    [
+                        'whatsapp_business_id' => $businessId,
+                        'name' => $tpl['name'],
+                    ],
+                    [
+                        'category' => $tpl['category'],
+                        'language' => $tpl['language'],
+                        'components' => $tpl['components'],
+                        'status' => $tpl['status'],
+                        'meta_template_id' => $tpl['meta_template_id'],
+                    ]
+                );
+            }
+
+            return [
+                'success' => true,
+                'count' => count($sampleTemplates),
+            ];
+        }
+
+        if (empty($account->waba_id)) {
+            return ['success' => false, 'error' => 'WABA ID is not connected to this account. Cannot sync templates.'];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->waba_id}/message_templates";
 
         try {
             $response = Http::withToken($account->access_token)
@@ -434,6 +601,14 @@ class MetaWhatsappService
      */
     public function deleteMetaTemplate(WhatsappAccount $account, string $name): array
     {
+        if ($this->isSandboxToken($account->access_token)) {
+            WhatsappTemplate::where('whatsapp_business_id', $account->whatsapp_business_id)
+                ->where('name', $name)
+                ->delete();
+
+            return ['success' => true];
+        }
+
         if (empty($account->waba_id)) {
             return ['success' => false, 'error' => 'WABA ID is not connected to this account. Cannot delete template.'];
         }

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Head, useForm, router, Link } from '@inertiajs/react';
+import { Head, useForm, router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import FlowBuilder from './FlowBuilder';
+import { ExternalLink } from 'lucide-react';
 
 interface Business {
     id: number;
@@ -17,6 +18,9 @@ interface Business {
     bot_reply_fee: string;
     facebook_client_id?: string | null;
     facebook_client_secret?: string | null;
+    is_test_mode?: boolean;
+    test_phone_number_id?: string | null;
+    test_waba_id?: string | null;
 }
 
 interface Account {
@@ -126,6 +130,9 @@ export default function Workspace({
     flows,
     isAdmin
 }: Props) {
+    const pageProps = usePage<any>().props;
+    const flash = pageProps?.flash;
+
     const [activeChannel, setActiveChannel] = useState<'whatsapp' | 'telegram'>('whatsapp');
     const [activeTab, setActiveTab] = useState<'send' | 'connectors' | 'templates' | 'groups' | 'schedules' | 'logs' | 'flows' | 'bots' | 'subscribers'>('connectors');
     const [selectedGroup, setSelectedGroup] = useState<ContactGroup | null>(null);
@@ -135,8 +142,27 @@ export default function Workspace({
     const [selectedSubscriberGroup, setSelectedSubscriberGroup] = useState<any | null>(null);
 
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showAddAccountModal, setShowAddAccountModal] = useState(false);
     const [editingWabaAccountId, setEditingWabaAccountId] = useState<number | null>(null);
     const [tempWabaId, setTempWabaId] = useState('');
+
+    const accountForm = useForm({
+        whatsapp_business_id: business.id,
+        name: '',
+        phone_number_id: '',
+        waba_id: '',
+        access_token: '',
+    });
+
+    const handleAddAccount = (e: React.FormEvent) => {
+        e.preventDefault();
+        accountForm.post('/whatsapp-sender/accounts', {
+            onSuccess: () => {
+                setShowAddAccountModal(false);
+                accountForm.reset();
+            }
+        });
+    };
 
     const editForm = useForm({
         name: business.name,
@@ -271,8 +297,13 @@ export default function Workspace({
 
         const endpoint = sendForm.data.is_scheduled ? '/whatsapp-sender/schedules' : '/whatsapp-sender/send';
 
+        const payloadMessageBody = sendForm.data.message_type === 'template'
+            ? (bodyText || sendForm.data.template_name || 'Template Message')
+            : sendForm.data.message_body;
+
         router.post(endpoint, {
             ...sendForm.data,
+            message_body: payloadMessageBody,
             whatsapp_business_id: business.id,
             template_components: componentsPayload,
         }, {
@@ -383,14 +414,105 @@ export default function Workspace({
 
                 {/* Main panel content */}
                 <div className="flex-1 py-8 px-6 space-y-8 overflow-y-auto">
+                    {/* Flash Notifications */}
+                    {flash?.success && (
+                        <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 rounded-2xl p-4 text-sm font-medium space-y-3 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <span className="font-bold flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    {flash.success}
+                                </span>
+                            </div>
+                            {flash?.meta_response && (
+                                <div className="mt-2 border-t border-emerald-500/20 pt-2 space-y-1">
+                                    <span className="text-xxs font-bold uppercase tracking-wider block text-emerald-700 dark:text-emerald-400">
+                                        Facebook Meta Graph API Raw Response:
+                                    </span>
+                                    <pre className="bg-zinc-950 text-emerald-400 text-xs p-3 rounded-xl font-mono overflow-x-auto border border-zinc-800 dir-ltr text-left">
+                                        {JSON.stringify(flash.meta_response, null, 2)}
+                                    </pre>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="bg-red-500/10 border border-red-500/30 text-red-800 dark:text-red-300 rounded-2xl p-4 text-sm font-medium space-y-3 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <span className="font-bold flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    {flash.error}
+                                </span>
+                            </div>
+                            {flash?.meta_response && (
+                                <div className="mt-2 border-t border-red-500/20 pt-2 space-y-1">
+                                    <span className="text-xxs font-bold uppercase tracking-wider block text-red-700 dark:text-red-400">
+                                        Facebook Meta Graph API Error Payload:
+                                    </span>
+                                    <pre className="bg-zinc-950 text-red-400 text-xs p-3 rounded-xl font-mono overflow-x-auto border border-zinc-800 dir-ltr text-left">
+                                        {JSON.stringify(flash.meta_response, null, 2)}
+                                    </pre>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Stripe Test Mode Banner */}
+                    {business.is_test_mode && (
+                        <div className="bg-amber-500/10 border border-amber-500/30 dark:bg-amber-950/40 rounded-2xl p-4 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <span className="p-2 bg-amber-500 text-white rounded-xl font-bold text-xs">TEST MODE</span>
+                                <div>
+                                    <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300">Meta WhatsApp Sandbox Mode Active</h4>
+                                    <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">
+                                        Operating in test mode with Meta pre-loaded Sandbox account. Ideal for Meta App Reviewers to verify templates & messages.
+                                    </p>
+                                </div>
+                            </div>
+                            <Link
+                                href={route('whatsapp.meta-app-guide')}
+                                className="text-xs text-amber-800 dark:text-amber-300 underline font-medium hover:text-amber-900"
+                            >
+                                View Meta Review Guide &rarr;
+                            </Link>
+                        </div>
+                    )}
+
                     {/* Header Information Dashboard Card */}
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{business.name}</h1>
                                 <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs px-2.5 py-1 rounded-full font-medium border border-emerald-200/50 dark:border-emerald-900/30">
                                     Active Workspace
                                 </span>
+
+                                {/* Stripe-style Test Mode Toggle */}
+                                <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 px-3 py-1 rounded-full">
+                                    <button
+                                        type="button"
+                                        onClick={() => router.post(route('whatsapp.businesses.toggle-test-mode', business.id))}
+                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                            business.is_test_mode ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'
+                                        }`}
+                                        title={business.is_test_mode ? 'Switch to Live Mode' : 'Switch to Test Mode (Sandbox)'}
+                                    >
+                                        <span
+                                            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                business.is_test_mode ? 'translate-x-4' : 'translate-x-0'
+                                            }`}
+                                        />
+                                    </button>
+                                    <span className={`text-xs font-bold uppercase tracking-wider ${
+                                        business.is_test_mode ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-500'
+                                    }`}>
+                                        {business.is_test_mode ? 'Test Mode' : 'Live'}
+                                    </span>
+                                </div>
+
                                 <button
                                     onClick={() => setShowEditModal(true)}
                                     className="p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition duration-200 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center justify-center shrink-0"
@@ -729,14 +851,24 @@ export default function Workspace({
                                             <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">WhatsApp Accounts</h3>
                                             <p className="text-xs text-zinc-500 mt-1">Direct API integration endpoints powered by Facebook WABA.</p>
                                         </div>
-                                        {(business.facebook_client_id && business.facebook_client_secret) && (
-                                            <a
-                                                href={facebookLoginUrl}
-                                                className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAddAccountModal(true)}
+                                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm flex items-center gap-1.5 cursor-pointer"
                                             >
-                                                Log in with Facebook
-                                            </a>
-                                        )}
+                                                <span>+ إضافة حساب yدوياً (Meta Tokens)</span>
+                                            </button>
+
+                                            {(business.facebook_client_id && business.facebook_client_secret) && (
+                                                <a
+                                                    href={facebookLoginUrl}
+                                                    className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
+                                                >
+                                                    Log in with Facebook
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {(!business.facebook_client_id || !business.facebook_client_secret) && (
@@ -830,6 +962,16 @@ export default function Workspace({
                                                                     >
                                                                         Set WABA ID
                                                                     </button>
+                                                                    <a
+                                                                        href="https://business.facebook.com/wa/manage/phone-numbers/"
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2 py-0.5 rounded text-xs font-semibold transition border border-blue-200/60 dark:border-blue-800/60"
+                                                                        title="Visit Meta Business Suite to find your WABA ID"
+                                                                    >
+                                                                        <ExternalLink className="w-3 h-3" />
+                                                                        <span>Visit External</span>
+                                                                    </a>
                                                                 </span>
                                                             )
                                                         )}
@@ -853,16 +995,70 @@ export default function Workspace({
                                     </div>
                                 </div>
 
-                                <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-4">
-                                    <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg font-sans">WABA Connection Guide</h3>
-                                    <p className="text-xs text-zinc-500 leading-relaxed">
-                                        Click "Log in with Facebook" to pair your Meta WhatsApp Business Account. Make sure you have admin rights on the Meta Business Suite portfolio.
-                                    </p>
+                                <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-5">
+                                    <div>
+                                        <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg font-sans">Meta Webhook Configuration</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">
+                                            استخدم هذه البيانات لربط الـ Webhook في لوحة مطوري Meta (Facebook Developer Portal).
+                                        </p>
+                                    </div>
+
+                                    {/* Callback URL */}
+                                    <div className="space-y-1.5">
+                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Callback URL</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`}
+                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => copyToClipboard(`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`)}
+                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
+                                            >
+                                                {copied ? 'Copied!' : 'Copy'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Verify Token */}
+                                    <div className="space-y-1.5">
+                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Verify Token</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={business.webhook_verify_token || webhookVerifyToken}
+                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => copyToClipboard(business.webhook_verify_token || webhookVerifyToken)}
+                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
+                                            >
+                                                {copied ? 'Copied!' : 'Copy'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-2 border-t border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                                        <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">خطوات التفعيل في Meta Portal:</h4>
+                                        <ol className="text-xxs text-zinc-500 list-decimal list-inside space-y-1 leading-relaxed">
+                                            <li>افتح <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-semibold">developers.facebook.com</a></li>
+                                            <li>اختر تطبيقك &rarr; <strong>WhatsApp</strong> &rarr; <strong>Configuration</strong></li>
+                                            <li>الصق <strong>Callback URL</strong> و <strong>Verify Token</strong> أعلاه</li>
+                                            <li>اضغط <strong>Verify and Save</strong> واشترك في <code>messages</code></li>
+                                        </ol>
+                                    </div>
+
                                     <Link
                                         href="/whatsapp-sender/meta-app-guide"
-                                        className="text-emerald-500 hover:text-emerald-600 text-xs font-semibold block mt-2 underline"
+                                        target="_blank"
+                                        className="text-emerald-600 dark:text-emerald-400 hover:underline text-xs font-semibold block pt-1"
                                     >
-                                        شرح إعداد تطبيق Meta Developer وكيفية الحصول على الصلاحيات 📖
+                                        دليل إعداد Meta App الشامل بالصور 📖
                                     </Link>
                                 </div>
                             </div>
@@ -941,16 +1137,33 @@ export default function Workspace({
                                 {/* Create Template Form */}
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                     <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Meta Template</h3>
+
+                                    {templateForm.errors.whatsapp_business_id && (
+                                        <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl text-xs font-medium text-red-700 dark:text-red-300">
+                                            {templateForm.errors.whatsapp_business_id}
+                                        </div>
+                                    )}
+
                                     <form onSubmit={handleCreateTemplate} className="space-y-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Template Name (alphanumeric & underscore)</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">
+                                                Template Name (auto-slugified to lowercase alphanumeric & underscores)
+                                            </label>
                                             <input
                                                 type="text"
                                                 value={templateForm.data.name}
-                                                onChange={e => templateForm.setData('name', e.target.value)}
-                                                placeholder="e.g. promo_coupon"
-                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                                onChange={e => {
+                                                    const raw = e.target.value;
+                                                    // Convert input to lowercase slug format
+                                                    const val = raw.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+                                                    templateForm.setData('name', val);
+                                                }}
+                                                placeholder="e.g. promo_coupon or offer_1"
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm font-mono"
                                             />
+                                            {templateForm.errors.name && (
+                                                <span className="text-xs text-red-500 mt-1 block">{templateForm.errors.name}</span>
+                                            )}
                                         </div>
                                         <div>
                                             <label className="text-xs font-semibold text-zinc-500 block mb-1">Category</label>
@@ -961,7 +1174,11 @@ export default function Workspace({
                                             >
                                                 <option value="UTILITY">UTILITY</option>
                                                 <option value="MARKETING">MARKETING</option>
+                                                <option value="AUTHENTICATION">AUTHENTICATION</option>
                                             </select>
+                                            {templateForm.errors.category && (
+                                                <span className="text-xs text-red-500 mt-1 block">{templateForm.errors.category}</span>
+                                            )}
                                         </div>
                                         <div>
                                             <label className="text-xs font-semibold text-zinc-500 block mb-1">Language</label>
@@ -971,8 +1188,22 @@ export default function Workspace({
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             >
                                                 <option value="en_US">English (US)</option>
-                                                <option value="ar">Arabic</option>
+                                                <option value="en_GB">English (UK)</option>
+                                                <option value="ar">Arabic (العربية)</option>
+                                                <option value="es">Spanish (Español)</option>
+                                                <option value="fr">French (Français)</option>
+                                                <option value="de">German (Deutsch)</option>
+                                                <option value="it">Italian (Italiano)</option>
+                                                <option value="pt_BR">Portuguese (Brasil)</option>
+                                                <option value="tr">Turkish (Türkçe)</option>
+                                                <option value="ru">Russian (Русский)</option>
+                                                <option value="hi">Hindi (हिन्दी)</option>
+                                                <option value="id">Indonesian (Bahasa)</option>
+                                                <option value="ur">Urdu (اردو)</option>
                                             </select>
+                                            {templateForm.errors.language && (
+                                                <span className="text-xs text-red-500 mt-1 block">{templateForm.errors.language}</span>
+                                            )}
                                         </div>
                                         <div>
                                             <label className="text-xs font-semibold text-zinc-500 block mb-1">Body Text (with variable indicators like {"{{"}1{"}}"})</label>
@@ -987,13 +1218,26 @@ export default function Workspace({
                                                 placeholder="Write body content here..."
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             />
+                                            {templateForm.errors.components && (
+                                                <span className="text-xs text-red-500 mt-1 block">{templateForm.errors.components}</span>
+                                            )}
                                         </div>
                                         <button
                                             type="submit"
                                             disabled={templateForm.processing}
-                                            className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
+                                            className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
                                         >
-                                            Submit Template to Meta
+                                            {templateForm.processing ? (
+                                                <>
+                                                    <svg className="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    <span>Submitting to Meta...</span>
+                                                </>
+                                            ) : (
+                                                <span>Submit Template to Meta</span>
+                                            )}
                                         </button>
                                     </form>
                                 </div>
@@ -1716,6 +1960,90 @@ export default function Workspace({
                                     className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
                                     Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Manual Meta Account Modal */}
+            {showAddAccountModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-6">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">إضافة حساب Meta yدوياً</h3>
+                                <p className="text-xs text-zinc-500 mt-1">أدخل بيانات الحساب المستخرجة من لوحة Meta Developer Portal.</p>
+                            </div>
+                            <button onClick={() => setShowAddAccountModal(false)} className="text-zinc-400 hover:text-zinc-600 font-bold text-xl">&times;</button>
+                        </div>
+
+                        <form onSubmit={handleAddAccount} className="space-y-4">
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Account Display Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="e.g. Meta Test Number (+20 15 58548650)"
+                                    value={accountForm.data.name}
+                                    onChange={e => accountForm.setData('name', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Phone Number ID</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="e.g. 1280491895139233"
+                                        value={accountForm.data.phone_number_id}
+                                        onChange={e => accountForm.setData('phone_number_id', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
+                                    />
+                                    {accountForm.errors.phone_number_id && <span className="text-xxs text-red-500 mt-1 block">{accountForm.errors.phone_number_id}</span>}
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">WABA ID (Optional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. 109283748291029"
+                                        value={accountForm.data.waba_id}
+                                        onChange={e => accountForm.setData('waba_id', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Access Token (Permanent or Temporary)</label>
+                                <textarea
+                                    rows={3}
+                                    required
+                                    placeholder="e.g. EAAsewqHOtVsBS..."
+                                    value={accountForm.data.access_token}
+                                    onChange={e => accountForm.setData('access_token', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-xs font-mono text-zinc-700 dark:text-zinc-300"
+                                />
+                                {accountForm.errors.access_token && <span className="text-xxs text-red-500 mt-1 block">{accountForm.errors.access_token}</span>}
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddAccountModal(false)}
+                                    className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={accountForm.processing}
+                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
+                                >
+                                    {accountForm.processing ? 'Verifying & Saving...' : 'Save Meta Account'}
                                 </button>
                             </div>
                         </form>

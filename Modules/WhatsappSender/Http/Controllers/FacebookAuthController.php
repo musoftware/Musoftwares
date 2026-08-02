@@ -104,10 +104,14 @@ class FacebookAuthController extends Controller
             // Auto-detect real WhatsApp Business Accounts & Phone Number IDs from Meta Graph API
             $metaAccounts = $this->whatsappService->fetchWhatsAppAccountsFromMetaToken($token);
 
+            $redirectTarget = $businessId
+                ? redirect()->route('whatsapp.business.workspace', $businessId)
+                : redirect()->back();
+
             if (empty($metaAccounts)) {
                 session(['fb_oauth_token' => $token]);
 
-                return redirect()->route('whatsapp.index')->with(
+                return $redirectTarget->with(
                     'info',
                     "Facebook Login succeeded! We saved your OAuth Access Token. Please enter your Meta Phone Number ID below to complete your connection."
                 );
@@ -135,12 +139,12 @@ class FacebookAuthController extends Controller
                 );
             }
 
-            return redirect()->route('whatsapp.index')->with(
+            return $redirectTarget->with(
                 'success',
                 __('whatsapp-sender::messages.facebook_account_connected')
             );
         } catch (\Throwable $e) {
-            return redirect()->route('whatsapp.index')->with('error', $this->formatErrorMessage($e));
+            return redirect()->back()->with('error', $this->formatErrorMessage($e));
         }
     }
 

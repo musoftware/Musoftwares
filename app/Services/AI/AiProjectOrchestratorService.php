@@ -41,12 +41,9 @@ class AiProjectOrchestratorService
 
         $cleanBody = strip_tags($messageBody);
 
-        // 1. Calculate & Bill actual token usage
-        $inputTokens  = (int) (mb_strlen($cleanBody) * 1.3) + 100;
-        $outputTokens = random_int(50, 180);
-        $billedResult = $this->tokenBillingService->billUsageWithAmount($project, $inputTokens, $outputTokens);
-        $billedAmount = $billedResult['amount'] ?? 0.0;
-        $currencySymbol = $billedResult['currency_symbol'] ?? 'EGP';
+        $totalPromptTokens = 0;
+        $totalCompletionTokens = 0;
+        $activeModelUsed = 'gpt-4o-mini';
 
         // 2. Extract Project Memory & Conversation Memory
         $context = $project->ai_context ?? [];
@@ -101,9 +98,9 @@ class AiProjectOrchestratorService
    - مرحلة `GREETING`: رد بسيط ومباشر دون فتح مواضيع مشروع تلقائياً.
    - مرحلة `DISCOVERY`: عند مناقشة تفاصيل الفكرة، يجب استدعاء أداة `update_context` بتمرير `current_stage` = 'DISCOVERY' وحفظ قائمة `pending_features` والـ `goal`.
    - مرحلة `VALUATION`: عند عرض التكلفة، احسب إجمالي ميزانية المشروع بالكامل (100%)، ووضح أن بدء العمل يتطلب سداد 50% كدفعة مقدمة لجدولة المهام وتوقيع العقد. استدعِ `update_context` بقيمة `current_stage` = 'VALUATION'.
-   - مرحلة `PROPOSAL`: عندما يوافق العميل أو يطلب بدء الديل/العمل/العقد، **يجب فوراً وبشكل إجباري استدعاء أداة `create_contract`** بمبلغ المشروع الإجمالي 100%. وعندما ترجع الأداة رابط `contract_url` (مثل `https://domain/c/uuid`), يجب أن تضمن الرابط الحقيقي داخل الرسالة بتنسيق Markdown مثل: `[اضغط هنا لمراجعة وتوقيع العقد](CONTRACT_URL)` أو كتابة الرابط المباشر، وممنوع كلياً إخراج الجملة الحرفية `[رابط العقد]`.
+   - مرحلة `PROPOSAL`: عندما يوافق العميل أو يطلب بدء الديل/العمل/العقد/تعديل الميزانية، **يجب فوراً وبشكل إجباري استدعاء أداة `create_contract`** بالمبلغ النهائي الدقيق المتفق عليه مع العميل في المحادثة (مثال: إذا اتفق العميل معك على 15000، مرر `total_amount: 15000` بدون استخدام أرقام قديمة 5000). وعندما ترجع الأداة رابط `contract_url` (مثل `https://domain/c/uuid`), يجب أن تضمن الرابط الحقيقي داخل الرسالة بتنسيق Markdown مثل: `[اضغط هنا لمراجعة وتوقيع العقد](CONTRACT_URL)` أو كتابة الرابط المباشر، وممنوع كلياً إخراج الجملة الحرفية `[رابط العقد]`.
    - مرحلة `EXECUTION`: بعد توقيع العقد وسداد الدفعة الأولى (50%) من رابط العقد، سيتولى النظام إنشاء الفاتورة وجدولة المهام تلقائياً في أوقات العمل الرسمية وتفعيل إشعارات الـ FCM والإيميل قبل كل مهمة بـ 15 دقيقة.
-   - إياك أن توافق شفهياً على الاتفاق أو إنشاء العقد دون استدعاء أداة `create_contract` بالفعل في نفس الرد!
+   - إياك أن توافق شفهياً على الاتفاق أو تعديل الميزانية أو إنشاء العقد دون استدعاء أداة `create_contract` بالفعل بالمبلغ الدقيق في نفس الرد!
 6. لا تكرر نفسك، وتذكر آخر الحوارات وسياق المشروع المحفوظ.
 
 Project Memory:
@@ -164,6 +161,11 @@ PROMPT;
                     ->post('https://api.openai.com/v1/chat/completions', $payload);
 
                 if ($response->successful()) {
+                    $activeModelUsed = $openAiModel;
+                    $usage1 = $response->json('usage') ?? [];
+                    $totalPromptTokens += (int) ($usage1['prompt_tokens'] ?? 0);
+                    $totalCompletionTokens += (int) ($usage1['completion_tokens'] ?? 0);
+
                     $choice = $response->json('choices.0.message');
                     $aiReplyText = $choice['content'] ?? '';
 
@@ -199,6 +201,10 @@ PROMPT;
                             ]);
 
                         if ($secondResponse->successful()) {
+                            $usage2 = $secondResponse->json('usage') ?? [];
+                            $totalPromptTokens += (int) ($usage2['prompt_tokens'] ?? 0);
+                            $totalCompletionTokens += (int) ($usage2['completion_tokens'] ?? 0);
+
                             $secondChoiceText = $secondResponse->json('choices.0.message.content');
                             if (!empty($secondChoiceText)) {
                                 $aiReplyText = $secondChoiceText;
@@ -238,6 +244,11 @@ PROMPT;
                     ]);
 
                 if ($response->successful()) {
+                    $activeModelUsed = $geminiModel;
+                    $usageMeta = $response->json('usageMetadata') ?? [];
+                    $totalPromptTokens += (int) ($usageMeta['promptTokenCount'] ?? 0);
+                    $totalCompletionTokens += (int) ($usageMeta['candidatesTokenCount'] ?? 0);
+
                     $aiReplyText = $response->json('candidates.0.content.parts.0.text') ?? '';
                 }
             } catch (\Throwable $e) {
@@ -250,7 +261,22 @@ PROMPT;
             $aiReplyText = "عذراً، حدث انقطاع مؤقت في الاتصال بخدمة الذكاء الاصطناعي. يرجى إعادة إرسال رسالتك مرة أخرى.";
         }
 
-        // 9. Save AI Response
+        // 9. Post-Response Real Token Billing
+        $billedAmount = 0.0;
+        $currencySymbol = 'EGP';
+        if ($totalPromptTokens > 0 || $totalCompletionTokens > 0) {
+            $billedResult = $this->tokenBillingService->billUsageWithAmount(
+                $project,
+                $totalPromptTokens,
+                $totalCompletionTokens,
+                $activeModelUsed,
+                'AI Project Manager Interaction'
+            );
+            $billedAmount = (float) ($billedResult['amount'] ?? 0.0);
+            $currencySymbol = $billedResult['currency_symbol'] ?? 'EGP';
+        }
+
+        // 10. Save AI Response
         ProjectComment::create([
             'project_id'       => $project->id,
             'author_id'        => null,
@@ -262,7 +288,7 @@ PROMPT;
 
         return [
             'ok'              => true,
-            'billed_amount'   => number_format($billedAmount, 2),
+            'billed_amount'   => number_format($billedAmount, 4),
             'currency_symbol' => $currencySymbol,
             'executed_tools'  => $executedTools,
         ];
