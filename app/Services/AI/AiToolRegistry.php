@@ -21,6 +21,7 @@ use App\Services\AI\Tools\UpdateProjectDetailsTool;
 use App\Services\AI\Tools\UpdateContextTool;
 use App\Services\AI\Tools\CreateInvoiceTool;
 use App\Services\AI\Tools\CreateContractTool;
+use App\Services\AI\Tools\SearchConversationHistoryTool;
 
 class AiToolRegistry
 {
@@ -52,6 +53,7 @@ class AiToolRegistry
             new SendNotificationsTool(),
             new GenerateDailyReportTool(),
             new FlagAdminInterventionTool(),
+            new SearchConversationHistoryTool(),
         ];
 
         foreach ($defaultTools as $tool) {

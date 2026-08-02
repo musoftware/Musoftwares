@@ -25,7 +25,7 @@ class AiProjectOrchestratorService
      * 1. System Prompt = Persona + Project Memory + Conversation Memory.
      * 2. Project Memory = Permanent facts (goal, completed_features, pending_features, tech_stack, invoice_status).
      * 3. Conversation Memory = Living facts (conversation_summary, waiting_for).
-     * 4. History Window = Last 3-5 messages only (Token efficient & highly focused).
+     * 4. History Window = Last 15 messages (enough context for a real conversation without hitting token limits).
      * 5. Tool Calling = OpenAI natively triggers update_context, create_invoice, create_todos, ask_customer_questions.
      * 6. Zero Laravel String Rules (Laravel is purely stateless execution & memory persistence).
      */
@@ -50,21 +50,21 @@ class AiProjectOrchestratorService
 
         // Dynamic Memory Summarization when discussion exceeds 10 turns
         $totalCommentsCount = ProjectComment::where('project_id', $project->id)->count();
-        if ($totalCommentsCount > 10) {
+        if ($totalCommentsCount > 20) {
             $olderComments = ProjectComment::where('project_id', $project->id)
                 ->latest()
-                ->skip(5)
-                ->take(10)
+                ->skip(15)
+                ->take(20)
                 ->get()
                 ->reverse();
 
             $recap = [];
             foreach ($olderComments as $c) {
-                $recap[] = ($c->author_id ? 'Client: ' : 'AI: ') . mb_strimwidth(strip_tags($c->body), 0, 50, '...');
+                $recap[] = ($c->author_id ? 'Client: ' : 'AI: ') . mb_strimwidth(strip_tags($c->body), 0, 200, '...');
             }
 
             if (!empty($recap)) {
-                $context['conversation_summary'] = "Summarized past history (" . count($recap) . " turns): " . implode(' | ', $recap);
+                $context['conversation_summary'] = "Summarized past history (" . count($recap) . " turns):\n" . implode("\n", $recap);
             }
         }
 
@@ -98,10 +98,15 @@ class AiProjectOrchestratorService
    - مرحلة `GREETING`: رد بسيط ومباشر دون فتح مواضيع مشروع تلقائياً.
    - مرحلة `DISCOVERY`: عند مناقشة تفاصيل الفكرة، يجب استدعاء أداة `update_context` بتمرير `current_stage` = 'DISCOVERY' وحفظ قائمة `pending_features` والـ `goal`.
    - مرحلة `VALUATION`: عند عرض التكلفة، احسب إجمالي ميزانية المشروع بالكامل (100%)، ووضح أن بدء العمل يتطلب سداد 50% كدفعة مقدمة لجدولة المهام وتوقيع العقد. استدعِ `update_context` بقيمة `current_stage` = 'VALUATION'.
-   - مرحلة `PROPOSAL`: عندما يوافق العميل أو يطلب بدء الديل/العمل/العقد/تعديل الميزانية، **يجب فوراً وبشكل إجباري استدعاء أداة `create_contract`** بالمبلغ النهائي الدقيق المتفق عليه مع العميل في المحادثة (مثال: إذا اتفق العميل معك على 15000، مرر `total_amount: 15000` بدون استخدام أرقام قديمة 5000). وعندما ترجع الأداة رابط `contract_url` (مثل `https://domain/c/uuid`), يجب أن تضمن الرابط الحقيقي داخل الرسالة بتنسيق Markdown مثل: `[اضغط هنا لمراجعة وتوقيع العقد](CONTRACT_URL)` أو كتابة الرابط المباشر، وممنوع كلياً إخراج الجملة الحرفية `[رابط العقد]`.
-   - مرحلة `EXECUTION`: بعد توقيع العقد وسداد الدفعة الأولى (50%) من رابط العقد، سيتولى النظام إنشاء الفاتورة وجدولة المهام تلقائياً في أوقات العمل الرسمية وتفعيل إشعارات الـ FCM والإيميل قبل كل مهمة بـ 15 دقيقة.
-   - إياك أن توافق شفهياً على الاتفاق أو تعديل الميزانية أو إنشاء العقد دون استدعاء أداة `create_contract` بالفعل بالمبلغ الدقيق في نفس الرد!
+   - مرحلة `PROPOSAL`: عندما يوافق العميل أو يطلب بدء الديل/العمل/العقد/تعديل الميزانية، **يجب فوراً وبشكل إجباري استدعاء أداة `create_contract`** بالمبلغ النهائي الدقيق المتفق عليه مع العميل في المحادثة. وعندما ترجع الأداة رابط `contract_url` يجب أن تضمن الرابط الحقيقي داخل الرسالة. 
+   - ملاحظة هامة جداً: إذا سأل العميل أو استفسر عن كيفية حساب التكلفة (مثال: "ازاي"، "ليه السعر ده")، اشرح له التفاصيل المنطقية للتسعير بوضوح تام، **ولا تقم باستدعاء أداة `create_contract` مجدداً** طالما لم يطلب هو إنشاء عقد جديد، بل اكتفِ بالشرح والإقناع.
+   - مرحلة `EXECUTION`: بعد توقيع العقد وسداد الدفعة الأولى، سيتولى النظام العمل تلقائياً.
+   - إياك أن توافق شفهياً على الاتفاق المالي لأول مرة دون استدعاء أداة `create_contract`، ولكن لا تكرر استدعاءها في كل رد إذا كان العميل يتناقش معك.
 6. لا تكرر نفسك، وتذكر آخر الحوارات وسياق المشروع المحفوظ.
+7. أداة الذاكرة الممتدة (EXTENDED MEMORY TOOL):
+   - الـ Context المتاح لك يشمل آخر 15 رسالة فقط. إذا أشار العميل لشيء قيل قبلها (ميزانية قديمة، فيتشر ذكره من قبل، موعد قيل مسبقاً)، **يجب فوراً استدعاء أداة `search_conversation_history`** بكلمة مفتاحية مناسبة قبل أن ترد.
+   - لا تقل أبداً "لا أتذكر" أو "لم يُذكر هذا سابقاً" دون أن تستدعي `search_conversation_history` أولاً.
+   - مثال: العميل يقول "قلتلك قبل كده السعر كان X" → استدعِ البحث بـ query="السعر" أو query="budget" واعرض ما وجدته.
 
 Project Memory:
 {$projectMemoryJson}
@@ -122,10 +127,10 @@ PROMPT;
             : config('services.gemini.key');
         $geminiModel   = !empty($adminSettings['gemini_model']) ? $adminSettings['gemini_model'] : 'gemini-2.0-flash';
 
-        // 5. Load Last 5 Messages Only for Memory Window
+        // 5. Load Last 15 Messages for Memory Window (gpt-4o-mini & gemini-2.0-flash handle large contexts cheaply)
         $recentDiscussions = ProjectComment::where('project_id', $project->id)
             ->latest()
-            ->take(5)
+            ->take(15)
             ->get()
             ->reverse();
 
@@ -151,7 +156,7 @@ PROMPT;
                 $payload = [
                     'model'       => $openAiModel,
                     'messages'    => $openAiMessages,
-                    'temperature' => 0.7,
+                    'temperature' => 0.5,
                 ];
 
                 if (!empty($openAiTools)) {
@@ -201,7 +206,7 @@ PROMPT;
                             ->post('https://api.openai.com/v1/chat/completions', [
                                 'model'       => $openAiModel,
                                 'messages'    => $openAiMessages,
-                                'temperature' => 0.7,
+                                'temperature' => 0.5,
                             ]);
 
                         if ($secondResponse->successful()) {
@@ -223,29 +228,46 @@ PROMPT;
             }
         }
 
-        // 7. Gemini Provider Support
+        // 7. Gemini Provider Support (multi-turn chat format + function calling)
         if (empty($aiReplyText) && !empty($geminiKey)) {
             try {
-                $historyText = '';
+                // Build proper multi-turn contents array (system prompt as first user turn)
+                $geminiContents = [
+                    ['role' => 'user', 'parts' => [['text' => $systemPrompt]]],
+                    ['role' => 'model', 'parts' => [['text' => 'فهمت التعليمات، أنا جاهز أساعد العميل.']]],
+                ];
+
                 foreach ($recentDiscussions as $comm) {
-                    $sender = $comm->author_id ? 'Client' : 'AI';
-                    $historyText .= "{$sender}: " . strip_tags($comm->body) . "\n";
+                    $geminiContents[] = [
+                        'role'  => $comm->author_id ? 'user' : 'model',
+                        'parts' => [['text' => strip_tags($comm->body)]],
+                    ];
+                }
+
+                // Append current message
+                $geminiContents[] = ['role' => 'user', 'parts' => [['text' => $cleanBody]]];
+
+                // Build Gemini-format tools declarations
+                $geminiTools = [];
+                foreach ($this->toolRegistry->all() as $tool) {
+                    $geminiTools[] = [
+                        'name'        => $tool->name(),
+                        'description' => $tool->description(),
+                        'parameters'  => $tool->parameters(),
+                    ];
+                }
+
+                $geminiPayload = [
+                    'contents'         => $geminiContents,
+                    'generationConfig' => ['temperature' => 0.5],
+                ];
+                if (!empty($geminiTools)) {
+                    $geminiPayload['tools'] = [['function_declarations' => $geminiTools]];
                 }
 
                 $response = Http::withoutVerifying()
                     ->timeout(25)
-                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key={$geminiKey}", [
-                        'contents' => [
-                            [
-                                'parts' => [
-                                    ['text' => $systemPrompt . "\n\nConversation History:\n{$historyText}\n\nClient Message: " . $cleanBody],
-                                ],
-                            ],
-                        ],
-                        'generationConfig' => [
-                            'temperature' => 0.7,
-                        ],
-                    ]);
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key={$geminiKey}", $geminiPayload);
 
                 if ($response->successful()) {
                     $activeModelUsed = $geminiModel;
@@ -253,7 +275,50 @@ PROMPT;
                     $totalPromptTokens += (int) ($usageMeta['promptTokenCount'] ?? 0);
                     $totalCompletionTokens += (int) ($usageMeta['candidatesTokenCount'] ?? 0);
 
-                    $aiReplyText = $response->json('candidates.0.content.parts.0.text') ?? '';
+                    $candidate = $response->json('candidates.0.content') ?? [];
+                    $parts = $candidate['parts'] ?? [];
+
+                    // Handle function calls from Gemini
+                    $geminiCalledTools = false;
+                    foreach ($parts as $part) {
+                        if (!empty($part['functionCall'])) {
+                            $geminiCalledTools = true;
+                            $fnName = $part['functionCall']['name'] ?? '';
+                            $fnArgs = $part['functionCall']['args'] ?? [];
+
+                            $tool = $this->toolRegistry->getTool($fnName);
+                            if ($tool) {
+                                $res = $tool->execute($project, $fnArgs);
+                                $executedTools[] = $res;
+
+                                // Append function response and re-call Gemini for final text
+                                $geminiContents[] = ['role' => 'model', 'parts' => $parts];
+                                $geminiContents[] = [
+                                    'role'  => 'user',
+                                    'parts' => [['functionResponse' => ['name' => $fnName, 'response' => $res]]],
+                                ];
+
+                                $followUp = Http::withoutVerifying()
+                                    ->timeout(25)
+                                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key={$geminiKey}", [
+                                        'contents'         => $geminiContents,
+                                        'generationConfig' => ['temperature' => 0.5],
+                                    ]);
+
+                                if ($followUp->successful()) {
+                                    $followUsage = $followUp->json('usageMetadata') ?? [];
+                                    $totalPromptTokens += (int) ($followUsage['promptTokenCount'] ?? 0);
+                                    $totalCompletionTokens += (int) ($followUsage['candidatesTokenCount'] ?? 0);
+                                    $aiReplyText = $followUp->json('candidates.0.content.parts.0.text') ?? '';
+                                }
+                            }
+                            break; // Handle one function call per turn
+                        }
+                    }
+
+                    if (!$geminiCalledTools) {
+                        $aiReplyText = $parts[0]['text'] ?? '';
+                    }
                 }
             } catch (\Throwable $e) {
                 Log::error('Gemini API Exception: ' . $e->getMessage());
