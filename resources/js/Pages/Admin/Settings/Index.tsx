@@ -56,6 +56,8 @@ interface SettingsData {
     friday_work_allowed: boolean;
     max_devices_per_tenant: number;
     gemini_api_keys: string | null;
+    openai_1m_tokens_price?: string | number | null;
+    gemini_1m_tokens_price?: string | number | null;
     expected_monthly_income: string | null;
     work_days_per_month: string | null;
     hours_per_day: string | null;
@@ -494,17 +496,44 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
 
                         {/* AI Integrations */}
                         <SectionCard title={__('general.ai_integrations')} icon={Lightbulb}>
-                            <Field label={__('general.gemini_api_keys')}>
-                                <textarea
-                                    id="gemini_api_keys"
-                                    value={form.gemini_api_keys ?? ''}
-                                    onChange={(e) => set('gemini_api_keys', e.target.value)}
-                                    placeholder={__('general.paste_multiple_keys_separated_by_commas_e_g_aiza_aiza')}
-                                    rows={3}
-                                    className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">{__('general.provide_one_or_more_gemini_api_keys_comma_separated_for_load_balancing_ai_features_across_multiple_free_tier_accounts')}</p>
-                            </Field>
+                            <div className="space-y-4">
+                                <Field label={__('general.gemini_api_keys')}>
+                                    <textarea
+                                        id="gemini_api_keys"
+                                        value={form.gemini_api_keys ?? ''}
+                                        onChange={(e) => set('gemini_api_keys', e.target.value)}
+                                        placeholder={__('general.paste_multiple_keys_separated_by_commas_e_g_aiza_aiza')}
+                                        rows={3}
+                                        className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">{__('general.provide_one_or_more_gemini_api_keys_comma_separated_for_load_balancing_ai_features_across_multiple_free_tier_accounts')}</p>
+                                </Field>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Field label="OpenAI 1M Tokens Price ($)">
+                                        <Input
+                                            id="openai_1m_tokens_price"
+                                            type="number"
+                                            step="0.0001"
+                                            min="0"
+                                            value={form.openai_1m_tokens_price ?? ''}
+                                            onChange={(e) => set('openai_1m_tokens_price', e.target.value)}
+                                            placeholder="e.g. 5.00"
+                                        />
+                                    </Field>
+                                    <Field label="Gemini 1M Tokens Price ($)">
+                                        <Input
+                                            id="gemini_1m_tokens_price"
+                                            type="number"
+                                            step="0.0001"
+                                            min="0"
+                                            value={form.gemini_1m_tokens_price ?? ''}
+                                            onChange={(e) => set('gemini_1m_tokens_price', e.target.value)}
+                                            placeholder="e.g. 1.00"
+                                        />
+                                    </Field>
+                                </div>
+                            </div>
                         </SectionCard>
 
                         {/* Google Calendar Integration */}

@@ -97,7 +97,7 @@ return [
     ],
 
     'gemini' => [
-        'key' => env('GEMINI_API_KEY'),
+        'key' => env('GEMINI_API_KEY', env('GEMINI_API_KEY_1')),
     ],
 
     'erp' => [

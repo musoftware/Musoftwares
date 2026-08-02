@@ -110,13 +110,17 @@ Conversation Memory:
 {$conversationMemoryJson}
 PROMPT;
 
-        // 4. Fetch Provider API Keys
+        // 4. Fetch Provider API Keys (Priority: AdminSettings -> env/config)
         $adminSettings = AdminSettings::pluck('setting_value', 'setting_key');
-        $openAiKey     = $adminSettings['openai_api_key'] ?? config('services.openai.key', '');
-        $openAiModel   = $adminSettings['openai_model'] ?? 'gpt-4o-mini';
+        $openAiKey     = !empty($adminSettings['openai_api_key'])
+            ? $adminSettings['openai_api_key']
+            : config('services.openai.key');
+        $openAiModel   = !empty($adminSettings['openai_model']) ? $adminSettings['openai_model'] : 'gpt-4o-mini';
 
-        $geminiKey     = $adminSettings['gemini_api_keys'] ?? config('services.gemini.key', '');
-        $geminiModel   = $adminSettings['gemini_model'] ?? 'gemini-2.0-flash';
+        $geminiKey     = !empty($adminSettings['gemini_api_keys'])
+            ? $adminSettings['gemini_api_keys']
+            : config('services.gemini.key');
+        $geminiModel   = !empty($adminSettings['gemini_model']) ? $adminSettings['gemini_model'] : 'gemini-2.0-flash';
 
         // 5. Load Last 5 Messages Only for Memory Window
         $recentDiscussions = ProjectComment::where('project_id', $project->id)

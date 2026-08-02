@@ -72,6 +72,8 @@ class AdminSettingController extends Controller
             'google_analytics_id' => AdminSettings::GetValue('google_analytics_id'),
             'google_tag_manager_id' => AdminSettings::GetValue('google_tag_manager_id'),
             'meta_pixel_id' => AdminSettings::GetValue('meta_pixel_id'),
+            'openai_1m_tokens_price' => AdminSettings::GetValue('openai_1m_tokens_price'),
+            'gemini_1m_tokens_price' => AdminSettings::GetValue('gemini_1m_tokens_price'),
             'custom_head_scripts' => AdminSettings::GetValue('custom_head_scripts'),
             'custom_body_scripts' => AdminSettings::GetValue('custom_body_scripts'),
             // Recurring invoice notification channel toggles (one place; default mail+fcm).
@@ -146,6 +148,8 @@ class AdminSettingController extends Controller
             'hours_per_day' => 'nullable|numeric|min:0',
             'google_analytics_id' => 'nullable|string',
             'google_tag_manager_id' => 'nullable|string',
+            'openai_1m_tokens_price' => 'nullable|numeric|min:0',
+            'gemini_1m_tokens_price' => 'nullable|numeric|min:0',
             'meta_pixel_id' => 'nullable|string',
             'custom_head_scripts' => 'nullable|string|max:16384',
             'custom_body_scripts' => 'nullable|string|max:16384',

@@ -33,6 +33,22 @@ class AiTokenBillingService
      */
     public function getModelRates(string $model): array
     {
+        // First check dynamic rates from admin settings for our primary models
+        if (in_array(strtolower($model), ['gpt-4o-mini', 'gemini-2.0-flash'])) {
+            $openaiPrice = (float) \App\Models\AdminSettings::GetValue('openai_1m_tokens_price', 0);
+            $geminiPrice = (float) \App\Models\AdminSettings::GetValue('gemini_1m_tokens_price', 0);
+
+            if (strtolower($model) === 'gpt-4o-mini' && $openaiPrice > 0) {
+                // Apply the flat 1M token price to both input and output for simplicity, or distribute it.
+                // Assuming the dynamic price applies flatly:
+                return ['input' => $openaiPrice, 'output' => $openaiPrice];
+            }
+
+            if (strtolower($model) === 'gemini-2.0-flash' && $geminiPrice > 0) {
+                return ['input' => $geminiPrice, 'output' => $geminiPrice];
+            }
+        }
+
         $normalized = strtolower(trim($model));
         if (isset($this->modelRates[$normalized])) {
             return $this->modelRates[$normalized];

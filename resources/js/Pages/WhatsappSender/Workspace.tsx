@@ -21,6 +21,7 @@ interface Business {
     is_test_mode?: boolean;
     test_phone_number_id?: string | null;
     test_waba_id?: string | null;
+    webhook_verify_token?: string | null;
 }
 
 interface Account {
