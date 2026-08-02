@@ -53,6 +53,12 @@ class CheckDsoLimits extends Command
         $this->info("Found " . $users->count() . " client(s) with unpaid invoices to inspect.");
 
         foreach ($users as $user) {
+            // Skip clients without any assigned serial devices
+            if ($user->serialUserDevices()->count() === 0) {
+                $this->info("Client #{$user->id} ({$user->name}) has no assigned serial devices. Skipping DSO checks.");
+                continue;
+            }
+
             $oldestInvoice = $user->oldestUnpaidInvoice();
             if (!$oldestInvoice) {
                 continue;

@@ -77,15 +77,36 @@ class UserEmailAliasTest extends TestCase
         $admin = $this->makeAdmin();
         $user = User::factory()->create();
 
-        $response = $this->actingAs($admin)->post("/admin/users/{$user->id}/emails", [
-            'email' => 'second@example.com',
-            'verified_at' => 1,
-        ]);
+        $response = $this->actingAs($admin)
+            ->from(route('admin.users.emails.index', $user->id))
+            ->post("/admin/users/{$user->id}/emails", [
+                'email' => 'second@example.com',
+                'verified_at' => 1,
+            ]);
 
         $response->assertRedirect(route('admin.users.emails.index', $user->id));
         $this->assertDatabaseHas('user_emails', [
             'user_id' => $user->id,
             'email' => 'second@example.com',
+        ]);
+    }
+
+    public function test_admin_can_create_alias_from_user_edit_page(): void
+    {
+        $admin = $this->makeAdmin();
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($admin)
+            ->from(route('admin.users.edit', $user->id))
+            ->post("/admin/users/{$user->id}/emails", [
+                'email' => 'editpage@example.com',
+                'verified_at' => 1,
+            ]);
+
+        $response->assertRedirect(route('admin.users.edit', $user->id));
+        $this->assertDatabaseHas('user_emails', [
+            'user_id' => $user->id,
+            'email' => 'editpage@example.com',
         ]);
     }
 

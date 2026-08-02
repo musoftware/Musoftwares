@@ -1391,7 +1391,9 @@ class InvoiceController extends Controller
               ->whereIn('status', ['unpaid', 'partially_paid'])
               ->where('archive', '0')
               ->with('items');
-        }])->get();
+        }])
+        ->withCount('serialUserDevices')
+        ->get();
 
         $clientDues = $users->map(function ($client) use ($limit) {
             // Group unpaid amounts by currency
@@ -1438,10 +1440,10 @@ class InvoiceController extends Controller
                 $defaultBody .= "\nThank you,\nMusoftware Team";
             }
 
-            // Calculate DSO data
+            // Calculate DSO data only if client has serial devices assigned
             $oldestInvoice = $client->invoices->sortBy('id')->first();
             $dsoData = null;
-            if ($oldestInvoice) {
+            if ($oldestInvoice && $client->serial_user_devices_count > 0) {
                 $createdAt = \Carbon\Carbon::parse($oldestInvoice->created_at)->timezone('Africa/Cairo');
                 $nowCairo = \Carbon\Carbon::now('Africa/Cairo');
                 $ageDays = (int) $createdAt->copy()->startOfDay()->diffInDays($nowCairo->copy()->startOfDay());

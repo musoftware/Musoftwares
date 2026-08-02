@@ -10094,7 +10094,18 @@
             "dso_safe": "مهلة التحصيل آمنة",
             "dso_deadline": "تاريخ إيقاف الخدمات المتوقع",
             "dso_days": "أيام",
-            "dso_system_disabled": "نظام مهلة التحصيل معطل حالياً"
+            "dso_system_disabled": "نظام مهلة التحصيل معطل حالياً",
+            "add_another_email_placeholder": "أدخل عنوان بريد إلكتروني إضافي...",
+            "add_email": "إضافة بريد إلكتروني",
+            "adding": "جاري الإضافة...",
+            "additional_email_addresses": "عناوين البريد الإلكتروني الإضافية",
+            "additional_emails_desc": "إدارة عناوين البريد الإلكتروني الثانوية المرتبطة بحساب هذا المستخدم.",
+            "confirm_make_primary_alias": "هل أنت تأكد من تعيين هذا البريد الإلكتروني كعنوان رئيسي؟",
+            "confirm_remove_alias": "هل أنت تأكد من إزالة عنوان البريد الإلكتروني هذا؟",
+            "manage_all_aliases": "إدارة كافة عناوين البريد البديلة",
+            "manage_emails": "إدارة البريد الإلكتروني",
+            "mark_verified": "تعيين كمتحقق منه",
+            "no_additional_emails": "لا توجد عناوين بريد إلكتروني إضافية مضافة."
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -22035,7 +22046,18 @@
             "dso_safe": "DSO Status: Safe",
             "dso_deadline": "Deactivation Deadline",
             "dso_days": "Days",
-            "dso_system_disabled": "DSO System is disabled"
+            "dso_system_disabled": "DSO System is disabled",
+            "add_another_email_placeholder": "Enter additional email address...",
+            "add_email": "Add Email",
+            "adding": "Adding...",
+            "additional_email_addresses": "Additional Email Addresses",
+            "additional_emails_desc": "Manage secondary email addresses associated with this user account.",
+            "confirm_make_primary_alias": "Are you sure you want to make this email the primary address?",
+            "confirm_remove_alias": "Are you sure you want to remove this email address?",
+            "manage_all_aliases": "Manage All Email Aliases",
+            "manage_emails": "Manage Emails",
+            "mark_verified": "Mark as Verified",
+            "no_additional_emails": "No additional email addresses added."
         },
         "gold_saver": {
             "achieved": "Achieved",

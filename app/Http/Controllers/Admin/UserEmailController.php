@@ -80,7 +80,7 @@ class UserEmailController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.users.emails.index', $user->id)
+            ->back()
             ->with('success', __('admin.alias_added', ['email' => $email]));
     }
 
@@ -91,7 +91,7 @@ class UserEmailController extends Controller
         $email->delete();
 
         return redirect()
-            ->route('admin.users.emails.index', $user->id)
+            ->back()
             ->with('success', __('admin.alias_removed'));
     }
 
@@ -102,7 +102,7 @@ class UserEmailController extends Controller
         $email->forceFill(['verified_at' => now()])->save();
 
         return redirect()
-            ->route('admin.users.emails.index', $user->id)
+            ->back()
             ->with('success', __('admin.alias_verified'));
     }
 
@@ -129,7 +129,7 @@ class UserEmailController extends Controller
         });
 
         return redirect()
-            ->route('admin.users.emails.index', $user->id)
+            ->back()
             ->with('success', __('admin.primary_email_updated'));
     }
 

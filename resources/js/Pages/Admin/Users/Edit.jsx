@@ -1,6 +1,6 @@
-import React from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { Save, ArrowLeft, Info, AlertTriangle, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Save, ArrowLeft, Info, AlertTriangle, CheckCircle, Mail, Plus, Trash2 } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -8,8 +8,43 @@ import { Label } from '@/Components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { Switch } from '@/Components/ui/switch';
+import { __ } from '@/lib/i18n';
 
-export default function Edit({ user, currencies = [], plans = [], statuses = [], roles = [] }) {
+export default function Edit({ user, currencies = [], plans = [], statuses = [], roles = [], emails = [] }) {
+    const [newAliasEmail, setNewAliasEmail] = useState('');
+    const [newAliasVerified, setNewAliasVerified] = useState(true);
+    const [addingAlias, setAddingAlias] = useState(false);
+
+    const handleAddAlias = (e) => {
+        e.preventDefault();
+        if (!newAliasEmail) return;
+        setAddingAlias(true);
+        router.post(`/admin/users/${user.id}/emails`, {
+            email: newAliasEmail.trim(),
+            verified_at: newAliasVerified ? 1 : 0,
+        }, {
+            onFinish: () => {
+                setAddingAlias(false);
+                setNewAliasEmail('');
+            },
+            preserveScroll: true,
+        });
+    };
+
+    const handleRemoveAlias = (alias) => {
+        if (!confirm(__('general.confirm_remove_alias', { email: alias.email }) || `Are you sure you want to remove ${alias.email}?`)) return;
+        router.delete(`/admin/users/${user.id}/emails/${alias.id}`, {
+            preserveScroll: true,
+        });
+    };
+
+    const handleMakePrimaryAlias = (alias) => {
+        if (!confirm(__('general.confirm_make_primary_alias', { email: alias.email }) || `Make ${alias.email} the primary email for this account?`)) return;
+        router.post(`/admin/users/${user.id}/emails/${alias.id}/make-primary`, {}, {
+            preserveScroll: true,
+        });
+    };
+
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
         full_name: user.full_name || '',
@@ -132,6 +167,102 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                             </DialogFooter>
                                         </DialogContent>
                                     </Dialog>
+                                </div>
+
+                                {/* Additional Email Addresses (Email Aliases) */}
+                                <div className="md:col-span-2 mt-2 p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-4">
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                        <div>
+                                            <h6 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                                <Mail className="h-4 w-4 text-slate-700" />
+                                                {__('general.additional_email_addresses') || 'عناوين البريد الإلكتروني الإضافية (Email Aliases)'}
+                                            </h6>
+                                            <p className="text-xs text-slate-500 mt-0.5">
+                                                {__('general.additional_emails_desc') || 'يمكن للمستخدم تسجيل الدخول بنفس كلمة المرور واستلام الإشعارات باستخدام أي من عناوين البريد المضافة.'}
+                                            </p>
+                                        </div>
+                                        <Link href={`/admin/users/${user.id}/emails`}>
+                                            <Button type="button" variant="outline" size="sm" className="text-xs">
+                                                {__('general.manage_all_aliases') || 'إدارة ودمج الحسابات'}
+                                            </Button>
+                                        </Link>
+                                    </div>
+
+                                    {/* Existing Aliases List */}
+                                    {emails && emails.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {emails.map((alias) => (
+                                                <div key={alias.id} className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200 text-sm">
+                                                    <div className="flex items-center gap-2.5 min-w-0">
+                                                        <span className="font-mono text-slate-800 text-xs sm:text-sm truncate">{alias.email}</span>
+                                                        <span className={`text-[10px] uppercase px-2 py-0.5 rounded-full font-semibold ${
+                                                            alias.verified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                                        }`}>
+                                                            {alias.verified ? (__('general.verified') || 'مؤكد') : (__('general.pending') || 'معلق')}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 shrink-0">
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-7 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2"
+                                                            onClick={() => handleMakePrimaryAlias(alias)}
+                                                        >
+                                                            {__('general.make_primary') || 'جعله رئيسي'}
+                                                        </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2"
+                                                            onClick={() => handleRemoveAlias(alias)}
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-xs text-slate-500 italic">
+                                            {__('general.no_additional_emails') || 'لا توجد عناوين بريد إلكتروني إضافية مضافة لهذا الحساب.'}
+                                        </p>
+                                    )}
+
+                                    {/* Add New Email Inline */}
+                                    <div className="pt-3 border-t border-slate-200/80">
+                                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                            <Input
+                                                type="email"
+                                                value={newAliasEmail}
+                                                onChange={(e) => setNewAliasEmail(e.target.value)}
+                                                placeholder={__('general.add_another_email_placeholder') || 'أدخل بريد إلكتروني إضافي... (مثال: secondary@example.com)'}
+                                                className="grow text-xs sm:text-sm bg-white"
+                                            />
+                                            <div className="flex items-center gap-2 shrink-0 justify-between sm:justify-start">
+                                                <label className="inline-flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer select-none px-1">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={newAliasVerified}
+                                                        onChange={(e) => setNewAliasVerified(e.target.checked)}
+                                                        className="rounded border-slate-300 text-slate-900 focus:ring-slate-900 h-3.5 w-3.5"
+                                                    />
+                                                    {__('general.mark_verified') || 'مؤكد'}
+                                                </label>
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    disabled={addingAlias || !newAliasEmail}
+                                                    onClick={handleAddAlias}
+                                                    className="text-xs"
+                                                >
+                                                    <Plus className="h-3.5 w-3.5 me-1" />
+                                                    {addingAlias ? (__('general.adding') || 'جاري الإضافة...') : (__('general.add_email') || 'إضافة بريد')}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

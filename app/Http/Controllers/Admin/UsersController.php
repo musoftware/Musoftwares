@@ -18,6 +18,7 @@ use App\Models\ModulePlan;
 use App\Models\SerialDevice;
 use App\Models\SerialUserDevice;
 use App\Models\User;
+use App\Models\UserEmail;
 use App\Models\UserSubscription;
 use App\Services\AdminUserService;
 use App\Services\EarningAnalyzeService;
@@ -384,7 +385,7 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $user = User::with(['kycDocuments', 'roles', 'kycVerifier'])->findOrFail($id);
+        $user = User::with(['kycDocuments', 'roles', 'kycVerifier', 'emails'])->findOrFail($id);
 
         return Inertia::render('Admin/Users/Edit', [
             'user' => [
@@ -447,6 +448,14 @@ class UsersController extends Controller
                 'slug' => $user->slug ?? '',
                 'max_devices' => $user->max_devices ?? '',
             ],
+            'emails' => $user->emails->map(fn (UserEmail $e) => [
+                'id' => $e->id,
+                'email' => $e->email,
+                'verified' => (bool) $e->isVerified(),
+                'verified_at' => $e->verified_at?->toIso8601String(),
+                'source' => $e->source,
+                'created_at' => $e->created_at?->toIso8601String(),
+            ])->values(),
             'roles' => ['client', 'user', 'admin', 'manager', 'employee', 'moderator'],
             'currencies' => Currency::all(),
             'plans' => ModulePlan::where('is_active', true)->get(),

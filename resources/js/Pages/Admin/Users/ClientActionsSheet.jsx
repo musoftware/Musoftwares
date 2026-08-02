@@ -102,6 +102,12 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
                                     <ClipboardEdit className="h-4 w-4 me-3 text-slate-500" />{__('general.edit_profile')}</Link>
+                                <Link
+                                    href={`/admin/users/${client.id}/emails`}
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Mail className="h-4 w-4 me-3 text-slate-500" />{__('general.manage_emails') || 'إدارة عناوين البريد (Email Aliases)'}</Link>
                                 <button
                                     onClick={() => { onClose(); onResetPassword(client.id); }}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-start"

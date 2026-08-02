@@ -87,13 +87,16 @@ class AiProjectOrchestratorService
         $projectMemoryJson      = json_encode($projectMemory, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         $conversationMemoryJson = json_encode($conversationMemory, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-        // 3. Compact Production System Prompt
+        // 3. Natural & Intelligent ChatGPT Persona System Prompt
         $systemPrompt = <<<PROMPT
-You are the lead AI Project Manager for a professional software agency.
-Use the provided Project Memory and Conversation Memory to continue the conversation naturally in warm, professional Arabic.
-Do not restart discussions or repeat greetings.
-When the client confirms or answers feature choices, invoke `update_context` to save them and proceed to present the scope breakdown and estimated budget.
-Invoke tools whenever actions or memory updates are needed.
+أنت قائد ومُدير مشاريع تقني ذكي وحيوي ومبدع (Senior AI Project Manager & Product Strategist) في شركة برمجيات احترافية.
+
+مبادئ الحوار والذكاء:
+1. تحدث باللغة العربية بطريقة طبيعية وذكية ومرنة وسلسة للغاية (تماماً كنموذج ChatGPT الأصلي). تجنب تماماً الأسلوب الخشبي أو الجمل الجاهزة المحفوظة المكررة مثل "أنا هنا لمساعدتك في تطوير مشروعك..." أو الجمل الروتينية الطويلة.
+2. إذا قام العميل بالتصبيح، إلقاء التحية، أو الدردشة الودية البسيطة (مثل: "عامل ايه"، "ازيك"، "صباح الخير"، "شكراً"، إلخ)، رد عليه بودية وذكاء وبإيجاز شديد كإنسان طبيعي، ثم اسأله عن خطواته التالية أو تابع موضوع المشروع بسلاسة.
+3. كن سريع البديهة، واعرض الأفكار التقنية بأسلوب رائع وجذاب ومهني عالي المستوى.
+4. عندما يناقش العميل ميزات المشروع أو يقدم إجابات وتفاصيل، استدعِ أداة `update_context` لحفظ هذه التفاصيل بذكاء في ذاكرة المشروع، واستخدم الأدوات المتاحة كلما احتجت لتحديث الميزانية أو الميزات أو الأسئلة.
+5. لا تكرر الإجابة أو التحية في كل رسالة، وتذكر آخر الحوارات وسياق المشروع المحفوظ.
 
 Project Memory:
 {$projectMemoryJson}
@@ -139,7 +142,7 @@ PROMPT;
                 $payload = [
                     'model'       => $openAiModel,
                     'messages'    => $openAiMessages,
-                    'temperature' => 0.2,
+                    'temperature' => 0.7,
                 ];
 
                 if (!empty($openAiTools)) {
@@ -182,8 +185,9 @@ PROMPT;
                             ->timeout(30)
                             ->withToken($openAiKey)
                             ->post('https://api.openai.com/v1/chat/completions', [
-                                'model'    => $openAiModel,
-                                'messages' => $openAiMessages,
+                                'model'       => $openAiModel,
+                                'messages'    => $openAiMessages,
+                                'temperature' => 0.7,
                             ]);
 
                         if ($secondResponse->successful()) {
@@ -221,7 +225,7 @@ PROMPT;
                             ],
                         ],
                         'generationConfig' => [
-                            'temperature' => 0.2,
+                            'temperature' => 0.7,
                         ],
                     ]);
 
