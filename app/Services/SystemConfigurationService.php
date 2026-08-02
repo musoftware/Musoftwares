@@ -25,6 +25,7 @@ class SystemConfigurationService extends BaseService
             'max_devices_per_tenant', 'gemini_api_keys',
             'expected_monthly_income', 'work_days_per_month', 'hours_per_day',
             'google_analytics_id', 'google_tag_manager_id', 'meta_pixel_id',
+            'openai_1m_tokens_price', 'gemini_1m_tokens_price',
             'custom_head_scripts', 'custom_body_scripts',
             'notif_channels_invoice_created', 'market_hourly_rate',
             'auto_pay_after_days', 'enable_dso_decrement', 'global_dso_limit', 'enable_dso_system',

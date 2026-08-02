@@ -62,7 +62,7 @@ class GuestInvoiceController extends Controller
 
         $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($amount, $currency)
-            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'user_'.$invoice->user_id)
+            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'guest_inv_'.$invoice->id)
             ->withSource('guest-invoice-payment', 'inv_')
             ->withMetadata([
                 'invoice_id' => $invoice->id,

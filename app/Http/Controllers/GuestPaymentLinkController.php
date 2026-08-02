@@ -57,7 +57,7 @@ class GuestPaymentLinkController extends Controller
 
         $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($amount, $currency)
-            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'user_'.$paymentLink->user_id)
+            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'guest_plnk_'.$paymentLink->uuid)
             ->withSource('payment-link', 'plnk_')
             ->withMetadata([
                 'payment_link_id' => $paymentLink->id,
@@ -66,7 +66,7 @@ class GuestPaymentLinkController extends Controller
             ->withRoutes(
                 success: route('guest.payment-links.success'),
                 failure: route('guest.payment-links.failure'),
-                webhook: route('webhook')
+                webhook: route('guest.payment-links.webhook')
             )
             ->build();
 

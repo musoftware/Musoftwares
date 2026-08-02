@@ -28,6 +28,8 @@ class KashierCheckoutBuilder
 
     private string $webhookUrl = '';
 
+    private string $saveCard = 'optional';
+
     private string $mode;
 
     private string $merchantId;
@@ -73,6 +75,21 @@ class KashierCheckoutBuilder
             'reference' => $reference,
         ];
         $this->customerReference = $reference;
+        $this->saveCard = 'false';
+
+        return $this;
+    }
+
+    public function withSaveCard(string $saveCard = 'optional'): self
+    {
+        $this->saveCard = $saveCard;
+
+        return $this;
+    }
+
+    public function withoutSaveCard(): self
+    {
+        $this->saveCard = 'false';
 
         return $this;
     }
@@ -166,7 +183,7 @@ class KashierCheckoutBuilder
             'display' => app()->getLocale() ?: 'en',
             'manualCapture' => 'false',
             'customer' => json_encode($this->customer),
-            'saveCard' => 'optional',
+            'saveCard' => $this->saveCard,
             'interactionSource' => 'Ecommerce',
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',

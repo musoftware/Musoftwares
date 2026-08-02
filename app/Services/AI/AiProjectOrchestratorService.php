@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\RateLimiter;
 class AiProjectOrchestratorService
 {
     protected AiTokenBillingService $tokenBillingService;
+    protected AiContextBuilder      $contextBuilder;
 
     /** Maximum number of sequential tool-call rounds before we force a text reply. */
     private const MAX_TOOL_ITERATIONS = 5;
@@ -27,35 +28,42 @@ class AiProjectOrchestratorService
     /** Admin-settings cache TTL in seconds. */
     private const SETTINGS_CACHE_TTL = 300;
 
+    /** Conversation history window (number of past messages sent to the LLM). */
+    private const HISTORY_WINDOW = 10;
+
     public function __construct(
         protected AiToolRegistry $toolRegistry
     ) {
         $this->tokenBillingService = new AiTokenBillingService();
+        $this->contextBuilder      = new AiContextBuilder();
     }
 
     /**
-     * Process client message in the Memory-Driven Conversation Engine Architecture.
+     * Process client message using the Lean Prompt / Layered Context Architecture.
      *
-     * Principles:
-     * 1. System Prompt = Persona + Project Memory + Conversation Memory.
-     * 2. Project Memory = Permanent facts (goal, completed_features, pending_features, tech_stack, invoice_status).
-     * 3. Conversation Memory = Living facts (conversation_summary, waiting_for).
-     * 4. History Window = Last 15 messages (enough context without hitting token limits).
-     * 5. Tool Calling = OpenAI natively triggers tools; supports multi-turn tool chains.
-     * 6. Zero Laravel String Rules (Laravel is purely stateless execution & memory persistence).
+     * Flow:
+     *  1. Guards (system message, rate limit).
+     *  2. Sanitise input.
+     *  3. Load cached settings.
+     *  4. Resolve pipeline stage → AiContextBuilder builds the lean system prompt.
+     *  5. Load history window (last N messages).
+     *  6. OpenAI provider with multi-turn tool loop.
+     *  7. Gemini fallback with multi-turn tool loop.
+     *  8. DB::transaction — billing + persist reply.
+     *  9. Structured log.
      */
     public function processClientMessage(Project $project, string $messageBody, int $authorId): array
     {
-        // ── Guard: ignore system-generated messages ─────────────────────────────
+        // ── Guard: ignore system-generated messages ──────────────────────────────
         if (str_starts_with(trim($messageBody), '[System:')) {
             return ['ok' => true, 'billed' => 0];
         }
 
-        // ── Guard: rate limit per project (10 req/min) ──────────────────────────
+        // ── Guard: rate limit per project (10 req / min) ─────────────────────────
         $rateLimitKey = 'ai_project:' . $project->id;
         if (RateLimiter::tooManyAttempts($rateLimitKey, self::RATE_LIMIT_PER_MINUTE)) {
             $seconds = RateLimiter::availableIn($rateLimitKey);
-            Log::warning("[AI Orchestrator] Rate limit hit for project #{$project->id}. Retry in {$seconds}s.");
+            Log::warning("[AI Orchestrator] Rate limit for project #{$project->id}. Retry in {$seconds}s.");
             return [
                 'ok'    => false,
                 'error' => "تم إرسال رسائل كثيرة. يرجى الانتظار {$seconds} ثانية ثم المحاولة مجدداً.",
@@ -67,9 +75,8 @@ class AiProjectOrchestratorService
             $project->update(['ai_enabled' => true]);
         }
 
-        // ── 1. Sanitize & size-limit incoming message ────────────────────────────
+        // ── 1. Sanitise & size-limit incoming message ────────────────────────────
         $cleanBody = $this->sanitizeInput($messageBody);
-
         if (empty($cleanBody)) {
             return ['ok' => false, 'error' => 'الرسالة فارغة بعد التنظيف.'];
         }
@@ -79,79 +86,30 @@ class AiProjectOrchestratorService
             return AdminSettings::pluck('setting_value', 'setting_key')->toArray();
         });
 
-        $openAiKey   = !empty($adminSettings['openai_api_key'])   ? $adminSettings['openai_api_key']   : config('services.openai.key');
-        $openAiModel = !empty($adminSettings['openai_model'])      ? $adminSettings['openai_model']      : 'gpt-4o-mini';
-        $geminiKey   = !empty($adminSettings['gemini_api_keys'])   ? $adminSettings['gemini_api_keys']   : config('services.gemini.key');
-        $geminiModel = !empty($adminSettings['gemini_model'])      ? $adminSettings['gemini_model']      : 'gemini-2.0-flash';
+        $openAiKey   = !empty($adminSettings['openai_api_key'])  ? $adminSettings['openai_api_key']  : config('services.openai.key');
+        $openAiModel = !empty($adminSettings['openai_model'])     ? $adminSettings['openai_model']     : 'gpt-4o-mini';
+        $geminiKey   = !empty($adminSettings['gemini_api_keys'])  ? $adminSettings['gemini_api_keys']  : config('services.gemini.key');
+        $geminiModel = !empty($adminSettings['gemini_model'])     ? $adminSettings['gemini_model']     : 'gemini-2.0-flash';
 
-        // ── 3. Extract Project Memory & Conversation Memory ──────────────────────
-        $context = $project->ai_context ?? [];
+        // ── 3. Resolve pipeline stage ────────────────────────────────────────────
+        $stage = $this->contextBuilder->resolveStage($project);
 
-        $projectMemory = [
-            'current_stage'      => $context['current_stage']          ?? 'GREETING',
-            'goal'               => $context['goal']                   ?? $project->project_name,
-            'completed_features' => $context['completed_features']     ?? [],
-            'pending_features'   => $context['pending_features']       ?? [],
-            'tech_stack'         => $context['tech_stack']             ?? 'Laravel, React, Inertia',
-            'invoice_status'     => $context['current_invoice_status'] ?? 'none',
-        ];
-
-        $conversationMemory = [
-            'summary'     => $context['conversation_summary'] ?? 'Conversation initiated.',
-            'waiting_for' => $context['waiting_for']          ?? [],
-        ];
-
-        $projectMemoryJson      = json_encode($projectMemory, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-        $conversationMemoryJson = json_encode($conversationMemory, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-
-        // ── 4. Build System Prompt ───────────────────────────────────────────────
-        $systemPrompt = <<<PROMPT
-أنت مبرمج مصري سينيور وقائد تقني (Senior Egyptian Software Developer & Tech Lead) في شركة برمجيات احترافية.
-
-قواعد الشخصية وأسلوب الحوار:
-1. تحدث بالعامية المصرية الدارجة السلسة والمباشرة الخاصة بالمبرمجين (مثال: "تمام يا هندسة"، "أمرك يا باشا"، "فل زي الفل"، "ظبطنا الـ logic"، "الـ API جاهز"، "كله تمام").
-2. تجنب تماماً الأسلوب الفصيح الجاف أو الروبوتي، وتجنب تماماً الجمل الكليشيه المكررة (مثل "أنا بخير، كيف تسير الأمور مع مشروعك؟" أو "هل لديك تفاصيل أخرى تود مشاركتها؟").
-3. ممنوع نهائياً إضافة أو تعقيب أي كلام مكرر أو أسئلة توجيهية زائفة في نهاية كل رسالة (Do NOT append trailing questions, project status checks, or boilerplate context summaries to your messages).
-4. عند السلام أو الدردشة البسيطة العادية (مثل: "عامل ايه"، "ازيك"، "صباح الخير"، "شكرا"): رد في جملة واحدة مختصرة جداً وبشكل طبيعي كإنسان طبيعي (مثال: "تمام الحمد لله يا هندسة، أخبارك إيه؟") دون فتح سيرة المشروع ودون إضافة أي أسئلة زائدة عن المشروع، إلا إذا كان العميل هو من بدأ بالحديث عن تفاصيل أو أسئلة بالمشروع.
-5. خط الدورة المعتمد للمشروع (AI PIPELINE STAGES & MANDATORY TOOL CALLS):
-   - مرحلة `GREETING`: رد بسيط ومباشر دون فتح مواضيع مشروع تلقائياً.
-   - مرحلة `DISCOVERY`: عند مناقشة تفاصيل الفكرة، يجب استدعاء أداة `update_context` بتمرير `current_stage` = 'DISCOVERY' وحفظ قائمة `pending_features` والـ `goal`.
-   - مرحلة `VALUATION`: قبل إعطاء أي سعر، يجب اتباع الخطوات الآتية بالترتيب:
-     أ) حدد نوع المشروع بدقة: هل هو بسيط (CRUD / Todo / صفحة بسيطة) أم متوسط (Web App / MVP) أم متقدم (E-Commerce / CRM / ERP) أم موبايل (Android / iOS)؟
-     ب) اعرض قائمة الميزات المتفق عليها مع ساعات العمل التقريبية لكل ميزة بشكل منفصل.
-     ج) احسب التكلفة بشكل تراكمي: ساعات العمل × سعر الساعة. لا تعطِ رقماً عشوائياً من عندك.
-     د) أسعار مرجعية يجب التزامها:
-        - Todo App / CRUD بسيط: بين 1,500 و 4,000 جنيه كحد أقصى.
-        - Web App متوسط (MVP بميزات متعددة): بين 5,000 و 15,000 جنيه.
-        - تطبيق موبايل Android/iOS: من 30,000 جنيه فأكثر.
-        - E-Commerce / CRM / ERP: من 20,000 جنيه فأكثر حسب التعقيد.
-     هـ) **لا تبالغ في السعر لمشروع بسيط** — التطبيق الذي يحتوي فقط على إضافة/حذف/تعديل/عرض مهام هو مشروع تدريبي بسيط لا يستحق أكثر من 2,000 إلى 3,000 جنيه.
-     و) استدعِ `update_context` بقيمة `current_stage` = 'VALUATION' بعد عرض التسعير التفصيلي.
-   - مرحلة `PROPOSAL`: عندما يوافق العميل أو يطلب بدء الديل/العمل/العقد/تعديل الميزانية، **يجب فوراً وبشكل إجباري استدعاء أداة `create_contract`** بالمبلغ النهائي الدقيق المتفق عليه مع العميل في المحادثة. وعندما ترجع الأداة رابط `contract_url` يجب أن تضمن الرابط الحقيقي داخل الرسالة.
-   - ملاحظة هامة جداً: إذا سأل العميل أو استفسر عن كيفية حساب التكلفة (مثال: "ازاي"، "ليه السعر ده")، اشرح له التفاصيل المنطقية للتسعير بوضوح تام، **ولا تقم باستدعاء أداة `create_contract` مجدداً** طالما لم يطلب هو إنشاء عقد جديد، بل اكتفِ بالشرح والإقناع.
-   - مرحلة `EXECUTION`: بعد توقيع العقد وسداد الدفعة الأولى، سيتولى النظام العمل تلقائياً.
-   - إياك أن توافق شفهياً على الاتفاق المالي لأول مرة دون استدعاء أداة `create_contract`، ولكن لا تكرر استدعاءها في كل رد إذا كان العميل يتناقش معك.
-6. لا تكرر نفسك، وتذكر آخر الحوارات وسياق المشروع المحفوظ.
-7. أداة الذاكرة الممتدة (EXTENDED MEMORY TOOL):
-   - الـ Context المتاح لك يشمل آخر 15 رسالة فقط. إذا أشار العميل لشيء قيل قبلها (ميزانية قديمة، فيتشر ذكره من قبل، موعد قيل مسبقاً)، **يجب فوراً استدعاء أداة `search_conversation_history`** بكلمة مفتاحية مناسبة قبل أن ترد.
-   - لا تقل أبداً "لا أتذكر" أو "لم يُذكر هذا سابقاً" دون أن تستدعي `search_conversation_history` أولاً.
-   - مثال: العميل يقول "قلتلك قبل كده السعر كان X" → استدعِ البحث بـ query="السعر" أو query="budget" واعرض ما وجدته.
-
-Project Memory:
-{$projectMemoryJson}
-
-Conversation Memory:
-{$conversationMemoryJson}
-PROMPT;
-
-        // ── 5. Load conversation history (single optimised query) ────────────────
-        // We fetch the last 15 messages ordered ascending so history is chronological.
+        // ── 4. Load conversation history (lean window: last N messages) ──────────
         $recentDiscussions = ProjectComment::where('project_id', $project->id)
             ->latest()
-            ->take(15)
+            ->take(self::HISTORY_WINDOW)
             ->get()
             ->reverse()
             ->values();
+
+        // Convert to provider-neutral format: [['role' => 'user'|'assistant', 'content' => '...']]
+        $history = $recentDiscussions->map(fn ($comm) => [
+            'role'    => $comm->author_id ? 'user' : 'assistant',
+            'content' => $this->sanitizeInput($comm->body),
+        ])->all();
+
+        // ── 5. Build stage-filtered tool list ────────────────────────────────────
+        $stageTools = $this->toolRegistry->toolsForStage($stage);
 
         // ── 6. Initialise counters ───────────────────────────────────────────────
         $totalPromptTokens     = 0;
@@ -164,20 +122,9 @@ PROMPT;
         // ── 7. OpenAI Provider ───────────────────────────────────────────────────
         if (!empty($openAiKey)) {
             try {
-                // Build messages array — history + CURRENT message (fix #1)
-                $openAiMessages = [['role' => 'system', 'content' => $systemPrompt]];
-
-                foreach ($recentDiscussions as $comm) {
-                    $openAiMessages[] = [
-                        'role'    => $comm->author_id ? 'user' : 'assistant',
-                        'content' => $this->sanitizeInput($comm->body),
-                    ];
-                }
-
-                // ✅ FIX #1: append the current user message that was missing
-                $openAiMessages[] = ['role' => 'user', 'content' => $cleanBody];
-
-                $openAiTools = $this->formatOpenAiTools();
+                // AiContextBuilder: base.md + stage/{stage}.md + lean memory + history + current message
+                $openAiMessages = $this->contextBuilder->build($project, $cleanBody, $history, 'openai');
+                $openAiTools    = $this->formatOpenAiTools($stageTools);
 
                 $payload = [
                     'model'       => $openAiModel,
@@ -189,7 +136,6 @@ PROMPT;
                     $payload['tool_choice'] = 'auto';
                 }
 
-                // ✅ FIX #4: Http::retry for transient network/rate errors
                 $response = Http::withoutVerifying()
                     ->retry(2, 600, fn (\Throwable $e, $response) => $this->isRetryable($response))
                     ->timeout(40)
@@ -200,31 +146,42 @@ PROMPT;
                     $activeModelUsed = $openAiModel;
                     $this->accumulateUsage($response->json('usage') ?? [], $totalPromptTokens, $totalCompletionTokens);
 
-                    $choice = $response->json('choices.0.message');
-
-                    // ✅ FIX #2: multi-turn tool calling while-loop
+                    $choice     = $response->json('choices.0.message');
                     $iterations = 0;
-                    while (!empty($choice['tool_calls']) && is_array($choice['tool_calls']) && $iterations < self::MAX_TOOL_ITERATIONS) {
-                        $iterations++;
 
-                        // Append assistant's tool-call message to conversation
-                        $openAiMessages[] = $choice;
+                    // Multi-turn tool-call loop — supports Tool → Tool → … → Reply chains
+                    while (
+                        !empty($choice['tool_calls']) &&
+                        is_array($choice['tool_calls']) &&
+                        $iterations < self::MAX_TOOL_ITERATIONS
+                    ) {
+                        $iterations++;
+                        $openAiMessages[] = $choice; // append assistant's tool-call turn
 
                         foreach ($choice['tool_calls'] as $toolCall) {
                             $fnName = $toolCall['function']['name'] ?? '';
                             $fnArgs = json_decode($toolCall['function']['arguments'] ?? '{}', true) ?: [];
 
-                            Log::info("[AI Orchestrator] OpenAI tool call: {$fnName}", [
+                            Log::info('[AI Orchestrator] OpenAI tool call', [
+                                'tool'       => $fnName,
                                 'project_id' => $project->id,
-                                'args'       => $fnArgs,
+                                'stage'      => $stage,
                                 'iteration'  => $iterations,
+                                'args'       => $fnArgs,
                             ]);
 
                             $tool = $this->toolRegistry->getTool($fnName);
-                            $res  = $tool ? $tool->execute($project, $fnArgs) : ['error' => "Unknown tool: {$fnName}"];
+                            try {
+                                $res = $tool ? $tool->execute($project, $fnArgs) : ['error' => "Unknown tool: {$fnName}"];
+                            } catch (\Throwable $te) {
+                                Log::error("[AI Orchestrator] Tool '{$fnName}' execution exception", [
+                                    'error'      => $te->getMessage(),
+                                    'project_id' => $project->id,
+                                ]);
+                                $res = ['error' => "Tool execution error: " . $te->getMessage()];
+                            }
                             $executedTools[] = ['tool' => $fnName, 'result' => $res];
 
-                            // Append tool result
                             $openAiMessages[] = [
                                 'role'         => 'tool',
                                 'tool_call_id' => $toolCall['id'] ?? '',
@@ -232,7 +189,7 @@ PROMPT;
                             ];
                         }
 
-                        // Re-call OpenAI after tool results
+                        // Re-call OpenAI with tool results
                         $followUp = Http::withoutVerifying()
                             ->retry(2, 600, fn (\Throwable $e, $response) => $this->isRetryable($response))
                             ->timeout(40)
@@ -246,7 +203,10 @@ PROMPT;
                             ]);
 
                         if (!$followUp->successful()) {
-                            Log::error('[AI Orchestrator] OpenAI tool follow-up failed: ' . $followUp->body());
+                            Log::error('[AI Orchestrator] OpenAI tool follow-up failed', [
+                                'status'     => $followUp->status(),
+                                'project_id' => $project->id,
+                            ]);
                             break;
                         }
 
@@ -254,7 +214,6 @@ PROMPT;
                         $choice = $followUp->json('choices.0.message');
                     }
 
-                    // Final text reply (no more tool_calls)
                     $aiReplyText = $choice['content'] ?? '';
                 } else {
                     Log::error('[AI Orchestrator] OpenAI API failed', [
@@ -267,7 +226,6 @@ PROMPT;
                 Log::error('[AI Orchestrator] OpenAI exception', [
                     'message'    => $e->getMessage(),
                     'project_id' => $project->id,
-                    'trace'      => $e->getTraceAsString(),
                 ]);
             }
         }
@@ -275,25 +233,12 @@ PROMPT;
         // ── 8. Gemini Fallback Provider ──────────────────────────────────────────
         if (empty($aiReplyText) && !empty($geminiKey)) {
             try {
-                // Gemini requires alternating user/model turns
-                $geminiContents = [
-                    ['role' => 'user',  'parts' => [['text' => $systemPrompt]]],
-                    ['role' => 'model', 'parts' => [['text' => 'فهمت التعليمات، أنا جاهز أساعد العميل.']]],
-                ];
+                // AiContextBuilder handles Gemini's alternating user/model format
+                $geminiContents = $this->contextBuilder->build($project, $cleanBody, $history, 'gemini');
 
-                foreach ($recentDiscussions as $comm) {
-                    $geminiContents[] = [
-                        'role'  => $comm->author_id ? 'user' : 'model',
-                        'parts' => [['text' => $this->sanitizeInput($comm->body)]],
-                    ];
-                }
-
-                // ✅ FIX #1: current message appended to Gemini too (was already there, kept for parity)
-                $geminiContents[] = ['role' => 'user', 'parts' => [['text' => $cleanBody]]];
-
-                $geminiTools = [];
-                foreach ($this->toolRegistry->all() as $tool) {
-                    $geminiTools[] = [
+                $geminiToolDeclarations = [];
+                foreach ($stageTools as $tool) {
+                    $geminiToolDeclarations[] = [
                         'name'        => $tool->name(),
                         'description' => $tool->description(),
                         'parameters'  => $tool->parameters(),
@@ -304,11 +249,10 @@ PROMPT;
                     'contents'         => $geminiContents,
                     'generationConfig' => ['temperature' => 0.5],
                 ];
-                if (!empty($geminiTools)) {
-                    $geminiPayload['tools'] = [['function_declarations' => $geminiTools]];
+                if (!empty($geminiToolDeclarations)) {
+                    $geminiPayload['tools'] = [['function_declarations' => $geminiToolDeclarations]];
                 }
 
-                // ✅ FIX #4: retry for Gemini
                 $response = Http::withoutVerifying()
                     ->retry(2, 600, fn (\Throwable $e, $response) => $this->isRetryable($response))
                     ->timeout(35)
@@ -318,11 +262,10 @@ PROMPT;
                     $activeModelUsed = $geminiModel;
                     $this->accumulateGeminiUsage($response->json('usageMetadata') ?? [], $totalPromptTokens, $totalCompletionTokens);
 
-                    $candidate = $response->json('candidates.0.content') ?? [];
-                    $parts     = $candidate['parts'] ?? [];
-
-                    // ✅ FIX #2: Gemini multi-turn tool calling while-loop
+                    $parts      = $response->json('candidates.0.content.parts') ?? [];
                     $iterations = 0;
+
+                    // Multi-turn Gemini tool-call loop
                     while ($iterations < self::MAX_TOOL_ITERATIONS) {
                         $iterations++;
                         $hasFunctionCall = false;
@@ -336,17 +279,26 @@ PROMPT;
                             $fnName = $part['functionCall']['name'] ?? '';
                             $fnArgs = $part['functionCall']['args'] ?? [];
 
-                            Log::info("[AI Orchestrator] Gemini tool call: {$fnName}", [
+                            Log::info('[AI Orchestrator] Gemini tool call', [
+                                'tool'       => $fnName,
                                 'project_id' => $project->id,
-                                'args'       => $fnArgs,
+                                'stage'      => $stage,
                                 'iteration'  => $iterations,
+                                'args'       => $fnArgs,
                             ]);
 
                             $tool = $this->toolRegistry->getTool($fnName);
-                            $res  = $tool ? $tool->execute($project, $fnArgs) : ['error' => "Unknown tool: {$fnName}"];
+                            try {
+                                $res = $tool ? $tool->execute($project, $fnArgs) : ['error' => "Unknown tool: {$fnName}"];
+                            } catch (\Throwable $te) {
+                                Log::error("[AI Orchestrator] Tool '{$fnName}' execution exception", [
+                                    'error'      => $te->getMessage(),
+                                    'project_id' => $project->id,
+                                ]);
+                                $res = ['error' => "Tool execution error: " . $te->getMessage()];
+                            }
                             $executedTools[] = ['tool' => $fnName, 'result' => $res];
 
-                            // Append model's function-call turn + user's function-response turn
                             $geminiContents[] = ['role' => 'model', 'parts' => $parts];
                             $geminiContents[] = [
                                 'role'  => 'user',
@@ -355,12 +307,10 @@ PROMPT;
                         }
 
                         if (!$hasFunctionCall) {
-                            // No more function calls — extract text and exit loop
                             $aiReplyText = $parts[0]['text'] ?? '';
                             break;
                         }
 
-                        // Re-call Gemini
                         $followUp = Http::withoutVerifying()
                             ->retry(2, 600, fn (\Throwable $e, $response) => $this->isRetryable($response))
                             ->timeout(35)
@@ -370,13 +320,15 @@ PROMPT;
                             ]);
 
                         if (!$followUp->successful()) {
-                            Log::error('[AI Orchestrator] Gemini tool follow-up failed: ' . $followUp->body());
+                            Log::error('[AI Orchestrator] Gemini tool follow-up failed', [
+                                'status'     => $followUp->status(),
+                                'project_id' => $project->id,
+                            ]);
                             break;
                         }
 
                         $this->accumulateGeminiUsage($followUp->json('usageMetadata') ?? [], $totalPromptTokens, $totalCompletionTokens);
-                        $candidate = $followUp->json('candidates.0.content') ?? [];
-                        $parts     = $candidate['parts'] ?? [];
+                        $parts = $followUp->json('candidates.0.content.parts') ?? [];
                     }
                 } else {
                     Log::error('[AI Orchestrator] Gemini API failed', [
@@ -389,7 +341,6 @@ PROMPT;
                 Log::error('[AI Orchestrator] Gemini exception', [
                     'message'    => $e->getMessage(),
                     'project_id' => $project->id,
-                    'trace'      => $e->getTraceAsString(),
                 ]);
             }
         }
@@ -399,8 +350,7 @@ PROMPT;
             $aiReplyText = 'عذراً، حدث انقطاع مؤقت في الاتصال بخدمة الذكاء الاصطناعي. يرجى إعادة إرسال رسالتك مرة أخرى.';
         }
 
-        // ── 10. Post-Response: Billing + Persistence inside one Transaction ───────
-        // ✅ FIX #3: DB::transaction wraps both billing and comment creation
+        // ── 10. Billing + Persistence inside one DB Transaction ─────────────────
         $billedAmount   = 0.0;
         $currencySymbol = 'EGP';
 
@@ -408,7 +358,6 @@ PROMPT;
             $project, $aiReplyText, $totalPromptTokens, $totalCompletionTokens,
             $activeModelUsed, &$billedAmount, &$currencySymbol
         ) {
-            // Billing
             if ($totalPromptTokens > 0 || $totalCompletionTokens > 0) {
                 $billedResult   = $this->tokenBillingService->billUsageWithAmount(
                     $project,
@@ -421,7 +370,6 @@ PROMPT;
                 $currencySymbol = $billedResult['currency_symbol'] ?? 'EGP';
             }
 
-            // Save AI response
             ProjectComment::create([
                 'project_id'       => $project->id,
                 'author_id'        => null,
@@ -432,18 +380,20 @@ PROMPT;
             ]);
         });
 
-        // ── 11. Detailed structured log ──────────────────────────────────────────
+        // ── 11. Structured log ───────────────────────────────────────────────────
         $durationMs = round((microtime(true) - $startTime) * 1000);
         Log::info('[AI Orchestrator] Completed', [
-            'project_id'       => $project->id,
-            'model'            => $activeModelUsed,
-            'prompt_tokens'    => $totalPromptTokens,
-            'completion_tokens'=> $totalCompletionTokens,
-            'executed_tools'   => array_column($executedTools, 'tool'),
-            'billed_amount'    => $billedAmount,
-            'currency'         => $currencySymbol,
-            'duration_ms'      => $durationMs,
-            'reply_length'     => mb_strlen($aiReplyText),
+            'project_id'        => $project->id,
+            'stage'             => $stage,
+            'model'             => $activeModelUsed,
+            'prompt_tokens'     => $totalPromptTokens,
+            'completion_tokens' => $totalCompletionTokens,
+            'tools_available'   => count($stageTools),
+            'executed_tools'    => array_column($executedTools, 'tool'),
+            'billed_amount'     => $billedAmount,
+            'currency'          => $currencySymbol,
+            'duration_ms'       => $durationMs,
+            'reply_length'      => mb_strlen($aiReplyText),
         ]);
 
         return [
@@ -459,29 +409,19 @@ PROMPT;
     // ════════════════════════════════════════════════════════════════════════════
 
     /**
-     * Sanitize and size-limit a user/history message.
-     *
-     * Removes HTML tags, null bytes, dangerous control characters, and trims to MAX_MESSAGE_CHARS.
+     * Sanitize and size-limit a message string.
+     * Removes HTML tags, null bytes, control characters, and trims to MAX_MESSAGE_CHARS.
      */
     private function sanitizeInput(string $raw): string
     {
-        // 1. Strip HTML
         $text = strip_tags($raw);
-
-        // 2. Remove null bytes and dangerous control characters (keep \t \n \r)
         $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $text);
-
-        // 3. Ensure valid UTF-8 (replace malformed sequences)
         $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
-
-        // 4. Enforce max length
-        $text = mb_substr(trim($text), 0, self::MAX_MESSAGE_CHARS);
-
-        return $text;
+        return mb_substr(trim($text), 0, self::MAX_MESSAGE_CHARS);
     }
 
     /**
-     * Accumulate OpenAI usage tokens into running totals.
+     * Accumulate OpenAI usage tokens.
      */
     private function accumulateUsage(array $usage, int &$prompt, int &$completion): void
     {
@@ -490,7 +430,7 @@ PROMPT;
     }
 
     /**
-     * Accumulate Gemini usage tokens into running totals.
+     * Accumulate Gemini usage tokens.
      */
     private function accumulateGeminiUsage(array $meta, int &$prompt, int &$completion): void
     {
@@ -500,23 +440,25 @@ PROMPT;
 
     /**
      * Determine whether an HTTP response/exception warrants a retry.
-     * Retries on: 429, 500, 502, 503, 504, and connection exceptions.
+     * Retries on: 429, 500, 502, 503, 504, and any connection-level exception.
      */
     private function isRetryable(mixed $response): bool
     {
         if ($response instanceof \Throwable) {
-            return true; // network/connection errors
+            return true;
         }
         return in_array($response?->status(), [429, 500, 502, 503, 504], true);
     }
 
     /**
-     * Format registered tools into OpenAI function declaration schema.
+     * Format a tool collection into the OpenAI function-declaration schema.
+     *
+     * @param  array<string, \App\Services\AI\Tools\AiToolInterface> $tools
      */
-    protected function formatOpenAiTools(): array
+    private function formatOpenAiTools(array $tools): array
     {
         $openAiTools = [];
-        foreach ($this->toolRegistry->all() as $tool) {
+        foreach ($tools as $tool) {
             $openAiTools[] = [
                 'type'     => 'function',
                 'function' => [

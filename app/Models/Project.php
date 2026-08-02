@@ -85,8 +85,9 @@ class Project extends Model
         $current = $this->ai_context;
         foreach ($updates as $k => $v) {
             if (is_array($v) && isset($current[$k]) && is_array($current[$k])) {
-                // Merge array fields without duplicating scalar items
-                $current[$k] = array_values(array_unique(array_merge($current[$k], $v)));
+                // Merge array fields without duplicating scalar items, capped to max 50 items
+                $merged = array_values(array_unique(array_merge($current[$k], $v)));
+                $current[$k] = array_slice($merged, -50);
             } else {
                 $current[$k] = $v;
             }
