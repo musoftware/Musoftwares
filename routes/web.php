@@ -230,6 +230,10 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::get('/projects/{project}/files/{file}/download', [ClientProjectFileController::class, 'download'])->name('files.download');
     Route::get('/projects/{project}/calendar', [ClientProjectCalendarController::class, 'calendarIndex'])->name('calendar.index');
     Route::get('/projects/{project}/calendar/{date}', [ClientProjectCalendarController::class, 'calendarDate'])->name('calendar.date');
+
+    // AI Workspace — message send (text + optional file) + AI question dismiss
+    Route::post('/projects/{project}/messages', [ClientProjectController::class, 'storeMessage'])->name('messages.store');
+    Route::patch('/projects/{project}/ai-questions/{questionId}/dismiss', [ClientProjectController::class, 'dismissAiQuestion'])->name('ai-questions.dismiss');
 });
 
 // Board mutations (JSON) — both client and admin and guest with write-access use these endpoints.
@@ -560,9 +564,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // KYC Review
     Route::get('/kyc', [App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
-    Route::get('/users/{id}/kyc/documents', [App\Http\Controllers\Admin\KycController::class, 'showUserDocuments'])->name('users.kyc-documents');
-    Route::post('/kyc/{id}/approve', [App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
-    Route::post('/kyc/{id}/reject', [App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
+    Route::get('/users/{user}/kyc/documents', [App\Http\Controllers\Admin\KycController::class, 'showUserDocuments'])->name('users.kyc-documents');
+    Route::post('/kyc/{user}/approve', [App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
+    Route::post('/kyc/{user}/reject', [App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
 
     // ── Admin Blog Articles ─────────────────────────────────────────
     Route::resource('/blog-articles', AdminBlogArticleController::class);

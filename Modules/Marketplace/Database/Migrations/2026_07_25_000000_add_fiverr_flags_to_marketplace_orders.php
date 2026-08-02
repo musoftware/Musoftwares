@@ -36,6 +36,9 @@ return new class extends Migration
             if (!Schema::hasColumn('marketplace_orders', 'due_date')) {
                 $table->timestamp('due_date')->nullable();
             }
+            if (!Schema::hasColumn('marketplace_orders', 'notes')) {
+                $table->text('notes')->nullable();
+            }
         });
     }
 

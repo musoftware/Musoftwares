@@ -102,7 +102,7 @@ class SerialUserDeviceControllerTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('serial_user_devices', [
+        $this->assertSoftDeleted('serial_user_devices', [
             'id' => $assignment->id,
         ]);
     }

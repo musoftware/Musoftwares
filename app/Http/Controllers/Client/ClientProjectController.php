@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClientProjectResource;
+use App\Jobs\AiProcessMessageJob;
 use App\Models\Project;
+use App\Models\ProjectComment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ClientProjectController extends Controller
@@ -30,52 +33,10 @@ class ClientProjectController extends Controller
 
         $project->loadCount(['tasks', 'publishedReports', 'files']);
 
-        $recentReports = $project->publishedReports()
-            ->latest('published_at')
-            ->limit(5)
-            ->get(['id', 'title', 'published_at']);
-
-        $allowedTabs = ['tasks', 'discussions', 'files', 'financials'];
-        $tab = in_array($request->query('tab'), $allowedTabs, true)
-            ? $request->query('tab')
-            : 'tasks';
-
         $team = $this->resolveTeam($project);
 
-        // Fetch pending/revision-requested deliverables from the board
-        $pendingApprovals = $project->boardItems()
-            ->whereIn('client_approval_status', ['pending', 'revision_requested'])
-            ->with('itemable')
-            ->get()
-            ->map(function ($item) {
-                $itemable = $item->itemable;
-                if (!$itemable) return null;
-                $type = array_search(get_class($itemable), \App\Models\ProjectBoardItem::MORPH_MAP, true);
-                if ($type === false) return null;
-                
-                $title = '';
-                if ($type === 'note') {
-                    $title = $itemable->title ?: ($itemable->content ? mb_strimwidth($itemable->content, 0, 80, '…') : 'Sticky Note');
-                } elseif ($type === 'task') {
-                    $title = $itemable->task_name;
-                } elseif ($type === 'report') {
-                    $title = $itemable->title;
-                } elseif ($type === 'todo') {
-                    $title = $itemable->title ?: 'Todo';
-                } elseif ($type === 'file') {
-                    $title = $itemable->original_name ?: 'File';
-                }
-                
-                return [
-                    'board_item_id' => $item->id,
-                    'type' => $type,
-                    'id' => $itemable->id,
-                    'title' => $title,
-                    'for_date' => $item->for_date,
-                    'client_approval_status' => $item->client_approval_status,
-                    'client_feedback' => $item->client_feedback,
-                ];
-            })->filter()->values();
+        // Always load discussions for the AI workspace (no tabs)
+        $discussions = $this->loadDiscussions($project);
 
         // Support tickets
         $supportTickets = \App\Models\Ticket::where('user_id', $request->user()->id)
@@ -83,45 +44,25 @@ class ClientProjectController extends Controller
             ->limit(5)
             ->get(['id', 'ticket_subject as subject', 'ticket_status as status', 'created_at']);
 
-        // Activity log
-        $activities = collect();
-        $comments = $project->comments()->with('author:id,name')->latest()->limit(10)->get();
-        foreach ($comments as $comment) {
-            $activities->push([
-                'type' => 'comment',
-                'user' => $comment->author?->name ?? $comment->guest_name ?? 'Client',
-                'description' => 'commented in discussions',
-                'detail' => mb_strimwidth(strip_tags($comment->body), 0, 80, '…'),
-                'time' => $comment->created_at?->toIso8601String(),
-            ]);
-        }
-        $files = $project->files()->latest()->limit(5)->get();
-        foreach ($files as $file) {
-            $activities->push([
-                'type' => 'file',
-                'user' => 'Team',
-                'description' => 'uploaded file: ' . $file->original_name,
-                'detail' => $file->humanSize(),
-                'time' => $file->created_at?->toIso8601String(),
-            ]);
-        }
-        $projectActivities = $activities->sortByDesc('time')->values()->take(8);
-
         return Inertia::render('Client/Projects/Show', [
-            'project' => fn () => (new ClientProjectResource($project))->resolve(),
-            'recentReports' => fn () => $recentReports,
-            'team' => fn () => $team,
-            'activeTab' => fn () => $tab,
-            'tabContent' => fn () => $this->loadTabContent($project, $tab),
-            'pendingApprovals' => fn () => $pendingApprovals,
+            'project'        => fn () => (new ClientProjectResource($project))->resolve(),
+            'team'           => fn () => $team,
+            'discussions'    => fn () => $discussions,
             'supportTickets' => fn () => $supportTickets,
-            'projectActivity' => fn () => $projectActivities,
+            'aiSummary'      => fn () => $project->ai_summary ?? [
+                'project_type' => null,
+                'features'     => [],
+                'current_goal' => null,
+                'missing_info' => [],
+                'complexity'   => null,
+            ],
+            'aiQuestions'   => fn () => collect($project->ai_questions ?? [])->where('answered', false)->values(),
+            'aiActionsLog'  => fn () => array_slice($project->ai_actions_log ?? [], 0, 10),
         ]);
     }
 
     /**
-     * Best-effort project team loader. Falls back to the project owner when no
-     * dedicated team relation exists on the Eloquent model.
+     * Best-effort project team loader.
      */
     protected function resolveTeam(Project $project): array
     {
@@ -130,24 +71,24 @@ class ClientProjectController extends Controller
         if (method_exists($project, 'team')) {
             try {
                 $members = $project->team()->get()->map(fn ($u) => [
-                    'id' => (int) $u->id,
-                    'name' => $u->name ?? '',
+                    'id'         => (int) $u->id,
+                    'name'       => $u->name ?? '',
                     'avatar_url' => $u->avatar_url ?? null,
-                    'role' => $u->pivot->role ?? null,
+                    'role'       => $u->pivot->role ?? null,
                 ])->all();
             } catch (\Throwable $e) {
                 $members = [];
             }
         }
 
-        if (empty($members) && $project->relationLoaded('user') === false && method_exists($project, 'user')) {
+        if (empty($members) && method_exists($project, 'user')) {
             $owner = $project->user ?? $project->client ?? null;
             if ($owner) {
                 $members = [[
-                    'id' => (int) $owner->id,
-                    'name' => $owner->name ?? '',
+                    'id'         => (int) $owner->id,
+                    'name'       => $owner->name ?? '',
                     'avatar_url' => $owner->avatar_url ?? null,
-                    'role' => 'Owner',
+                    'role'       => 'Owner',
                 ]];
             }
         }
@@ -155,86 +96,32 @@ class ClientProjectController extends Controller
         return $members;
     }
 
-    protected function loadTabContent(Project $project, string $tab): array
+    /**
+     * Load all discussion messages for the project chat.
+     */
+    protected function loadDiscussions(Project $project): array
     {
-        switch ($tab) {
-            case 'tasks':
-                $tasks = $project->tasks()
-                    ->orderByDesc('created_at')
-                    ->limit(50)
-                    ->get(['id', 'task_name', 'task_description', 'due_date', 'priority']);
-                return ['tasks' => $tasks];
+        // Project-level comments (the main AI workspace chat)
+        $projectComments = ProjectComment::where('project_id', $project->id)
+            ->where('commentable_type', Project::class)
+            ->with('author:id,name')
+            ->oldest()
+            ->limit(200)
+            ->get()
+            ->map(fn ($c) => [
+                'id'             => $c->id,
+                'body'           => $c->body,
+                'author_id'      => $c->author_id,
+                'guest_name'     => $c->guest_name,
+                'created_at'     => $c->created_at,
+                'parent_id'      => $c->parent_id,
+                'commentable_id' => $c->commentable_id,
+                'type'           => 'project',
+                'author'         => $c->author ? ['id' => $c->author->id, 'name' => $c->author->name] : null,
+                'file'           => null,
+            ]);
 
-            case 'discussions':
-                $comments = $project->comments()
-                    ->with('author:id,name,email')
-                    ->latest()
-                    ->limit(50)
-                    ->get()
-                    ->map(function ($c) {
-                        $morphMap = [
-                            \App\Models\ProjectBoardNote::class => 'note',
-                            \App\Models\Task::class => 'task',
-                            \App\Models\ProjectReport::class => 'report',
-                            \App\Models\Todo::class => 'todo',
-                            \App\Models\ProjectFile::class => 'file',
-                        ];
-                        $type = $morphMap[$c->commentable_type] ?? 'note';
-                        return [
-                            'id' => $c->id,
-                            'body' => $c->body,
-                            'author_id' => $c->author_id,
-                            'created_at' => $c->created_at,
-                            'parent_id' => $c->parent_id,
-                            'guest_name' => $c->guest_name,
-                            'commentable_id' => $c->commentable_id,
-                            'type' => $type,
-                            'author' => $c->author,
-                        ];
-                    });
-                
-                // Merge project-level comments (for main chat tab)
-                $projectComments = \App\Models\ProjectComment::where('project_id', $project->id)
-                    ->where('commentable_type', Project::class)
-                    ->with('author')
-                    ->latest()
-                    ->limit(50)
-                    ->get()
-                    ->map(fn ($c) => [
-                        'id' => $c->id,
-                        'body' => $c->body,
-                        'author_id' => $c->author_id,
-                        'created_at' => $c->created_at,
-                        'parent_id' => $c->parent_id,
-                        'guest_name' => $c->guest_name,
-                        'commentable_id' => $c->commentable_id,
-                        'type' => 'project',
-                        'author' => $c->author,
-                    ]);
-
-                $allDiscussions = $comments->concat($projectComments)->sortByDesc('created_at')->values();
-
-                return ['discussions' => $allDiscussions->toArray()];
-
-            case 'files':
-                $files = $project->files()
-                    ->latest()
-                    ->limit(50)
-                    ->get(['id', 'original_name', 'mime', 'size', 'created_at']);
-                return ['files' => $files];
-
-            case 'financials':
-                return [
-                    'financials' => [
-                        'budget' => (string) $project->budget,
-                        'paid' => (string) $project->paid_invoices,
-                        'pending' => (string) $project->pending_invoices,
-                        'percentage' => (float) $project->percentage,
-                    ],
-                ];
-        }
-
-        return [];
+        return $projectComments->toArray();
     }
 
     public function create()
@@ -246,32 +133,148 @@ class ClientProjectController extends Controller
     {
         $data = $request->validate([
             'project_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description'  => 'nullable|string',
         ]);
 
         $project = Project::create([
-            'user_id' => $request->user()->id,
+            'user_id'      => $request->user()->id,
             'project_name' => $data['project_name'],
-            'status' => 'open',
-            'archived' => false,
-            'percentage' => 0,
-            'budget' => 0,
-            'total_paid' => 0,
-            'date_start' => now(),
-            'ai_enabled' => false,
+            'status'       => 'open',
+            'archived'     => false,
+            'percentage'   => 0,
+            'budget'       => 0,
+            'total_paid'   => 0,
+            'date_start'   => now(),
+            'ai_enabled'   => false,
+            'ai_summary'   => [
+                'project_type' => null,
+                'features'     => [],
+                'current_goal' => null,
+                'missing_info' => ['Budget', 'Timeline', 'Target audience'],
+                'complexity'   => null,
+            ],
+            'ai_questions' => [
+                ['id' => Str::uuid(), 'question' => 'What is the main purpose of this project?', 'answered' => false],
+                ['id' => Str::uuid(), 'question' => 'Who is the target audience?', 'answered' => false],
+                ['id' => Str::uuid(), 'question' => 'What is your estimated budget?', 'answered' => false],
+            ],
+            'ai_actions_log'       => [],
+            'ai_understanding_pct' => 0,
+        ]);
+
+        // Seed initial AI greeting
+        ProjectComment::create([
+            'project_id'       => $project->id,
+            'author_id'        => null,
+            'guest_name'       => 'AI',
+            'body'             => '[System: Welcome! Your project has been created. Start by describing what you need — type anything and I\'ll start organizing your project automatically.]',
+            'commentable_type' => Project::class,
+            'commentable_id'   => $project->id,
         ]);
 
         if (! empty($data['description'])) {
-            $project->comments()->create([
-                'project_id' => $project->id,
-                'author_id' => $request->user()->id,
-                'body' => $data['description'],
+            // Save description as first client message
+            $comment = ProjectComment::create([
+                'project_id'       => $project->id,
+                'author_id'        => $request->user()->id,
+                'body'             => $data['description'],
                 'commentable_type' => Project::class,
-                'commentable_id' => $project->id,
+                'commentable_id'   => $project->id,
             ]);
         }
 
         return redirect()->route('client.projects.show', $project->id);
+    }
+
+    /**
+     * Store a new chat message (text + optional file attachment).
+     * Dispatches AI processing job.
+     */
+    public function storeMessage(Request $request, Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $data = $request->validate([
+            'body' => 'nullable|string|max:5000',
+            'file' => 'nullable|file|max:20480', // 20MB max
+        ]);
+
+        if (empty($data['body']) && !$request->hasFile('file')) {
+            return response()->json(['ok' => false, 'message' => 'Message or file required.'], 422);
+        }
+
+        $fileData = null;
+        if ($request->hasFile('file')) {
+            $file    = $request->file('file');
+            $stored  = $file->store('project-chat-files/' . $project->id, 'public');
+            $fileData = [
+                'path'          => $stored,
+                'original_name' => $file->getClientOriginalName(),
+                'mime'          => $file->getMimeType(),
+                'size'          => $file->getSize(),
+                'url'           => asset('storage/' . $stored),
+            ];
+        }
+
+        $body = $data['body'] ?? ($fileData ? '📎 ' . $fileData['original_name'] : '');
+
+        $comment = ProjectComment::create([
+            'project_id'       => $project->id,
+            'author_id'        => $request->user()->id,
+            'body'             => $body,
+            'commentable_type' => Project::class,
+            'commentable_id'   => $project->id,
+        ]);
+
+        // If file was uploaded, store metadata in body as JSON marker
+        if ($fileData) {
+            $comment->update(['body' => '[File:' . json_encode($fileData) . ']' . ($data['body'] ? "\n" . $data['body'] : '')]);
+        }
+
+        // Process AI tools synchronously for immediate feedback
+        if ($project->ai_enabled) {
+            AiProcessMessageJob::dispatchSync($project->id, $body, $request->user()->id);
+        }
+
+        // Return the new comment for optimistic UI update
+        $comment->refresh();
+        $user = $request->user();
+
+        return response()->json([
+            'ok'      => true,
+            'comment' => [
+                'id'             => $comment->id,
+                'body'           => $comment->body,
+                'author_id'      => $comment->author_id,
+                'guest_name'     => $comment->guest_name,
+                'created_at'     => $comment->created_at,
+                'parent_id'      => $comment->parent_id,
+                'commentable_id' => $comment->commentable_id,
+                'type'           => 'project',
+                'author'         => ['id' => $user->id, 'name' => $user->name],
+                'file'           => $fileData,
+            ],
+        ]);
+    }
+
+    /**
+     * Dismiss (mark as answered) an AI question.
+     */
+    public function dismissAiQuestion(Request $request, Project $project, string $questionId)
+    {
+        $this->authorize('view', $project);
+
+        $questions = collect($project->ai_questions ?? [])
+            ->map(function ($q) use ($questionId) {
+                if ((string)($q['id'] ?? '') === $questionId) {
+                    $q['answered'] = true;
+                }
+                return $q;
+            })->values()->toArray();
+
+        $project->update(['ai_questions' => $questions]);
+
+        return response()->json(['ok' => true]);
     }
 
     public function activateAi(Request $request, Project $project)
@@ -279,11 +282,11 @@ class ClientProjectController extends Controller
         $this->authorize('view', $project);
 
         $user = $request->user();
-        
+
         $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
         if (!$egpCurrency) {
             return response()->json([
-                'ok' => false,
+                'ok'      => false,
                 'message' => 'EGP currency configuration not found.',
             ], 422);
         }
@@ -292,44 +295,46 @@ class ClientProjectController extends Controller
 
         if ((float) $user->user_balance < $costInUserCurrency) {
             return response()->json([
-                'ok' => false,
+                'ok'          => false,
                 'insufficient' => true,
-                'balance' => (float) $user->user_balance,
-                'required' => $costInUserCurrency,
-                'message' => 'Insufficient wallet balance. You need ' . number_format($costInUserCurrency, 2) . ' ' . $user->currency_name() . ' (10 EGP) to activate the AI.',
+                'balance'     => (float) $user->user_balance,
+                'required'    => $costInUserCurrency,
+                'message'     => 'Insufficient wallet balance. You need ' . number_format($costInUserCurrency, 2) . ' ' . $user->currency_name() . ' (10 EGP) to activate the AI.',
             ], 422);
         }
 
         \DB::transaction(function () use ($user, $project, $costInUserCurrency) {
             \App\Models\Transaction::create([
-                'user_id' => $user->id,
-                'amount' => -$costInUserCurrency,
-                'reason' => 'AI Project Manager Activation for project: ' . $project->project_name,
-                'category' => 'other',
-                'type' => 'used',
-                'project_id' => $project->id,
+                'user_id'     => $user->id,
+                'amount'      => -$costInUserCurrency,
+                'reason'      => 'AI Project Manager Activation for project: ' . $project->project_name,
+                'category'    => 'other',
+                'type'        => 'used',
+                'project_id'  => $project->id,
                 'currency_id' => $user->currency_id,
             ]);
 
             $project->update([
-                'ai_enabled' => true,
-                'last_ai_charged_at' => \Carbon\Carbon::now('Africa/Cairo'),
+                'ai_enabled'           => true,
+                'last_ai_charged_at'   => \Carbon\Carbon::now('Africa/Cairo'),
+                'ai_understanding_pct' => 5, // Seed initial understanding
             ]);
 
             \App\Helpers\BalancesHelper::UpdateBalance($user, $project);
         });
 
-        $project->comments()->create([
-            'project_id' => $project->id,
-            'author_id' => null,
-            'guest_name' => 'System',
-            'body' => '[System: AI Project Manager activated successfully!]',
+        // Post AI activation system message
+        ProjectComment::create([
+            'project_id'       => $project->id,
+            'author_id'        => null,
+            'guest_name'       => 'AI',
+            'body'             => '[System: AI Project Manager activated! I\'m now analyzing your project. Start describing what you need and I\'ll automatically organize everything — requirements, tasks, timelines, and more.]',
             'commentable_type' => Project::class,
-            'commentable_id' => $project->id,
+            'commentable_id'   => $project->id,
         ]);
 
         return response()->json([
-            'ok' => true,
+            'ok'      => true,
             'message' => 'AI Project Manager activated successfully!',
         ]);
     }

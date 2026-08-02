@@ -27,6 +27,9 @@ return new class extends Migration
                 if (!Schema::hasColumn('order_delivery_files', 'service_order_id')) {
                     $table->unsignedBigInteger('service_order_id')->nullable()->after('order_id');
                 }
+                if (!Schema::hasColumn('order_delivery_files', 'deleted_at')) {
+                    $table->softDeletes();
+                }
             });
 
             // Synchronize foreign key column data for backward compatibility

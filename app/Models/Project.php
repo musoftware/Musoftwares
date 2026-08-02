@@ -44,6 +44,10 @@ class Project extends Model
         'date_start' => 'datetime',
         'date_end' => 'datetime',
         'ai_enabled' => 'boolean',
+        'ai_understanding_pct' => 'integer',
+        'ai_summary' => 'array',
+        'ai_questions' => 'array',
+        'ai_actions_log' => 'array',
         'last_ai_charged_at' => 'datetime',
     ];
 

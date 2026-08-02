@@ -279,9 +279,9 @@ class UserFileControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('files', ['id' => $file->id]);
-        $this->assertDatabaseMissing('file_folders', ['id' => $folder->id]);
-        $this->assertDatabaseMissing('files', ['id' => $childFile->id]);
+        $this->assertSoftDeleted('files', ['id' => $file->id]);
+        $this->assertSoftDeleted('file_folders', ['id' => $folder->id]);
+        $this->assertSoftDeleted('files', ['id' => $childFile->id]);
 
         Storage::disk('uploaded_user_files')->assertMissing('test_delete.pdf');
         Storage::disk('uploaded_user_files')->assertMissing('child_delete.pdf');

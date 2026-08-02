@@ -73,7 +73,7 @@ class SerialDeviceControllerTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('serial_devices', [
+        $this->assertSoftDeleted('serial_devices', [
             'id' => $device->id,
         ]);
     }
@@ -112,7 +112,7 @@ class SerialDeviceControllerTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('serial_devices', ['id' => $device1->id]);
-        $this->assertDatabaseMissing('serial_devices', ['id' => $device2->id]);
+        $this->assertSoftDeleted('serial_devices', ['id' => $device1->id]);
+        $this->assertSoftDeleted('serial_devices', ['id' => $device2->id]);
     }
 }

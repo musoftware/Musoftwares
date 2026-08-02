@@ -26,6 +26,7 @@ class User extends Authenticatable
         'email',
         'lang',
         'password',
+        'currency_id',
         'role',
         'avatar',
         'phone',

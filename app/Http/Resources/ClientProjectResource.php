@@ -31,6 +31,8 @@ class ClientProjectResource extends JsonResource
             'pending_invoices' => (string) $this->pendingInvoicesAmount(),
             'total_paid' => (string) ($this->total_paid ?? 0),
             'hide_future_tasks' => (bool) $this->hide_future_tasks,
+            'ai_enabled' => (bool) $this->ai_enabled,
+            'ai_understanding_pct' => (int) ($this->ai_understanding_pct ?? 0),
             'currency' => $currency ? [
                 'id' => $currency->id,
                 'currency' => $currency->currency,
