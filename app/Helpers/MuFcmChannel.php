@@ -35,7 +35,7 @@ class MuFcmChannel
 
         $fcmMessage = $notification->toFcm($notifiable);
 
-        \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $fcmMessage->toArray());
+        \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $fcmMessage->jsonSerialize());
 
         return null;
     }

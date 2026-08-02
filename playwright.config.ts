@@ -15,6 +15,7 @@ export default defineConfig({
     actionTimeout: 0,
     trace: 'on-first-retry',
     baseURL: 'http://127.0.0.1:8000',
+    screenshot: 'only-on-failure',
   },
   projects: [
     {

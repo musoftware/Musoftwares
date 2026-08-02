@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Http\Controllers\Auth\SetPasswordController;
+use App\Mail\PasswordResetLinkMail;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -126,8 +127,8 @@ class AdminSecurityHardeningTest extends TestCase
             ->postJson("/admin/users/{$target->id}/reset-password")
             ->assertOk();
 
-        Mail::assertSent(function ($mail) {
-            $body = $mail->raw();
+        Mail::assertSent(function (PasswordResetLinkMail $mail) {
+            $body = $mail->render();
 
             // Must contain a signed URL with token= and signature=, never plaintext.
             return str_contains((string) $body, '/set-password')
@@ -301,8 +302,8 @@ class AdminSecurityHardeningTest extends TestCase
         $token = Str::random(48);
         Cache::put(
             'admin_password_set:'.$token,
-            ['user_id' => $user->id, 'expires_at' => now()->addHour, 'issued_by' => 1],
-            now()->addHour
+            ['user_id' => $user->id, 'expires_at' => now()->addHour(), 'issued_by' => 1],
+            now()->addHour()
         );
 
         $response = $this->get('/set-password?token='.$token.'&uid='.$user->id.'&signature=invalid');

@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('serial/device',
     [SerialDeviceController::class, 'register']
-)->middleware(['force.json', 'throttle:60,1']);
+)->middleware(['force.json', 'throttle:60,1', 'serial.device.hmac']);
 
 // ── Paid Commission Play (PUBLIC - NO AUTH) ──────────────────────────────────
 // CRITICAL NOTE FOR AI / DEVELOPERS: DO NOT ADD AUTH / SANCTUM TO THIS ROUTE.

@@ -114,7 +114,7 @@ class NotificationHelper
         }
 
         try {
-            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->toArray());
+            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->jsonSerialize());
 
             return true;
         } catch (\Throwable) {
@@ -178,7 +178,7 @@ class NotificationHelper
         ]);
 
         try {
-            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->toArray());
+            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->jsonSerialize());
 
             return true;
         } catch (\Throwable) {

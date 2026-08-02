@@ -159,7 +159,7 @@ cmd.exe /c "tar.exe -czf build_$uniqueId.tar.gz -C public/build ."
 # 4 & 5. Upload & Extract
 $timestamp = $uniqueId
 $remoteZip = "$REMOTE_PATH/public/build_$uniqueId.tar.gz"
-$unzipCmd = "cd $REMOTE_PATH/public && mkdir -p build_$timestamp && tar -xzf build_$uniqueId.tar.gz -C build_$timestamp/ && rsync -a --delete build_$timestamp/ build/ && rm -rf build_$timestamp build_$uniqueId.tar.gz && cd $REMOTE_PATH && php artisan config:cache && php artisan route:cache"
+$unzipCmd = "cd $REMOTE_PATH/public && mkdir -p build_$timestamp && tar -xzf build_$uniqueId.tar.gz -C build_$timestamp/ && rsync -a --delete build_$timestamp/ build/ && rm -rf build_$timestamp build_$uniqueId.tar.gz && cd $REMOTE_PATH && rm -f bootstrap/cache/*.php && php artisan config:cache && php artisan route:cache"
 
 $hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue) -and $null -ne (Get-Command pscp -ErrorAction SilentlyContinue)
 

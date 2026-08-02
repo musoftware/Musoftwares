@@ -15,7 +15,6 @@ class PriceCalculatorService extends BaseService
     {
         $apiKeysString = \App\Models\AdminSettings::GetValue('gemini_api_keys') 
             ?: \App\Models\AdminSettings::GetValue('gemini_api_key') 
-            ?: env('GEMINI_API_KEY') 
             ?: config('services.gemini.key');
 
         if (!$apiKeysString) {

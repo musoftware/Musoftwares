@@ -1110,6 +1110,14 @@ class ClientProjectBoardController extends Controller
     public function generateReportDraft(Request $request, Project $project)
     {
         $this->authorizeProject($project);
+        abort_unless((bool)$project->ai_enabled, 403, 'AI features are not enabled for this project. Please activate AI Project Manager first.');
+
+        if (!$project->ensureAiIsCharged($request->user())) {
+            return response()->json([
+                'error' => 'Your AI Project Manager was deactivated due to insufficient wallet balance to cover the daily fee (10 EGP).',
+                'insufficient' => true,
+            ], 402);
+        }
 
         $request->validate([
             'period_start' => 'required|date',
@@ -1196,19 +1204,13 @@ class ClientProjectBoardController extends Controller
 - Write the text in the same language as the input activities (usually Arabic or English) and use a professional, clear, corporate tone suitable for a client report.
 - Do not output JSON, html tags, backticks, or any markdown code blocks (e.g. do not wrap the response in ```markdown). Output ONLY the raw markdown content for the report.";
 
-        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
-
-        if ($defaultProvider === 'openai') {
-            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
-        } else {
-            $apiKey = AdminSettings::GetValue('gemini_api_key', config('services.gemini.key'));
-            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
-        }
+        $defaultProvider = 'openai';
+        $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+        $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
 
         if (empty($apiKey)) {
             return response()->json([
-                'error' => "AI integration is not configured. Please set your {$defaultProvider} API key in admin settings.",
+                'error' => "AI integration is not configured. Please set your OpenAI API key in admin settings.",
             ], 400);
         }
 
@@ -1257,6 +1259,14 @@ class ClientProjectBoardController extends Controller
     public function generateAiQuestions(Request $request, Project $project)
     {
         $this->authorizeProject($project);
+        abort_unless((bool)$project->ai_enabled, 403, 'AI features are not enabled for this project. Please activate AI Project Manager first.');
+
+        if (!$project->ensureAiIsCharged($request->user())) {
+            return response()->json([
+                'error' => 'Your AI Project Manager was deactivated due to insufficient wallet balance to cover the daily fee (10 EGP).',
+                'insufficient' => true,
+            ], 402);
+        }
 
         $data = $request->validate([
             'prompt' => 'required|string|max:10000',
@@ -1280,6 +1290,14 @@ class ClientProjectBoardController extends Controller
     public function addWithAi(Request $request, Project $project)
     {
         $this->authorizeProject($project);
+        abort_unless((bool)$project->ai_enabled, 403, 'AI features are not enabled for this project. Please activate AI Project Manager first.');
+
+        if (!$project->ensureAiIsCharged($request->user())) {
+            return response()->json([
+                'error' => 'Your AI Project Manager was deactivated due to insufficient wallet balance to cover the daily fee (10 EGP).',
+                'insufficient' => true,
+            ], 402);
+        }
 
         $data = $request->validate([
             'prompt'          => 'required|string|max:10000',

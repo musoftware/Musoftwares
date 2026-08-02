@@ -65,7 +65,9 @@ class ClientProjectCommentController extends Controller
         $aiAdjusted = false;
 
         if ($project->ai_enabled && $data['type'] === 'project' && $request->user()?->id) {
-            \App\Jobs\ProcessClientMessageWithAi::dispatch($project, $comment);
+            if ($project->ensureAiIsCharged($request->user())) {
+                \App\Jobs\ProcessClientMessageWithAi::dispatch($project, $comment);
+            }
         }
 
         if (!empty($data['adjust_future_ai']) && $data['type'] !== 'project') {

@@ -27,6 +27,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\PasswordResetLinkMail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
@@ -827,40 +828,28 @@ class UsersController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $plainPassword = $this->generateSecurePassword(12);
+        // Invalidate any existing password & sessions — the user will set a new
+        // password via the one-time signed link. We never emit plaintext.
         $user->update([
-            'password' => Hash::make($plainPassword),
+            'password' => Hash::make(Str::random(48)),
         ]);
 
         if (method_exists($user, 'tokens')) {
             $user->tokens()->delete();
         }
 
-        $loginUrl = url('/login');
-
         try {
-            $messageText = "Hello {$user->name},\n\n"
-                ."An administrator has generated a new password for your account.\n\n"
-                ."Email: {$user->email}\n"
-                ."Password: {$plainPassword}\n\n"
-                ."You can sign in here: {$loginUrl}\n\n"
-                .'For your security, please change your password after signing in. '
-                ."If you did not request this, please ignore this email and contact support.\n\nThank you.";
-
-            Mail::raw($messageText, function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject(__('general.your_new_account_password') ?: 'Your new account password');
-            });
+            $setLink = SetPasswordController::issueLink($user, Auth::id());
+            Mail::to($user->email)->send(new PasswordResetLinkMail($user, $setLink));
         } catch (\Exception $e) {
             Log::error('Failed to send password reset email: '.$e->getMessage());
         }
 
         return response()->json([
-            'message' => __('general.password_reset_email_sent_with_new_password')
-                ?: 'A new password has been generated and emailed to the user.',
+            'message' => __('general.password_reset_link_sent')
+                ?: 'A password reset link has been sent to the user.',
             'email' => $user->email,
             'name' => $user->name,
-            'login_url' => $loginUrl,
         ]);
     }
 

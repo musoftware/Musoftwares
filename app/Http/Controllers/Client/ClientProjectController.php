@@ -167,7 +167,7 @@ class ClientProjectController extends Controller
 
             case 'discussions':
                 $comments = $project->comments()
-                    ->with('author:id,name,avatar_url')
+                    ->with('author:id,name,email')
                     ->latest()
                     ->limit(50)
                     ->get()
@@ -306,12 +306,15 @@ class ClientProjectController extends Controller
                 'amount' => -$costInUserCurrency,
                 'reason' => 'AI Project Manager Activation for project: ' . $project->project_name,
                 'category' => 'other',
-                'type' => 'out',
+                'type' => 'used',
                 'project_id' => $project->id,
                 'currency_id' => $user->currency_id,
             ]);
 
-            $project->update(['ai_enabled' => true]);
+            $project->update([
+                'ai_enabled' => true,
+                'last_ai_charged_at' => \Carbon\Carbon::now('Africa/Cairo'),
+            ]);
 
             \App\Helpers\BalancesHelper::UpdateBalance($user, $project);
         });

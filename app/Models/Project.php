@@ -44,6 +44,7 @@ class Project extends Model
         'date_start' => 'datetime',
         'date_end' => 'datetime',
         'ai_enabled' => 'boolean',
+        'last_ai_charged_at' => 'datetime',
     ];
 
     private $oneTime = false;
@@ -413,5 +414,74 @@ class Project extends Model
     public function scopeArchived(Builder $query): Builder
     {
         return $query->where('archived', 1);
+    }
+
+    /**
+     * Ensure the AI fee is charged for today.
+     * Returns true if successfully charged (or already charged today).
+     * Returns false if user has insufficient balance, which deactivates AI.
+     */
+    public function ensureAiIsCharged(\App\Models\User $user): bool
+    {
+        if (!$this->ai_enabled) {
+            return false;
+        }
+
+        $today = Carbon::now('Africa/Cairo')->toDateString();
+
+        if ($this->last_ai_charged_at) {
+            $chargedDate = Carbon::parse($this->last_ai_charged_at)->timezone('Africa/Cairo')->toDateString();
+            if ($chargedDate === $today) {
+                return true;
+            }
+        }
+
+        // Charge 10 EGP
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        if (!$egpCurrency) {
+            return false;
+        }
+
+        $costInUserCurrency = \App\Models\CurrenciesExchange::RateToday(10.0, $egpCurrency->id, $user->currency_id);
+
+        if ((float) $user->user_balance < $costInUserCurrency) {
+            // Deactivate AI
+            $this->update([
+                'ai_enabled' => false,
+            ]);
+
+            // Add system comment to project board informing the client
+            $this->comments()->create([
+                'project_id' => $this->id,
+                'author_id' => null,
+                'guest_name' => 'System',
+                'body' => '[System: AI Project Manager deactivated due to insufficient wallet balance to cover the daily fee (10 EGP).]',
+                'commentable_type' => self::class,
+                'commentable_id' => $this->id,
+            ]);
+
+            return false;
+        }
+
+        DB::transaction(function () use ($user, $costInUserCurrency) {
+            // Deduct
+            \App\Models\Transaction::create([
+                'user_id' => $user->id,
+                'amount' => -$costInUserCurrency,
+                'reason' => 'Daily AI Project Manager Fee for project: ' . $this->project_name,
+                'category' => 'other',
+                'type' => 'used',
+                'project_id' => $this->id,
+                'currency_id' => $user->currency_id,
+            ]);
+
+            $this->update([
+                'last_ai_charged_at' => Carbon::now('Africa/Cairo'),
+            ]);
+
+            \App\Helpers\BalancesHelper::UpdateBalance($user, $this);
+        });
+
+        return true;
     }
 }

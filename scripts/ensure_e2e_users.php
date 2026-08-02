@@ -43,10 +43,12 @@ foreach ($users as $userData) {
             'email' => $userData['email'],
             'password' => bcrypt('password'),
             'email_verified_at' => now(),
+            'onboarding_completed' => true,
         ]);
         echo "Created E2E user: {$userData['email']}\n";
     } else {
-        echo "E2E user already exists: {$userData['email']}\n";
+        $user->update(['onboarding_completed' => true]);
+        echo "E2E user already exists and marked onboarded: {$userData['email']}\n";
     }
 
     // Ensure they have the correct role assigned
@@ -66,6 +68,24 @@ foreach ($users as $userData) {
 // Ensure client project seeding
 $clientUser = User::where('email', 'client@musoftwares.com')->first();
 if ($clientUser) {
+    // Seed wallet balance via transaction to survive balance recalculations
+    \App\Models\Transaction::where('user_id', $clientUser->id)->delete();
+    \App\Models\Transaction::create([
+        'user_id' => $clientUser->id,
+        'amount' => 1000.0,
+        'reason' => 'E2E Seed Deposit',
+        'category' => 'other',
+        'type' => 'received',
+        'currency_id' => $clientUser->currency_id,
+    ]);
+    \App\Helpers\BalancesHelper::UpdateBalance($clientUser);
+    echo "Ensured client user balance is 1000 EGP via seed transaction.\n";
+    // Clean up test-run leftovers so the project list stays small
+    \App\Models\Project::where('user_id', $clientUser->id)
+        ->where('project_name', 'Playwright E2E AI Project')
+        ->delete();
+    echo "Cleaned up duplicate Playwright test projects.\n";
+
     $project = \App\Models\Project::updateOrCreate(
         ['user_id' => $clientUser->id, 'project_name' => 'E2E Test Client Project'],
         ['status' => 'open', 'archived' => 0]

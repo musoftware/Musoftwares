@@ -135,10 +135,20 @@ class ProfileController extends Controller
     {
         $request->validate([
             'enable_3d_dashboard' => ['required', 'boolean'],
+            'default_ai_model' => ['nullable', 'string', 'in:openai,gemini'],
+            'openai_api_key' => ['nullable', 'string', 'max:255'],
+            'openai_model' => ['nullable', 'string', 'max:255'],
+            'gemini_api' => ['nullable', 'string', 'max:255'],
+            'gemini_model' => ['nullable', 'string', 'max:255'],
         ]);
 
         $request->user()->forceFill([
             'enable_3d_dashboard' => $request->boolean('enable_3d_dashboard'),
+            'default_ai_model' => $request->input('default_ai_model'),
+            'openai_api_key' => $request->input('openai_api_key'),
+            'openai_model' => $request->input('openai_model') ?: 'gpt-4o-mini',
+            'gemini_api' => $request->input('gemini_api'),
+            'gemini_model' => $request->input('gemini_model') ?: 'gemini-2.0-flash',
         ])->save();
 
         return Redirect::route('profile.edit')->with('status', __('general.preferences_updated_successfully'));

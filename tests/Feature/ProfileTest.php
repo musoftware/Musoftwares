@@ -178,4 +178,30 @@ class ProfileTest extends TestCase
         $user->refresh();
         $this->assertFalse($user->workspace_settings['hide_values']);
     }
+
+    public function test_user_can_update_ai_preferences(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile/preferences', [
+                'enable_3d_dashboard' => true,
+                'default_ai_model' => 'openai',
+                'openai_api_key' => 'sk-my-custom-test-key',
+                'openai_model' => 'gpt-4o',
+                'gemini_api' => 'AIzaSyMyCustomGeminiKey',
+                'gemini_model' => 'gemini-2.5-pro',
+            ]);
+
+        $response->assertRedirect();
+        
+        $user->refresh();
+        $this->assertTrue($user->enable_3d_dashboard);
+        $this->assertSame('openai', $user->default_ai_model);
+        $this->assertSame('sk-my-custom-test-key', $user->openai_api_key);
+        $this->assertSame('gpt-4o', $user->openai_model);
+        $this->assertSame('AIzaSyMyCustomGeminiKey', $user->gemini_api);
+        $this->assertSame('gemini-2.5-pro', $user->gemini_model);
+    }
 }

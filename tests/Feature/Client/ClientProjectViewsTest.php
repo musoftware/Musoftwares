@@ -261,7 +261,10 @@ class ClientProjectViewsTest extends TestCase
         \Illuminate\Support\Facades\Queue::fake();
 
         $client = $this->makeClient();
-        $project = $this->makeProject($client, ['ai_enabled' => true]);
+        $project = $this->makeProject($client, [
+            'ai_enabled' => true,
+            'last_ai_charged_at' => \Carbon\Carbon::now('Africa/Cairo'),
+        ]);
 
         $response = $this->actingAs($client)->post(route('client.projects.comments.store', $project), [
             'type' => 'project',

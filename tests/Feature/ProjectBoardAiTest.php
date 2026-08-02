@@ -28,6 +28,7 @@ class ProjectBoardAiTest extends TestCase
         $this->clientUser = User::factory()->create([
             'onboarding_completed' => true,
             'currency_id' => 1,
+            'user_balance' => 1000.00,
         ]);
         $this->clientUser->assignRole('client');
 
@@ -36,6 +37,8 @@ class ProjectBoardAiTest extends TestCase
             'project_name' => 'AI Test Project',
             'status' => 'open',
             'currency' => 1,
+            'ai_enabled' => true,
+            'last_ai_charged_at' => \Carbon\Carbon::now('Africa/Cairo'),
         ]);
 
         AdminSettings::SetValue('default_ai_model', 'openai');
@@ -213,5 +216,86 @@ class ProjectBoardAiTest extends TestCase
 
         $bi2->refresh();
         $this->assertTrue((bool)$bi2->is_important);
+    }
+
+    public function test_ai_endpoints_forbidden_when_ai_disabled(): void
+    {
+        $nonAiProject = Project::create([
+            'user_id' => $this->clientUser->id,
+            'project_name' => 'Non-AI Project',
+            'status' => 'open',
+            'currency' => 1,
+            'ai_enabled' => false,
+        ]);
+
+        $response = $this->actingAs($this->clientUser)
+            ->postJson(route('client.projects.board.add-with-ai', ['project' => $nonAiProject->id]), [
+                'prompt' => 'Create captcha helper bot plan',
+                'start_date' => '2026-08-02',
+            ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_daily_ai_charging_logic(): void
+    {
+        $egp = \App\Models\Currency::where('currency', 'EGP')->first();
+        if (!$egp) {
+            $egp = \App\Models\Currency::create([
+                'currency' => 'EGP',
+                'symbol' => 'Egp',
+                'rate' => 1.000,
+            ]);
+        }
+
+        $user = User::factory()->create([
+            'currency_id' => $egp->id,
+        ]);
+
+        \App\Models\Transaction::create([
+            'user_id' => $user->id,
+            'amount' => 20.00,
+            'reason' => 'Deposit',
+            'category' => 'other',
+            'type' => 'in',
+            'currency_id' => $egp->id,
+        ]);
+        \App\Helpers\BalancesHelper::UpdateBalance($user);
+
+        $project = Project::create([
+            'user_id' => $user->id,
+            'project_name' => 'AI Charged Project',
+            'status' => 'open',
+            'currency' => $egp->id,
+            'ai_enabled' => true,
+            'last_ai_charged_at' => null,
+        ]);
+
+        $charged = $project->ensureAiIsCharged($user);
+        $this->assertTrue($charged);
+        $user->refresh();
+        $project->refresh();
+        $this->assertEquals(10.00, (float)$user->user_balance);
+        $this->assertNotNull($project->last_ai_charged_at);
+
+        $chargedAgain = $project->ensureAiIsCharged($user);
+        $this->assertTrue($chargedAgain);
+        $user->refresh();
+        $this->assertEquals(10.00, (float)$user->user_balance);
+
+        $yesterday = \Carbon\Carbon::now('Africa/Cairo')->subDay();
+        $project->update(['last_ai_charged_at' => $yesterday]);
+
+        $chargedNextDay = $project->ensureAiIsCharged($user);
+        $this->assertTrue($chargedNextDay);
+        $user->refresh();
+        $this->assertEquals(0.00, (float)$user->user_balance);
+
+        $project->update(['last_ai_charged_at' => $yesterday]);
+        
+        $chargedNoBalance = $project->ensureAiIsCharged($user);
+        $this->assertFalse($chargedNoBalance);
+        $project->refresh();
+        $this->assertFalse($project->ai_enabled);
     }
 }

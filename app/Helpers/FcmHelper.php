@@ -31,7 +31,7 @@ class FcmHelper
         $message = self::buildMessage($data, $webPushLink, withOrderId: true);
 
         try {
-            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->toArray());
+            \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $message->jsonSerialize());
 
             return true;
         } catch (\Throwable) {
@@ -54,7 +54,7 @@ class FcmHelper
             ->withTopic($topic);
 
         try {
-            \App\Jobs\SendFcmNotificationJob::dispatch([], $message->toArray());
+            \App\Jobs\SendFcmNotificationJob::dispatch([], $message->jsonSerialize());
 
             return true;
         } catch (\Throwable) {

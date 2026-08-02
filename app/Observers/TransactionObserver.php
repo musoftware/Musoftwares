@@ -28,9 +28,11 @@ class TransactionObserver
             // Skip reactivation if the user still has an invoice that exceeds the DSO limit
             $user = $transaction->user;
             if ($user) {
-                // Auto-pay old unpaid invoices first with the added balance
-                $user->try_pay_unpaid_invoices();
-                $user->refresh();
+                // Auto-pay old unpaid invoices first with the added balance (skip if this transaction is already explicitly tied to an invoice payment)
+                if (!($transaction->reason && str_starts_with($transaction->reason, 'Invoice #'))) {
+                    $user->try_pay_unpaid_invoices();
+                    $user->refresh();
+                }
 
                 $oldestUnpaid = $user->oldestUnpaidInvoice();
                 if ($oldestUnpaid) {

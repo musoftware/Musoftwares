@@ -8,6 +8,11 @@ export interface User {
     permissions?: string[];
     crm_features?: string[];
     enable_3d_dashboard?: boolean;
+    openai_api_key?: string;
+    openai_model?: string;
+    gemini_api?: string;
+    gemini_model?: string;
+    default_ai_model?: string;
 }
 
 export type PageProps<
