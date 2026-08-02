@@ -13,8 +13,8 @@ class AiAgencyStructuredEngine
      */
     public function think(Project $project, string $userText, array $recentMessages = []): array
     {
-        $adminSettings = \App\Models\AdminSettings::all()->pluck('setting_value', 'setting_key');
-        $apiKey = $adminSettings['gemini_api_keys'] ?? env('GEMINI_API_KEY', '');
+        $adminSettings = \App\Models\AdminSettings::pluck('setting_value', 'setting_key');
+        $apiKey = $adminSettings['gemini_api_keys'] ?? config('services.gemini.key', '');
         $model  = $adminSettings['gemini_model'] ?? 'gemini-2.0-flash';
 
         $context = $project->ai_context;

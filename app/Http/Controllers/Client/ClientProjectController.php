@@ -49,13 +49,8 @@ class ClientProjectController extends Controller
             'team'           => fn () => $team,
             'discussions'    => fn () => $discussions,
             'supportTickets' => fn () => $supportTickets,
-            'aiSummary'      => fn () => $project->ai_summary ?? [
-                'project_type' => null,
-                'features'     => [],
-                'current_goal' => null,
-                'missing_info' => [],
-                'complexity'   => null,
-            ],
+            'aiContext'      => fn () => $project->ai_context,
+            'aiStage'        => fn () => $project->ai_context['current_stage'] ?? 'greeting',
             'aiQuestions'   => fn () => collect($project->ai_questions ?? [])->where('answered', false)->values(),
             'aiActionsLog'  => fn () => array_slice($project->ai_actions_log ?? [], 0, 10),
         ]);
@@ -233,10 +228,11 @@ class ClientProjectController extends Controller
 
         // Process AI tools & Orchestrator
         $aiResult = ['billed_amount' => '0.00', 'currency_symbol' => 'EGP'];
-        if ($project->ai_enabled) {
-            $orchestrator = new \App\Services\AI\AiProjectOrchestratorService(new \App\Services\AI\AiToolRegistry());
-            $aiResult = $orchestrator->processClientMessage($project, $body, $request->user()->id);
+        if (!$project->ai_enabled) {
+            $project->update(['ai_enabled' => true]);
         }
+        $orchestrator = new \App\Services\AI\AiProjectOrchestratorService(new \App\Services\AI\AiToolRegistry());
+        $aiResult = $orchestrator->processClientMessage($project, $body, $request->user()->id);
 
         // Re-load all discussions so both client message & AI reply are returned
         $discussions = $this->loadDiscussions($project);

@@ -6,17 +6,17 @@ use App\Models\Project;
 
 class UpdateContextTool implements AiToolInterface
 {
-    public function getName(): string
+    public function name(): string
     {
         return 'update_context';
     }
 
-    public function getDescription(): string
+    public function description(): string
     {
         return 'Update project context incrementally (e.g. current_stage, pending_features, completed_features, tech_stack, known_decisions).';
     }
 
-    public function getParametersSchema(): array
+    public function parameters(): array
     {
         return [
             'type'       => 'object',

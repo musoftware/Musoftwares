@@ -91,7 +91,7 @@ if ($clientUser) {
 
     $project = \App\Models\Project::updateOrCreate(
         ['user_id' => $clientUser->id, 'project_name' => 'E2E Test Client Project'],
-        ['status' => 'open', 'archived' => 0]
+        ['status' => 'open', 'archived' => 0, 'budget' => 0.0, 'ai_summary' => ['project_type' => null, 'features' => [], 'current_goal' => null, 'missing_info' => [], 'complexity' => null]]
     );
     echo "Ensured E2E project exists.\n";
 

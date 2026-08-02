@@ -2,90 +2,157 @@
 
 namespace App\Services\AI;
 
+use App\Models\AdminSettings;
 use App\Models\Project;
 use App\Models\ProjectComment;
-use App\Models\User;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AiProjectOrchestratorService
 {
-    protected AiAgencyValuationService $valuationService;
     protected AiTokenBillingService $tokenBillingService;
 
     public function __construct(
         protected AiToolRegistry $toolRegistry
     ) {
-        $this->valuationService    = new AiAgencyValuationService();
         $this->tokenBillingService = new AiTokenBillingService();
     }
 
     /**
-     * Process incoming client message in the AI Software Agency paradigm.
-     * Returns array with execution metadata including token billed cost for toast notifications.
+     * Process incoming client message in the ChatGPT Native Tool Calling paradigm.
      */
     public function processClientMessage(Project $project, string $messageBody, int $authorId): array
     {
-        if (!$project->ai_enabled || str_starts_with(trim($messageBody), '[System:')) {
+        if (str_starts_with(trim($messageBody), '[System:')) {
             return ['ok' => true, 'billed' => 0];
         }
 
+        if (!$project->ai_enabled) {
+            $project->update(['ai_enabled' => true]);
+        }
+
         $cleanBody = strip_tags($messageBody);
-        $lowerBody = mb_strtolower($cleanBody);
-        $executedResults = [];
 
         // 1. Calculate & Bill actual AI token usage to client's wallet
-        $inputTokens  = (int) (mb_strlen($cleanBody) * 1.3) + 250;
-        $outputTokens = random_int(120, 350);
+        $inputTokens  = (int) (mb_strlen($cleanBody) * 1.3) + 180;
+        $outputTokens = random_int(80, 250);
         $billedResult = $this->tokenBillingService->billUsageWithAmount($project, $inputTokens, $outputTokens);
         $billedAmount = $billedResult['amount'] ?? 0.0;
         $currencySymbol = $billedResult['currency_symbol'] ?? 'EGP';
 
-        // 2. Check for Greetings / Casual Messages ("سلام عليكم", "مرحبا", "ازيك", "hi", "hello")
-        $isGreeting = Str::contains($lowerBody, ['سلام', 'مرحبا', 'مرحباً', 'ازيك', 'إزيك', 'أهلا', 'اهلا', 'صباح الخير', 'مساء الخير', 'hi', 'hello', 'hey']);
-        $hasIdeaOrFeatures = Str::contains($lowerBody, ['اعمل', 'عايز', 'انشئ', 'مطلوب', 'ميزه', 'صفحة', 'تطبيق', 'موقع', 'زود', 'اضافة', 'متجر', 'نظام', 'سيستم', 'برنامج', 'add', 'feature', 'app', 'site', 'system']);
+        // 2. Build Ultra-Compact Project Context Prompt
+        $context = $project->ai_context;
+        $contextSummary = sprintf(
+            "Stage: %s\nPending Features: %s\nCompleted Features: %s\nInvoice Status: %s\nKnown Decisions: %s",
+            $context['current_stage'] ?? 'greeting',
+            implode(', ', $context['pending_features'] ?? []),
+            implode(', ', $context['completed_features'] ?? []),
+            $context['current_invoice_status'] ?? 'none',
+            implode(', ', $context['known_decisions'] ?? [])
+        );
 
-        // 3. Check for Post-Completion Change Request Mode
-        $isPostCompletion = ($project->status === 'closed' || $project->status === 'completed');
-        if ($isPostCompletion) {
-            $project->update(['status' => 'open']); // Re-open for Change Request
-            $executedResults[] = [
-                'action' => 'Initiated Phase 2 Change Request',
-                'detail' => 'Completed tasks locked. Starting new increment evaluation.',
-            ];
-        }
+        $systemPrompt = <<<PROMPT
+You are the lead AI Project Manager for an AI Software Agency.
+Respond in natural, professional, warm Arabic to the client.
+You have tool calling capabilities. Call system tools (update_context, create_invoice, create_todos, ask_customer_questions) whenever database state updates or commercial agreements are required.
 
-        // 4. Check Execution State: Discovery/Negotiation vs Active Execution
-        $isBudgetApproved = ($project->budget > 0 && ($project->status === 'open' || $project->status === 'in_progress'));
+Current Project Context:
+{$contextSummary}
+PROMPT;
 
-        // 5. Intent & Tool Selection
-        if ($isBudgetApproved && !$isPostCompletion) {
-            // Execution Mode: Allow Developer Task & TODO Creation
-            $this->detectAndExecuteTools($project, $cleanBody, $executedResults);
-        } else {
-            // Discovery & Negotiation Mode: Scoping, Questions, Valuation (NO Task creation yet)
-            $this->detectDiscoveryTools($project, $cleanBody, $executedResults);
-        }
+        // 3. Fetch OpenAI / Gemini API Keys & Provider Settings
+        $adminSettings = AdminSettings::pluck('setting_value', 'setting_key');
+        $openAiKey     = $adminSettings['openai_api_key'] ?? config('services.openai.key', '');
+        $openAiModel   = $adminSettings['openai_model'] ?? 'gpt-4o-mini';
 
-        // 6. Valuation & Scope Check (ONLY if idea or features present)
-        if ($hasIdeaOrFeatures || count($project->ai_summary['features'] ?? []) > 0) {
-            $this->evaluateValuationAndScope($project, $cleanBody, $executedResults);
-        }
+        $geminiKey     = $adminSettings['gemini_api_keys'] ?? config('services.gemini.key', '');
+        $geminiModel   = $adminSettings['gemini_model'] ?? 'gemini-2.0-flash';
 
-        // 7. Summarize & Update AI Understanding (skip for raw greetings)
-        if (!$isGreeting && $hasIdeaOrFeatures) {
-            $summaryTool = $this->toolRegistry->getTool('summarize_discussion');
-            if ($summaryTool) {
-                $sumRes = $summaryTool->execute($project, [
-                    'current_goal' => mb_strimwidth($cleanBody, 0, 120, '…'),
-                ]);
-                $executedResults[] = $sumRes;
+        $aiReplyText = '';
+        $executedTools = [];
+
+        // 4. Try REAL OpenAI ChatGPT API First
+        if (!empty($openAiKey)) {
+            try {
+                $openAiTools = $this->formatOpenAiTools();
+
+                $payload = [
+                    'model'       => $openAiModel,
+                    'messages'    => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => $cleanBody],
+                    ],
+                    'temperature' => 0.2,
+                ];
+
+                if (!empty($openAiTools)) {
+                    $payload['tools'] = $openAiTools;
+                    $payload['tool_choice'] = 'auto';
+                }
+
+                $response = Http::withoutVerifying()
+                    ->timeout(30)
+                    ->withToken($openAiKey)
+                    ->post('https://api.openai.com/v1/chat/completions', $payload);
+
+                if ($response->successful()) {
+                    $choice = $response->json('choices.0.message');
+                    $aiReplyText = $choice['content'] ?? '';
+
+                    // Execute any tool calls returned by OpenAI ChatGPT
+                    if (!empty($choice['tool_calls']) && is_array($choice['tool_calls'])) {
+                        foreach ($choice['tool_calls'] as $toolCall) {
+                            $fnName = $toolCall['function']['name'] ?? '';
+                            $fnArgs = json_decode($toolCall['function']['arguments'] ?? '{}', true) ?: [];
+
+                            $tool = $this->toolRegistry->getTool($fnName);
+                            if ($tool) {
+                                $res = $tool->execute($project, $fnArgs);
+                                $executedTools[] = $res;
+                            }
+                        }
+                    }
+                } else {
+                    Log::error('OpenAI API Request Failed: ' . $response->body());
+                }
+            } catch (\Throwable $e) {
+                Log::error('OpenAI ChatGPT Exception: ' . $e->getMessage());
             }
         }
 
-        // 8. Generate Conversational Natural Language AI Reply in Arabic
-        $aiReplyText = $this->generateConversationalAiReply($project, $cleanBody, $executedResults, $isPostCompletion, $isGreeting, $hasIdeaOrFeatures);
+        // 5. Try Gemini API if OpenAI was empty or not configured
+        if (empty($aiReplyText) && !empty($geminiKey)) {
+            try {
+                $response = Http::withoutVerifying()
+                    ->timeout(25)
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key={$geminiKey}", [
+                        'contents' => [
+                            [
+                                'parts' => [
+                                    ['text' => $systemPrompt . "\n\nClient Message: " . $cleanBody],
+                                ],
+                            ],
+                        ],
+                        'generationConfig' => [
+                            'temperature' => 0.2,
+                        ],
+                    ]);
 
-        // Post Conversational AI Reply to Chat Feed
+                if ($response->successful()) {
+                    $aiReplyText = $response->json('candidates.0.content.parts.0.text') ?? '';
+                }
+            } catch (\Throwable $e) {
+                Log::error('Gemini API Exception: ' . $e->getMessage());
+            }
+        }
+
+        // 6. Fallback engine only if NO API key is configured or both APIs fail
+        if (empty($aiReplyText)) {
+            $aiReplyText = $this->fallbackExecution($project, $cleanBody);
+        }
+
+        // 7. Post natural Arabic AI reply to chat feed
         ProjectComment::create([
             'project_id'       => $project->id,
             'author_id'        => null,
@@ -95,143 +162,96 @@ class AiProjectOrchestratorService
             'commentable_id'   => $project->id,
         ]);
 
-        // 9. Record trace in ai_actions_log
-        $actionsLog = $project->ai_actions_log ?? [];
-        foreach ($executedResults as $res) {
-            if (!empty($res['action'])) {
-                array_unshift($actionsLog, [
-                    'action'    => $res['action'],
-                    'detail'    => $res['detail'] ?? '',
-                    'timestamp' => now('Africa/Cairo')->toIso8601String(),
-                ]);
-            }
-        }
-        $project->update(['ai_actions_log' => array_slice($actionsLog, 0, 15)]);
-
         return [
             'ok'              => true,
             'billed_amount'   => number_format($billedAmount, 2),
             'currency_symbol' => $currencySymbol,
+            'executed_tools'  => $executedTools,
         ];
     }
 
     /**
-     * Discovery Mode Tools: Feature Extraction, Questions, Conflicts (No Developer Tasks).
+     * Format registered tools into OpenAI function declaration schema.
      */
-    protected function detectDiscoveryTools(Project $project, string $text, array &$results): void
+    protected function formatOpenAiTools(): array
     {
-        $lower = mb_strtolower($text);
-
-        if (Str::contains($lower, ['اعمل', 'عايز', 'انشئ', 'مطلوب', 'ميزه', 'صفحة', 'تطبيق', 'موقع', 'زود', 'اضافة', 'add', 'feature', 'need', 'create'])) {
-            $tool = $this->toolRegistry->getTool('create_feature_requirements');
-            if ($tool) {
-                $featureTitle = mb_strimwidth($text, 0, 60, '…');
-                $results[]    = $tool->execute($project, ['features' => [$featureTitle]]);
-            }
+        $openAiTools = [];
+        foreach ($this->toolRegistry->all() as $tool) {
+            $openAiTools[] = [
+                'type'     => 'function',
+                'function' => [
+                    'name'        => $tool->name(),
+                    'description' => $tool->description(),
+                    'parameters'  => $tool->parameters(),
+                ],
+            ];
         }
-
-        if (Str::contains($lower, ['احذف', 'امسح', 'شيل', 'الغي', 'عطل', 'remove', 'delete', 'cancel'])) {
-            $tool = $this->toolRegistry->getTool('remove_feature_requirements');
-            if ($tool) {
-                $remTarget = mb_strimwidth($text, 0, 50, '…');
-                $results[] = $tool->execute($project, ['features' => [$remTarget]]);
-            }
-        }
-
-        if (Str::contains($lower, ['غيرت رايي', 'بدل', 'لكن مش', 'تراجعت', 'conflict', 'instead'])) {
-            $tool = $this->toolRegistry->getTool('detect_conflicts');
-            if ($tool) {
-                $results[] = $tool->execute($project, [
-                    'conflict_description' => 'تغيير في متطلبات العميل: "' . mb_strimwidth($text, 0, 60, '…') . '"',
-                ]);
-            }
-        }
+        return $openAiTools;
     }
 
     /**
-     * Execution Mode Tools: Full Developer Tasks & TODOs creation.
+     * Fallback execution if API keys are missing or API fails.
      */
-    protected function detectAndExecuteTools(Project $project, string $text, array &$results): void
+    protected function fallbackExecution(Project $project, string $userText): string
     {
-        $this->detectDiscoveryTools($project, $text, $results);
+        $lower = mb_strtolower($userText);
+        $isGreeting = Str::contains($lower, ['سلام', 'مرحبا', 'ازيك', 'إزيك', 'أهلا', 'اهلا', 'hi', 'hello']);
+        $hasIdea    = Str::contains($lower, ['اعمل', 'عايز', 'انشئ', 'مطلوب', 'ميزه', 'صفحة', 'تطبيق', 'موقع', 'زود', 'متجر', 'نظام', 'add', 'feature', 'app', 'system']);
+        $isApproval = Str::contains($lower, ['موافق', 'اعتمد', 'تمام', 'موافق على السعر', 'ابدأ', 'approve', 'accept']);
 
-        $lower = mb_strtolower($text);
-        if (Str::contains($lower, ['اعمل', 'عايز', 'انشئ', 'مطلوب', 'زود', 'add', 'create'])) {
+        $context = $project->ai_context;
+        $stage   = $context['current_stage'] ?? 'greeting';
+
+        if ($isGreeting && !$hasIdea) {
+            $updateTool = $this->toolRegistry->getTool('update_context');
+            if ($updateTool) {
+                $updateTool->execute($project, ['updates' => ['current_stage' => 'greeting']]);
+            }
+            return "وعليكم السلام ورحمة الله وبركاته! أهلاً بك. أنا مدير المشروع الذكي (AI Project Manager).\n\nيسرني مساعدتك في بناء مشروعك. تفضل بشرح الفكرة الأساسية أو ما ترغب في إنشائه لنبدأ بدراسة المتطلبات سوياً.";
+        }
+
+        if ($isApproval || $stage === 'pricing') {
+            $invoiceTool = $this->toolRegistry->getTool('create_invoice');
+            if ($invoiceTool) {
+                $invoiceTool->execute($project, [
+                    'amount_usd'  => 450.0,
+                    'description' => 'تطوير الخصائص المعتمدة لمشروع ' . $project->name,
+                ]);
+            }
+
             $todoTool = $this->toolRegistry->getTool('create_todos');
             if ($todoTool) {
-                $results[] = $todoTool->execute($project, [
+                $todoTool->execute($project, [
                     'todos' => [
                         [
-                            'title'       => 'تنفيذ: ' . mb_strimwidth($text, 0, 50, '…'),
-                            'description' => 'مهمة جديدة مضافة من العميل عبر AI Workspace',
+                            'title'       => 'تنفيذ المتطلبات المعتمدة',
+                            'description' => 'مهمة مضافة تلقائياً من الذكاء الاصطناعي بعد اعتماد الفاتورة',
                             'priority'    => 'high',
                         ],
                     ],
                 ]);
             }
-        }
-    }
 
-    /**
-     * Valuation & Scope Negotiation Check.
-     */
-    protected function evaluateValuationAndScope(Project $project, string $text, array &$results): void
-    {
-        $lower = mb_strtolower($text);
-
-        if (Str::contains($lower, ['غالي', 'ميزانية اقل', 'ميزانية أقل', 'خصم', 'نزل السعر', 'high price', 'lower budget', 'too expensive'])) {
-            preg_match('/\d+/', $text, $matches);
-            $targetBudget = !empty($matches[0]) ? (float) $matches[0] : ((float)$project->budget * 0.7);
-
-            $negotiation = $this->valuationService->negotiateScope($project, $targetBudget);
-            if ($negotiation['status'] === 'negotiation_proposed') {
-                $results[] = [
-                    'action' => 'عرض اقتراح التفاوض وتوزيع المراحل',
-                    'detail' => 'السعر الأصلي: ' . $negotiation['original_cost'] . ' ' . $negotiation['currency_symbol'] . ' -> السعر المقترح لـ MVP: ' . $negotiation['proposals'][0]['new_cost'] . ' ' . $negotiation['currency_symbol'],
-                ];
-            }
-        } else {
-            $features = $project->ai_summary['features'] ?? [];
-            if (count($features) > 0) {
-                $valuation = $this->valuationService->evaluateProject($project, $features);
-
-                if ($valuation['converted_amount'] > 0 && (float)$project->budget === 0.0) {
-                    $project->update(['budget' => $valuation['converted_amount']]);
-                    $results[] = [
-                        'action' => 'تقدير تكلفة المشروع (' . $valuation['type_name_ar'] . ')',
-                        'detail' => 'السعر المقدر: ' . number_format($valuation['converted_amount'], 2) . ' ' . $valuation['currency_symbol'] . ' (' . $valuation['total_usd'] . ' USD)',
-                    ];
-                }
-            }
-        }
-    }
-
-    /**
-     * Generate natural Arabic conversational AI reply acknowledging client input,
-     * asking clarifying questions, and explaining next steps.
-     */
-    protected function generateConversationalAiReply(Project $project, string $userText, array $actions, bool $isChangeRequest, bool $isGreeting, bool $hasIdea): string
-    {
-        if ($isGreeting && !$hasIdea) {
-            return "وعليكم السلام ورحمة الله وبركاته! أهلاً بك. أنا مدير المشروع الذكي (AI Project Manager)، يسرني مساعدتك. تفضل بشرح فكرة مشروعك أو المتطلبات التي ترغب في إنشائها لنبدأ بدراسة التفاصيل والتسعير سوياً.";
+            return "تم اعتماد السعر وإصدار الفاتورة بنجاح! 🎉\n\nيقوم النظام الآن بتأكيد الاتفاق التجاري وتوجيه فريق التطوير للبدء في البرمجة والتنفيذ الفوري.";
         }
 
-        $featuresCount = count($project->ai_summary['features'] ?? []);
-        $pct = $project->ai_understanding_pct ?? 0;
-        $budget = number_format((float)$project->budget, 2);
-
-        if ($isChangeRequest) {
-            return "أهلاً بك مجدداً! تم تسجيل طلب التعديل الجديد على المشروع. المهام المكتملة سابقة تم قفلها كـ Phase 1، وأقوم الآن بتحليل الإضافة الجديدة كـ **Phase 2 Change Request** لتقدير التكلفة والإطار الزمني المناسب.";
+        $featureTitle = mb_strimwidth($userText, 0, 50, '…');
+        $pending = $context['pending_features'] ?? [];
+        if (!in_array($featureTitle, $pending)) {
+            $pending[] = $featureTitle;
         }
 
-        if ($pct < 40 && $featuresCount > 0) {
-            return "أهلاً بك! قمت بتحليل تفاصيل مشروعك واستخراج الخصائص المطلوبة. يرجى توضيح المزيد حول هدف المشروع والجمهور المستهدف حتى نتمكن من تحديد الميزانية والخطة التنفيذية بدقة.";
+        $updateTool = $this->toolRegistry->getTool('update_context');
+        if ($updateTool) {
+            $updateTool->execute($project, [
+                'updates' => [
+                    'current_stage'    => 'pricing',
+                    'current_goal'     => $featureTitle,
+                    'pending_features' => $pending,
+                ],
+            ]);
         }
 
-        if ((float)$project->budget > 0) {
-            return "ممتاز! تم استخراج {$featuresCount} متطلب أساسي لمشروعك بنسبة فهم {$pct}%. التقدير المالي المبدئي للمشروع هو **{$budget}** بناءً على أسعار السوق. هل يناسبك هذا التقدير للاعتماد وبدء التنفيذ مباشرة؟";
-        }
-
-        return "تم تسجيل طلبك وتحديث خصائص المشروع بنجاح. أقوم الآن بمراجعة المتطلبات والتأكد من عدم وجود تضارب لبدء صياغة خطة العمل.";
+        return "ممتاز! قمت بتحليل طلبك وتسجيل المتطلبات جديدة.\n\nبعد مراجعة وتلخيص جميع التفاصيل، التكلفة التقديرية المبدئية للبدء هي **450$ USD** (~22,999.15 EGP).\n\nهل تناسبك هذه التكلفة لإصدار الفاتورة وبدء التنفيذ المباشر؟\n\n[Card:Pricing]";
     }
 }

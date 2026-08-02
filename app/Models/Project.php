@@ -45,11 +45,54 @@ class Project extends Model
         'date_end' => 'datetime',
         'ai_enabled' => 'boolean',
         'ai_understanding_pct' => 'integer',
+        'ai_stage' => 'string',
+        'ai_context' => 'array',
         'ai_summary' => 'array',
         'ai_questions' => 'array',
         'ai_actions_log' => 'array',
         'last_ai_charged_at' => 'datetime',
     ];
+
+    public function getAiStageAttribute($value)
+    {
+        return $value ?: 'greeting';
+    }
+
+    public function getAiContextAttribute($value)
+    {
+        $default = [
+            'current_goal'           => null,
+            'current_stage'          => 'greeting',
+            'completed_features'     => [],
+            'pending_features'       => [],
+            'current_invoice_status' => 'none',
+            'current_invoice_id'     => null,
+            'tech_stack'             => [],
+            'developer_notes'        => null,
+            'known_decisions'        => [],
+        ];
+
+        if (empty($value)) {
+            return $default;
+        }
+
+        $decoded = is_string($value) ? json_decode($value, true) : $value;
+        return array_merge($default, is_array($decoded) ? $decoded : []);
+    }
+
+    public function updateAiContext(array $updates): void
+    {
+        $current = $this->ai_context;
+        foreach ($updates as $k => $v) {
+            if (is_array($v) && isset($current[$k]) && is_array($current[$k])) {
+                // Merge array fields without duplicating scalar items
+                $current[$k] = array_values(array_unique(array_merge($current[$k], $v)));
+            } else {
+                $current[$k] = $v;
+            }
+        }
+        $this->update(['ai_context' => $current]);
+    }
 
     private $oneTime = false;
 
@@ -265,9 +308,14 @@ class Project extends Model
         return $this->hasMany(InvoiceItemTimer::class);
     }
 
-    public function invoices()
+    public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Invoice::class);
+        return $this->hasMany(\App\Models\Invoice::class);
+    }
+
+    public function activeInvoice()
+    {
+        return $this->invoices()->where('status', '!=', 'cancelled')->latest()->first();
     }
 
     public function currencyRow()

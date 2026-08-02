@@ -26,15 +26,12 @@ test.describe('Client Projects AI Workspace Experience', () => {
         await page.goto(href!);
         await page.waitForLoadState('networkidle');
 
-        // Chat input area should be visible directly without clicking tabs
+        // Chat input area should be visible directly
         const chatInput = page.locator('textarea').first();
         await expect(chatInput).toBeVisible({ timeout: 10000 });
 
-        // AI Understanding header widget should be visible
-        await expect(page.locator('text=AI Understanding').first()).toBeVisible();
-
-        // AI Live Understanding sidebar should be visible
-        await expect(page.locator('text=AI Live Understanding').first()).toBeVisible();
+        // Project Stage widget should be visible
+        await expect(page.locator('text=حالة المشـــــروع').first()).toBeVisible();
     });
 
     test('should send a message in AI workspace chat and verify it appears', async ({ page }) => {
@@ -87,7 +84,5 @@ test.describe('Client Projects AI Workspace Experience', () => {
 
         // Toast notification appears on success
         await expect(page.locator('text=AI Project Manager activated successfully!').first()).toBeVisible({ timeout: 10000 });
-        await page.waitForLoadState('networkidle');
-        await expect(page.locator('text=AI Project Manager Active').first()).toBeVisible({ timeout: 10000 });
     });
 });

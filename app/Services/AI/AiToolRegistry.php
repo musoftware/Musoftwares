@@ -18,6 +18,9 @@ use App\Services\AI\Tools\UpdateDocumentationTool;
 use App\Services\AI\Tools\UpdatePrioritiesTool;
 use App\Services\AI\Tools\UpdateProjectDetailsTool;
 
+use App\Services\AI\Tools\UpdateContextTool;
+use App\Services\AI\Tools\CreateInvoiceTool;
+
 class AiToolRegistry
 {
     /** @var array<string, AiToolInterface> */
@@ -31,6 +34,8 @@ class AiToolRegistry
     protected function registerDefaultTools(): void
     {
         $defaultTools = [
+            new UpdateContextTool(),
+            new CreateInvoiceTool(),
             new UpdateProjectDetailsTool(),
             new CreateFeatureRequirementsTool(),
             new RemoveFeatureRequirementsTool(),

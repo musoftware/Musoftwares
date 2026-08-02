@@ -18,7 +18,7 @@ class SubscriptionModuleTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Currencies are seeded by the migration itself
+        $this->seed(\Database\Seeders\CurrenciesSeeder::class);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -384,7 +384,7 @@ class SubscriptionModuleTest extends TestCase
             ->has('subscriptions', 1)
             ->where('subscriptions.0.plan_slug', 'erp')
             ->where('subscriptions.0.status', 'active')
-            ->where('subscriptions.0.amount', 999.99) // Due to missing EGP currency in test, rate is 1, and psychological_price applies
+            ->where('subscriptions.0.amount', 999.99)
         );
     }
 

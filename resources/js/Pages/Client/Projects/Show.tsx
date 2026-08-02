@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     ArrowLeft, Sparkles, Send, Paperclip, X, Download, FileText,
-    BrainCircuit, CheckCircle2, HelpCircle, Activity, AlertTriangle, ShieldQuestion,
-    MessageSquare, Check
+    BrainCircuit, CheckCircle2, HelpCircle, Check, CreditCard, MessageCircle
 } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { AvatarStack, AvatarStackMember } from '@/Components/ui/AvatarStack';
 import { formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
@@ -55,12 +54,16 @@ interface ChatDiscussion {
     } | null;
 }
 
-interface AiSummaryData {
-    project_type?: string | null;
-    features?: string[];
+interface AiContextData {
     current_goal?: string | null;
-    missing_info?: string[];
-    complexity?: string | null;
+    current_stage?: string;
+    completed_features?: string[];
+    pending_features?: string[];
+    current_invoice_status?: string;
+    current_invoice_id?: number | null;
+    tech_stack?: string[];
+    developer_notes?: string | null;
+    known_decisions?: string[];
 }
 
 interface AiQuestion {
@@ -69,28 +72,31 @@ interface AiQuestion {
     answered: boolean;
 }
 
-interface AiActionLog {
-    action: string;
-    detail?: string;
-    timestamp: string;
+interface StageChecklistItem {
+    id: string;
+    label: string;
+    completed: boolean;
+    active: boolean;
 }
 
 interface Props {
     project: ProjectDetail;
     team?: AvatarStackMember[];
     discussions?: ChatDiscussion[];
-    aiSummary?: AiSummaryData;
+    aiContext?: AiContextData;
     aiQuestions?: AiQuestion[];
-    aiActionsLog?: AiActionLog[];
+    aiStage?: string;
+    aiStageChecklist?: StageChecklistItem[];
 }
 
 export default function ProjectShow({
     project,
     team = [],
     discussions = [],
-    aiSummary = {},
+    aiContext = {},
     aiQuestions = [],
-    aiActionsLog = [],
+    aiStage = 'greeting',
+    aiStageChecklist = [],
 }: Props) {
     const page = usePage();
     const currentUserId = (page.props.auth as any)?.user?.id;
@@ -109,7 +115,9 @@ export default function ProjectShow({
 
     // Keep feed in sync with prop updates
     useEffect(() => {
-        setChatFeed(discussions);
+        if (discussions && discussions.length >= chatFeed.length) {
+            setChatFeed(discussions);
+        }
     }, [discussions]);
 
     // Auto-scroll chat to bottom
@@ -167,8 +175,8 @@ export default function ProjectShow({
                     toast.info(`خصم ${res.data.billed_amount} ${res.data.currency_symbol} (تكلفة الـ AI الحقيقية)`);
                 }
 
-                // Reload to fetch updated AI summary/questions/actions in background
-                router.reload({ only: ['aiSummary', 'aiQuestions', 'aiActionsLog', 'project'] });
+                // Reload to fetch updated stage, context & discussions in background
+                router.reload({ only: ['discussions', 'aiContext', 'aiQuestions', 'aiStage', 'project'] });
             }
         } catch (err) {
             toast.error(__('general.error') || 'Failed to send message.');
@@ -178,23 +186,17 @@ export default function ProjectShow({
     };
 
     const handleApproveBudget = async () => {
+        setSubmitting(true);
         try {
             const res = await axios.post(route('client.projects.ai.approve-budget', { project: project.id }));
             if (res.data.ok) {
-                toast.success(res.data.message || 'تم اعتماد الميزانية وخطة العمل بنجاح!');
+                toast.success(res.data.message || 'تم اعتماد الفاتورة والميزانية بنجاح!');
                 router.reload();
             }
         } catch (err) {
-            toast.error('فشل في اعتماد الميزانية.');
-        }
-    };
-
-    const handleDismissQuestion = async (qId: string) => {
-        try {
-            await axios.patch(route('client.projects.ai-questions.dismiss', { project: project.id, questionId: qId }));
-            router.reload({ only: ['aiQuestions'] });
-        } catch (err) {
-            // Silent fallback
+            toast.error('فشل في اعتماد الفاتورة.');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -217,107 +219,86 @@ export default function ProjectShow({
                     extraText: match[2] || '',
                 };
             }
-        } catch (e) { /* empty */ }
+        } catch (e) {
+            // Fallback
+        }
         return null;
     };
 
-    const understandingPct = project.ai_understanding_pct || 0;
+    const currencySymbol = project.currency?.symbol || 'EGP';
 
     return (
         <AuthenticatedLayout>
-            <Head title={project.name} />
-            <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+            <Head title={`AI Agency — ${project.name}`} />
+
+            <div className="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8 space-y-4">
                 
-                {/* Header: Project Title, AI Status Badge, Understanding KPI */}
-                <header className="space-y-3 border-b border-slate-200 pb-4">
-                    <Link
-                        href={route('client.projects.index')}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 transition-colors hover:text-slate-700"
-                    >
-                        <ArrowLeft className="h-4 w-4" /> {__('general.all_projects')}
-                    </Link>
+                {/* Header Navbar */}
+                <header className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href={route('client.projects.index')}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition hover:bg-slate-200"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                        </Link>
 
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div className="space-y-1">
-                            <div className="flex flex-wrap items-center gap-3">
-                                <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-                                    {project.name}
-                                </h1>
-
-                                {/* AI Manager Status Badge */}
-                                {project.ai_enabled ? (
-                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-200">
-                                        <Sparkles className="h-3.5 w-3.5 text-emerald-500 animate-pulse" />
-                                        AI Project Manager Active
-                                    </span>
-                                ) : (
-                                    <button
-                                        onClick={handleActivateAi}
-                                        disabled={activationLoading}
-                                        className="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1 text-xs font-bold text-white shadow-sm hover:bg-indigo-700 transition-colors"
-                                    >
-                                        <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-                                        {activationLoading ? 'Activating...' : 'Activate AI Manager (10 EGP)'}
-                                    </button>
-                                )}
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-lg font-black text-slate-900 tracking-tight">{project.name}</h1>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    AI Software Agency
+                                </span>
                             </div>
-
-                            <div className="flex items-center gap-3 text-xs text-slate-500">
-                                <AvatarStack members={team} max={4} size="sm" />
-                                <span className="text-slate-300">|</span>
-                                <span>{project.date_start ? formatDate(project.date_start) : '—'}</span>
-                            </div>
+                            <p className="text-xs text-slate-500 font-medium">Chat-first interactive project workspace</p>
                         </div>
+                    </div>
 
-                        {/* AI Understanding Progress Header Badge */}
-                        <div className="flex items-center gap-3 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-3 shadow-xs md:self-end">
-                            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-xs">
-                                <span className="text-xs font-black text-indigo-700">{understandingPct}%</span>
-                                <svg className="absolute inset-0 h-full w-full -rotate-90">
-                                    <circle cx="24" cy="24" r="20" className="stroke-indigo-100 fill-none" strokeWidth="3.5" />
-                                    <circle
-                                        cx="24"
-                                        cy="24"
-                                        r="20"
-                                        className="stroke-indigo-600 fill-none transition-all duration-700"
-                                        strokeWidth="3.5"
-                                        strokeDasharray="125.66"
-                                        strokeDashoffset={125.66 - (125.66 * understandingPct) / 100}
-                                    />
-                                </svg>
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">AI Understanding</p>
-                                <p className="text-xs font-extrabold text-indigo-900">
-                                    {understandingPct > 80 ? 'High Clarity' : understandingPct > 40 ? 'Analyzing Details' : 'Gathering Requirements'}
-                                </p>
-                            </div>
-                        </div>
+                    <div className="flex items-center gap-4">
+                        {!project.ai_enabled && (
+                            <button
+                                onClick={handleActivateAi}
+                                disabled={activationLoading}
+                                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-700 transition"
+                            >
+                                <Sparkles className="h-4 w-4 text-indigo-200" />
+                                {activationLoading ? 'Activating...' : 'Activate AI Manager (10 EGP)'}
+                            </button>
+                        )}
+                        <AvatarStack members={team} max={4} size="sm" />
                     </div>
                 </header>
 
-                {/* AI Workspace Core Layout: Chat (70%) + AI Context Sidebar (30%) */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                {/* Pure Chat-First Grid Layout: Chat (85-90% width, 10 out of 12 cols), Stage Sidebar (15% width, 2 out of 12 cols) */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                     
-                    {/* Left Column (70% width): Chat Workspace */}
-                    <div className="lg:col-span-2 flex flex-col h-[680px] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    {/* Main Chat Workspace (10 of 12 Columns - 85% width) */}
+                    <div className="lg:col-span-10 flex flex-col h-[740px] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         
-                        {/* Workspace Header */}
-                        <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+                        {/* Chat Bar Header */}
+                        <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <BrainCircuit className="h-4 w-4 text-indigo-600" />
-                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">AI Interactive Workspace</span>
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">🤖</div>
+                                <div>
+                                    <span className="text-xs font-black text-slate-900">AI Project Manager</span>
+                                    <span className="text-[10px] text-slate-400 block font-medium">Direct interactive chat — answers, estimates & invoice inline</span>
+                                </div>
                             </div>
-                            <span className="text-[11px] text-slate-400 font-medium">Just chat naturally — AI handles tasks & specs</span>
+                            <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-extrabold text-indigo-700 border border-indigo-100">
+                                    Stage: {aiStage.toUpperCase()}
+                                </span>
+                            </div>
                         </div>
 
-                        {/* Messages Thread Container */}
-                        <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-slate-50/30">
+                        {/* Messages Thread Feed */}
+                        <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/20">
                             {chatFeed.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-                                    <BrainCircuit className="h-10 w-10 text-indigo-300 mb-2 animate-bounce" />
-                                    <p className="text-sm font-bold text-slate-700">Your AI Workspace is Ready</p>
-                                    <p className="text-xs max-w-sm mt-1">Type your project needs, ideas, or requirements below. The AI Project Manager will start organizing everything automatically.</p>
+                                    <BrainCircuit className="h-12 w-12 text-indigo-400 mb-3 animate-bounce" />
+                                    <p className="text-sm font-black text-slate-800">أهلاً بك في AI Software Agency</p>
+                                    <p className="text-xs max-w-sm mt-1 text-slate-500">اكتب فكرة مشروعك أو أي متطلبات بالأسفل. وسيقوم الـ AI Project Manager بإجابتك ودراسة المتطلبات مباشرة.</p>
                                 </div>
                             ) : (
                                 chatFeed.map((msg) => {
@@ -340,8 +321,12 @@ export default function ProjectShow({
                                     const displayText = parsedFileMsg ? parsedFileMsg.extraText : msg.body;
 
                                     const isCurrentUser = msg.author_id === currentUserId;
-                                    const authorName = msg.author?.name || msg.guest_name || 'Client';
+                                    const isAi = !msg.author_id && (msg.guest_name?.includes('AI') || !msg.author);
+                                    const authorName = isAi ? 'AI Project Manager' : (msg.author?.name || msg.guest_name || 'Client');
                                     const initials = authorName.slice(0, 1).toUpperCase();
+
+                                    const hasPricingCard = displayText.includes('[Card:Pricing]');
+                                    const cleanTextWithoutCard = displayText.replace('[Card:Pricing]', '').trim();
 
                                     return (
                                         <div
@@ -349,21 +334,21 @@ export default function ProjectShow({
                                             className={`flex flex-col w-full my-1.5 ${isCurrentUser ? 'items-end' : 'items-start'}`}
                                         >
                                             <div
-                                                className={`flex gap-3 max-w-xl rounded-2xl p-4 shadow-xs relative ${
+                                                className={`flex gap-3 max-w-2xl rounded-2xl p-4 shadow-xs relative ${
                                                     isCurrentUser
                                                         ? 'bg-indigo-600 text-white rounded-tr-none'
                                                         : 'bg-white border border-slate-200 text-slate-850 rounded-tl-none'
                                                 }`}
                                             >
                                                 {!isCurrentUser && (
-                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-black text-indigo-700">
-                                                        {msg.guest_name === 'AI' ? '🤖' : initials}
+                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700 shadow-xs">
+                                                        {isAi ? '🤖' : initials}
                                                     </div>
                                                 )}
 
-                                                <div className="min-w-0 flex-1 space-y-1">
+                                                <div className="min-w-0 flex-1 space-y-2">
                                                     <div className="flex items-baseline justify-between gap-4">
-                                                        <span className={`text-[11px] font-extrabold ${isCurrentUser ? 'text-indigo-100' : 'text-slate-900'}`}>
+                                                        <span className={`text-[11px] font-black ${isCurrentUser ? 'text-indigo-100' : 'text-slate-900'}`}>
                                                             {authorName}
                                                         </span>
                                                         <span className={`text-[10px] ${isCurrentUser ? 'text-indigo-200' : 'text-slate-400'}`}>
@@ -371,7 +356,7 @@ export default function ProjectShow({
                                                         </span>
                                                     </div>
 
-                                                    {/* Attached File Display (WhatsApp style inline file card) */}
+                                                    {/* Attached File Display */}
                                                     {fileData && (
                                                         <div className={`my-2 flex items-center justify-between rounded-xl p-3 text-xs border ${
                                                             isCurrentUser
@@ -388,23 +373,61 @@ export default function ProjectShow({
                                                                     download
                                                                     target="_blank"
                                                                     rel="noreferrer"
-                                                                    className="ml-2 shrink-0 p-1 hover:opacity-80 transition-opacity"
+                                                                    className="inline-flex items-center gap-1 rounded-lg bg-white/20 px-2 py-1 text-[11px] font-bold text-white hover:bg-white/30"
                                                                 >
-                                                                    <Download className="h-4 w-4" />
+                                                                    <Download className="h-3 w-3" />
                                                                 </a>
                                                             )}
                                                         </div>
                                                     )}
 
-                                                    {displayText && (
+                                                    {/* Message Text Body */}
+                                                    {cleanTextWithoutCard && (
                                                         <div
+                                                            dir="auto"
                                                             className={`prose max-w-none text-xs leading-relaxed break-words ${
                                                                 isCurrentUser
                                                                     ? 'text-white prose-invert prose-p:text-white prose-a:text-indigo-200'
-                                                                    : 'text-slate-700 prose-a:text-indigo-600 font-medium'
+                                                                    : 'text-slate-800 prose-p:text-slate-800 prose-a:text-indigo-600'
                                                             }`}
-                                                            dangerouslySetInnerHTML={renderMarkdown(displayText)}
+                                                            dangerouslySetInnerHTML={renderMarkdown(cleanTextWithoutCard)}
                                                         />
+                                                    )}
+
+                                                    {/* INLINE INTERACTIVE CARD: PRICING PROPOSAL */}
+                                                    {hasPricingCard && (
+                                                        <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-4 shadow-sm space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-2 text-emerald-800 font-extrabold text-xs">
+                                                                    <CreditCard className="h-4 w-4 text-emerald-600" />
+                                                                    <span>عرض السعر المبدئي والفاتورة</span>
+                                                                </div>
+                                                                <span className="text-sm font-black text-emerald-700">
+                                                                    {project.budget} {currencySymbol}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-[11px] text-emerald-800 font-medium leading-relaxed">
+                                                                التكلفة التقديرية تشمل تحليل الخصائص وصياغة المهام واستلام المخرجات البرمجية. عند الضغط على الاعتماد، سيتم توليد فاتورة المشروع وبدء التنفيذ الفوري.
+                                                            </p>
+                                                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                                                                <Button
+                                                                    onClick={handleApproveBudget}
+                                                                    disabled={submitting}
+                                                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs h-9 rounded-xl px-4 shadow-xs inline-flex items-center gap-1.5"
+                                                                >
+                                                                    <Check className="h-4 w-4" />
+                                                                    {submitting ? 'جاري الاعتماد...' : 'اعتماد الفاتورة وبدء التنفيذ'}
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    onClick={() => setMessageText('عايز اعدل الميزانية واقترح سعر اقل')}
+                                                                    className="border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs h-9 rounded-xl px-3 inline-flex items-center gap-1.5"
+                                                                >
+                                                                    <MessageCircle className="h-3.5 w-3.5" />
+                                                                    تعديل / تفاوض الميزانية
+                                                                </Button>
+                                                            </div>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
@@ -415,43 +438,35 @@ export default function ProjectShow({
                             <div ref={chatEndRef} />
                         </div>
 
-                        {/* File Attachment Pill Preview */}
-                        {selectedFile && (
-                            <div className="px-4 py-2 border-t border-slate-200 bg-indigo-50/60 flex items-center justify-between text-xs text-indigo-900">
-                                <span className="flex items-center gap-2 truncate font-bold">
-                                    <Paperclip className="h-3.5 w-3.5 text-indigo-600" />
-                                    {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
-                                </span>
-                                <button onClick={() => setSelectedFile(null)} className="text-slate-400 hover:text-slate-600">
-                                    <X className="h-4 w-4" />
+                        {/* Input Box Footer */}
+                        <div className="p-3 border-t border-slate-100 bg-white">
+                            {selectedFile && (
+                                <div className="mb-2 flex items-center justify-between rounded-xl bg-indigo-50 px-3 py-1.5 text-xs text-indigo-700 border border-indigo-100">
+                                    <span className="truncate font-bold">{selectedFile.name}</span>
+                                    <button onClick={() => setSelectedFile(null)} className="text-indigo-400 hover:text-indigo-600">
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            )}
+
+                            <form onSubmit={handleSendMessage} className="flex items-end gap-2">
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={(e) => e.target.files?.[0] && setSelectedFile(e.target.files[0])}
+                                    className="hidden"
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 transition"
+                                    title="Attach File"
+                                >
+                                    <Paperclip className="h-4 w-4" />
                                 </button>
-                            </div>
-                        )}
 
-                        {/* Bottom Chat Input Controls */}
-                        <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-slate-200 flex items-end gap-3">
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                                className="hidden"
-                            />
-
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 text-slate-400 hover:text-indigo-600 rounded-xl shrink-0"
-                                onClick={() => fileInputRef.current?.click()}
-                            >
-                                <Paperclip className="h-5 w-5" />
-                            </Button>
-
-                            <div className="flex-1 min-w-0">
                                 <Textarea
-                                    placeholder="Type anything... e.g., 'Add online payment module', 'Change budget to 50k'"
-                                    rows={1}
-                                    className="w-full text-xs rounded-xl focus:ring-indigo-500 border-slate-200 resize-none py-2.5 max-h-32"
                                     value={messageText}
                                     onChange={(e) => setMessageText(e.target.value)}
                                     onKeyDown={(e) => {
@@ -460,175 +475,101 @@ export default function ProjectShow({
                                             handleSendMessage(e);
                                         }
                                     }}
+                                    placeholder="اكتب رسالتك هنا... تفاصيل الفكرة، الاستفسارات، أو التعديلات"
+                                    rows={1}
+                                    className="min-h-[44px] max-h-32 flex-1 resize-none rounded-xl border-slate-200 text-xs py-2.5 focus:border-indigo-500 focus:ring-indigo-500"
                                 />
-                            </div>
 
-                            <Button
-                                type="submit"
-                                size="icon"
-                                disabled={(!messageText.trim() && !selectedFile) || submitting}
-                                className="h-10 w-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shrink-0 shadow-md"
-                            >
-                                <Send className="h-4 w-4" />
-                            </Button>
-                        </form>
+                                <Button
+                                    type="submit"
+                                    disabled={submitting || (!messageText.trim() && !selectedFile)}
+                                    className="h-10 w-10 shrink-0 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition p-0 flex items-center justify-center"
+                                >
+                                    <Send className="h-4 w-4" />
+                                </Button>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* Right Column (30% width): AI Live Understanding Sidebar */}
-                    <div className="space-y-6">
-
-                        {/* 1. AI Live Understanding Box */}
-                        <Card className="rounded-2xl border-indigo-100 shadow-sm overflow-hidden bg-gradient-to-b from-indigo-50/40 to-white">
-                            <CardHeader className="px-5 py-4 border-b border-indigo-50 bg-indigo-50/30">
-                                <CardTitle className="text-sm font-extrabold text-indigo-950 flex items-center gap-2">
+                    {/* Right Sidebar: Compact Project Context (2 of 12 Columns - 15% width) */}
+                    <div className="lg:col-span-2 space-y-4">
+                        
+                        {/* Project Stage Widget */}
+                        <Card className="rounded-2xl border border-slate-200 shadow-xs">
+                            <CardHeader className="p-3.5 pb-2">
+                                <CardTitle className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-1.5">
                                     <BrainCircuit className="h-4 w-4 text-indigo-600" />
-                                    AI Live Understanding
+                                    حالة المشـــــروع
                                 </CardTitle>
-                                <CardDescription className="text-[11px] text-indigo-700/70">
-                                    Automatically updated as you message.
-                                </CardDescription>
                             </CardHeader>
-                            <CardContent className="p-5 space-y-4 text-xs">
-                                <div>
-                                    <span className="font-bold text-slate-400 uppercase text-[10px]">Project Type</span>
-                                    <p className="font-extrabold text-slate-800">{aiSummary.project_type || 'Analyzing from chat...'}</p>
-                                </div>
-
-                                <div>
-                                    <span className="font-bold text-slate-400 uppercase text-[10px]">Current Goal</span>
-                                    <p className="font-bold text-indigo-900 bg-indigo-50/70 p-2.5 rounded-xl border border-indigo-100">
-                                        {aiSummary.current_goal || 'Describe your vision in chat...'}
-                                    </p>
-                                </div>
-
-                                {aiSummary.missing_info && aiSummary.missing_info.length > 0 && (
-                                    <div>
-                                        <span className="font-bold text-amber-600 uppercase text-[10px]">Missing Information</span>
-                                        <div className="flex flex-wrap gap-1.5 mt-1">
-                                            {aiSummary.missing_info.map((info, idx) => (
-                                                <span key={idx} className="rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
-                                                    ? {info}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                            <CardContent className="p-3.5 pt-0">
+                                <span className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-50 px-3 py-1 text-xs font-extrabold text-indigo-700 border border-indigo-200">
+                                    <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+                                    {aiContext.current_stage ? aiContext.current_stage.toUpperCase() : 'GREETING'}
+                                </span>
                             </CardContent>
                         </Card>
 
-                        {/* Budget Valuation & Execution Approval Card */}
-                        {parseFloat(project.budget) > 0 && (
-                            <Card className="rounded-2xl border-emerald-200 bg-emerald-50/40 shadow-sm">
-                                <CardHeader className="px-5 py-4 border-b border-emerald-100">
-                                    <CardTitle className="text-xs font-extrabold text-emerald-950 flex items-center justify-between">
-                                        <span className="flex items-center gap-1.5">
-                                            <Sparkles className="h-4 w-4 text-emerald-600" />
-                                            AI Valuation & Budget
-                                        </span>
-                                        <span className="text-sm font-black text-emerald-700">
-                                            {project.budget} {project.currency?.symbol || 'EGP'}
-                                        </span>
+                        {/* Pending Features Widget */}
+                        {aiContext.pending_features && aiContext.pending_features.length > 0 && (
+                            <Card className="rounded-2xl border border-indigo-200 bg-indigo-50/40 shadow-xs">
+                                <CardHeader className="p-3.5 pb-2">
+                                    <CardTitle className="text-xs font-black text-indigo-900 tracking-tight flex items-center gap-1.5">
+                                        <Sparkles className="h-4 w-4 text-indigo-600" />
+                                        الميزات المطلوبة
                                     </CardTitle>
-                                    <CardDescription className="text-[10px] text-emerald-700">
-                                        Estimated based on market standards. Approve to start developer task execution.
-                                    </CardDescription>
                                 </CardHeader>
-                                <CardContent className="p-4">
-                                    <Button
-                                        onClick={handleApproveBudget}
-                                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl shadow-sm transition-all"
-                                    >
-                                        <CheckCircle2 className="h-4 w-4 mr-1.5" />
-                                        Approve Budget & Start Project
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {/* 2. AI Questions Card (Only shown if unanswered questions exist) */}
-                        {aiQuestions.length > 0 && (
-                            <Card className="rounded-2xl border-amber-200 bg-amber-50/30 shadow-sm">
-                                <CardHeader className="px-5 py-4 border-b border-amber-100">
-                                    <CardTitle className="text-xs font-extrabold text-amber-900 flex items-center gap-2">
-                                        <HelpCircle className="h-4 w-4 text-amber-600" />
-                                        AI Needs Clarification
-                                    </CardTitle>
-                                    <CardDescription className="text-[10px] text-amber-700">
-                                        Answer in chat to help AI structure your project.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="p-5 space-y-3">
-                                    {aiQuestions.map((q) => (
-                                        <div key={q.id} className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-white border border-amber-100 shadow-xs">
-                                            <p className="text-xs font-bold text-slate-800">{q.question}</p>
-                                            <button
-                                                onClick={() => handleDismissQuestion(q.id)}
-                                                className="text-slate-400 hover:text-slate-600 text-[10px] shrink-0 font-bold"
-                                                title="Dismiss question"
-                                            >
-                                                <X className="h-3.5 w-3.5" />
-                                            </button>
+                                <CardContent className="p-3.5 pt-0 space-y-1.5">
+                                    {aiContext.pending_features.map((feat, idx) => (
+                                        <div key={idx} className="text-[11px] font-bold text-indigo-800 bg-white p-2 rounded-lg border border-indigo-100 flex items-start gap-1.5 shadow-2xs">
+                                            <span className="text-indigo-500 font-extrabold">•</span>
+                                            <span className="truncate">{feat}</span>
                                         </div>
                                     ))}
                                 </CardContent>
                             </Card>
                         )}
 
-                        {/* 3. AI Actions Log Card */}
-                        <Card className="rounded-2xl border-slate-200 shadow-sm">
-                            <CardHeader className="px-5 py-4 border-b border-slate-100">
-                                <CardTitle className="text-xs font-extrabold text-slate-800 flex items-center gap-2">
-                                    <Activity className="h-4 w-4 text-indigo-500" />
-                                    AI Action Stream
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-5">
-                                {aiActionsLog.length === 0 ? (
-                                    <p className="text-xs text-slate-400 italic">No AI actions logged yet.</p>
-                                ) : (
-                                    <ul className="space-y-3">
-                                        {aiActionsLog.map((log, idx) => (
-                                            <li key={idx} className="flex items-start gap-2 text-xs">
-                                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="font-bold text-slate-700">{log.action}</p>
-                                                    {log.detail && <p className="text-[10px] text-slate-400 truncate">{log.detail}</p>}
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </CardContent>
-                        </Card>
+                        {/* Completed Features Widget */}
+                        {aiContext.completed_features && aiContext.completed_features.length > 0 && (
+                            <Card className="rounded-2xl border border-emerald-200 bg-emerald-50/40 shadow-xs">
+                                <CardHeader className="p-3.5 pb-2">
+                                    <CardTitle className="text-xs font-black text-emerald-900 tracking-tight flex items-center gap-1.5">
+                                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                        الميزات المكتملة
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-3.5 pt-0 space-y-1.5">
+                                    {aiContext.completed_features.map((feat, idx) => (
+                                        <div key={idx} className="text-[11px] font-bold text-emerald-800 bg-white p-2 rounded-lg border border-emerald-100 flex items-start gap-1.5 shadow-2xs">
+                                            <span className="text-emerald-500 font-extrabold">✓</span>
+                                            <span className="truncate">{feat}</span>
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Top-up Dialog for AI Activation */}
+            {/* Topup Modal */}
             <Dialog open={topupModalOpen} onOpenChange={setTopupModalOpen}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="max-w-md rounded-2xl p-6">
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 text-rose-600">
-                            <AlertTriangle className="h-5 w-5" />
-                            Insufficient Balance
-                        </DialogTitle>
-                        <DialogDescription className="text-slate-500 pt-2 text-xs">
-                            Top up your wallet balance to activate the AI Project Manager.
+                        <DialogTitle className="text-base font-black text-slate-900">محفظة الرصيد غير كافية</DialogTitle>
+                        <DialogDescription className="text-xs text-slate-500 mt-1">
+                            تحتاج إلى رصيد إضافي بقيمة <strong>{requiredAmount} EGP</strong> لتفعيل الـ AI Manager في هذا المشروع.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="py-2 text-xs text-slate-600">
-                        Activation costs 10 EGP. Required: {requiredAmount ? Number(requiredAmount).toFixed(2) : '10.00'}.
-                    </div>
-                    <DialogFooter className="mt-4 flex gap-2 justify-end">
-                        <Button variant="outline" size="sm" onClick={() => setTopupModalOpen(false)}>
-                            Cancel
-                        </Button>
-                        <a
-                            href="/app/wallet"
-                            className="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors"
+                    <DialogFooter className="mt-4 flex gap-2">
+                        <Button variant="outline" onClick={() => setTopupModalOpen(false)}>إلغاء</Button>
+                        <Link
+                            href="/dashboard"
+                            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-700"
                         >
-                            Top up Wallet
-                        </a>
+                            شحن المحفظة الآن
+                        </Link>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

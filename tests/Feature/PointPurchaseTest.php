@@ -39,12 +39,12 @@ class PointPurchaseTest extends TestCase
         $this->user->currency_id = $usdCurrency->id;
         $this->user->save();
 
-        $this->user->add_balance(100.00, 'Initial Deposit', 'received', $usdCurrency->id);
+        CurrenciesExchange::flushCache();
 
         CurrenciesExchange::updateOrCreate([
             'currency1' => $egpCurrency->id,
             'currency2' => $usdCurrency->id,
-            'date_string' => now()->toDateString(),
+            'date_string' => now('Africa/Cairo')->toDateString(),
         ], [
             'rate' => 0.02,
         ]);
@@ -52,10 +52,14 @@ class PointPurchaseTest extends TestCase
         CurrenciesExchange::updateOrCreate([
             'currency1' => $usdCurrency->id,
             'currency2' => $egpCurrency->id,
-            'date_string' => now()->toDateString(),
+            'date_string' => now('Africa/Cairo')->toDateString(),
         ], [
             'rate' => 50.00,
         ]);
+
+        CurrenciesExchange::flushCache();
+
+        $this->user->add_balance(100.00, 'Initial Deposit', 'received', $usdCurrency->id);
 
         // Points package: Starter Pack (100 points, 100 EGP price)
         $this->package = PointPackage::create([

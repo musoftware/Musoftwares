@@ -9,17 +9,17 @@ use Illuminate\Support\Str;
 
 class CreateInvoiceTool implements AiToolInterface
 {
-    public function getName(): string
+    public function name(): string
     {
         return 'create_invoice';
     }
 
-    public function getDescription(): string
+    public function description(): string
     {
         return 'Create a commercial invoice for approved scope or feature request.';
     }
 
-    public function getParametersSchema(): array
+    public function parameters(): array
     {
         return [
             'type'       => 'object',

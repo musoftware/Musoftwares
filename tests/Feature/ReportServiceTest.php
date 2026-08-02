@@ -32,9 +32,12 @@ class ReportServiceTest extends TestCase
         $this->user->assignRole('client');
 
         $this->currency = Currency::firstOrCreate(
-            ['currency' => 'USD'],
-            ['symbol' => '$', 'string_format' => '$%01.2f']
+            ['currency' => 'EGP'],
+            ['symbol' => 'e£', 'string_format' => 'e£%01.2f']
         );
+
+        $this->user->currency_id = $this->currency->id;
+        $this->user->save();
     }
 
     public function test_get_pnl_report_executes_successfully(): void
