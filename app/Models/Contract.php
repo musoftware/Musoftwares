@@ -13,6 +13,7 @@ class Contract extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'project_id',
         'project_proposal_id',
@@ -59,6 +60,15 @@ class Contract extends Model
         'includes_hosting' => 'boolean',
         'includes_support' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($contract) {
+            if (empty($contract->uuid)) {
+                $contract->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
 
     public function getCurrencyAttribute()
     {

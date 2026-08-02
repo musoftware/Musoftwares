@@ -72,7 +72,7 @@ class CreateInvoiceTool implements AiToolInterface
         $project->updateAiContext([
             'current_invoice_id'     => $invoice->id,
             'current_invoice_status' => 'pending',
-            'current_stage'          => 'invoice',
+            'current_stage'          => 'PROPOSAL',
         ]);
 
         return [

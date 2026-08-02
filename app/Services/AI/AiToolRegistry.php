@@ -20,6 +20,7 @@ use App\Services\AI\Tools\UpdateProjectDetailsTool;
 
 use App\Services\AI\Tools\UpdateContextTool;
 use App\Services\AI\Tools\CreateInvoiceTool;
+use App\Services\AI\Tools\CreateContractTool;
 
 class AiToolRegistry
 {
@@ -35,6 +36,7 @@ class AiToolRegistry
     {
         $defaultTools = [
             new UpdateContextTool(),
+            new CreateContractTool(),
             new CreateInvoiceTool(),
             new UpdateProjectDetailsTool(),
             new CreateFeatureRequirementsTool(),

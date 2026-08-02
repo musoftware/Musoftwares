@@ -61,6 +61,9 @@ interface AiContextData {
     pending_features?: string[];
     current_invoice_status?: string;
     current_invoice_id?: number | null;
+    current_contract_url?: string | null;
+    current_contract_id?: number | null;
+    current_contract_uuid?: string | null;
     tech_stack?: string[];
     developer_notes?: string | null;
     known_decisions?: string[];
@@ -149,10 +152,30 @@ export default function ProjectShow({
         e.preventDefault();
         if (!messageText.trim() && !selectedFile) return;
 
+        const outgoingText = messageText.trim();
+        const outgoingFile = selectedFile;
+
+        // Optimistic UI: Append user's message immediately to feed
+        const tempMsgId = 'temp-' + Date.now();
+        const tempUserMessage = {
+            id: tempMsgId,
+            author_id: currentUserId,
+            body: outgoingText || (outgoingFile ? `📎 ${outgoingFile.name}` : ''),
+            created_at: new Date().toISOString(),
+            guest_name: 'Client',
+        };
+
+        setChatFeed((prev) => [...prev, tempUserMessage as any]);
+        setMessageText('');
+        setSelectedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+
         setSubmitting(true);
+        setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+
         const formData = new FormData();
-        if (messageText.trim()) formData.append('body', messageText);
-        if (selectedFile) formData.append('file', selectedFile);
+        if (outgoingText) formData.append('body', outgoingText);
+        if (outgoingFile) formData.append('file', outgoingFile);
 
         try {
             const res = await axios.post(route('client.projects.messages.store', { project: project.id }), formData, {
@@ -163,12 +186,8 @@ export default function ProjectShow({
                 if (res.data.discussions) {
                     setChatFeed(res.data.discussions);
                 } else if (res.data.comment) {
-                    setChatFeed((prev) => [...prev, res.data.comment]);
+                    setChatFeed((prev) => [...prev.filter((m) => String(m.id) !== String(tempMsgId)), res.data.comment]);
                 }
-
-                setMessageText('');
-                setSelectedFile(null);
-                if (fileInputRef.current) fileInputRef.current.value = '';
 
                 // Display Token Deduction Toast Notification
                 if (res.data.billed_amount && parseFloat(res.data.billed_amount) > 0) {
@@ -179,9 +198,12 @@ export default function ProjectShow({
                 router.reload({ only: ['discussions', 'aiContext', 'aiQuestions', 'aiStage', 'project'] });
             }
         } catch (err) {
+            // Revert optimistic message on failure
+            setChatFeed((prev) => prev.filter((m) => String(m.id) !== String(tempMsgId)));
             toast.error(__('general.error') || 'Failed to send message.');
         } finally {
             setSubmitting(false);
+            setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
         }
     };
 
@@ -394,6 +416,32 @@ export default function ProjectShow({
                                                         />
                                                     )}
 
+                                                     {/* INLINE INTERACTIVE CARD: CONTRACT PROPOSAL */}
+                                                     {(displayText.includes('/c/') || displayText.includes('العقد')) && aiContext.current_contract_url && (
+                                                         <div className="mt-3 rounded-xl border border-indigo-200 bg-indigo-50/90 p-4 shadow-sm space-y-3">
+                                                             <div className="flex items-center justify-between">
+                                                                 <div className="flex items-center gap-2 text-indigo-900 font-extrabold text-xs">
+                                                                     <FileText className="h-4 w-4 text-indigo-600" />
+                                                                     <span>عقد اتفاقية المشروع والسياسات (50% دفعة أولى)</span>
+                                                                 </div>
+                                                             </div>
+                                                             <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
+                                                                 تم تجهيز العقد الرسمي الخاص بالمشروع شامل المتطلبات والأسعار وشروط السداد. اتفضل بالاطلاع والتوقيع واعتمد الدفعة الأولى لبدء التنفيذ.
+                                                             </p>
+                                                             <div className="flex flex-wrap items-center gap-2 pt-1">
+                                                                 <a
+                                                                     href={aiContext.current_contract_url}
+                                                                     target="_blank"
+                                                                     rel="noreferrer"
+                                                                     className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs h-9 rounded-xl px-4 shadow-xs inline-flex items-center gap-1.5 transition"
+                                                                 >
+                                                                     <FileText className="h-4 w-4" />
+                                                                     مراجعة وتوقيع العقد (50%) 📄
+                                                                 </a>
+                                                             </div>
+                                                         </div>
+                                                     )}
+
                                                     {/* INLINE INTERACTIVE CARD: PRICING PROPOSAL */}
                                                     {hasPricingCard && (
                                                         <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-4 shadow-sm space-y-3">
@@ -435,6 +483,24 @@ export default function ProjectShow({
                                     );
                                 })
                             )}
+
+                            {/* WhatsApp-style Animated Typing Indicator (3 Dots) */}
+                            {submitting && (
+                                <div className="flex flex-col w-full my-1.5 items-start animate-fade-in">
+                                    <div className="flex gap-3 max-w-md rounded-2xl p-3 shadow-xs bg-white border border-slate-200 text-slate-800 rounded-tl-none items-center">
+                                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-black text-indigo-700 shadow-xs">
+                                            🤖
+                                        </div>
+                                        <div className="flex items-center gap-1.5 px-2 py-1">
+                                            <span className="text-xs text-slate-500 font-bold ml-1">AI Project Manager يكتب الآن</span>
+                                            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce [animation-delay:-0.3s]" />
+                                            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce [animation-delay:-0.15s]" />
+                                            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             <div ref={chatEndRef} />
                         </div>
 

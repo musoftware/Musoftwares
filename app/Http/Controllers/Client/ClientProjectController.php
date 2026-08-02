@@ -256,34 +256,43 @@ class ClientProjectController extends Controller
             'status' => 'open',
         ]);
 
-        // Generate Developer Tasks & Execution Plan
+        $project->updateAiContext([
+            'current_stage' => 'EXECUTION',
+        ]);
+
+        // 1. Generate Developer Tasks & Execution Plan
         $todoTool = (new \App\Services\AI\AiToolRegistry())->getTool('create_todos');
         if ($todoTool) {
-            $features = $project->ai_summary['features'] ?? ['Core Platform Requirements'];
+            $features = $project->ai_context['pending_features'] ?? $project->ai_summary['features'] ?? ['Core Platform Requirements'];
             $todos = [];
             foreach ($features as $feat) {
                 $todos[] = [
                     'title'       => 'تنفيذ: ' . mb_strimwidth($feat, 0, 50, '…'),
-                    'description' => 'مهمة معتمدة من العميل بعد فتح اعتماد المشروع',
+                    'description' => 'مهمة معتمدة من العميل بعد فتح الاعتماد ودفع الدفعة الأولى (50%)',
                     'priority'    => 'high',
                 ];
             }
             $todoTool->execute($project, ['todos' => $todos]);
         }
 
-        // Post confirmation system message
+        // 2. Schedule tasks into Admin Working Hours & Queue 15-min FCM + Email notifications
+        $scheduler = new \App\Services\AI\TaskSchedulerService();
+        $scheduleResult = $scheduler->scheduleProjectTasks($project);
+
+        // 3. Post confirmation system message
         ProjectComment::create([
             'project_id'       => $project->id,
             'author_id'        => null,
             'guest_name'       => 'AI Agency Manager',
-            'body'             => '[System: تم اعتماد ميزانية وخطة عمل المشروع بنجاح! تم إنشاء خطة المهام للمبرمج وبدء مرحلة التنفيذ الفعلي.]',
+            'body'             => '[System: تم سداد/اعتماد الدفعة الأولى (50%) بنجاح! تم اعتماد الميزانية وجدولة المهام تلقائياً في أوقات العمل الرسمية للمبرمج، وتم تفعيل إشعارات الـ FCM والإيميل للأدمن قبل كل مهمة بـ 15 دقيقة.]',
             'commentable_type' => Project::class,
             'commentable_id'   => $project->id,
         ]);
 
         return response()->json([
-            'ok'      => true,
-            'message' => 'تم اعتماد الميزانية وبدء تنفيذ المشروع بنجاح!',
+            'ok'              => true,
+            'message'         => 'تم اعتماد الميزانية وجدولة المهام بنجاح!',
+            'schedule_result' => $scheduleResult,
         ]);
     }
 

@@ -171,7 +171,7 @@ export default function Workspace({
             facebook_client_id: business.facebook_client_id || '',
             facebook_client_secret: business.facebook_client_secret || '',
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [business]);
 
     const tgGroupForm = useForm({
@@ -243,7 +243,7 @@ export default function Workspace({
             telegram_bot_id: bots[0]?.id || '',
             message_type: activeChannel === 'telegram' ? 'text' : data.message_type
         }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeChannel, accounts, bots]);
 
     const [mappedVariables, setMappedVariables] = useState<{ [key: string]: string }>({});
@@ -344,11 +344,10 @@ export default function Workspace({
                             setActiveChannel('whatsapp');
                             setActiveTab('connectors');
                         }}
-                        className={`p-2.5 rounded-2xl transition duration-200 relative group border-2 ${
-                            activeChannel === 'whatsapp'
+                        className={`p-2.5 rounded-2xl transition duration-200 relative group border-2 ${activeChannel === 'whatsapp'
                                 ? 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-950/20 shadow-md shadow-emerald-500/10'
                                 : 'border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                        }`}
+                            }`}
                         title="WhatsApp Hub"
                     >
                         <svg viewBox="0 0 24 24" width="24" height="24" className="w-6 h-6">
@@ -366,11 +365,10 @@ export default function Workspace({
                             setActiveChannel('telegram');
                             setActiveTab('bots');
                         }}
-                        className={`p-2.5 rounded-2xl transition duration-200 relative group border-2 ${
-                            activeChannel === 'telegram'
+                        className={`p-2.5 rounded-2xl transition duration-200 relative group border-2 ${activeChannel === 'telegram'
                                 ? 'border-sky-500 bg-sky-500/10 dark:bg-sky-950/20 shadow-md shadow-sky-500/10'
                                 : 'border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                        }`}
+                            }`}
                         title="Telegram Hub"
                     >
                         <svg viewBox="0 0 24 24" width="24" height="24" className="w-6 h-6">
@@ -475,789 +473,709 @@ export default function Workspace({
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab as any)}
-                                className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize ${
-                                    activeTab === tab
+                                className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize ${activeTab === tab
                                         ? 'border-zinc-900 dark:border-zinc-50 text-zinc-900 dark:text-zinc-50'
                                         : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
-                                }`}
+                                    }`}
                             >
                                 {tab === 'send' ? 'Campaign / Quick Send' :
-                                 tab === 'connectors' ? 'Meta Accounts' :
-                                 tab === 'groups' ? 'WhatsApp Groups' :
-                                 tab === 'bots' ? 'Telegram Bots' :
-                                 tab === 'flows' ? 'Chat Flows (Bot Builder)' :
-                                 tab === 'subscribers' ? 'Telegram Subscribers' :
-                                 tab}
+                                    tab === 'connectors' ? 'Meta Accounts' :
+                                        tab === 'groups' ? 'WhatsApp Groups' :
+                                            tab === 'bots' ? 'Telegram Bots' :
+                                                tab === 'flows' ? 'Chat Flows (Bot Builder)' :
+                                                    tab === 'subscribers' ? 'Telegram Subscribers' :
+                                                        tab}
                             </button>
                         ))}
                     </div>
 
-                {/* Tab Contents */}
-                <div>
-                    {activeTab === 'send' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Unified dispatch form */}
-                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Campaign / Message</h3>
-                                <form onSubmit={handleSend} className="space-y-5">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
-                                                {activeChannel === 'telegram' ? 'Select Sender Bot' : 'Select Sender Device'}
-                                            </label>
-                                            {activeChannel === 'whatsapp' ? (
+                    {/* Tab Contents */}
+                    <div>
+                        {activeTab === 'send' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* Unified dispatch form */}
+                                <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Campaign / Message</h3>
+                                    <form onSubmit={handleSend} className="space-y-5">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
+                                                    {activeChannel === 'telegram' ? 'Select Sender Bot' : 'Select Sender Device'}
+                                                </label>
+                                                {activeChannel === 'whatsapp' ? (
+                                                    <select
+                                                        value={sendForm.data.whatsapp_account_id}
+                                                        onChange={e => sendForm.setData('whatsapp_account_id', e.target.value)}
+                                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                                    >
+                                                        {accounts.map(acc => (
+                                                            <option key={acc.id} value={acc.id}>{acc.name} ({acc.phone_number_id})</option>
+                                                        ))}
+                                                        {accounts.length === 0 && <option value="">No WhatsApp account connected</option>}
+                                                    </select>
+                                                ) : (
+                                                    <select
+                                                        value={sendForm.data.telegram_bot_id}
+                                                        onChange={e => sendForm.setData('telegram_bot_id', e.target.value)}
+                                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                                    >
+                                                        {bots.map(bot => (
+                                                            <option key={bot.id} value={bot.id}>{bot.name} (@{bot.username})</option>
+                                                        ))}
+                                                        {bots.length === 0 && <option value="">No Telegram bots registered</option>}
+                                                    </select>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Recipient Source</label>
                                                 <select
-                                                    value={sendForm.data.whatsapp_account_id}
-                                                    onChange={e => sendForm.setData('whatsapp_account_id', e.target.value)}
+                                                    value={sendForm.data.recipient_source}
+                                                    onChange={e => sendForm.setData('recipient_source', e.target.value)}
                                                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                 >
-                                                    {accounts.map(acc => (
-                                                        <option key={acc.id} value={acc.id}>{acc.name} ({acc.phone_number_id})</option>
-                                                    ))}
-                                                    {accounts.length === 0 && <option value="">No WhatsApp account connected</option>}
+                                                    <option value="single">Single Recipient</option>
+                                                    <option value="group">Bulk Contact Group</option>
                                                 </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {sendForm.data.recipient_source === 'single' ? (
+                                                <div>
+                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
+                                                        {activeChannel === 'telegram' ? 'Recipient Chat ID' : 'Recipient Phone Number'}
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={sendForm.data.recipient_phone}
+                                                        onChange={e => sendForm.setData('recipient_phone', e.target.value)}
+                                                        placeholder={activeChannel === 'telegram' ? 'e.g. 123456789' : 'e.g. 201001234567'}
+                                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                                    />
+                                                </div>
                                             ) : (
-                                                <select
-                                                    value={sendForm.data.telegram_bot_id}
-                                                    onChange={e => sendForm.setData('telegram_bot_id', e.target.value)}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                                >
-                                                    {bots.map(bot => (
-                                                        <option key={bot.id} value={bot.id}>{bot.name} (@{bot.username})</option>
-                                                    ))}
-                                                    {bots.length === 0 && <option value="">No Telegram bots registered</option>}
-                                                </select>
+                                                <div>
+                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Select Target Contact Group</label>
+                                                    <select
+                                                        value={sendForm.data.whatsapp_contact_group_id}
+                                                        onChange={e => sendForm.setData('whatsapp_contact_group_id', e.target.value)}
+                                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                                    >
+                                                        {contactGroups.map(gp => (
+                                                            <option key={gp.id} value={gp.id}>{gp.name} ({gp.contacts_count} contacts)</option>
+                                                        ))}
+                                                        {contactGroups.length === 0 && <option value="">No contact groups available</option>}
+                                                    </select>
+                                                </div>
                                             )}
                                         </div>
 
+
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Recipient Source</label>
+                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Format</label>
                                             <select
-                                                value={sendForm.data.recipient_source}
-                                                onChange={e => sendForm.setData('recipient_source', e.target.value)}
-                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                                value={sendForm.data.message_type}
+                                                onChange={e => sendForm.setData('message_type', e.target.value)}
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             >
-                                                <option value="single">Single Recipient</option>
-                                                <option value="group">Bulk Contact Group</option>
+                                                <option value="text">Raw Text Message</option>
+                                                <option value="template">Meta Template Message</option>
                                             </select>
                                         </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {sendForm.data.recipient_source === 'single' ? (
+                                        {sendForm.data.message_type === 'text' ? (
                                             <div>
-                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
-                                                    {activeChannel === 'telegram' ? 'Recipient Chat ID' : 'Recipient Phone Number'}
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={sendForm.data.recipient_phone}
-                                                    onChange={e => sendForm.setData('recipient_phone', e.target.value)}
-                                                    placeholder={activeChannel === 'telegram' ? 'e.g. 123456789' : 'e.g. 201001234567'}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Body (HTML Allowed for Telegram)</label>
+                                                <textarea
+                                                    rows={4}
+                                                    value={sendForm.data.message_body}
+                                                    onChange={e => sendForm.setData('message_body', e.target.value)}
+                                                    placeholder="Write your notification message here..."
+                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                                 />
                                             </div>
                                         ) : (
-                                            <div>
-                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Select Target Contact Group</label>
-                                                <select
-                                                    value={sendForm.data.whatsapp_contact_group_id}
-                                                    onChange={e => sendForm.setData('whatsapp_contact_group_id', e.target.value)}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                                >
-                                                    {contactGroups.map(gp => (
-                                                        <option key={gp.id} value={gp.id}>{gp.name} ({gp.contacts_count} contacts)</option>
-                                                    ))}
-                                                    {contactGroups.length === 0 && <option value="">No contact groups available</option>}
-                                                </select>
+                                            <div className="space-y-4 bg-zinc-50 dark:bg-zinc-950 p-4 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
+                                                <div>
+                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2 font-medium">Select Approved Template</label>
+                                                    <select
+                                                        value={sendForm.data.template_name}
+                                                        onChange={e => sendForm.setData('template_name', e.target.value)}
+                                                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                                    >
+                                                        {templates.map(tpl => (
+                                                            <option key={tpl.id} value={tpl.name}>{tpl.name} ({tpl.language})</option>
+                                                        ))}
+                                                        {templates.length === 0 && <option value="">No templates registered</option>}
+                                                    </select>
+                                                </div>
+
+                                                {selectedTemplate && (
+                                                    <div className="space-y-3">
+                                                        <span className="text-xs text-zinc-500 font-medium">Template Text Content:</span>
+                                                        <p className="text-sm bg-white dark:bg-zinc-900 p-3 rounded-xl border border-zinc-100 dark:border-zinc-850 font-mono text-zinc-700 dark:text-zinc-300">
+                                                            {bodyText}
+                                                        </p>
+
+                                                        {variableCount > 0 && (
+                                                            <div className="space-y-3 pt-2">
+                                                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide block">Map Template Variables</span>
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                    {Array.from({ length: variableCount }).map((_, idx) => (
+                                                                        <div key={idx}>
+                                                                            <label className="text-xs text-zinc-500 block mb-1">Variable {"{{"}{idx + 1}{"}}"}</label>
+                                                                            <input
+                                                                                type="text"
+                                                                                placeholder="Static value or 'name'/'phone'"
+                                                                                value={mappedVariables[`var_${idx + 1}`] || ''}
+                                                                                onChange={e => setMappedVariables({
+                                                                                    ...mappedVariables,
+                                                                                    [`var_${idx + 1}`]: e.target.value
+                                                                                })}
+                                                                                className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-xs"
+                                                                            />
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <p className="text-xxs text-zinc-400">
+                                                                    Tip: Type <code>name</code> or <code>phone</code> to map variables dynamically to contact fields, or enter custom text.
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
+                                        )}
+
+                                        {/* Campaign Scheduler options */}
+                                        <div className="border-t border-zinc-150 dark:border-zinc-800 pt-5 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Schedule for Future Delivery</h4>
+                                                    <p className="text-xs text-zinc-500">Enable to process this campaign later at a specific Cairo timezone date/time.</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => sendForm.setData('is_scheduled', !sendForm.data.is_scheduled)}
+                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${sendForm.data.is_scheduled ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-200 dark:bg-zinc-850'
+                                                        }`}
+                                                >
+                                                    <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white dark:bg-zinc-900 shadow ring-0 transition duration-200 ease-in-out ${sendForm.data.is_scheduled ? 'translate-x-5' : 'translate-x-0'
+                                                        }`} />
+                                                </button>
+                                            </div>
+
+                                            {sendForm.data.is_scheduled && (
+                                                <div>
+                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Delivery Time (Cairo Timezone - Africa/Cairo)</label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={sendForm.data.scheduled_at}
+                                                        onChange={e => sendForm.setData('scheduled_at', e.target.value)}
+                                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={sendForm.processing}
+                                            className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-3 rounded-xl font-semibold tracking-tight transition duration-200"
+                                        >
+                                            {sendForm.data.is_scheduled ? 'Schedule Delivery' : 'Send Immediately'}
+                                        </button>
+                                    </form>
+                                </div>
+
+                                {/* Sidebar Guidelines & Fee Info */}
+                                <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-6">
+                                    <div>
+                                        <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg">Platform Message Fees</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Wallet deductions are processed automatically upon each successfully processed delivery attempt.</p>
+                                        <div className="mt-4 border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-2">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-zinc-500">WhatsApp Dispatch Fee:</span>
+                                                <span className="font-bold text-zinc-850 dark:text-zinc-200">${business.per_message_fee} USD / msg</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-zinc-500">Telegram Bot Dispatch Fee:</span>
+                                                <span className="font-bold text-zinc-850 dark:text-zinc-200">${business.per_message_fee} USD / msg</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 p-4 rounded-2xl">
+                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Dynamic Fields Mapping</h4>
+                                        <p className="text-xxs text-zinc-500 leading-relaxed">
+                                            You can map variables inside your templates (e.g. <code>{"{{"}1{"}}"}</code>) to specific properties in contact segments:
+                                        </p>
+                                        <ul className="text-xxs text-zinc-500 list-disc list-inside space-y-1 mt-2">
+                                            <li><code>name</code> - Resolves contact Name</li>
+                                            <li><code>phone</code> - Resolves contact Phone / Telegram Chat ID</li>
+                                            <li><code>custom_fields.FIELD_NAME</code> - Resolves CSV imported fields</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'connectors' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">WhatsApp Accounts</h3>
+                                            <p className="text-xs text-zinc-500 mt-1">Direct API integration endpoints powered by Facebook WABA.</p>
+                                        </div>
+                                        {(business.facebook_client_id && business.facebook_client_secret) && (
+                                            <a
+                                                href={facebookLoginUrl}
+                                                className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
+                                            >
+                                                Log in with Facebook
+                                            </a>
                                         )}
                                     </div>
 
+                                    {(!business.facebook_client_id || !business.facebook_client_secret) && (
+                                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="space-y-1">
+                                                <p className="text-xs font-bold text-amber-800 dark:text-amber-300">لم يتم إعداد تطبيق فيسبوك (Meta App) لهذا البيزنس</p>
+                                                <p className="text-xxs text-zinc-500 leading-relaxed">يجب إضافة App ID و App Secret للبيزنس من إعدادات الأعمال بالخارج لتفعيل تسجيل الدخول.</p>
+                                            </div>
+                                            <div className="flex gap-2 shrink-0">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowEditModal(true)}
+                                                    className="bg-amber-600 hover:bg-amber-700 text-white text-xxs font-bold px-3 py-2 rounded-xl transition cursor-pointer"
+                                                >
+                                                    تعديل البيزنس
+                                                </button>
+                                                <Link
+                                                    href="/whatsapp-sender/meta-app-guide"
+                                                    target="_blank"
+                                                    className="border border-amber-300 dark:border-amber-800 text-amber-850 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/30 text-xxs font-bold px-3 py-2 rounded-xl transition inline-flex items-center gap-1"
+                                                >
+                                                    دليل الإعداد 📖
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )}
 
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Format</label>
-                                        <select
-                                            value={sendForm.data.message_type}
-                                            onChange={e => sendForm.setData('message_type', e.target.value)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
-                                        >
-                                            <option value="text">Raw Text Message</option>
-                                            <option value="template">Meta Template Message</option>
-                                        </select>
+                                    <div className="space-y-4 mt-6">
+                                        {accounts.map(acc => (
+                                            <div key={acc.id} className="border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl flex justify-between items-center">
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{acc.name}</span>
+                                                        <span className={`text-xxs px-2 py-0.5 rounded-full font-semibold ${acc.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-amber-50 text-amber-600'
+                                                            }`}>
+                                                            {acc.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-xs text-zinc-500 mt-1 flex items-center gap-2 flex-wrap">
+                                                        <span>Phone ID: <strong className="font-mono">{acc.phone_number_id}</strong></span>
+                                                        <span className="text-zinc-300 dark:text-zinc-800">|</span>
+                                                        <span>WABA ID:</span>
+                                                        {acc.waba_id ? (
+                                                            <strong className="font-mono text-zinc-700 dark:text-zinc-300">{acc.waba_id}</strong>
+                                                        ) : (
+                                                            editingWabaAccountId === acc.id ? (
+                                                                <form
+                                                                    onSubmit={(e) => {
+                                                                        e.preventDefault();
+                                                                        if (!tempWabaId.trim()) return;
+                                                                        router.put(`/whatsapp-sender/accounts/${acc.id}/waba`, {
+                                                                            waba_id: tempWabaId.trim()
+                                                                        }, {
+                                                                            onSuccess: () => setEditingWabaAccountId(null)
+                                                                        });
+                                                                    }}
+                                                                    className="inline-flex items-center gap-2"
+                                                                >
+                                                                    <input
+                                                                        type="text"
+                                                                        required
+                                                                        placeholder="WABA ID"
+                                                                        value={tempWabaId}
+                                                                        onChange={e => setTempWabaId(e.target.value)}
+                                                                        className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 w-36 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                                                        autoFocus
+                                                                    />
+                                                                    <button
+                                                                        type="submit"
+                                                                        className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xxs font-bold px-2 py-0.5 rounded-md transition"
+                                                                    >
+                                                                        Save
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setEditingWabaAccountId(null)}
+                                                                        className="text-zinc-400 hover:text-zinc-600 text-xxs"
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+                                                                </form>
+                                                            ) : (
+                                                                <span className="inline-flex items-center gap-2">
+                                                                    <span className="text-amber-600 dark:text-amber-400 font-medium text-xxs bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded-sm">Missing</span>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setEditingWabaAccountId(acc.id);
+                                                                            setTempWabaId('');
+                                                                        }}
+                                                                        className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold"
+                                                                    >
+                                                                        Set WABA ID
+                                                                    </button>
+                                                                </span>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm('Are you sure you want to disconnect this number?')) {
+                                                            router.delete(`/whatsapp-sender/accounts/${acc.id}`);
+                                                        }
+                                                    }}
+                                                    className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                                >
+                                                    Disconnect
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {accounts.length === 0 && (
+                                            <p className="text-sm text-zinc-400 text-center py-6">No WhatsApp account connected yet.</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-4">
+                                    <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg font-sans">WABA Connection Guide</h3>
+                                    <p className="text-xs text-zinc-500 leading-relaxed">
+                                        Click "Log in with Facebook" to pair your Meta WhatsApp Business Account. Make sure you have admin rights on the Meta Business Suite portfolio.
+                                    </p>
+                                    <Link
+                                        href="/whatsapp-sender/meta-app-guide"
+                                        className="text-emerald-500 hover:text-emerald-600 text-xs font-semibold block mt-2 underline"
+                                    >
+                                        شرح إعداد تطبيق Meta Developer وكيفية الحصول على الصلاحيات 📖
+                                    </Link>
+                                </div>
+                            </div>
+                        )}
+
+
+                        {activeTab === 'bots' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Telegram Bots</h3>
+                                            <p className="text-xs text-zinc-500 mt-1">Register bot tokens to send notifications. Webhook setup will trigger automatically.</p>
+                                        </div>
                                     </div>
 
-                                    {sendForm.data.message_type === 'text' ? (
+                                    <div className="space-y-4 mt-6">
+                                        {bots.map(bot => (
+                                            <div key={bot.id} className="border border-zinc-100 dark:border-zinc-800/80 p-4 rounded-2xl flex justify-between items-center">
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{bot.name}</span>
+                                                        <span className="text-xs text-zinc-500">(@{bot.username})</span>
+                                                    </div>
+                                                    <div className="text-xs text-emerald-500 font-semibold mt-1">Webhook Active</div>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm('Are you sure you want to delete this Telegram bot?')) {
+                                                            router.delete(`/whatsapp-sender/telegram-bots/${bot.id}`);
+                                                        }
+                                                    }}
+                                                    className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {bots.length === 0 && (
+                                            <p className="text-sm text-zinc-400 text-center py-6">No Telegram bots registered yet.</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">Register New Bot</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Provide your bot's FatherToken to link it to this business workspace.</p>
+                                    </div>
+                                    <form onSubmit={handleAddBot} className="space-y-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Body (HTML Allowed for Telegram)</label>
-                                            <textarea
-                                                rows={4}
-                                                value={sendForm.data.message_body}
-                                                onChange={e => sendForm.setData('message_body', e.target.value)}
-                                                placeholder="Write your notification message here..."
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Telegram Bot Token</label>
+                                            <input
+                                                type="text"
+                                                value={botForm.data.token}
+                                                onChange={e => botForm.setData('token', e.target.value)}
+                                                placeholder="Enter token from @BotFather"
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                            />
+                                            {botForm.errors.token && <span className="text-xs text-red-500 mt-1 block">{botForm.errors.token}</span>}
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            disabled={botForm.processing}
+                                            className="w-full bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
+                                        >
+                                            Verify & Register Bot
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'templates' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* Create Template Form */}
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Meta Template</h3>
+                                    <form onSubmit={handleCreateTemplate} className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Template Name (alphanumeric & underscore)</label>
+                                            <input
+                                                type="text"
+                                                value={templateForm.data.name}
+                                                onChange={e => templateForm.setData('name', e.target.value)}
+                                                placeholder="e.g. promo_coupon"
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             />
                                         </div>
-                                    ) : (
-                                        <div className="space-y-4 bg-zinc-50 dark:bg-zinc-950 p-4 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
-                                            <div>
-                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2 font-medium">Select Approved Template</label>
-                                                <select
-                                                    value={sendForm.data.template_name}
-                                                    onChange={e => sendForm.setData('template_name', e.target.value)}
-                                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
-                                                >
-                                                    {templates.map(tpl => (
-                                                        <option key={tpl.id} value={tpl.name}>{tpl.name} ({tpl.language})</option>
-                                                    ))}
-                                                    {templates.length === 0 && <option value="">No templates registered</option>}
-                                                </select>
-                                            </div>
-
-                                            {selectedTemplate && (
-                                                <div className="space-y-3">
-                                                    <span className="text-xs text-zinc-500 font-medium">Template Text Content:</span>
-                                                    <p className="text-sm bg-white dark:bg-zinc-900 p-3 rounded-xl border border-zinc-100 dark:border-zinc-850 font-mono text-zinc-700 dark:text-zinc-300">
-                                                        {bodyText}
-                                                    </p>
-
-                                                    {variableCount > 0 && (
-                                                        <div className="space-y-3 pt-2">
-                                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide block">Map Template Variables</span>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                                {Array.from({ length: variableCount }).map((_, idx) => (
-                                                                    <div key={idx}>
-                                                                        <label className="text-xs text-zinc-500 block mb-1">Variable {"{{"}{idx + 1}{"}}"}</label>
-                                                                        <input
-                                                                            type="text"
-                                                                            placeholder="Static value or 'name'/'phone'"
-                                                                            value={mappedVariables[`var_${idx + 1}`] || ''}
-                                                                            onChange={e => setMappedVariables({
-                                                                                ...mappedVariables,
-                                                                                [`var_${idx + 1}`]: e.target.value
-                                                                            })}
-                                                                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-xs"
-                                                                        />
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            <p className="text-xxs text-zinc-400">
-                                                                Tip: Type <code>name</code> or <code>phone</code> to map variables dynamically to contact fields, or enter custom text.
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* Campaign Scheduler options */}
-                                    <div className="border-t border-zinc-150 dark:border-zinc-800 pt-5 space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Schedule for Future Delivery</h4>
-                                                <p className="text-xs text-zinc-500">Enable to process this campaign later at a specific Cairo timezone date/time.</p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => sendForm.setData('is_scheduled', !sendForm.data.is_scheduled)}
-                                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                                    sendForm.data.is_scheduled ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-200 dark:bg-zinc-850'
-                                                }`}
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Category</label>
+                                            <select
+                                                value={templateForm.data.category}
+                                                onChange={e => templateForm.setData('category', e.target.value)}
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             >
-                                                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white dark:bg-zinc-900 shadow ring-0 transition duration-200 ease-in-out ${
-                                                    sendForm.data.is_scheduled ? 'translate-x-5' : 'translate-x-0'
-                                                }`} />
-                                            </button>
+                                                <option value="UTILITY">UTILITY</option>
+                                                <option value="MARKETING">MARKETING</option>
+                                            </select>
                                         </div>
-
-                                        {sendForm.data.is_scheduled && (
-                                            <div>
-                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Delivery Time (Cairo Timezone - Africa/Cairo)</label>
-                                                <input
-                                                    type="datetime-local"
-                                                    value={sendForm.data.scheduled_at}
-                                                    onChange={e => sendForm.setData('scheduled_at', e.target.value)}
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={sendForm.processing}
-                                        className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-3 rounded-xl font-semibold tracking-tight transition duration-200"
-                                    >
-                                        {sendForm.data.is_scheduled ? 'Schedule Delivery' : 'Send Immediately'}
-                                    </button>
-                                </form>
-                            </div>
-
-                            {/* Sidebar Guidelines & Fee Info */}
-                            <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-6">
-                                <div>
-                                    <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg">Platform Message Fees</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Wallet deductions are processed automatically upon each successfully processed delivery attempt.</p>
-                                    <div className="mt-4 border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-2">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-zinc-500">WhatsApp Dispatch Fee:</span>
-                                            <span className="font-bold text-zinc-850 dark:text-zinc-200">${business.per_message_fee} USD / msg</span>
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Language</label>
+                                            <select
+                                                value={templateForm.data.language}
+                                                onChange={e => templateForm.setData('language', e.target.value)}
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                            >
+                                                <option value="en_US">English (US)</option>
+                                                <option value="ar">Arabic</option>
+                                            </select>
                                         </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-zinc-500">Telegram Bot Dispatch Fee:</span>
-                                            <span className="font-bold text-zinc-850 dark:text-zinc-200">${business.per_message_fee} USD / msg</span>
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Body Text (with variable indicators like {"{{"}1{"}}"})</label>
+                                            <textarea
+                                                rows={4}
+                                                value={templateForm.data.components[0].text}
+                                                onChange={e => {
+                                                    const updated = [...templateForm.data.components];
+                                                    updated[0].text = e.target.value;
+                                                    templateForm.setData('components', updated);
+                                                }}
+                                                placeholder="Write body content here..."
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                            />
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 p-4 rounded-2xl">
-                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Dynamic Fields Mapping</h4>
-                                    <p className="text-xxs text-zinc-500 leading-relaxed">
-                                        You can map variables inside your templates (e.g. <code>{"{{"}1{"}}"}</code>) to specific properties in contact segments:
-                                    </p>
-                                    <ul className="text-xxs text-zinc-500 list-disc list-inside space-y-1 mt-2">
-                                        <li><code>name</code> - Resolves contact Name</li>
-                                        <li><code>phone</code> - Resolves contact Phone / Telegram Chat ID</li>
-                                        <li><code>custom_fields.FIELD_NAME</code> - Resolves CSV imported fields</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'connectors' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">WhatsApp Accounts</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Direct API integration endpoints powered by Facebook WABA.</p>
-                                    </div>
-                                    {(business.facebook_client_id && business.facebook_client_secret) && (
-                                        <a
-                                            href={facebookLoginUrl}
-                                            className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
+                                        <button
+                                            type="submit"
+                                            disabled={templateForm.processing}
+                                            className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
                                         >
-                                            Log in with Facebook
-                                        </a>
-                                    )}
+                                            Submit Template to Meta
+                                        </button>
+                                    </form>
                                 </div>
 
-                                {(!business.facebook_client_id || !business.facebook_client_secret) && (
-                                    <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                        <div className="space-y-1">
-                                            <p className="text-xs font-bold text-amber-800 dark:text-amber-300">لم يتم إعداد تطبيق فيسبوك (Meta App) لهذا البيزنس</p>
-                                            <p className="text-xxs text-zinc-500 leading-relaxed">يجب إضافة App ID و App Secret للبيزنس من إعدادات الأعمال بالخارج لتفعيل تسجيل الدخول.</p>
-                                        </div>
-                                        <div className="flex gap-2 shrink-0">
-                                            <Link
-                                                href="/whatsapp-sender"
-                                                className="bg-amber-600 hover:bg-amber-700 text-white text-xxs font-bold px-3 py-2 rounded-xl transition"
-                                            >
-                                                تعديل البيزنس
-                                            </Link>
-                                            <Link
-                                                href="/whatsapp-sender/meta-app-guide"
-                                                className="border border-amber-300 dark:border-amber-800 text-amber-850 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/30 text-xxs font-bold px-3 py-2 rounded-xl transition"
-                                            >
-                                                دليل الإعداد 📖
-                                            </Link>
-                                        </div>
+                                {/* Templates Table List */}
+                                <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Synced Templates</h3>
+                                        <button
+                                            onClick={() => router.post(`/whatsapp-sender/templates/${business.id}/sync`)}
+                                            className="bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 text-xs px-4 py-2 rounded-xl font-semibold transition duration-200 text-zinc-800 dark:text-zinc-200"
+                                        >
+                                            Sync from Facebook
+                                        </button>
                                     </div>
-                                )}
 
-                                <div className="space-y-4 mt-6">
-                                    {accounts.map(acc => (
-                                        <div key={acc.id} className="border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl flex justify-between items-center">
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{acc.name}</span>
-                                                    <span className={`text-xxs px-2 py-0.5 rounded-full font-semibold ${
-                                                        acc.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-amber-50 text-amber-600'
-                                                    }`}>
-                                                        {acc.status}
-                                                    </span>
-                                                </div>
-                                                <div className="text-xs text-zinc-500 mt-1 flex items-center gap-2 flex-wrap">
-                                                    <span>Phone ID: <strong className="font-mono">{acc.phone_number_id}</strong></span>
-                                                    <span className="text-zinc-300 dark:text-zinc-800">|</span>
-                                                    <span>WABA ID:</span>
-                                                    {acc.waba_id ? (
-                                                        <strong className="font-mono text-zinc-700 dark:text-zinc-300">{acc.waba_id}</strong>
-                                                    ) : (
-                                                        editingWabaAccountId === acc.id ? (
-                                                            <form
-                                                                onSubmit={(e) => {
-                                                                    e.preventDefault();
-                                                                    if (!tempWabaId.trim()) return;
-                                                                    router.put(`/whatsapp-sender/accounts/${acc.id}/waba`, {
-                                                                        waba_id: tempWabaId.trim()
-                                                                    }, {
-                                                                        onSuccess: () => setEditingWabaAccountId(null)
-                                                                    });
-                                                                }}
-                                                                className="inline-flex items-center gap-2"
-                                                            >
-                                                                <input
-                                                                    type="text"
-                                                                    required
-                                                                    placeholder="WABA ID"
-                                                                    value={tempWabaId}
-                                                                    onChange={e => setTempWabaId(e.target.value)}
-                                                                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 w-36 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                                                                    autoFocus
-                                                                />
-                                                                <button
-                                                                    type="submit"
-                                                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xxs font-bold px-2 py-0.5 rounded-md transition"
-                                                                >
-                                                                    Save
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setEditingWabaAccountId(null)}
-                                                                    className="text-zinc-400 hover:text-zinc-600 text-xxs"
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                            </form>
-                                                        ) : (
-                                                            <span className="inline-flex items-center gap-2">
-                                                                <span className="text-amber-600 dark:text-amber-400 font-medium text-xxs bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded-sm">Missing</span>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setEditingWabaAccountId(acc.id);
-                                                                        setTempWabaId('');
-                                                                    }}
-                                                                    className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold"
-                                                                >
-                                                                    Set WABA ID
-                                                                </button>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
+                                                    <th className="py-3 px-2 font-semibold">Name</th>
+                                                    <th className="py-3 px-2 font-semibold">Category</th>
+                                                    <th className="py-3 px-2 font-semibold">Language</th>
+                                                    <th className="py-3 px-2 font-semibold">Status</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {templates.map(tpl => (
+                                                    <tr key={tpl.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
+                                                        <td className="py-3 px-2 font-semibold text-zinc-800 dark:text-zinc-200">{tpl.name}</td>
+                                                        <td className="py-3 px-2 text-zinc-500 text-xs">{tpl.category}</td>
+                                                        <td className="py-3 px-2 text-zinc-500 text-xs">{tpl.language}</td>
+                                                        <td className="py-3 px-2">
+                                                            <span className={`text-xxs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${tpl.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-amber-50 text-amber-700'
+                                                                }`}>
+                                                                {tpl.status}
                                                             </span>
-                                                        )
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    if(confirm('Are you sure you want to disconnect this number?')) {
-                                                        router.delete(`/whatsapp-sender/accounts/${acc.id}`);
-                                                    }
-                                                }}
-                                                className="text-red-500 hover:text-red-650 text-xs font-semibold"
-                                            >
-                                                Disconnect
-                                            </button>
+                                                        </td>
+                                                        <td className="py-3 px-2 text-right">
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (confirm('Are you sure you want to delete this template from Meta?')) {
+                                                                        router.delete(`/whatsapp-sender/templates/${tpl.id}`);
+                                                                    }
+                                                                }}
+                                                                className="text-red-500 hover:text-red-600 text-xs font-semibold"
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {templates.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">No synced templates found.</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'groups' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* Contact Groups setup list */}
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Segment Group</h3>
+                                    <form onSubmit={handleCreateGroup} className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Group Name</label>
+                                            <input
+                                                type="text"
+                                                value={groupForm.data.name}
+                                                onChange={e => groupForm.setData('name', e.target.value)}
+                                                placeholder="e.g. Premium Customers"
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                            />
                                         </div>
-                                    ))}
-                                    {accounts.length === 0 && (
-                                        <p className="text-sm text-zinc-400 text-center py-6">No WhatsApp account connected yet.</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-4">
-                                <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg font-sans">WABA Connection Guide</h3>
-                                <p className="text-xs text-zinc-500 leading-relaxed">
-                                    Click "Log in with Facebook" to pair your Meta WhatsApp Business Account. Make sure you have admin rights on the Meta Business Suite portfolio.
-                                </p>
-                                <Link
-                                    href="/whatsapp-sender/meta-app-guide"
-                                    className="text-emerald-500 hover:text-emerald-600 text-xs font-semibold block mt-2 underline"
-                                >
-                                    شرح إعداد تطبيق Meta Developer وكيفية الحصول على الصلاحيات 📖
-                                </Link>
-                            </div>
-                        </div>
-                    )}
-
-
-                    {activeTab === 'bots' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Telegram Bots</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Register bot tokens to send notifications. Webhook setup will trigger automatically.</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4 mt-6">
-                                    {bots.map(bot => (
-                                        <div key={bot.id} className="border border-zinc-100 dark:border-zinc-800/80 p-4 rounded-2xl flex justify-between items-center">
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{bot.name}</span>
-                                                    <span className="text-xs text-zinc-500">(@{bot.username})</span>
-                                                </div>
-                                                <div className="text-xs text-emerald-500 font-semibold mt-1">Webhook Active</div>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    if(confirm('Are you sure you want to delete this Telegram bot?')) {
-                                                        router.delete(`/whatsapp-sender/telegram-bots/${bot.id}`);
-                                                    }
-                                                }}
-                                                className="text-red-500 hover:text-red-650 text-xs font-semibold"
-                                            >
-                                                Remove
-                                            </button>
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Description</label>
+                                            <textarea
+                                                rows={2}
+                                                value={groupForm.data.description}
+                                                onChange={e => groupForm.setData('description', e.target.value)}
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm"
+                                            />
                                         </div>
-                                    ))}
-                                    {bots.length === 0 && (
-                                        <p className="text-sm text-zinc-400 text-center py-6">No Telegram bots registered yet.</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div>
-                                    <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">Register New Bot</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Provide your bot's FatherToken to link it to this business workspace.</p>
-                                </div>
-                                <form onSubmit={handleAddBot} className="space-y-4">
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Telegram Bot Token</label>
-                                        <input
-                                            type="text"
-                                            value={botForm.data.token}
-                                            onChange={e => botForm.setData('token', e.target.value)}
-                                            placeholder="Enter token from @BotFather"
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                        />
-                                        {botForm.errors.token && <span className="text-xs text-red-500 mt-1 block">{botForm.errors.token}</span>}
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        disabled={botForm.processing}
-                                        className="w-full bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
-                                    >
-                                        Verify & Register Bot
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'templates' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Create Template Form */}
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Meta Template</h3>
-                                <form onSubmit={handleCreateTemplate} className="space-y-4">
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Template Name (alphanumeric & underscore)</label>
-                                        <input
-                                            type="text"
-                                            value={templateForm.data.name}
-                                            onChange={e => templateForm.setData('name', e.target.value)}
-                                            placeholder="e.g. promo_coupon"
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Category</label>
-                                        <select
-                                            value={templateForm.data.category}
-                                            onChange={e => templateForm.setData('category', e.target.value)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
+                                        <button
+                                            type="submit"
+                                            disabled={groupForm.processing}
+                                            className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
                                         >
-                                            <option value="UTILITY">UTILITY</option>
-                                            <option value="MARKETING">MARKETING</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Language</label>
-                                        <select
-                                            value={templateForm.data.language}
-                                            onChange={e => templateForm.setData('language', e.target.value)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
-                                        >
-                                            <option value="en_US">English (US)</option>
-                                            <option value="ar">Arabic</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Body Text (with variable indicators like {"{{"}1{"}}"})</label>
-                                        <textarea
-                                            rows={4}
-                                            value={templateForm.data.components[0].text}
-                                            onChange={e => {
-                                                const updated = [...templateForm.data.components];
-                                                updated[0].text = e.target.value;
-                                                templateForm.setData('components', updated);
-                                            }}
-                                            placeholder="Write body content here..."
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
-                                        />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        disabled={templateForm.processing}
-                                        className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
-                                    >
-                                        Submit Template to Meta
-                                    </button>
-                                </form>
-                            </div>
+                                            Create Group
+                                        </button>
+                                    </form>
 
-                            {/* Templates Table List */}
-                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Synced Templates</h3>
-                                    <button
-                                        onClick={() => router.post(`/whatsapp-sender/templates/${business.id}/sync`)}
-                                        className="bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 text-xs px-4 py-2 rounded-xl font-semibold transition duration-200 text-zinc-800 dark:text-zinc-200"
-                                    >
-                                        Sync from Facebook
-                                    </button>
-                                </div>
-
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm border-collapse">
-                                        <thead>
-                                            <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                <th className="py-3 px-2 font-semibold">Name</th>
-                                                <th className="py-3 px-2 font-semibold">Category</th>
-                                                <th className="py-3 px-2 font-semibold">Language</th>
-                                                <th className="py-3 px-2 font-semibold">Status</th>
-                                                <th className="py-3 px-2 font-semibold text-right">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {templates.map(tpl => (
-                                                <tr key={tpl.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
-                                                    <td className="py-3 px-2 font-semibold text-zinc-800 dark:text-zinc-200">{tpl.name}</td>
-                                                    <td className="py-3 px-2 text-zinc-500 text-xs">{tpl.category}</td>
-                                                    <td className="py-3 px-2 text-zinc-500 text-xs">{tpl.language}</td>
-                                                    <td className="py-3 px-2">
-                                                        <span className={`text-xxs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                                                            tpl.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-amber-50 text-amber-700'
-                                                        }`}>
-                                                            {tpl.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-3 px-2 text-right">
-                                                        <button
-                                                            onClick={() => {
-                                                                if(confirm('Are you sure you want to delete this template from Meta?')) {
-                                                                    router.delete(`/whatsapp-sender/templates/${tpl.id}`);
-                                                                }
-                                                            }}
-                                                            className="text-red-500 hover:text-red-600 text-xs font-semibold"
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            {templates.length === 0 && (
-                                                <tr>
-                                                    <td colSpan={5} className="py-6 text-center text-zinc-400">No synced templates found.</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'groups' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Contact Groups setup list */}
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Segment Group</h3>
-                                <form onSubmit={handleCreateGroup} className="space-y-4">
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Group Name</label>
-                                        <input
-                                            type="text"
-                                            value={groupForm.data.name}
-                                            onChange={e => groupForm.setData('name', e.target.value)}
-                                            placeholder="e.g. Premium Customers"
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Description</label>
-                                        <textarea
-                                            rows={2}
-                                            value={groupForm.data.description}
-                                            onChange={e => groupForm.setData('description', e.target.value)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm"
-                                        />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        disabled={groupForm.processing}
-                                        className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
-                                    >
-                                        Create Group
-                                    </button>
-                                </form>
-
-                                <div className="space-y-3 mt-6">
-                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Available Contact Segments</h4>
-                                    {contactGroups.map(gp => (
-                                        <div
-                                            key={gp.id}
-                                            onClick={() => setSelectedGroup(gp)}
-                                            className={`p-4 border rounded-2xl cursor-pointer transition ${
-                                                selectedGroup?.id === gp.id
-                                                    ? 'border-zinc-900 dark:border-zinc-50 bg-zinc-50/50 dark:bg-zinc-850/40'
-                                                    : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/40'
-                                            }`}
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{gp.name}</span>
-                                                <span className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2.5 py-0.5 rounded-full font-semibold">
-                                                    {gp.contacts_count} contacts
-                                                </span>
-                                            </div>
-                                            {gp.description && <p className="text-xs text-zinc-400 mt-2 line-clamp-1">{gp.description}</p>}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Group Contacts Import / Display panel */}
-                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                {selectedGroup ? (
-                                    <>
-                                        <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                                            <div>
-                                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{selectedGroup.name} Workspace</h3>
-                                                <p className="text-xs text-zinc-500 mt-1">{selectedGroup.description || 'No description provided.'}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    if(confirm('Are you sure you want to delete this group? All contacts in this group will be deleted.')) {
-                                                        router.delete(`/whatsapp-sender/contact-groups/${selectedGroup.id}`);
-                                                        setSelectedGroup(null);
-                                                    }
-                                                }}
-                                                className="text-red-500 hover:text-red-600 text-xs font-semibold"
+                                    <div className="space-y-3 mt-6">
+                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Available Contact Segments</h4>
+                                        {contactGroups.map(gp => (
+                                            <div
+                                                key={gp.id}
+                                                onClick={() => setSelectedGroup(gp)}
+                                                className={`p-4 border rounded-2xl cursor-pointer transition ${selectedGroup?.id === gp.id
+                                                        ? 'border-zinc-900 dark:border-zinc-50 bg-zinc-50/50 dark:bg-zinc-850/40'
+                                                        : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/40'
+                                                    }`}
                                             >
-                                                Delete Group
-                                            </button>
-                                        </div>
-
-                                        <form onSubmit={handleImportContacts} className="space-y-4">
-                                            <div>
-                                                <label className="text-xs font-semibold text-zinc-500 block mb-1">
-                                                    Paste contacts text (Format: <code>phone_or_chat_id,name</code> per line, example: <code>201001234567,John Doe</code>)
-                                                </label>
-                                                <textarea
-                                                    rows={5}
-                                                    value={importForm.data.contacts_text}
-                                                    onChange={e => importForm.setData('contacts_text', e.target.value)}
-                                                    placeholder="201001234567,John Doe&#10;201009876543,Alice Smith&#10;123456789,Telegram User"
-                                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono"
-                                                />
-                                            </div>
-                                            <button
-                                                type="submit"
-                                                disabled={importForm.processing}
-                                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-250 text-white dark:text-zinc-900 text-xs px-4 py-2.5 rounded-xl font-bold transition duration-200"
-                                            >
-                                                Import / Save Contacts
-                                            </button>
-                                        </form>
-                                    </>
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
-                                        <span className="text-4xl text-zinc-300">👥</span>
-                                        <h3 className="text-zinc-500 dark:text-zinc-400 font-bold">No Contact Group Selected</h3>
-                                        <p className="text-zinc-400 dark:text-zinc-500 text-xs max-w-sm">Select a contact group from the left panel to import list numbers, customize CSV fields, and schedule bulk notifications.</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'schedules' && (
-                        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                            <div>
-                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Active Scheduler Campaigns</h3>
-                                <p className="text-xs text-zinc-500 mt-1">Pending and executed schedules managed under Cairo Timezone.</p>
-                            </div>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm border-collapse">
-                                    <thead>
-                                        <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                            <th className="py-3 px-2 font-semibold">Channel</th>
-                                            <th className="py-3 px-2 font-semibold">Sender Device / Bot</th>
-                                            <th className="py-3 px-2 font-semibold">Recipient</th>
-                                            <th className="py-3 px-2 font-semibold">Type</th>
-                                            <th className="py-3 px-2 font-semibold">Scheduled Date (Cairo Time)</th>
-                                            <th className="py-3 px-2 font-semibold">Status</th>
-                                            <th className="py-3 px-2 font-semibold text-right">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {schedules.map(sch => (
-                                            <tr key={sch.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
-                                                <td className="py-3 px-2">
-                                                    <span className={`text-xxs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                                                        sch.channel === 'telegram' ? 'bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-400' : 'bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400'
-                                                    }`}>
-                                                        {sch.channel}
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{gp.name}</span>
+                                                    <span className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2.5 py-0.5 rounded-full font-semibold">
+                                                        {gp.contacts_count} contacts
                                                     </span>
-                                                </td>
-                                                <td className="py-3 px-2 text-zinc-700 dark:text-zinc-300 font-medium">
-                                                    {sch.channel === 'telegram' ? sch.telegram_bot?.name : sch.account?.name}
-                                                </td>
-                                                <td className="py-3 px-2 text-zinc-600 dark:text-zinc-400">
-                                                    {sch.group ? `Group: ${sch.group.name}` : sch.recipient_phone}
-                                                </td>
-                                                <td className="py-3 px-2 text-zinc-500 text-xs capitalize">{sch.message_type}</td>
-                                                <td className="py-3 px-2 text-zinc-500 text-xs font-mono">{new Date(sch.scheduled_at).toLocaleString('en-US', { timeZone: 'Africa/Cairo' })}</td>
-                                                <td className="py-3 px-2">
-                                                    <span className={`text-xxs px-2 py-0.5 rounded-full font-bold capitalize ${
-                                                        sch.status === 'sent' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' :
-                                                        sch.status === 'failed' ? 'bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400' :
-                                                        'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
-                                                    }`}>
-                                                        {sch.status}
-                                                    </span>
-                                                </td>
-                                                <td className="py-3 px-2 text-right">
-                                                    {sch.status === 'pending' && (
-                                                        <button
-                                                            onClick={() => {
-                                                                if(confirm('Are you sure you want to cancel this scheduled delivery?')) {
-                                                                    router.delete(`/whatsapp-sender/schedules/${sch.id}`);
-                                                                }
-                                                            }}
-                                                            className="text-red-500 hover:text-red-600 text-xs font-semibold"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
+                                                </div>
+                                                {gp.description && <p className="text-xs text-zinc-400 mt-2 line-clamp-1">{gp.description}</p>}
+                                            </div>
                                         ))}
-                                        {schedules.length === 0 && (
-                                            <tr>
-                                                <td colSpan={7} className="py-6 text-center text-zinc-400">No scheduled message logs found.</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
+                                    </div>
+                                </div>
 
-                    {activeTab === 'logs' && (
-                        <div className="grid grid-cols-1 gap-8">
-                            {/* Message Logs */}
+                                {/* Group Contacts Import / Display panel */}
+                                <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    {selectedGroup ? (
+                                        <>
+                                            <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                                                <div>
+                                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{selectedGroup.name} Workspace</h3>
+                                                    <p className="text-xs text-zinc-500 mt-1">{selectedGroup.description || 'No description provided.'}</p>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm('Are you sure you want to delete this group? All contacts in this group will be deleted.')) {
+                                                            router.delete(`/whatsapp-sender/contact-groups/${selectedGroup.id}`);
+                                                            setSelectedGroup(null);
+                                                        }
+                                                    }}
+                                                    className="text-red-500 hover:text-red-600 text-xs font-semibold"
+                                                >
+                                                    Delete Group
+                                                </button>
+                                            </div>
+
+                                            <form onSubmit={handleImportContacts} className="space-y-4">
+                                                <div>
+                                                    <label className="text-xs font-semibold text-zinc-500 block mb-1">
+                                                        Paste contacts text (Format: <code>phone_or_chat_id,name</code> per line, example: <code>201001234567,John Doe</code>)
+                                                    </label>
+                                                    <textarea
+                                                        rows={5}
+                                                        value={importForm.data.contacts_text}
+                                                        onChange={e => importForm.setData('contacts_text', e.target.value)}
+                                                        placeholder="201001234567,John Doe&#10;201009876543,Alice Smith&#10;123456789,Telegram User"
+                                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono"
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="submit"
+                                                    disabled={importForm.processing}
+                                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-250 text-white dark:text-zinc-900 text-xs px-4 py-2.5 rounded-xl font-bold transition duration-200"
+                                                >
+                                                    Import / Save Contacts
+                                                </button>
+                                            </form>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
+                                            <span className="text-4xl text-zinc-300">👥</span>
+                                            <h3 className="text-zinc-500 dark:text-zinc-400 font-bold">No Contact Group Selected</h3>
+                                            <p className="text-zinc-400 dark:text-zinc-500 text-xs max-w-sm">Select a contact group from the left panel to import list numbers, customize CSV fields, and schedule bulk notifications.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'schedules' && (
                             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                 <div>
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Unified Message Logs</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Audit log of successfully dispatched notifications across both channels.</p>
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Active Scheduler Campaigns</h3>
+                                    <p className="text-xs text-zinc-500 mt-1">Pending and executed schedules managed under Cairo Timezone.</p>
                                 </div>
 
                                 <div className="overflow-x-auto">
@@ -1267,474 +1185,543 @@ export default function Workspace({
                                                 <th className="py-3 px-2 font-semibold">Channel</th>
                                                 <th className="py-3 px-2 font-semibold">Sender Device / Bot</th>
                                                 <th className="py-3 px-2 font-semibold">Recipient</th>
-                                                <th className="py-3 px-2 font-semibold">Content Preview</th>
-                                                <th className="py-3 px-2 font-semibold">Fee Charged</th>
+                                                <th className="py-3 px-2 font-semibold">Type</th>
+                                                <th className="py-3 px-2 font-semibold">Scheduled Date (Cairo Time)</th>
                                                 <th className="py-3 px-2 font-semibold">Status</th>
-                                                <th className="py-3 px-2 font-semibold text-right">Timestamp</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {logs.map(log => (
-                                                <tr key={log.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
-                                                    <td className="py-3 px-2">
-                                                        <span className={`text-xxs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                                                            log.channel === 'telegram' ? 'bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-400' : 'bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400'
-                                                        }`}>
-                                                            {log.channel}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-3 px-2 text-zinc-700 dark:text-zinc-300 font-medium">
-                                                        {log.channel === 'telegram' ? log.telegram_bot?.name : log.account?.name}
-                                                    </td>
-                                                    <td className="py-3 px-2 text-zinc-650 dark:text-zinc-300 font-mono text-xs">{log.recipient_phone}</td>
-                                                    <td className="py-3 px-2 text-zinc-500 text-xs truncate max-w-xs">{log.message_body || `[${log.message_type}]`}</td>
-                                                    <td className="py-3 px-2 text-zinc-900 dark:text-zinc-100 font-bold">${parseFloat(log.cost_charged).toFixed(4)}</td>
-                                                    <td className="py-3 px-2">
-                                                        <span className={`text-xxs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                                                            log.status === 'sent' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-red-50 text-red-700'
-                                                        }`}>
-                                                            {log.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-3 px-2 text-right text-zinc-400 text-xxs font-mono">{new Date(log.created_at).toLocaleString()}</td>
-                                                </tr>
-                                            ))}
-                                            {logs.length === 0 && (
-                                                <tr>
-                                                    <td colSpan={7} className="py-6 text-center text-zinc-400">No message logs available.</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            {/* Wallet Ledger Transactions */}
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div>
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Business Wallet Transaction History</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Audit log of wallet recharges and bulk campaign deductions.</p>
-                                </div>
-
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm border-collapse">
-                                        <thead>
-                                            <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                <th className="py-3 px-2 font-semibold">Transaction Type</th>
-                                                <th className="py-3 px-2 font-semibold">Amount</th>
-                                                <th className="py-3 px-2 font-semibold">Balance After</th>
-                                                <th className="py-3 px-2 font-semibold">Description</th>
-                                                <th className="py-3 px-2 font-semibold text-right">Timestamp</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {transactions.map(tx => (
-                                                <tr key={tx.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
-                                                    <td className="py-3 px-2 font-bold capitalize text-zinc-700 dark:text-zinc-300">{tx.type.replace(/_/g, ' ')}</td>
-                                                    <td className={`py-3 px-2 font-bold ${tx.type.includes('recharge') ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                        {tx.type.includes('recharge') ? '+' : '-'}${parseFloat(tx.amount).toFixed(4)}
-                                                    </td>
-                                                    <td className="py-3 px-2 text-zinc-500 text-xs">${parseFloat(tx.balance_after).toFixed(4)}</td>
-                                                    <td className="py-3 px-2 text-zinc-500 text-xs">{tx.description}</td>
-                                                    <td className="py-3 px-2 text-right text-zinc-400 text-xxs font-mono">{new Date(tx.created_at).toLocaleString()}</td>
-                                                </tr>
-                                            ))}
-                                            {transactions.length === 0 && (
-                                                <tr>
-                                                    <td colSpan={5} className="py-6 text-center text-zinc-400">No transaction logs found.</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'flows' && (
-                        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6 font-sans">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Visual Chat Flows</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Configure automated chatbot response flows for triggers, keywords, delay pacers, and conditions.</p>
-                                </div>
-                                <button
-                                    onClick={() => setIsCreatingFlow(true)}
-                                    className="bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200"
-                                >
-                                    + New Chat Flow
-                                </button>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {flows.map(flow => (
-                                    <div key={flow.id} className="border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl bg-zinc-50/30 dark:bg-zinc-955/20 flex flex-col justify-between h-48 relative overflow-hidden group">
-                                        <div className="absolute right-4 top-4 flex items-center space-x-2">
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                                                flow.channel === 'telegram' ? 'bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-400' : 'bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400'
-                                            }`}>
-                                                {flow.channel}
-                                            </span>
-                                        </div>
-
-                                        <div>
-                                            <h4 className="font-bold text-base text-zinc-900 dark:text-zinc-100">{flow.name}</h4>
-                                            <p className="text-xs text-zinc-500 mt-1 font-medium">
-                                                Trigger: <span className="font-semibold text-zinc-700 dark:text-zinc-300 capitalize">{flow.trigger_type}</span>
-                                            </p>
-                                            {flow.trigger_type === 'keyword' && (
-                                                <p className="text-xxs text-zinc-400 mt-1 truncate max-w-xs">
-                                                    Keywords: {flow.trigger_keywords?.join(', ')}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className="flex justify-between items-center border-t border-zinc-100 dark:border-zinc-800/80 pt-4 mt-4">
-                                            <div className="flex items-center space-x-2">
-                                                <button
-                                                    onClick={() => router.post(`/whatsapp-sender/bot-flows/${flow.id}/toggle`)}
-                                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition ${
-                                                        flow.is_active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-zinc-150 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
-                                                    }`}
-                                                >
-                                                    {flow.is_active ? 'Active' : 'Inactive'}
-                                                </button>
-                                            </div>
-
-                                            <div className="flex items-center space-x-2">
-                                                <button
-                                                    onClick={() => setEditingFlow(flow)}
-                                                    className="text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 text-xs font-semibold px-2 py-1"
-                                                >
-                                                    Edit Canvas
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        if(confirm('Are you sure you want to delete this flow?')) {
-                                                            router.delete(`/whatsapp-sender/bot-flows/${flow.id}`);
-                                                        }
-                                                    }}
-                                                    className="text-red-500 hover:text-red-650 text-xs font-semibold px-2 py-1"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                {flows.length === 0 && (
-                                    <div className="col-span-full py-12 text-center text-zinc-400 text-sm">
-                                        No chatbot response flows configured yet. Click "+ New Chat Flow" to design your first conversation logic.
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'subscribers' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
-                            {/* Create subscriber group */}
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div>
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Subscriber Group</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Organize bot subscribers into custom target cohorts.</p>
-                                </div>
-                                
-                                <form onSubmit={handleCreateTgGroup} className="space-y-4">
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Select Bot</label>
-                                        <select
-                                            value={tgGroupForm.data.telegram_bot_id}
-                                            onChange={e => tgGroupForm.setData('telegram_bot_id', e.target.value)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                        >
-                                            {bots.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                                            {bots.length === 0 && <option value="">No bots registered</option>}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Group Name</label>
-                                        <input
-                                            type="text"
-                                            value={tgGroupForm.data.name}
-                                            onChange={e => tgGroupForm.setData('name', e.target.value)}
-                                            placeholder="e.g. Daily Subscribers"
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-zinc-500 block mb-1">Description</label>
-                                        <textarea
-                                            rows={2}
-                                            value={tgGroupForm.data.description}
-                                            onChange={e => tgGroupForm.setData('description', e.target.value)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                        />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        disabled={tgGroupForm.processing}
-                                        className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
-                                    >
-                                        Create Subscriber Group
-                                    </button>
-                                </form>
-
-                                <div className="space-y-3 mt-6 border-t border-zinc-100 dark:border-zinc-800 pt-6">
-                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Subscriber Segments</h4>
-                                    {telegramSubscriberGroups.map(gp => (
-                                        <div
-                                            key={gp.id}
-                                            onClick={() => setSelectedSubscriberGroup(selectedSubscriberGroup?.id === gp.id ? null : gp)}
-                                            className={`p-4 border rounded-2xl cursor-pointer transition ${
-                                                selectedSubscriberGroup?.id === gp.id
-                                                    ? 'border-zinc-900 dark:border-zinc-50 bg-zinc-50/50 dark:bg-zinc-850/40'
-                                                    : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/40'
-                                            }`}
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{gp.name}</span>
-                                                <span className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300 px-2.5 py-0.5 rounded-full font-semibold">
-                                                    {gp.subscribers_count} members
-                                                </span>
-                                            </div>
-                                            {gp.description && <p className="text-xs text-zinc-400 mt-2 line-clamp-1">{gp.description}</p>}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Subscribers listing */}
-                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                                    <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
-                                            {selectedSubscriberGroup ? `${selectedSubscriberGroup.name} Members` : 'All Telegram Subscribers'}
-                                        </h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Subscribers who have initiated communication with registered bots.</p>
-                                    </div>
-                                    {selectedSubscriberGroup && (
-                                        <button
-                                            onClick={() => {
-                                                if(confirm('Are you sure you want to delete this subscriber group?')) {
-                                                    router.delete(`/whatsapp-sender/telegram-subscriber-groups/${selectedSubscriberGroup.id}`);
-                                                    setSelectedSubscriberGroup(null);
-                                                }
-                                            }}
-                                            className="text-red-500 hover:text-red-650 text-xs font-semibold"
-                                        >
-                                            Delete Group
-                                        </button>
-                                    )}
-                                </div>
-
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm border-collapse">
-                                        <thead>
-                                            <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                <th className="py-3 px-2 font-semibold">Chat ID</th>
-                                                <th className="py-3 px-2 font-semibold">Username</th>
-                                                <th className="py-3 px-2 font-semibold">Name</th>
-                                                <th className="py-3 px-2 font-semibold">Assigned Cohort</th>
                                                 <th className="py-3 px-2 font-semibold text-right">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {telegramSubscribers
-                                                .filter(sub => !selectedSubscriberGroup || sub.telegram_subscriber_group_id === selectedSubscriberGroup.id)
-                                                .map(sub => (
-                                                    <tr key={sub.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
-                                                        <td className="py-3 px-2 font-mono text-xs text-zinc-700 dark:text-zinc-300 font-bold">{sub.chat_id}</td>
-                                                        <td className="py-3 px-2 text-zinc-500 text-xs">@{sub.username || 'n/a'}</td>
-                                                        <td className="py-3 px-2 text-zinc-700 dark:text-zinc-200 font-medium">
-                                                            {sub.first_name} {sub.last_name}
-                                                        </td>
-                                                        <td className="py-3 px-2 text-zinc-500 text-xs">
-                                                            <select
-                                                                value={sub.telegram_subscriber_group_id || ''}
-                                                                onChange={e => router.put(`/whatsapp-sender/telegram-subscribers/${sub.id}/group`, {
-                                                                    telegram_subscriber_group_id: e.target.value || null
-                                                                })}
-                                                                className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg py-1 px-2 text-xs focus:outline-none text-zinc-700 dark:text-zinc-300"
-                                                            >
-                                                                <option value="">Unassigned</option>
-                                                                {telegramSubscriberGroups.map(g => (
-                                                                    <option key={g.id} value={g.id}>{g.name}</option>
-                                                                ))}
-                                                            </select>
-                                                        </td>
-                                                        <td className="py-3 px-2 text-right">
+                                            {schedules.map(sch => (
+                                                <tr key={sch.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
+                                                    <td className="py-3 px-2">
+                                                        <span className={`text-xxs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${sch.channel === 'telegram' ? 'bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-400' : 'bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400'
+                                                            }`}>
+                                                            {sch.channel}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-3 px-2 text-zinc-700 dark:text-zinc-300 font-medium">
+                                                        {sch.channel === 'telegram' ? sch.telegram_bot?.name : sch.account?.name}
+                                                    </td>
+                                                    <td className="py-3 px-2 text-zinc-600 dark:text-zinc-400">
+                                                        {sch.group ? `Group: ${sch.group.name}` : sch.recipient_phone}
+                                                    </td>
+                                                    <td className="py-3 px-2 text-zinc-500 text-xs capitalize">{sch.message_type}</td>
+                                                    <td className="py-3 px-2 text-zinc-500 text-xs font-mono">{new Date(sch.scheduled_at).toLocaleString('en-US', { timeZone: 'Africa/Cairo' })}</td>
+                                                    <td className="py-3 px-2">
+                                                        <span className={`text-xxs px-2 py-0.5 rounded-full font-bold capitalize ${sch.status === 'sent' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' :
+                                                                sch.status === 'failed' ? 'bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400' :
+                                                                    'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+                                                            }`}>
+                                                            {sch.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-3 px-2 text-right">
+                                                        {sch.status === 'pending' && (
                                                             <button
                                                                 onClick={() => {
-                                                                    if(confirm('Are you sure you want to remove this subscriber?')) {
-                                                                        router.delete(`/whatsapp-sender/telegram-subscribers/${sub.id}`);
+                                                                    if (confirm('Are you sure you want to cancel this scheduled delivery?')) {
+                                                                        router.delete(`/whatsapp-sender/schedules/${sch.id}`);
                                                                     }
                                                                 }}
-                                                                className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                                                className="text-red-500 hover:text-red-600 text-xs font-semibold"
                                                             >
-                                                                Remove
+                                                                Cancel
                                                             </button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            {telegramSubscribers.length === 0 && (
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {schedules.length === 0 && (
                                                 <tr>
-                                                    <td colSpan={5} className="py-6 text-center text-zinc-400">No active subscribers discovered yet.</td>
+                                                    <td colSpan={7} className="py-6 text-center text-zinc-400">No scheduled message logs found.</td>
                                                 </tr>
                                             )}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+                        )}
 
-        {/* Visual Chat Flow Builder Screen Overlay */}
-        {(isCreatingFlow || editingFlow) && (
-            <FlowBuilder
-                flow={editingFlow}
-                whatsappBusinessId={business.id}
-                channel={activeChannel}
-                telegramBotId={bots[0]?.id || null}
-                bots={bots}
-                onClose={() => {
-                    setIsCreatingFlow(false);
-                    setEditingFlow(null);
-                }}
-            />
-        )}
+                        {activeTab === 'logs' && (
+                            <div className="grid grid-cols-1 gap-8">
+                                {/* Message Logs */}
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Unified Message Logs</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Audit log of successfully dispatched notifications across both channels.</p>
+                                    </div>
 
-        {/* Edit Business Modal inside workspace */}
-        {showEditModal && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-6">
-                    <div>
-                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Edit Client Business Profile</h3>
-                        <p className="text-xs text-zinc-400 mt-1">Modify company properties and custom app credentials.</p>
-                    </div>
-                    <form onSubmit={handleEditBusiness} className="space-y-4">
-                        <div>
-                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Company / Business Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={editForm.data.name}
-                                onChange={e => editForm.setData('name', e.target.value)}
-                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Contact Name</label>
-                                <input
-                                    type="text"
-                                    value={editForm.data.client_name}
-                                    onChange={e => editForm.setData('client_name', e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Email Address</label>
-                                <input
-                                    type="email"
-                                    value={editForm.data.client_email}
-                                    onChange={e => editForm.setData('client_email', e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Mobile Number</label>
-                                <input
-                                    type="text"
-                                    value={editForm.data.client_mobile}
-                                    onChange={e => editForm.setData('client_mobile', e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client WhatsApp Number</label>
-                                <input
-                                    type="text"
-                                    value={editForm.data.client_whatsapp}
-                                    onChange={e => editForm.setData('client_whatsapp', e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
-                                <input
-                                    type="text"
-                                    value={editForm.data.facebook_client_id}
-                                    onChange={e => editForm.setData('facebook_client_id', e.target.value)}
-                                    placeholder="e.g. 104829384920"
-                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
-                                <input
-                                    type="password"
-                                    value={editForm.data.facebook_client_secret}
-                                    onChange={e => editForm.setData('facebook_client_secret', e.target.value)}
-                                    placeholder="••••••••"
-                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
-                                />
-                            </div>
-                        </div>
-
-                        {isAdmin && (
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Per Message Fee ($ USD)</label>
-                                    <input
-                                        type="number"
-                                        step="0.0001"
-                                        value={editForm.data.per_message_fee}
-                                        onChange={e => editForm.setData('per_message_fee', e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-bold text-zinc-700 dark:text-zinc-300"
-                                    />
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
+                                                    <th className="py-3 px-2 font-semibold">Channel</th>
+                                                    <th className="py-3 px-2 font-semibold">Sender Device / Bot</th>
+                                                    <th className="py-3 px-2 font-semibold">Recipient</th>
+                                                    <th className="py-3 px-2 font-semibold">Content Preview</th>
+                                                    <th className="py-3 px-2 font-semibold">Fee Charged</th>
+                                                    <th className="py-3 px-2 font-semibold">Status</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">Timestamp</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {logs.map(log => (
+                                                    <tr key={log.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
+                                                        <td className="py-3 px-2">
+                                                            <span className={`text-xxs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${log.channel === 'telegram' ? 'bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-400' : 'bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400'
+                                                                }`}>
+                                                                {log.channel}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3 px-2 text-zinc-700 dark:text-zinc-300 font-medium">
+                                                            {log.channel === 'telegram' ? log.telegram_bot?.name : log.account?.name}
+                                                        </td>
+                                                        <td className="py-3 px-2 text-zinc-650 dark:text-zinc-300 font-mono text-xs">{log.recipient_phone}</td>
+                                                        <td className="py-3 px-2 text-zinc-500 text-xs truncate max-w-xs">{log.message_body || `[${log.message_type}]`}</td>
+                                                        <td className="py-3 px-2 text-zinc-900 dark:text-zinc-100 font-bold">${parseFloat(log.cost_charged).toFixed(4)}</td>
+                                                        <td className="py-3 px-2">
+                                                            <span className={`text-xxs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${log.status === 'sent' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-red-50 text-red-700'
+                                                                }`}>
+                                                                {log.status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3 px-2 text-right text-zinc-400 text-xxs font-mono">{new Date(log.created_at).toLocaleString()}</td>
+                                                    </tr>
+                                                ))}
+                                                {logs.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={7} className="py-6 text-center text-zinc-400">No message logs available.</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Bot Reply Fee ($ USD)</label>
-                                    <input
-                                        type="number"
-                                        step="0.0001"
-                                        value={editForm.data.bot_reply_fee}
-                                        onChange={e => editForm.setData('bot_reply_fee', e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-bold text-zinc-700 dark:text-zinc-300"
-                                    />
+
+                                {/* Wallet Ledger Transactions */}
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Business Wallet Transaction History</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Audit log of wallet recharges and bulk campaign deductions.</p>
+                                    </div>
+
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
+                                                    <th className="py-3 px-2 font-semibold">Transaction Type</th>
+                                                    <th className="py-3 px-2 font-semibold">Amount</th>
+                                                    <th className="py-3 px-2 font-semibold">Balance After</th>
+                                                    <th className="py-3 px-2 font-semibold">Description</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">Timestamp</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {transactions.map(tx => (
+                                                    <tr key={tx.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
+                                                        <td className="py-3 px-2 font-bold capitalize text-zinc-700 dark:text-zinc-300">{tx.type.replace(/_/g, ' ')}</td>
+                                                        <td className={`py-3 px-2 font-bold ${tx.type.includes('recharge') ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                            {tx.type.includes('recharge') ? '+' : '-'}${parseFloat(tx.amount).toFixed(4)}
+                                                        </td>
+                                                        <td className="py-3 px-2 text-zinc-500 text-xs">${parseFloat(tx.balance_after).toFixed(4)}</td>
+                                                        <td className="py-3 px-2 text-zinc-500 text-xs">{tx.description}</td>
+                                                        <td className="py-3 px-2 text-right text-zinc-400 text-xxs font-mono">{new Date(tx.created_at).toLocaleString()}</td>
+                                                    </tr>
+                                                ))}
+                                                {transactions.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">No transaction logs found.</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         )}
 
-                        <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                            <button
-                                type="button"
-                                onClick={() => setShowEditModal(false)}
-                                className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={editForm.processing}
-                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
-                            >
-                                Save Changes
-                            </button>
-                        </div>
-                    </form>
+                        {activeTab === 'flows' && (
+                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6 font-sans">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Visual Chat Flows</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Configure automated chatbot response flows for triggers, keywords, delay pacers, and conditions.</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsCreatingFlow(true)}
+                                        className="bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200"
+                                    >
+                                        + New Chat Flow
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {flows.map(flow => (
+                                        <div key={flow.id} className="border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl bg-zinc-50/30 dark:bg-zinc-955/20 flex flex-col justify-between h-48 relative overflow-hidden group">
+                                            <div className="absolute right-4 top-4 flex items-center space-x-2">
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${flow.channel === 'telegram' ? 'bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-400' : 'bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400'
+                                                    }`}>
+                                                    {flow.channel}
+                                                </span>
+                                            </div>
+
+                                            <div>
+                                                <h4 className="font-bold text-base text-zinc-900 dark:text-zinc-100">{flow.name}</h4>
+                                                <p className="text-xs text-zinc-500 mt-1 font-medium">
+                                                    Trigger: <span className="font-semibold text-zinc-700 dark:text-zinc-300 capitalize">{flow.trigger_type}</span>
+                                                </p>
+                                                {flow.trigger_type === 'keyword' && (
+                                                    <p className="text-xxs text-zinc-400 mt-1 truncate max-w-xs">
+                                                        Keywords: {flow.trigger_keywords?.join(', ')}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="flex justify-between items-center border-t border-zinc-100 dark:border-zinc-800/80 pt-4 mt-4">
+                                                <div className="flex items-center space-x-2">
+                                                    <button
+                                                        onClick={() => router.post(`/whatsapp-sender/bot-flows/${flow.id}/toggle`)}
+                                                        className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition ${flow.is_active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-zinc-150 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                                                            }`}
+                                                    >
+                                                        {flow.is_active ? 'Active' : 'Inactive'}
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex items-center space-x-2">
+                                                    <button
+                                                        onClick={() => setEditingFlow(flow)}
+                                                        className="text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 text-xs font-semibold px-2 py-1"
+                                                    >
+                                                        Edit Canvas
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (confirm('Are you sure you want to delete this flow?')) {
+                                                                router.delete(`/whatsapp-sender/bot-flows/${flow.id}`);
+                                                            }
+                                                        }}
+                                                        className="text-red-500 hover:text-red-650 text-xs font-semibold px-2 py-1"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {flows.length === 0 && (
+                                        <div className="col-span-full py-12 text-center text-zinc-400 text-sm">
+                                            No chatbot response flows configured yet. Click "+ New Chat Flow" to design your first conversation logic.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'subscribers' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
+                                {/* Create subscriber group */}
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Subscriber Group</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">Organize bot subscribers into custom target cohorts.</p>
+                                    </div>
+
+                                    <form onSubmit={handleCreateTgGroup} className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Select Bot</label>
+                                            <select
+                                                value={tgGroupForm.data.telegram_bot_id}
+                                                onChange={e => tgGroupForm.setData('telegram_bot_id', e.target.value)}
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                            >
+                                                {bots.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                                                {bots.length === 0 && <option value="">No bots registered</option>}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Group Name</label>
+                                            <input
+                                                type="text"
+                                                value={tgGroupForm.data.name}
+                                                onChange={e => tgGroupForm.setData('name', e.target.value)}
+                                                placeholder="e.g. Daily Subscribers"
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Description</label>
+                                            <textarea
+                                                rows={2}
+                                                value={tgGroupForm.data.description}
+                                                onChange={e => tgGroupForm.setData('description', e.target.value)}
+                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                            />
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            disabled={tgGroupForm.processing}
+                                            className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
+                                        >
+                                            Create Subscriber Group
+                                        </button>
+                                    </form>
+
+                                    <div className="space-y-3 mt-6 border-t border-zinc-100 dark:border-zinc-800 pt-6">
+                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Subscriber Segments</h4>
+                                        {telegramSubscriberGroups.map(gp => (
+                                            <div
+                                                key={gp.id}
+                                                onClick={() => setSelectedSubscriberGroup(selectedSubscriberGroup?.id === gp.id ? null : gp)}
+                                                className={`p-4 border rounded-2xl cursor-pointer transition ${selectedSubscriberGroup?.id === gp.id
+                                                        ? 'border-zinc-900 dark:border-zinc-50 bg-zinc-50/50 dark:bg-zinc-850/40'
+                                                        : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50/40'
+                                                    }`}
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{gp.name}</span>
+                                                    <span className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300 px-2.5 py-0.5 rounded-full font-semibold">
+                                                        {gp.subscribers_count} members
+                                                    </span>
+                                                </div>
+                                                {gp.description && <p className="text-xs text-zinc-400 mt-2 line-clamp-1">{gp.description}</p>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Subscribers listing */}
+                                <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                                        <div>
+                                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+                                                {selectedSubscriberGroup ? `${selectedSubscriberGroup.name} Members` : 'All Telegram Subscribers'}
+                                            </h3>
+                                            <p className="text-xs text-zinc-500 mt-1">Subscribers who have initiated communication with registered bots.</p>
+                                        </div>
+                                        {selectedSubscriberGroup && (
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Are you sure you want to delete this subscriber group?')) {
+                                                        router.delete(`/whatsapp-sender/telegram-subscriber-groups/${selectedSubscriberGroup.id}`);
+                                                        setSelectedSubscriberGroup(null);
+                                                    }
+                                                }}
+                                                className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                            >
+                                                Delete Group
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
+                                                    <th className="py-3 px-2 font-semibold">Chat ID</th>
+                                                    <th className="py-3 px-2 font-semibold">Username</th>
+                                                    <th className="py-3 px-2 font-semibold">Name</th>
+                                                    <th className="py-3 px-2 font-semibold">Assigned Cohort</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {telegramSubscribers
+                                                    .filter(sub => !selectedSubscriberGroup || sub.telegram_subscriber_group_id === selectedSubscriberGroup.id)
+                                                    .map(sub => (
+                                                        <tr key={sub.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
+                                                            <td className="py-3 px-2 font-mono text-xs text-zinc-700 dark:text-zinc-300 font-bold">{sub.chat_id}</td>
+                                                            <td className="py-3 px-2 text-zinc-500 text-xs">@{sub.username || 'n/a'}</td>
+                                                            <td className="py-3 px-2 text-zinc-700 dark:text-zinc-200 font-medium">
+                                                                {sub.first_name} {sub.last_name}
+                                                            </td>
+                                                            <td className="py-3 px-2 text-zinc-500 text-xs">
+                                                                <select
+                                                                    value={sub.telegram_subscriber_group_id || ''}
+                                                                    onChange={e => router.put(`/whatsapp-sender/telegram-subscribers/${sub.id}/group`, {
+                                                                        telegram_subscriber_group_id: e.target.value || null
+                                                                    })}
+                                                                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg py-1 px-2 text-xs focus:outline-none text-zinc-700 dark:text-zinc-300"
+                                                                >
+                                                                    <option value="">Unassigned</option>
+                                                                    {telegramSubscriberGroups.map(g => (
+                                                                        <option key={g.id} value={g.id}>{g.name}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </td>
+                                                            <td className="py-3 px-2 text-right">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (confirm('Are you sure you want to remove this subscriber?')) {
+                                                                            router.delete(`/whatsapp-sender/telegram-subscribers/${sub.id}`);
+                                                                        }
+                                                                    }}
+                                                                    className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                                                >
+                                                                    Remove
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                {telegramSubscribers.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">No active subscribers discovered yet.</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-        )}
-    </AuthenticatedLayout>
-);
+
+            {/* Visual Chat Flow Builder Screen Overlay */}
+            {(isCreatingFlow || editingFlow) && (
+                <FlowBuilder
+                    flow={editingFlow}
+                    whatsappBusinessId={business.id}
+                    channel={activeChannel}
+                    telegramBotId={bots[0]?.id || null}
+                    bots={bots}
+                    onClose={() => {
+                        setIsCreatingFlow(false);
+                        setEditingFlow(null);
+                    }}
+                />
+            )}
+
+            {/* Edit Business Modal inside workspace */}
+            {showEditModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-6">
+                        <div>
+                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Edit Client Business Profile</h3>
+                            <p className="text-xs text-zinc-400 mt-1">Modify company properties and custom app credentials.</p>
+                        </div>
+                        <form onSubmit={handleEditBusiness} className="space-y-4">
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Company / Business Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={editForm.data.name}
+                                    onChange={e => editForm.setData('name', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Contact Name</label>
+                                    <input
+                                        type="text"
+                                        value={editForm.data.client_name}
+                                        onChange={e => editForm.setData('client_name', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Email Address</label>
+                                    <input
+                                        type="email"
+                                        value={editForm.data.client_email}
+                                        onChange={e => editForm.setData('client_email', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Mobile Number</label>
+                                    <input
+                                        type="text"
+                                        value={editForm.data.client_mobile}
+                                        onChange={e => editForm.setData('client_mobile', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client WhatsApp Number</label>
+                                    <input
+                                        type="text"
+                                        value={editForm.data.client_whatsapp}
+                                        onChange={e => editForm.setData('client_whatsapp', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
+                                    <input
+                                        type="text"
+                                        value={editForm.data.facebook_client_id}
+                                        onChange={e => editForm.setData('facebook_client_id', e.target.value)}
+                                        placeholder="e.g. 104829384920"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
+                                    <input
+                                        type="password"
+                                        value={editForm.data.facebook_client_secret}
+                                        onChange={e => editForm.setData('facebook_client_secret', e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                    />
+                                </div>
+                            </div>
+
+                            {isAdmin && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Per Message Fee ($ USD)</label>
+                                        <input
+                                            type="number"
+                                            step="0.0001"
+                                            value={editForm.data.per_message_fee}
+                                            onChange={e => editForm.setData('per_message_fee', e.target.value)}
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Bot Reply Fee ($ USD)</label>
+                                        <input
+                                            type="number"
+                                            step="0.0001"
+                                            value={editForm.data.bot_reply_fee}
+                                            onChange={e => editForm.setData('bot_reply_fee', e.target.value)}
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEditModal(false)}
+                                    className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={editForm.processing}
+                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </AuthenticatedLayout>
+    );
 }

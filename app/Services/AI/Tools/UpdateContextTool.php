@@ -13,7 +13,7 @@ class UpdateContextTool implements AiToolInterface
 
     public function description(): string
     {
-        return 'Invoke this tool whenever the client confirms, answers, or selects project features or goals. Updates project memory and conversation state.';
+        return 'Invoke this tool whenever the client confirms, answers, or selects project features, goals, or requests stage progress. Updates project memory, current_stage, and conversation state.';
     }
 
     public function parameters(): array
@@ -23,7 +23,7 @@ class UpdateContextTool implements AiToolInterface
             'properties' => [
                 'updates' => [
                     'type'        => 'object',
-                    'description' => 'Key-value pairs to update (e.g. goal, pending_features, completed_features, conversation_summary, waiting_for, tech_stack)',
+                    'description' => 'Key-value pairs to update (e.g. current_stage [GREETING|DISCOVERY|VALUATION|PROPOSAL|EXECUTION|COMPLETED], goal, pending_features, completed_features, conversation_summary, waiting_for, tech_stack)',
                 ],
             ],
             'required'   => ['updates'],
