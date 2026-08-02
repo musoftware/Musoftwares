@@ -1393,7 +1393,7 @@ class InvoiceController extends Controller
               ->with('items');
         }])->get();
 
-        $clientDues = $users->map(function ($client) use ($isEnabled, $limit) {
+        $clientDues = $users->map(function ($client) use ($limit) {
             // Group unpaid amounts by currency
             $totals = [];
             foreach ($client->invoices as $invoice) {

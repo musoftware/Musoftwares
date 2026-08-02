@@ -25,11 +25,7 @@ class MarketplaceAiService extends BaseService
 
         $prompt = $this->buildPrompt($titlePrompt, $categoriesFormatted);
 
-        if (strtolower($provider) === 'gemini') {
-            $aiResult = $this->callGemini($prompt);
-        } else {
-            $aiResult = $this->callOpenAI($prompt);
-        }
+        $aiResult = $this->callGemini($prompt);
 
         if (!$aiResult || empty($aiResult['title'])) {
             throw new \Exception('Failed to generate service details from AI. Please check your API key configuration.');
@@ -308,7 +304,7 @@ GENERAL RULES:
      */
     public function generateCoverImage(string $imagePrompt, int $sellerId): array
     {
-        $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+        $apiKey = null; // Forced null to bypass OpenAI image generation for cost control
         $imageBinary = null;
 
         $cleanPrompt = $this->getRefinedImagePrompt($imagePrompt);

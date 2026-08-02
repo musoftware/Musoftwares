@@ -38,6 +38,19 @@ class ProjectBoardItem extends Model
         return array_keys(self::MORPH_MAP);
     }
 
+    public const APPROVAL_PENDING = 'pending';
+    public const APPROVAL_APPROVED = 'approved';
+    public const APPROVAL_REVISION = 'revision_requested';
+
+    public static function validApprovalStatuses(): array
+    {
+        return [
+            self::APPROVAL_PENDING,
+            self::APPROVAL_APPROVED,
+            self::APPROVAL_REVISION,
+        ];
+    }
+
     protected $casts = [
         'pos_x' => 'integer',
         'pos_y' => 'integer',

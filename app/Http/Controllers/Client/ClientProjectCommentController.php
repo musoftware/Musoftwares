@@ -33,15 +33,42 @@ class ClientProjectCommentController extends Controller
         $data = $request->validated();
         $commentable = $this->resolveCommentable($project, $data['type'], (int) $data['commentable_id']);
 
+        $body = $data['body'];
+
+        if ($request->hasFile('file')) {
+            $upload = $request->file('file');
+            $disk = config('filesystems.default');
+            $path = $upload->store("project-files/{$project->id}", $disk);
+
+            $projectFile = $project->files()->create([
+                'uploaded_by' => $request->user()?->id ?? $project->user_id,
+                'disk_path' => $path,
+                'original_name' => $upload->getClientOriginalName(),
+                'mime' => $upload->getMimeType(),
+                'size' => $upload->getSize(),
+            ]);
+
+            $downloadUrl = route('client.projects.files.download', ['project' => $project->id, 'file' => $projectFile->id]);
+            $body = trim($body . "\n\n📄 **Attachment**: [{$projectFile->original_name}]({$downloadUrl})");
+        }
+
         $comment = $commentable->comments()->create([
             'project_id' => $project->id,
             'author_id' => $request->user()?->id,
-            'body' => $data['body'],
+            'body' => $body,
+            'parent_id' => $data['parent_id'] ?? null,
+            'commentable_type' => $data['type'] === 'project' ? \App\Models\Project::class : $commentable->getMorphClass(),
+            'commentable_id' => $data['type'] === 'project' ? $project->id : $commentable->id,
         ]);
         $comment->load('author');
 
         $aiAdjusted = false;
-        if (!empty($data['adjust_future_ai'])) {
+
+        if ($project->ai_enabled && $data['type'] === 'project' && $request->user()?->id) {
+            \App\Jobs\ProcessClientMessageWithAi::dispatch($project, $comment);
+        }
+
+        if (!empty($data['adjust_future_ai']) && $data['type'] !== 'project') {
             $morphClass = ProjectBoardItem::morphClassFor($data['type']);
             $boardItem = ProjectBoardItem::where('project_id', $project->id)
                 ->where('itemable_type', $morphClass)
@@ -81,6 +108,7 @@ class ClientProjectCommentController extends Controller
     private function resolveCommentable(Project $project, string $type, int $id)
     {
         $model = match ($type) {
+            'project' => $project->id === $id ? $project : null,
             'note' => $project->boardNotes()->whereKey($id)->first(),
             'task' => $project->tasks()->whereKey($id)->first(),
             'todo' => $project->todos()->whereKey($id)->first(),
@@ -108,6 +136,7 @@ class ClientProjectCommentController extends Controller
             'guest_name' => $comment->guest_name,
             'guest_email' => $comment->guest_email,
             'created_at' => $comment->created_at?->toIso8601String(),
+            'parent_id' => $comment->parent_id,
         ])->all();
     }
 }

@@ -13,13 +13,24 @@ class PriceCalculatorService extends BaseService
      */
     public function estimate(string $requirements): ?array
     {
-        $apiKey = config('services.openai.key');
+        $apiKeysString = \App\Models\AdminSettings::GetValue('gemini_api_keys') 
+            ?: \App\Models\AdminSettings::GetValue('gemini_api_key') 
+            ?: env('GEMINI_API_KEY') 
+            ?: config('services.gemini.key');
 
-        if (! $apiKey) {
-            Log::error('OpenAI API key missing in PriceCalculatorService.');
-
+        if (!$apiKeysString) {
+            Log::error('Gemini API keys missing in settings for PriceCalculatorService.');
             return null;
         }
+
+        $keys = array_filter(array_map('trim', explode(',', $apiKeysString)));
+        $apiKey = $keys[0] ?? null;
+
+        if (!$apiKey) {
+            return null;
+        }
+
+        $model = \App\Models\AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
 
         $prompt = "You are an expert enterprise software estimator. The user has provided the following requirements for a freelance software project:\n\n"
                 ."Requirements: {$requirements}\n\n"
@@ -32,32 +43,39 @@ class PriceCalculatorService extends BaseService
                 .'}';
 
         try {
-            $response = Http::withToken($apiKey)
-                ->timeout(30)
-                ->post('https://api.openai.com/v1/chat/completions', [
-                    'model' => 'gpt-3.5-turbo', // Using 3.5 turbo for cost efficiency
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'You are an expert software estimator. Output strictly valid JSON.'],
-                        ['role' => 'user', 'content' => $prompt],
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+
+            $response = Http::timeout(45)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])
+                ->post($url, [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt],
+                            ],
+                        ],
                     ],
-                    'temperature' => 0.2,
+                    'generationConfig' => [
+                        'temperature' => 0.2,
+                        'responseMimeType' => 'application/json',
+                    ],
                 ]);
 
             if ($response->successful()) {
-                $content = $response->json('choices.0.message.content');
-                // Remove markdown code blocks if any
-                $content = preg_replace('/```json|```/', '', $content);
-
-                return json_decode(trim($content), true);
+                $content = $response->json('candidates.0.content.parts.0.text');
+                if ($content !== null) {
+                    $content = preg_replace('/```json|```/', '', $content);
+                    return json_decode(trim($content), true);
+                }
             }
 
-            Log::error('OpenAI API error in PriceCalculatorService', ['response' => $response->body()]);
-
+            Log::error('Gemini API error in PriceCalculatorService', ['response' => $response->body()]);
             return null;
 
         } catch (\Exception $e) {
             Log::error('Exception in PriceCalculatorService: '.$e->getMessage());
-
             return null;
         }
     }

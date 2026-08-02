@@ -216,6 +216,9 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::get('/projects/tasks', [ClientTasksAggregatorController::class, 'index'])->name('all-tasks');
     Route::get('/projects/board', [ClientProjectCalendarController::class, 'allProjectsBoardIndex'])->name('all-projects-board.index');
     Route::get('/projects/board/{date}', [ClientProjectCalendarController::class, 'allProjectsBoardDate'])->name('all-projects-board.date');
+    Route::get('/projects/create-new', [ClientProjectController::class, 'create'])->name('create-new');
+    Route::post('/projects/store-new', [ClientProjectController::class, 'store'])->name('store-new');
+    Route::post('/projects/{project}/ai/activate', [ClientProjectController::class, 'activateAi'])->name('ai.activate');
     Route::get('/projects/{project}', [ClientProjectController::class, 'show'])->name('show');
     Route::get('/projects/{project}/tasks', [ClientProjectTaskController::class, 'tasksIndex'])->name('tasks.index');
     Route::get('/projects/{project}/reports/{report}', [ClientProjectReportController::class, 'show'])->name('reports.show');
@@ -258,6 +261,7 @@ Route::middleware([\App\Http\Middleware\VerifyBoardAccess::class])->name('client
     Route::post('/projects/{project}/board/reorder', [ClientProjectBoardController::class, 'reorderCards'])->name('board.reorder-cards');
     Route::post('/projects/{project}/board/reschedule', [ClientProjectBoardController::class, 'rescheduleCard'])->name('board.reschedule-card');
     Route::post('/projects/{project}/board/bring-undone', [ClientProjectBoardController::class, 'bringUndone'])->name('board.bring-undone');
+    Route::post('/projects/{project}/board/items/{boardItem}/approval', [ClientProjectBoardController::class, 'updateApproval'])->name('board.items.approval');
 });
 
 Route::middleware('auth')->group(function () {

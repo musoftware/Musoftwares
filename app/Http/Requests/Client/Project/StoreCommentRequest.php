@@ -15,10 +15,11 @@ class StoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:'.implode(',', ProjectBoardItem::validTypeKeys())],
+            'type' => ['required', 'string', 'in:'.implode(',', array_merge(ProjectBoardItem::validTypeKeys(), ['project']))],
             'commentable_id' => ['required', 'integer'],
             'body' => ['required', 'string', 'max:5000'],
             'adjust_future_ai' => ['sometimes', 'boolean'],
+            'parent_id' => ['nullable', 'integer', 'exists:project_comments,id'],
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\AdminSettings;
+use App\Models\Project;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,8 +15,8 @@ class ContractAiControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
-
     protected User $clientUser;
+    protected Project $project;
 
     protected function setUp(): void
     {
@@ -23,98 +24,107 @@ class ContractAiControllerTest extends TestCase
 
         $this->seed(RolesAndPermissionsSeeder::class);
 
-        // Setting openai key so it bypasses the empty key check
         $this->admin = User::factory()->create([
             'onboarding_completed' => true,
         ]);
-        AdminSettings::SetValue('default_ai_model', 'openai');
-        AdminSettings::SetValue('openai_api_key', 'test-key');
         $this->admin->assignRole('admin');
 
         $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
         $this->clientUser->assignRole('client');
+
+        $this->project = Project::create([
+            'user_id' => $this->clientUser->id,
+            'project_name' => 'My New Project',
+            'status' => 'open',
+        ]);
+
+        AdminSettings::SetValue('default_ai_model', 'gemini');
+        AdminSettings::SetValue('gemini_api_key', 'test-gemini-key');
     }
 
     public function test_admin_can_generate_contract_ai()
     {
-        Http::fake([
-            'api.openai.com/*' => Http::response([
-                'choices' => [
-                    [
-                        'message' => [
-                            'content' => json_encode([
-                                'project_description' => 'Test Project',
-                                'description' => 'Test Desc',
-                            ]),
-                        ],
-                    ],
+        $geminiResponse = [
+            'description' => 'Test Desc',
+            'payment_terms' => 'Test Payments',
+            'terms' => 'Test Terms',
+            'notes' => 'Test Notes',
+            'duration' => '2 Weeks',
+            'key_features' => ['Feature 1'],
+            'pricing_items' => [
+                [
+                    'item' => 'Setup',
+                    'description' => 'Initial setup',
+                    'hours' => 10,
+                    'hourly_rate' => 50,
+                    'total' => 500,
                 ],
+            ],
+            'total_amount' => 500,
+        ];
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
+                    [
+                        'content' => [
+                            'parts' => [
+                                ['text' => json_encode($geminiResponse)]
+                            ]
+                        ]
+                    ]
+                ]
             ], 200),
         ]);
 
-        // Assuming standard resourceful or custom routes
-        // The exact route URL might differ in your routes/admin.php, but typical naming:
-        // POST /admin/contracts/ai/generate or /admin/ai/contract/generate
-        // Testing both or relying on the developer to adjust the URL string
-
-        $response = $this->actingAs($this->admin)->postJson('/admin/contract-ai/generate', [
-            'project_name' => 'My New Project',
+        $response = $this->actingAs($this->admin)->postJson('/admin/contracts/ai/generate', [
+            'project_id' => $this->project->id,
+            'prompt' => 'Make a contract for web design',
         ]);
 
-        if ($response->status() === 404) {
-            $this->markTestSkipped('Route not found, update to correct route URL for generate.');
-        }
-
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['description', 'payment_terms', 'terms', 'notes']);
     }
 
     public function test_admin_can_review_contract_ai()
     {
+        $geminiResponse = [
+            'critical_issues' => ['None'],
+            'suggestions' => ['Looks good'],
+            'refined_content' => 'Refined text here',
+        ];
+
         Http::fake([
-            'api.openai.com/*' => Http::response([
-                'choices' => [
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
                     [
-                        'message' => [
-                            'content' => json_encode([
-                                'critical_issues' => ['None'],
-                                'suggestions' => ['Looks good'],
-                                'refined_content' => 'Refined text here',
-                            ]),
-                        ],
-                    ],
-                ],
+                        'content' => [
+                            'parts' => [
+                                ['text' => json_encode($geminiResponse)]
+                            ]
+                        ]
+                    ]
+                ]
             ], 200),
         ]);
 
-        $response = $this->actingAs($this->admin)->postJson('/admin/contract-ai/review', [
+        $response = $this->actingAs($this->admin)->postJson('/admin/contracts/ai/review', [
             'description' => str_repeat('This is a test description long enough to pass validation.', 3), // min:50
         ]);
 
-        if ($response->status() === 404) {
-            $this->markTestSkipped('Route not found, update to correct route URL for review.');
-        }
-
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['data' => ['critical_issues', 'suggestions', 'refined_content']]);
     }
 
     public function test_fails_if_api_key_missing()
     {
-        // Admin with no key
-        $adminNoKey = User::factory()->create([
-            'onboarding_completed' => true,
-        ]);
-        AdminSettings::SetValue('openai_api_key', null);
-        $adminNoKey->assignRole('admin');
+        AdminSettings::SetValue('gemini_api_key', null);
+        AdminSettings::SetValue('gemini_api_keys', null);
 
-        $response = $this->actingAs($adminNoKey)->postJson('/admin/contract-ai/generate', [
-            'project_name' => 'My New Project',
+        $response = $this->actingAs($this->admin)->postJson('/admin/contracts/ai/generate', [
+            'project_id' => $this->project->id,
+            'prompt' => 'Make a contract for web design',
         ]);
-
-        if ($response->status() === 404) {
-            $this->markTestSkipped('Route not found.');
-        }
 
         $response->assertStatus(400);
         $response->assertJsonStructure(['error']);

@@ -5,7 +5,8 @@ import {
     Filter, StickyNote as NoteIcon, AlertCircle, ChevronDown, RotateCcw, Search, Paperclip,
     ClipboardList, Download, Edit3, X, UploadCloud, CalendarDays, BarChart, Eye,
     ArrowLeft, ArrowRight, CalendarClock, Calendar as CalendarIcon, Tag,
-    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList, Sparkles, Clock, Folder
+    LayoutGrid, Rows3, Table2, ArrowUpDown, ArrowUp, ArrowDown, LayoutList, Sparkles, Clock, Folder,
+    Check, AlertTriangle
 } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -35,6 +36,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Checkbox } from '@/Components/ui/checkbox';
+import { Button } from '@/Components/ui/button';
 import CommentsPopover from '@/Pages/Client/Projects/Components/CommentsPopover';
 import BoardCategoryChip, { categoryPalette, type BoardCategoryLike } from './BoardCategoryChip';
 import BoardCategoryPicker, { type BoardCategory } from './BoardCategoryPicker';
@@ -86,6 +88,9 @@ export interface BoardCard {
     board_published_at?: string | null;
     project_id?: number;
     project_name?: string;
+    board_item_id?: number;
+    client_approval_status?: string;
+    client_feedback?: string | null;
 }
 
 interface ProjectBoardProps {
@@ -272,6 +277,59 @@ export default function ProjectBoard({
     });
     const [generatingReportDraft, setGeneratingReportDraft] = useState(false);
     const [viewingCard, setViewingCard] = useState<BoardCard | null>(null);
+    const [showApprovalRevisionForm, setShowApprovalRevisionForm] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
+    const [boardItemUpdating, setBoardItemUpdating] = useState(false);
+
+    const handleBoardItemApproval = async (boardItemId: number, status: 'approved' | 'revision_requested', feedback?: string) => {
+        setBoardItemUpdating(true);
+        try {
+            const response = await axios.post(route('client.projects.board.items.approval', { project: projectId, boardItem: boardItemId }), {
+                client_approval_status: status,
+                client_feedback: feedback || null,
+            });
+
+            if (response.data.ok) {
+                toast.success(
+                    status === 'approved'
+                        ? __('general.deliverable_approved') || 'Deliverable approved successfully!'
+                        : __('general.revision_requested') || 'Revision requested successfully!'
+                );
+                
+                setCards(prev => prev.map(card => {
+                    if (card.board_item_id === boardItemId) {
+                        return {
+                            ...card,
+                            client_approval_status: status,
+                            client_feedback: feedback || null,
+                        };
+                    }
+                    return card;
+                }));
+
+                if (viewingCard && viewingCard.board_item_id === boardItemId) {
+                    setViewingCard(prev => prev ? {
+                        ...prev,
+                        client_approval_status: status,
+                        client_feedback: feedback || null,
+                    } : null);
+                }
+
+                setShowApprovalRevisionForm(false);
+                setFeedbackText('');
+            }
+        } catch (error) {
+            toast.error(__('general.error') || 'Failed to update approval status.');
+        } finally {
+            setBoardItemUpdating(false);
+        }
+    };
+
+    useEffect(() => {
+        setShowApprovalRevisionForm(false);
+        setFeedbackText('');
+    }, [viewingCard]);
+
     const [uploading, setUploading] = useState(false);
     const [highlightedCardKey, setHighlightedCardKey] = useState<string | null>(null);
     const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1206,6 +1264,18 @@ export default function ProjectBoard({
                                                                     <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-indigo-700 ring-1 ring-indigo-200" title="Scheduled to publish">
                                                                         <Clock className="h-2.5 w-2.5 text-indigo-500" />
                                                                         {new Date(card.board_published_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                                    </span>
+                                                                )}
+                                                                {card.client_approval_status === 'approved' && (
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200">
+                                                                        <Check className="h-2.5 w-2.5 text-emerald-500" />
+                                                                        Approved
+                                                                    </span>
+                                                                )}
+                                                                {card.client_approval_status === 'revision_requested' && (
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-rose-700 ring-1 ring-rose-200">
+                                                                        <AlertTriangle className="h-2.5 w-2.5 text-rose-500" />
+                                                                        Revision
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -2410,6 +2480,85 @@ export default function ProjectBoard({
                                         <p className="text-sm text-slate-400 italic text-center py-8">
                                             {__('general.no_content') || 'No content available.'}
                                         </p>
+                                    )}
+                                    {/* Client Approval Sign-off */}
+                                    {viewingCard.board_item_id && (
+                                        <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50 space-y-3 mt-6">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                                                    Client Approval Sign-off
+                                                </h4>
+                                                <span className={cn(
+                                                    "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset",
+                                                    viewingCard.client_approval_status === 'approved'
+                                                        ? "bg-emerald-100 text-emerald-800 ring-emerald-200"
+                                                        : viewingCard.client_approval_status === 'revision_requested'
+                                                            ? "bg-rose-100 text-rose-800 ring-rose-200"
+                                                            : "bg-slate-200 text-slate-800 ring-slate-350"
+                                                )}>
+                                                    {viewingCard.client_approval_status || 'pending'}
+                                                </span>
+                                            </div>
+                                            
+                                            {viewingCard.client_feedback && (
+                                                <p className="text-xs text-slate-500 italic bg-white p-2.5 rounded-lg border border-slate-100">
+                                                    Feedback: "{viewingCard.client_feedback}"
+                                                </p>
+                                            )}
+
+                                            {!readOnly && (
+                                                <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:justify-end">
+                                                    {showApprovalRevisionForm ? (
+                                                        <div className="w-full space-y-2">
+                                                            <Textarea
+                                                                placeholder="Explain the required revisions..."
+                                                                className="text-xs"
+                                                                rows={3}
+                                                                value={feedbackText}
+                                                                onChange={(e) => setFeedbackText(e.target.value)}
+                                                            />
+                                                            <div className="flex gap-2 justify-end">
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="h-8 text-xs"
+                                                                    onClick={() => setShowApprovalRevisionForm(false)}
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    className="h-8 bg-slate-900 text-white text-xs"
+                                                                    disabled={!feedbackText.trim() || boardItemUpdating}
+                                                                    onClick={() => handleBoardItemApproval(viewingCard.board_item_id!, 'revision_requested', feedbackText)}
+                                                                >
+                                                                    Submit Revision Request
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex gap-2 justify-end w-full">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-8 text-xs border-rose-200 text-rose-600 hover:bg-rose-50"
+                                                                onClick={() => setShowApprovalRevisionForm(true)}
+                                                            >
+                                                                Request Revision
+                                                            </Button>
+                                                            <Button
+                                                                size="sm"
+                                                                className="h-8 bg-emerald-600 text-white text-xs hover:bg-emerald-700"
+                                                                disabled={boardItemUpdating}
+                                                                onClick={() => handleBoardItemApproval(viewingCard.board_item_id!, 'approved')}
+                                                            >
+                                                                Approve Deliverable
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                                 <DialogFooter className="gap-2 sm:gap-0 px-6 py-3 border-t border-slate-100 bg-slate-50/60 shrink-0">

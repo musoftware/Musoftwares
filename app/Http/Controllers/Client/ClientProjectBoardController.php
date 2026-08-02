@@ -1322,6 +1322,44 @@ class ClientProjectBoardController extends Controller
         }
     }
 
+    public function updateApproval(Request $request, Project $project, ProjectBoardItem $boardItem)
+    {
+        $this->authorizeProject($project);
+
+        abort_unless((int)$boardItem->project_id === (int)$project->id, 403, 'Unauthorized.');
+
+        $data = $request->validate([
+            'client_approval_status' => 'required|string|in:approved,revision_requested',
+            'client_feedback' => 'nullable|string|max:2000',
+        ]);
+
+        $boardItem->update([
+            'client_approval_status' => $data['client_approval_status'],
+            'client_feedback' => $data['client_feedback'] ?? null,
+        ]);
+
+        if ($data['client_approval_status'] === 'revision_requested' && !empty($data['client_feedback'])) {
+            $type = array_search($boardItem->itemable_type, ProjectBoardItem::MORPH_MAP, true);
+            if ($type !== false && $boardItem->itemable) {
+                $commentData = [
+                    'project_id' => $project->id,
+                    'author_id' => $request->user()?->id,
+                    'body' => "**Revision Requested:** " . $data['client_feedback'],
+                ];
+                if (!auth()->check()) {
+                    $commentData['guest_name'] = 'Client (Guest)';
+                }
+                $boardItem->itemable->comments()->create($commentData);
+            }
+        }
+
+        return response()->json([
+            'ok' => true,
+            'client_approval_status' => $boardItem->client_approval_status,
+            'client_feedback' => $boardItem->client_feedback,
+        ]);
+    }
+
     private function cairoToUtc(?string $datetime): ?string
     {
         return $datetime ? Carbon::parse($datetime, 'Africa/Cairo')->setTimezone('UTC')->toDateTimeString() : null;

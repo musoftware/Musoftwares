@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'approvals_center' => 'مركز الاعتمادات والموافقات',
+    'deliverable_approved' => 'تم اعتماد التسليم',
+    'due_invoices' => 'الفواتير المستحقة',
+    'project_status' => 'حالة المشروع',
+    'receive_amount' => 'استلام المبلغ',
+    'revision_requested' => 'تم طلب تعديل',
     'system_preferences' => 'تفضيلات النظام',
     'enable_3d_dashboard' => 'تفعيل لوحة التحكم ثلاثية الأبعاد المجسمة',
     'dashboard_layout_description' => 'التبديل بين لوحة التحكم ثلاثية الأبعاد التفاعلية وواجهة قائمة المشاريع البسيطة.',

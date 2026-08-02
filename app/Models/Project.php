@@ -43,6 +43,7 @@ class Project extends Model
         'total_paid' => 'decimal:3',
         'date_start' => 'datetime',
         'date_end' => 'datetime',
+        'ai_enabled' => 'boolean',
     ];
 
     private $oneTime = false;

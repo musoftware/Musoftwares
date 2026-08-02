@@ -61,7 +61,7 @@ You MUST return strictly valid JSON matching this exact structure without markdo
      */
     private function callLLM(string $prompt): ?array
     {
-        // Try Gemini First
+        // Try Gemini
         $geminiKeys = AdminSettings::GetValue('gemini_api_keys') ?: AdminSettings::GetValue('gemini_api_key') ?: config('services.gemini.key');
         if ($geminiKeys) {
             $keys = array_filter(array_map('trim', explode(',', $geminiKeys)));
@@ -71,13 +71,7 @@ You MUST return strictly valid JSON matching this exact structure without markdo
             }
         }
 
-        // Fallback to OpenAI
-        $openAiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-        if ($openAiKey) {
-            return $this->callOpenAI($prompt, $openAiKey);
-        }
-
-        Log::error('No LLM credentials found (Gemini or OpenAI) in settings or configuration.');
+        Log::error('No Gemini LLM credentials found in settings or configuration.');
         return null;
     }
 

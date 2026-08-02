@@ -352,6 +352,9 @@ class ProjectBoardService
             $extra['category_id'] = $placement->category_id ?? null;
             $extra['is_ai'] = $placement ? (bool)$placement->is_ai : false;
             $extra['is_important'] = $placement ? (bool)$placement->is_important : false;
+            $extra['client_approval_status'] = $placement ? $placement->client_approval_status : 'pending';
+            $extra['client_feedback'] = $placement ? $placement->client_feedback : null;
+            $extra['board_item_id'] = $placement ? $placement->id : null;
             $extra['published_at'] = $placement?->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null;
             $extra['board_published_at'] = $placement?->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null;
             $extra['category'] = $placement?->category ? [
@@ -475,6 +478,9 @@ class ProjectBoardService
                 'category_id' => $placement->category_id ?? null,
                 'is_ai' => (bool)$placement->is_ai,
                 'is_important' => (bool)$placement->is_important,
+                'client_approval_status' => $placement->client_approval_status,
+                'client_feedback' => $placement->client_feedback,
+                'board_item_id' => $placement->id,
                 'published_at' => $placement->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
                 'board_published_at' => $placement->published_at ? $placement->published_at->copy()->setTimezone('Africa/Cairo')->toIso8601String() : null,
                 'category' => $placement->category ? [

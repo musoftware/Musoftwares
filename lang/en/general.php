@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'approvals_center' => 'Approvals Center',
+    'deliverable_approved' => 'Deliverable Approved',
+    'due_invoices' => 'Due Invoices',
+    'project_status' => 'Project Status',
+    'receive_amount' => 'Receive Amount',
+    'revision_requested' => 'Revision Requested',
     'system_preferences' => 'System Preferences',
     'enable_3d_dashboard' => 'Enable 3D Holographic Dashboard',
     'dashboard_layout_description' => 'Switch between the 3D holographic dashboard with interactive animations and the clean projects portal layout.',

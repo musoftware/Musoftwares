@@ -42,12 +42,80 @@ class ClientProjectController extends Controller
 
         $team = $this->resolveTeam($project);
 
+        // Fetch pending/revision-requested deliverables from the board
+        $pendingApprovals = $project->boardItems()
+            ->whereIn('client_approval_status', ['pending', 'revision_requested'])
+            ->with('itemable')
+            ->get()
+            ->map(function ($item) {
+                $itemable = $item->itemable;
+                if (!$itemable) return null;
+                $type = array_search(get_class($itemable), \App\Models\ProjectBoardItem::MORPH_MAP, true);
+                if ($type === false) return null;
+                
+                $title = '';
+                if ($type === 'note') {
+                    $title = $itemable->title ?: ($itemable->content ? mb_strimwidth($itemable->content, 0, 80, '…') : 'Sticky Note');
+                } elseif ($type === 'task') {
+                    $title = $itemable->task_name;
+                } elseif ($type === 'report') {
+                    $title = $itemable->title;
+                } elseif ($type === 'todo') {
+                    $title = $itemable->title ?: 'Todo';
+                } elseif ($type === 'file') {
+                    $title = $itemable->original_name ?: 'File';
+                }
+                
+                return [
+                    'board_item_id' => $item->id,
+                    'type' => $type,
+                    'id' => $itemable->id,
+                    'title' => $title,
+                    'for_date' => $item->for_date,
+                    'client_approval_status' => $item->client_approval_status,
+                    'client_feedback' => $item->client_feedback,
+                ];
+            })->filter()->values();
+
+        // Support tickets
+        $supportTickets = \App\Models\Ticket::where('user_id', $request->user()->id)
+            ->latest()
+            ->limit(5)
+            ->get(['id', 'ticket_subject as subject', 'ticket_status as status', 'created_at']);
+
+        // Activity log
+        $activities = collect();
+        $comments = $project->comments()->with('author:id,name')->latest()->limit(10)->get();
+        foreach ($comments as $comment) {
+            $activities->push([
+                'type' => 'comment',
+                'user' => $comment->author?->name ?? $comment->guest_name ?? 'Client',
+                'description' => 'commented in discussions',
+                'detail' => mb_strimwidth(strip_tags($comment->body), 0, 80, '…'),
+                'time' => $comment->created_at?->toIso8601String(),
+            ]);
+        }
+        $files = $project->files()->latest()->limit(5)->get();
+        foreach ($files as $file) {
+            $activities->push([
+                'type' => 'file',
+                'user' => 'Team',
+                'description' => 'uploaded file: ' . $file->original_name,
+                'detail' => $file->humanSize(),
+                'time' => $file->created_at?->toIso8601String(),
+            ]);
+        }
+        $projectActivities = $activities->sortByDesc('time')->values()->take(8);
+
         return Inertia::render('Client/Projects/Show', [
             'project' => fn () => (new ClientProjectResource($project))->resolve(),
             'recentReports' => fn () => $recentReports,
             'team' => fn () => $team,
             'activeTab' => fn () => $tab,
             'tabContent' => fn () => $this->loadTabContent($project, $tab),
+            'pendingApprovals' => fn () => $pendingApprovals,
+            'supportTickets' => fn () => $supportTickets,
+            'projectActivity' => fn () => $projectActivities,
         ]);
     }
 
@@ -99,11 +167,54 @@ class ClientProjectController extends Controller
 
             case 'discussions':
                 $comments = $project->comments()
-                    ->with('user:id,name,avatar_url')
+                    ->with('author:id,name,avatar_url')
                     ->latest()
                     ->limit(50)
-                    ->get(['id', 'body', 'user_id', 'created_at']);
-                return ['discussions' => $comments];
+                    ->get()
+                    ->map(function ($c) {
+                        $morphMap = [
+                            \App\Models\ProjectBoardNote::class => 'note',
+                            \App\Models\Task::class => 'task',
+                            \App\Models\ProjectReport::class => 'report',
+                            \App\Models\Todo::class => 'todo',
+                            \App\Models\ProjectFile::class => 'file',
+                        ];
+                        $type = $morphMap[$c->commentable_type] ?? 'note';
+                        return [
+                            'id' => $c->id,
+                            'body' => $c->body,
+                            'author_id' => $c->author_id,
+                            'created_at' => $c->created_at,
+                            'parent_id' => $c->parent_id,
+                            'guest_name' => $c->guest_name,
+                            'commentable_id' => $c->commentable_id,
+                            'type' => $type,
+                            'author' => $c->author,
+                        ];
+                    });
+                
+                // Merge project-level comments (for main chat tab)
+                $projectComments = \App\Models\ProjectComment::where('project_id', $project->id)
+                    ->where('commentable_type', Project::class)
+                    ->with('author')
+                    ->latest()
+                    ->limit(50)
+                    ->get()
+                    ->map(fn ($c) => [
+                        'id' => $c->id,
+                        'body' => $c->body,
+                        'author_id' => $c->author_id,
+                        'created_at' => $c->created_at,
+                        'parent_id' => $c->parent_id,
+                        'guest_name' => $c->guest_name,
+                        'commentable_id' => $c->commentable_id,
+                        'type' => 'project',
+                        'author' => $c->author,
+                    ]);
+
+                $allDiscussions = $comments->concat($projectComments)->sortByDesc('created_at')->values();
+
+                return ['discussions' => $allDiscussions->toArray()];
 
             case 'files':
                 $files = $project->files()
@@ -124,5 +235,99 @@ class ClientProjectController extends Controller
         }
 
         return [];
+    }
+
+    public function create()
+    {
+        return Inertia::render('Client/Projects/Create');
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'project_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $project = Project::create([
+            'user_id' => $request->user()->id,
+            'project_name' => $data['project_name'],
+            'status' => 'open',
+            'archived' => false,
+            'percentage' => 0,
+            'budget' => 0,
+            'total_paid' => 0,
+            'date_start' => now(),
+            'ai_enabled' => false,
+        ]);
+
+        if (! empty($data['description'])) {
+            $project->comments()->create([
+                'project_id' => $project->id,
+                'author_id' => $request->user()->id,
+                'body' => $data['description'],
+                'commentable_type' => Project::class,
+                'commentable_id' => $project->id,
+            ]);
+        }
+
+        return redirect()->route('client.projects.show', $project->id);
+    }
+
+    public function activateAi(Request $request, Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $user = $request->user();
+        
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        if (!$egpCurrency) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'EGP currency configuration not found.',
+            ], 422);
+        }
+
+        $costInUserCurrency = \App\Models\CurrenciesExchange::RateToday(10.0, $egpCurrency->id, $user->currency_id);
+
+        if ((float) $user->user_balance < $costInUserCurrency) {
+            return response()->json([
+                'ok' => false,
+                'insufficient' => true,
+                'balance' => (float) $user->user_balance,
+                'required' => $costInUserCurrency,
+                'message' => 'Insufficient wallet balance. You need ' . number_format($costInUserCurrency, 2) . ' ' . $user->currency_name() . ' (10 EGP) to activate the AI.',
+            ], 422);
+        }
+
+        \DB::transaction(function () use ($user, $project, $costInUserCurrency) {
+            \App\Models\Transaction::create([
+                'user_id' => $user->id,
+                'amount' => -$costInUserCurrency,
+                'reason' => 'AI Project Manager Activation for project: ' . $project->project_name,
+                'category' => 'other',
+                'type' => 'out',
+                'project_id' => $project->id,
+                'currency_id' => $user->currency_id,
+            ]);
+
+            $project->update(['ai_enabled' => true]);
+
+            \App\Helpers\BalancesHelper::UpdateBalance($user, $project);
+        });
+
+        $project->comments()->create([
+            'project_id' => $project->id,
+            'author_id' => null,
+            'guest_name' => 'System',
+            'body' => '[System: AI Project Manager activated successfully!]',
+            'commentable_type' => Project::class,
+            'commentable_id' => $project->id,
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'AI Project Manager activated successfully!',
+        ]);
     }
 }

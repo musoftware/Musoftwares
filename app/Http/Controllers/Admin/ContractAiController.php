@@ -21,19 +21,20 @@ class ContractAiController extends Controller
         $project = Project::findOrFail($request->project_id);
 
         $user = Auth::user();
-        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
-
-        if ($defaultProvider === 'openai') {
-            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
-        } else {
-            $apiKey = AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
-            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
+        $defaultProvider = 'gemini';
+        $apiKeysString = AdminSettings::GetValue('gemini_api_keys') ?: AdminSettings::GetValue('gemini_api_key') ?: env('GEMINI_API_KEY') ?: config('services.gemini.key');
+        
+        $apiKey = null;
+        if ($apiKeysString) {
+            $keys = array_filter(array_map('trim', explode(',', $apiKeysString)));
+            $apiKey = $keys[0] ?? null;
         }
+        
+        $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
 
         if (empty($apiKey)) {
             return response()->json([
-                'error' => "Please set your {$defaultProvider} API key in admin settings.",
+                'error' => "Please set your Gemini API key in admin settings.",
             ], 400);
         }
 
@@ -117,21 +118,21 @@ class ContractAiController extends Controller
         ]);
 
         $user = Auth::user();
-        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
-
-        if ($defaultProvider === 'openai') {
-            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
-            $providerName = 'OpenAI';
-        } else {
-            $apiKey = AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
-            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
-            $providerName = 'Gemini';
+        $defaultProvider = 'gemini';
+        $apiKeysString = AdminSettings::GetValue('gemini_api_keys') ?: AdminSettings::GetValue('gemini_api_key') ?: env('GEMINI_API_KEY') ?: config('services.gemini.key');
+        
+        $apiKey = null;
+        if ($apiKeysString) {
+            $keys = array_filter(array_map('trim', explode(',', $apiKeysString)));
+            $apiKey = $keys[0] ?? null;
         }
+        
+        $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
+        $providerName = 'Gemini';
 
         if (empty($apiKey)) {
             return response()->json([
-                'error' => "Please set your {$providerName} API key in admin settings.",
+                'error' => "Please set your Gemini API key in admin settings.",
             ], 400);
         }
 

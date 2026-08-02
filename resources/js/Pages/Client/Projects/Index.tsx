@@ -42,12 +42,20 @@ export default function ProjectsIndex({ projects }: Props) {
         <AuthenticatedLayout>
             <Head title={__('general.my_projects')} />
             <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-                <div>
-                    <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-slate-900">
-                        <FolderKanban className="icon-md text-slate-400" aria-hidden="true" />
-                        {__('general.my_projects')}
-                    </h1>
-                    <p className="mt-1 text-sm text-slate-500">{__('general.projects_portal_intro')}</p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-slate-900">
+                            <FolderKanban className="icon-md text-slate-400" aria-hidden="true" />
+                            {__('general.my_projects')}
+                        </h1>
+                        <p className="mt-1 text-sm text-slate-500">{__('general.projects_portal_intro')}</p>
+                    </div>
+                    <Link
+                        href={route('client.projects.create-new')}
+                        className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-slate-800 shrink-0"
+                    >
+                        + {__('general.new_project') || 'New Project'}
+                    </Link>
                 </div>
 
                 {/* Tabs Navigation */}

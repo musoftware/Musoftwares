@@ -353,15 +353,9 @@ class SmsPaymentGatewayPaymentHubController extends Controller
      */
     protected function extractTransactionWithAI(string $message, string $sender, User $user): ?array
     {
-        $defaultProvider = $user->default_ai_model ?? 'gemini';
-
-        if ($defaultProvider === 'openai') {
-            $apiKey = $user->openai_api_key ?? null;
-            $model = $user->openai_model ?? 'gpt-4o-mini';
-        } else {
-            $apiKey = $user->gemini_api ?? null;
-            $model = $user->gemini_model ?? 'gemini-2.0-flash';
-        }
+        $defaultProvider = 'gemini';
+        $apiKey = $user->gemini_api ?? null;
+        $model = $user->gemini_model ?? 'gemini-2.0-flash';
 
         if (empty($apiKey)) {
             return null;

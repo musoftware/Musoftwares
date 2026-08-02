@@ -146,4 +146,23 @@ class ProjectApprovalTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_client_can_load_project_details_page_with_tickets()
+    {
+        $client = $this->makeClient();
+        $project = $this->makeProject($client);
+
+        // Create a ticket for the user
+        \App\Models\Ticket::create([
+            'user_id' => $client->id,
+            'ticket_subject' => 'Help with Logo',
+            'ticket_message' => 'Please assist with logo design details.',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+
+        $response = $this->actingAs($client)->get(route('client.projects.show', $project));
+
+        $response->assertSuccessful();
+    }
 }

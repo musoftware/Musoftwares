@@ -631,27 +631,16 @@ class ServiceLandingPageAIController extends Controller
     private function getCurrentModelAndKey(): array
     {
         $user = Auth::user();
-        $defaultProvider = $user->default_ai_model ?? 'gemini';
+        $defaultProvider = 'gemini';
 
-        if ($defaultProvider === 'openai') {
-            $apiKey = $user->openai_api_key ?? null;
-            if (empty($apiKey)) {
-                return [
-                    'error' => 'OpenAI API key is required. Please set it in your profile settings first.'
-                ];
-            }
-            $model = $user->openai_model ?? 'gpt-4o-mini';
-            return ['provider' => 'openai', 'model' => $model, 'api_key' => $apiKey];
-        } else {
-            $apiKey = $user->gemini_api ?? null;
-            if (empty($apiKey)) {
-                return [
-                    'error' => 'Gemini API key is required. Please set it in your profile settings first.'
-                ];
-            }
-            $model = $user->gemini_model ?? 'gemini-2.0-flash';
-            return ['provider' => 'gemini', 'model' => $model, 'api_key' => $apiKey];
+        $apiKey = $user->gemini_api ?? null;
+        if (empty($apiKey)) {
+            return [
+                'error' => 'Gemini API key is required. Please set it in your profile settings first.'
+            ];
         }
+        $model = $user->gemini_model ?? 'gemini-2.0-flash';
+        return ['provider' => 'gemini', 'model' => $model, 'api_key' => $apiKey];
     }
 
 

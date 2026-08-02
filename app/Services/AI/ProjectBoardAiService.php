@@ -22,17 +22,12 @@ class ProjectBoardAiService
      */
     public function generatePlanQuestions(Project $project, string $userPrompt): array
     {
-        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
-        if ($defaultProvider === 'openai') {
-            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
-        } else {
-            $apiKey = AdminSettings::GetValue('gemini_api_key', config('services.gemini.key'));
-            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
-        }
+        $defaultProvider = 'openai';
+        $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+        $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
 
         if (empty($apiKey)) {
-            throw new \Exception("AI integration is not configured. Please set your {$defaultProvider} API key in admin settings.");
+            throw new \Exception("AI integration is not configured. Please set your OpenAI API key in admin settings.");
         }
 
         $systemPrompt = "You are an expert project manager. The user wants to generate a project board timeline for: '{$userPrompt}' in the project '{$project->project_name}'.\n"
@@ -80,17 +75,12 @@ class ProjectBoardAiService
         array $answers = [] // User answers to clarify details
     ): array
     {
-        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
-        if ($defaultProvider === 'openai') {
-            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
-        } else {
-            $apiKey = AdminSettings::GetValue('gemini_api_key', config('services.gemini.key'));
-            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
-        }
+        $defaultProvider = 'openai';
+        $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+        $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
 
         if (empty($apiKey)) {
-            throw new \Exception("AI integration is not configured. Please set your {$defaultProvider} API key in admin settings.");
+            throw new \Exception("AI integration is not configured. Please set your OpenAI API key in admin settings.");
         }
 
         // Build a human-readable list of allowed types for the AI prompt.
@@ -314,17 +304,12 @@ class ProjectBoardAiService
      */
     public function adjustFutureItems(Project $project, string $commentBody, int $commentedItemId, string $commentedItemType, int $userId): void
     {
-        $defaultProvider = AdminSettings::GetValue('default_ai_model', 'openai');
-        if ($defaultProvider === 'openai') {
-            $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
-            $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
-        } else {
-            $apiKey = AdminSettings::GetValue('gemini_api_key', config('services.gemini.key'));
-            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
-        }
+        $defaultProvider = 'openai';
+        $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
+        $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
 
         if (empty($apiKey)) {
-            throw new \Exception("AI integration is not configured. Please set your {$defaultProvider} API key.");
+            throw new \Exception("AI integration is not configured. Please set your OpenAI API key.");
         }
 
         $commentedBoardItem = ProjectBoardItem::where('project_id', $project->id)
