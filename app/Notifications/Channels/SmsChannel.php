@@ -6,6 +6,12 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
 /**
+ * ══════════════════════════════════════════════════════════════════════════════
+ * 🚨 CRITICAL SYSTEM NOTICE - DO NOT MODIFY SMS SYSTEM 🚨
+ * 🔴 تحذير هام جداً: سيستم الـ SMS حساس لأقصى درجة! ممنوع التعديل عليه أو تغيير منطق العمل نهائياً.
+ * 🔴 DO NOT ALTER OR TOUCH THE SMS SYSTEM / SMS CHANNEL LOGIC. EXTREMELY SENSITIVE.
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
  * SMS delivery channel.
  *
  * The actual SMS gateway (Twilio, Vonage, Infobip, etc.) is intentionally

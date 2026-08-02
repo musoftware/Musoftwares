@@ -202,72 +202,17 @@ class AdminSecurityHardeningTest extends TestCase
         \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\SendCampaignBroadcastJob::class);
     }
 
-    // ── serial device HMAC ─────────────────────────────────────────────────
+    // ── serial device check-in (public, no auth required) ───────────────────
 
-    public function test_serial_device_rejects_unsigned_request(): void
+    public function test_serial_device_allows_unauthenticated_checkin(): void
     {
-        config(['services.serial_device.api_secret' => 'topsecret']);
-
         $response = $this->postJson('/api/serial/device', [
             'program_name' => 'DemoSoft',
             'device_id' => 'dev-001',
         ]);
 
-        $response->assertStatus(401);
-        $this->assertSame('missing_signature', $response->json('error'));
-    }
-
-    public function test_serial_device_rejects_bad_signature(): void
-    {
-        config(['services.serial_device.api_secret' => 'topsecret']);
-
-        $response = $this->withHeaders([
-            'X-Musoftwares-Signature' => 'sha256='.str_repeat('0', 64),
-        ])->postJson('/api/serial/device', [
-            'program_name' => 'DemoSoft',
-            'device_id' => 'dev-001',
-        ]);
-
-        $response->assertStatus(401);
-        $this->assertSame('invalid_signature', $response->json('error'));
-    }
-
-    public function test_serial_device_accepts_valid_signature_and_auto_registers(): void
-    {
-        config(['services.serial_device.api_secret' => 'topsecret']);
-
-        $body = json_encode([
-            'program_name' => 'NewSoft',
-            'device_id' => 'dev-001',
-            'machine_name' => 'workstation',
-        ]);
-
-        $sig = 'sha256='.hash_hmac('sha256', $body, 'topsecret');
-
-        $response = $this->call(
-            'POST',
-            '/api/serial/device',
-            [], [], [],
-            ['CONTENT_TYPE' => 'application/json', 'HTTP_X_MUSOFTWARES_SIGNATURE' => $sig, 'HTTP_ACCEPT' => 'application/json'],
-            $body
-        );
-
         $response->assertOk();
         $response->assertJson(['status' => 'active']);
-    }
-
-    public function test_serial_device_fails_closed_when_secret_unset(): void
-    {
-        config(['services.serial_device.api_secret' => null]);
-
-        $response = $this->withHeaders([
-            'X-Musoftwares-Signature' => 'sha256=anything',
-        ])->postJson('/api/serial/device', [
-            'program_name' => 'DemoSoft',
-            'device_id' => 'dev-001',
-        ]);
-
-        $response->assertStatus(401);
     }
 
     // ── set password controller single-use ─────────────────────────────────

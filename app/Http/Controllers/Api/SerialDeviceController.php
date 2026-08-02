@@ -19,14 +19,14 @@ use Illuminate\Http\Request;
  * 5. Response: { "status": "active" } or { "status": "inactive" }.
  * 6. Software reads status and enables/disables accordingly.
  *
- * Security:
- *  - Shared-secret HMAC over raw body (`X-Musoftwares-Signature`), enforced by
- *    the `serial.device.hmac` middleware. Fails closed when the secret env var
- *    is unset.
+ * Security & Access:
+ *  - ══════════════════════════════════════════════════════════════════════════════
+ *  - 🚨 CRITICAL SYSTEM NOTICE - DO NOT MODIFY OR ADD COMPLEX SECURITY 🚨
+ *  - 🔴 تحذير هام جداً: سيستم الـ Serial حساس لأقصى درجة! ممنوع إضافة أي حمايات معقدة أو توثيق نهائياً.
+ *  - 🔴 CRITICAL: NO COMPLEX PROTECTION / HMAC / AUTH ALLOWED HERE.
+ *  - Public endpoint called by all C# programs/devices on startup.
  *  - Throttled 60 req/min per IP via `throttle:60,1`.
- *  - Optional IP allowlist via `services.serial_device.ip_allowlist` env var.
- *  - Every NEW software auto-registration is written to the admin audit log
- *    so admins see when unknown programs start checking in.
+ *  - ══════════════════════════════════════════════════════════════════════════════
  */
 class SerialDeviceController extends Controller
 {

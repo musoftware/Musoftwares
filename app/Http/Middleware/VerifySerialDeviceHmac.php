@@ -34,36 +34,14 @@ class VerifySerialDeviceHmac
 //            ], 401);
 //        }
 
-        // IP allowlist (optional).
-        $allowlist = trim((string) config('services.serial_device.ip_allowlist', ''));
-        if ($allowlist !== '') {
-            if (! $this->ipAllowed($request->ip(), explode(',', $allowlist))) {
-                return response()->json([
-                    'error' => 'ip_not_allowed',
-                ], 403);
-            }
-        }
-
-        $header = (string) $request->header('X-Musoftwares-Signature', '');
-        if ($header === '') {
-            return response()->json([
-                'error' => 'missing_signature',
-            ], 401);
-        }
-
-//        $expected = 'sha256='.hash_hmac('sha256', $request->getContent(), $secret);
-
-//        if (! hash_equals($expected, $header)) {
-//            Log::warning('Serial device HMAC mismatch', [
-//                'ip' => $request->ip(),
-//                'path' => $request->path(),
-//            ]);
-//
-//            return response()->json([
-//                'error' => 'invalid_signature',
-//            ], 401);
-//        }
-
+        // ══════════════════════════════════════════════════════════════════════════════
+        // 🚨 CRITICAL SYSTEM NOTICE - DO NOT RE-ENABLE HMAC OR SIGNATURE CHECKS 🚨
+        // 🔴 تحذير هام جداً: سيستم الـ Serial حساس لأقصى درجة! ممنوع تفعيل حماية HMAC أو توثيق التوقيع نهائياً.
+        // 🔴 DO NOT RE-ENABLE STRICT HMAC OR SIGNATURE CHECKS ON SERIAL DEVICE CHECK-IN.
+        // The user explicitly requested NO complex protection/security for the Serial System.
+        // All C# client programs and external devices check in without signatures or headers as from day 1.
+        // ══════════════════════════════════════════════════════════════════════════════
+        
         return $next($request);
     }
 

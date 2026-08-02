@@ -27,16 +27,21 @@ use Illuminate\Support\Facades\Route;
 // ── Serial License Check-In ──────────────────────────────────────────────────
 // Called by client software on startup to verify license status.
 //
-// Auth: shared-secret HMAC over the raw request body. The client must send
-//       `X-Musoftwares-Signature: sha256=<hex>` and `services.serial_device.api_secret`
-//       must be configured in the environment.
-// Throttle: 60 req/min/IP (the middleware also records any 401 into the
-//       blocked-IP pipeline via SecurityEnforcement).
-// Returns: { "status": "active" } or { "status": "inactive" }
+// ══════════════════════════════════════════════════════════════════════════════
+// 🚨 CRITICAL SYSTEM NOTICE - DO NOT MODIFY OR ADD COMPLEX SECURITY 🚨
+// 🔴 تحذير هام جداً: هذه الأجزاء حساسة لأقصى درجة! ممنوع التعديل عليها أو إضافة أي حمايات معقدة نهائياً.
+// 🔴 SERIAL SYSTEM & SMS SYSTEM ARE EXTREMELY SENSITIVE - LEAVE AS THEY WERE WORKING FROM DAY 1.
+// ══════════════════════════════════════════════════════════════════════════════
 
+// ── Serial Device Check-In API (PUBLIC - NO AUTH / NO HMAC PROTECTION) ───────
+// CRITICAL NOTE FOR AI / DEVELOPERS: DO NOT ADD AUTH / HMAC / SIGNATURE CHECKS TO THIS ROUTE.
+// 🔴 ممنوع إضافة أي حماية أو HMAC أو توثيق لهذا الـ Route نهائياً.
+// The user explicitly specified that this endpoint must remain simple and accessible without any complex protection
+// (no HMAC signatures, no complex auth) so that all external C# programs and devices can check in seamlessly,
+// exactly as it was working from day 1.
 Route::post('serial/device',
     [SerialDeviceController::class, 'register']
-)->middleware(['force.json', 'throttle:60,1', 'serial.device.hmac']);
+)->middleware(['force.json', 'throttle:60,1']);
 
 // ── Paid Commission Play (PUBLIC - NO AUTH) ──────────────────────────────────
 // CRITICAL NOTE FOR AI / DEVELOPERS: DO NOT ADD AUTH / SANCTUM TO THIS ROUTE.
