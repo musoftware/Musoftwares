@@ -44,7 +44,8 @@ class PriceCalculatorService extends BaseService
         try {
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-            $response = Http::timeout(45)
+            $response = Http::withoutVerifying()
+                ->timeout(45)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                 ])

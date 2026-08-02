@@ -27,11 +27,6 @@ class PointPurchaseTest extends TestCase
         $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
 
-        $this->user->user_balance = 100.00;
-        $this->user->save();
-
-        // Seed EGP to USD exchange rate (1 EGP = 0.02 USD)
-        // Also need to create Currency model for EGP and attach to user if user_balance expects it.
         $egpCurrency = Currency::firstOrCreate(
             ['currency' => 'EGP'],
             ['symbol' => 'e£', 'string_format' => 'e£%01.2f']
@@ -40,8 +35,11 @@ class PointPurchaseTest extends TestCase
             ['currency' => 'USD'],
             ['symbol' => '$', 'string_format' => '$%01.2f']
         );
+
         $this->user->currency_id = $usdCurrency->id;
         $this->user->save();
+
+        $this->user->add_balance(100.00, 'Initial Deposit', 'received', $usdCurrency->id);
 
         CurrenciesExchange::updateOrCreate([
             'currency1' => $egpCurrency->id,

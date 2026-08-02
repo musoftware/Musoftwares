@@ -174,7 +174,7 @@ class ClientProjectAgentService
     private function callAi(string $provider, string $apiKey, string $model, string $systemPrompt, string $userPrompt): string
     {
         if ($provider === 'openai') {
-            $response = Http::withToken($apiKey)->post('https://api.openai.com/v1/chat/completions', [
+            $response = Http::withoutVerifying()->withToken($apiKey)->post('https://api.openai.com/v1/chat/completions', [
                 'model' => $model,
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
@@ -190,7 +190,7 @@ class ClientProjectAgentService
             return $response->json('choices.0.message.content') ?? '';
         } else {
             // Gemini API call
-            $response = Http::post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
+            $response = Http::withoutVerifying()->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
                 'contents' => [
                     [
                         'parts' => [

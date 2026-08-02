@@ -82,8 +82,11 @@ if ($clientUser) {
     echo "Ensured client user balance is 1000 EGP via seed transaction.\n";
     // Clean up test-run leftovers so the project list stays small
     \App\Models\Project::where('user_id', $clientUser->id)
-        ->where('project_name', 'Playwright E2E AI Project')
-        ->delete();
+        ->where(function ($q) {
+            $q->where('project_name', 'Playwright E2E AI Project')
+              ->orWhere('project_name', 'Playwright E2E AI Workspace Project')
+              ->orWhere('project_name', 'like', 'Gemini Test%');
+        })->forceDelete();
     echo "Cleaned up duplicate Playwright test projects.\n";
 
     $project = \App\Models\Project::updateOrCreate(

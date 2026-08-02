@@ -151,11 +151,21 @@ export default function ProjectShow({
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-            if (res.data.ok && res.data.comment) {
-                setChatFeed((prev) => [...prev, res.data.comment]);
+            if (res.data.ok) {
+                if (res.data.discussions) {
+                    setChatFeed(res.data.discussions);
+                } else if (res.data.comment) {
+                    setChatFeed((prev) => [...prev, res.data.comment]);
+                }
+
                 setMessageText('');
                 setSelectedFile(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
+
+                // Display Token Deduction Toast Notification
+                if (res.data.billed_amount && parseFloat(res.data.billed_amount) > 0) {
+                    toast.info(`خصم ${res.data.billed_amount} ${res.data.currency_symbol} (تكلفة الـ AI الحقيقية)`);
+                }
 
                 // Reload to fetch updated AI summary/questions/actions in background
                 router.reload({ only: ['aiSummary', 'aiQuestions', 'aiActionsLog', 'project'] });
@@ -164,6 +174,18 @@ export default function ProjectShow({
             toast.error(__('general.error') || 'Failed to send message.');
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleApproveBudget = async () => {
+        try {
+            const res = await axios.post(route('client.projects.ai.approve-budget', { project: project.id }));
+            if (res.data.ok) {
+                toast.success(res.data.message || 'تم اعتماد الميزانية وخطة العمل بنجاح!');
+                router.reload();
+            }
+        } catch (err) {
+            toast.error('فشل في اعتماد الميزانية.');
         }
     };
 
@@ -195,7 +217,7 @@ export default function ProjectShow({
                     extraText: match[2] || '',
                 };
             }
-        } catch (e) {}
+        } catch (e) { /* empty */ }
         return null;
     };
 
@@ -493,6 +515,35 @@ export default function ProjectShow({
                                 )}
                             </CardContent>
                         </Card>
+
+                        {/* Budget Valuation & Execution Approval Card */}
+                        {parseFloat(project.budget) > 0 && (
+                            <Card className="rounded-2xl border-emerald-200 bg-emerald-50/40 shadow-sm">
+                                <CardHeader className="px-5 py-4 border-b border-emerald-100">
+                                    <CardTitle className="text-xs font-extrabold text-emerald-950 flex items-center justify-between">
+                                        <span className="flex items-center gap-1.5">
+                                            <Sparkles className="h-4 w-4 text-emerald-600" />
+                                            AI Valuation & Budget
+                                        </span>
+                                        <span className="text-sm font-black text-emerald-700">
+                                            {project.budget} {project.currency?.symbol || 'EGP'}
+                                        </span>
+                                    </CardTitle>
+                                    <CardDescription className="text-[10px] text-emerald-700">
+                                        Estimated based on market standards. Approve to start developer task execution.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-4">
+                                    <Button
+                                        onClick={handleApproveBudget}
+                                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl shadow-sm transition-all"
+                                    >
+                                        <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                                        Approve Budget & Start Project
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        )}
 
                         {/* 2. AI Questions Card (Only shown if unanswered questions exist) */}
                         {aiQuestions.length > 0 && (

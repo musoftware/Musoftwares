@@ -173,7 +173,9 @@ class MarketplaceWorkflowTest extends TestCase
 
         // 4. Seller delivers the service order
         $response = $this->actingAs($this->seller)
-            ->post(route('marketplace.orders.deliver', $order->id));
+            ->post(route('marketplace.orders.deliver', $order->id), [
+                'note' => 'Here is your completed deliverable.',
+            ]);
 
         $response->assertStatus(302);
         $this->assertEquals(ServiceOrderStatus::DELIVERED->value, is_object($order->fresh()->status) ? $order->fresh()->status->value : $order->fresh()->status);

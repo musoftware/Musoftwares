@@ -209,7 +209,7 @@ class ClientProjectViewsTest extends TestCase
 
         $response->assertRedirect(route('client.projects.show', $project->id));
         
-        $comment = $project->comments()->where('commentable_type', Project::class)->first();
+        $comment = $project->comments()->where('commentable_type', Project::class)->where('author_id', $client->id)->first();
         $this->assertNotNull($comment);
         $this->assertEquals('First message of project scope', $comment->body);
     }

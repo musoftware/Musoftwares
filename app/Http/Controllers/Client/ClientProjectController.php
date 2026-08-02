@@ -231,29 +231,63 @@ class ClientProjectController extends Controller
             $comment->update(['body' => '[File:' . json_encode($fileData) . ']' . ($data['body'] ? "\n" . $data['body'] : '')]);
         }
 
-        // Process AI tools synchronously for immediate feedback
+        // Process AI tools & Orchestrator
+        $aiResult = ['billed_amount' => '0.00', 'currency_symbol' => 'EGP'];
         if ($project->ai_enabled) {
-            AiProcessMessageJob::dispatchSync($project->id, $body, $request->user()->id);
+            $orchestrator = new \App\Services\AI\AiProjectOrchestratorService(new \App\Services\AI\AiToolRegistry());
+            $aiResult = $orchestrator->processClientMessage($project, $body, $request->user()->id);
         }
 
-        // Return the new comment for optimistic UI update
-        $comment->refresh();
-        $user = $request->user();
+        // Re-load all discussions so both client message & AI reply are returned
+        $discussions = $this->loadDiscussions($project);
+
+        return response()->json([
+            'ok'              => true,
+            'billed_amount'   => $aiResult['billed_amount'] ?? '0.00',
+            'currency_symbol' => $aiResult['currency_symbol'] ?? 'EGP',
+            'discussions'     => $discussions,
+        ]);
+    }
+
+    /**
+     * Approve AI Valuation and start project execution (generates tasks for developer).
+     */
+    public function approveBudget(Request $request, Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $project->update([
+            'status' => 'open',
+        ]);
+
+        // Generate Developer Tasks & Execution Plan
+        $todoTool = (new \App\Services\AI\AiToolRegistry())->getTool('create_todos');
+        if ($todoTool) {
+            $features = $project->ai_summary['features'] ?? ['Core Platform Requirements'];
+            $todos = [];
+            foreach ($features as $feat) {
+                $todos[] = [
+                    'title'       => 'تنفيذ: ' . mb_strimwidth($feat, 0, 50, '…'),
+                    'description' => 'مهمة معتمدة من العميل بعد فتح اعتماد المشروع',
+                    'priority'    => 'high',
+                ];
+            }
+            $todoTool->execute($project, ['todos' => $todos]);
+        }
+
+        // Post confirmation system message
+        ProjectComment::create([
+            'project_id'       => $project->id,
+            'author_id'        => null,
+            'guest_name'       => 'AI Agency Manager',
+            'body'             => '[System: تم اعتماد ميزانية وخطة عمل المشروع بنجاح! تم إنشاء خطة المهام للمبرمج وبدء مرحلة التنفيذ الفعلي.]',
+            'commentable_type' => Project::class,
+            'commentable_id'   => $project->id,
+        ]);
 
         return response()->json([
             'ok'      => true,
-            'comment' => [
-                'id'             => $comment->id,
-                'body'           => $comment->body,
-                'author_id'      => $comment->author_id,
-                'guest_name'     => $comment->guest_name,
-                'created_at'     => $comment->created_at,
-                'parent_id'      => $comment->parent_id,
-                'commentable_id' => $comment->commentable_id,
-                'type'           => 'project',
-                'author'         => ['id' => $user->id, 'name' => $user->name],
-                'file'           => $fileData,
-            ],
+            'message' => 'تم اعتماد الميزانية وبدء تنفيذ المشروع بنجاح!',
         ]);
     }
 

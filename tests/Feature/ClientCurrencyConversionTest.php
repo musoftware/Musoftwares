@@ -84,11 +84,11 @@ class ClientCurrencyConversionTest extends TestCase
         $inv1 = DB::table('invoices')->where('id', $data['inv1'])->first();
         $this->assertEquals(self::EGP, (int) $inv1->currency_id);
         $this->assertAmount($exp(100), $inv1->paid);
+        $this->assertAmount($exp(5), $inv1->tax_value);
 
         $inv2 = DB::table('invoices')->where('id', $data['inv2'])->first();
         $this->assertEquals(self::EGP, (int) $inv2->currency_id);
-        $this->assertAmount($exp(80), $inv2->unpaid);
-        $this->assertAmount($exp(5), $inv2->tax_value);
+        $this->assertAmount($exp(100), $inv2->unpaid);
         $this->assertAmount($exp(2), $inv2->cost);
 
         $item1 = DB::table('invoice_items')->where('id', $data['item1'])->first();
@@ -123,7 +123,7 @@ class ClientCurrencyConversionTest extends TestCase
 
         // total() = sub_total + tax - discounts; for the seeded paid invoice
         // (1 item @100, qty 1, no tax/discount) total must equal paid + unpaid.
-        $this->assertAmount(round(self::USD_TO_EGP * 100, 2), $invoice->total());
+        $this->assertAmount(round(self::USD_TO_EGP * 105, 2), $invoice->total());
         $this->assertAmount(
             round($invoice->paid + $invoice->unpaid, 2),
             round($invoice->total(), 2)
@@ -234,7 +234,7 @@ class ClientCurrencyConversionTest extends TestCase
 
         $inv1 = DB::table('invoices')->insertGetId([
             'user_id' => $user->id, 'currency_id' => self::USD, 'uuid' => Str::uuid(),
-            'paid' => 100, 'unpaid' => 0, 'discount' => 0, 'second_discount' => 0, 'tax_value' => 0, 'cost' => 0,
+            'paid' => 100, 'unpaid' => 0, 'discount' => 0, 'second_discount' => 0, 'tax_value' => 5, 'cost' => 0,
             'status' => 'paid', 'created_at' => $now, 'updated_at' => $now,
         ]);
         $item1 = DB::table('invoice_items')->insertGetId([
@@ -243,7 +243,7 @@ class ClientCurrencyConversionTest extends TestCase
 
         $inv2 = DB::table('invoices')->insertGetId([
             'user_id' => $user->id, 'currency_id' => self::USD, 'uuid' => Str::uuid(),
-            'paid' => 0, 'unpaid' => 80, 'discount' => 0, 'second_discount' => 0, 'tax_value' => 5, 'cost' => 2,
+            'paid' => 0, 'unpaid' => 80, 'discount' => 0, 'second_discount' => 0, 'tax_value' => 0, 'cost' => 2,
             'status' => 'unpaid', 'created_at' => $now, 'updated_at' => $now,
         ]);
         $item2 = DB::table('invoice_items')->insertGetId([

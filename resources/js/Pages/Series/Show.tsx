@@ -44,6 +44,7 @@ export default function Show({ playlist, videos }: ShowProps) {
             setNoteText(activeVideo.notes || '');
             setSaveStatus('idle');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeIdx]);
 
     const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
