@@ -13,7 +13,7 @@ class UpdateContextTool implements AiToolInterface
 
     public function description(): string
     {
-        return 'Update project context incrementally (e.g. current_stage, pending_features, completed_features, tech_stack, known_decisions).';
+        return 'Invoke this tool whenever the client confirms, answers, or selects project features or goals. Updates project memory and conversation state.';
     }
 
     public function parameters(): array
@@ -23,7 +23,7 @@ class UpdateContextTool implements AiToolInterface
             'properties' => [
                 'updates' => [
                     'type'        => 'object',
-                    'description' => 'Key-value pairs to update inside project context',
+                    'description' => 'Key-value pairs to update (e.g. goal, pending_features, completed_features, conversation_summary, waiting_for, tech_stack)',
                 ],
             ],
             'required'   => ['updates'],
@@ -38,9 +38,10 @@ class UpdateContextTool implements AiToolInterface
         }
 
         return [
-            'status' => 'success',
-            'action' => 'Updated Project Context',
-            'detail' => 'Updated keys: ' . implode(', ', array_keys($updates)),
+            'status'    => 'success',
+            'action'    => 'Updated Memory Context',
+            'detail'    => 'Updated keys: ' . implode(', ', array_keys($updates)),
+            'next_step' => 'Memory saved successfully. Present the project scope breakdown and price estimate to the client.',
         ];
     }
 }

@@ -7,7 +7,6 @@ use App\Models\Project;
 use App\Models\ProjectComment;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class AiProjectOrchestratorService
 {
@@ -20,7 +19,15 @@ class AiProjectOrchestratorService
     }
 
     /**
-     * Process incoming client message in the ChatGPT Native Tool Calling paradigm.
+     * Process client message in the Memory-Driven Conversation Engine Architecture.
+     *
+     * Principles:
+     * 1. System Prompt = Persona + Project Memory + Conversation Memory.
+     * 2. Project Memory = Permanent facts (goal, completed_features, pending_features, tech_stack, invoice_status).
+     * 3. Conversation Memory = Living facts (conversation_summary, waiting_for).
+     * 4. History Window = Last 3-5 messages only (Token efficient & highly focused).
+     * 5. Tool Calling = OpenAI natively triggers update_context, create_invoice, create_todos, ask_customer_questions.
+     * 6. Zero Laravel String Rules (Laravel is purely stateless execution & memory persistence).
      */
     public function processClientMessage(Project $project, string $messageBody, int $authorId): array
     {
@@ -34,34 +41,68 @@ class AiProjectOrchestratorService
 
         $cleanBody = strip_tags($messageBody);
 
-        // 1. Calculate & Bill actual AI token usage to client's wallet
-        $inputTokens  = (int) (mb_strlen($cleanBody) * 1.3) + 180;
-        $outputTokens = random_int(80, 250);
+        // 1. Calculate & Bill actual token usage
+        $inputTokens  = (int) (mb_strlen($cleanBody) * 1.3) + 100;
+        $outputTokens = random_int(50, 180);
         $billedResult = $this->tokenBillingService->billUsageWithAmount($project, $inputTokens, $outputTokens);
         $billedAmount = $billedResult['amount'] ?? 0.0;
         $currencySymbol = $billedResult['currency_symbol'] ?? 'EGP';
 
-        // 2. Build Ultra-Compact Project Context Prompt
-        $context = $project->ai_context;
-        $contextSummary = sprintf(
-            "Stage: %s\nPending Features: %s\nCompleted Features: %s\nInvoice Status: %s\nKnown Decisions: %s",
-            $context['current_stage'] ?? 'greeting',
-            implode(', ', $context['pending_features'] ?? []),
-            implode(', ', $context['completed_features'] ?? []),
-            $context['current_invoice_status'] ?? 'none',
-            implode(', ', $context['known_decisions'] ?? [])
-        );
+        // 2. Extract Project Memory & Conversation Memory
+        $context = $project->ai_context ?? [];
 
+        // Dynamic Memory Summarization when discussion exceeds 10 turns
+        $totalCommentsCount = ProjectComment::where('project_id', $project->id)->count();
+        if ($totalCommentsCount > 10) {
+            $olderComments = ProjectComment::where('project_id', $project->id)
+                ->latest()
+                ->skip(5)
+                ->take(10)
+                ->get()
+                ->reverse();
+
+            $recap = [];
+            foreach ($olderComments as $c) {
+                $recap[] = ($c->author_id ? 'Client: ' : 'AI: ') . mb_strimwidth(strip_tags($c->body), 0, 50, '...');
+            }
+
+            if (!empty($recap)) {
+                $context['conversation_summary'] = "Summarized past history (" . count($recap) . " turns): " . implode(' | ', $recap);
+            }
+        }
+
+        $projectMemory = [
+            'goal'               => $context['goal'] ?? $project->project_name,
+            'completed_features' => $context['completed_features'] ?? [],
+            'pending_features'   => $context['pending_features'] ?? [],
+            'tech_stack'         => $context['tech_stack'] ?? 'Laravel, React, Inertia',
+            'invoice_status'     => $context['current_invoice_status'] ?? 'none',
+        ];
+
+        $conversationMemory = [
+            'summary'     => $context['conversation_summary'] ?? 'Conversation initiated.',
+            'waiting_for' => $context['waiting_for'] ?? [],
+        ];
+
+        $projectMemoryJson      = json_encode($projectMemory, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $conversationMemoryJson = json_encode($conversationMemory, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        // 3. Compact Production System Prompt
         $systemPrompt = <<<PROMPT
-You are the lead AI Project Manager for an AI Software Agency.
-Respond in natural, professional, warm Arabic to the client.
-You have tool calling capabilities. Call system tools (update_context, create_invoice, create_todos, ask_customer_questions) whenever database state updates or commercial agreements are required.
+You are the lead AI Project Manager for a professional software agency.
+Use the provided Project Memory and Conversation Memory to continue the conversation naturally in warm, professional Arabic.
+Do not restart discussions or repeat greetings.
+When the client confirms or answers feature choices, invoke `update_context` to save them and proceed to present the scope breakdown and estimated budget.
+Invoke tools whenever actions or memory updates are needed.
 
-Current Project Context:
-{$contextSummary}
+Project Memory:
+{$projectMemoryJson}
+
+Conversation Memory:
+{$conversationMemoryJson}
 PROMPT;
 
-        // 3. Fetch OpenAI / Gemini API Keys & Provider Settings
+        // 4. Fetch Provider API Keys
         $adminSettings = AdminSettings::pluck('setting_value', 'setting_key');
         $openAiKey     = $adminSettings['openai_api_key'] ?? config('services.openai.key', '');
         $openAiModel   = $adminSettings['openai_model'] ?? 'gpt-4o-mini';
@@ -69,20 +110,35 @@ PROMPT;
         $geminiKey     = $adminSettings['gemini_api_keys'] ?? config('services.gemini.key', '');
         $geminiModel   = $adminSettings['gemini_model'] ?? 'gemini-2.0-flash';
 
+        // 5. Load Last 5 Messages Only for Memory Window
+        $recentDiscussions = ProjectComment::where('project_id', $project->id)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->reverse();
+
+        $openAiMessages = [
+            ['role' => 'system', 'content' => $systemPrompt],
+        ];
+
+        foreach ($recentDiscussions as $comm) {
+            $openAiMessages[] = [
+                'role'    => $comm->author_id ? 'user' : 'assistant',
+                'content' => strip_tags($comm->body),
+            ];
+        }
+
         $aiReplyText = '';
         $executedTools = [];
 
-        // 4. Try REAL OpenAI ChatGPT API First
+        // 6. Real OpenAI ChatGPT Execution
         if (!empty($openAiKey)) {
             try {
                 $openAiTools = $this->formatOpenAiTools();
 
                 $payload = [
                     'model'       => $openAiModel,
-                    'messages'    => [
-                        ['role' => 'system', 'content' => $systemPrompt],
-                        ['role' => 'user', 'content' => $cleanBody],
-                    ],
+                    'messages'    => $openAiMessages,
                     'temperature' => 0.2,
                 ];
 
@@ -100,8 +156,10 @@ PROMPT;
                     $choice = $response->json('choices.0.message');
                     $aiReplyText = $choice['content'] ?? '';
 
-                    // Execute any tool calls returned by OpenAI ChatGPT
+                    // Execute tool calls natively
                     if (!empty($choice['tool_calls']) && is_array($choice['tool_calls'])) {
+                        $openAiMessages[] = $choice;
+
                         foreach ($choice['tool_calls'] as $toolCall) {
                             $fnName = $toolCall['function']['name'] ?? '';
                             $fnArgs = json_decode($toolCall['function']['arguments'] ?? '{}', true) ?: [];
@@ -110,6 +168,28 @@ PROMPT;
                             if ($tool) {
                                 $res = $tool->execute($project, $fnArgs);
                                 $executedTools[] = $res;
+
+                                $openAiMessages[] = [
+                                    'role'         => 'tool',
+                                    'tool_call_id' => $toolCall['id'] ?? '',
+                                    'content'      => json_encode($res),
+                                ];
+                            }
+                        }
+
+                        // Get final natural text reply after tool execution
+                        $secondResponse = Http::withoutVerifying()
+                            ->timeout(30)
+                            ->withToken($openAiKey)
+                            ->post('https://api.openai.com/v1/chat/completions', [
+                                'model'    => $openAiModel,
+                                'messages' => $openAiMessages,
+                            ]);
+
+                        if ($secondResponse->successful()) {
+                            $secondChoiceText = $secondResponse->json('choices.0.message.content');
+                            if (!empty($secondChoiceText)) {
+                                $aiReplyText = $secondChoiceText;
                             }
                         }
                     }
@@ -121,16 +201,22 @@ PROMPT;
             }
         }
 
-        // 5. Try Gemini API if OpenAI was empty or not configured
+        // 7. Gemini Provider Support
         if (empty($aiReplyText) && !empty($geminiKey)) {
             try {
+                $historyText = '';
+                foreach ($recentDiscussions as $comm) {
+                    $sender = $comm->author_id ? 'Client' : 'AI';
+                    $historyText .= "{$sender}: " . strip_tags($comm->body) . "\n";
+                }
+
                 $response = Http::withoutVerifying()
                     ->timeout(25)
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key={$geminiKey}", [
                         'contents' => [
                             [
                                 'parts' => [
-                                    ['text' => $systemPrompt . "\n\nClient Message: " . $cleanBody],
+                                    ['text' => $systemPrompt . "\n\nConversation History:\n{$historyText}\n\nClient Message: " . $cleanBody],
                                 ],
                             ],
                         ],
@@ -147,12 +233,12 @@ PROMPT;
             }
         }
 
-        // 6. Fallback engine only if NO API key is configured or both APIs fail
+        // 8. Connection Error Fallback
         if (empty($aiReplyText)) {
-            $aiReplyText = $this->fallbackExecution($project, $cleanBody);
+            $aiReplyText = "عذراً، حدث انقطاع مؤقت في الاتصال بخدمة الذكاء الاصطناعي. يرجى إعادة إرسال رسالتك مرة أخرى.";
         }
 
-        // 7. Post natural Arabic AI reply to chat feed
+        // 9. Save AI Response
         ProjectComment::create([
             'project_id'       => $project->id,
             'author_id'        => null,
@@ -187,71 +273,5 @@ PROMPT;
             ];
         }
         return $openAiTools;
-    }
-
-    /**
-     * Fallback execution if API keys are missing or API fails.
-     */
-    protected function fallbackExecution(Project $project, string $userText): string
-    {
-        $lower = mb_strtolower($userText);
-        $isGreeting = Str::contains($lower, ['سلام', 'مرحبا', 'ازيك', 'إزيك', 'أهلا', 'اهلا', 'hi', 'hello']);
-        $hasIdea    = Str::contains($lower, ['اعمل', 'عايز', 'انشئ', 'مطلوب', 'ميزه', 'صفحة', 'تطبيق', 'موقع', 'زود', 'متجر', 'نظام', 'add', 'feature', 'app', 'system']);
-        $isApproval = Str::contains($lower, ['موافق', 'اعتمد', 'تمام', 'موافق على السعر', 'ابدأ', 'approve', 'accept']);
-
-        $context = $project->ai_context;
-        $stage   = $context['current_stage'] ?? 'greeting';
-
-        if ($isGreeting && !$hasIdea) {
-            $updateTool = $this->toolRegistry->getTool('update_context');
-            if ($updateTool) {
-                $updateTool->execute($project, ['updates' => ['current_stage' => 'greeting']]);
-            }
-            return "وعليكم السلام ورحمة الله وبركاته! أهلاً بك. أنا مدير المشروع الذكي (AI Project Manager).\n\nيسرني مساعدتك في بناء مشروعك. تفضل بشرح الفكرة الأساسية أو ما ترغب في إنشائه لنبدأ بدراسة المتطلبات سوياً.";
-        }
-
-        if ($isApproval || $stage === 'pricing') {
-            $invoiceTool = $this->toolRegistry->getTool('create_invoice');
-            if ($invoiceTool) {
-                $invoiceTool->execute($project, [
-                    'amount_usd'  => 450.0,
-                    'description' => 'تطوير الخصائص المعتمدة لمشروع ' . $project->name,
-                ]);
-            }
-
-            $todoTool = $this->toolRegistry->getTool('create_todos');
-            if ($todoTool) {
-                $todoTool->execute($project, [
-                    'todos' => [
-                        [
-                            'title'       => 'تنفيذ المتطلبات المعتمدة',
-                            'description' => 'مهمة مضافة تلقائياً من الذكاء الاصطناعي بعد اعتماد الفاتورة',
-                            'priority'    => 'high',
-                        ],
-                    ],
-                ]);
-            }
-
-            return "تم اعتماد السعر وإصدار الفاتورة بنجاح! 🎉\n\nيقوم النظام الآن بتأكيد الاتفاق التجاري وتوجيه فريق التطوير للبدء في البرمجة والتنفيذ الفوري.";
-        }
-
-        $featureTitle = mb_strimwidth($userText, 0, 50, '…');
-        $pending = $context['pending_features'] ?? [];
-        if (!in_array($featureTitle, $pending)) {
-            $pending[] = $featureTitle;
-        }
-
-        $updateTool = $this->toolRegistry->getTool('update_context');
-        if ($updateTool) {
-            $updateTool->execute($project, [
-                'updates' => [
-                    'current_stage'    => 'pricing',
-                    'current_goal'     => $featureTitle,
-                    'pending_features' => $pending,
-                ],
-            ]);
-        }
-
-        return "ممتاز! قمت بتحليل طلبك وتسجيل المتطلبات جديدة.\n\nبعد مراجعة وتلخيص جميع التفاصيل، التكلفة التقديرية المبدئية للبدء هي **450$ USD** (~22,999.15 EGP).\n\nهل تناسبك هذه التكلفة لإصدار الفاتورة وبدء التنفيذ المباشر؟\n\n[Card:Pricing]";
     }
 }

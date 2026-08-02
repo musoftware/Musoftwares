@@ -365,7 +365,11 @@ class SubscriptionModuleTest extends TestCase
 
     public function test_manage_page_shows_active_subscriptions_with_price()
     {
-        $user = User::factory()->create(['currency_id' => 1]);
+        $egpCurrency = Currency::firstOrCreate(
+            ['currency' => 'EGP'],
+            ['symbol' => 'e£', 'string_format' => 'e£%01.2f']
+        );
+        $user = User::factory()->create(['currency_id' => $egpCurrency->id]);
 
         UserSubscription::create([
             'user_id' => $user->id,

@@ -59,13 +59,16 @@ class CreateTodosTool implements AiToolInterface
             ]);
 
             Todo::create([
-                'project_id'  => $project->id,
-                'user_id'     => $project->user_id,
-                'task_id'     => $task->id,
-                'title'       => $item['title'],
-                'description' => $item['description'] ?? null,
-                'priority'    => $item['priority'] ?? 'medium',
-                'completed'   => false,
+                'project_id'    => $project->id,
+                'user_id'       => $project->user_id,
+                'task_id'       => $task->id,
+                'title'         => $item['title'],
+                'description'   => $item['description'] ?? null,
+                'priority'      => $item['priority'] ?? 'medium',
+                'priorityColor' => 'indigo',
+                'tags'          => '[]',
+                'inDate'        => date('Y-m-d'),
+                'completed'     => false,
             ]);
 
             $createdTitles[] = $item['title'];

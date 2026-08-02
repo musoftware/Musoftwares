@@ -73,10 +73,13 @@ class AiAgencyLaravelExecutor
                 ]);
 
                 Todo::create([
-                    'user_id'    => $project->user_id,
-                    'project_id' => $project->id,
-                    'title'      => $title,
-                    'completed'  => false,
+                    'user_id'       => $project->user_id,
+                    'project_id'    => $project->id,
+                    'title'         => $title,
+                    'priorityColor' => 'indigo',
+                    'tags'          => '[]',
+                    'inDate'        => date('Y-m-d'),
+                    'completed'     => false,
                 ]);
 
                 // Append item to project board continuous timeline
