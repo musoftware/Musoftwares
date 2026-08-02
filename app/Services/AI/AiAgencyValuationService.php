@@ -17,21 +17,50 @@ class AiAgencyValuationService
         $benchmarks = EgyptianMarketBenchmarkRates::getBenchmarks();
 
         // 1. Detect project archetype
-        $text = mb_strtolower($project->project_name . ' ' . implode(' ', $features));
-        $typeKey = 'corporate_website';
+        // Detection order matters: check SIMPLE types first to avoid a "Todo App" being
+        // misclassified as a mobile_application just because the word "app" appears.
+        $typeKey = 'corporate_website'; // default fallback
 
-        if (str_contains($text, 'متجر') || str_contains($text, 'e-commerce') || str_contains($text, 'store') || str_contains($text, 'بيع')) {
+        // 1. Simple CRUD / Todo / Task apps (check before generic 'app' keyword)
+        if (
+            str_contains($text, 'todo') || str_contains($text, 'to-do') ||
+            str_contains($text, 'قائمة مهام') || str_contains($text, 'مهام بسيطة') ||
+            str_contains($text, 'crud') || str_contains($text, 'بسيط') ||
+            (str_contains($text, 'تطبيق') && (str_contains($text, 'بسيط') || str_contains($text, 'صغير') || str_contains($text, 'تدريبي')))
+        ) {
+            $typeKey = 'todo_simple_crud';
+        }
+        // 2. E-commerce
+        elseif (str_contains($text, 'متجر') || str_contains($text, 'e-commerce') || str_contains($text, 'store') || str_contains($text, 'بيع')) {
             $typeKey = 'ecommerce_store';
-        } elseif (str_contains($text, 'تطبيق') || str_contains($text, 'mobile') || str_contains($text, 'app') || str_contains($text, 'اندرويد')) {
+        }
+        // 3. Mobile Apps (native iOS/Android — must explicitly mention mobile/android/ios)
+        elseif (
+            str_contains($text, 'mobile app') || str_contains($text, 'تطبيق موبايل') ||
+            str_contains($text, 'android') || str_contains($text, 'ios') || str_contains($text, 'اندرويد') ||
+            (str_contains($text, 'تطبيق') && (str_contains($text, 'ايفون') || str_contains($text, 'جوال')))
+        ) {
             $typeKey = 'mobile_application';
-        } elseif (str_contains($text, 'crm') || str_contains($text, 'عملاء')) {
+        }
+        // 4. CRM
+        elseif (str_contains($text, 'crm') || str_contains($text, 'إدارة عملاء') || str_contains($text, 'علاقات عملاء')) {
             $typeKey = 'crm_system';
-        } elseif (str_contains($text, 'erp') || str_contains($text, 'حسابات') || str_contains($text, 'مخازن')) {
+        }
+        // 5. ERP
+        elseif (str_contains($text, 'erp') || str_contains($text, 'حسابات') || str_contains($text, 'مخازن') || str_contains($text, 'موارد بشرية')) {
             $typeKey = 'erp_system';
-        } elseif (str_contains($text, 'هبوط') || str_contains($text, 'landing')) {
+        }
+        // 6. Landing page
+        elseif (str_contains($text, 'هبوط') || str_contains($text, 'landing')) {
             $typeKey = 'landing_page';
-        } elseif (str_contains($text, 'داشبورد') || str_contains($text, 'dashboard')) {
+        }
+        // 7. Admin dashboard
+        elseif (str_contains($text, 'داشبورد') || str_contains($text, 'dashboard') || str_contains($text, 'لوحة تحكم')) {
             $typeKey = 'admin_dashboard';
+        }
+        // 8. General web app / MVP (has word "app" or "تطبيق ويب" but not simple)
+        elseif (str_contains($text, 'web app') || str_contains($text, 'تطبيق ويب') || str_contains($text, 'mvp')) {
+            $typeKey = 'mvp_web_app';
         }
 
         $benchmark = $benchmarks[$typeKey] ?? $benchmarks['corporate_website'];
