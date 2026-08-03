@@ -47,7 +47,7 @@ class CreateFeatureRequirementsTool implements AiToolInterface
         ];
 
         $existing = $summary['features'] ?? [];
-        $merged = array_unique(array_merge($existing, $newFeatures));
+        $merged = array_unique(array_merge($existing, $newFeatures), SORT_REGULAR);
         $summary['features'] = array_values($merged);
 
         $project->update(['ai_summary' => $summary]);

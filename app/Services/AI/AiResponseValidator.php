@@ -56,12 +56,16 @@ class AiResponseValidator
     }
 
     /**
-     * Apply default structural keys to ensure no undefined index errors.
+     * Apply default structural keys to ensure single-brain decisions are always well-formed.
      */
     public function applySchemaDefaults(array $data): array
     {
         $defaults = [
-            'reasoning' => $data['reasoning'] ?? 'تحليل الرسالة وتحديد الخطوة التالية بناءً على سياق المشروع.',
+            'reasoning'            => $data['reasoning'] ?? 'تحليل الرسالة وتحديد نوع وقواعد المشروع.',
+            'project_type'         => $data['project_type'] ?? ($data['context_updates']['current_archetype'] ?? 'corporate_website'),
+            'archetype_confidence' => (float) ($data['archetype_confidence'] ?? 0.90),
+            'conflict_detected'    => (bool) ($data['conflict_detected'] ?? false),
+            'reconciliation_reason'=> $data['reconciliation_reason'] ?? '',
             'intent'    => [
                 'primary'           => $data['intent']['primary'] ?? 'inquiry',
                 'confidence'        => (float) ($data['intent']['confidence'] ?? 0.85),
@@ -75,19 +79,29 @@ class AiResponseValidator
                 'questions_needed_count' => (int) ($data['requirements_analysis']['questions_needed_count'] ?? 1),
                 'stop_asking_questions'  => (bool) ($data['requirements_analysis']['stop_asking_questions'] ?? false),
             ],
-            'reply'               => $data['reply'] ?? 'أهلاً بك! يرجى توضيح تفاصيل مشروعك لنبدأ بدراسة المتطلبات.',
-            'next_best_action'    => $data['next_best_action'] ?? 'استيضاح بقية المتطلبات الفنية من العميل.',
-            'action_proposals'    => [
+            'request_classification' => $data['request_classification'] ?? 'DISCOVERY',
+            'support_check'          => $data['support_check'] ?? 'N_A',
+            'scope_check'            => $data['scope_check'] ?? 'N_A',
+            'reply'                  => $data['reply'] ?? 'أهلاً بك! يرجى توضيح تفاصيل مشروعك لنبدأ بدراسة المتطلبات.',
+            'next_best_action'       => $data['next_best_action'] ?? 'استيضاح بقية المتطلبات الفنية من العميل.',
+            'action_proposals'       => [
                 'invoice' => [
-                    'propose'                       => (bool) ($data['action_proposals']['invoice']['propose'] ?? false),
+                    'propose'                      => (bool) ($data['action_proposals']['invoice']['propose'] ?? false),
                     'requires_client_confirmation' => true,
-                    'amount_usd'                    => (float) ($data['action_proposals']['invoice']['amount_usd'] ?? 0.0),
-                    'description'                   => $data['action_proposals']['invoice']['description'] ?? '',
+                    'amount_usd'                   => (float) ($data['action_proposals']['invoice']['amount_usd'] ?? 0.0),
+                    'description'                  => $data['action_proposals']['invoice']['description'] ?? '',
                 ],
                 'tasks'            => $data['action_proposals']['tasks'] ?? [],
                 'stage_transition' => $data['action_proposals']['stage_transition'] ?? null,
             ],
             'need_more_questions' => $data['need_more_questions'] ?? [],
+            'admin_work'          => [
+                'summary'              => $data['admin_work']['summary'] ?? null,
+                'developer_tasks'      => $data['admin_work']['developer_tasks'] ?? [],
+                'admin_todos'          => $data['admin_work']['admin_todos'] ?? [],
+                'developer_notes'      => $data['admin_work']['developer_notes'] ?? null,
+                'suggested_priorities' => $data['admin_work']['suggested_priorities'] ?? [],
+            ],
             'context_updates'     => $data['context_updates'] ?? [],
         ];
 

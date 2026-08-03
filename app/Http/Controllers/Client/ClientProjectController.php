@@ -297,6 +297,69 @@ class ClientProjectController extends Controller
     }
 
     /**
+     * Explicit Client Confirmation for Invoice Proposal & Task Generation.
+     */
+    public function confirmInvoice(Request $request, Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $context = $project->ai_context ?? [];
+        $features = $context['pending_features'] ?? [];
+
+        $pricingEngine = new \App\Services\AI\ScopePricingEngine();
+        $valuation     = $pricingEngine->calculateValuation($project, $features);
+
+        $executor = new \App\Services\AI\AiAgencyLaravelExecutor();
+        
+        // 1. Create Invoice safely
+        $invoice = $executor->executeApprovedInvoice(
+            $project,
+            (float) ($valuation['recommended_usd'] ?? 450.0),
+            'تطوير المتطلبات المعتمدة للمشروع: ' . $project->project_name,
+            $request->user()->id
+        );
+
+        // 2. Generate Developer Tasks
+        $tasksToCreate = [];
+        foreach ($features as $f) {
+            $tasksToCreate[] = [
+                'title'       => 'تنفيذ: ' . mb_strimwidth($f, 0, 50, '…'),
+                'description' => 'مهمة مضافة تلقائياً بعد اعتماد العميل للفاتورة وتأكيد الاتفاق.',
+                'priority'    => 'high',
+            ];
+        }
+        if (empty($tasksToCreate)) {
+            $tasksToCreate[] = [
+                'title'       => 'تنفيذ المتطلبات المعتمدة للمشروع',
+                'description' => 'مهمة مضافة تلقائياً بعد إذن إصدار الفاتورة.',
+                'priority'    => 'high',
+            ];
+        }
+        $executor->executeApprovedTasks($project, $tasksToCreate);
+
+        // 3. Post system comment confirming invoice creation
+        $currencyCode = $invoice->currency?->currency ?? 'EGP';
+        ProjectComment::create([
+            'project_id'       => $project->id,
+            'author_id'        => null,
+            'guest_name'       => 'AI Project Manager',
+            'body'             => "🎉 **تم إذن إصدار الفاتورة بنجاح!**\n\nتم إصدار الفاتورة رقم `#{$invoice->id}` بقيمة **{$invoice->total} {$currencyCode}**، وتم توليد مهام التطوير التنفيذية ونقل المشروع إلى مرحلة التنفيذ المباشر.",
+            'commentable_type' => Project::class,
+            'commentable_id'   => $project->id,
+        ]);
+
+        $discussions = $this->loadDiscussions($project);
+
+        return response()->json([
+            'ok'          => true,
+            'message'     => 'تم إصدار الفاتورة وتوليد المهام بنجاح!',
+            'invoice_id'  => $invoice->id,
+            'discussions' => $discussions,
+        ]);
+    }
+
+
+    /**
      * Dismiss (mark as answered) an AI question.
      */
     public function dismissAiQuestion(Request $request, Project $project, string $questionId)

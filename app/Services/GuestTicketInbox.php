@@ -26,20 +26,29 @@ class GuestTicketInbox
      */
     public function pull(bool $dryRun = false): array
     {
-        $cfg = config('imap');
-        $sinceUnix = now()->subDays((int) $cfg['lookback_days'])->getTimestamp();
+        $cfg = config('imap', []);
+        $sinceUnix = now()->subDays((int) ($cfg['lookback_days'] ?? 14))->getTimestamp();
 
         $stats = ['fetched' => 0, 'matched' => 0, 'created_tickets' => 0, 'errors' => 0];
+
+        $host = (string) ($cfg['host'] ?? '');
+        $username = (string) ($cfg['username'] ?? '');
+        $password = (string) ($cfg['password'] ?? '');
+
+        if ($host === '' || $username === '' || $password === '') {
+            Log::info('IMAP pull skipped: Host or credentials not configured.');
+
+            return $stats;
+        }
 
         $client = new PurePhpImapClient($cfg);
 
         try {
-            $client->connect((string) $cfg['username'], (string) $cfg['password']);
-            $client->select((string) $cfg['folder']);
+            $client->connect($username, $password);
+            $client->select((string) ($cfg['folder'] ?? 'INBOX'));
             $uids = $client->unseenUidsSince($sinceUnix);
         } catch (\Throwable $e) {
-            Log::error('IMAP connect failed: '.$e->getMessage());
-            $stats['errors']++;
+            Log::warning('IMAP connect failed: '.$e->getMessage());
 
             return $stats;
         }

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     ArrowLeft, Sparkles, Send, Paperclip, X, Download, FileText,
-    BrainCircuit, CheckCircle2, HelpCircle, Check, CreditCard, MessageCircle
+    BrainCircuit, CheckCircle2, HelpCircle, Check, CreditCard, MessageCircle, Bug
 } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -111,7 +111,8 @@ export default function ProjectShow({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
-    // AI Activation State
+    // AI Debug & Activation State
+    const [debugModalOpen, setDebugModalOpen] = useState(false);
     const [activationLoading, setActivationLoading] = useState(false);
     const [topupModalOpen, setTopupModalOpen] = useState(false);
     const [requiredAmount, setRequiredAmount] = useState(0);
@@ -222,6 +223,22 @@ export default function ProjectShow({
         }
     };
 
+    const handleConfirmInvoice = async () => {
+        setSubmitting(true);
+        try {
+            const res = await axios.post(route('client.projects.ai.confirm-invoice', { project: project.id }));
+            if (res.data.ok) {
+                toast.success(res.data.message || 'تم إذن إصدار الفاتورة وتأكيد الاتفاق بنجاح!');
+                router.reload();
+            }
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || 'حدث خطأ أثناء إصدار الفاتورة');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+
     const renderMarkdown = (text: string) => {
         try {
             const html = marked.parse(text);
@@ -308,6 +325,14 @@ export default function ProjectShow({
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setDebugModalOpen(true)}
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-700 hover:bg-amber-500/20 border border-amber-300/40 transition shadow-2xs"
+                                    title="كشف الـ Context البرمجي الحالي والتشخيص (Debug Panel)"
+                                >
+                                    <Bug className="h-3.5 w-3.5 text-amber-600" />
+                                    <span>AI Debug / كشف Context</span>
+                                </button>
                                 <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-extrabold text-indigo-700 border border-indigo-100">
                                     Stage: {aiStage.toUpperCase()}
                                 </span>
@@ -348,7 +373,7 @@ export default function ProjectShow({
                                     const initials = authorName.slice(0, 1).toUpperCase();
 
                                     const hasPricingCard = displayText.includes('[Card:Pricing]');
-                                    const cleanTextWithoutCard = displayText.replace('[Card:Pricing]', '').trim();
+                                    const cleanTextWithoutCard = displayText.replace('[Card:Pricing]', '').replace('[Card:ConfirmInvoice]', '').trim();
 
                                     return (
                                         <div
@@ -636,6 +661,81 @@ export default function ProjectShow({
                         >
                             شحن المحفظة الآن
                         </Link>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* AI Context Debug Modal for Admin */}
+            <Dialog open={debugModalOpen} onOpenChange={setDebugModalOpen}>
+                <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto bg-slate-950 text-slate-100 border border-slate-800 rounded-2xl p-6">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-amber-400 text-base font-black">
+                            <Bug className="h-5 w-5 text-amber-400" />
+                            تشخيص محركات الذكاء الاصطناعي (AI Context Debug Panel)
+                        </DialogTitle>
+                        <DialogDescription className="text-xs text-slate-400">
+                            عرض المحتوى الحقيقي المخزن في ai_context للتحقق من خلوه من التناقضات ومتابعة التفكير الحقيقي للنظام.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-2">
+                        {/* Quick Status Cards */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
+                                <span className="text-[10px] text-slate-400 block">Current Stage</span>
+                                <span className="text-xs font-black text-emerald-400">{aiStage.toUpperCase()}</span>
+                            </div>
+                            <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
+                                <span className="text-[10px] text-slate-400 block">Archetype</span>
+                                <span className="text-xs font-black text-cyan-400">{(aiContext as any)?.current_archetype || 'N/A'}</span>
+                            </div>
+                            <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
+                                <span className="text-[10px] text-slate-400 block">Conflict Status</span>
+                                <span className={`text-xs font-black ${(aiContext as any)?.conflict_detected ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`}>
+                                    {(aiContext as any)?.conflict_detected ? '⚠️ Conflict Reconciled' : 'Clean'}
+                                </span>
+                            </div>
+                            <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
+                                <span className="text-[10px] text-slate-400 block">Clean Last Feature</span>
+                                <span className="text-xs font-black text-indigo-300 truncate block">{(aiContext as any)?.last_user_message_clean || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        {/* Conflict Reason Alert if any */}
+                        {(aiContext as any)?.reconciliation_reason && (
+                            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300 font-medium">
+                                💡 <strong>سبب إعادة التوفيق والضبط:</strong> {(aiContext as any).reconciliation_reason}
+                            </div>
+                        )}
+
+                        {/* Raw JSON viewer */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-xs font-bold text-slate-300">محتوى ai_context الخام (JSON):</span>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(JSON.stringify(aiContext, null, 2));
+                                        toast.success('تم نسخ JSON للـ Context بنجاح!');
+                                    }}
+                                    className="text-[11px] text-indigo-400 hover:underline font-bold"
+                                >
+                                    نسخ JSON 📋
+                                </button>
+                            </div>
+                            <pre className="rounded-xl bg-slate-900 p-4 text-[11px] font-mono text-emerald-400 overflow-x-auto max-h-[350px] border border-slate-800 dir-ltr">
+                                {JSON.stringify(aiContext, null, 2)}
+                            </pre>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDebugModalOpen(false)}
+                            className="bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-800"
+                        >
+                            إغلاق نافذة Debug
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

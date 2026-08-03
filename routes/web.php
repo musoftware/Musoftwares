@@ -231,9 +231,10 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::get('/projects/{project}/calendar', [ClientProjectCalendarController::class, 'calendarIndex'])->name('calendar.index');
     Route::get('/projects/{project}/calendar/{date}', [ClientProjectCalendarController::class, 'calendarDate'])->name('calendar.date');
 
-    // AI Workspace — message send (text + optional file) + AI question dismiss & budget approval
+    // AI Workspace — message send (text + optional file) + AI question dismiss & budget approval & invoice confirmation
     Route::post('/projects/{project}/messages', [ClientProjectController::class, 'storeMessage'])->name('messages.store');
     Route::post('/projects/{project}/ai/approve-budget', [ClientProjectController::class, 'approveBudget'])->name('ai.approve-budget');
+    Route::post('/projects/{project}/ai/confirm-invoice', [ClientProjectController::class, 'confirmInvoice'])->name('ai.confirm-invoice');
     Route::patch('/projects/{project}/ai-questions/{questionId}/dismiss', [ClientProjectController::class, 'dismissAiQuestion'])->name('ai-questions.dismiss');
 });
 

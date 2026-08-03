@@ -78,7 +78,7 @@ class ContextReconciler
 
         // Update context fields
         $context['current_archetype']      = $newArchetype;
-        $context['pending_features']       = array_values(array_unique($pendingFeatures));
+        $context['pending_features']       = array_values(array_unique($pendingFeatures, SORT_REGULAR));
         $context['conflict_detected']      = $conflictDetected;
         $context['reconciliation_reason']  = $reconciliationReason;
         $context['last_user_message_clean'] = $cleanedTitle;

@@ -24,8 +24,13 @@ class RequirementsAnalyzer
     {
         $context          = $project->ai_context ?? [];
         $pendingFeatures  = $context['pending_features'] ?? [];
-        $completedFeatures= $context['completed_features'] ?? [];
-        $allFeatures      = array_unique(array_merge($pendingFeatures, $completedFeatures));
+        $rawFeatures = array_merge($pendingFeatures, $completedFeatures);
+        $allFeatures = array_values(array_unique(array_map(function ($f) {
+            if (is_array($f)) {
+                return $f['title'] ?? $f['name'] ?? json_encode($f, JSON_UNESCAPED_UNICODE);
+            }
+            return (string) $f;
+        }, $rawFeatures), SORT_REGULAR));
 
         $fullText = mb_strtolower($userText . ' ' . implode(' ', $allFeatures) . ' ' . ($project->project_name ?? '') . ' ' . ($project->description ?? ''));
 

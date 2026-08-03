@@ -10,21 +10,18 @@ use App\Models\User;
 class ScopePricingEngine
 {
     /**
-     * Calculate comprehensive scope-based valuation for a project.
+     * Calculate scope-based valuation for a project using AI's determined archetype & features.
+     * Pure Pricing Calculator Tool — Zero decision split.
      */
-    public function calculateValuation(Project $project, array $features = [], ?string $customText = null): array
+    public function calculateValuation(Project $project, array $features = [], ?string $overrideArchetype = null): array
     {
         $benchmarks = EgyptianMarketBenchmarkRates::getBenchmarks();
 
-        $textToAnalyze = mb_strtolower(
-            ($customText ?? '') . ' ' .
-            ($project->project_name ?? '') . ' ' .
-            ($project->description ?? '') . ' ' .
-            implode(' ', $features)
-        );
+        // Use AI's decided archetype if provided, otherwise detect cleanly from text
+        $typeKey = !empty($overrideArchetype) && isset($benchmarks[$overrideArchetype])
+            ? $overrideArchetype
+            : $this->detectArchetype(implode(' ', $features) . ' ' . ($project->project_name ?? ''));
 
-        // Detect archetype
-        $typeKey = $this->detectArchetype($textToAnalyze);
         $benchmark = $benchmarks[$typeKey] ?? $benchmarks['corporate_website'];
 
         $baseUsd = (float) $benchmark['base_usd'];
@@ -39,7 +36,7 @@ class ScopePricingEngine
         $recommendedUsd = round($baseUsd * $complexityMultiplier, 2);
         $finalMinUsd    = round($minUsd * $complexityMultiplier, 2);
         $finalMaxUsd    = round($maxUsd * $complexityMultiplier, 2);
-        $calculatedDays = ceil($estDays * $complexityMultiplier);
+        $calculatedDays = (int) ceil($estDays * $complexityMultiplier);
 
         // Convert USD to Client's Currency (EGP or user currency)
         $clientUser       = !empty($project->user_id) ? User::find($project->user_id) : null;
@@ -80,8 +77,10 @@ class ScopePricingEngine
     /**
      * Detect project archetype cleanly from text.
      */
-    protected function detectArchetype(string $text): string
+    public function detectArchetype(string $text): string
     {
+        $text = mb_strtolower($text);
+
         if (
             str_contains($text, 'todo') || str_contains($text, 'to-do') ||
             str_contains($text, 'قائمة مهام') || str_contains($text, 'مهام بسيطة') ||

@@ -154,7 +154,8 @@ class PurePhpImapClient
     {
         $r = $response ?? $this->readUntilTagged();
         if (! preg_match('/^'.$this->tag.' OK/i', $r)) {
-            throw new RuntimeException('IMAP command failed: '.trim($r));
+            $cleanResp = trim((string) $r);
+            throw new RuntimeException('IMAP command failed: '.($cleanResp !== '' ? $cleanResp : 'No response from server'));
         }
     }
 

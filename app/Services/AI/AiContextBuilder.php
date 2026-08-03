@@ -104,7 +104,12 @@ class AiContextBuilder
             $parts[] = $stageFile;
         }
 
-        // Layer 3: Memory — only fields relevant to the current stage
+        // Layer 3: Full Project Snapshot (Summary, Scope, Contracts, Payments, Support, Tasks & Company Policies)
+        $snapshot = $this->buildProjectSnapshot($project);
+        $snapshotJson = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $parts[] = "## Full Project Snapshot\n```json\n{$snapshotJson}\n```";
+
+        // Layer 4: Compact Memory Block
         $memoryBlock = $this->buildMemoryBlock($project, $stage);
         if (!empty($memoryBlock)) {
             $parts[] = $memoryBlock;
@@ -208,5 +213,100 @@ class AiContextBuilder
         }
 
         return trim(file_get_contents($fullPath));
+    }
+
+    /**
+     * Build full Project Snapshot as required by the AI Project Manager workflow.
+     */
+    public function buildProjectSnapshot(Project $project): array
+    {
+        $context = $project->ai_context ?? [];
+        $summary = $project->ai_summary ?? [];
+
+        // Contract status
+        $contract = null;
+        try {
+            $contract = $project->contracts()->latest()->first();
+        } catch (\Throwable $e) {
+            $contract = null;
+        }
+
+        $contractStatus = $contract ? [
+            'status'       => $contract->status ?? 'draft',
+            'signed_at'    => $contract->signed_at ?? null,
+            'title'        => $contract->title ?? 'Main Contract',
+            'has_contract' => true,
+        ] : [
+            'status'       => 'none',
+            'has_contract' => false,
+        ];
+
+        // Financial & 50% Payment status
+        $budget     = (float) ($project->budget ?? 0.0);
+        $totalPaid  = (float) ($project->total_paid ?? 0.0);
+        $is50PctPaid = $budget > 0 ? ($totalPaid >= ($budget * 0.50)) : ($totalPaid > 0);
+
+        // Support Status (Default 30 days free support post project completion)
+        $completedAt       = $project->archived_at ?? ($context['completed_at'] ?? null);
+        $supportActive     = false;
+        $supportExpiration = null;
+
+        if ($completedAt) {
+            $expDate           = \Carbon\Carbon::parse($completedAt)->addDays(30);
+            $supportExpiration = $expDate->toIso8601String();
+            $supportActive     = \Carbon\Carbon::now('Africa/Cairo')->lessThanOrEqualTo($expDate);
+        }
+
+        // Active Tasks & Todos
+        $existingTasks = [];
+        try {
+            $existingTasks = \App\Models\ProjectBoardItem::where('project_id', $project->id)
+                ->take(20)
+                ->pluck('title')
+                ->toArray();
+        } catch (\Throwable $e) {
+            $existingTasks = [];
+        }
+
+        $existingTodos = [];
+        try {
+            $existingTodos = \App\Models\Todo::where('project_id', $project->id)
+                ->take(20)
+                ->pluck('title')
+                ->toArray();
+        } catch (\Throwable $e) {
+            $existingTodos = [];
+        }
+
+        return [
+            'project_summary' => $summary['project_type'] ?? ($context['current_archetype'] ?? $project->project_name),
+            'current_context' => [
+                'stage'             => $this->resolveStage($project),
+                'goal'              => $context['current_goal'] ?? $project->description,
+                'current_archetype' => $context['current_archetype'] ?? null,
+            ],
+            'approved_scope'    => $context['approved_scope'] ?? [],
+            'existing_features' => [
+                'pending'   => $context['pending_features'] ?? [],
+                'completed' => $context['completed_features'] ?? [],
+            ],
+            'contract_status'        => $contractStatus,
+            'invoice_payment_status' => [
+                'budget_usd'     => $budget,
+                'total_paid_usd' => $totalPaid,
+                'is_50pct_paid'  => $is50PctPaid,
+            ],
+            'support_status' => [
+                'is_active'  => $supportActive,
+                'expires_at' => $supportExpiration,
+            ],
+            'existing_tasks'   => $existingTasks,
+            'existing_todos'   => $existingTodos,
+            'company_policies' => [
+                'down_payment'    => '50% down payment required before development work begins.',
+                'free_support'    => '30 days free post-completion support for bug fixes within approved scope.',
+                'change_requests' => 'New features or scope changes outside the approved contract require a new estimate and addendum contract.',
+            ],
+        ];
     }
 }
