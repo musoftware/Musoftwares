@@ -14,47 +14,72 @@ class ClientContractController extends Controller
     /**
      * Show the contract publicly via UUID.
      */
-    public function show($uuid)
+    public function show(Request $request, $uuid)
     {
         $contract = Contract::with(['project', 'versions', 'invoices' => function ($q) {
             $q->orderBy('created_at', 'asc');
         }])->where('uuid', $uuid)->firstOrFail();
 
-        // Convert the model to an array and structure the data needed for the view
+        $user = $request->user();
+
+        // If client is logged in and contract has no user_id, bind contract & project to client
+        if ($user && empty($contract->user_id)) {
+            $contract->update(['user_id' => $user->id]);
+            if ($contract->project && empty($contract->project->user_id)) {
+                $contract->project->update(['user_id' => $user->id]);
+            }
+        }
+
+        $depositAmount = $contract->deposit_amount > 0
+            ? (float) $contract->deposit_amount
+            : round((float) $contract->total_amount * 0.50, 2);
+
+        $userBalance = $user ? (float) $user->user_balance : 0.0;
+        $hasSufficientBalance = $user ? ($userBalance >= $depositAmount) : false;
+
         $data = [
             'contract' => [
-                'id' => $contract->id,
-                'uuid' => $contract->uuid,
-                'project_name' => $contract->project_name,
-                'description' => $contract->description,
-                'payment_terms' => $contract->payment_terms,
-                'total_amount' => $contract->total_amount,
-                'currency' => $contract->currencyRow() ?? Currency::first(),
-                'duration' => $contract->duration,
-                'status' => $contract->status,
-                'signed_at' => $contract->signed_at,
-                'content' => $contract->content,
+                'id'             => $contract->id,
+                'uuid'           => $contract->uuid,
+                'project_name'   => $contract->project_name,
+                'description'    => $contract->description,
+                'payment_terms'  => $contract->payment_terms,
+                'total_amount'   => $contract->total_amount,
+                'deposit_amount' => $depositAmount,
+                'currency'       => $contract->currencyRow() ?? Currency::first(),
+                'duration'       => $contract->duration,
+                'status'         => $contract->status,
+                'signed_at'      => $contract->signed_at,
+                'content'        => $contract->content,
+            ],
+            'wallet_check' => [
+                'is_logged_in'           => !empty($user),
+                'user_balance'           => $userBalance,
+                'deposit_amount'         => $depositAmount,
+                'has_sufficient_balance' => $hasSufficientBalance,
+                'missing_amount'         => max(0, round($depositAmount - $userBalance, 2)),
+                'currency_symbol'        => $user?->currency_name() ?? '$',
             ],
             'invoices' => $contract->invoices->map(function ($invoice) {
                 return [
-                    'id' => $invoice->id,
-                    'uuid' => $invoice->uuid,
-                    'status' => $invoice->status,
-                    'total_str' => $invoice->total_str(),
+                    'id'         => $invoice->id,
+                    'uuid'       => $invoice->uuid,
+                    'status'     => $invoice->status,
+                    'total_str'  => $invoice->total_str(),
                     'unpaid_str' => $invoice->unpaid_str(),
-                    'enc_id' => $invoice->enc_id(),
-                    'items' => $invoice->items->map(function ($item) {
+                    'enc_id'     => $invoice->enc_id(),
+                    'items'      => $invoice->items->map(function ($item) {
                         return [
-                            'item' => $item->item,
+                            'item'  => $item->item,
                             'price' => $item->price,
                         ];
                     }),
                 ];
             }),
             'project' => $contract->project ? [
-                'id' => $contract->project->id,
+                'id'         => $contract->project->id,
                 'date_start' => $contract->project->date_start_str(),
-                'date_end' => $contract->project->date_end_str(),
+                'date_end'   => $contract->project->date_end_str(),
             ] : null,
         ];
 

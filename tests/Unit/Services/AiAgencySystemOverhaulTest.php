@@ -76,7 +76,7 @@ class AiAgencySystemOverhaulTest extends TestCase
 
         $valuation = $this->pricingEngine->calculateValuation($project, $features);
 
-        $this->assertEquals('crm_system', $valuation['type_key']);
+        $this->assertEquals('component_based', $valuation['type_key']);
         $this->assertGreaterThan(0, $valuation['recommended_usd']);
         $this->assertGreaterThanOrEqual($valuation['min_usd'], $valuation['recommended_usd']);
         $this->assertLessThanOrEqual($valuation['max_usd'], $valuation['recommended_usd']);

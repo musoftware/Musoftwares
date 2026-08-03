@@ -15,7 +15,7 @@ class ContextReconciler
     }
 
     /**
-     * Clean conversational noise from feature titles.
+     * Clean conversational noise from feature/component titles.
      * Example: "بقولك عايز Todo App" -> "Todo App"
      */
     public function cleanFeatureTitle(string $rawText): string
@@ -39,19 +39,18 @@ class ContextReconciler
     }
 
     /**
-     * Reconcile current project context against latest user text to detect contradictions.
+     * Reconcile current project context against latest user text to sync component features.
      */
     public function reconcile(Project $project, string $userText): array
     {
-        $context          = $project->ai_context ?? [];
-        $previousType     = $context['current_archetype'] ?? null;
-        $pendingFeatures  = $context['pending_features'] ?? [];
+        $context         = $project->ai_context ?? [];
+        $pendingFeatures = $context['pending_features'] ?? [];
 
-        // 1. Clean incoming feature title if user text contains feature/idea request
+        // Clean incoming feature/component title
         $cleanedTitle = $this->cleanFeatureTitle($userText);
-        
+
         $hasNewIdea = Str::contains(mb_strtolower($userText), [
-            'todo', 'crud', 'متجر', 'موقع', 'تطبيق', 'داشبورد', 'crm', 'erp', 'هبوط', 'landing', 'app', 'system'
+            'todo', 'crud', 'متجر', 'موقع', 'تطبيق', 'داشبورد', 'crm', 'erp', 'هبوط', 'landing', 'app', 'system', 'auth', 'دخول', 'شاشة'
         ]);
 
         if ($hasNewIdea && !empty($cleanedTitle)) {
@@ -60,27 +59,10 @@ class ContextReconciler
             }
         }
 
-        // 2. Detect Archetype for latest user message
-        $newArchetype = $this->pricingEngine->detectArchetype($userText . ' ' . implode(' ', $pendingFeatures));
-
-        // 3. Conflict Detection & Scope Reconciliation
-        $conflictDetected = false;
-        $reconciliationReason = '';
-
-        if (!empty($previousType) && $previousType !== $newArchetype) {
-            // Scope conflict detected! User changed idea (e.g. from Corporate Website to Todo App)
-            $conflictDetected = true;
-            $reconciliationReason = "تم اكتشاف تعديل في نوع المشـروع من ({$previousType}) إلى ({$newArchetype}) بناءً على طلب العميل الصريح.";
-
-            // Reset outdated features that belong to the previous archetype
-            $pendingFeatures = [$cleanedTitle];
-        }
-
         // Update context fields
-        $context['current_archetype']      = $newArchetype;
         $context['pending_features']       = array_values(array_unique($pendingFeatures, SORT_REGULAR));
-        $context['conflict_detected']      = $conflictDetected;
-        $context['reconciliation_reason']  = $reconciliationReason;
+        $context['conflict_detected']      = false;
+        $context['reconciliation_reason']  = '';
         $context['last_user_message_clean'] = $cleanedTitle;
 
         $project->update(['ai_context' => $context]);

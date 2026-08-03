@@ -10,37 +10,107 @@ use App\Models\User;
 class ScopePricingEngine
 {
     /**
-     * Calculate scope-based valuation for a project using AI's determined archetype & features.
-     * Pure Pricing Calculator Tool — Zero decision split.
+     * Standard hourly rate benchmark in USD.
+     * $25/hr standard development rate.
      */
-    public function calculateValuation(Project $project, array $features = [], ?string $overrideArchetype = null): array
+    public const BASE_HOURLY_RATE_USD = 25.0;
+
+    /**
+     * Calculate valuation using Two-Level Realistic Pricing Formula:
+     * Final Price = Project Overhead (Base Setup / Context Cost) + Sum(Component Marginal Costs)
+     *
+     * @param Project $project
+     * @param array $components List of component keys, objects, or feature requirement strings.
+     * @param array $options Additional options (context_type, hourly_rate_usd).
+     * @return array
+     */
+    public function calculateValuation(Project $project, array $components = [], array $options = []): array
     {
-        $benchmarks = EgyptianMarketBenchmarkRates::getBenchmarks();
+        $hourlyRate  = (float) ($options['hourly_rate_usd'] ?? self::BASE_HOURLY_RATE_USD);
+        $contextType = $options['context_type'] ?? $this->detectContextType($components, $project);
 
-        // Use AI's decided archetype if provided, otherwise detect cleanly from text
-        $typeKey = !empty($overrideArchetype) && isset($benchmarks[$overrideArchetype])
-            ? $overrideArchetype
-            : $this->detectArchetype(implode(' ', $features) . ' ' . ($project->project_name ?? ''));
+        // 1. Determine Project Overhead (Fixed Base Context Cost)
+        $overheadHours = match ($contextType) {
+            'NEW_PROJECT'              => 8, // Git, DB Architecture, Setup, Deploy, PM, QA
+            'EXISTING_PROJECT_FEATURE' => 2, // Branching, Context Review, Integration Testing
+            'BUG_FIX'                  => 1, // Diagnostics & Verification
+            default                    => 4,
+        };
 
-        $benchmark = $benchmarks[$typeKey] ?? $benchmarks['corporate_website'];
+        // Normalize input components
+        $rawComponents = !empty($components) ? $components : ($project->ai_context['pending_features'] ?? []);
+        if (empty($rawComponents) && !empty($project->project_name)) {
+            $rawComponents = [$project->project_name];
+        }
 
-        $baseUsd = (float) $benchmark['base_usd'];
-        $minUsd  = (float) ($benchmark['min_usd'] ?? ($baseUsd * 0.7));
-        $maxUsd  = (float) ($benchmark['max_usd'] ?? ($baseUsd * 1.5));
-        $estDays = (int) $benchmark['est_days'];
+        $resolvedComponents = [];
+        $sumComponentHours  = 0;
+        $componentCount     = max(1, count($rawComponents));
 
-        // Adjust for feature count & complexity multiplier
-        $featCount = max(1, count($features));
-        $complexityMultiplier = 1.0 + min(1.5, ($featCount * 0.1));
+        // Economy of Scale factor: In a NEW_PROJECT with multiple components, marginal cost per component scales down
+        $scaleFactor = ($contextType === 'NEW_PROJECT' && $componentCount > 1)
+            ? max(0.5, 1.0 - ($componentCount * 0.04))
+            : 1.0;
 
-        $recommendedUsd = round($baseUsd * $complexityMultiplier, 2);
-        $finalMinUsd    = round($minUsd * $complexityMultiplier, 2);
-        $finalMaxUsd    = round($maxUsd * $complexityMultiplier, 2);
-        $calculatedDays = (int) ceil($estDays * $complexityMultiplier);
+        foreach ($rawComponents as $compInput) {
+            $resolved = ComponentBenchmarkRates::resolveComponent($compInput);
+            
+            $complexityMultiplier = match (strtolower($resolved['complexity'] ?? 'medium')) {
+                'low'    => 0.8,
+                'high'   => 1.3,
+                default  => 1.0,
+            };
 
-        // Convert USD to Client's Currency (EGP or user currency)
+            $baseH = ($contextType === 'NEW_PROJECT')
+                ? $resolved['marginal_hours']
+                : $resolved['standalone_hours'];
+
+            $calculatedHours = (int) max(1, round($baseH * $complexityMultiplier * $scaleFactor));
+            $componentCostUsd = round($calculatedHours * $hourlyRate, 2);
+
+            $sumComponentHours += $calculatedHours;
+
+            $resolvedComponents[] = [
+                'name_ar'         => $resolved['name_ar'],
+                'name_en'         => $resolved['name_en'],
+                'complexity'      => $resolved['complexity'],
+                'estimated_hours' => $calculatedHours,
+                'cost_usd'        => $componentCostUsd,
+            ];
+        }
+
+        // Total hours = Overhead + Component Hours
+        $totalHours = $overheadHours + $sumComponentHours;
+
+        // Build itemized micro-components list including Project Overhead as the first item
+        $overheadCostUsd = round($overheadHours * $hourlyRate, 2);
+        $overheadTitleAr = match ($contextType) {
+            'NEW_PROJECT'              => 'التكلفة الثابتة للمشروع (Project Setup, DB Schema, Git & PM)',
+            'EXISTING_PROJECT_FEATURE' => 'مراجعة الكود والدمج المباشر (Context Review & Integration)',
+            'BUG_FIX'                  => 'الفحص الفني والتأكيد الجوهري (Diagnostics & QA)',
+            default                    => 'التكلفة التشغيلية للطلب (Operational Overhead)',
+        };
+
+        $itemizedComponents = array_merge([
+            [
+                'name_ar'         => $overheadTitleAr,
+                'name_en'         => 'Project Operational Overhead',
+                'complexity'      => 'standard',
+                'estimated_hours' => $overheadHours,
+                'cost_usd'        => $overheadCostUsd,
+            ]
+        ], $resolvedComponents);
+
+        $recommendedUsd = round($totalHours * $hourlyRate, 2);
+        $minUsd         = round($recommendedUsd * 0.85, 2);
+        $maxUsd         = round($recommendedUsd * 1.25, 2);
+        $calculatedDays = (int) max(1, ceil($totalHours / 6)); // 6 productive hours per developer day
+
+        // Convert USD to Client's Currency (EGP or target currency)
         $clientUser       = !empty($project->user_id) ? User::find($project->user_id) : null;
         $targetCurrencyId = $clientUser?->currency_id;
+        $usdCurrency      = null;
+
         try {
             $usdCurrency = Currency::where('currency', 'USD')->first();
         } catch (\Throwable $e) {
@@ -48,106 +118,76 @@ class ScopePricingEngine
         }
 
         $convertedAmount = $recommendedUsd;
-        $currencySymbol = '$';
+        $currencySymbol  = '$';
+        $exchangeRate    = 1.0;
 
         if ($targetCurrencyId && $usdCurrency && $targetCurrencyId !== $usdCurrency->id) {
-            $convertedAmount = CurrenciesExchange::RateToday($recommendedUsd, $usdCurrency->id, $targetCurrencyId);
-            $targetCurrency = Currency::find($targetCurrencyId);
-            $currencySymbol = $targetCurrency?->symbol ?? 'EGP';
+            try {
+                $convertedRate = CurrenciesExchange::RateToday(1.0, $usdCurrency->id, $targetCurrencyId);
+                if ($convertedRate > 0) {
+                    $exchangeRate = $convertedRate;
+                }
+            } catch (\Throwable $e) {
+                $exchangeRate = 50.0;
+            }
+
+            $targetCurrency  = Currency::find($targetCurrencyId);
+            $currencySymbol  = $targetCurrency?->symbol ?? 'EGP';
+            $convertedAmount = round($recommendedUsd * $exchangeRate, 2);
         }
 
-        // Build feature cost breakdown
-        $breakdown = $this->buildFeatureBreakdown($features, $recommendedUsd);
+        // Attach converted costs to itemized components
+        foreach ($itemizedComponents as &$comp) {
+            $comp['converted_cost']  = round($comp['cost_usd'] * $exchangeRate, 2);
+            $comp['currency_symbol'] = $currencySymbol;
+        }
+        unset($comp);
 
         return [
-            'type_key'          => $typeKey,
-            'type_name_ar'      => $benchmark['name_ar'],
-            'type_name_en'      => $benchmark['name_en'],
-            'min_usd'           => $finalMinUsd,
-            'max_usd'           => $finalMaxUsd,
-            'recommended_usd'   => $recommendedUsd,
-            'converted_amount'  => round($convertedAmount, 2),
-            'currency_symbol'   => $currencySymbol,
-            'estimated_days'    => $calculatedDays,
-            'complexity'        => $featCount > 8 ? 'High' : ($featCount > 4 ? 'Medium' : 'Standard'),
-            'feature_breakdown' => $breakdown,
+            'context_type'         => $contextType,
+            'type_key'             => 'component_based',
+            'type_name_ar'         => 'تسعير ثنائي المستوى متوازن (Two-Level Pricing Engine)',
+            'type_name_en'         => 'Two-Level Realistic Valuation',
+            'overhead_hours'       => $overheadHours,
+            'overhead_cost_usd'    => $overheadCostUsd,
+            'min_usd'              => $minUsd,
+            'max_usd'              => $maxUsd,
+            'recommended_usd'      => $recommendedUsd,
+            'converted_amount'     => $convertedAmount,
+            'currency_symbol'      => $currencySymbol,
+            'estimated_days'       => $calculatedDays,
+            'total_hours'          => $totalHours,
+            'complexity'           => $totalHours > 80 ? 'High' : ($totalHours > 30 ? 'Medium' : 'Standard'),
+            'feature_breakdown'    => array_map(fn($c) => ['name' => $c['name_ar'], 'estimated_usd' => $c['cost_usd']], $itemizedComponents),
+            'micro_components'     => $itemizedComponents,
+            'granular_estimation'  => [
+                'context_type'     => $contextType,
+                'total_usd'        => $recommendedUsd,
+                'total_converted'  => $convertedAmount,
+                'currency_symbol'  => $currencySymbol,
+                'total_hours'      => $totalHours,
+                'estimated_days'   => $calculatedDays,
+                'components_count' => count($itemizedComponents),
+                'micro_components' => $itemizedComponents,
+            ],
         ];
     }
 
     /**
-     * Detect project archetype cleanly from text.
+     * Auto-detect execution context type (NEW_PROJECT, EXISTING_PROJECT_FEATURE, BUG_FIX).
      */
-    public function detectArchetype(string $text): string
+    protected function detectContextType(array $components, Project $project): string
     {
-        $text = mb_strtolower($text);
+        $text = mb_strtolower(implode(' ', array_map(fn($c) => is_array($c) ? ($c['name'] ?? '') : (string) $c, $components)) . ' ' . ($project->project_name ?? ''));
 
-        if (
-            str_contains($text, 'todo') || str_contains($text, 'to-do') ||
-            str_contains($text, 'قائمة مهام') || str_contains($text, 'مهام بسيطة') ||
-            str_contains($text, 'crud') ||
-            (str_contains($text, 'تطبيق') && (str_contains($text, 'بسيط') || str_contains($text, 'صغير') || str_contains($text, 'تدريبي')))
-        ) {
-            return 'todo_simple_crud';
+        if (str_contains($text, 'fix') || str_contains($text, 'bug') || str_contains($text, 'خطأ') || str_contains($text, 'إصلاح') || str_contains($text, 'مشكلة')) {
+            return 'BUG_FIX';
         }
 
-        if (str_contains($text, 'متجر') || str_contains($text, 'e-commerce') || str_contains($text, 'store') || str_contains($text, 'بيع')) {
-            return 'ecommerce_store';
+        if (!empty($project->approved_scope) || count($components) <= 2) {
+            return 'EXISTING_PROJECT_FEATURE';
         }
 
-        if (
-            str_contains($text, 'mobile app') || str_contains($text, 'تطبيق موبايل') ||
-            str_contains($text, 'android') || str_contains($text, 'ios') || str_contains($text, 'اندرويد') ||
-            (str_contains($text, 'تطبيق') && (str_contains($text, 'ايفون') || str_contains($text, 'جوال')))
-        ) {
-            return 'mobile_application';
-        }
-
-        if (str_contains($text, 'crm') || str_contains($text, 'إدارة عملاء') || str_contains($text, 'علاقات عملاء')) {
-            return 'crm_system';
-        }
-
-        if (str_contains($text, 'erp') || str_contains($text, 'حسابات') || str_contains($text, 'مخازن') || str_contains($text, 'موارد بشرية')) {
-            return 'erp_system';
-        }
-
-        if (str_contains($text, 'هبوط') || str_contains($text, 'landing')) {
-            return 'landing_page';
-        }
-
-        if (str_contains($text, 'داشبورد') || str_contains($text, 'dashboard') || str_contains($text, 'لوحة تحكم')) {
-            return 'admin_dashboard';
-        }
-
-        if (str_contains($text, 'web app') || str_contains($text, 'تطبيق ويب') || str_contains($text, 'mvp')) {
-            return 'mvp_web_app';
-        }
-
-        return 'corporate_website';
-    }
-
-    /**
-     * Itemize cost breakdown by features.
-     */
-    protected function buildFeatureBreakdown(array $features, float $totalUsd): array
-    {
-        if (empty($features)) {
-            return [
-                ['name' => 'تطوير النواة الأساسية وقواعد البيانات', 'estimated_usd' => round($totalUsd * 0.6, 2)],
-                ['name' => 'واجهة المستخدم واختبارات الأداء', 'estimated_usd' => round($totalUsd * 0.4, 2)],
-            ];
-        }
-
-        $count = count($features);
-        $share = round($totalUsd / $count, 2);
-
-        $breakdown = [];
-        foreach ($features as $f) {
-            $breakdown[] = [
-                'name'          => $f,
-                'estimated_usd' => $share,
-            ];
-        }
-
-        return $breakdown;
+        return 'NEW_PROJECT';
     }
 }

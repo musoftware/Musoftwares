@@ -2,16 +2,51 @@
 
 namespace App\Services\AI;
 
+use App\Models\ContractPriceItem;
+
 class ComponentBenchmarkRates
 {
     /**
      * Standard Software Component Reference Map.
-     * Includes standalone hours (isolated feature) and marginal hours (part of full project).
+     * Fetches dynamic software components from ContractPriceItem database table, with fallback to default array.
      */
     public static function getComponents(): array
     {
+        try {
+            $dbComponents = ContractPriceItem::whereNotNull('key')
+                ->where('is_active', true)
+                ->orderBy('sort_order', 'asc')
+                ->get();
+
+            if ($dbComponents->count() > 0) {
+                $mapped = [];
+                foreach ($dbComponents as $comp) {
+                    $key = $comp->key ?: strtolower(str_replace(' ', '_', $comp->name));
+                    $mapped[$key] = [
+                        'key'              => $key,
+                        'name_ar'          => $comp->name_ar ?: $comp->name,
+                        'name_en'          => $comp->name_en ?: $comp->name,
+                        'standalone_hours' => $comp->standalone_hours ?: 4,
+                        'marginal_hours'   => $comp->marginal_hours ?: 2,
+                        'complexity'       => $comp->complexity ?: 'medium',
+                        'keywords'         => is_array($comp->keywords) ? $comp->keywords : json_decode($comp->keywords ?? '[]', true),
+                    ];
+                }
+                return $mapped;
+            }
+        } catch (\Throwable $e) {
+            // DB offline or table missing fallback
+        }
+
+        return self::getDefaultComponents();
+    }
+
+    /**
+     * Default fallback component registry array.
+     */
+    public static function getDefaultComponents(): array
+    {
         return [
-            // --- Authentication & Access Control ---
             'authentication' => [
                 'name_ar'          => 'منظومة المصادقة وتسجيل الدخول (Auth)',
                 'name_en'          => 'Authentication System',
@@ -44,8 +79,6 @@ class ComponentBenchmarkRates
                 'complexity'       => 'low',
                 'keywords'         => ['profile', 'ملف شخصي', 'حسابي', 'تعديل البيانات'],
             ],
-
-            // --- Core UI & Management Modules ---
             'dashboard' => [
                 'name_ar'          => 'لوحة التحكم المركزية (Dashboard)',
                 'name_en'          => 'Admin / Overview Dashboard',
@@ -78,8 +111,6 @@ class ComponentBenchmarkRates
                 'complexity'       => 'medium',
                 'keywords'         => ['files', 'media', 'ملفات', 'مرفقات', 'رفع صور', 'وسائط'],
             ],
-
-            // --- Business & Operational Modules ---
             'tasks_todo' => [
                 'name_ar'          => 'إدارة المهام والواجبات (Tasks / Todo)',
                 'name_en'          => 'Task & Todo Management',
@@ -128,8 +159,6 @@ class ComponentBenchmarkRates
                 'complexity'       => 'medium',
                 'keywords'         => ['calendar', 'scheduling', 'تقويم', 'مواعيد', 'حجوزات'],
             ],
-
-            // --- Communication & Automation ---
             'notifications' => [
                 'name_ar'          => 'منظومة الإشعارات (Notifications)',
                 'name_en'          => 'Notification Engine',
@@ -154,8 +183,6 @@ class ComponentBenchmarkRates
                 'complexity'       => 'high',
                 'keywords'         => ['chat', 'messaging', 'دردشة', 'محادثات', 'تواصل مباشر'],
             ],
-
-            // --- Intelligence & Advanced Tools ---
             'ai_agent' => [
                 'name_ar'          => 'المساعد الذكي ووظائف AI (AI Agent & Automation)',
                 'name_en'          => 'AI Agent & Intelligent Workflows',
@@ -180,8 +207,6 @@ class ComponentBenchmarkRates
                 'complexity'       => 'low',
                 'keywords'         => ['audit', 'logs', 'سجل', 'مراقبة التغييرات', 'تتبع'],
             ],
-
-            // --- Micro-Tasks & Maintenance ---
             'bug_fix' => [
                 'name_ar'          => 'إصلاح مشكلة / خطأ برمجي (Bug Fix)',
                 'name_en'          => 'Bug Fix / Issue Resolution',
@@ -237,7 +262,8 @@ class ComponentBenchmarkRates
 
         // Fuzzy match by keywords
         foreach ($componentsMap as $key => $comp) {
-            foreach ($comp['keywords'] as $kw) {
+            $keywords = is_array($comp['keywords']) ? $comp['keywords'] : [];
+            foreach ($keywords as $kw) {
                 if (!empty($kw) && str_contains($normalizedKey, strtolower($kw))) {
                     if (!empty($complexity) && in_array($complexity, ['low', 'medium', 'high'])) {
                         $comp['complexity'] = $complexity;

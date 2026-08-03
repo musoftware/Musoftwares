@@ -203,19 +203,19 @@ PROMPT;
 
         // Feature title extraction (cleaned)
         $cleanFeature = $this->cleanFeatureTitle($userText);
-        $pendingFeatures = $conflictDetected ? [$cleanFeature] : ($context['pending_features'] ?? []);
-        if (!in_array($cleanFeature, $pendingFeatures, true)) {
+        $pendingFeatures = $context['pending_features'] ?? [];
+        if (!in_array($cleanFeature, $pendingFeatures, true) && !empty($cleanFeature)) {
             $pendingFeatures[] = $cleanFeature;
         }
 
-        $valuation = $this->pricingEngine->calculateValuation($project, $pendingFeatures, $archetype);
+        $valuation = $this->pricingEngine->calculateValuation($project, $pendingFeatures);
 
         if ($isApproval) {
             return $this->validator->applySchemaDefaults([
-                'reasoning'            => 'العميل أعلن موافقته على التسعير والنطاق الفني.',
-                'project_type'         => $archetype,
+                'reasoning'            => 'العميل أعلن موافقته على التسعير والنطاق الفني للمكونات.',
+                'project_type'         => 'component_based',
                 'archetype_confidence' => 0.98,
-                'conflict_detected'    => $conflictDetected,
+                'conflict_detected'    => false,
                 'intent' => [
                     'primary'    => 'approval',
                     'confidence' => 0.98,
@@ -224,20 +224,20 @@ PROMPT;
                     'is_complete'        => true,
                     'completeness_score' => 100,
                 ],
-                'reply' => "ممتاز جداً! تم تسجيل موافقتك على نطاق المشروع والتكلفة التقديرية (تنفيذ خلال {$valuation['estimated_days']} يوم).\n\nهل ترغب في إصدار الفاتورة الرسمية وتأكيد الاتفاق لبدء تنفيذ المهام المباشرة؟\n\n[Card:ConfirmInvoice]",
+                'reply' => "ممتاز جداً! تم تسجيل موافقتك على نطاق المشروع المكون وتكلفته التقديرية (تنفيذ خلال {$valuation['estimated_days']} يوم).\n\nهل ترغب في إصدار الفاتورة الرسمية وتأكيد الاتفاق لبدء تنفيذ المهام المباشرة؟\n\n[Card:ConfirmInvoice]",
                 'next_best_action' => 'تأكيد العميل لإصدار الفاتورة وبدء التنفيذ.',
                 'action_proposals' => [
                     'invoice' => [
                         'propose'                      => true,
                         'requires_client_confirmation' => true,
                         'amount_usd'                   => $valuation['recommended_usd'],
-                        'description'                  => 'تطوير وتنفيذ مشروع: ' . ($project->name ?? 'المشروع المعتمد'),
+                        'description'                  => 'تطوير وتنفيذ نطاق المكونات لمشروع: ' . ($project->name ?? 'المشروع المعتمد'),
                     ],
                     'stage_transition' => 'PROPOSAL',
                 ],
                 'context_updates' => [
                     'current_stage'     => 'PROPOSAL',
-                    'current_archetype' => $archetype,
+                    'current_archetype' => 'component_based',
                     'pending_features'  => $pendingFeatures,
                 ],
             ]);
@@ -246,39 +246,48 @@ PROMPT;
         if ($isGreeting && !$hasIdea && !$isPriceReq) {
             return $this->validator->applySchemaDefaults([
                 'reasoning'            => 'تحية أولية من العميل دون تفاصيل فنية.',
-                'project_type'         => $archetype,
+                'project_type'         => 'component_based',
                 'archetype_confidence' => 0.90,
                 'intent' => [
                     'primary'    => 'greeting',
                     'confidence' => 0.95,
                 ],
-                'reply' => "وعليكم السلام ورحمة الله وبركاته! أهلاً بك. أنا مدير المشروع الذكي.\n\nيسعدني مساعدتك في تحليل وتطوير مشروعك. تفضل بشرح الفكرة الأساسية وما ترغب في بنائه لنبدأ بدراسة المتطلبات سوياً.",
-                'next_best_action' => 'الاستماع لفكرة العميل واستيضاح الخصائص الأساسية.',
+                'reply' => "وعليكم السلام ورحمة الله وبركاته! أهلاً بك. أنا مدير المشروع الذكي.\n\nيسعدني مساعدتك في تحليل وتطوير مشروعك. تفضل بشرح المكونات والخصائص التي ترغب في بنائها لنبدأ بدراسة المتطلبات سوياً.",
+                'next_best_action' => 'الاستماع لفكرة العميل واستيضاح المكونات الأساسية.',
                 'context_updates'  => ['current_stage' => 'GREETING'],
             ]);
         }
 
-        $replyText = "تم تحليل طلبك وتسجيل المتطلبات الموضحة.\n\n";
-        $replyText .= "📋 **النوع التقديري**: {$valuation['type_name_ar']}\n";
-        $replyText .= "💰 **التكلفة التقديرية**: من **{$valuation['min_usd']}$** إلى **{$valuation['max_usd']}$ USD** (الموصى به: **{$valuation['recommended_usd']}$ USD** ~ {$valuation['converted_amount']} {$valuation['currency_symbol']}).\n";
-        $replyText .= "⏱️ **المدة المتوقعة**: حوالي **{$valuation['estimated_days']} أيام عمل**.\n\n";
-        $replyText .= "هل مناسب لك هذا النطاق التقديري لإصدار الفاتورة وبدء العمل؟";
+        $replyText = "تم تحليل طلبك وتفصيل التقدير الفني والمالي القائم على المكونات (Component-Based Valuation):\n\n";
+        $replyText .= "📋 **نموذج التسعير**: {$valuation['type_name_ar']}\n";
+        $replyText .= "💰 **إجمالي التكلفة التقديرية**: **{$valuation['recommended_usd']}$ USD** (نطاق: {$valuation['min_usd']}$ - {$valuation['max_usd']}$) ~ **{$valuation['converted_amount']} {$valuation['currency_symbol']}**\n";
+        $replyText .= "⏱️ **إجمالي الوقت المتوقع**: حوالي **{$valuation['estimated_days']} أيام عمل** ({$valuation['total_hours']} ساعة تطويرية).\n\n";
+
+        if (!empty($valuation['micro_components'])) {
+            $replyText .= "🔍 **التفكيك الفني والمالي للمكونات (Components Breakdown)**:\n";
+            foreach ($valuation['micro_components'] as $comp) {
+                $replyText .= "  • **{$comp['name_ar']}**: ~{$comp['estimated_hours']} ساعة | **{$comp['cost_usd']}$ USD** ({$comp['converted_cost']} {$comp['currency_symbol']})\n";
+            }
+            $replyText .= "\n";
+        }
+
+        $replyText .= "هل مناسب لك هذا التفكيك المالي والفني لإصدار العقد والتأكيد؟";
 
         return $this->validator->applySchemaDefaults([
-            'reasoning'            => "تم استنتاج نوع المشروع ({$archetype}) وحساب النطاق بناءً على أحدث طلب للعميل.",
-            'project_type'         => $archetype,
+            'reasoning'            => "تم تقييم المتطلبات بحساب ساعات المكونات الفعلية والتكلفة التقديرية.",
+            'project_type'         => 'component_based',
             'archetype_confidence' => 0.95,
-            'conflict_detected'    => $conflictDetected,
-            'reconciliation_reason'=> $conflictDetected ? "تم كشف تغيير النطاق إلى ({$archetype}) وتحديث السياق المعتمد." : '',
+            'conflict_detected'    => false,
+            'reconciliation_reason'=> '',
             'intent' => [
                 'primary'           => $isPriceReq ? 'price_request' : 'inquiry',
                 'confidence'        => 0.90,
             ],
             'reply'            => $replyText,
-            'next_best_action' => 'استكمال المتطلبات أو الاعتماد التكلفة التقديرية.',
+            'next_best_action' => 'استكمال المتطلبات أو اعتماد التكلفة التقديرية للمكونات.',
             'context_updates'  => [
                 'current_stage'     => 'VALUATION',
-                'current_archetype' => $archetype,
+                'current_archetype' => 'component_based',
                 'pending_features'  => $pendingFeatures,
             ],
         ]);

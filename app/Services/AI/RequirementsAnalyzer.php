@@ -24,6 +24,7 @@ class RequirementsAnalyzer
     {
         $context          = $project->ai_context ?? [];
         $pendingFeatures  = $context['pending_features'] ?? [];
+        $completedFeatures = $context['completed_features'] ?? [];
         $rawFeatures = array_merge($pendingFeatures, $completedFeatures);
         $allFeatures = array_values(array_unique(array_map(function ($f) {
             if (is_array($f)) {

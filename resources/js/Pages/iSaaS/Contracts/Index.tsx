@@ -74,11 +74,18 @@ export default function Index({ contracts, currentTab }) {
                         >
                             {__('general.signed')}</Link>
                     </div>
-                    <Link href={route('isaas.contracts.create')}>
-                        <Button className="bg-slate-900 hover:bg-slate-800 text-white">
-                            + Create Contract
-                        </Button>
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <Link href="/admin/contracts/quick-create">
+                            <Button variant="outline" className="gap-2 border-amber-500 text-amber-900 bg-amber-50 hover:bg-amber-100 font-extrabold shadow-sm">
+                                ✨ التسعير والعقد السريع
+                            </Button>
+                        </Link>
+                        <Link href={route('isaas.contracts.create')}>
+                            <Button className="bg-slate-900 hover:bg-slate-800 text-white">
+                                + Create Contract
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="overflow-hidden rounded-lg bg-white shadow border border-slate-200">

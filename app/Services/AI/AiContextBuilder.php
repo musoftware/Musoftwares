@@ -278,34 +278,60 @@ class AiContextBuilder
             $existingTodos = [];
         }
 
+        // Recent Messages & Summary
+        $recentMessages = [];
+        $conversationSummary = $context['conversation_summary'] ?? 'جلسة حوارية جديدة لم تبدأ بعد.';
+
         return [
-            'project_summary' => $summary['project_type'] ?? ($context['current_archetype'] ?? $project->project_name),
-            'current_context' => [
-                'stage'             => $this->resolveStage($project),
-                'goal'              => $context['current_goal'] ?? $project->description,
-                'current_archetype' => $context['current_archetype'] ?? null,
+            'Project' => [
+                'Summary'       => $summary['project_type'] ?? ($context['current_archetype'] ?? $project->project_name ?? 'مشروع جديد'),
+                'Current Scope' => $context['approved_scope'] ?? [],
+                'Requirements'  => [
+                    'pending'   => $context['pending_features'] ?? [],
+                    'completed' => $context['completed_features'] ?? [],
+                ],
+                'Context' => [
+                    'stage'     => $this->resolveStage($project),
+                    'goal'      => $context['current_goal'] ?? $project->description ?? 'بناء وتطوير البرمجيات',
+                    'archetype' => $context['current_archetype'] ?? null,
+                ],
+                'AI Memory' => $context['ai_memory'] ?? [],
             ],
-            'approved_scope'    => $context['approved_scope'] ?? [],
-            'existing_features' => [
-                'pending'   => $context['pending_features'] ?? [],
-                'completed' => $context['completed_features'] ?? [],
+            'Commercial' => [
+                'Estimate' => [
+                    'budget_usd'          => $budget,
+                    'recommended_usd'     => $context['recommended_usd'] ?? $budget,
+                    'estimated_days'      => $context['estimated_days'] ?? 7,
+                    'last_valuation'      => $context['last_valuation'] ?? null,
+                ],
+                'Contract' => $contractStatus,
+                'Invoice' => [
+                    'total_paid_usd'      => $totalPaid,
+                    'balance_due_usd'     => max(0, $budget - $totalPaid),
+                ],
+                'Payment Status' => [
+                    'is_50pct_paid'       => $is50PctPaid,
+                    'is_fully_paid'       => $budget > 0 ? ($totalPaid >= $budget) : false,
+                ],
             ],
-            'contract_status'        => $contractStatus,
-            'invoice_payment_status' => [
-                'budget_usd'     => $budget,
-                'total_paid_usd' => $totalPaid,
-                'is_50pct_paid'  => $is50PctPaid,
+            'Support' => [
+                'Support Active'          => $supportActive,
+                'Support End Date'        => $supportExpiration,
             ],
-            'support_status' => [
-                'is_active'  => $supportActive,
-                'expires_at' => $supportExpiration,
+            'Execution' => [
+                'Tasks'                   => $existingTasks,
+                'Todos'                   => $existingTodos,
+                'Notes'                   => $context['developer_notes'] ?? [],
             ],
-            'existing_tasks'   => $existingTasks,
-            'existing_todos'   => $existingTodos,
-            'company_policies' => [
-                'down_payment'    => '50% down payment required before development work begins.',
-                'free_support'    => '30 days free post-completion support for bug fixes within approved scope.',
-                'change_requests' => 'New features or scope changes outside the approved contract require a new estimate and addendum contract.',
+            'Conversation' => [
+                'Recent Messages'         => $recentMessages,
+                'Conversation Summary'    => $conversationSummary,
+            ],
+            'Company Policies' => [
+                'Pricing'                 => 'التسعير يعتمد على معايير السوق المحلية وتكلفة المكونات الدقيقة (Micro-Components).',
+                'Support'                 => '30 يوماً دعم مجاني بعد التسليم النهائي لإصلاح أي عيوب برمجية (Bugs) داخل العقد.',
+                'External Services'       => 'تكاليف الاستضافة، والدومينات، وبوابات الدفع والتطبيقات الخارجية يتحملها العميل بشكل مستقل.',
+                'Source Code Ownership'   => 'الكود المصدري كاملاً ملك للعميل فور سداد مستحقات المشروع بالكامل.',
             ],
         ];
     }

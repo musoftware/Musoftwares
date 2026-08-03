@@ -22,6 +22,7 @@ import {
     History,
     MoreHorizontal,
     Plus,
+    Sparkles,
     Trash2,
 } from 'lucide-react';
 import { EmptyState } from '@/Components/ui/EmptyState';
@@ -70,7 +71,13 @@ export default function Index({ contracts }) {
 
     return (
         <AdminSidebarLayout title={__('general.contracts')} header={__('general.all_contracts')}>
-            <div className="mb-6 flex items-center justify-end">
+            <div className="mb-6 flex items-center justify-end gap-3">
+                <Link href="/admin/contracts/quick-create">
+                    <Button variant="outline" className="gap-2 border-amber-500 text-amber-900 bg-amber-50 hover:bg-amber-100 font-extrabold shadow-sm">
+                        <Sparkles className="h-4 w-4 text-amber-600" />
+                        التسعير والعقد السريع
+                    </Button>
+                </Link>
                 <Link href="/admin/contracts/create">
                     <Button className="gap-2">
                         <Plus className="h-4 w-4" />
