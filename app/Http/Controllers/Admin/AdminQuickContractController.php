@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Services\AI;
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -30,7 +28,9 @@ class AdminQuickContractController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Contracts/QuickCreate', [
-            'clients'    => User::where('role', '!=', 'admin')->get(['id', 'name', 'email']),
+            'clients'    => User::whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'admin');
+            })->get(['id', 'name', 'email']),
             'currencies' => Currency::all(),
         ]);
     }
@@ -40,16 +40,21 @@ class AdminQuickContractController extends Controller
      */
     public function calculate(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'description' => 'required|string|min:5',
+            'currency_id' => 'nullable|integer|exists:currencies,id',
         ]);
 
         $project = new Project([
-            'project_name' => mb_strimwidth($request->description, 0, 50, '…'),
-            'description'  => $request->description,
+            'project_name' => mb_strimwidth($validated['description'], 0, 50, '…'),
+            'description'  => $validated['description'],
         ]);
 
-        $valuation = $this->pricingEngine->calculateValuation($project, [$request->description]);
+        $valuation = $this->pricingEngine->calculateValuation(
+            $project,
+            [$validated['description']],
+            ['currency_id' => $validated['currency_id'] ?? null]
+        );
 
         return response()->json([
             'ok'        => true,
@@ -69,10 +74,11 @@ class AdminQuickContractController extends Controller
         ]);
 
         $description = $validated['description'];
+        $currencyId  = $validated['currency_id'] ?? 1;
 
         // 1. Calculate Two-Level Valuation
         $projectDummy = new Project(['project_name' => mb_strimwidth($description, 0, 50, '…'), 'description' => $description]);
-        $valuation = $this->pricingEngine->calculateValuation($projectDummy, [$description]);
+        $valuation = $this->pricingEngine->calculateValuation($projectDummy, [$description], ['currency_id' => $currencyId]);
 
         $totalUsd       = (float) $valuation['recommended_usd'];
         $convertedAmount = (float) $valuation['converted_amount'];

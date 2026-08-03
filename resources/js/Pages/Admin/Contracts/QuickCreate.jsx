@@ -22,14 +22,16 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
         currency_id: 1,
     });
 
-    const handleCalculate = async () => {
+    const handleCalculate = async (customCurrencyId = null) => {
         if (!data.description || data.description.trim().length < 5) {
             return;
         }
         setCalculating(true);
+        const targetCurrency = customCurrencyId || data.currency_id;
         try {
             const res = await axios.post(route('admin.contracts.quick-calculate'), {
                 description: data.description,
+                currency_id: targetCurrency,
             });
             if (res.data.ok) {
                 setValuation(res.data.valuation);
@@ -38,6 +40,13 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
             console.error('Failed to calculate valuation:', err);
         } finally {
             setCalculating(false);
+        }
+    };
+
+    const handleCurrencyChange = (newCurrencyId) => {
+        setData('currency_id', newCurrencyId);
+        if (valuation && data.description && data.description.trim().length >= 5) {
+            handleCalculate(newCurrencyId);
         }
     };
 
@@ -146,12 +155,12 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                                 <div className="flex justify-end">
                                     <Button
                                         type="button"
-                                        onClick={handleCalculate}
+                                        onClick={() => handleCalculate()}
                                         disabled={calculating || !data.description || data.description.trim().length < 5}
                                         className="bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-xs gap-2 rounded-full px-6"
                                     >
                                         <Calculator className="w-4 h-4" />
-                                        {calculating ? 'جاري حساب التسعير...' : 'حساب وتحليل التسعير الآن'}
+                                        {calculating ? 'جاري حساب التسعير بالذكاء الاصطناعي...' : 'حساب وتحليل التسعير الآن'}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -189,8 +198,8 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                                     <Label className="text-xs font-bold text-slate-700">عملة العقد</Label>
                                     <select
                                         value={data.currency_id}
-                                        onChange={(e) => setData('currency_id', e.target.value)}
-                                        className="w-full h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                                        onChange={(e) => handleCurrencyChange(e.target.value)}
+                                        className="w-full h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-amber-500 focus:outline-none font-bold text-slate-900"
                                     >
                                         {currencies.map((curr) => (
                                             <option key={curr.id} value={curr.id}>
@@ -225,16 +234,16 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                                             <div>
                                                 <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">إجمالي التكلفة</p>
                                                 <p className="text-2xl font-black text-slate-900 mt-1">
-                                                    ${valuation.recommended_usd} <span className="text-xs font-bold text-slate-500">USD</span>
+                                                    {valuation.converted_amount} <span className="text-xs font-bold text-amber-600">{valuation.currency_symbol}</span>
                                                 </p>
-                                                <p className="text-xs font-extrabold text-amber-600 mt-0.5">
-                                                    ~ {valuation.converted_amount} {valuation.currency_symbol}
+                                                <p className="text-xs font-bold text-slate-400 mt-0.5">
+                                                    ~ ${valuation.recommended_usd} USD
                                                 </p>
                                             </div>
                                             <div>
                                                 <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">الدفعة الأولى (50%)</p>
                                                 <p className="text-2xl font-black text-emerald-600 mt-1">
-                                                    ${(valuation.recommended_usd * 0.5).toFixed(2)}
+                                                    {valuation.deposit_converted || (valuation.converted_amount * 0.5).toFixed(2)} <span className="text-xs font-bold text-emerald-700">{valuation.currency_symbol}</span>
                                                 </p>
                                                 <p className="text-[10px] font-bold text-emerald-700 mt-0.5">مطلوبة لتفعيل العقد</p>
                                             </div>
@@ -245,18 +254,76 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                                             <span className="font-extrabold text-slate-900">{valuation.estimated_days} أيام عمل ({valuation.total_hours} ساعة)</span>
                                         </div>
 
+                                        {/* AI Summary & Tech Stack Card */}
+                                        {valuation.ai_summary && (
+                                            <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-4 space-y-3 text-xs">
+                                                <div className="flex items-center gap-1.5 font-extrabold text-amber-900">
+                                                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                                                    <span>تحليل الذكاء الاصطناعي للمشروع (AI Scope Analysis):</span>
+                                                </div>
+                                                <p className="text-slate-700 leading-relaxed font-sans">
+                                                    {valuation.ai_summary}
+                                                </p>
+                                                {valuation.tech_stack && (
+                                                    <div className="pt-1 flex items-center gap-2 flex-wrap">
+                                                        <span className="text-[10px] font-bold text-slate-500">البيئة البرمجية المقترحة:</span>
+                                                        <span className="bg-white text-slate-800 border border-amber-300 font-mono text-[10px] px-2 py-0.5 rounded-md font-bold">
+                                                            {valuation.tech_stack}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Key Deliverables List */}
+                                        {valuation.key_features && valuation.key_features.length > 0 && (
+                                            <div className="space-y-2">
+                                                <p className="text-xs font-black uppercase tracking-wider text-slate-500">المخرجات الرئيسية للمشروع (Deliverables):</p>
+                                                <div className="grid grid-cols-1 gap-1.5">
+                                                    {valuation.key_features.map((feat, fIdx) => (
+                                                        <div key={fIdx} className="flex items-center gap-2 text-xs text-slate-800 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-100">
+                                                            <span className="text-emerald-600 font-bold text-xs">✓</span>
+                                                            <span className="font-bold">{feat}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {/* Itemized Micro-Components */}
                                         <div className="space-y-3">
-                                            <p className="text-xs font-black uppercase tracking-wider text-slate-500">التفكيك الفني للمكونات (Components):</p>
-                                            <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+                                            <p className="text-xs font-black uppercase tracking-wider text-slate-500">التفكيك الفني والمالي المفصّل (Micro-Components):</p>
+                                            <div className="max-h-72 overflow-y-auto space-y-2.5 pr-1">
                                                 {valuation.micro_components?.map((comp, idx) => (
-                                                    <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs">
-                                                        <div>
-                                                            <p className="font-bold text-slate-900">{comp.name_ar}</p>
-                                                            <p className="text-[10px] text-slate-400">~ {comp.estimated_hours} ساعة تطويرية</p>
+                                                    <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <div>
+                                                                <div className="flex items-center gap-2 flex-wrap">
+                                                                    <p className="font-extrabold text-slate-900 text-xs">{comp.name_ar}</p>
+                                                                    {comp.name_en && (
+                                                                        <span className="text-[10px] text-slate-400 font-mono">({comp.name_en})</span>
+                                                                    )}
+                                                                </div>
+                                                                {comp.description_ar && (
+                                                                    <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">{comp.description_ar}</p>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-left shrink-0">
+                                                                <p className="font-mono font-black text-slate-900 text-sm">
+                                                                    {comp.converted_cost} <span className="text-[11px] font-bold text-amber-600">{comp.currency_symbol}</span>
+                                                                </p>
+                                                                <p className="text-[10px] font-bold text-slate-400 mt-0.5">
+                                                                    ~ ${comp.cost_usd} USD
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <div className="text-left font-mono font-bold text-slate-800">
-                                                            ${comp.cost_usd}
+                                                        <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
+                                                            <span className="text-slate-500 font-bold">⏱ الساعات المقدرة: <strong className="text-slate-800">{comp.estimated_hours} ساعة</strong></span>
+                                                            {comp.complexity && (
+                                                                <span className="bg-slate-200/70 text-slate-700 font-bold px-2 py-0.5 rounded uppercase">
+                                                                    مستوى التعقيد: {comp.complexity}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ))}

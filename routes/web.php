@@ -594,9 +594,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/projects-export', [ProjectController::class, 'export'])->name('projects.export');
 
     // Project Contracts
-    Route::get('/contracts/quick-create', [AdminQuickContractController::class, 'create'])->name('admin.contracts.quick-create');
-    Route::post('/contracts/quick-calculate', [AdminQuickContractController::class, 'calculate'])->name('admin.contracts.quick-calculate');
-    Route::post('/contracts/quick-store', [AdminQuickContractController::class, 'store'])->name('admin.contracts.quick-store');
+    Route::get('/contracts/quick-create', [AdminQuickContractController::class, 'create'])->name('contracts.quick-create');
+    Route::post('/contracts/quick-calculate', [AdminQuickContractController::class, 'calculate'])->name('contracts.quick-calculate');
+    Route::post('/contracts/quick-store', [AdminQuickContractController::class, 'store'])->name('contracts.quick-store');
     Route::get('/projects/{project}/contracts', [ProjectContractController::class, 'index'])->name('projects.contracts.index');
     Route::post('/projects/{project}/contracts', [ProjectContractController::class, 'store'])->name('projects.contracts.store');
     Route::put('/projects/{project}/contracts/{contract}', [ProjectContractController::class, 'update'])->name('projects.contracts.update');

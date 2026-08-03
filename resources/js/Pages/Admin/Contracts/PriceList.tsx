@@ -14,6 +14,19 @@ import { toast } from 'sonner';
 
 export default function PriceList({ items, currencies, system_hourly_rate = 25 }: any) {
     const hourlyRate = system_hourly_rate || 25;
+    const isLocalCurrencyRate = hourlyRate > 100;
+    const hourlyRateUsd = isLocalCurrencyRate ? (hourlyRate / 50) : hourlyRate;
+
+    const formatItemPrice = (hours: number) => {
+        if (isLocalCurrencyRate) {
+            const egpCost = Math.round(hours * hourlyRate);
+            const usdCost = Math.round(hours * hourlyRateUsd);
+            return `~${egpCost} EGP (~$${usdCost})`;
+        }
+        const usdCost = Math.round(hours * hourlyRateUsd);
+        return `~$${usdCost}`;
+    };
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingItem, setEditingItem] = useState<number | null>(null);
     const [pendingDelete, setPendingDelete] = useState<number | null>(null);
@@ -192,8 +205,8 @@ export default function PriceList({ items, currencies, system_hourly_rate = 25 }
                                                     <p className="text-xs text-slate-500 mt-1">{item.description}</p>
                                                 )}
                                                 <div className="flex items-center gap-4 mt-2 text-xs text-slate-600">
-                                                    <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5 text-slate-400" /> منفرد: <strong>{item.standalone_hours || 4}h</strong> (~${(item.standalone_hours || 4) * hourlyRate})</span>
-                                                    <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5 text-slate-400" /> مشروع: <strong>{item.marginal_hours || 2}h</strong> (~${(item.marginal_hours || 2) * hourlyRate})</span>
+                                                    <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5 text-slate-400" /> منفرد: <strong>{item.standalone_hours || 4}h</strong> ({formatItemPrice(item.standalone_hours || 4)})</span>
+                                                    <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5 text-slate-400" /> مشروع: <strong>{item.marginal_hours || 2}h</strong> ({formatItemPrice(item.marginal_hours || 2)})</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2 shrink-0">
