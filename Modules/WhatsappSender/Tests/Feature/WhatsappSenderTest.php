@@ -53,6 +53,32 @@ class WhatsappSenderTest extends TestCase
         ]);
     }
 
+    public function test_user_can_update_whatsapp_account()
+    {
+        $user = User::factory()->create();
+        $account = WhatsappAccount::create([
+            'user_id' => $user->id,
+            'name' => 'Original Name',
+            'phone_number_id' => '111222333',
+            'waba_id' => '444555666',
+            'access_token' => 'old_token',
+        ]);
+
+        $response = $this->actingAs($user)->put('/whatsapp-sender/accounts/' . $account->id, [
+            'name' => 'Updated Name',
+            'phone_number_id' => '999888777',
+            'waba_id' => '777666555',
+            'access_token' => 'new_token',
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('whatsapp_accounts', [
+            'id' => $account->id,
+            'name' => 'Updated Name',
+            'phone_number_id' => '999888777',
+        ]);
+    }
+
     public function test_user_can_delete_whatsapp_account()
     {
         $user = User::factory()->create();
@@ -775,5 +801,48 @@ class WhatsappSenderTest extends TestCase
             'whatsapp_business_id' => $business->id,
             'message_body' => 'Option selected successfully!',
         ]);
+    }
+
+    public function test_fetch_whatsapp_accounts_from_meta_token_discovers_accounts()
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'https://graph.facebook.com/debug_token*' => \Illuminate\Support\Facades\Http::response([
+                'data' => [
+                    'granular_scopes' => [
+                        [
+                            'scope' => 'whatsapp_business_management',
+                            'target_ids' => ['100200300400']
+                        ]
+                    ]
+                ]
+            ], 200),
+            'https://graph.facebook.com/v21.0/me/whatsapp_business_accounts*' => \Illuminate\Support\Facades\Http::response([
+                'data' => [
+                    ['id' => '100200300400', 'name' => 'My WABA Account']
+                ]
+            ], 200),
+            'https://graph.facebook.com/v21.0/me/client_whatsapp_business_accounts*' => \Illuminate\Support\Facades\Http::response(['data' => []], 200),
+            'https://graph.facebook.com/v21.0/me/shared_whatsapp_business_accounts*' => \Illuminate\Support\Facades\Http::response(['data' => []], 200),
+            'https://graph.facebook.com/v21.0/me/businesses*' => \Illuminate\Support\Facades\Http::response(['data' => []], 200),
+            'https://graph.facebook.com/v21.0/me?*' => \Illuminate\Support\Facades\Http::response(['data' => []], 200),
+            'https://graph.facebook.com/v21.0/100200300400/phone_numbers*' => \Illuminate\Support\Facades\Http::response([
+                'data' => [
+                    [
+                        'id' => '9988776655',
+                        'display_phone_number' => '+20 100 123 4567',
+                        'verified_name' => 'Verified Business Name'
+                    ]
+                ]
+            ], 200),
+        ]);
+
+        $service = app(\Modules\WhatsappSender\Services\MetaWhatsappService::class);
+        $accounts = $service->fetchWhatsAppAccountsFromMetaToken('mock_user_token', 'mock_app_id', 'mock_app_secret');
+
+        $this->assertCount(1, $accounts);
+        $this->assertEquals('100200300400', $accounts[0]['waba_id']);
+        $this->assertEquals('9988776655', $accounts[0]['phone_number_id']);
+        $this->assertEquals('+20 100 123 4567', $accounts[0]['display_phone_number']);
+        $this->assertEquals('Verified Business Name', $accounts[0]['verified_name']);
     }
 }

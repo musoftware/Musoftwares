@@ -189,7 +189,7 @@ class ComponentBenchmarkRates
                 'standalone_hours' => 14,
                 'marginal_hours'   => 8,
                 'complexity'       => 'high',
-                'keywords'         => ['ai', 'agent', 'ذكاء اصطناعي', 'بوت', 'bot', 'openai', 'gemini'],
+                'keywords'         => ['ai', 'agent', 'ذكاء اصطناعي', 'openai', 'gemini', 'chatgpt', 'llm', 'الذكاء الاصطناعي'],
             ],
             'workflow_approval' => [
                 'name_ar'          => 'دورات العمل والاعتمادات (Workflow & Approvals)',

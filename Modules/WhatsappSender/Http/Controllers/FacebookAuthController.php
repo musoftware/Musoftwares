@@ -52,7 +52,7 @@ class FacebookAuthController extends Controller
             $driver = Socialite::driver('facebook');
 
             return $driver
-                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging'])
+                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging', 'business_management'])
                 ->redirect();
         } catch (\Throwable $e) {
             return redirect()->route('whatsapp.index')->with('error', $this->formatErrorMessage($e));
@@ -102,10 +102,10 @@ class FacebookAuthController extends Controller
                 ->delete();
 
             // Auto-detect real WhatsApp Business Accounts & Phone Number IDs from Meta Graph API
-            $metaAccounts = $this->whatsappService->fetchWhatsAppAccountsFromMetaToken($token);
+            $metaAccounts = $this->whatsappService->fetchWhatsAppAccountsFromMetaToken($token, $clientId, $clientSecret);
 
             $redirectTarget = $businessId
-                ? redirect()->route('whatsapp.business.workspace', $businessId)
+                ? redirect()->route('whatsapp.businesses.workspace', $businessId)
                 : redirect()->back();
 
             if (empty($metaAccounts)) {
@@ -113,7 +113,7 @@ class FacebookAuthController extends Controller
 
                 return $redirectTarget->with(
                     'info',
-                    "Facebook Login succeeded! We saved your OAuth Access Token. Please enter your Meta Phone Number ID below to complete your connection."
+                    'تم تسجيل الدخول بحساب فيسبوك وحفظ توكن الصلاحية بنجاح! لم يتم العثور على أرقام واتساب تجارية مرتبطة تلقائياً. تأكد أن تطبيق فيسبوك في وضع Live أو أن حساب الفيسبوك يملك حساب WhatsApp Business مفعل، أو يمكنك إضافة Phone Number ID يدويًا.'
                 );
             }
 

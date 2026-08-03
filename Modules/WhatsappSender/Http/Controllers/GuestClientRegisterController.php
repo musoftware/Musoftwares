@@ -65,7 +65,7 @@ class GuestClientRegisterController extends Controller
             $driver = Socialite::driver('facebook');
 
             return $driver
-                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging'])
+                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging', 'business_management'])
                 ->with(['state' => $uuid])
                 ->redirect();
         } catch (\Throwable $e) {
@@ -113,7 +113,7 @@ class GuestClientRegisterController extends Controller
             $name = $fbUser->getName() ?? 'Connected Client Account';
 
             // Fetch real WhatsApp Business Accounts & Phone Number IDs from Meta Graph API
-            $metaAccounts = $this->whatsappService->fetchWhatsAppAccountsFromMetaToken($token);
+            $metaAccounts = $this->whatsappService->fetchWhatsAppAccountsFromMetaToken($token, $clientId, $clientSecret);
 
             if (empty($metaAccounts)) {
                 // If direct detection fails, create a placeholder using the access token

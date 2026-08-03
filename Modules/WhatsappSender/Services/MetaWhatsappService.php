@@ -339,7 +339,7 @@ class MetaWhatsappService
     /**
      * Fetch WhatsApp Business Accounts and Phone Numbers linked to an OAuth user token across all Meta endpoints.
      */
-    public function fetchWhatsAppAccountsFromMetaToken(string $accessToken): array
+    public function fetchWhatsAppAccountsFromMetaToken(string $accessToken, ?string $clientId = null, ?string $clientSecret = null): array
     {
         if ($this->isSandboxToken($accessToken)) {
             return [
@@ -353,80 +353,195 @@ class MetaWhatsappService
             ];
         }
 
-        $foundAccounts = [];
+        $clientId = $clientId ?: config('services.facebook.client_id');
+        $clientSecret = $clientSecret ?: config('services.facebook.client_secret');
 
+        $rawResponses = [];
+        $discoveredWabas = []; // waba_id => waba_name
+        $targetPhoneIds = [];  // phone_number_id => true
+        $foundAccounts = [];   // phone_number_id => account_data
+
+        // Strategy 0: Inspect Meta Token via /debug_token if app credentials provided
+        if (!empty($clientId) && !empty($clientSecret)) {
+            try {
+                $appToken = "{$clientId}|{$clientSecret}";
+                $debugRes = Http::get("https://graph.facebook.com/debug_token", [
+                    'input_token' => $accessToken,
+                    'access_token' => $appToken,
+                ]);
+                $rawResponses['strategy_0_debug_token'] = [
+                    'status' => $debugRes->status(),
+                    'body' => $debugRes->json(),
+                ];
+
+                if ($debugRes->successful()) {
+                    $granularScopes = $debugRes->json()['data']['granular_scopes'] ?? [];
+                    foreach ($granularScopes as $gs) {
+                        $scope = $gs['scope'] ?? '';
+                        $targetIds = $gs['target_ids'] ?? [];
+
+                        if (in_array($scope, ['whatsapp_business_management', 'whatsapp_business_messaging'])) {
+                            foreach ($targetIds as $tid) {
+                                $discoveredWabas[(string) $tid] = null;
+                                $targetPhoneIds[(string) $tid] = true;
+                            }
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[MetaWhatsappService] debug_token inspection warning: ' . $e->getMessage());
+                $rawResponses['strategy_0_debug_token'] = ['error' => $e->getMessage()];
+            }
+        }
+
+        // Strategy 1: User Permissions inspection via /me/permissions
         try {
-            // Strategy 1: Direct /me/whatsapp_business_accounts
-            $res1 = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/me/whatsapp_business_accounts", [
-                'fields' => 'id,name,phone_numbers{id,display_phone_number,verified_name}',
-            ]);
+            $permRes = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/me/permissions");
+            $rawResponses['strategy_1_me_permissions'] = [
+                'status' => $permRes->status(),
+                'body' => $permRes->json(),
+            ];
+        } catch (\Throwable $e) {
+            $rawResponses['strategy_1_me_permissions'] = ['error' => $e->getMessage()];
+        }
 
-            if ($res1->successful()) {
-                $wabas = $res1->json()['data'] ?? [];
-                foreach ($wabas as $waba) {
-                    $phones = $waba['phone_numbers']['data'] ?? [];
-                    foreach ($phones as $phone) {
-                        $foundAccounts[$phone['id']] = [
-                            'waba_id' => $waba['id'],
-                            'waba_name' => $waba['name'] ?? null,
-                            'phone_number_id' => $phone['id'],
-                            'display_phone_number' => $phone['display_phone_number'] ?? null,
-                            'verified_name' => $phone['verified_name'] ?? null,
+        // Strategy 2: Business Managers /me/businesses & WABAs per business
+        try {
+            $resBiz = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/me/businesses", [
+                'fields' => 'id,name',
+            ]);
+            $rawResponses['strategy_2_me_businesses'] = [
+                'status' => $resBiz->status(),
+                'body' => $resBiz->json(),
+            ];
+
+            if ($resBiz->successful()) {
+                foreach ($resBiz->json()['data'] ?? [] as $biz) {
+                    $bizId = $biz['id'] ?? null;
+                    if (!$bizId) continue;
+
+                    // Query owned WABAs under this business
+                    try {
+                        $ownedRes = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/{$bizId}/owned_whatsapp_business_accounts", [
+                            'fields' => 'id,name',
+                        ]);
+                        $rawResponses["biz_{$bizId}_owned_wabas"] = [
+                            'status' => $ownedRes->status(),
+                            'body' => $ownedRes->json(),
                         ];
-                    }
+                        if ($ownedRes->successful()) {
+                            foreach ($ownedRes->json()['data'] ?? [] as $waba) {
+                                if (!empty($waba['id'])) {
+                                    $discoveredWabas[(string) $waba['id']] = $waba['name'] ?? $biz['name'] ?? null;
+                                }
+                            }
+                        }
+                    } catch (\Throwable) {}
+
+                    // Query client WABAs under this business
+                    try {
+                        $clientRes = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/{$bizId}/client_whatsapp_business_accounts", [
+                            'fields' => 'id,name',
+                        ]);
+                        $rawResponses["biz_{$bizId}_client_wabas"] = [
+                            'status' => $clientRes->status(),
+                            'body' => $clientRes->json(),
+                        ];
+                        if ($clientRes->successful()) {
+                            foreach ($clientRes->json()['data'] ?? [] as $waba) {
+                                if (!empty($waba['id'])) {
+                                    $discoveredWabas[(string) $waba['id']] = $waba['name'] ?? $biz['name'] ?? null;
+                                }
+                            }
+                        }
+                    } catch (\Throwable) {}
                 }
             }
+        } catch (\Throwable $e) {
+            Log::warning('[MetaWhatsappService] businesses strategy warning: ' . $e->getMessage());
+            $rawResponses['strategy_2_me_businesses'] = ['error' => $e->getMessage()];
+        }
 
-            // Strategy 2: Client WABAs /me/client_whatsapp_business_accounts
-            $res2 = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/me/client_whatsapp_business_accounts", [
-                'fields' => 'id,name,phone_numbers{id,display_phone_number,verified_name}',
-            ]);
+        // Strategy 3: Query Phone Numbers for all Discovered WABAs via /{waba_id}/phone_numbers
+        foreach ($discoveredWabas as $wabaId => $wabaName) {
+            if (empty($wabaId)) continue;
 
-            if ($res2->successful()) {
-                $wabas = $res2->json()['data'] ?? [];
-                foreach ($wabas as $waba) {
-                    $phones = $waba['phone_numbers']['data'] ?? [];
-                    foreach ($phones as $phone) {
-                        $foundAccounts[$phone['id']] = [
-                            'waba_id' => $waba['id'],
-                            'waba_name' => $waba['name'] ?? null,
-                            'phone_number_id' => $phone['id'],
-                            'display_phone_number' => $phone['display_phone_number'] ?? null,
-                            'verified_name' => $phone['verified_name'] ?? null,
-                        ];
+            try {
+                if (empty($wabaName)) {
+                    $wabaInfoRes = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/{$wabaId}", [
+                        'fields' => 'id,name',
+                    ]);
+                    $rawResponses["waba_info_{$wabaId}"] = [
+                        'status' => $wabaInfoRes->status(),
+                        'body' => $wabaInfoRes->json(),
+                    ];
+                    if ($wabaInfoRes->successful()) {
+                        $wabaName = $wabaInfoRes->json()['name'] ?? null;
+                        $discoveredWabas[$wabaId] = $wabaName;
                     }
                 }
-            }
 
-            // Strategy 3: Business Managers /me/businesses
-            $res3 = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/me/businesses", [
-                'fields' => 'id,name,whatsapp_business_accounts{id,name,phone_numbers{id,display_phone_number,verified_name}}',
-            ]);
+                $phoneRes = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/{$wabaId}/phone_numbers", [
+                    'fields' => 'id,display_phone_number,verified_name,quality_rating,status',
+                ]);
+                $rawResponses["waba_phone_numbers_{$wabaId}"] = [
+                    'status' => $phoneRes->status(),
+                    'body' => $phoneRes->json(),
+                ];
 
-            if ($res3->successful()) {
-                $businesses = $res3->json()['data'] ?? [];
-                foreach ($businesses as $biz) {
-                    $wabas = $biz['whatsapp_business_accounts']['data'] ?? [];
-                    foreach ($wabas as $waba) {
-                        $phones = $waba['phone_numbers']['data'] ?? [];
-                        foreach ($phones as $phone) {
-                            $foundAccounts[$phone['id']] = [
-                                'waba_id' => $waba['id'],
-                                'waba_name' => $waba['name'] ?? $biz['name'] ?? null,
-                                'phone_number_id' => $phone['id'],
+                if ($phoneRes->successful()) {
+                    $phones = $phoneRes->json()['data'] ?? [];
+                    foreach ($phones as $phone) {
+                        if (!empty($phone['id'])) {
+                            $foundAccounts[(string) $phone['id']] = [
+                                'waba_id' => (string) $wabaId,
+                                'waba_name' => $wabaName,
+                                'phone_number_id' => (string) $phone['id'],
                                 'display_phone_number' => $phone['display_phone_number'] ?? null,
-                                'verified_name' => $phone['verified_name'] ?? null,
+                                'verified_name' => $phone['verified_name'] ?? $wabaName,
                             ];
                         }
                     }
                 }
+            } catch (\Throwable $e) {
+                Log::warning("[MetaWhatsappService] Failed to fetch phone numbers for WABA {$wabaId}: " . $e->getMessage());
+                $rawResponses["waba_phone_numbers_{$wabaId}"] = ['error' => $e->getMessage()];
+            }
+        }
+
+        // Query any direct Phone Number IDs discovered via debug_token target_ids
+        foreach (array_keys($targetPhoneIds) as $phoneId) {
+            if (isset($foundAccounts[$phoneId]) || isset($discoveredWabas[$phoneId])) {
+                continue;
             }
 
-            return array_values($foundAccounts);
-        } catch (\Throwable $e) {
-            Log::error('[MetaWhatsappService] fetchWhatsAppAccountsFromMetaToken error: ' . $e->getMessage());
-            return array_values($foundAccounts);
+            try {
+                $pRes = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/{$phoneId}", [
+                    'fields' => 'id,display_phone_number,verified_name,status,waba_id',
+                ]);
+                $rawResponses["target_phone_details_{$phoneId}"] = [
+                    'status' => $pRes->status(),
+                    'body' => $pRes->json(),
+                ];
+
+                if ($pRes->successful()) {
+                    $pData = $pRes->json();
+                    if (!empty($pData['id']) && (isset($pData['display_phone_number']) || isset($pData['waba_id']))) {
+                        $foundAccounts[(string) $pData['id']] = [
+                            'waba_id' => $pData['waba_id'] ?? $phoneId,
+                            'waba_name' => $pData['verified_name'] ?? 'Meta WhatsApp Account',
+                            'phone_number_id' => (string) $pData['id'],
+                            'display_phone_number' => $pData['display_phone_number'] ?? null,
+                            'verified_name' => $pData['verified_name'] ?? null,
+                        ];
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Not a phone number ID, ignore
+            }
         }
+
+        return array_values($foundAccounts);
     }
 
     /**

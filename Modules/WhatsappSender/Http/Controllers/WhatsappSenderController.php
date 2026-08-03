@@ -250,6 +250,52 @@ class WhatsappSenderController extends Controller
     }
 
     /**
+     * Update an existing WhatsApp account details.
+     */
+    public function updateAccount(Request $request, int $id): RedirectResponse
+    {
+        $account = WhatsappAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone_number_id' => ['required', 'string', 'max:255'],
+            'waba_id' => ['nullable', 'string', 'max:255'],
+            'access_token' => ['nullable', 'string'],
+        ]);
+
+        $accessToken = !empty($validated['access_token']) ? trim($validated['access_token']) : $account->access_token;
+        $phoneNumberId = trim($validated['phone_number_id']);
+
+        $metadata = $account->metadata ?? [];
+        $status = $account->status;
+
+        if (!empty($validated['access_token']) || $phoneNumberId !== $account->phone_number_id) {
+            $verification = $this->whatsappService->verifyAccountCredentials(
+                $phoneNumberId,
+                $accessToken
+            );
+
+            if ($verification['valid']) {
+                $metadata = array_merge($metadata, $verification['data']);
+                $status = (isset($metadata['status']) && $metadata['status'] !== 'CONNECTED') ? 'unregistered' : 'active';
+            }
+        }
+
+        $account->update([
+            'name' => trim($validated['name']),
+            'phone_number_id' => $phoneNumberId,
+            'waba_id' => !empty($validated['waba_id']) ? trim($validated['waba_id']) : null,
+            'access_token' => $accessToken,
+            'status' => $status,
+            'metadata' => $metadata,
+        ]);
+
+        return redirect()->back()->with('success', 'WhatsApp account updated successfully.');
+    }
+
+    /**
      * Send a WhatsApp message via the web form.
      */
     public function sendMessage(Request $request): RedirectResponse

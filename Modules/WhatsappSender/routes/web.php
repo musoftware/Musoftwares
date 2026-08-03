@@ -21,10 +21,11 @@ Route::middleware(['auth'])
         Route::get('/meta-app-guide', [WhatsappSenderController::class, 'showMetaAppGuide'])->name('meta-app-guide');
         Route::get('/businesses/{id}', [WhatsappSenderController::class, 'showBusinessWorkspace'])->name('businesses.workspace');
         Route::post('/accounts', [WhatsappSenderController::class, 'storeAccount'])->name('accounts.store');
+        Route::match(['PUT', 'PATCH'], '/accounts/{id}', [WhatsappSenderController::class, 'updateAccount'])->name('accounts.update');
         Route::delete('/accounts/{id}', [WhatsappSenderController::class, 'destroyAccount'])->name('accounts.destroy');
         Route::post('/accounts/{id}/register', [WhatsappSenderController::class, 'registerAccount'])->name('accounts.register');
         Route::post('/accounts/{id}/sync', [WhatsappSenderController::class, 'syncAccountStatus'])->name('accounts.sync');
-        Route::put('/accounts/{id}/waba', [WhatsappSenderController::class, 'updateWabaId'])->name('accounts.waba.update');
+        Route::match(['PUT', 'PATCH'], '/accounts/{id}/waba', [WhatsappSenderController::class, 'updateWabaId'])->name('accounts.waba.update');
         Route::post('/send', [WhatsappSenderController::class, 'sendMessage'])->name('send');
 
         // Telegram Bots Management routes

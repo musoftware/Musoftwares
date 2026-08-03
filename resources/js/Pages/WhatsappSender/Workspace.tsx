@@ -144,6 +144,8 @@ export default function Workspace({
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [showAddAccountModal, setShowAddAccountModal] = useState(false);
+    const [showEditAccountModal, setShowEditAccountModal] = useState(false);
+    const [editingAccount, setEditingAccount] = useState<Account | null>(null);
     const [editingWabaAccountId, setEditingWabaAccountId] = useState<number | null>(null);
     const [tempWabaId, setTempWabaId] = useState('');
 
@@ -161,6 +163,36 @@ export default function Workspace({
             onSuccess: () => {
                 setShowAddAccountModal(false);
                 accountForm.reset();
+            }
+        });
+    };
+
+    const editAccountForm = useForm({
+        name: '',
+        phone_number_id: '',
+        waba_id: '',
+        access_token: '',
+    });
+
+    const openEditAccountModal = (acc: Account) => {
+        setEditingAccount(acc);
+        editAccountForm.setData({
+            name: acc.name || '',
+            phone_number_id: acc.phone_number_id || '',
+            waba_id: acc.waba_id || '',
+            access_token: (acc as any).access_token || '',
+        });
+        setShowEditAccountModal(true);
+    };
+
+    const handleUpdateAccount = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingAccount) return;
+        editAccountForm.put(`/whatsapp-sender/accounts/${editingAccount.id}`, {
+            onSuccess: () => {
+                setShowEditAccountModal(false);
+                setEditingAccount(null);
+                editAccountForm.reset();
             }
         });
     };
@@ -912,82 +944,103 @@ export default function Workspace({
                                                         <span>Phone ID: <strong className="font-mono">{acc.phone_number_id}</strong></span>
                                                         <span className="text-zinc-300 dark:text-zinc-800">|</span>
                                                         <span>WABA ID:</span>
-                                                        {acc.waba_id ? (
-                                                            <strong className="font-mono text-zinc-700 dark:text-zinc-300">{acc.waba_id}</strong>
-                                                        ) : (
-                                                            editingWabaAccountId === acc.id ? (
-                                                                <form
-                                                                    onSubmit={(e) => {
-                                                                        e.preventDefault();
-                                                                        if (!tempWabaId.trim()) return;
-                                                                        router.put(`/whatsapp-sender/accounts/${acc.id}/waba`, {
-                                                                            waba_id: tempWabaId.trim()
-                                                                        }, {
-                                                                            onSuccess: () => setEditingWabaAccountId(null)
-                                                                        });
-                                                                    }}
-                                                                    className="inline-flex items-center gap-2"
+                                                        {editingWabaAccountId === acc.id ? (
+                                                            <form
+                                                                onSubmit={(e) => {
+                                                                    e.preventDefault();
+                                                                    if (!tempWabaId.trim()) return;
+                                                                    router.put(`/whatsapp-sender/accounts/${acc.id}/waba`, {
+                                                                        waba_id: tempWabaId.trim()
+                                                                    }, {
+                                                                        onSuccess: () => setEditingWabaAccountId(null)
+                                                                    });
+                                                                }}
+                                                                className="inline-flex items-center gap-2"
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    placeholder="WABA ID"
+                                                                    value={tempWabaId}
+                                                                    onChange={e => setTempWabaId(e.target.value)}
+                                                                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 w-36 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                                                    autoFocus
+                                                                />
+                                                                <button
+                                                                    type="submit"
+                                                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xxs font-bold px-2 py-0.5 rounded-md transition"
                                                                 >
-                                                                    <input
-                                                                        type="text"
-                                                                        required
-                                                                        placeholder="WABA ID"
-                                                                        value={tempWabaId}
-                                                                        onChange={e => setTempWabaId(e.target.value)}
-                                                                        className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 w-36 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                                                                        autoFocus
-                                                                    />
-                                                                    <button
-                                                                        type="submit"
-                                                                        className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xxs font-bold px-2 py-0.5 rounded-md transition"
-                                                                    >
-                                                                        Save
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setEditingWabaAccountId(null)}
-                                                                        className="text-zinc-400 hover:text-zinc-600 text-xxs"
-                                                                    >
-                                                                        Cancel
-                                                                    </button>
-                                                                </form>
-                                                            ) : (
-                                                                <span className="inline-flex items-center gap-2">
-                                                                    <span className="text-amber-600 dark:text-amber-400 font-medium text-xxs bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded-sm">Missing</span>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            setEditingWabaAccountId(acc.id);
-                                                                            setTempWabaId('');
-                                                                        }}
-                                                                        className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold"
-                                                                    >
-                                                                        Set WABA ID
-                                                                    </button>
-                                                                    <a
-                                                                        href="https://business.facebook.com/wa/manage/phone-numbers/"
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2 py-0.5 rounded text-xs font-semibold transition border border-blue-200/60 dark:border-blue-800/60"
-                                                                        title="Visit Meta Business Suite to find your WABA ID"
-                                                                    >
-                                                                        <ExternalLink className="w-3 h-3" />
-                                                                        <span>Visit External</span>
-                                                                    </a>
-                                                                </span>
-                                                            )
+                                                                    Save
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setEditingWabaAccountId(null)}
+                                                                    className="text-zinc-400 hover:text-zinc-600 text-xxs"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            </form>
+                                                        ) : acc.waba_id ? (
+                                                            <span className="inline-flex items-center gap-1.5">
+                                                                <strong className="font-mono text-zinc-700 dark:text-zinc-300">{acc.waba_id}</strong>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setEditingWabaAccountId(acc.id);
+                                                                        setTempWabaId(acc.waba_id || '');
+                                                                    }}
+                                                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                                                                    title="Edit WABA ID"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-2">
+                                                                <span className="text-amber-600 dark:text-amber-400 font-medium text-xxs bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded-sm">Missing</span>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEditingWabaAccountId(acc.id);
+                                                                        setTempWabaId('');
+                                                                    }}
+                                                                    className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold"
+                                                                >
+                                                                    Set WABA ID
+                                                                </button>
+                                                                <a
+                                                                    href="https://business.facebook.com/wa/manage/phone-numbers/"
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2 py-0.5 rounded text-xs font-semibold transition border border-blue-200/60 dark:border-blue-800/60"
+                                                                    title="Visit Meta Business Suite to find your WABA ID"
+                                                                >
+                                                                    <ExternalLink className="w-3 h-3" />
+                                                                    <span>Visit External</span>
+                                                                </a>
+                                                            </span>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => {
-                                                        if (confirm('Are you sure you want to disconnect this number?')) {
-                                                            router.delete(`/whatsapp-sender/accounts/${acc.id}`);
-                                                        }
-                                                    }}
-                                                    className="text-red-500 hover:text-red-650 text-xs font-semibold"
-                                                >
-                                                    Disconnect
-                                                </button>
+                                                <div className="flex items-center gap-3 shrink-0">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openEditAccountModal(acc)}
+                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 text-xs font-semibold"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (confirm('Are you sure you want to disconnect this number?')) {
+                                                                router.delete(`/whatsapp-sender/accounts/${acc.id}`);
+                                                            }
+                                                        }}
+                                                        className="text-red-500 hover:text-red-650 text-xs font-semibold"
+                                                    >
+                                                        Disconnect
+                                                    </button>
+                                                </div>
                                             </div>
                                         ))}
                                         {accounts.length === 0 && (
@@ -2045,6 +2098,91 @@ export default function Workspace({
                                     className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
                                     {accountForm.processing ? 'Verifying & Saving...' : 'Save Meta Account'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Meta Account Modal */}
+            {showEditAccountModal && editingAccount && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-6">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">تعديل حساب Meta / WhatsApp</h3>
+                                <p className="text-xs text-zinc-500 mt-1">تعديل بيانات الحساب ومُعرفات Meta Developer Portal.</p>
+                            </div>
+                            <button onClick={() => { setShowEditAccountModal(false); setEditingAccount(null); }} className="text-zinc-400 hover:text-zinc-600 font-bold text-xl">&times;</button>
+                        </div>
+
+                        <form onSubmit={handleUpdateAccount} className="space-y-4">
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Account Display Name / Phone</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="e.g. +20 12 26024269"
+                                    value={editAccountForm.data.name}
+                                    onChange={e => editAccountForm.setData('name', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
+                                />
+                                {editAccountForm.errors.name && <span className="text-xxs text-red-500 mt-1 block">{editAccountForm.errors.name}</span>}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Phone Number ID</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="e.g. 1327754942721420"
+                                        value={editAccountForm.data.phone_number_id}
+                                        onChange={e => editAccountForm.setData('phone_number_id', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
+                                    />
+                                    {editAccountForm.errors.phone_number_id && <span className="text-xxs text-red-500 mt-1 block">{editAccountForm.errors.phone_number_id}</span>}
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">WABA ID</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. 1223248954207318"
+                                        value={editAccountForm.data.waba_id}
+                                        onChange={e => editAccountForm.setData('waba_id', e.target.value)}
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
+                                    />
+                                    {editAccountForm.errors.waba_id && <span className="text-xxs text-red-500 mt-1 block">{editAccountForm.errors.waba_id}</span>}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Access Token (Optional - Leave blank to keep existing token)</label>
+                                <textarea
+                                    rows={3}
+                                    placeholder="Leave blank to keep existing token or paste a new token..."
+                                    value={editAccountForm.data.access_token}
+                                    onChange={e => editAccountForm.setData('access_token', e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-xs font-mono text-zinc-700 dark:text-zinc-300"
+                                />
+                                {editAccountForm.errors.access_token && <span className="text-xxs text-red-500 mt-1 block">{editAccountForm.errors.access_token}</span>}
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowEditAccountModal(false); setEditingAccount(null); }}
+                                    className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={editAccountForm.processing}
+                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
+                                >
+                                    {editAccountForm.processing ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>
                         </form>

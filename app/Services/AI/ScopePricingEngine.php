@@ -32,43 +32,59 @@ class ScopePricingEngine
         $contextType = $options['context_type'] ?? $this->detectContextType($components, $project);
 
         // 1. Fetch USD and EGP currency models to determine the base USD -> EGP exchange rate
-        $usdCurrency = Currency::where('currency', 'USD')->first();
-        $egpCurrency = Currency::where('currency', 'EGP')->first();
-
         $usdToEgpRate = 50.0;
-        if ($usdCurrency && $egpCurrency) {
-            try {
+        $usdCurrency = null;
+        $egpCurrency = null;
+
+        try {
+            $usdCurrency = Currency::where('currency', 'USD')->first();
+            $egpCurrency = Currency::where('currency', 'EGP')->first();
+
+            if ($usdCurrency && $egpCurrency) {
                 $rate = CurrenciesExchange::RateToday(1.0, $usdCurrency->id, $egpCurrency->id);
                 if ($rate > 0) {
                     $usdToEgpRate = (float) $rate;
                 } elseif (!empty($egpCurrency->rate) && $egpCurrency->rate > 0) {
                     $usdToEgpRate = (float) $egpCurrency->rate;
                 }
-            } catch (\Throwable $e) {
-                $usdToEgpRate = (float) ($egpCurrency->rate ?? 50.0);
             }
+        } catch (\Throwable $e) {
+            $usdToEgpRate = 50.0;
         }
 
         // 2. Determine base hourly rate in USD
-        $marketRateSetting = (float) (AdminSettings::GetValue('market_hourly_rate') ?: self::BASE_HOURLY_RATE_USD);
+        $marketRateSetting = self::BASE_HOURLY_RATE_USD;
+        try {
+            $settingVal = AdminSettings::GetValue('market_hourly_rate');
+            if ($settingVal) {
+                $marketRateSetting = (float) $settingVal;
+            }
+        } catch (\Throwable $e) {
+            $marketRateSetting = self::BASE_HOURLY_RATE_USD;
+        }
+
         if ($options['hourly_rate_usd'] ?? null) {
             $hourlyRate = (float) $options['hourly_rate_usd'];
         } elseif ($marketRateSetting > 100) {
-            // Setting was entered in local EGP currency (e.g. 350 EGP/hr).
-            // Convert EGP/hr to USD/hr using USD->EGP rate (e.g. 350 / 50 = $7.00 USD/hr)
             $hourlyRate = round($marketRateSetting / max(1.0, $usdToEgpRate), 2);
         } else {
             $hourlyRate = $marketRateSetting > 0 ? $marketRateSetting : self::BASE_HOURLY_RATE_USD;
         }
 
         // 3. Determine target currency and its exchange rate from USD
-        $clientUser       = !empty($project->user_id) ? User::find($project->user_id) : null;
-        $targetCurrencyId = $options['currency_id'] ?? $clientUser?->currency_id;
-        $targetCurrency   = $targetCurrencyId ? Currency::find($targetCurrencyId) : null;
+        $clientUser = null;
+        $targetCurrency = null;
+        try {
+            $clientUser       = !empty($project->user_id) ? User::find($project->user_id) : null;
+            $targetCurrencyId = $options['currency_id'] ?? $clientUser?->currency_id;
+            $targetCurrency   = $targetCurrencyId ? Currency::find($targetCurrencyId) : null;
+        } catch (\Throwable $e) {
+            $targetCurrency = null;
+        }
 
-        $exchangeRate   = 1.0;
-        $currencySymbol = '$';
-        $currencyCode   = 'USD';
+        $exchangeRate   = 50.0;
+        $currencySymbol = 'EGP';
+        $currencyCode   = 'EGP';
 
         if ($targetCurrency) {
             $currencySymbol = $targetCurrency->symbol ?? $targetCurrency->currency;
@@ -81,8 +97,6 @@ class ScopePricingEngine
                         $exchangeRate = (float) $convertedRate;
                     } elseif (!empty($targetCurrency->rate) && $targetCurrency->rate > 0) {
                         $exchangeRate = (float) $targetCurrency->rate;
-                    } else {
-                        $exchangeRate = 50.0;
                     }
                 } catch (\Throwable $e) {
                     $exchangeRate = (float) ($targetCurrency->rate ?? 50.0);
@@ -101,18 +115,18 @@ class ScopePricingEngine
         // Fetch official registered components catalog from DB (ContractPriceItem table)
         $registeredCatalog = ComponentBenchmarkRates::getComponents();
 
-        // Normalize input description text
+        // Normalize input description text without duplicating $project->description
         $rawComponents = !empty($components) ? $components : ($project->ai_context['pending_features'] ?? []);
         if (empty($rawComponents) && !empty($project->project_name)) {
             $rawComponents = [$project->project_name];
         }
 
         $descriptionText = is_array($rawComponents) 
-            ? implode(' ', array_map(fn($c) => is_string($c) ? $c : json_encode($c), $rawComponents)) 
+            ? implode(" \n", array_map(fn($c) => is_string($c) ? $c : json_encode($c), $rawComponents)) 
             : (string) $rawComponents;
 
-        if (!empty($project->description)) {
-            $descriptionText .= ' ' . $project->description;
+        if (!empty($project->description) && !str_contains($descriptionText, trim($project->description))) {
+            $descriptionText .= "\n" . $project->description;
         }
 
         $cleanPromptText = trim($descriptionText);
@@ -128,10 +142,10 @@ class ScopePricingEngine
         }
 
         $aiSummary   = $aiAnalysis['ai_summary'] ?? null;
-        $techStack   = $aiAnalysis['tech_stack'] ?? $platformInfo['tech_stack'];
+        $techStack   = !empty($aiAnalysis['tech_stack']) ? $aiAnalysis['tech_stack'] : $platformInfo['tech_stack'];
         
-        // Enforce tech_stack precision if a mobile platform (Android/Flutter/iOS) was requested
-        if ($platformInfo['platform'] !== 'Web' || !str_contains($techStack, 'Laravel')) {
+        // Enforce tech_stack precision if a non-web platform was auto-detected and Gemini returned empty
+        if ($platformInfo['platform'] !== 'Web' && empty($aiAnalysis['tech_stack'])) {
             $techStack = $platformInfo['tech_stack'];
         }
 
@@ -142,14 +156,24 @@ class ScopePricingEngine
         $sumComponentHours  = 0;
 
         if (!empty($selectedAiItems) && is_array($selectedAiItems)) {
+            $seenTitles = [];
             foreach ($selectedAiItems as $item) {
                 $key = strtolower(trim($item['key'] ?? ''));
-                $customNameAr = $item['name_ar'] ?? null;
+                $customNameAr = trim($item['name_ar'] ?? '');
                 $customDesc = $item['description_ar'] ?? null;
+
+                // Deduplicate items with identical or visually duplicated titles
+                $normalizedTitle = mb_strtolower(preg_replace('/\s+/u', ' ', $customNameAr));
+                if (!empty($normalizedTitle) && isset($seenTitles[$normalizedTitle])) {
+                    continue;
+                }
+                if (!empty($normalizedTitle)) {
+                    $seenTitles[$normalizedTitle] = true;
+                }
 
                 if (!empty($key) && isset($registeredCatalog[$key])) {
                     $catComp = $registeredCatalog[$key];
-                    $baseH = ($contextType === 'NEW_PROJECT') ? ($catComp['marginal_hours'] ?? 4) : ($catComp['standalone_hours'] ?? 6);
+                    $baseH = ($contextType === 'NEW_PROJECT') ? ($catComp['marginal_hours'] ?? 4) : ($catComp['standalone_hours'] ?? 3);
                     if (!empty($item['hours'])) {
                         $baseH = (int) max(1, $item['hours']);
                     }
@@ -159,7 +183,7 @@ class ScopePricingEngine
 
                     $resolvedComponents[] = [
                         'key'             => $key,
-                        'name_ar'         => $catComp['name_ar'],
+                        'name_ar'         => !empty($customNameAr) ? $customNameAr : $catComp['name_ar'],
                         'name_en'         => $catComp['name_en'],
                         'description_ar'  => $customDesc ?: 'بناء وتكامل الوحدة البرمجية المسجلة وفق معايير النظام.',
                         'complexity'      => strtolower($catComp['complexity'] ?? 'medium'),
@@ -168,7 +192,7 @@ class ScopePricingEngine
                     ];
                 } elseif (!empty($customNameAr)) {
                     // Custom AI component not in catalog
-                    $baseH = (int) max(1, $item['hours'] ?? 4);
+                    $baseH = (int) max(1, $item['hours'] ?? 2);
                     $h = (int) max(1, round($baseH * $platformMultiplier));
                     $compCostUsd = round($h * $hourlyRate, 2);
                     $sumComponentHours += $h;
@@ -186,46 +210,73 @@ class ScopePricingEngine
             }
         }
 
-        // Fallback NLP Catalog Matcher if AI returned empty or failed
+        // Fallback Task Parser if AI returned empty or failed
         if (empty($resolvedComponents)) {
-            $matchedKeys = $this->detectRegisteredComponentsFromText($cleanPromptText, $registeredCatalog);
+            $promptLines = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $cleanPromptText)));
 
-            $componentCount = count($matchedKeys);
-            $scaleFactor = ($contextType === 'NEW_PROJECT' && $componentCount > 1)
-                ? max(0.6, 1.0 - ($componentCount * 0.03))
-                : 1.0;
+            if (count($promptLines) >= 2) {
+                $seenLines = [];
+                foreach ($promptLines as $line) {
+                    $cleanTitle = preg_replace('/^(?:\d+[\.\)]|[-*•])\s*/u', '', $line);
+                    if (mb_strlen($cleanTitle) < 3) continue;
 
-            foreach ($matchedKeys as $key) {
-                if (isset($registeredCatalog[$key])) {
-                    $catComp = $registeredCatalog[$key];
-                    $baseH = ($contextType === 'NEW_PROJECT')
-                        ? ($catComp['marginal_hours'] ?? 4)
-                        : ($catComp['standalone_hours'] ?? 6);
+                    $normalizedLine = mb_strtolower($cleanTitle);
+                    if (isset($seenLines[$normalizedLine])) continue;
+                    $seenLines[$normalizedLine] = true;
 
-                    $h = (int) max(1, round($baseH * $scaleFactor * $platformMultiplier));
+                    $h = (int) max(1, round(2 * $platformMultiplier));
                     $compCostUsd = round($h * $hourlyRate, 2);
                     $sumComponentHours += $h;
 
                     $resolvedComponents[] = [
-                        'key'             => $key,
-                        'name_ar'         => $catComp['name_ar'],
-                        'name_en'         => $catComp['name_en'],
-                        'description_ar'  => 'بناء وتكامل مكون (' . $catComp['name_ar'] . ') المعتمد في نظام البرمجيات.',
-                        'complexity'      => $catComp['complexity'] ?? 'medium',
+                        'key'             => 'task_' . md5($cleanTitle),
+                        'name_ar'         => $cleanTitle,
+                        'name_en'         => $cleanTitle,
+                        'description_ar'  => 'تطوير وتنفيذ المهمة المطلوبة: ' . $cleanTitle,
+                        'complexity'      => 'medium',
                         'estimated_hours' => $h,
                         'cost_usd'        => $compCostUsd,
                     ];
+                }
+            } else {
+                $matchedKeys = $this->detectRegisteredComponentsFromText($cleanPromptText, $registeredCatalog);
+
+                $componentCount = count($matchedKeys);
+                $scaleFactor = ($contextType === 'NEW_PROJECT' && $componentCount > 1)
+                    ? max(0.6, 1.0 - ($componentCount * 0.03))
+                    : 1.0;
+
+                foreach ($matchedKeys as $key) {
+                    if (isset($registeredCatalog[$key])) {
+                        $catComp = $registeredCatalog[$key];
+                        $baseH = ($contextType === 'NEW_PROJECT')
+                            ? ($catComp['marginal_hours'] ?? 4)
+                            : ($catComp['standalone_hours'] ?? 3);
+
+                        $h = (int) max(1, round($baseH * $scaleFactor * $platformMultiplier));
+                        $compCostUsd = round($h * $hourlyRate, 2);
+                        $sumComponentHours += $h;
+
+                        $resolvedComponents[] = [
+                            'key'             => $key,
+                            'name_ar'         => $catComp['name_ar'],
+                            'name_en'         => $catComp['name_en'],
+                            'description_ar'  => 'بناء وتكامل مكون (' . $catComp['name_ar'] . ') المعتمد في نظام البرمجيات.',
+                            'complexity'      => $catComp['complexity'] ?? 'medium',
+                            'estimated_hours' => $h,
+                            'cost_usd'        => $compCostUsd,
+                        ];
+                    }
                 }
             }
         }
 
         // Add mobile integration features to keyFeatures if mobile platform requested
-        if ($platformInfo['platform'] !== 'Web') {
+        if (str_contains($platformInfo['platform'], 'Android') || str_contains($platformInfo['platform'], 'Flutter') || str_contains($platformInfo['platform'], 'iOS')) {
             array_unshift($keyFeatures, 'تطوير وتكامل تطبيق الهواتف الجوالة (' . $platformInfo['label_ar'] . ')');
             if (!in_array('بناء وتأمين بروتوكولات REST API للتطبيق', $keyFeatures)) {
                 $keyFeatures[] = 'بناء وتأمين بروتوكولات REST API للتطبيق';
             }
-            $keyFeatures = array_unique($keyFeatures);
         }
 
         if (empty($aiSummary)) {
@@ -235,6 +286,7 @@ class ScopePricingEngine
         if (empty($keyFeatures)) {
             $keyFeatures = array_column($resolvedComponents, 'name_ar');
         }
+        $keyFeatures = array_values(array_unique(array_filter($keyFeatures)));
 
         // Total hours = Overhead + Component Hours
         $totalHours = $overheadHours + $sumComponentHours;
@@ -320,17 +372,28 @@ class ScopePricingEngine
     }
 
     /**
-     * Detect platform requirements (Android, Flutter, iOS, Web) and calculate platform multiplier.
+     * Detect platform requirements (Android, Flutter, iOS, Bot, Web) and calculate platform multiplier.
      */
     protected function detectPlatformInfo(string $prompt): array
     {
         $text = mb_strtolower($prompt);
 
+        $hasBot     = str_contains($text, 'bot') || str_contains($text, 'بوت') || str_contains($text, 'telegram') || str_contains($text, 'تلجرام') || str_contains($text, 'whatsapp') || str_contains($text, 'واتساب') || str_contains($text, 'otpjob');
+        $hasScript  = str_contains($text, 'script') || str_contains($text, 'سكربت') || str_contains($text, 'automation') || str_contains($text, 'أوتوميشن') || str_contains($text, 'handler');
         $hasAndroid = str_contains($text, 'android') || str_contains($text, 'اندرويد') || str_contains($text, 'أندرويد');
         $hasFlutter = str_contains($text, 'flutter') || str_contains($text, 'فلاتر');
         $hasIos     = str_contains($text, 'ios') || str_contains($text, 'ايفون') || str_contains($text, 'آيفون') || str_contains($text, 'swift');
         $hasMobile  = str_contains($text, 'mobile') || str_contains($text, 'موبايل') || str_contains($text, 'تطبيق');
         $hasWeb     = str_contains($text, 'web') || str_contains($text, 'موقع') || str_contains($text, 'react') || str_contains($text, 'laravel');
+
+        if (($hasBot || $hasScript) && !$hasAndroid && !$hasFlutter && !$hasIos) {
+            return [
+                'platform'   => 'Bot & Script Automation',
+                'tech_stack' => 'Telegram / Bot API / Script Modifications',
+                'multiplier' => 0.75,
+                'label_ar'   => 'تعديلات وإضافات بوت / أوتوميشن (Bot & Script Modifications)',
+            ];
+        }
 
         if ($hasAndroid && ($hasWeb || str_contains($text, 'laravel') || str_contains($text, 'dashboard'))) {
             return [
@@ -440,19 +503,28 @@ class ScopePricingEngine
      */
     protected function analyzeScopeWithGemini(string $description, array $catalog): ?array
     {
-        $apiKeysString = AdminSettings::GetValue('gemini_api_keys') ?: AdminSettings::GetValue('gemini_api_key') ?: config('services.gemini.key');
+        $apiKeysString = null;
+        $model = 'gemini-2.0-flash';
+        try {
+            $apiKeysString = AdminSettings::GetValue('gemini_api_keys')
+                ?: AdminSettings::GetValue('gemini_api_key')
+                ?: (auth()->check() ? auth()->user()?->gemini_api : null)
+                ?: config('services.gemini.key');
+            $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
+        } catch (\Throwable $e) {
+            $apiKeysString = config('services.gemini.key');
+        }
 
         if (empty($apiKeysString)) {
             return null;
         }
 
-        $keys = array_filter(array_map('trim', explode(',', $apiKeysString)));
+        $keys = array_filter(array_map('trim', explode(',', (string) $apiKeysString)));
         if (empty($keys)) {
             return null;
         }
 
         $apiKey = $keys[0];
-        $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
 
         $catalogList = [];
         foreach ($catalog as $key => $c) {
@@ -463,24 +535,28 @@ class ScopePricingEngine
             ];
         }
 
-        $prompt = "You are an expert enterprise software engineering estimator and technical consultant.\n"
-            . "User Project Requirement Description:\n\"{$description}\"\n\n"
+        $prompt = "You are an expert enterprise software engineering solution architect and estimator.\n"
+            . "User Requirements Prompt:\n\"{$description}\"\n\n"
             . "OFFICIAL REGISTERED SYSTEM COMPONENTS CATALOG (JSON):\n" . json_encode($catalogList, JSON_UNESCAPED_UNICODE) . "\n\n"
             . "Instructions:\n"
-            . "1. Analyze the project description carefully. Detect target platforms (e.g. Web, Flutter, Android Native, iOS Native, or Dual Web+Mobile).\n"
-            . "2. Explicitly specify the 'tech_stack' field based on the user's prompt (e.g. if prompt mentions Android or Flutter, write 'Laravel 12 (REST API Backend) + Android Native (Kotlin)' or 'Laravel 12 (REST API) + Flutter Cross-Platform'). Do NOT default to Web if Android/Flutter/Mobile is requested!\n"
-            . "3. Select ALL relevant component keys from the catalog above required to build this system.\n"
-            . "4. For each selected component, provide a concise description in Arabic ('description_ar') explaining what will be developed for this specific project.\n"
-            . "5. Provide an executive summary in Arabic ('ai_summary') and key deliverables list ('key_features').\n\n"
+            . "1. Analyze the user prompt carefully line by line. DO NOT duplicate requirements or output repeated components!\n"
+            . "2. Detect if the user is asking for minor Bot Updates / Script Modifications (e.g. adding bot buttons, updating handlers, sum/withdraw commands, changing manager ID) vs a full web application build.\n"
+            . "3. For minor Bot / Script updates, set 'tech_stack' to 'Telegram / Bot API / Script Modifications' (or matching specific bot tech), keep estimated development hours lean (1 to 3 hours per micro-component), and do NOT inflate scope.\n"
+            . "4. For each micro-component, provide a specific, clear Arabic title ('name_ar') describing the specific task (e.g. 'إضافة أزرار حسابات OTPJob: Refresh/Withdraw/Sum', 'تحديث زر الموظفين وإظهار اسم البوت'). DO NOT use generic template names!\n"
+            . "5. Map each task to the closest catalog key in 'key' if applicable, or specify 'key': 'custom'.\n"
+            . "6. Provide a concise description in Arabic ('description_ar') and estimated development hours ('hours', e.g. 1 to 3 hours for bot tweaks, 2 to 6 hours for complex features) for each micro-component.\n"
+            . "7. Provide an executive summary in Arabic ('ai_summary') and a UNIQUE key deliverables list ('key_features') matching the user's tasks.\n\n"
             . "Respond strictly with a JSON object matching this structure (no markdown wrappers):\n"
             . "{\n"
-            . "  \"ai_summary\": \"ملخص تنفيذي دقيق للمشروع باللغة العربية...\",\n"
-            . "  \"tech_stack\": \"Laravel 12 (REST API) + Android Native (Kotlin) / MySQL Database\",\n"
-            . "  \"key_features\": [\"ميزة 1\", \"ميزة 2\", \"ميزة 3\"],\n"
+            . "  \"ai_summary\": \"ملخص تنفيذي للمشروع والمهام المطلوبة باللغة العربية...\",\n"
+            . "  \"tech_stack\": \"Telegram / Bot API / Script Modifications\",\n"
+            . "  \"key_features\": [\"ميزة 1\", \"ميزة 2\"],\n"
             . "  \"selected_components\": [\n"
             . "    {\n"
-            . "      \"key\": \"exact_catalog_key\",\n"
-            . "      \"description_ar\": \"شرح مختصر باللغة العربية لما سيتم إنجازه لهذا المكون...\"\n"
+            . "      \"key\": \"matching_catalog_key_or_custom\",\n"
+            . "      \"name_ar\": \"عنوان عربي مخصص يوضح المهمة المطلوبة بدقة\",\n"
+            . "      \"description_ar\": \"شرح مختصر باللغة العربية لما سيتم إنجازه لهذا البند...\",\n"
+            . "      \"hours\": 2\n"
             . "    }\n"
             . "  ]\n"
             . "}";
@@ -529,13 +605,22 @@ class ScopePricingEngine
      */
     protected function detectContextType(array $components, Project $project): string
     {
-        $text = mb_strtolower(implode(' ', array_map(fn($c) => is_array($c) ? ($c['name'] ?? '') : (string) $c, $components)) . ' ' . ($project->project_name ?? ''));
+        $text = mb_strtolower(
+            implode(' ', array_map(fn($c) => is_array($c) ? ($c['name'] ?? $c['name_ar'] ?? '') : (string) $c, $components))
+            . ' ' . ($project->project_name ?? '')
+            . ' ' . ($project->description ?? '')
+        );
 
         if (str_contains($text, 'fix') || str_contains($text, 'bug') || str_contains($text, 'خطأ') || str_contains($text, 'إصلاح') || str_contains($text, 'مشكلة')) {
             return 'BUG_FIX';
         }
 
-        if (!empty($project->approved_scope) || count($components) <= 2) {
+        // Minor updates / script tweaks / bot modifications should always be EXISTING_PROJECT_FEATURE
+        $isScriptOrBot = str_contains($text, 'bot') || str_contains($text, 'بوت') || str_contains($text, 'script') || str_contains($text, 'سكربت')
+            || str_contains($text, 'tweak') || str_contains($text, 'update') || str_contains($text, 'تعديل') || str_contains($text, 'تحديث')
+            || str_contains($text, 'أزرار') || str_contains($text, 'زر') || str_contains($text, 'otpjob');
+
+        if (!empty($project->approved_scope) || count($components) <= 2 || $isScriptOrBot) {
             return 'EXISTING_PROJECT_FEATURE';
         }
 
