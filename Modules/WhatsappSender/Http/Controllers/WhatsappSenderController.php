@@ -466,6 +466,28 @@ class WhatsappSenderController extends Controller
     }
 
     /**
+     * Test WhatsApp account Meta Graph API connection and return raw JSON metadata.
+     */
+    public function testAccount(Request $request, int $id): RedirectResponse
+    {
+        $account = WhatsappAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $result = $this->whatsappService->testAccountConnection($account);
+
+        if ($result['success']) {
+            return redirect()->back()
+                ->with('success', "Meta API Connection Test Completed! {$result['message']}")
+                ->with('meta_response', $result['data']);
+        }
+
+        return redirect()->back()
+            ->with('error', $result['error'] ?? 'Meta API Connection Test Failed.')
+            ->with('meta_response', $result['data'] ?? null);
+    }
+
+    /**
      * Send template messages immediately to a contact group.
      */
     public function sendGroupCampaign(Request $request): RedirectResponse

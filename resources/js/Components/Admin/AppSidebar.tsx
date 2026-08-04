@@ -109,6 +109,7 @@ const items: MenuItem[] = [
     url: "/admin/marketplace", 
     icon: Building2,
     subItems: [
+        { title: "Service Playbooks", url: "/admin/marketplace/service-playbooks" },
         { title: "All Services", url: "/admin/marketplace/all-services" },
         { title: "Pending Services", url: "/admin/marketplace/pending-services" },
         { title: "Categories", url: "/admin/marketplace/categories" },

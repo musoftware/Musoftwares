@@ -652,61 +652,74 @@ class ServiceController extends Controller
             'provider' => 'required|string|in:chatgpt,gemini',
         ]);
 
-        $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug'])->toArray();
+        try {
+            $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug'])->toArray();
 
-        $aiService = app(MarketplaceAiService::class);
-        $aiData = $aiService->generateServiceData($validated['title'], $validated['provider'], $categories, $user->id);
+            $aiService = app(MarketplaceAiService::class);
+            $aiData = $aiService->generateServiceData($validated['title'], $validated['provider'], $categories, $user->id);
 
-        $service = DB::transaction(function () use ($aiData, $user) {
-            $service = Service::create([
-                'seller_id' => $user->id,
-                'title' => $aiData['title'],
-                'slug' => Str::slug($aiData['title']),
-                'thumbnail' => $aiData['thumbnail'] ?? null,
-                'tagline' => $aiData['tagline'] ?? null,
-                'description' => $aiData['description'] ?? null,
-                'category_id' => $aiData['category_id'],
-                'status' => 'active',
-                'approved_at' => now(),
-                'approved_by' => $user->id,
-                'tags' => $aiData['tags'] ?? [],
-                'faq' => $aiData['faq'] ?? [],
-                'requirements' => $aiData['requirements'] ?? [],
-                'gallery' => $aiData['gallery'] ?? [],
-                'is_free' => false,
-            ]);
+            $service = DB::transaction(function () use ($aiData, $user) {
+                $service = Service::create([
+                    'seller_id' => $user->id,
+                    'title' => $aiData['title'],
+                    'slug' => Str::slug($aiData['title']),
+                    'thumbnail' => $aiData['thumbnail'] ?? null,
+                    'tagline' => $aiData['tagline'] ?? null,
+                    'description' => $aiData['description'] ?? null,
+                    'category_id' => $aiData['category_id'],
+                    'status' => 'active',
+                    'approved_at' => now(),
+                    'approved_by' => $user->id,
+                    'tags' => $aiData['tags'] ?? [],
+                    'faq' => $aiData['faq'] ?? [],
+                    'requirements' => $aiData['requirements'] ?? [],
+                    'gallery' => $aiData['gallery'] ?? [],
+                    'is_free' => false,
+                ]);
 
-            if (! empty($aiData['packages']) && is_array($aiData['packages'])) {
-                foreach ($aiData['packages'] as $pkg) {
+                if (! empty($aiData['packages']) && is_array($aiData['packages'])) {
+                    foreach ($aiData['packages'] as $pkg) {
+                        ServicePackage::create([
+                            'service_id' => $service->id,
+                            'name' => $pkg['name'] ?? 'Standard',
+                            'description' => $pkg['description'] ?? '',
+                            'price' => $pkg['price'] ?? 25,
+                            'currency_id' => $pkg['currency_id'] ?? 1,
+                            'delivery_days' => $pkg['delivery_days'] ?? 3,
+                            'revisions' => $pkg['revisions'] ?? 2,
+                            'features' => $pkg['features'] ?? [],
+                        ]);
+                    }
+                } else {
                     ServicePackage::create([
                         'service_id' => $service->id,
-                        'name' => $pkg['name'] ?? 'Standard',
-                        'description' => $pkg['description'] ?? '',
-                        'price' => $pkg['price'] ?? 25,
-                        'currency_id' => $pkg['currency_id'] ?? 1,
-                        'delivery_days' => $pkg['delivery_days'] ?? 3,
-                        'revisions' => $pkg['revisions'] ?? 2,
-                        'features' => $pkg['features'] ?? [],
+                        'name' => 'Standard',
+                        'description' => $service->description ?: 'Standard package deliverable.',
+                        'price' => 25,
+                        'currency_id' => 1,
+                        'delivery_days' => 3,
+                        'revisions' => 2,
+                        'features' => [],
                     ]);
                 }
-            } else {
-                ServicePackage::create([
-                    'service_id' => $service->id,
-                    'name' => 'Standard',
-                    'description' => $service->description ?: 'Standard package deliverable.',
-                    'price' => 25,
-                    'currency_id' => 1,
-                    'delivery_days' => 3,
-                    'revisions' => 2,
-                    'features' => [],
-                ]);
-            }
 
-            return $service;
-        });
+                return $service;
+            });
 
-        return redirect()->route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug])
-            ->with('success', __('general.service_created_successfully_by_ai') ?? 'Service generated successfully by AI!');
+            return redirect()->route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug])
+                ->with('success', __('general.service_created_successfully_by_ai') ?? 'Service generated successfully by AI!');
+        } catch (\Throwable $e) {
+            Log::error('Marketplace AI generation error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'title' => $validated['title'] ?? null,
+                'provider' => $validated['provider'] ?? null,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     public function destroy(Service $service)

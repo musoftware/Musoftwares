@@ -97,6 +97,24 @@ class WhatsappSenderTest extends TestCase
         ]);
     }
 
+    public function test_user_can_test_whatsapp_account_connection()
+    {
+        $user = User::factory()->create();
+        $account = WhatsappAccount::create([
+            'user_id' => $user->id,
+            'name' => 'Sandbox Test Account',
+            'phone_number_id' => '114811102562039',
+            'waba_id' => '109283748291029',
+            'access_token' => 'SANDBOX_TOKEN_DEMO',
+        ]);
+
+        $response = $this->actingAs($user)->post('/whatsapp-sender/accounts/' . $account->id . '/test');
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('success');
+        $response->assertSessionHas('meta_response');
+    }
+
     public function test_api_requires_sanctum_authentication()
     {
         $response = $this->postJson('/api/v1/whatsapp/send', [

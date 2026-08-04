@@ -87,17 +87,17 @@ class PromotionsService
         $coupon = Coupon::where('code', strtoupper($code))->where('is_active', true)->first();
 
         if (!$coupon) {
-            throw new Exception("Invalid coupon code.");
+            throw new Exception("كود الخصم غير صالح أو غير مفعّل.");
         }
 
         if ($coupon->expires_at && now('Africa/Cairo')->isAfter($coupon->expires_at)) {
-            throw new Exception("Coupon code has expired.");
+            throw new Exception("انتهت صلاحية كود الخصم كلياً.");
         }
 
         // Usage limit check
         $userRedemptions = CouponRedemption::where('coupon_id', $coupon->id)->where('user_id', $user->id)->count();
         if ($coupon->max_uses_per_user && $userRedemptions >= $coupon->max_uses_per_user) {
-            throw new Exception("You have reached the maximum redemption limit for this coupon.");
+            throw new Exception("لقد تجاوزت الحد الأقصى لاستخدام كود الخصم هذا.");
         }
 
         $discountAmount = $coupon->calculateDiscount($amount);

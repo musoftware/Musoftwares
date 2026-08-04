@@ -15,7 +15,7 @@ class FreeDownloadService
     public function processLeadDownload(Service $service, string $email, ?string $name = null, ?string $ip = null): ServiceLeadDownload
     {
         if (!$service->is_free) {
-            throw new Exception("This service is not available for free download.");
+            throw new Exception("هذه الخدمة غير متاحة للتحميل المجاني.");
         }
 
         $token = Str::random(40);
@@ -43,11 +43,11 @@ class FreeDownloadService
 
 
         if (!$download) {
-            throw new Exception("Invalid or expired download link.");
+            throw new Exception("رابط التحميل غير صالح أو غير موجود.");
         }
 
         if ($download->expires_at && now('Africa/Cairo')->isAfter($download->expires_at)) {
-            throw new Exception("Download token has expired.");
+            throw new Exception("انتهت صلاحية رابط التحميل المجاني.");
         }
 
         $download->update([

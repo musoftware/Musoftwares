@@ -25,10 +25,24 @@ class MarketplaceAiService extends BaseService
 
         $prompt = $this->buildPrompt($titlePrompt, $categoriesFormatted);
 
-        $aiResult = $this->callGemini($prompt);
+        $aiResult = null;
+
+        if ($provider === 'gemini') {
+            $aiResult = $this->callGemini($prompt);
+            if (!$aiResult || empty($aiResult['title'])) {
+                Log::warning('Gemini AI generation failed, attempting OpenAI fallback...');
+                $aiResult = $this->callOpenAI($prompt);
+            }
+        } else {
+            $aiResult = $this->callOpenAI($prompt);
+            if (!$aiResult || empty($aiResult['title'])) {
+                Log::warning('OpenAI AI generation failed, attempting Gemini fallback...');
+                $aiResult = $this->callGemini($prompt);
+            }
+        }
 
         if (!$aiResult || empty($aiResult['title'])) {
-            throw new \Exception('Failed to generate service details from AI. Please check your API key configuration.');
+            throw new \Exception('عذراً، تعذر التوافق مع خدمات الذكاء الاصطناعي (ChatGPT / Gemini). يرجى التحقق من إعدادات المفاتيح وربط الخدمة.');
         }
 
         // Default fallback category if AI returned invalid or missing category_id
@@ -40,6 +54,10 @@ class MarketplaceAiService extends BaseService
         // Generate AI Cover Image
         $imagePrompt = $aiResult['image_prompt'] ?? ($aiResult['title'] . ' ' . ($aiResult['tagline'] ?? ''));
         $imageResult = $this->generateCoverImage($imagePrompt, $sellerId);
+
+        if (empty($imageResult['thumbnail']) && empty($imageResult['gallery'])) {
+            throw new \Exception('تعذر توليد صورة الغلاف الخاصة بالخدمة عبر الذكاء الاصطناعي. يرجى إعادة المحاولة.');
+        }
 
         $aiResult['gallery'] = $imageResult['gallery'];
         $aiResult['thumbnail'] = $imageResult['thumbnail'];
@@ -304,7 +322,7 @@ GENERAL RULES:
      */
     public function generateCoverImage(string $imagePrompt, int $sellerId): array
     {
-        $apiKey = null; // Forced null to bypass OpenAI image generation for cost control
+        $apiKey = AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
         $imageBinary = null;
 
         $cleanPrompt = $this->getRefinedImagePrompt($imagePrompt);

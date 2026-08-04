@@ -27,7 +27,7 @@ class ProjectBoardAiService
         $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
 
         if (empty($apiKey)) {
-            throw new \Exception("AI integration is not configured. Please set your OpenAI API key in admin settings.");
+            throw new \Exception("لم يتم ضبط مفتاح الذكاء الاصطناعي (OpenAI API Key) في إعدادات النظام.");
         }
 
         $systemPrompt = "You are an expert project manager. The user wants to generate a project board timeline for: '{$userPrompt}' in the project '{$project->project_name}'.\n"
@@ -80,7 +80,7 @@ class ProjectBoardAiService
         $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
 
         if (empty($apiKey)) {
-            throw new \Exception("AI integration is not configured. Please set your OpenAI API key in admin settings.");
+            throw new \Exception("لم يتم ضبط مفتاح الذكاء الاصطناعي (OpenAI API Key) في إعدادات النظام.");
         }
 
         // Build a human-readable list of allowed types for the AI prompt.
@@ -155,7 +155,7 @@ class ProjectBoardAiService
         $data = json_decode($content, true);
         if (!$data || !isset($data['phases'])) {
             Log::error('ProjectBoardAiService: failed to parse JSON', ['content' => $content]);
-            throw new \Exception('AI failed to generate a valid project plan. Please try again.');
+            throw new \Exception('تعذر على الذكاء الاصطناعي إنشاء خطة العمل. يرجى المحاولة مرة أخرى.');
         }
 
         return DB::transaction(function () use ($project, $data, $startDate, $userId, $allowedTypes, $maxDailyHours, $skipDays) {
@@ -309,7 +309,7 @@ class ProjectBoardAiService
         $model = AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
 
         if (empty($apiKey)) {
-            throw new \Exception("AI integration is not configured. Please set your OpenAI API key.");
+            throw new \Exception("لم يتم ضبط مفتاح الذكاء الاصطناعي (OpenAI API Key) في إعدادات النظام.");
         }
 
         $commentedBoardItem = ProjectBoardItem::where('project_id', $project->id)
@@ -389,7 +389,7 @@ class ProjectBoardAiService
         $data = json_decode($content, true);
         if (!$data || !isset($data['timeline'])) {
             Log::error('ProjectBoardAiService adjustFutureItems: failed to parse JSON', ['content' => $content]);
-            throw new \Exception('AI failed to parse timeline adjustments. Please try again.');
+            throw new \Exception('فشل الذكاء الاصطناعي في معالجة تعديلات الجدول الزمني. يرجى المحاولة مرة أخرى.');
         }
 
         DB::transaction(function () use ($project, $data, $futureBoardItems, $commentedBoardItem, $userId) {

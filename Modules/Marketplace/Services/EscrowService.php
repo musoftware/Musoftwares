@@ -21,7 +21,7 @@ class EscrowService
             $buyer = $order->buyer;
             
             if ($buyer->available_balance() < $order->amount) {
-                throw new Exception("Insufficient balance to hold funds.");
+                throw new Exception("رصيدك الحسابي غير كافٍ لحجز مبلغ الضمان (Escrow).");
             }
 
             // Deduct from Buyer using 'used' type per rules
@@ -65,7 +65,7 @@ class EscrowService
     {
         DB::transaction(function () use ($escrow) {
             if (!in_array($escrow->status, [EscrowStatus::HELD, EscrowStatus::DISPUTED])) {
-                throw new Exception("Escrow is not in releaseable state. Current status: " . (is_object($escrow->status) ? $escrow->status->value : $escrow->status));
+                throw new Exception("حالة مبلغ الضمان الحالي لا تسمح بتحرير الأموال للمستفيد.");
             }
 
             $order = $escrow->order;
@@ -96,7 +96,7 @@ class EscrowService
     {
         DB::transaction(function () use ($escrow) {
             if (!in_array($escrow->status, [EscrowStatus::HELD, EscrowStatus::DISPUTED])) {
-                throw new Exception("Cannot refund escrow in current state: " . $escrow->status->value);
+                throw new Exception("تعذر إرجاع مبلغ الضمان للمشتري في الحالة الحالية.");
             }
 
             $order = $escrow->order;
@@ -121,7 +121,7 @@ class EscrowService
     {
         DB::transaction(function () use ($escrow) {
             if ($escrow->status !== EscrowStatus::HELD) {
-                throw new Exception("Only held escrows can be disputed.");
+                throw new Exception("يمكن فتح النزاع فقط للمبالغ المحجوزة قيد التنفيذ.");
             }
 
             $escrow->update([

@@ -30,6 +30,8 @@ interface Account {
     phone_number_id: string;
     waba_id: string | null;
     status: string;
+    metadata?: any;
+    access_token?: string;
 }
 
 interface Bot {
@@ -148,6 +150,15 @@ export default function Workspace({
     const [editingAccount, setEditingAccount] = useState<Account | null>(null);
     const [editingWabaAccountId, setEditingWabaAccountId] = useState<number | null>(null);
     const [tempWabaId, setTempWabaId] = useState('');
+    const [testingAccountId, setTestingAccountId] = useState<number | null>(null);
+    const [debugAccount, setDebugAccount] = useState<Account | null>(null);
+
+    const handleTestAccount = (accId: number) => {
+        setTestingAccountId(accId);
+        router.post(`/whatsapp-sender/accounts/${accId}/test`, {}, {
+            onFinish: () => setTestingAccountId(null),
+        });
+    };
 
     const accountForm = useForm({
         whatsapp_business_id: business.id,
@@ -1022,6 +1033,41 @@ export default function Workspace({
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3 shrink-0">
+                                                    <button
+                                                        type="button"
+                                                        disabled={testingAccountId === acc.id}
+                                                        onClick={() => handleTestAccount(acc.id)}
+                                                        className="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/60 dark:border-emerald-800/60 px-2.5 py-1 rounded-lg text-xs font-semibold transition disabled:opacity-50 cursor-pointer"
+                                                        title="Test connection against Meta Graph API for Phone ID & WABA ID"
+                                                    >
+                                                        {testingAccountId === acc.id ? (
+                                                            <span className="flex items-center gap-1">
+                                                                <svg className="animate-spin h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                </svg>
+                                                                <span>Testing...</span>
+                                                            </span>
+                                                        ) : (
+                                                            <span className="flex items-center gap-1">
+                                                                <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <span>Test</span>
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setDebugAccount(acc)}
+                                                        className="inline-flex items-center gap-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/80 px-2 py-1 rounded-lg text-xs font-mono font-medium transition cursor-pointer"
+                                                        title="View actual raw JSON metadata stored for this account"
+                                                    >
+                                                        <svg className="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                                        </svg>
+                                                        <span>JSON</span>
+                                                    </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => openEditAccountModal(acc)}
@@ -2186,6 +2232,61 @@ export default function Workspace({
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Debug Raw JSON Modal */}
+            {debugAccount && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-4">
+                        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                            <div className="flex items-center gap-2">
+                                <span className="p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-mono text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                                    {'{ }'}
+                                </span>
+                                <div>
+                                    <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
+                                        Actual JSON Metadata — {debugAccount.name}
+                                    </h3>
+                                    <p className="text-xs text-zinc-500">Phone ID: {debugAccount.phone_number_id} | WABA ID: {debugAccount.waba_id || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setDebugAccount(null)}
+                                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between text-xs text-zinc-500">
+                                <span>Stored Account Metadata & API State:</span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(JSON.stringify(debugAccount.metadata || debugAccount, null, 2));
+                                        alert('Copied raw JSON to clipboard!');
+                                    }}
+                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                                >
+                                    📋 Copy JSON
+                                </button>
+                            </div>
+                            <pre className="bg-zinc-950 text-emerald-400 text-xs p-4 rounded-2xl font-mono overflow-x-auto max-h-96 border border-zinc-800 dir-ltr text-left">
+                                {JSON.stringify(debugAccount.metadata || debugAccount, null, 2)}
+                            </pre>
+                        </div>
+
+                        <div className="flex justify-end pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setDebugAccount(null)}
+                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer"
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

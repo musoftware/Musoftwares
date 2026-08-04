@@ -184,7 +184,8 @@ class ClientProjectAgentService
             ]);
 
             if ($response->failed()) {
-                throw new \Exception('OpenAI API call failed: ' . $response->body());
+                \Illuminate\Support\Facades\Log::error('OpenAI API call failed in ClientProjectAgentService', ['response' => $response->body()]);
+                throw new \Exception('عذراً، حدث خطأ أثناء الاتصال بمحرك الذكاء الاصطناعي (OpenAI). يرجى المحاولة لاحقاً.');
             }
 
             return $response->json('choices.0.message.content') ?? '';
@@ -205,7 +206,8 @@ class ClientProjectAgentService
             ]);
 
             if ($response->failed()) {
-                throw new \Exception('Gemini API call failed: ' . $response->body());
+                \Illuminate\Support\Facades\Log::error('Gemini API call failed in ClientProjectAgentService', ['response' => $response->body()]);
+                throw new \Exception('عذراً، حدث خطأ أثناء الاتصال بمحرك الذكاء الاصطناعي (Gemini). يرجى المحاولة لاحقاً.');
             }
 
             return $response->json('candidates.0.content.parts.0.text') ?? '';

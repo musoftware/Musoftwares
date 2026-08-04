@@ -25,8 +25,9 @@ class MetaWhatsappService
         }
 
         return $token === 'EAAG_META_TEST_SANDBOX_TOKEN_DEMO'
-            || str_contains($token, 'EAAG_META_TEST')
-            || str_contains($token, 'TEST_SANDBOX')
+            || str_contains(strtoupper($token), 'EAAG_META_TEST')
+            || str_contains(strtoupper($token), 'SANDBOX')
+            || str_contains(strtoupper($token), 'TEST')
             || $token === config('services.facebook.test_access_token');
     }
 
@@ -272,6 +273,126 @@ class MetaWhatsappService
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Perform deep diagnostic test of a WhatsApp Account against Meta Graph API for both Phone Number ID and WABA ID.
+     */
+    public function testAccountConnection(WhatsappAccount $account): array
+    {
+        if ($this->isSandboxToken($account->access_token)) {
+            $mockData = [
+                'mode' => 'sandbox_test_mode',
+                'phone_number_details' => [
+                    'id' => $account->phone_number_id,
+                    'verified_name' => 'Meta Sandbox Test Number',
+                    'display_phone_number' => '+1 555-0199',
+                    'quality_rating' => 'GREEN',
+                    'status' => 'CONNECTED',
+                    'code_verification_status' => 'VERIFIED',
+                    'is_official_business_account' => false,
+                    'platform_type' => 'CLOUD_API',
+                    'throughput' => ['level' => 'STANDARD'],
+                ],
+                'waba_details' => [
+                    'id' => $account->waba_id ?? '1717790922679702',
+                    'name' => 'Meta Sandbox WABA Account',
+                    'account_review_status' => 'APPROVED',
+                    'business_verification_status' => 'VERIFIED',
+                    'currency' => 'USD',
+                    'timezone_id' => 'Africa/Cairo',
+                ],
+                'summary' => 'Sandbox mode active. Connection test simulated successfully.',
+            ];
+
+            $account->update([
+                'status' => 'active',
+                'metadata' => array_merge($account->metadata ?? [], $mockData['phone_number_details']),
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'WhatsApp account test passed (Sandbox Mode).',
+                'data' => $mockData,
+            ];
+        }
+
+        $phoneFields = 'id,verified_name,display_phone_number,quality_rating,status,code_verification_status,is_official_business_account,platform_type,throughput,name_status,messaging_limit_tier';
+        $phoneUrl = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}";
+
+        $phoneResponse = null;
+        $wabaResponse = null;
+        $phoneData = null;
+        $wabaData = null;
+
+        try {
+            $res = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->get($phoneUrl, ['fields' => $phoneFields]);
+
+            $phoneResponse = [
+                'status' => $res->status(),
+                'body' => $res->json(),
+            ];
+
+            if ($res->successful()) {
+                $phoneData = $res->json();
+            }
+        } catch (\Throwable $e) {
+            $phoneResponse = ['error' => $e->getMessage()];
+        }
+
+        if (!empty($account->waba_id)) {
+            $wabaFields = 'id,name,account_review_status,business_verification_status,currency,timezone_id,owner_business_info';
+            $wabaUrl = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->waba_id}";
+
+            try {
+                $resWaba = Http::withToken($account->access_token)
+                    ->acceptJson()
+                    ->get($wabaUrl, ['fields' => $wabaFields]);
+
+                $wabaResponse = [
+                    'status' => $resWaba->status(),
+                    'body' => $resWaba->json(),
+                ];
+
+                if ($resWaba->successful()) {
+                    $wabaData = $resWaba->json();
+                }
+            } catch (\Throwable $e) {
+                $wabaResponse = ['error' => $e->getMessage()];
+            }
+        }
+
+        $combinedResult = [
+            'phone_number_id' => $account->phone_number_id,
+            'waba_id' => $account->waba_id,
+            'phone_number_api_response' => $phoneResponse,
+            'waba_api_response' => $wabaResponse,
+        ];
+
+        if ($phoneData) {
+            $metaStatus = $phoneData['status'] ?? 'CONNECTED';
+            $dbStatus = ($metaStatus === 'CONNECTED' || $metaStatus === 'APPROVED') ? 'active' : 'unregistered';
+
+            $existingMeta = $account->metadata ?? [];
+            $account->update([
+                'status' => $dbStatus,
+                'metadata' => array_merge($existingMeta, $phoneData, ['waba_info' => $wabaData]),
+            ]);
+
+            return [
+                'success' => true,
+                'message' => "Phone ID status: {$metaStatus}" . ($wabaData ? " | WABA review: " . ($wabaData['account_review_status'] ?? 'N/A') : ""),
+                'data' => $combinedResult,
+            ];
+        }
+
+        return [
+            'success' => false,
+            'error' => $phoneResponse['body']['error']['message'] ?? ($phoneResponse['error'] ?? 'Failed to test phone number API endpoint.'),
+            'data' => $combinedResult,
+        ];
     }
 
     /**

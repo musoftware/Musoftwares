@@ -158,4 +158,9 @@ Route::middleware(['web', 'auth', 'admin'])
         Route::get('/service-landing-pages', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'index'])->name('service-landing-pages.index');
         Route::post('/service-landing-pages/{landingPage}/toggle-status', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'toggleStatus'])->name('service-landing-pages.toggle-status');
         Route::delete('/service-landing-pages/{landingPage}', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'destroy'])->name('service-landing-pages.destroy');
+
+        // Service Playbooks (أدلة الخدمات وكيفية العمل)
+        Route::get('/service-playbooks/service-details/{service}', [\Modules\Marketplace\Http\Controllers\Admin\ServicePlaybookController::class, 'getServiceDetails'])->name('service-playbooks.service-details');
+        Route::resource('service-playbooks', \Modules\Marketplace\Http\Controllers\Admin\ServicePlaybookController::class);
     });
+
