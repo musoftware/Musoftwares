@@ -23,9 +23,10 @@ Route::middleware(['auth'])
         Route::post('/accounts', [WhatsappSenderController::class, 'storeAccount'])->name('accounts.store');
         Route::match(['PUT', 'PATCH'], '/accounts/{id}', [WhatsappSenderController::class, 'updateAccount'])->name('accounts.update');
         Route::delete('/accounts/{id}', [WhatsappSenderController::class, 'destroyAccount'])->name('accounts.destroy');
-        Route::post('/accounts/{id}/register', [WhatsappSenderController::class, 'registerAccount'])->name('accounts.register');
-        Route::post('/accounts/{id}/sync', [WhatsappSenderController::class, 'syncAccountStatus'])->name('accounts.sync');
-        Route::post('/accounts/{id}/test', [WhatsappSenderController::class, 'testAccount'])->name('accounts.test');
+        Route::match(['GET', 'POST'], '/accounts/{id}/register', [WhatsappSenderController::class, 'registerAccount'])->name('accounts.register');
+        Route::match(['GET', 'POST'], '/accounts/{id}/request-code', [WhatsappSenderController::class, 'requestCodeAccount'])->name('accounts.request-code');
+        Route::match(['GET', 'POST'], '/accounts/{id}/sync', [WhatsappSenderController::class, 'syncAccountStatus'])->name('accounts.sync');
+        Route::match(['GET', 'POST'], '/accounts/{id}/test', [WhatsappSenderController::class, 'testAccount'])->name('accounts.test');
         Route::match(['PUT', 'PATCH'], '/accounts/{id}/waba', [WhatsappSenderController::class, 'updateWabaId'])->name('accounts.waba.update');
         Route::post('/send', [WhatsappSenderController::class, 'sendMessage'])->name('send');
 

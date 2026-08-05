@@ -2126,6 +2126,7 @@
             "manager_response_placeholder": "أدخل ردك أو سبب الرفض هنا..."
         },
         "general": {
+            "old_price": "السعر القديم",
             "approvals_center": "مركز الاعتمادات والموافقات",
             "deliverable_approved": "تم اعتماد التسليم",
             "due_invoices": "الفواتير المستحقة",
@@ -14118,6 +14119,7 @@
             "your_musoftwares_account": "Your Musoftwares Account"
         },
         "general": {
+            "old_price": "Old Price",
             "approvals_center": "Approvals Center",
             "deliverable_approved": "Deliverable Approved",
             "due_invoices": "Due Invoices",

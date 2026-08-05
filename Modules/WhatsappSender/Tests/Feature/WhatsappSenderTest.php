@@ -863,4 +863,25 @@ class WhatsappSenderTest extends TestCase
         $this->assertEquals('+20 100 123 4567', $accounts[0]['display_phone_number']);
         $this->assertEquals('Verified Business Name', $accounts[0]['verified_name']);
     }
+
+    public function test_user_can_request_verification_code_via_sms_or_voice()
+    {
+        $user = User::factory()->create();
+        $account = WhatsappAccount::create([
+            'user_id' => $user->id,
+            'name' => 'Test Account',
+            'phone_number_id' => '123456789',
+            'access_token' => 'sandbox_test_token_123',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from('/whatsapp-sender')
+            ->post("/whatsapp-sender/accounts/{$account->id}/request-code", [
+                'code_method' => 'SMS',
+                'language' => 'ar',
+            ]);
+
+        $response->assertRedirect('/whatsapp-sender');
+        $response->assertSessionHas('success');
+    }
 }

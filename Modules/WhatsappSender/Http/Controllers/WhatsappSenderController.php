@@ -419,21 +419,32 @@ class WhatsappSenderController extends Controller
      */
     public function registerAccount(Request $request, int $id): RedirectResponse
     {
-        $validated = $request->validate([
-            'pin' => ['required', 'string', 'size:6', 'regex:/^[0-9]+$/'],
-        ]);
-
         $account = WhatsappAccount::where('user_id', $request->user()->id)
             ->where('id', $id)
             ->firstOrFail();
 
+        if ($request->isMethod('GET')) {
+            if ($account->whatsapp_business_id) {
+                return redirect()->route('whatsapp.businesses.workspace', $account->whatsapp_business_id);
+            }
+            return redirect()->route('whatsapp.index');
+        }
+
+        $validated = $request->validate([
+            'pin' => ['required', 'string', 'size:6', 'regex:/^[0-9]+$/'],
+        ]);
+
         $result = $this->whatsappService->registerPhoneNumber($account, $validated['pin']);
 
         if ($result['success']) {
-            return redirect()->back()->with('success', $result['message'] ?? 'Phone number registered and activated on Meta Cloud API successfully!');
+            return redirect()->back()
+                ->with('success', $result['message'] ?? 'Phone number registered and activated on Meta Cloud API successfully!')
+                ->with('meta_response', $result['response'] ?? null);
         }
 
-        return redirect()->back()->with('error', $result['error'] ?? 'Failed to register phone number.');
+        return redirect()->back()
+            ->with('error', $result['error'] ?? 'Failed to register phone number.')
+            ->with('meta_response', $result['response'] ?? null);
     }
 
     /**
@@ -444,6 +455,13 @@ class WhatsappSenderController extends Controller
         $account = WhatsappAccount::where('user_id', $request->user()->id)
             ->where('id', $id)
             ->firstOrFail();
+
+        if ($request->isMethod('GET')) {
+            if ($account->whatsapp_business_id) {
+                return redirect()->route('whatsapp.businesses.workspace', $account->whatsapp_business_id);
+            }
+            return redirect()->route('whatsapp.index');
+        }
 
         $verification = $this->whatsappService->verifyAccountCredentials(
             $account->phone_number_id,
@@ -478,17 +496,62 @@ class WhatsappSenderController extends Controller
             ->where('id', $id)
             ->firstOrFail();
 
+        if ($request->isMethod('GET')) {
+            if ($account->whatsapp_business_id) {
+                return redirect()->route('whatsapp.businesses.workspace', $account->whatsapp_business_id);
+            }
+            return redirect()->route('whatsapp.index');
+        }
+
         $result = $this->whatsappService->testAccountConnection($account);
 
-        if ($result['success']) {
+        if (!empty($result['is_connected']) || !empty($result['success'])) {
             return redirect()->back()
-                ->with('success', "Meta API Connection Test Completed! {$result['message']}")
+                ->with('success', $result['message'])
                 ->with('meta_response', $result['data']);
         }
 
         return redirect()->back()
-            ->with('error', $result['error'] ?? 'Meta API Connection Test Failed.')
+            ->with('error', $result['message'] ?? ($result['error'] ?? 'Meta API Connection Test Failed.'))
             ->with('meta_response', $result['data'] ?? null);
+    }
+
+    /**
+     * Request a 6-digit verification code via SMS or VOICE from Meta.
+     */
+    public function requestCodeAccount(Request $request, int $id): RedirectResponse
+    {
+        $account = WhatsappAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        if ($request->isMethod('GET')) {
+            if ($account->whatsapp_business_id) {
+                return redirect()->route('whatsapp.businesses.workspace', $account->whatsapp_business_id);
+            }
+            return redirect()->route('whatsapp.index');
+        }
+
+        $validated = $request->validate([
+            'code_method' => ['required', 'string', 'in:SMS,VOICE,sms,voice'],
+            'language' => ['nullable', 'string', 'max:10'],
+        ]);
+
+        $result = $this->whatsappService->requestVerificationCode(
+            $account,
+            strtoupper($validated['code_method']),
+            $validated['language'] ?? 'ar'
+        );
+
+        if ($result['success']) {
+            return redirect()->back()
+                ->with('success', $result['message'])
+                ->with('meta_response', $result['response'] ?? null);
+        }
+
+        return redirect()->back()
+            ->with('error', $result['error'] ?? 'Failed to request verification code.')
+            ->with('meta_response', $result['response'] ?? null);
     }
 
     /**

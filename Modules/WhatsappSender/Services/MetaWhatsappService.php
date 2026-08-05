@@ -372,8 +372,9 @@ class MetaWhatsappService
         ];
 
         if ($phoneData) {
-            $metaStatus = $phoneData['status'] ?? 'CONNECTED';
-            $dbStatus = ($metaStatus === 'CONNECTED' || $metaStatus === 'APPROVED') ? 'active' : 'unregistered';
+            $metaStatus = strtoupper($phoneData['status'] ?? 'CONNECTED');
+            $isConnected = in_array($metaStatus, ['CONNECTED', 'APPROVED', 'ACTIVE']);
+            $dbStatus = $isConnected ? 'active' : 'unregistered';
 
             $existingMeta = $account->metadata ?? [];
             $account->update([
@@ -382,17 +383,73 @@ class MetaWhatsappService
             ]);
 
             return [
-                'success' => true,
-                'message' => "Phone ID status: {$metaStatus}" . ($wabaData ? " | WABA review: " . ($wabaData['account_review_status'] ?? 'N/A') : ""),
+                'success' => $isConnected,
+                'is_connected' => $isConnected,
+                'meta_status' => $metaStatus,
+                'message' => $isConnected
+                    ? '✓ Connected - Ready to send messages'
+                    : '⚠️ Action Required: Your WhatsApp number is disconnected from Meta API. Reconnect to continue.',
                 'data' => $combinedResult,
             ];
         }
 
         return [
             'success' => false,
+            'is_connected' => false,
             'error' => $phoneResponse['body']['error']['message'] ?? ($phoneResponse['error'] ?? 'Failed to test phone number API endpoint.'),
             'data' => $combinedResult,
         ];
+    }
+
+    /**
+     * Request a 6-digit verification code via SMS or VOICE from Meta Cloud API.
+     */
+    public function requestVerificationCode(WhatsappAccount $account, string $codeMethod = 'SMS', string $language = 'ar'): array
+    {
+        if ($this->isSandboxToken($account->access_token)) {
+            return [
+                'success' => true,
+                'message' => 'Verification code requested successfully (Sandbox Test Mode: Code is 123456).',
+                'response' => ['success' => true],
+            ];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/request_code";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->post($url, [
+                    'messaging_product' => 'whatsapp',
+                    'code_method' => strtoupper($codeMethod),
+                    'language' => $language,
+                ]);
+
+            $responseData = $response->json();
+
+            if ($response->successful() && isset($responseData['success']) && $responseData['success'] === true) {
+                return [
+                    'success' => true,
+                    'message' => "Verification code sent successfully via {$codeMethod}.",
+                    'response' => $responseData,
+                ];
+            }
+
+            $errorMessage = $this->extractMetaErrorMessage($responseData, 'Failed to request verification code from Meta API.');
+
+            return [
+                'success' => false,
+                'error' => $errorMessage,
+                'response' => $responseData,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] Request Verification Code Exception: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
@@ -441,7 +498,7 @@ class MetaWhatsappService
                 ];
             }
 
-            $errorMessage = $responseData['error']['message'] ?? 'Failed to register phone number with Meta API.';
+            $errorMessage = $this->extractMetaErrorMessage($responseData, 'Failed to register phone number with Meta API.');
             return [
                 'success' => false,
                 'error' => $errorMessage,
@@ -455,6 +512,43 @@ class MetaWhatsappService
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Extract human-readable error title & message from Meta Graph API error payload.
+     */
+    public function extractMetaErrorMessage(array $responseData, string $defaultFallback = 'Meta API Error'): string
+    {
+        $error = $responseData['error'] ?? (isset($responseData['body']['error']) ? $responseData['body']['error'] : []);
+        $userMsg = $error['error_user_msg'] ?? null;
+        $userTitle = $error['error_user_title'] ?? null;
+        $details = $error['error_data']['details'] ?? null;
+        $rawMsg = $error['message'] ?? null;
+        $subcode = $error['error_subcode'] ?? null;
+        $code = $error['code'] ?? null;
+
+        if ($userMsg) {
+            return $userTitle ? "{$userTitle}: {$userMsg}" : $userMsg;
+        }
+
+        if ($details) {
+            return $details;
+        }
+
+        if ($rawMsg && $rawMsg !== 'Request code error' && $rawMsg !== 'Error') {
+            return $rawMsg;
+        }
+
+        if ($userTitle) {
+            return $userTitle;
+        }
+
+        if ($subcode || $code) {
+            $codeStr = $subcode ? "Code {$code} (Subcode {$subcode})" : "Code {$code}";
+            return "Meta Error {$codeStr}: " . ($defaultFallback);
+        }
+
+        return $defaultFallback;
     }
 
     /**

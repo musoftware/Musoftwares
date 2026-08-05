@@ -35,6 +35,21 @@ class AdminTicketControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_admin_can_view_tickets_index_with_closed_ticket(): void
+    {
+        Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Closed Ticket Test',
+            'ticket_message' => 'This ticket is closed',
+            'ticket_status' => 'closed',
+            'priority' => 'low',
+            'closed_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.tickets.index'));
+        $response->assertStatus(200);
+    }
+
     public function test_non_admin_cannot_view_tickets_index(): void
     {
         $response = $this->actingAs($this->clientUser)->get(route('admin.tickets.index'));

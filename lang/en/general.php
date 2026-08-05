@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'old_price' => 'Old Price',
     'approvals_center' => 'Approvals Center',
     'deliverable_approved' => 'Deliverable Approved',
     'due_invoices' => 'Due Invoices',

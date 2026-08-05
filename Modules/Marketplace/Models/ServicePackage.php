@@ -6,6 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $service_id
+ * @property string $name
+ * @property string|null $description
+ * @property float $price
+ * @property float|null $old_price
+ * @property int|null $currency_id
+ * @property int|null $delivery_days
+ * @property int|null $revisions
+ * @property array|null $features
+ * @property-read bool $has_discount
+ * @property-read int $discount_percentage
+ */
 class ServicePackage extends Model
 {
     use SoftDeletes;

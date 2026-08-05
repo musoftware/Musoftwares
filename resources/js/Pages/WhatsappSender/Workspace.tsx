@@ -154,6 +154,12 @@ export default function Workspace({
     const [tempWabaId, setTempWabaId] = useState('');
     const [testingAccountId, setTestingAccountId] = useState<number | null>(null);
     const [debugAccount, setDebugAccount] = useState<Account | null>(null);
+    const [reconnectAccount, setReconnectAccount] = useState<Account | null>(null);
+    const [reconnectPin, setReconnectPin] = useState('');
+    const [isRequestingCode, setIsRequestingCode] = useState(false);
+    const [isRegisteringPin, setIsRegisteringPin] = useState(false);
+    const [codeRequested, setCodeRequested] = useState(false);
+    const [isWebhookOpen, setIsWebhookOpen] = useState(false);
 
     const handleTestAccount = (accId: number) => {
         setTestingAccountId(accId);
@@ -583,7 +589,7 @@ export default function Workspace({
                             <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl px-5 py-3 text-right">
                                 <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-medium">Business Balance</span>
                                 <span className="text-2xl font-black text-zinc-900 dark:text-zinc-50">
-                                    ${parseFloat(business.wallet_balance).toFixed(4)} <span className="text-xs font-normal text-zinc-500">{business.currency}</span>
+                                    ${parseFloat(business.wallet_balance).toFixed(2)} <span className="text-xs font-normal text-zinc-500">{business.currency}</span>
                                 </span>
                             </div>
 
@@ -890,26 +896,26 @@ export default function Workspace({
                         )}
 
                         {activeTab === 'connectors' && (
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                    <div className="flex justify-between items-center">
+                            <div className="space-y-6">
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                         <div>
                                             <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">WhatsApp Accounts</h3>
                                             <p className="text-xs text-zinc-500 mt-1">Direct API integration endpoints powered by Facebook WABA.</p>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             <button
                                                 type="button"
                                                 onClick={() => setShowAddAccountModal(true)}
-                                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm flex items-center gap-1.5 cursor-pointer"
+                                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-xs flex items-center gap-1.5 cursor-pointer dir-rtl"
                                             >
-                                                <span>+ إضافة حساب yدوياً (Meta Tokens)</span>
+                                                <span>+ إضافة حساب يدوي (Meta Tokens)</span>
                                             </button>
 
                                             {hasFacebookApp && (
                                                 <a
                                                     href={facebookLoginUrl}
-                                                    className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
+                                                    className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-xs"
                                                 >
                                                     Log in with Facebook
                                                 </a>
@@ -942,152 +948,102 @@ export default function Workspace({
                                         </div>
                                     )}
 
+                                    {/* Accounts Cards List */}
                                     <div className="space-y-4 mt-6">
                                         {accounts.map(acc => (
-                                            <div key={acc.id} className="border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl flex justify-between items-center">
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{acc.name}</span>
-                                                        <span className={`text-xxs px-2 py-0.5 rounded-full font-semibold ${acc.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-amber-50 text-amber-600'
-                                                            }`}>
-                                                            {acc.status}
-                                                        </span>
-                                                    </div>
-                                                    <div className="text-xs text-zinc-500 mt-1 flex items-center gap-2 flex-wrap">
-                                                        <span>Phone ID: <strong className="font-mono">{acc.phone_number_id}</strong></span>
-                                                        <span className="text-zinc-300 dark:text-zinc-800">|</span>
-                                                        <span>WABA ID:</span>
-                                                        {editingWabaAccountId === acc.id ? (
-                                                            <form
-                                                                onSubmit={(e) => {
-                                                                    e.preventDefault();
-                                                                    if (!tempWabaId.trim()) return;
-                                                                    router.put(`/whatsapp-sender/accounts/${acc.id}/waba`, {
-                                                                        waba_id: tempWabaId.trim()
-                                                                    }, {
-                                                                        onSuccess: () => setEditingWabaAccountId(null)
-                                                                    });
-                                                                }}
-                                                                className="inline-flex items-center gap-2"
-                                                            >
-                                                                <input
-                                                                    type="text"
-                                                                    required
-                                                                    placeholder="WABA ID"
-                                                                    value={tempWabaId}
-                                                                    onChange={e => setTempWabaId(e.target.value)}
-                                                                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 w-36 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                                                                    autoFocus
-                                                                />
-                                                                <button
-                                                                    type="submit"
-                                                                    className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xxs font-bold px-2 py-0.5 rounded-md transition"
-                                                                >
-                                                                    Save
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setEditingWabaAccountId(null)}
-                                                                    className="text-zinc-400 hover:text-zinc-600 text-xxs"
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                            </form>
-                                                        ) : acc.waba_id ? (
-                                                            <span className="inline-flex items-center gap-1.5">
-                                                                <strong className="font-mono text-zinc-700 dark:text-zinc-300">{acc.waba_id}</strong>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        setEditingWabaAccountId(acc.id);
-                                                                        setTempWabaId(acc.waba_id || '');
-                                                                    }}
-                                                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
-                                                                    title="Edit WABA ID"
-                                                                >
-                                                                    Edit
-                                                                </button>
+                                            <div key={acc.id} className="border border-zinc-200/70 dark:border-zinc-800 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-50/50 dark:bg-zinc-950/20 hover:border-zinc-300 dark:hover:border-zinc-700 transition">
+                                                <div className="space-y-1.5">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="font-bold text-base text-zinc-900 dark:text-zinc-100">{acc.name}</span>
+                                                        {acc.status === 'active' ? (
+                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60">
+                                                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                                Connected
                                                             </span>
                                                         ) : (
-                                                            <span className="inline-flex items-center gap-2">
-                                                                <span className="text-amber-600 dark:text-amber-400 font-medium text-xxs bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded-sm">Missing</span>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setEditingWabaAccountId(acc.id);
-                                                                        setTempWabaId('');
-                                                                    }}
-                                                                    className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold"
-                                                                >
-                                                                    Set WABA ID
-                                                                </button>
-                                                                <a
-                                                                    href="https://business.facebook.com/wa/manage/phone-numbers/"
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2 py-0.5 rounded text-xs font-semibold transition border border-blue-200/60 dark:border-blue-800/60"
-                                                                    title="Visit Meta Business Suite to find your WABA ID"
-                                                                >
-                                                                    <ExternalLink className="w-3 h-3" />
-                                                                    <span>Visit External</span>
-                                                                </a>
+                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/60">
+                                                                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                                                                Disconnected
                                                             </span>
                                                         )}
                                                     </div>
+                                                    <div className="text-xs text-zinc-500 flex items-center gap-2 flex-wrap">
+                                                        <span className="font-semibold text-zinc-700 dark:text-zinc-300 dir-ltr">
+                                                            {acc.metadata?.display_phone_number || acc.name}
+                                                        </span>
+                                                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                                                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">WABA Approved</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-3 shrink-0">
+
+                                                <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                                                    {acc.status !== 'active' && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setReconnectAccount(acc);
+                                                                setReconnectPin('');
+                                                                setCodeRequested(false);
+                                                            }}
+                                                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                            </svg>
+                                                            <span>Reconnect WhatsApp</span>
+                                                        </button>
+                                                    )}
+
                                                     <button
                                                         type="button"
                                                         disabled={testingAccountId === acc.id}
                                                         onClick={() => handleTestAccount(acc.id)}
-                                                        className="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/60 dark:border-emerald-800/60 px-2.5 py-1 rounded-lg text-xs font-semibold transition disabled:opacity-50 cursor-pointer"
-                                                        title="Test connection against Meta Graph API for Phone ID & WABA ID"
+                                                        className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
+                                                        title="Test connection against Meta Graph API"
                                                     >
                                                         {testingAccountId === acc.id ? (
                                                             <span className="flex items-center gap-1">
-                                                                <svg className="animate-spin h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                <svg className="animate-spin h-3.5 w-3.5 text-zinc-600 dark:text-zinc-400" fill="none" viewBox="0 0 24 24">
                                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                                 </svg>
                                                                 <span>Testing...</span>
                                                             </span>
                                                         ) : (
-                                                            <span className="flex items-center gap-1">
-                                                                <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                </svg>
-                                                                <span>Test</span>
-                                                            </span>
+                                                            <span>Test Connection</span>
                                                         )}
                                                     </button>
+
                                                     <button
                                                         type="button"
                                                         onClick={() => setDebugAccount(acc)}
-                                                        className="inline-flex items-center gap-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/80 px-2 py-1 rounded-lg text-xs font-mono font-medium transition cursor-pointer"
+                                                        className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 px-2.5 py-2 rounded-xl text-xs font-mono font-bold transition cursor-pointer"
                                                         title="View actual raw JSON metadata stored for this account"
                                                     >
-                                                        <svg className="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                                                        </svg>
-                                                        <span>JSON</span>
+                                                        <span>&lt;/&gt; JSON</span>
                                                     </button>
+
                                                     <button
                                                         type="button"
                                                         onClick={() => openEditAccountModal(acc)}
-                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 text-xs font-semibold"
+                                                        className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold px-2 py-1"
                                                     >
                                                         Edit
                                                     </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            if (confirm('Are you sure you want to disconnect this number?')) {
-                                                                router.delete(`/whatsapp-sender/accounts/${acc.id}`);
-                                                            }
-                                                        }}
-                                                        className="text-red-500 hover:text-red-650 text-xs font-semibold"
-                                                    >
-                                                        Disconnect
-                                                    </button>
+
+                                                    {acc.status === 'active' && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (confirm('Are you sure you want to disconnect this number?')) {
+                                                                    router.delete(`/whatsapp-sender/accounts/${acc.id}`);
+                                                                }
+                                                            }}
+                                                            className="text-red-500 hover:text-red-650 text-xs font-semibold px-2 py-1"
+                                                        >
+                                                            Disconnect
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
@@ -1095,73 +1051,87 @@ export default function Workspace({
                                             <p className="text-sm text-zinc-400 text-center py-6">No WhatsApp account connected yet.</p>
                                         )}
                                     </div>
-                                </div>
 
-                                <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-5">
-                                    <div>
-                                        <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg font-sans">Meta Webhook Configuration</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">
-                                            استخدم هذه البيانات لربط الـ Webhook في لوحة مطوري Meta (Facebook Developer Portal).
-                                        </p>
+                                    {/* Collapsible Webhook Settings Accordion */}
+                                    <div className="mt-8 border-t border-zinc-200/80 dark:border-zinc-800/80 pt-6">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsWebhookOpen(!isWebhookOpen)}
+                                            className="flex items-center justify-between w-full p-4 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl text-left transition hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                                                    ⚙️ Advanced Developer Settings (Meta Webhook)
+                                                </span>
+                                                <span className="text-xs text-zinc-400 font-normal hidden sm:inline">
+                                                    (Callback URL & Verify Token)
+                                                </span>
+                                            </div>
+                                            <span className="text-zinc-500 font-bold text-xs">
+                                                {isWebhookOpen ? '▲ إخفاء' : '▼ عرض التفاصيل'}
+                                            </span>
+                                        </button>
+
+                                        {isWebhookOpen && (
+                                            <div className="mt-4 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 space-y-5">
+                                                <div>
+                                                    <h4 className="font-bold text-zinc-900 dark:text-zinc-50 text-sm">Meta Webhook Configuration</h4>
+                                                    <p className="text-xs text-zinc-500 mt-1">
+                                                        استخدم هذه البيانات لربط الـ Webhook في لوحة مطوري Meta (Facebook Developer Portal).
+                                                    </p>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {/* Callback URL */}
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Callback URL</label>
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                type="text"
+                                                                readOnly
+                                                                value={`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`}
+                                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => copyToClipboard(`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`)}
+                                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
+                                                            >
+                                                                {copied ? 'Copied!' : 'Copy'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Verify Token */}
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Verify Token</label>
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                type="text"
+                                                                readOnly
+                                                                value={business.webhook_verify_token || webhookVerifyToken}
+                                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => copyToClipboard(business.webhook_verify_token || webhookVerifyToken)}
+                                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
+                                                            >
+                                                                {copied ? 'Copied!' : 'Copy'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="pt-3 border-t border-zinc-200/80 dark:border-zinc-800 space-y-2 dir-rtl text-right">
+                                                    <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">خطوات التفعيل في Meta Portal:</h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                                        اذهب إلى <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-semibold">developers.facebook.com</a> &gt; تطبيقك &gt; <strong>WhatsApp</strong> &gt; <strong>Configuration</strong> &gt; الصق Callback URL والتوكن أعلاه ثم اضغط <strong>Verify and Save</strong> واشترك في <code>messages</code>.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {/* Callback URL */}
-                                    <div className="space-y-1.5">
-                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Callback URL</label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`}
-                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => copyToClipboard(`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`)}
-                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
-                                            >
-                                                {copied ? 'Copied!' : 'Copy'}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Verify Token */}
-                                    <div className="space-y-1.5">
-                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Verify Token</label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={business.webhook_verify_token || webhookVerifyToken}
-                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => copyToClipboard(business.webhook_verify_token || webhookVerifyToken)}
-                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
-                                            >
-                                                {copied ? 'Copied!' : 'Copy'}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-2 border-t border-zinc-200/80 dark:border-zinc-800 space-y-2">
-                                        <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">خطوات التفعيل في Meta Portal:</h4>
-                                        <ol className="text-xxs text-zinc-500 list-decimal list-inside space-y-1 leading-relaxed">
-                                            <li>افتح <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-semibold">developers.facebook.com</a></li>
-                                            <li>اختر تطبيقك &rarr; <strong>WhatsApp</strong> &rarr; <strong>Configuration</strong></li>
-                                            <li>الصق <strong>Callback URL</strong> و <strong>Verify Token</strong> أعلاه</li>
-                                            <li>اضغط <strong>Verify and Save</strong> واشترك في <code>messages</code></li>
-                                        </ol>
-                                    </div>
-
-                                    <Link
-                                        href="/whatsapp-sender/meta-app-guide"
-                                        target="_blank"
-                                        className="text-emerald-600 dark:text-emerald-400 hover:underline text-xs font-semibold block pt-1"
-                                    >
-                                        دليل إعداد Meta App الشامل بالصور 📖
-                                    </Link>
                                 </div>
                             </div>
                         )}
@@ -2288,6 +2258,158 @@ export default function Workspace({
                             >
                                 Close
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reconnect Verification Modal */}
+            {reconnectAccount && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-6 dir-rtl text-right">
+                        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center font-bold text-lg">
+                                    ⚠️
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
+                                        WhatsApp Disconnected
+                                    </h3>
+                                    <p className="text-xs text-zinc-500">{reconnectAccount.name}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setReconnectAccount(null)}
+                                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-xl font-bold"
+                            >
+                                &times;
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                                رقمك غير متصل بميتا حالياً بسبب عدم التحقق. اختر طريقة استلام كود التحقق لتفعيل الرقم:
+                            </p>
+
+                            {flash?.success && (
+                                <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 p-3 rounded-2xl text-xs font-semibold space-y-1">
+                                    <div className="flex items-center gap-1.5 font-bold">
+                                        <span>✓</span>
+                                        <span>{flash.success}</span>
+                                    </div>
+                                    <p className="text-xxs text-emerald-700/80 dark:text-emerald-400/80">
+                                        أدخل الكود المكون من 6 أرقام المستلم في الحقل أدناه ثم اضغط تأكيد وتفعيل.
+                                    </p>
+                                </div>
+                            )}
+
+                            {flash?.error && (
+                                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 p-3.5 rounded-2xl text-xs font-semibold space-y-2">
+                                    <div className="flex items-center gap-1.5 font-bold">
+                                        <span>⚠️</span>
+                                        <span>{flash.error}</span>
+                                    </div>
+                                    {flash?.meta_response && (
+                                        <div className="pt-2 border-t border-red-200 dark:border-red-900/60 space-y-1">
+                                            <span className="text-xxs font-bold text-red-700 dark:text-red-400 block uppercase">
+                                                Meta Graph API Error Payload:
+                                            </span>
+                                            <pre className="bg-zinc-950 text-red-400 text-xxs p-2.5 rounded-xl font-mono overflow-x-auto border border-zinc-800 dir-ltr text-left">
+                                                {JSON.stringify(flash.meta_response, null, 2)}
+                                            </pre>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Step 1: Request Code Buttons */}
+                            <div className="space-y-2">
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">1. طلب كود التحقق (Request Code)</span>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        disabled={isRequestingCode}
+                                        onClick={() => {
+                                            setIsRequestingCode(true);
+                                            router.post(`/whatsapp-sender/accounts/${reconnectAccount.id}/request-code`, {
+                                                code_method: 'SMS',
+                                                language: 'ar',
+                                            }, {
+                                                onFinish: () => {
+                                                    setIsRequestingCode(false);
+                                                    setCodeRequested(true);
+                                                }
+                                            });
+                                        }}
+                                        className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 p-3 rounded-2xl text-xs font-bold transition flex flex-col items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                                    >
+                                        <span className="text-base">💬</span>
+                                        <span>إرسال عبر SMS</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        disabled={isRequestingCode}
+                                        onClick={() => {
+                                            setIsRequestingCode(true);
+                                            router.post(`/whatsapp-sender/accounts/${reconnectAccount.id}/request-code`, {
+                                                code_method: 'VOICE',
+                                                language: 'ar',
+                                            }, {
+                                                onFinish: () => {
+                                                    setIsRequestingCode(false);
+                                                    setCodeRequested(true);
+                                                }
+                                            });
+                                        }}
+                                        className="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 p-3 rounded-2xl text-xs font-bold transition flex flex-col items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                                    >
+                                        <span className="text-base">📞</span>
+                                        <span>إرسال عبر مكالمة</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Step 2: Input PIN & Register */}
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    if (!reconnectPin.trim() || reconnectPin.length !== 6) {
+                                        alert('يرجى إدخال كود التحقق المكون من 6 أرقام');
+                                        return;
+                                    }
+                                    setIsRegisteringPin(true);
+                                    router.post(`/whatsapp-sender/accounts/${reconnectAccount.id}/register`, {
+                                        pin: reconnectPin.trim(),
+                                    }, {
+                                        onFinish: () => {
+                                            setIsRegisteringPin(false);
+                                            setReconnectAccount(null);
+                                        }
+                                    });
+                                }}
+                                className="border-t border-zinc-100 dark:border-zinc-800 pt-4 space-y-3"
+                            >
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">2. أدخل كود التحقق المكون من 6 أرقام</span>
+                                <input
+                                    type="text"
+                                    maxLength={6}
+                                    required
+                                    placeholder="مثال: 123456"
+                                    value={reconnectPin}
+                                    onChange={e => setReconnectPin(e.target.value)}
+                                    className="w-full text-center tracking-widest text-lg font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                />
+
+                                <button
+                                    type="submit"
+                                    disabled={isRegisteringPin || reconnectPin.length !== 6}
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl transition shadow-md disabled:opacity-50 cursor-pointer"
+                                >
+                                    {isRegisteringPin ? 'جاري التفعيل...' : '🚀 تأكيد وتفعيل الرقم (Register)'}
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

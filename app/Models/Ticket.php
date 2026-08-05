@@ -23,6 +23,10 @@ class Ticket extends Model
         'closed_at',
     ];
 
+    protected $casts = [
+        'closed_at' => 'datetime',
+    ];
+
     public function close(): void
     {
         $this->ticket_status = 'closed';

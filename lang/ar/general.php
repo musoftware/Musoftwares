@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'old_price' => 'السعر القديم',
     'approvals_center' => 'مركز الاعتمادات والموافقات',
     'deliverable_approved' => 'تم اعتماد التسليم',
     'due_invoices' => 'الفواتير المستحقة',

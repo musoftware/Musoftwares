@@ -45,9 +45,15 @@ class TicketResource extends JsonResource
                 ];
             }),
 
-            'closed_at' => $this->closed_at?->toIso8601String(),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'closed_at' => $this->closed_at instanceof \DateTimeInterface
+                ? $this->closed_at->toIso8601String()
+                : ($this->closed_at ? \Illuminate\Support\Carbon::parse($this->closed_at)->toIso8601String() : null),
+            'created_at' => $this->created_at instanceof \DateTimeInterface
+                ? $this->created_at->toIso8601String()
+                : ($this->created_at ? \Illuminate\Support\Carbon::parse($this->created_at)->toIso8601String() : null),
+            'updated_at' => $this->updated_at instanceof \DateTimeInterface
+                ? $this->updated_at->toIso8601String()
+                : ($this->updated_at ? \Illuminate\Support\Carbon::parse($this->updated_at)->toIso8601String() : null),
         ];
     }
 }
