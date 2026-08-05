@@ -56,7 +56,9 @@ class UpdateServiceRequest extends FormRequest
             'gallery'                  => 'nullable|array|max:5',
             'gallery.*'                => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'kept_gallery'             => 'nullable|array',
-            'kept_gallery.*'           => 'string'
+            'kept_gallery.*'           => 'string',
+            'gallery_order'            => 'nullable|array',
+            'gallery_order.*'          => 'string',
         ];
     }
 }

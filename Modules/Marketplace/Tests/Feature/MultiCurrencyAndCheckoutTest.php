@@ -79,7 +79,7 @@ class MultiCurrencyAndCheckoutTest extends TestCase
         $checkoutService = new CheckoutService(new EscrowService(), new PromotionsService());
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Insufficient balance.");
+        $this->expectExceptionMessage(__('marketplace.insufficient_balance_for_checkout', ['required' => 300, 'available' => 0]));
         $checkoutService->processCheckout($buyer, $package->id);
     }
 }

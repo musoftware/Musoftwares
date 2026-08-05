@@ -486,6 +486,14 @@ export default function Show({
                         </h2>
                         {getStatusBadge(invoice.status)}
                         {getJobStatusBadge(invoice.job_status)}
+                        {invoice.is_editable === false && (
+                            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                                <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                                {invoice.status === 'unpaid' 
+                                    ? (__('admin.cannot_add_timers_to_old_invoices', { days: 3 }) || 'Locked (Created > 3 days ago)')
+                                    : (__('general.locked') || 'Locked')}
+                            </span>
+                        )}
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-500 mt-2">
                         <span className="flex items-center gap-1">
@@ -769,7 +777,7 @@ export default function Show({
                             </div>
                         )}
                         
-                        {isUnpaid && (
+                        {isUnpaid && invoice.is_editable !== false && (
                             <Button onClick={handleAddTimerItem} variant="link" className="mt-2 text-slate-900 font-bold hover:text-slate-900">
                                 <Plus className="w-3 h-3 me-1" />{__('general.add_manual_entry')}
                             </Button>
@@ -829,8 +837,8 @@ export default function Show({
                 )}
             </div>
 
-            {/* Toolbar (Unpaid only) */}
-            {isUnpaid && !isEditing && (
+            {/* Toolbar (Unpaid & Editable only) */}
+            {isUnpaid && invoice.is_editable !== false && !isEditing && (
                 <div className="bg-white border rounded-lg p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                         <span className="text-xs font-bold text-gray-500 uppercase tracking-wider me-2">Quick Build:</span>
@@ -855,7 +863,7 @@ export default function Show({
                 <div className="bg-gray-50 border-b px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center text-gray-700 font-semibold">
                         <List className="w-5 h-5 text-gray-400 me-2" />{__('general.invoice_items')}</div>
-                    {isUnpaid && !isEditing && (
+                    {isUnpaid && invoice.is_editable !== false && !isEditing && (
                         <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                             <Edit2 className="w-4 h-4 me-2" />{__('general.edit_rows')}</Button>
                     )}

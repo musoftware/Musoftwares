@@ -39,6 +39,7 @@ interface Props {
     client_rate: number;
     is_custom_rate_enabled?: boolean;
     hour_rate: number;
+    is_editable?: boolean;
 }
 
 function formatDurationMS(seconds: number): string {
@@ -86,8 +87,9 @@ const isSameDateStr = (d1: string, d2: string) => {
 
 export default function TimerDetails({
     item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds,
-    system_base_rate, client_rate, is_custom_rate_enabled, hour_rate,
+    system_base_rate, client_rate, is_custom_rate_enabled, hour_rate, is_editable = true,
 }: Props) {
+    const isCanEdit = item.invoice_status === 'unpaid' && is_editable !== false;
     const storageKey = `timer-details-${item.id}`;
 
     const loadCache = (): TimerCache | null => {
@@ -334,6 +336,17 @@ export default function TimerDetails({
 
                 <Card className="shadow-md border-0 rounded-2xl overflow-hidden">
                     <CardContent className="p-6">
+                        {!isCanEdit && (
+                            <div className="p-4 mb-6 text-amber-800 bg-amber-50 border border-amber-200 rounded-xl text-sm font-semibold flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                                <span>
+                                    {item.invoice_status !== 'unpaid'
+                                        ? (__('admin.only_unpaid_invoices_can_be_edited') || 'Only unpaid invoices can be edited.')
+                                        : (__('admin.cannot_add_timers_to_old_invoices', { days: 3 }) || 'Cannot add or edit timer sessions for invoices created more than 3 days ago.')}
+                                </span>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">
@@ -356,7 +369,7 @@ export default function TimerDetails({
                                         type={rateVisible ? 'number' : 'password'}
                                         value={rate}
                                         onChange={(e) => setRate(parseFloat(e.target.value) || 0)}
-                                        disabled={item.invoice_status !== 'unpaid'}
+                                        disabled={!isCanEdit}
                                         className="font-mono font-bold tracking-widest rounded-e-none border-e-0 focus-visible:ring-0 bg-gray-50"
                                     />
                                     <Button type="button" variant="outline" className="rounded-none border-s-0 px-3 hover:bg-gray-100" onClick={() => setRateVisible((v) => !v)} aria-label={rateVisible ? __('general.hide_rate') : __('general.show_rate')}>
@@ -381,7 +394,7 @@ export default function TimerDetails({
                                     placeholder={__('general.what_did_you_work_on')}
                                     onKeyDown={(e) => { if (e.key === 'Enter') handleStart(); }}
                                     className="shadow-sm"
-                                    disabled={item.invoice_status !== 'unpaid'}
+                                    disabled={!isCanEdit}
                                 />
                             </div>
 
@@ -389,13 +402,13 @@ export default function TimerDetails({
                                 <div className="flex items-end gap-3 flex-wrap bg-gray-50/50 p-3 rounded-xl border border-gray-100">
                                     <div className="w-24">
                                         <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">{__('general.hours')}</label>
-                                        <Input type="number" min="0" placeholder="0" value={manualHours} onChange={(e) => setManualHours(e.target.value)} disabled={item.invoice_status !== 'unpaid'} />
+                                        <Input type="number" min="0" placeholder="0" value={manualHours} onChange={(e) => setManualHours(e.target.value)} disabled={!isCanEdit} />
                                     </div>
                                     <div className="w-24">
                                         <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">{__('general.minutes')}</label>
-                                        <Input type="number" min="0" max="59" placeholder="0" value={manualMinutes} onChange={(e) => setManualMinutes(e.target.value)} disabled={item.invoice_status !== 'unpaid'} />
+                                        <Input type="number" min="0" max="59" placeholder="0" value={manualMinutes} onChange={(e) => setManualMinutes(e.target.value)} disabled={!isCanEdit} />
                                     </div>
-                                    <Button type="button" variant="secondary" onClick={handleAddManual} disabled={item.invoice_status !== 'unpaid'}>
+                                    <Button type="button" variant="secondary" onClick={handleAddManual} disabled={!isCanEdit}>
                                         <Plus className="w-4 h-4 me-2" /> {__('general.add_duration')}
                                     </Button>
                                 </div>
@@ -425,7 +438,7 @@ export default function TimerDetails({
                                             </td>
                                             <td className="px-4 py-2.5 font-bold text-gray-900">{formatMoney(timer.amount, invoice_currency)}</td>
                                             <td className="px-4 py-2.5 text-center">
-                                                {item.invoice_status === 'unpaid' && (
+                                                {isCanEdit && (
                                                     <button onClick={() => handleDelete(index)} className="text-gray-400 hover:text-red-500 transition-colors" aria-label={__('general.delete')}>
                                                         <X className="w-4 h-4" />
                                                     </button>
@@ -466,14 +479,14 @@ export default function TimerDetails({
                             <div className="flex items-center flex-wrap gap-3">
                                 <Button
                                     onClick={handleStart}
-                                    disabled={isRunning || item.invoice_status !== 'unpaid'}
+                                    disabled={isRunning || !isCanEdit}
                                     className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
                                 >
                                     <Play className="w-4 h-4 me-2" /> {__('general.start')}
                                 </Button>
                                 <Button
                                     onClick={handlePseudoStart}
-                                    disabled={isRunning || item.invoice_status !== 'unpaid'}
+                                    disabled={isRunning || !isCanEdit}
                                     className="bg-purple-700 hover:bg-purple-800 text-white shadow-sm"
                                 >
                                     <Play className="w-4 h-4 me-2" /> {__('general.pseudo_start') || 'تشغيل تجريبي (خصم 95%)'}
@@ -490,7 +503,7 @@ export default function TimerDetails({
                                 <div className="ms-auto">
                                     <Button
                                         onClick={handleSave}
-                                        disabled={isSaving || item.invoice_status !== 'unpaid'}
+                                        disabled={isSaving || !isCanEdit}
                                         className="bg-gray-900 hover:bg-gray-800 text-white shadow-sm px-6"
                                     >
                                         <Save className="w-4 h-4 me-2" /> {__('general.save')}

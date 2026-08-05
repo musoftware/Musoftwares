@@ -396,6 +396,10 @@ class InvoiceController extends Controller
      */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
+        if (! $invoice->canBeEdited()) {
+            return redirect()->back()->with('error', __('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
+        }
+
         try {
             $this->invoiceService->updateInvoice($invoice, $request->validated());
         } catch (\Exception $e) {
@@ -1016,6 +1020,7 @@ class InvoiceController extends Controller
             'client_rate' => round($client_rate, 2),
             'is_custom_rate_enabled' => $is_custom_rate_enabled,
             'hour_rate' => round($effectiveRate, 2),
+            'is_editable' => $item->invoice ? $item->invoice->canBeEdited() : false,
         ]);
     }
 
@@ -1023,11 +1028,7 @@ class InvoiceController extends Controller
     {
         $item = InvoiceItem::findOrFail($item_id);
 
-        if ($item->invoice && $item->invoice->status !== 'unpaid') {
-            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
-        }
-
-        if ($item->invoice && Carbon::parse($item->invoice->created_at)->timezone('Africa/Cairo')->startOfDay()->diffInDays(now('Africa/Cairo')->startOfDay()) > 3) {
+        if ($item->invoice && ! $item->invoice->canBeEdited()) {
             return redirect()->back()->with('error', __('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
         }
 
@@ -1080,8 +1081,8 @@ class InvoiceController extends Controller
     {
         $item = InvoiceItem::findOrFail($item_id);
 
-        if ($item->invoice && $item->invoice->status !== 'unpaid') {
-            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
+        if ($item->invoice && ! $item->invoice->canBeEdited()) {
+            return redirect()->back()->with('error', __('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
         }
 
         $timer = InvoiceItemTimer::where('invoice_item_id', $item->id)->findOrFail($timer_id);
@@ -1092,8 +1093,8 @@ class InvoiceController extends Controller
 
     public function createTimerItem(Invoice $invoice)
     {
-        if ($invoice->status !== 'unpaid') {
-            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
+        if (! $invoice->canBeEdited()) {
+            return redirect()->back()->with('error', __('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
         }
 
         $item = new InvoiceItem;
@@ -1246,8 +1247,8 @@ class InvoiceController extends Controller
             'tasks_details' => 'nullable|string',
         ]);
 
-        if ($invoice->status != 'unpaid') {
-            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
+        if (! $invoice->canBeEdited()) {
+            return redirect()->back()->with('error', __('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
         }
 
         $calc = $this->runPayServiceCalculation(

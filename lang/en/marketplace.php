@@ -41,4 +41,57 @@ return [
     
     'geo_faq_4_q' => 'How do AI agents and runtime automation tools integrate?',
     'geo_faq_4_a' => 'Tools and desktop runtime plugins on Musoftware Marketplace connect directly with the local Musoftware Runtime Agent via secure local WebSockets (RPC), keeping your business credentials private and zero-dependency.',
+
+    // Promotions
+    'promo_seasonal_not_active' => 'Seasonal promo not active',
+    'promo_new_users_only' => 'Discount reserved for new users',
+    'promo_min_price_threshold' => 'Base price below minimum threshold',
+    'special_discount' => 'Special Discount',
+    'coupon_invalid_or_inactive' => 'Coupon code is invalid or inactive.',
+    'coupon_expired' => 'Coupon code has expired.',
+    'coupon_max_uses_exceeded' => 'You have reached the maximum uses for this coupon.',
+
+    // Checkout & Purchase
+    'service_not_available_for_purchase' => 'Sorry, this service is currently unavailable for purchase.',
+    'cannot_purchase_own_service' => 'You cannot purchase your own service.',
+    'insufficient_balance_for_checkout' => 'Insufficient account balance for checkout (Required: :required, Available: :available).',
+
+    // Escrow
+    'insufficient_balance_for_escrow' => 'Insufficient account balance to hold Escrow funds.',
+    'escrow_hold_description' => 'Escrow hold for service order #:id',
+    'escrow_cannot_release' => 'Current escrow status does not permit releasing funds.',
+    'escrow_released_description' => 'Earnings from service order #:id (Escrow Released)',
+    'escrow_cannot_refund' => 'Unable to refund escrow funds in the current status.',
+    'escrow_refunded_description' => 'Refund for service order #:id (Escrow Cancelled)',
+    'escrow_dispute_held_only' => 'Disputes can only be opened for held funds in progress.',
+
+    // Deliverables & Revisions
+    'deliverable_cannot_submit_in_status' => 'Cannot submit new deliverables for an order in its current status.',
+    'revision_delivered_only' => 'Revisions can only be requested for delivered orders.',
+
+    // Free Downloads
+    'service_not_available_for_free_download' => 'This service is not available for free download.',
+    'download_link_invalid' => 'Download link is invalid or does not exist.',
+    'download_link_expired' => 'Free download link has expired.',
+
+    // Referrals & Withdrawals
+    'referral_commission_description' => 'Referral commission for marketplace order #:id',
+    'insufficient_balance_for_withdrawal' => 'Available balance is insufficient for a withdrawal request.',
+    'withdrawal_pending_review_description' => 'Withdrawal request pending admin review',
+    'insufficient_funds' => 'Insufficient funds available.',
+
+    // Meta SEO
+    'meta_title' => 'Software Development & IT Services Marketplace | MuSoftwares',
+    'meta_description' => 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
+
+    // Admin Playbook Markdown Templates
+    'playbook_package_details_title' => '### 💰 Package & Pricing Details for Service: :title',
+    'playbook_package_heading' => '#### 📦 Package: :name',
+    'playbook_price_label' => '- **Price:** `:price :currency`',
+    'playbook_delivery_label' => '- **Turnaround Time:** `:days` days',
+    'playbook_description_label' => '- **Description:** :description',
+    'playbook_features_label' => '- **Features:**',
+    'playbook_no_packages' => '*(No registered packages currently for this service)*',
+    'playbook_extras_title' => '### ➕ Additional Services (Extras)',
+    'playbook_extra_item' => '- **:title**: `:price $` (:days extra days)',
 ];

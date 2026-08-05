@@ -43,6 +43,7 @@ export default function CreateService({ categories, seller }: Props) {
         requirements: [] as string[],
         gallery: [] as File[],
         kept_gallery: [] as string[],
+        gallery_order: [] as string[],
         video_url: '',
         packages: [emptyPackage()],
     });

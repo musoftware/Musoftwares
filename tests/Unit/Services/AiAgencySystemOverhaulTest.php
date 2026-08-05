@@ -82,4 +82,21 @@ class AiAgencySystemOverhaulTest extends TestCase
         $this->assertLessThanOrEqual($valuation['max_usd'], $valuation['recommended_usd']);
         $this->assertIsArray($valuation['feature_breakdown']);
     }
+
+    public function test_scope_pricing_engine_handles_malware_cleanup_and_security_audit_relevance()
+    {
+        $project = new Project([
+            'project_name' => 'مشكلة هوستينجر',
+            'description'  => 'عندي هوست على هوستينجر بيتضاف ملفات خبيثة وكل ما احذفها ترجع تاني وقفلت معاه مش عارف اوصل هو بيدخل منين',
+        ]);
+
+        $valuation = $this->pricingEngine->calculateValuation($project, [$project->description]);
+
+        $this->assertEquals('BUG_FIX', $valuation['context_type']);
+        $this->assertStringContainsString('Security', $valuation['platform']);
+        
+        // Ensure file_manager is not force-matched due to the word 'ملفات'
+        $keys = array_column($valuation['micro_components'], 'key');
+        $this->assertNotContains('file_manager', $keys);
+    }
 }

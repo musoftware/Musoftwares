@@ -24,7 +24,7 @@ class DeliverableService
         ];
 
         if (! in_array($order->status, $allowedStatuses, true)) {
-            throw new Exception("لا يمكن تسليم أي ملفات جديدة للطلب في حالته الحالية.");
+            throw new Exception(__('marketplace.deliverable_cannot_submit_in_status'));
         }
 
         DB::transaction(function () use ($order, $note, $filePath) {
@@ -58,7 +58,7 @@ class DeliverableService
     public function requestRevision(ServiceOrder $order, string $revisionNote): ServiceOrder
     {
         if ($order->status !== ServiceOrderStatus::DELIVERED) {
-            throw new Exception("يمكن طلب التعديل فقط للطلبات المستلمة (Delivered).");
+            throw new Exception(__('marketplace.revision_delivered_only'));
         }
 
         \Modules\Marketplace\Models\OrderRevision::create([

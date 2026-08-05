@@ -55,6 +55,8 @@ class StoreServiceRequest extends FormRequest
             'gallery.*'                => 'image|mimes:jpeg,png,jpg,webp|max:5120',
             'kept_gallery'             => 'nullable|array|max:5',
             'kept_gallery.*'           => 'string',
+            'gallery_order'            => 'nullable|array|max:5',
+            'gallery_order.*'          => 'string',
         ];
     }
 }

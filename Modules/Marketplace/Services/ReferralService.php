@@ -43,7 +43,7 @@ class ReferralService
         DB::transaction(function () use ($referrer, $commissionAmount, $order) {
             $referrer->add_balance(
                 $commissionAmount,
-                "Referral commission for marketplace order #{$order->id}",
+                __('marketplace.referral_commission_description', ['id' => $order->id]),
                 'earned',
                 $order->currency_id
             );
@@ -60,14 +60,14 @@ class ReferralService
     public function requestWithdrawal(User $user, float $amount, string $payoutMethod, array $paymentDetails, ?int $userPaymentMethodId = null): UserReferralRequestWithdraw
     {
         if ($user->available_balance() < $amount) {
-            throw new Exception("رصيدك الحسابي المتوفر غير كافٍ لتقديم طلب السحب.");
+            throw new Exception(__('marketplace.insufficient_balance_for_withdrawal'));
         }
 
         return DB::transaction(function () use ($user, $amount, $payoutMethod, $paymentDetails, $userPaymentMethodId) {
             // Deduct balance temporarily for review
             $user->add_balance(
                 -$amount,
-                "Withdrawal request pending admin review",
+                __('marketplace.withdrawal_pending_review_description'),
                 'used'
             );
 

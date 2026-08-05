@@ -30,11 +30,11 @@ class CheckoutService
             $service = $package->service;
 
             if (!$service || $service->status !== 'active') {
-                throw new Exception("عذراً، هذه الخدمة غير متاحة للشراء حالياً.");
+                throw new Exception(__('marketplace.service_not_available_for_purchase'));
             }
 
             if ($lockedBuyer->id === $service->seller_id) {
-                throw new Exception("لا يمكنك شراء الخدمة الخاصة بك.");
+                throw new Exception(__('marketplace.cannot_purchase_own_service'));
             }
 
             $totalAmount = $package->price;
@@ -60,7 +60,7 @@ class CheckoutService
 
             $availableBalance = $lockedBuyer->available_balance();
             if ($availableBalance < $totalAmount) {
-                throw new Exception("رصيدك الحسابي غير كافٍ لإتمام الشراء (المطلوب: {$totalAmount}، المتاح: {$availableBalance}).");
+                throw new Exception(__('marketplace.insufficient_balance_for_checkout', ['required' => $totalAmount, 'available' => $availableBalance]));
             }
 
             $commissionRate = config('marketplace.commission_rate', 0.10);

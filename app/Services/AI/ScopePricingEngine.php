@@ -2,16 +2,21 @@
 
 namespace App\Services\AI;
 
+use App\Helpers\FinanceHelper;
 use App\Models\AdminSettings;
+use App\Models\ContractPriceItem;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\Project;
 use App\Models\User;
+use App\Traits\ConvertsCurrency;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ScopePricingEngine
 {
+    use ConvertsCurrency;
     /**
      * Standard hourly rate benchmark in USD.
      * $25/hr standard development rate.
@@ -31,22 +36,28 @@ class ScopePricingEngine
     {
         $contextType = $options['context_type'] ?? $this->detectContextType($components, $project);
 
-        // 1. Fetch USD and EGP currency models to determine the base USD -> EGP exchange rate
-        $usdToEgpRate = 50.0;
+        // 1. Resolve USD and EGP models using cached helper to determine USD -> EGP rate
+        $usdId = 1;
+        $egpId = 2;
         $usdCurrency = null;
         $egpCurrency = null;
 
         try {
-            $usdCurrency = Currency::where('currency', 'USD')->first();
-            $egpCurrency = Currency::where('currency', 'EGP')->first();
+            $usdCurrency = Currency::findCached(1) ?? Currency::where('currency', 'USD')->first();
+            $egpCurrency = Currency::findCached(2) ?? Currency::where('currency', 'EGP')->first();
+            $usdId = $usdCurrency?->id ?? 1;
+            $egpId = $egpCurrency?->id ?? 2;
+        } catch (\Throwable $e) {
+            // DB offline or unmigrated in unit tests
+        }
 
-            if ($usdCurrency && $egpCurrency) {
-                $rate = CurrenciesExchange::RateToday(1.0, $usdCurrency->id, $egpCurrency->id);
-                if ($rate > 0) {
-                    $usdToEgpRate = (float) $rate;
-                } elseif (!empty($egpCurrency->rate) && $egpCurrency->rate > 0) {
-                    $usdToEgpRate = (float) $egpCurrency->rate;
-                }
+        $usdToEgpRate = 50.0;
+        try {
+            $rate = CurrenciesExchange::RateToday(1.0, $usdId, $egpId);
+            if ($rate > 0) {
+                $usdToEgpRate = (float) $rate;
+            } elseif ($egpCurrency?->rate > 0) {
+                $usdToEgpRate = (float) $egpCurrency->rate;
             }
         } catch (\Throwable $e) {
             $usdToEgpRate = 50.0;
@@ -71,31 +82,31 @@ class ScopePricingEngine
             $hourlyRate = $marketRateSetting > 0 ? $marketRateSetting : self::BASE_HOURLY_RATE_USD;
         }
 
-        // 3. Determine target currency and its exchange rate from USD
+        // 3. Determine target currency object and exchange rate using system Helpers
         $clientUser = null;
         $targetCurrency = null;
         try {
             $clientUser       = !empty($project->user_id) ? User::find($project->user_id) : null;
-            $targetCurrencyId = $options['currency_id'] ?? $clientUser?->currency_id;
-            $targetCurrency   = $targetCurrencyId ? Currency::find($targetCurrencyId) : null;
+            $targetCurrencyId = $options['currency_id'] ?? $clientUser?->currency_id ?? $egpId;
+            $targetCurrency   = Currency::findCached($targetCurrencyId) ?? Currency::find($targetCurrencyId);
         } catch (\Throwable $e) {
             $targetCurrency = null;
         }
 
-        $exchangeRate   = 50.0;
-        $currencySymbol = 'EGP';
-        $currencyCode   = 'EGP';
+        $exchangeRate   = 1.0;
+        $currencySymbol = '$';
+        $currencyCode   = 'USD';
 
         if ($targetCurrency) {
             $currencySymbol = $targetCurrency->symbol ?? $targetCurrency->currency;
             $currencyCode   = $targetCurrency->currency;
 
-            if ($usdCurrency && $targetCurrency->id !== $usdCurrency->id) {
+            if ($targetCurrency->id !== $usdId) {
                 try {
-                    $convertedRate = CurrenciesExchange::RateToday(1.0, $usdCurrency->id, $targetCurrency->id);
+                    $convertedRate = CurrenciesExchange::RateToday(1.0, $usdId, $targetCurrency->id);
                     if ($convertedRate > 0) {
                         $exchangeRate = (float) $convertedRate;
-                    } elseif (!empty($targetCurrency->rate) && $targetCurrency->rate > 0) {
+                    } elseif ($targetCurrency->rate > 0) {
                         $exchangeRate = (float) $targetCurrency->rate;
                     }
                 } catch (\Throwable $e) {
@@ -129,6 +140,11 @@ class ScopePricingEngine
             $descriptionText .= "\n" . $project->description;
         }
 
+        $selectedAnswer = $options['selected_answer'] ?? null;
+        if (!empty($selectedAnswer)) {
+            $descriptionText .= "\n\nتوضيح العميل المحدد لنطاق العمل: " . $selectedAnswer;
+        }
+
         $cleanPromptText = trim($descriptionText);
 
         // Dynamic Platform & Tech Stack Detection
@@ -139,6 +155,21 @@ class ScopePricingEngine
         $aiAnalysis = null;
         if (mb_strlen($cleanPromptText) >= 5) {
             $aiAnalysis = $this->analyzeScopeWithGemini($cleanPromptText, $registeredCatalog);
+        }
+
+        $needsClarification = empty($selectedAnswer) && !empty($aiAnalysis['needs_clarification']);
+        $clarifyingQuestion = $aiAnalysis['clarifying_question'] ?? null;
+        $suggestedAnswers   = is_array($aiAnalysis['suggested_answers'] ?? null) ? $aiAnalysis['suggested_answers'] : [];
+
+        // Fallback ambiguity detection if prompt is brief (<= 25 chars) and no clarification generated yet
+        if (empty($selectedAnswer) && !$needsClarification && mb_strlen($cleanPromptText) <= 30 && count($suggestedAnswers) < 3) {
+            $needsClarification = true;
+            $clarifyingQuestion = "ما هو النطاق التكنيكي المفضل لتنفيذ '{$cleanPromptText}'؟";
+            $suggestedAnswers = [
+                "تجهيز وإعداد المفاتيح والتهيئة الأساسية (Setup & Configuration)",
+                "بناء الخدمة والربط البرمجي المتكامل مع لوحة التحكم (Full System Integration)",
+                "فحص وإصلاح المشاكل الفنية الحالية للتطبيق (Troubleshooting & Fix)"
+            ];
         }
 
         $aiSummary   = $aiAnalysis['ai_summary'] ?? null;
@@ -157,6 +188,9 @@ class ScopePricingEngine
 
         if (!empty($selectedAiItems) && is_array($selectedAiItems)) {
             $seenTitles = [];
+            $textLower = mb_strtolower($cleanPromptText);
+            $isSecurityOrMalwarePrompt = str_contains($textLower, 'خبيثة') || str_contains($textLower, 'فيروس') || str_contains($textLower, 'اختراق') || str_contains($textLower, 'ثغرة') || str_contains($textLower, 'malware') || str_contains($textLower, 'clean');
+
             foreach ($selectedAiItems as $item) {
                 $key = strtolower(trim($item['key'] ?? ''));
                 $customNameAr = trim($item['name_ar'] ?? '');
@@ -171,7 +205,12 @@ class ScopePricingEngine
                     $seenTitles[$normalizedTitle] = true;
                 }
 
-                if (!empty($key) && isset($registeredCatalog[$key])) {
+                // Contextual Relevance Guard: Reject file_manager if prompt is security/malware and not media library
+                if ($key === 'file_manager' && $isSecurityOrMalwarePrompt && !str_contains($textLower, 'ميديا') && !str_contains($textLower, 'وسائط')) {
+                    $key = 'custom';
+                }
+
+                if (!empty($key) && $key !== 'custom' && isset($registeredCatalog[$key])) {
                     $catComp = $registeredCatalog[$key];
                     $baseH = ($contextType === 'NEW_PROJECT') ? ($catComp['marginal_hours'] ?? 4) : ($catComp['standalone_hours'] ?? 3);
                     if (!empty($item['hours'])) {
@@ -189,22 +228,32 @@ class ScopePricingEngine
                         'complexity'      => strtolower($catComp['complexity'] ?? 'medium'),
                         'estimated_hours' => $h,
                         'cost_usd'        => $compCostUsd,
+                        'is_new_item'     => false,
                     ];
                 } elseif (!empty($customNameAr)) {
-                    // Custom AI component not in catalog
+                    // Custom AI component not in standard catalog — Auto register as dynamic ContractPriceItem
                     $baseH = (int) max(1, $item['hours'] ?? 2);
                     $h = (int) max(1, round($baseH * $platformMultiplier));
                     $compCostUsd = round($h * $hourlyRate, 2);
                     $sumComponentHours += $h;
 
+                    $itemKey = 'custom_' . Str::slug($item['name_en'] ?? $customNameAr, '_');
+                    if (strlen($itemKey) < 8) {
+                        $itemKey = 'custom_' . substr(md5($customNameAr), 0, 8);
+                    }
+
+                    $newPriceItem = $this->autoRegisterContractPriceItem($itemKey, $customNameAr, $customDesc, $h);
+
                     $resolvedComponents[] = [
-                        'key'             => 'custom_' . md5($customNameAr),
-                        'name_ar'         => $customNameAr,
-                        'name_en'         => $item['name_en'] ?? 'Custom Feature',
-                        'description_ar'  => $customDesc ?: 'تطوير وتنفيذ الميزة المخصصة.',
-                        'complexity'      => strtolower($item['complexity'] ?? 'medium'),
-                        'estimated_hours' => $h,
-                        'cost_usd'        => $compCostUsd,
+                        'key'                    => $itemKey,
+                        'name_ar'                => $customNameAr,
+                        'name_en'                => $item['name_en'] ?? 'Custom Feature',
+                        'description_ar'         => $customDesc ?: 'تطوير وتنفيذ الخدمة المخصصة وفق متطلبات العميل.',
+                        'complexity'             => strtolower($item['complexity'] ?? 'medium'),
+                        'estimated_hours'        => $h,
+                        'cost_usd'               => $compCostUsd,
+                        'is_new_item'            => true,
+                        'contract_price_item_id' => $newPriceItem?->id,
                     ];
                 }
             }
@@ -331,6 +380,9 @@ class ScopePricingEngine
         $depositConverted = round($convertedAmount * 0.50, 2);
 
         return [
+            'needs_clarification'  => $needsClarification,
+            'clarifying_question'  => $clarifyingQuestion,
+            'suggested_answers'    => array_values($suggestedAnswers),
             'ai_summary'           => $aiSummary,
             'tech_stack'           => $techStack,
             'key_features'         => array_values($keyFeatures),
@@ -372,19 +424,74 @@ class ScopePricingEngine
     }
 
     /**
-     * Detect platform requirements (Android, Flutter, iOS, Bot, Web) and calculate platform multiplier.
+     * Automatically persist custom component as a general reusable ContractPriceItem in the DB catalog.
+     */
+    protected function autoRegisterContractPriceItem(string $key, string $nameAr, ?string $descriptionAr, int $hours): ?ContractPriceItem
+    {
+        try {
+            // Generalize title: Strip domain names, URLs, or client-specific references
+            $cleanNameAr = preg_replace('/https?:\/\/\S+|www\.\S+|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b|\b[a-zA-Z0-9-]+\.(com|net|org|eg|io|co)\b/u', '', $nameAr);
+            $cleanNameAr = trim(preg_replace('/\s+/u', ' ', $cleanNameAr));
+
+            if (mb_strlen($cleanNameAr) < 3) {
+                $cleanNameAr = $nameAr;
+            }
+
+            return ContractPriceItem::firstOrCreate(
+                ['name_ar' => $cleanNameAr],
+                [
+                    'key'              => $key,
+                    'name'             => $cleanNameAr,
+                    'name_en'          => $cleanNameAr,
+                    'description'      => $descriptionAr ?: 'بند تسعير عام مسجل بالمكونات القياسية للنظام.',
+                    'standalone_hours' => $hours,
+                    'marginal_hours'   => max(1, (int) round($hours * 0.6)),
+                    'complexity'       => 'medium',
+                    'keywords'         => array_values(array_filter(explode(' ', $cleanNameAr))),
+                    'is_active'        => true,
+                    'sort_order'       => 99,
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::warning('Failed to auto register ContractPriceItem: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Detect platform requirements (Android, Flutter, iOS, Security, Server, Bot, Web) and calculate platform multiplier.
      */
     protected function detectPlatformInfo(string $prompt): array
     {
         $text = mb_strtolower($prompt);
 
-        $hasBot     = str_contains($text, 'bot') || str_contains($text, 'بوت') || str_contains($text, 'telegram') || str_contains($text, 'تلجرام') || str_contains($text, 'whatsapp') || str_contains($text, 'واتساب') || str_contains($text, 'otpjob');
-        $hasScript  = str_contains($text, 'script') || str_contains($text, 'سكربت') || str_contains($text, 'automation') || str_contains($text, 'أوتوميشن') || str_contains($text, 'handler');
-        $hasAndroid = str_contains($text, 'android') || str_contains($text, 'اندرويد') || str_contains($text, 'أندرويد');
-        $hasFlutter = str_contains($text, 'flutter') || str_contains($text, 'فلاتر');
-        $hasIos     = str_contains($text, 'ios') || str_contains($text, 'ايفون') || str_contains($text, 'آيفون') || str_contains($text, 'swift');
-        $hasMobile  = str_contains($text, 'mobile') || str_contains($text, 'موبايل') || str_contains($text, 'تطبيق');
-        $hasWeb     = str_contains($text, 'web') || str_contains($text, 'موقع') || str_contains($text, 'react') || str_contains($text, 'laravel');
+        $hasSecurity = str_contains($text, 'خبيثة') || str_contains($text, 'ملفات خبيثة') || str_contains($text, 'فيروس') || str_contains($text, 'اختراق') || str_contains($text, 'ثغرة') || str_contains($text, 'تنظيف') || str_contains($text, 'هوستينجر') || str_contains($text, 'hostinger') || str_contains($text, 'malware') || str_contains($text, 'clean');
+        $hasServer   = str_contains($text, 'سيرفر') || str_contains($text, 'cpanel') || str_contains($text, 'vps') || str_contains($text, 'دومين') || str_contains($text, 'استضافة') || str_contains($text, 'server') || str_contains($text, 'hosting');
+        $hasBot      = str_contains($text, 'bot') || str_contains($text, 'بوت') || str_contains($text, 'telegram') || str_contains($text, 'تلجرام') || str_contains($text, 'whatsapp') || str_contains($text, 'واتساب') || str_contains($text, 'otpjob');
+        $hasScript   = str_contains($text, 'script') || str_contains($text, 'سكربت') || str_contains($text, 'automation') || str_contains($text, 'أوتوميشن') || str_contains($text, 'handler');
+        $hasAndroid  = str_contains($text, 'android') || str_contains($text, 'اندرويد') || str_contains($text, 'أندرويد');
+        $hasFlutter  = str_contains($text, 'flutter') || str_contains($text, 'فلاتر');
+        $hasIos      = str_contains($text, 'ios') || str_contains($text, 'ايفون') || str_contains($text, 'آيفون') || str_contains($text, 'swift');
+        $hasMobile   = str_contains($text, 'mobile') || str_contains($text, 'موبايل') || str_contains($text, 'تطبيق');
+        $hasWeb      = str_contains($text, 'web') || str_contains($text, 'موقع') || str_contains($text, 'react') || str_contains($text, 'laravel');
+
+        if ($hasSecurity) {
+            return [
+                'platform'   => 'Security Audit & Hosting Maintenance',
+                'tech_stack' => 'Hostinger Security Audit / Malware Cleanup & Server Hardening',
+                'multiplier' => 0.8,
+                'label_ar'   => 'خدمة فحص وتأمين الاستضافة وتنظيف الملفات الخبيثة (Security Audit & Hosting Maintenance)',
+            ];
+        }
+
+        if ($hasServer && !$hasWeb && !$hasAndroid && !$hasFlutter) {
+            return [
+                'platform'   => 'Server & Hosting Operations',
+                'tech_stack' => 'Linux Server Administration / Hosting Setup',
+                'multiplier' => 0.85,
+                'label_ar'   => 'إدارة وتجهيز الاستضافة والسيرفر (Server & Hosting Operations)',
+            ];
+        }
 
         if (($hasBot || $hasScript) && !$hasAndroid && !$hasFlutter && !$hasIos) {
             return [
@@ -465,7 +572,14 @@ class ScopePricingEngine
         $normalizedText = mb_strtolower($text);
         $selectedKeys = [];
 
+        $isSecurityOrMalware = str_contains($normalizedText, 'خبيثة') || str_contains($normalizedText, 'فيروس') || str_contains($normalizedText, 'اختراق') || str_contains($normalizedText, 'ثغرة') || str_contains($normalizedText, 'malware');
+
         foreach ($catalog as $key => $comp) {
+            // Prevent 'file_manager' matching when user text is about malware/security
+            if ($key === 'file_manager' && $isSecurityOrMalware && !str_contains($normalizedText, 'ميديا') && !str_contains($normalizedText, 'وسائط')) {
+                continue;
+            }
+
             $keywords = is_array($comp['keywords']) ? $comp['keywords'] : [];
             
             // Check if any keyword matches the user prompt
@@ -477,8 +591,10 @@ class ScopePricingEngine
             }
         }
 
-        // Always ensure essential default components for web apps if prompt implies web project
-        if (str_contains($normalizedText, 'موقع') || str_contains($normalizedText, 'تطبيق') || str_contains($normalizedText, 'app') || str_contains($normalizedText, 'system')) {
+        // Always ensure essential default components for web apps if prompt explicitly implies a full web app build
+        $isFullWebApp = (str_contains($normalizedText, 'موقع') || str_contains($normalizedText, 'تطبيق') || str_contains($normalizedText, 'متجر') || str_contains($normalizedText, 'منصة')) && !$isSecurityOrMalware;
+
+        if ($isFullWebApp) {
             if (!in_array('authentication', $selectedKeys)) {
                 $selectedKeys[] = 'authentication';
             }
@@ -488,11 +604,6 @@ class ScopePricingEngine
             if (!in_array('users', $selectedKeys) && (str_contains($normalizedText, 'موظفين') || str_contains($normalizedText, 'عملاء') || str_contains($normalizedText, 'مستخدمين'))) {
                 $selectedKeys[] = 'users';
             }
-        }
-
-        // If still empty, add default generic component
-        if (empty($selectedKeys)) {
-            $selectedKeys[] = 'tasks_todo';
         }
 
         return array_unique($selectedKeys);
@@ -540,16 +651,24 @@ class ScopePricingEngine
             . "OFFICIAL REGISTERED SYSTEM COMPONENTS CATALOG (JSON):\n" . json_encode($catalogList, JSON_UNESCAPED_UNICODE) . "\n\n"
             . "Instructions:\n"
             . "1. Analyze the user prompt carefully line by line. DO NOT duplicate requirements or output repeated components!\n"
-            . "2. Detect if the user is asking for minor Bot Updates / Script Modifications (e.g. adding bot buttons, updating handlers, sum/withdraw commands, changing manager ID) vs a full web application build.\n"
-            . "3. For minor Bot / Script updates, set 'tech_stack' to 'Telegram / Bot API / Script Modifications' (or matching specific bot tech), keep estimated development hours lean (1 to 3 hours per micro-component), and do NOT inflate scope.\n"
-            . "4. For each micro-component, provide a specific, clear Arabic title ('name_ar') describing the specific task (e.g. 'إضافة أزرار حسابات OTPJob: Refresh/Withdraw/Sum', 'تحديث زر الموظفين وإظهار اسم البوت'). DO NOT use generic template names!\n"
-            . "5. Map each task to the closest catalog key in 'key' if applicable, or specify 'key': 'custom'.\n"
-            . "6. Provide a concise description in Arabic ('description_ar') and estimated development hours ('hours', e.g. 1 to 3 hours for bot tweaks, 2 to 6 hours for complex features) for each micro-component.\n"
-            . "7. Provide an executive summary in Arabic ('ai_summary') and a UNIQUE key deliverables list ('key_features') matching the user's tasks.\n\n"
+            . "2. STRICT RELEVANCE CHECK: Review all catalog items strictly against the user's prompt text. DO NOT map irrelevant catalog components! For example, if the prompt mentions 'ملفات خبيثة' (malware files), DO NOT select 'File & Media Manager' ('file_manager')! Only select catalog items if they directly match the user's problem.\n"
+            . "3. DYNAMIC GENERAL CONTRACT PRICE LIST ITEMS: If the user prompt describes tasks not in the catalog (e.g. malware cleanup, security audit, server fix, custom bot tweak), DO NOT force-fit generic web app components. Create new custom micro-components with key set to 'custom' (or 'custom_...'), a clear, GENERAL, professional Arabic name ('name_ar'), a clean English name ('name_en'), description ('description_ar'), and realistic development hours ('hours'). IMPORTANT: The titles MUST be GENERAL and reusable for any client (e.g. 'فحص واستخراج الملفات الخبيثة وتأمين الاستضافة'). DO NOT include specific client names, personal email addresses, domain names, or private credentials in the title!\n"
+            . "4. For minor Bot / Security / Script / Maintenance tasks, set 'tech_stack' to match the actual tech (e.g., 'Hostinger Security Audit / Malware Cleanup' or 'Telegram Bot API'), keep estimated development hours lean (1 to 4 hours per micro-component), and do NOT inflate scope.\n"
+            . "5. For each micro-component, provide a specific, clear Arabic title ('name_ar') describing the exact task. DO NOT use generic template names!\n"
+            . "6. Provide a concise description in Arabic ('description_ar') and estimated development hours ('hours') for each micro-component.\n"
+            . "7. Provide an executive summary in Arabic ('ai_summary') and a UNIQUE key deliverables list ('key_features') matching the user's tasks.\n"
+            . "8. AMBIGUITY & CLARIFICATION DETECTION: If the user requirements prompt is brief, underspecified, or open to multiple technical interpretations (e.g. 'إعداد Firebase Push', 'ربط الدفع', 'عمل تطبيق'), set 'needs_clarification': true, and provide 'clarifying_question' (a brief Arabic question) and 'suggested_answers' (an array of EXACTLY 3 distinct, specific Arabic technical options for the user to pick from). Otherwise, set 'needs_clarification': false.\n\n"
             . "Respond strictly with a JSON object matching this structure (no markdown wrappers):\n"
             . "{\n"
+            . "  \"needs_clarification\": true,\n"
+            . "  \"clarifying_question\": \"ما هو النطاق المحدد المطلوب لإعداد إشعارات Firebase Push؟\",\n"
+            . "  \"suggested_answers\": [\n"
+            . "    \"إعادة ضبط مفاتيح Firebase Service Account واستقبال الإشعارات بالتطبيق الحالي\",\n"
+            . "    \"بناء سيرفر إشعارات متكامل لارسال الإشعارات الجماعية والفردية من لوحة التحكم\",\n"
+            . "    \"فحص وإصلاح مشكلة عدم وصول الإشعارات بالتطبيق الحالي (Troubleshooting & Fix)\"\n"
+            . "  ],\n"
             . "  \"ai_summary\": \"ملخص تنفيذي للمشروع والمهام المطلوبة باللغة العربية...\",\n"
-            . "  \"tech_stack\": \"Telegram / Bot API / Script Modifications\",\n"
+            . "  \"tech_stack\": \"Hostinger Security Audit / Malware Cleanup & Server Hardening\",\n"
             . "  \"key_features\": [\"ميزة 1\", \"ميزة 2\"],\n"
             . "  \"selected_components\": [\n"
             . "    {\n"
@@ -611,8 +730,17 @@ class ScopePricingEngine
             . ' ' . ($project->description ?? '')
         );
 
-        if (str_contains($text, 'fix') || str_contains($text, 'bug') || str_contains($text, 'خطأ') || str_contains($text, 'إصلاح') || str_contains($text, 'مشكلة')) {
-            return 'BUG_FIX';
+        $securityOrBugKeywords = [
+            'fix', 'bug', 'خطأ', 'إصلاح', 'مشكلة', 'خبيثة', 'ملفات خبيثة', 'فيروس', 'فيروسات',
+            'اختراق', 'ثغرة', 'ثغرات', 'هوست', 'هوستينجر', 'استضافة', 'احذفها', 'تنظيف', 'تأمين',
+            'سيرفر', 'هجوم', 'تشفير', 'انترسبت', 'malware', 'clean', 'hack', 'virus', 'security',
+            'hosting', 'hostinger', 'cpanel', 'vps'
+        ];
+
+        foreach ($securityOrBugKeywords as $kw) {
+            if (str_contains($text, $kw)) {
+                return 'BUG_FIX';
+            }
         }
 
         // Minor updates / script tweaks / bot modifications should always be EXISTING_PROJECT_FEATURE

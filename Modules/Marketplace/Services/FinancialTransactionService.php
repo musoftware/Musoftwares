@@ -31,7 +31,7 @@ class FinancialTransactionService
     public function processPayment(User $user, float $amount, string $description): void
     {
         if ($user->available_balance() < $amount) {
-            throw new Exception("Insufficient funds.");
+            throw new Exception(__('marketplace.insufficient_funds'));
         }
 
         DB::transaction(function () use ($user, $amount, $description) {

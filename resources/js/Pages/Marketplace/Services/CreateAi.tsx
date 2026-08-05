@@ -62,12 +62,12 @@ export default function CreateAiService({ categories }: Props) {
                     {/* Creation Form Card */}
                     <div className="bg-slate-800/80 backdrop-blur-xl border border-slate-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl">
                         {/* Error Alert Banner */}
-                        {(errors.error || (errors as any).message) && (
+                        {((errors as Record<string, string>).error || (errors as Record<string, string>).message) && (
                             <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start gap-3 text-rose-300 text-sm">
                                 <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                                 <div>
                                     <h4 className="font-bold text-rose-200 mb-1">تعذر استكمال توليد الخدمة بالذكاء الاصطناعي</h4>
-                                    <p className="text-rose-300/90 leading-relaxed">{errors.error || (errors as any).message}</p>
+                                    <p className="text-rose-300/90 leading-relaxed">{(errors as Record<string, string>).error || (errors as Record<string, string>).message}</p>
                                 </div>
                             </div>
                         )}

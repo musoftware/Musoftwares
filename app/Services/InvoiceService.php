@@ -12,8 +12,8 @@ class InvoiceService extends BaseService
 {
     public function updateInvoice(Invoice $invoice, array $data): void
     {
-        if ($invoice->status !== 'unpaid') {
-            throw new \Exception('Cannot edit items on a paid/cancelled invoice.');
+        if (! $invoice->canBeEdited()) {
+            throw new \Exception(__('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
         }
 
         $this->executeInTransaction(function () use ($invoice, $data) {

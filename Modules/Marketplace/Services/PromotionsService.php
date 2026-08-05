@@ -44,7 +44,7 @@ class PromotionsService
                 'final_price' => $basePrice,
                 'discount_amount' => 0,
                 'applied' => false,
-                'reason' => 'Seasonal promo not active',
+                'reason' => __('marketplace.promo_seasonal_not_active'),
             ];
         }
 
@@ -54,7 +54,7 @@ class PromotionsService
                 'final_price' => $basePrice,
                 'discount_amount' => 0,
                 'applied' => false,
-                'reason' => 'Discount reserved for new users',
+                'reason' => __('marketplace.promo_new_users_only'),
             ];
         }
 
@@ -64,7 +64,7 @@ class PromotionsService
                 'final_price' => $basePrice,
                 'discount_amount' => 0,
                 'applied' => false,
-                'reason' => 'Base price below minimum threshold',
+                'reason' => __('marketplace.promo_min_price_threshold'),
             ];
         }
 
@@ -75,7 +75,7 @@ class PromotionsService
             'final_price' => $finalPrice,
             'discount_amount' => $discountAmount,
             'applied' => true,
-            'discount_name' => $discount->code ?? 'Special Discount',
+            'discount_name' => $discount->code ?? __('marketplace.special_discount'),
         ];
     }
 
@@ -87,17 +87,17 @@ class PromotionsService
         $coupon = Coupon::where('code', strtoupper($code))->where('is_active', true)->first();
 
         if (!$coupon) {
-            throw new Exception("كود الخصم غير صالح أو غير مفعّل.");
+            throw new Exception(__('marketplace.coupon_invalid_or_inactive'));
         }
 
         if ($coupon->expires_at && now('Africa/Cairo')->isAfter($coupon->expires_at)) {
-            throw new Exception("انتهت صلاحية كود الخصم كلياً.");
+            throw new Exception(__('marketplace.coupon_expired'));
         }
 
         // Usage limit check
         $userRedemptions = CouponRedemption::where('coupon_id', $coupon->id)->where('user_id', $user->id)->count();
         if ($coupon->max_uses_per_user && $userRedemptions >= $coupon->max_uses_per_user) {
-            throw new Exception("لقد تجاوزت الحد الأقصى لاستخدام كود الخصم هذا.");
+            throw new Exception(__('marketplace.coupon_max_uses_exceeded'));
         }
 
         $discountAmount = $coupon->calculateDiscount($amount);

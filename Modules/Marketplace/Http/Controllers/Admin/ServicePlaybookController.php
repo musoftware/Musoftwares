@@ -123,21 +123,21 @@ class ServicePlaybookController extends Controller
         $service->load(['packages.currency', 'extras']);
 
         // Build automatic pricing Markdown template
-        $markdown = "### 💰 تفاصيل الباقات والأسعار لخدمة: {$service->title}\n\n";
+        $markdown = __('marketplace.playbook_package_details_title', ['title' => $service->title]) . "\n\n";
         
         if ($service->packages && $service->packages->count() > 0) {
             foreach ($service->packages as $pkg) {
                 $curr = $pkg->currency->symbol ?? $pkg->currency->code ?? '$';
-                $markdown .= "#### 📦 باقة: {$pkg->name}\n";
-                $markdown .= "- **السعر:** `{$pkg->price} {$curr}`\n";
+                $markdown .= __('marketplace.playbook_package_heading', ['name' => $pkg->name]) . "\n";
+                $markdown .= __('marketplace.playbook_price_label', ['price' => $pkg->price, 'currency' => $curr]) . "\n";
                 if ($pkg->delivery_days) {
-                    $markdown .= "- **مدة التسليم:** `{$pkg->delivery_days}` أيام\n";
+                    $markdown .= __('marketplace.playbook_delivery_label', ['days' => $pkg->delivery_days]) . "\n";
                 }
                 if ($pkg->description) {
-                    $markdown .= "- **الوصف:** {$pkg->description}\n";
+                    $markdown .= __('marketplace.playbook_description_label', ['description' => $pkg->description]) . "\n";
                 }
                 if (!empty($pkg->features) && is_array($pkg->features)) {
-                    $markdown .= "- **المميزات:**\n";
+                    $markdown .= __('marketplace.playbook_features_label') . "\n";
                     foreach ($pkg->features as $feat) {
                         $markdown .= "  - {$feat}\n";
                     }
@@ -145,13 +145,17 @@ class ServicePlaybookController extends Controller
                 $markdown .= "\n---\n\n";
             }
         } else {
-            $markdown .= "*(لا توجد باقات مسجلة حالياً لهذه الخدمة)*\n";
+            $markdown .= __('marketplace.playbook_no_packages') . "\n";
         }
 
         if ($service->extras && $service->extras->count() > 0) {
-            $markdown .= "### ➕ الخدمات الإضافية (Extras)\n\n";
+            $markdown .= __('marketplace.playbook_extras_title') . "\n\n";
             foreach ($service->extras as $extra) {
-                $markdown .= "- **{$extra->title}**: `{$extra->price} $` ({$extra->delivery_days} أيام إضافية)\n";
+                $markdown .= __('marketplace.playbook_extra_item', [
+                    'title' => $extra->title,
+                    'price' => $extra->price,
+                    'days' => $extra->delivery_days,
+                ]) . "\n";
             }
         }
 

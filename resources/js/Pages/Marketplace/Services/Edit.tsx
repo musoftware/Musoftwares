@@ -48,6 +48,7 @@ export default function EditService({ categories, service }: Props) {
         extras: service.extras || [],
         gallery: [] as File[],
         kept_gallery: service.gallery || [],
+        gallery_order: [] as string[],
         video_url: service.video_url || '',
         packages: service.packages?.length > 0 ? service.packages : [emptyPackage()],
         is_free: service.is_free || false,

@@ -41,8 +41,9 @@ class AdminQuickContractController extends Controller
     public function calculate(Request $request)
     {
         $validated = $request->validate([
-            'description' => 'required|string|min:5',
-            'currency_id' => 'nullable|integer|exists:currencies,id',
+            'description'     => 'required|string|min:5',
+            'currency_id'     => 'nullable|integer|exists:currencies,id',
+            'selected_answer' => 'nullable|string',
         ]);
 
         $project = new Project([
@@ -53,7 +54,10 @@ class AdminQuickContractController extends Controller
         $valuation = $this->pricingEngine->calculateValuation(
             $project,
             [$validated['description']],
-            ['currency_id' => $validated['currency_id'] ?? null]
+            [
+                'currency_id'     => $validated['currency_id'] ?? null,
+                'selected_answer' => $validated['selected_answer'] ?? null,
+            ]
         );
 
         return response()->json([

@@ -15,7 +15,7 @@ class FreeDownloadService
     public function processLeadDownload(Service $service, string $email, ?string $name = null, ?string $ip = null): ServiceLeadDownload
     {
         if (!$service->is_free) {
-            throw new Exception("هذه الخدمة غير متاحة للتحميل المجاني.");
+            throw new Exception(__('marketplace.service_not_available_for_free_download'));
         }
 
         $token = Str::random(40);
@@ -43,11 +43,11 @@ class FreeDownloadService
 
 
         if (!$download) {
-            throw new Exception("رابط التحميل غير صالح أو غير موجود.");
+            throw new Exception(__('marketplace.download_link_invalid'));
         }
 
         if ($download->expires_at && now('Africa/Cairo')->isAfter($download->expires_at)) {
-            throw new Exception("انتهت صلاحية رابط التحميل المجاني.");
+            throw new Exception(__('marketplace.download_link_expired'));
         }
 
         $download->update([

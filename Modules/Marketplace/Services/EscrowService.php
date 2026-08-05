@@ -21,13 +21,13 @@ class EscrowService
             $buyer = $order->buyer;
             
             if ($buyer->available_balance() < $order->amount) {
-                throw new Exception("رصيدك الحسابي غير كافٍ لحجز مبلغ الضمان (Escrow).");
+                throw new Exception(__('marketplace.insufficient_balance_for_escrow'));
             }
 
             // Deduct from Buyer using 'used' type per rules
             $transactionId = $buyer->add_balance(
                 -$order->amount,
-                "Escrow hold for service order #{$order->id}",
+                __('marketplace.escrow_hold_description', ['id' => $order->id]),
                 'used',
                 $order->currency_id
             );
@@ -65,7 +65,7 @@ class EscrowService
     {
         DB::transaction(function () use ($escrow) {
             if (!in_array($escrow->status, [EscrowStatus::HELD, EscrowStatus::DISPUTED])) {
-                throw new Exception("حالة مبلغ الضمان الحالي لا تسمح بتحرير الأموال للمستفيد.");
+                throw new Exception(__('marketplace.escrow_cannot_release'));
             }
 
             $order = $escrow->order;
@@ -76,7 +76,7 @@ class EscrowService
 
             $transactionId = $seller->add_balance(
                 $sellerEarnings,
-                "Earnings from service order #{$order->id} (Escrow Released)",
+                __('marketplace.escrow_released_description', ['id' => $order->id]),
                 'earned',
                 $order->currency_id
             );
@@ -96,7 +96,7 @@ class EscrowService
     {
         DB::transaction(function () use ($escrow) {
             if (!in_array($escrow->status, [EscrowStatus::HELD, EscrowStatus::DISPUTED])) {
-                throw new Exception("تعذر إرجاع مبلغ الضمان للمشتري في الحالة الحالية.");
+                throw new Exception(__('marketplace.escrow_cannot_refund'));
             }
 
             $order = $escrow->order;
@@ -105,7 +105,7 @@ class EscrowService
             // Credit back buyer via 'refunded'
             $transactionId = $buyer->add_balance(
                 $order->amount,
-                "Refund for service order #{$order->id} (Escrow Cancelled)",
+                __('marketplace.escrow_refunded_description', ['id' => $order->id]),
                 'refunded',
                 $order->currency_id
             );
@@ -121,7 +121,7 @@ class EscrowService
     {
         DB::transaction(function () use ($escrow) {
             if ($escrow->status !== EscrowStatus::HELD) {
-                throw new Exception("يمكن فتح النزاع فقط للمبالغ المحجوزة قيد التنفيذ.");
+                throw new Exception(__('marketplace.escrow_dispute_held_only'));
             }
 
             $escrow->update([

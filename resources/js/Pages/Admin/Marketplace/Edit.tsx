@@ -95,6 +95,7 @@ export default function Edit({ auth, service, categories }: Props) {
         faq: service.faq || [],
         kept_gallery: service.gallery || [],
         gallery: [] as File[],
+        gallery_order: [] as string[],
         is_free: service.is_free || false,
         service_link: service.service_link || '',
         generate_serials: service.generate_serials || false,

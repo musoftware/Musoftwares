@@ -1,11 +1,35 @@
 import React, { useCallback, useState } from 'react';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
-import { Image as ImageIcon, Video, X, UploadCloud, Sparkles, Loader2, Copy, Check, ExternalLink, FileText } from 'lucide-react';
+import { 
+    Image as ImageIcon, 
+    Video, 
+    X, 
+    UploadCloud, 
+    Sparkles, 
+    Loader2, 
+    Copy, 
+    Check, 
+    ExternalLink, 
+    FileText,
+    Star,
+    ChevronLeft,
+    ChevronRight,
+    GripVertical
+} from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { __ } from '@/lib/i18n';
+
+interface UnifiedItem {
+    id: string;
+    type: 'kept' | 'new';
+    path?: string;
+    file?: File;
+    src: string;
+    originalIndex: number;
+}
 
 export default function GalleryStep({ data, setData, errors }: any) {
     const { auth } = usePage().props as any;
@@ -23,8 +47,154 @@ export default function GalleryStep({ data, setData, errors }: any) {
     const [showPromptBox, setShowPromptBox] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
 
+    const [dragItemIndex, setDragItemIndex] = useState<number | null>(null);
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
     const keptCount = data.kept_gallery?.length || 0;
     const totalCount = keptCount + (data.gallery?.length || 0);
+
+    const getImageSrc = (path: string) => {
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('/')) return path;
+        const clean = path.replace(/^storage\//, '').replace(/^uploads\//, '');
+        return `/uploads/${clean}`;
+    };
+
+    const getUnifiedItems = (): UnifiedItem[] => {
+        const keptList: string[] = data.kept_gallery || [];
+        const newFilesList: File[] = data.gallery || [];
+        const orderList: string[] = data.gallery_order || [];
+
+        if (orderList.length > 0) {
+            const items: UnifiedItem[] = [];
+            const usedKept = new Set<number>();
+            const usedNew = new Set<number>();
+
+            orderList.forEach((token) => {
+                if (token.startsWith('kept:')) {
+                    const kIdx = parseInt(token.replace('kept:', ''), 10);
+                    if (!isNaN(kIdx) && keptList[kIdx] !== undefined && !usedKept.has(kIdx)) {
+                        usedKept.add(kIdx);
+                        items.push({
+                            id: `kept-${kIdx}-${keptList[kIdx]}`,
+                            type: 'kept',
+                            path: keptList[kIdx],
+                            src: getImageSrc(keptList[kIdx]),
+                            originalIndex: kIdx,
+                        });
+                    }
+                } else if (token.startsWith('new:') || token.startsWith('gallery:')) {
+                    const nIdx = parseInt(token.replace(/^(new:|gallery:)/, ''), 10);
+                    if (!isNaN(nIdx) && newFilesList[nIdx] !== undefined && !usedNew.has(nIdx)) {
+                        usedNew.add(nIdx);
+                        items.push({
+                            id: `new-${nIdx}-${newFilesList[nIdx].name}`,
+                            type: 'new',
+                            file: newFilesList[nIdx],
+                            src: URL.createObjectURL(newFilesList[nIdx]),
+                            originalIndex: nIdx,
+                        });
+                    }
+                }
+            });
+
+            // Append any remaining items
+            keptList.forEach((path: string, kIdx: number) => {
+                if (!usedKept.has(kIdx)) {
+                    items.push({
+                        id: `kept-${kIdx}-${path}`,
+                        type: 'kept',
+                        path,
+                        src: getImageSrc(path),
+                        originalIndex: kIdx,
+                    });
+                }
+            });
+
+            newFilesList.forEach((file: File, nIdx: number) => {
+                if (!usedNew.has(nIdx)) {
+                    items.push({
+                        id: `new-${nIdx}-${file.name}`,
+                        type: 'new',
+                        file,
+                        src: URL.createObjectURL(file),
+                        originalIndex: nIdx,
+                    });
+                }
+            });
+
+            return items;
+        }
+
+        const defaultItems: UnifiedItem[] = [];
+        keptList.forEach((path: string, kIdx: number) => {
+            defaultItems.push({
+                id: `kept-${kIdx}-${path}`,
+                type: 'kept',
+                path,
+                src: getImageSrc(path),
+                originalIndex: kIdx,
+            });
+        });
+        newFilesList.forEach((file: File, nIdx: number) => {
+            defaultItems.push({
+                id: `new-${nIdx}-${file.name}`,
+                type: 'new',
+                file,
+                src: URL.createObjectURL(file),
+                originalIndex: nIdx,
+            });
+        });
+        return defaultItems;
+    };
+
+    const syncState = (items: UnifiedItem[]) => {
+        const newKept: string[] = [];
+        const newGalleryFiles: File[] = [];
+        const newOrder: string[] = [];
+
+        items.forEach((item) => {
+            if (item.type === 'kept' && item.path) {
+                const indexInKept = newKept.length;
+                newKept.push(item.path);
+                newOrder.push(`kept:${indexInKept}`);
+            } else if (item.type === 'new' && item.file) {
+                const indexInNew = newGalleryFiles.length;
+                newGalleryFiles.push(item.file);
+                newOrder.push(`new:${indexInNew}`);
+            }
+        });
+
+        if (typeof setData === 'function') {
+            setData((prev: any) => ({
+                ...prev,
+                kept_gallery: newKept,
+                gallery: newGalleryFiles,
+                gallery_order: newOrder,
+            }));
+        }
+    };
+
+    const handleReorder = (fromIdx: number, toIdx: number) => {
+        const items = getUnifiedItems();
+        if (fromIdx < 0 || fromIdx >= items.length || toIdx < 0 || toIdx >= items.length || fromIdx === toIdx) {
+            return;
+        }
+        const updated = [...items];
+        const [moved] = updated.splice(fromIdx, 1);
+        updated.splice(toIdx, 0, moved);
+        syncState(updated);
+    };
+
+    const handleMakePrimary = (idx: number) => {
+        handleReorder(idx, 0);
+    };
+
+    const handleRemoveItem = (idx: number) => {
+        const items = getUnifiedItems();
+        const updated = items.filter((_, i) => i !== idx);
+        syncState(updated);
+    };
 
     const handleGenerateAiImage = async () => {
         if (totalCount >= 5) return;
@@ -39,8 +209,15 @@ export default function GalleryStep({ data, setData, errors }: any) {
             });
 
             if (response.data?.success && response.data?.path) {
-                const newKept = [...(data.kept_gallery || []), response.data.path];
-                setData('kept_gallery', newKept);
+                const items = getUnifiedItems();
+                const newItem: UnifiedItem = {
+                    id: `kept-ai-${Date.now()}-${response.data.path}`,
+                    type: 'kept',
+                    path: response.data.path,
+                    src: getImageSrc(response.data.path),
+                    originalIndex: items.length,
+                };
+                syncState([...items, newItem]);
                 if (response.data?.prompt) {
                     setPromptText(response.data.prompt);
                 }
@@ -85,9 +262,17 @@ export default function GalleryStep({ data, setData, errors }: any) {
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const currentTotal = (data.kept_gallery?.length || 0) + (data.gallery?.length || 0);
         if (currentTotal + acceptedFiles.length <= 5) {
-            setData('gallery', [...(data.gallery || []), ...acceptedFiles]);
+            const items = getUnifiedItems();
+            const newItems: UnifiedItem[] = acceptedFiles.map((file, idx) => ({
+                id: `new-drop-${Date.now()}-${idx}-${file.name}`,
+                type: 'new',
+                file,
+                src: URL.createObjectURL(file),
+                originalIndex: items.length + idx,
+            }));
+            syncState([...items, ...newItems]);
         }
-    }, [data.gallery, data.kept_gallery, setData]);
+    }, [data.gallery, data.kept_gallery, data.gallery_order, setData]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -96,22 +281,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
         disabled: totalCount >= 5
     });
 
-    const removeKeptImage = (pathToRemove: string) => {
-        if (setData && data.kept_gallery) {
-            setData('kept_gallery', data.kept_gallery.filter((path: string) => path !== pathToRemove));
-        }
-    };
-
-    const removeNewImage = (idx: number) => {
-        setData('gallery', data.gallery.filter((_: any, i: number) => i !== idx));
-    };
-
-    const getImageSrc = (path: string) => {
-        if (path.startsWith('http')) return path;
-        if (path.startsWith('/')) return path;
-        const clean = path.replace(/^storage\//, '').replace(/^uploads\//, '');
-        return `/uploads/${clean}`;
-    };
+    const unifiedItems = getUnifiedItems();
 
     return (
         <div className="space-y-10">
@@ -228,7 +398,6 @@ export default function GalleryStep({ data, setData, errors }: any) {
             )}
 
             <div className="space-y-4">
-
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
                         <ImageIcon className="w-5 h-5 text-indigo-500" /> Images (up to 5)
@@ -237,37 +406,111 @@ export default function GalleryStep({ data, setData, errors }: any) {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {/* Existing Kept Images */}
-                    {data.kept_gallery?.map((path: string, idx: number) => (
-                        <div key={`kept-${idx}`} className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 group bg-slate-100">
-                            <img src={getImageSrc(path)} alt={`Kept ${idx}`} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <button type="button" onClick={() => removeKeptImage(path)} className="p-2 bg-white rounded-full text-red-500 hover:scale-110 transition-transform">
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-                            {idx === 0 && (
-                                <div className="absolute top-2 start-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
-                                    {__('general.primary')}</div>
-                            )}
-                        </div>
-                    ))}
+                    {/* Render Unified Ordered Images */}
+                    {unifiedItems.map((item, idx) => {
+                        const isPrimary = idx === 0;
+                        const isDragging = dragItemIndex === idx;
+                        const isDragOver = dragOverIndex === idx;
 
-                    {/* New Uploaded Images */}
-                    {data.gallery?.map((file: File, idx: number) => (
-                        <div key={`new-${idx}`} className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 group bg-slate-100">
-                            <img src={URL.createObjectURL(file)} alt={`Upload ${idx}`} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <button type="button" onClick={() => removeNewImage(idx)} className="p-2 bg-white rounded-full text-red-500 hover:scale-110 transition-transform">
-                                    <X className="w-5 h-5" />
-                                </button>
+                        return (
+                            <div
+                                key={item.id}
+                                draggable
+                                onDragStart={(e) => {
+                                    setDragItemIndex(idx);
+                                    e.dataTransfer.effectAllowed = 'move';
+                                }}
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.dataTransfer.dropEffect = 'move';
+                                    if (dragOverIndex !== idx) setDragOverIndex(idx);
+                                }}
+                                onDragLeave={() => {
+                                    if (dragOverIndex === idx) setDragOverIndex(null);
+                                }}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    setDragOverIndex(null);
+                                    if (dragItemIndex !== null) {
+                                        handleReorder(dragItemIndex, idx);
+                                        setDragItemIndex(null);
+                                    }
+                                }}
+                                onDragEnd={() => {
+                                    setDragItemIndex(null);
+                                    setDragOverIndex(null);
+                                }}
+                                className={`relative aspect-[4/3] rounded-2xl overflow-hidden border transition-all duration-200 group bg-slate-100 cursor-grab active:cursor-grabbing select-none ${
+                                    isDragging ? 'opacity-40 scale-95 border-indigo-400' : 'opacity-100 border-slate-200 shadow-sm hover:shadow-md'
+                                } ${isDragOver ? 'ring-4 ring-indigo-500/40 border-indigo-500 scale-[1.02]' : ''}`}
+                            >
+                                <img src={item.src} alt={`Service visual ${idx + 1}`} className="w-full h-full object-cover" />
+
+                                {/* Primary Badge */}
+                                {isPrimary && (
+                                    <div className="absolute top-3 start-3 bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 z-10">
+                                        <Star className="w-3 h-3 fill-white" />
+                                        <span>{__('general.primary')}</span>
+                                    </div>
+                                )}
+
+                                {/* Action Overlay */}
+                                <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col justify-between p-3 z-20">
+                                    <div className="flex items-center justify-between gap-1">
+                                        {!isPrimary ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleMakePrimary(idx)}
+                                                className="inline-flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm transition-transform active:scale-95 cursor-pointer"
+                                                title="Set as Primary cover image"
+                                            >
+                                                <Star className="w-3 h-3" /> Make Primary
+                                            </button>
+                                        ) : (
+                                            <div />
+                                        )}
+
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveItem(idx)}
+                                            className="p-1.5 bg-white/90 hover:bg-red-500 text-slate-700 hover:text-white rounded-lg transition-colors shadow-sm ms-auto cursor-pointer"
+                                            title="Remove image"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center justify-between bg-white/90 backdrop-blur-sm rounded-xl p-1.5 shadow-md">
+                                        <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 px-1.5">
+                                            <GripVertical className="w-3.5 h-3.5 text-slate-400" />
+                                            <span>#{idx + 1}</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                disabled={idx === 0}
+                                                onClick={() => handleReorder(idx, idx - 1)}
+                                                className="p-1 hover:bg-slate-200 text-slate-700 rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                                title="Move left"
+                                            >
+                                                <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={idx === unifiedItems.length - 1}
+                                                onClick={() => handleReorder(idx, idx + 1)}
+                                                className="p-1 hover:bg-slate-200 text-slate-700 rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                                title="Move right"
+                                            >
+                                                <ChevronRight className="w-4 h-4 rtl:rotate-180" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            {keptCount === 0 && idx === 0 && (
-                                <div className="absolute top-2 start-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
-                                    {__('general.primary')}</div>
-                            )}
-                        </div>
-                    ))}
+                        );
+                    })}
 
                     {/* Upload Dropzone */}
                     {totalCount < 5 && (

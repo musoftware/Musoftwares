@@ -33,7 +33,7 @@ export default function PublishStep({ data, setStep, processing }: any) {
                         <button type="button" onClick={() => setStep(3)} className="text-xs font-bold text-indigo-600 hover:underline">{__('general.edit')}</button>
                     </div>
                     <div className="flex items-center justify-between py-2">
-                        <span className="text-sm font-medium text-slate-600">Gallery ({data.gallery.length} Images)</span>
+                        <span className="text-sm font-medium text-slate-600">Gallery ({(data.gallery?.length || 0) + (data.kept_gallery?.length || 0)} Images)</span>
                         <button type="button" onClick={() => setStep(4)} className="text-xs font-bold text-indigo-600 hover:underline">{__('general.edit')}</button>
                     </div>
                 </div>

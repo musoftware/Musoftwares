@@ -98,6 +98,24 @@ class Invoice extends Model
         );
     }
 
+    public function canBeEdited(): bool
+    {
+        if ($this->status !== 'unpaid') {
+            return false;
+        }
+
+        if (! empty($this->created_at)) {
+            $createdAt = Carbon::parse($this->created_at)->timezone('Africa/Cairo')->startOfDay();
+            $nowCairo = now('Africa/Cairo')->startOfDay();
+            if ($createdAt->diffInDays($nowCairo) > 3) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
     protected function scheduledStartDate(): Attribute
     {
         return Attribute::make(

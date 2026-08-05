@@ -140,8 +140,8 @@ class ServiceController extends Controller
             ],
         ])->withViewData([
             'meta' => [
-                'title' => $isAr ? 'سوق تطوير البرمجيات والخدمات التقنية | MuSoftwares' : 'Software Development & IT Services Marketplace | MuSoftwares',
-                'description' => $isAr ? 'تصفح أفضل خدمات تطوير البرمجيات وحلول تقنية المعلومات والسكربتات المخصصة على سوق MuSoftwares.' : 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
+                'title' => __('marketplace.meta_title'),
+                'description' => __('marketplace.meta_description'),
                 'image' => url('/images/og-default.jpg'),
                 'url' => $canonicalUrl,
                 'canonical_url' => $canonicalUrl,
@@ -392,12 +392,56 @@ class ServiceController extends Controller
         $validated = $request->validated();
 
         $service = DB::transaction(function () use ($validated, $request) {
-            // Handle gallery uploads using standard Laravel Storage disk (public_uploads disk points directly to public/uploads)
-            $galleryPaths = $validated['kept_gallery'] ?? $request->input('kept_gallery', []);
+            // Handle gallery uploads using standard Laravel Storage disk with custom ordering support
+            $keptPaths = array_values($validated['kept_gallery'] ?? $request->input('kept_gallery', []));
+            $uploadedPaths = [];
             if ($request->hasFile('gallery')) {
                 foreach ($request->file('gallery') as $image) {
-                    $galleryPaths[] = $image->store('services/'.auth()->id(), 'public_uploads');
+                    $uploadedPaths[] = $image->store('services/'.auth()->id(), 'public_uploads');
                 }
+            }
+
+            $galleryOrder = $validated['gallery_order'] ?? $request->input('gallery_order', []);
+            $galleryPaths = [];
+            if (! empty($galleryOrder) && is_array($galleryOrder)) {
+                $usedKept = [];
+                $usedUploaded = [];
+                foreach ($galleryOrder as $token) {
+                    if (str_starts_with($token, 'kept:')) {
+                        $val = substr($token, 5);
+                        if (is_numeric($val)) {
+                            $idx = (int) $val;
+                            if (isset($keptPaths[$idx])) {
+                                $galleryPaths[] = $keptPaths[$idx];
+                                $usedKept[$idx] = true;
+                            }
+                        } else {
+                            $idx = array_search($val, $keptPaths);
+                            if ($idx !== false) {
+                                $galleryPaths[] = $keptPaths[$idx];
+                                $usedKept[$idx] = true;
+                            }
+                        }
+                    } elseif (str_starts_with($token, 'new:') || str_starts_with($token, 'gallery:')) {
+                        $idx = (int) str_replace(['new:', 'gallery:'], '', $token);
+                        if (isset($uploadedPaths[$idx])) {
+                            $galleryPaths[] = $uploadedPaths[$idx];
+                            $usedUploaded[$idx] = true;
+                        }
+                    }
+                }
+                foreach ($keptPaths as $idx => $path) {
+                    if (! isset($usedKept[$idx]) && ! in_array($path, $galleryPaths, true)) {
+                        $galleryPaths[] = $path;
+                    }
+                }
+                foreach ($uploadedPaths as $idx => $path) {
+                    if (! isset($usedUploaded[$idx]) && ! in_array($path, $galleryPaths, true)) {
+                        $galleryPaths[] = $path;
+                    }
+                }
+            } else {
+                $galleryPaths = array_merge($keptPaths, $uploadedPaths);
             }
 
             $thumbnailPath = null;
@@ -509,12 +553,55 @@ class ServiceController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $request, $service) {
-            $galleryPaths = $validated['kept_gallery'] ?? [];
-
+            $keptPaths = array_values($validated['kept_gallery'] ?? []);
+            $uploadedPaths = [];
             if ($request->hasFile('gallery')) {
                 foreach ($request->file('gallery') as $image) {
-                    $galleryPaths[] = $image->store('services/'.auth()->id(), 'public_uploads');
+                    $uploadedPaths[] = $image->store('services/'.auth()->id(), 'public_uploads');
                 }
+            }
+
+            $galleryOrder = $validated['gallery_order'] ?? $request->input('gallery_order', []);
+            $galleryPaths = [];
+            if (! empty($galleryOrder) && is_array($galleryOrder)) {
+                $usedKept = [];
+                $usedUploaded = [];
+                foreach ($galleryOrder as $token) {
+                    if (str_starts_with($token, 'kept:')) {
+                        $val = substr($token, 5);
+                        if (is_numeric($val)) {
+                            $idx = (int) $val;
+                            if (isset($keptPaths[$idx])) {
+                                $galleryPaths[] = $keptPaths[$idx];
+                                $usedKept[$idx] = true;
+                            }
+                        } else {
+                            $idx = array_search($val, $keptPaths);
+                            if ($idx !== false) {
+                                $galleryPaths[] = $keptPaths[$idx];
+                                $usedKept[$idx] = true;
+                            }
+                        }
+                    } elseif (str_starts_with($token, 'new:') || str_starts_with($token, 'gallery:')) {
+                        $idx = (int) str_replace(['new:', 'gallery:'], '', $token);
+                        if (isset($uploadedPaths[$idx])) {
+                            $galleryPaths[] = $uploadedPaths[$idx];
+                            $usedUploaded[$idx] = true;
+                        }
+                    }
+                }
+                foreach ($keptPaths as $idx => $path) {
+                    if (! isset($usedKept[$idx]) && ! in_array($path, $galleryPaths, true)) {
+                        $galleryPaths[] = $path;
+                    }
+                }
+                foreach ($uploadedPaths as $idx => $path) {
+                    if (! isset($usedUploaded[$idx]) && ! in_array($path, $galleryPaths, true)) {
+                        $galleryPaths[] = $path;
+                    }
+                }
+            } else {
+                $galleryPaths = array_merge($keptPaths, $uploadedPaths);
             }
 
             $thumbnailPath = $service->thumbnail;

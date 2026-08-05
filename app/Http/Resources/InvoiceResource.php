@@ -43,6 +43,7 @@ class InvoiceResource extends JsonResource
             'business_amount' => $this->business_total(),
             'business_currency' => Currency::findCached(AdminSettings::GetValue('business_currency', 2))?->currency,
             'status' => $this->status,
+            'is_editable' => $this->canBeEdited(),
             'job_status' => $this->job_status ?? 'pending',
             'created_at' => $this->created_at,
             'due_date' => $this->due_date ?? null,

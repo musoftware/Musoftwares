@@ -15,6 +15,9 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
     const [calculating, setCalculating] = useState(false);
     const [valuation, setValuation] = useState(null);
     const [copied, setCopied] = useState(false);
+    const [showClarificationModal, setShowClarificationModal] = useState(false);
+    const [selectedAnswer, setSelectedAnswer] = useState('');
+    const [customAnswer, setCustomAnswer] = useState('');
 
     const { data, setData, post, processing, errors } = useForm({
         description: '',
@@ -22,7 +25,7 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
         currency_id: 1,
     });
 
-    const handleCalculate = async (customCurrencyId = null) => {
+    const handleCalculate = async (customCurrencyId = null, selectedAns = null) => {
         if (!data.description || data.description.trim().length < 5) {
             return;
         }
@@ -32,9 +35,13 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
             const res = await axios.post(route('admin.contracts.quick-calculate'), {
                 description: data.description,
                 currency_id: targetCurrency,
+                selected_answer: selectedAns,
             });
             if (res.data.ok) {
                 setValuation(res.data.valuation);
+                if (res.data.valuation.needs_clarification && !selectedAns) {
+                    setShowClarificationModal(true);
+                }
             }
         } catch (err) {
             console.error('Failed to calculate valuation:', err);
@@ -303,6 +310,11 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                                                                     {comp.name_en && (
                                                                         <span className="text-[10px] text-slate-400 font-mono">({comp.name_en})</span>
                                                                     )}
+                                                                    {comp.is_new_item && (
+                                                                        <span className="bg-amber-100 text-amber-900 border border-amber-300 font-extrabold px-2 py-0.5 rounded text-[9px] flex items-center gap-1">
+                                                                            ✨ بند تسعير جديد مسجل
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                                 {comp.description_ar && (
                                                                     <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">{comp.description_ar}</p>
@@ -330,6 +342,23 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                                             </div>
                                         </div>
 
+                                        {/* Clarification Trigger Banner */}
+                                        {valuation.needs_clarification && (
+                                            <div className="bg-gradient-to-r from-amber-500/10 via-amber-400/15 to-amber-500/10 border border-amber-400/40 rounded-xl p-3.5 flex items-center justify-between gap-3 text-xs">
+                                                <div className="flex items-center gap-2">
+                                                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0 animate-pulse" />
+                                                    <span className="font-extrabold text-amber-950">هذا الطلب ينطوي على خيارات متعددة لتحديد النطاق.</span>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => setShowClarificationModal(true)}
+                                                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[11px] px-3.5 py-1.5 rounded-lg shrink-0 shadow-sm gap-1"
+                                                >
+                                                    تخصيص النطاق <ArrowRight className="w-3.5 h-3.5" />
+                                                </Button>
+                                            </div>
+                                        )}
+
                                         {/* Action Button */}
                                         <Button
                                             type="submit"
@@ -353,6 +382,88 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                         </Card>
                     </div>
                 </form>
+
+                {/* AI Clarification Modal */}
+                <Dialog open={showClarificationModal} onOpenChange={setShowClarificationModal}>
+                    <DialogContent className="max-w-xl bg-white border border-slate-200 shadow-2xl rounded-2xl p-6">
+                        <DialogHeader className="pb-3 border-b border-slate-100">
+                            <div className="flex items-center gap-2 text-amber-600 font-extrabold text-xs uppercase tracking-wider">
+                                <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+                                استفسار ذكي لتحديد النطاق (AI Clarification)
+                            </div>
+                            <DialogTitle className="text-base font-extrabold text-slate-900 mt-1 leading-relaxed">
+                                {valuation?.clarifying_question || "النص المدخل ينطوي على خيارات متعددة، يرجى تحديد النطاق ليتم التسعير بناءً عليه:"}
+                            </DialogTitle>
+                            <DialogDescription className="text-xs text-slate-500 mt-1">
+                                اختر أحد الخيارات الثلاثة التالية لإعادة احتساب الساعات والتكلفة بدقة عالية:
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-3 py-4">
+                            {valuation?.suggested_answers?.map((ans, aIdx) => (
+                                <div
+                                    key={aIdx}
+                                    onClick={() => {
+                                        setSelectedAnswer(ans);
+                                        setCustomAnswer('');
+                                    }}
+                                    className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 text-xs ${
+                                        selectedAnswer === ans
+                                            ? 'border-amber-500 bg-amber-50/90 ring-2 ring-amber-500/20 text-slate-950 font-bold shadow-sm'
+                                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80 text-slate-800 font-medium'
+                                    }`}
+                                >
+                                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
+                                        selectedAnswer === ans ? 'border-amber-600 bg-amber-500 text-slate-950 font-extrabold text-[10px]' : 'border-slate-300 bg-white'
+                                    }`}>
+                                        {selectedAnswer === ans ? '✓' : aIdx + 1}
+                                    </div>
+                                    <span className="leading-relaxed">{ans}</span>
+                                </div>
+                            ))}
+
+                            {/* Custom Answer Input */}
+                            <div className="pt-2">
+                                <Label className="text-[11px] font-bold text-slate-700">أو اكتب تفاصيل إضافية مخصصة (اختياري):</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="مثال: إضافة زر في لوحة التحكم يرسل إشعارات مخصصة للمستخدمين..."
+                                    value={customAnswer}
+                                    onChange={(e) => {
+                                        setCustomAnswer(e.target.value);
+                                        setSelectedAnswer(e.target.value);
+                                    }}
+                                    className="text-xs mt-1.5 border-slate-300 focus:border-amber-500 focus:ring-amber-500"
+                                />
+                            </div>
+                        </div>
+
+                        <DialogFooter className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setShowClarificationModal(false)}
+                                className="text-xs font-bold text-slate-600 border-slate-300 hover:bg-slate-100"
+                            >
+                                تخطي واعتماد التقدير المبدئي
+                            </Button>
+                            <Button
+                                type="button"
+                                disabled={!selectedAnswer && !customAnswer}
+                                onClick={() => {
+                                    const ansToSubmit = customAnswer.trim() || selectedAnswer;
+                                    if (ansToSubmit) {
+                                        setShowClarificationModal(false);
+                                        handleCalculate(data.currency_id, ansToSubmit);
+                                    }
+                                }}
+                                className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-6 py-2.5 rounded-xl shadow-md gap-2"
+                            >
+                                تأكيد واستكمال التسعير الدقيق <ArrowRight className="w-4 h-4" />
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AdminSidebarLayout>
     );
