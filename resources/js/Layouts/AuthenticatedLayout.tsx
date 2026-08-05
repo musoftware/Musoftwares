@@ -28,6 +28,7 @@ import {
     ListTodo
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import ProductTourModal from '@/Components/ProductTourModal';
 import BackgroundTaskStatus from '@/Components/Tools/BackgroundTaskStatus';
 
@@ -1072,6 +1073,7 @@ function AuthenticatedContent({
             <CommandPalette />
 
             <Toaster />
+            <FloatingWhatsAppButton />
         </div>
     );
 }

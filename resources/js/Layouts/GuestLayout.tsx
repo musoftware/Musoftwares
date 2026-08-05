@@ -5,6 +5,7 @@ import { PropsWithChildren, useRef } from 'react';
 import { __ } from '@/lib/i18n';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 
 export default function Guest({ children }: PropsWithChildren) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -70,6 +71,7 @@ export default function Guest({ children }: PropsWithChildren) {
                     {children}
                 </div>
             </div>
+            <FloatingWhatsAppButton />
         </div>
     );
 }

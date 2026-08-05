@@ -7,6 +7,7 @@ import { RuntimeStatusBanner } from '@/Components/Tools/RuntimeStatusBanner';
 import { Download, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight, LifeBuoy } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import SafeLink, { visitUrl } from '@/Components/SafeLink';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 
 interface ToolsPublicLayoutProps extends PropsWithChildren {
     title: string;
@@ -27,7 +28,7 @@ export default function ToolsPublicLayout({
 
     const navItems = [
         { id: 'explore',   label: 'Browse',      icon: LayoutGrid,   href: route('tools.explore'),   public: true  },
-        { id: 'downloads', label: 'Downloads',    icon: Download,     href: route('tools.downloads'), public: false },
+        { id: 'downloads', label: 'Downloads',    icon: Download,     href: route('tools.billing'), public: false },
         { id: 'billing',   label: 'Billing',      icon: CreditCard,   href: route('tools.billing'),   public: false },
         { id: 'tickets',   label: 'Tickets',      icon: LifeBuoy,     href: route('tickets.index'),   public: false },
     ];
@@ -155,6 +156,7 @@ export default function ToolsPublicLayout({
                     </div>
                 </div>
             </footer>
+            <FloatingWhatsAppButton />
         </div>
     );
 }

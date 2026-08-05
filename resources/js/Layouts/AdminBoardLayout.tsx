@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import BoardNoticesRail from '@/Components/Admin/BoardNoticesRail';
 import NoticesManager from '@/Components/Admin/NoticesManager';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 
 interface AdminBoardLayoutProps extends PropsWithChildren {
     title?: string;
@@ -24,6 +25,7 @@ export default function AdminBoardLayout({ title, children }: AdminBoardLayoutPr
             <BoardNoticesRail />
             <div className="flex-1 min-w-0">{children}</div>
             <NoticesManager />
+            <FloatingWhatsAppButton />
         </div>
     );
 }

@@ -7995,4 +7995,6 @@ return [
     'manage_emails' => 'Manage Emails',
     'mark_verified' => 'Mark as Verified',
     'no_additional_emails' => 'No additional email addresses added.',
+    'whatsapp_float_default_msg' => 'Mahmoud here 👋 Send me your project details',
+    'contact_on_whatsapp' => 'Contact on WhatsApp',
 ];

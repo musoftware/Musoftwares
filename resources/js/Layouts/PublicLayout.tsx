@@ -11,6 +11,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Label } from '@/Components/ui/label';
 import { useToast } from '@/Components/ui/use-toast';
 import { Toaster } from '@/Components/ui/toaster';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 interface PublicLayoutProps extends PropsWithChildren {
     auth?: {
         user: any;
@@ -468,6 +469,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                 </DialogContent>
             </Dialog>
             <Toaster />
+            <FloatingWhatsAppButton />
         </div>
     );
 }

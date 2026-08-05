@@ -3631,7 +3631,7 @@
             "contact_location": "الموقع",
             "contact_me": "الاتصال Me",
             "contact_mobile": "الموبايل",
-            "contact_on_whatsapp": "الاتصال On Whatsapp",
+            "contact_on_whatsapp": "التواصل عبر الواتساب",
             "contact_sales": "الاتصال Sales",
             "contact_sales_musoftware": "الاتصال Sales Musoftware",
             "contact_seller": "الاتصال Seller",
@@ -10109,7 +10109,8 @@
             "manage_all_aliases": "إدارة كافة عناوين البريد البديلة",
             "manage_emails": "إدارة البريد الإلكتروني",
             "mark_verified": "تعيين كمتحقق منه",
-            "no_additional_emails": "لا توجد عناوين بريد إلكتروني إضافية مضافة."
+            "no_additional_emails": "لا توجد عناوين بريد إلكتروني إضافية مضافة.",
+            "whatsapp_float_default_msg": "محمود هنا 👋 أرسل لي تفاصيل مشروعك"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -15624,7 +15625,7 @@
             "contact_location": "Location",
             "contact_me": "Contact Me",
             "contact_mobile": "Mobile",
-            "contact_on_whatsapp": "Contact On Whatsapp",
+            "contact_on_whatsapp": "Contact on WhatsApp",
             "contact_sales": "Contact Sales",
             "contact_sales_musoftware": "Contact Sales Musoftware",
             "contact_seller": "Contact Seller",
@@ -22102,7 +22103,8 @@
             "manage_all_aliases": "Manage All Email Aliases",
             "manage_emails": "Manage Emails",
             "mark_verified": "Mark as Verified",
-            "no_additional_emails": "No additional email addresses added."
+            "no_additional_emails": "No additional email addresses added.",
+            "whatsapp_float_default_msg": "Mahmoud here 👋 Send me your project details"
         },
         "gold_saver": {
             "achieved": "Achieved",

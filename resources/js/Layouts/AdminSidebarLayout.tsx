@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { TooltipProvider } from '@/Components/ui/tooltip';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { __ } from '@/lib/i18n';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 
 interface AdminSidebarLayoutProps extends PropsWithChildren {
     title?: string;
@@ -85,6 +86,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                     </div>
                 </div>
             </main>
+            <FloatingWhatsAppButton />
         </SidebarProvider>
         </TooltipProvider>
     );

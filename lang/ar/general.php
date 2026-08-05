@@ -7995,4 +7995,6 @@ return [
     'manage_emails' => 'إدارة البريد الإلكتروني',
     'mark_verified' => 'تعيين كمتحقق منه',
     'no_additional_emails' => 'لا توجد عناوين بريد إلكتروني إضافية مضافة.',
+    'whatsapp_float_default_msg' => 'محمود هنا 👋 أرسل لي تفاصيل مشروعك',
+    'contact_on_whatsapp' => 'التواصل عبر الواتساب',
 ];

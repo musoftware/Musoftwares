@@ -9,6 +9,7 @@ import {
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { CrmCommandPalette } from '@/Components/CRM/CrmCommandPalette';
 import { __ } from '@/lib/i18n';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 
 interface CrmLayoutProps extends PropsWithChildren {
     title: string;
@@ -230,6 +231,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
             </div>
 
             <CrmCommandPalette open={cmdOpen} setOpen={setCmdOpen} onOpenLead={() => { }} />
+            <FloatingWhatsAppButton />
         </div>
     );
 }

@@ -4,6 +4,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
 import SafeLink from '@/Components/SafeLink';
 import { __ } from '@/lib/i18n';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import {
     Calculator, 
     Coins, 
@@ -148,6 +149,7 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                     </div>
                 </div>
             </footer>
+            <FloatingWhatsAppButton />
         </div>
     );
 }
