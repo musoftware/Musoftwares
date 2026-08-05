@@ -42,13 +42,13 @@ class GuestClientRegisterController extends Controller
     {
         $business = WhatsappBusiness::where('uuid', $uuid)->firstOrFail();
         
-        $clientId = $business->facebook_client_id;
-        $clientSecret = $business->facebook_client_secret;
+        $clientId = $business->facebook_client_id ?: config('services.facebook.client_id');
+        $clientSecret = $business->facebook_client_secret ?: config('services.facebook.client_secret');
 
         if (empty($clientId) || empty($clientSecret)) {
             return redirect()->route('whatsapp.guest.register', ['uuid' => $uuid])->with(
                 'error',
-                'Facebook App integration settings are not configured for this business client. Please contact the administrator.'
+                'Facebook App integration settings are not configured. Please contact the administrator.'
             );
         }
 
@@ -89,11 +89,11 @@ class GuestClientRegisterController extends Controller
             return redirect()->route('whatsapp.index')->with('error', 'Business profile not found.');
         }
 
-        $clientId = $business->facebook_client_id;
-        $clientSecret = $business->facebook_client_secret;
+        $clientId = $business->facebook_client_id ?: config('services.facebook.client_id');
+        $clientSecret = $business->facebook_client_secret ?: config('services.facebook.client_secret');
 
         if (empty($clientId) || empty($clientSecret)) {
-            return redirect()->route('whatsapp.index')->with('error', 'Facebook App integration settings are not configured for this business client.');
+            return redirect()->route('whatsapp.index')->with('error', 'Facebook App integration settings are not configured.');
         }
 
         config([

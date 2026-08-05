@@ -7,10 +7,15 @@ use App\Models\AdminSettings;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\Earning;
+use App\Models\Invoice;
 use App\Traits\ConvertsCurrency;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Invoice
+ * @property Invoice $resource
+ */
 class InvoiceResource extends JsonResource
 {
     use ConvertsCurrency;

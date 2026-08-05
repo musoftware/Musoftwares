@@ -29,6 +29,7 @@ class MarketplaceServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Modules\Marketplace\Console\GenerateAiFilesCommand::class,
+                \Modules\Marketplace\Console\SendDailyDiscountNotificationsCommand::class,
             ]);
         }
     }

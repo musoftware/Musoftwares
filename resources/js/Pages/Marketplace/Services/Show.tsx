@@ -528,9 +528,23 @@ export default function Show({ service }: any) {
                                                         {selectedPackage.name}{' '}
                                                         Package
                                                     </h3>
-                                                    <span className="text-2xl font-bold text-gray-900">
-                                                        {formatCurrency(selectedPackage.price, selectedPackage.currency)}
-                                                    </span>
+                                                    <div className="text-end">
+                                                        <div className="flex items-center gap-2 justify-end">
+                                                            <span className="text-2xl font-bold text-gray-900">
+                                                                {formatCurrency(selectedPackage.price, selectedPackage.currency)}
+                                                            </span>
+                                                            {Number(selectedPackage.old_price) > Number(selectedPackage.price) && (
+                                                                <span className="text-sm text-gray-400 line-through">
+                                                                    {formatCurrency(selectedPackage.old_price, selectedPackage.currency)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {Number(selectedPackage.old_price) > Number(selectedPackage.price) && (
+                                                            <span className="inline-block bg-red-100 text-red-700 font-bold text-[11px] px-2 py-0.5 rounded mt-0.5">
+                                                                -{Math.round(((Number(selectedPackage.old_price) - Number(selectedPackage.price)) / Number(selectedPackage.old_price)) * 100)}% OFF
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <p className="mb-6 text-sm text-gray-600">
                                                     {

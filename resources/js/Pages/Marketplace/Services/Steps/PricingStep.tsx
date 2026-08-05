@@ -117,25 +117,48 @@ export default function PricingStep({ data, setData, errors }: any) {
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-100">
-                                <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 block">{__('general.price')}</Label>
-                                <div className="relative flex items-center shadow-sm rounded-xl overflow-hidden border focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-                                    <select
-                                        value={pkg.currency_id}
-                                        onChange={e => setPackageField(idx, 'currency_id', Number(e.target.value))}
-                                        className="h-12 ps-4 pe-2 bg-slate-50 text-sm font-bold text-slate-600 border-none outline-none appearance-none cursor-pointer"
-                                    >
-                                        {CURRENCIES.map(c => <option key={c.id} value={c.id}>{c.currency}</option>)}
-                                    </select>
-                                    <div className="w-[1px] h-6 bg-slate-200 mx-1"></div>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={pkg.price}
-                                        onChange={e => setPackageField(idx, 'price', e.target.value)}
-                                        placeholder="0.00"
-                                        className="flex-1 h-12 bg-transparent text-lg font-bold px-3 border-none outline-none text-slate-900"
-                                    />
+                            <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2 block">{__('general.price')}</Label>
+                                    <div className="relative flex items-center shadow-sm rounded-xl overflow-hidden border focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                                        <select
+                                            value={pkg.currency_id}
+                                            onChange={e => setPackageField(idx, 'currency_id', Number(e.target.value))}
+                                            className="h-10 ps-3 pe-1 bg-slate-50 text-xs font-bold text-slate-600 border-none outline-none appearance-none cursor-pointer"
+                                        >
+                                            {CURRENCIES.map(c => <option key={c.id} value={c.id}>{c.currency}</option>)}
+                                        </select>
+                                        <div className="w-[1px] h-5 bg-slate-200 mx-1"></div>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={pkg.price}
+                                            onChange={e => setPackageField(idx, 'price', e.target.value)}
+                                            placeholder="0.00"
+                                            className="flex-1 h-10 bg-transparent text-sm font-bold px-2 border-none outline-none text-slate-900"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+                                        {__('general.old_price') || 'Old Price'}
+                                    </Label>
+                                    <div className="relative flex items-center shadow-sm rounded-xl overflow-hidden border focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all bg-slate-50/50">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={pkg.old_price || ''}
+                                            onChange={e => setPackageField(idx, 'old_price', e.target.value)}
+                                            placeholder="0.00"
+                                            className="flex-1 h-10 bg-transparent text-sm font-medium px-3 border-none outline-none text-slate-500 line-through"
+                                        />
+                                    </div>
+                                    {Number(pkg.old_price) > Number(pkg.price) && Number(pkg.price) >= 0 && (
+                                        <span className="text-[11px] font-bold text-emerald-600 mt-1 block">
+                                            -{Math.round(((Number(pkg.old_price) - Number(pkg.price)) / Number(pkg.old_price)) * 100)}% OFF
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>

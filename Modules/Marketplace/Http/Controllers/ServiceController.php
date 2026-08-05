@@ -234,6 +234,13 @@ class ServiceController extends Controller
                     $package->currency_id,
                     $viewerCurrency->id
                 );
+                if ($package->old_price) {
+                    $package->old_price = CurrenciesExchange::RateToday(
+                        $package->old_price,
+                        $package->currency_id,
+                        $viewerCurrency->id
+                    );
+                }
                 $package->currency_id = $viewerCurrency->id;
                 $package->setRelation('currency', $viewerCurrency);
             }
@@ -511,6 +518,7 @@ class ServiceController extends Controller
                     'name' => $pkg['name'],
                     'description' => $pkg['description'],
                     'price' => $pkg['price'],
+                    'old_price' => !empty($pkg['old_price']) ? $pkg['old_price'] : null,
                     'currency_id' => $pkg['currency_id'],
                     'delivery_days' => $pkg['delivery_days'],
                     'revisions' => $pkg['revisions'] ?? 2,
@@ -684,6 +692,7 @@ class ServiceController extends Controller
                         'name' => $pkg['name'],
                         'description' => $pkg['description'],
                         'price' => $pkg['price'],
+                        'old_price' => !empty($pkg['old_price']) ? $pkg['old_price'] : null,
                         'currency_id' => $pkg['currency_id'],
                         'delivery_days' => $pkg['delivery_days'],
                         'revisions' => $pkg['revisions'] ?? 2,
@@ -696,6 +705,7 @@ class ServiceController extends Controller
                         'name' => $pkg['name'],
                         'description' => $pkg['description'],
                         'price' => $pkg['price'],
+                        'old_price' => !empty($pkg['old_price']) ? $pkg['old_price'] : null,
                         'currency_id' => $pkg['currency_id'],
                         'delivery_days' => $pkg['delivery_days'],
                         'revisions' => $pkg['revisions'] ?? 2,

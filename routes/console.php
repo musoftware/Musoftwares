@@ -64,5 +64,10 @@ Schedule::command(\App\Console\Commands\DecrementDsoLimit::class)
     ->monthlyOn(1, '00:00')
     ->timezone('Africa/Cairo');
 
+// Send daily marketplace discount notifications to 30 random users daily at 12:00 Cairo Time
+Schedule::command(\Modules\Marketplace\Console\SendDailyDiscountNotificationsCommand::class)
+    ->dailyAt('12:00')
+    ->timezone('Africa/Cairo');
+
 
 

@@ -165,6 +165,9 @@ class WhatsappSenderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $hasFacebookApp = (!empty($business->facebook_client_id) && !empty($business->facebook_client_secret))
+            || (!empty(config('services.facebook.client_id')) && !empty(config('services.facebook.client_secret')));
+
         return Inertia::render('WhatsappSender/Workspace', [
             'business' => $business,
             'accounts' => $accounts,
@@ -183,6 +186,7 @@ class WhatsappSenderController extends Controller
             'telegramSubscriberGroups' => $telegramSubscriberGroups,
             'flows' => $flows,
             'isAdmin' => $user->isAdmin(),
+            'hasFacebookApp' => $hasFacebookApp,
         ]);
     }
 

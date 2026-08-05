@@ -112,6 +112,7 @@ interface Props {
     telegramSubscriberGroups: any[];
     flows: any[];
     isAdmin: boolean;
+    hasFacebookApp?: boolean;
 }
 
 export default function Workspace({
@@ -131,7 +132,8 @@ export default function Workspace({
     telegramSubscribers,
     telegramSubscriberGroups,
     flows,
-    isAdmin
+    isAdmin,
+    hasFacebookApp = true
 }: Props) {
     const pageProps = usePage<any>().props;
     const flash = pageProps?.flash;
@@ -904,7 +906,7 @@ export default function Workspace({
                                                 <span>+ إضافة حساب yدوياً (Meta Tokens)</span>
                                             </button>
 
-                                            {(business.facebook_client_id && business.facebook_client_secret) && (
+                                            {hasFacebookApp && (
                                                 <a
                                                     href={facebookLoginUrl}
                                                     className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-sm"
@@ -915,7 +917,7 @@ export default function Workspace({
                                         </div>
                                     </div>
 
-                                    {(!business.facebook_client_id || !business.facebook_client_secret) && (
+                                    {!hasFacebookApp && (
                                         <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                             <div className="space-y-1">
                                                 <p className="text-xs font-bold text-amber-800 dark:text-amber-300">لم يتم إعداد تطبيق فيسبوك (Meta App) لهذا البيزنس</p>

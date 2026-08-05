@@ -41,6 +41,7 @@ class StoreServiceRequest extends FormRequest
             'packages.*.name'          => 'required|string|max:80',
             'packages.*.description'   => 'required|string|max:500',
             'packages.*.price'         => 'required|numeric|min:1',
+            'packages.*.old_price'     => 'nullable|numeric|min:0',
             'packages.*.currency_id'   => 'required|integer|exists:currencies,id',
             'packages.*.delivery_days' => 'required|integer|min:1|max:365',
             'packages.*.revisions'     => 'nullable|integer|min:-1',

@@ -31,13 +31,13 @@ class FacebookAuthController extends Controller
             $business = \Modules\WhatsappSender\Models\WhatsappBusiness::find($businessId);
         }
 
-        $clientId = $business?->facebook_client_id;
-        $clientSecret = $business?->facebook_client_secret;
+        $clientId = $business?->facebook_client_id ?: config('services.facebook.client_id');
+        $clientSecret = $business?->facebook_client_secret ?: config('services.facebook.client_secret');
 
         if (empty($clientId) || empty($clientSecret)) {
             return redirect()->route('whatsapp.index')->with(
                 'error',
-                'يرجى إعداد معرف تطبيق فيسبوك (Facebook App ID) والمفتاح السري (App Secret) أولاً من الإعدادات للتمكن من ربط الحساب.'
+                'يرجى إعداد معرف تطبيق فيسبوك (Facebook App ID) والمفتاح السري (App Secret) في ملف .env للنظام أو من إعدادات البيزنس للتمكن من ربط الحساب.'
             );
         }
 
@@ -70,13 +70,13 @@ class FacebookAuthController extends Controller
             $business = \Modules\WhatsappSender\Models\WhatsappBusiness::find($businessId);
         }
 
-        $clientId = $business?->facebook_client_id;
-        $clientSecret = $business?->facebook_client_secret;
+        $clientId = $business?->facebook_client_id ?: config('services.facebook.client_id');
+        $clientSecret = $business?->facebook_client_secret ?: config('services.facebook.client_secret');
 
         if (empty($clientId) || empty($clientSecret)) {
             return redirect()->route('whatsapp.index')->with(
                 'error',
-                'بيانات تطبيق فيسبوك غير متوفرة أو غير مكتملة لهذا البيزنس.'
+                'بيانات تطبيق فيسبوك غير متوفرة بالنظام أو بهذا البيزنس.'
             );
         }
 

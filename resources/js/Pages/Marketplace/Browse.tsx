@@ -235,7 +235,7 @@ export default function Browse({ services, categories, filters }: any) {
                     ) : (
                         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                             {((servicesData?.data || services?.data || []) as any).map((service: any) => {
-                            // Determine starting price package
+                            {/* Determine starting price package and discount */}
                             const startingPackage =
                                 service.packages && service.packages.length > 0
                                     ? service.packages.reduce((min: any, p: any) => Number(p.price) < Number(min.price) ? p : min, service.packages[0])
@@ -243,6 +243,9 @@ export default function Browse({ services, categories, filters }: any) {
 
                             const startingPrice = startingPackage ? startingPackage.price : (service.is_free ? 0 : 5);
                             const startingCurrency = startingPackage ? startingPackage.currency : 'USD';
+                            const hasDiscount = startingPackage && Number(startingPackage.old_price) > Number(startingPackage.price);
+                            const oldPrice = hasDiscount ? startingPackage.old_price : null;
+                            const discountPct = hasDiscount ? Math.round(((Number(startingPackage.old_price) - Number(startingPackage.price)) / Number(startingPackage.old_price)) * 100) : 0;
 
                             // Use actual rating
                             const rating = service.avg_rating ? Number(service.avg_rating).toFixed(1) : '0.0';
@@ -275,10 +278,14 @@ export default function Browse({ services, categories, filters }: any) {
                                                     </svg>
                                                 </div>
                                             )}
-                                            {service.is_featured && (
+                                            {hasDiscount ? (
+                                                <div className="absolute top-3 start-3 rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-extrabold text-white shadow-md z-10">
+                                                    🔥 -{discountPct}% OFF
+                                                </div>
+                                            ) : service.is_featured ? (
                                                 <div className="absolute top-3 start-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
                                                     {__('general.featured')}</div>
-                                            )}
+                                            ) : null}
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
@@ -366,9 +373,16 @@ export default function Browse({ services, categories, filters }: any) {
                                             </div>
                                             <div className="text-end">
                                                 <span className="text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.starting_at')}</span>
-                                                <span className="block text-lg font-bold text-gray-900">
-                                                    {formatCurrency(startingPrice, startingCurrency)}
-                                                </span>
+                                                <div className="flex items-center gap-1.5 justify-end">
+                                                    <span className="block text-lg font-bold text-gray-900">
+                                                        {formatCurrency(startingPrice, startingCurrency)}
+                                                    </span>
+                                                    {hasDiscount && oldPrice && (
+                                                        <span className="text-xs font-medium text-gray-400 line-through">
+                                                            {formatCurrency(oldPrice, startingCurrency)}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
