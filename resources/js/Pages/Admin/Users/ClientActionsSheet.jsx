@@ -119,16 +119,6 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                 >
                                     <ShieldCheck className="h-4 w-4 me-3 text-slate-500" />{__('general.change_role')}</button>
 
-                                <div className="pt-3 mt-3 border-t border-slate-200" />
-                                <button
-                                    onClick={() => {
-                                        if (!confirm(__('general.confirm_delete_user') || 'Are you sure you want to delete this user?')) return;
-                                        router.delete(`/admin/users/${client.id}`, { preserveScroll: true });
-                                        onClose();
-                                    }}
-                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-red-50 transition-colors text-red-600 font-medium w-full text-start"
-                                >
-                                    <Trash2 className="h-4 w-4 me-3" />{__('general.delete_user')}</button>
                             </div>
                         </div>
 

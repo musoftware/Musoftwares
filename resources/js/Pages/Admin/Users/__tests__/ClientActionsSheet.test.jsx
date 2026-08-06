@@ -48,29 +48,29 @@ describe('ClientActionsSheet', () => {
         };
 
         // Finance links
-        expectLink('New Invoice', '/admin/invoices/create?user=1');
-        expectLink('Create Recurring Invoice', '/admin/business/recurring/invoices/create?user=1');
+        expectLink('New invoice', '/admin/invoices/create?user=1');
+        expectLink('Create a Recurring Invoice', '/admin/business/recurring/invoices/create?user=1');
         expectLink('Recurring Payout', '/admin/business/recurring/salaries?action=create&user=1');
         expectLink('New Payout', '/admin/payouts/create?user=1');
         expectLink('Invoices', '/admin/invoices?client_id=1');
         expectLink('Receive Money', '/admin/transactions/create?user=1&type=receive');
         expectLink('Send Money', '/admin/transactions/create?user=1&type=send-money');
         expectLink('Refund Money', '/admin/transactions/create?user=1&type=refund');
-        expectLink('Swap Projects Budget', '/admin/transactions/transfer?user=1');
-        expectLink('All Transactions', '/admin/transactions?user=1');
+        expectLink('Swap projects Budget', '/admin/transactions/transfer?user=1');
+        expectLink('All transactions', '/admin/transactions?user=1');
 
         // Workspace & Tools
         expectLink('Projects', '/admin/projects?user_id=1');
-        expectLink('Assign Task', '/admin/users/1/tasks/add');
+        expectLink('Set Task', '/admin/users/1/tasks/add');
         expectLink('Files', '/admin/users/1/files');
         expectLink('Reports', '/admin/users/1/reports');
         expectLink('Manage Referrals', '/admin/users/1/referrals');
 
         // Buttons (handlers / dynamic)
         expect(screen.getByText('Login As').closest('button')).toBeInTheDocument();
-        expect(screen.getByText('Reset Password').closest('button')).toBeInTheDocument();
-        expect(screen.getByText('Change Role').closest('button')).toBeInTheDocument();
-        expect(screen.getByText('Recalc Balance').closest('button')).toBeInTheDocument();
+        expect(screen.getByText('Reset password').closest('button')).toBeInTheDocument();
+        expect(screen.getByText('Change role').closest('button')).toBeInTheDocument();
+        expect(screen.getByText('Recalc balance').closest('button')).toBeInTheDocument();
     });
 
     it('calls onLoginAs when Login As button is clicked', () => {
@@ -89,7 +89,7 @@ describe('ClientActionsSheet', () => {
         expect(onLoginAsMock).toHaveBeenCalledWith(1);
     });
 
-    it('calls onResetPassword when Reset Password button is clicked', () => {
+    it('calls onResetPassword when Reset password button is clicked', () => {
         const onResetPasswordMock = vi.fn();
         render(
             <ClientActionsSheet
@@ -101,7 +101,7 @@ describe('ClientActionsSheet', () => {
             />
         );
 
-        fireEvent.click(screen.getByText('Reset Password'));
+        fireEvent.click(screen.getByText('Reset password'));
         expect(onResetPasswordMock).toHaveBeenCalledWith(1);
     });
 });

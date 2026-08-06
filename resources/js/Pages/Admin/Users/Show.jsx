@@ -839,6 +839,13 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 />
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-slate-500 text-sm">{__('general.total_transaction_costs')}</span>
+                                <HiddenAmount 
+                                    amount={formatCurrency(client.total_cost || 0, client.currency)}
+                                    hiddenText={__("general.hidden")}
+                                />
+                            </div>
+                            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">{__('general.remaining')}</span>
                                 <span className={`font-bold font-jetbrains ${((client.user_balance || 0) - (stats.invoices_unpaid_sum || 0)) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     {formatCurrency((client.user_balance || 0) - (stats.invoices_unpaid_sum || 0), client.currency)}
@@ -859,6 +866,32 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">{__('general.reward_points')}</span>
                                 <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded font-bold text-xs">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Invoices Summary */}
+                    <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
+                        <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
+                            <FileText size={18} className="text-slate-400" />{__('general.invoices_summary')}</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-slate-500 text-sm">{__('general.total_invoices_amount')}</span>
+                                <span className="font-bold text-slate-900 font-jetbrains">{formatCurrency(stats.invoices_total_sum || 0, client.currency)}</span>
+                            </div>
+                            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-slate-500 text-sm">{__('general.total_invoices_paid')}</span>
+                                <span className="font-bold text-green-600 font-jetbrains">{formatCurrency(stats.invoices_paid_sum || 0, client.currency)}</span>
+                            </div>
+                            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-slate-500 text-sm">{__('general.total_invoices_cost')}</span>
+                                <span className="font-bold text-red-600 font-jetbrains">{formatCurrency(stats.invoices_cost_sum || 0, client.currency)}</span>
+                            </div>
+                            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-slate-500 text-sm">{__('general.total_invoices_margin')}</span>
+                                <span className={`font-bold font-jetbrains ${((stats.invoices_margin_sum || 0) >= 0) ? 'text-green-600' : 'text-red-600'}`}>
+                                    {formatCurrency(stats.invoices_margin_sum || 0, client.currency)}
+                                </span>
                             </div>
                         </div>
                     </div>

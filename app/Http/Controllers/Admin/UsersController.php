@@ -137,6 +137,22 @@ class UsersController extends Controller
             $stats['invoices_total'] = $user->invoices()->count();
             $stats['invoices_paid'] = $user->invoices()->where('status', 'paid')->count();
             $stats['invoices_unpaid_sum'] = $user->unpaid_invoices_amount(true);
+
+            $invoicesTotalSum = 0;
+            $invoicesPaidSum = 0;
+            $invoicesCostSum = 0;
+
+            foreach ($user->invoices()->get() as $invoice) {
+                $currencyId = $invoice->currency_id;
+                $invoicesTotalSum += CurrenciesExchange::RateToday($invoice->total(), $currencyId, $user->currency_id);
+                $invoicesPaidSum += CurrenciesExchange::RateToday($invoice->paid, $currencyId, $user->currency_id);
+                $invoicesCostSum += CurrenciesExchange::RateToday($invoice->totalInternalCost(), $currencyId, $user->currency_id);
+            }
+
+            $stats['invoices_total_sum'] = $invoicesTotalSum;
+            $stats['invoices_paid_sum'] = $invoicesPaidSum;
+            $stats['invoices_cost_sum'] = $invoicesCostSum;
+            $stats['invoices_margin_sum'] = $invoicesTotalSum - $invoicesCostSum;
         } catch (\Throwable $e) {
             Log::error('Error fetching user stats: '.$e->getMessage());
         }

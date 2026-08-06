@@ -52,7 +52,7 @@ class FacebookAuthController extends Controller
             $driver = Socialite::driver('facebook');
 
             return $driver
-                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging', 'business_management'])
+                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging'])
                 ->redirect();
         } catch (\Throwable $e) {
             return redirect()->route('whatsapp.index')->with('error', $this->formatErrorMessage($e));

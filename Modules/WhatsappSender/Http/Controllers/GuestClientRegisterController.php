@@ -41,7 +41,7 @@ class GuestClientRegisterController extends Controller
     public function redirectFacebook(string $uuid): RedirectResponse
     {
         $business = WhatsappBusiness::where('uuid', $uuid)->firstOrFail();
-        
+
         $clientId = $business->facebook_client_id ?: config('services.facebook.client_id');
         $clientSecret = $business->facebook_client_secret ?: config('services.facebook.client_secret');
 
@@ -65,7 +65,7 @@ class GuestClientRegisterController extends Controller
             $driver = Socialite::driver('facebook');
 
             return $driver
-                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging', 'business_management'])
+                ->setScopes(['public_profile', 'whatsapp_business_management', 'whatsapp_business_messaging'])
                 ->with(['state' => $uuid])
                 ->redirect();
         } catch (\Throwable $e) {
