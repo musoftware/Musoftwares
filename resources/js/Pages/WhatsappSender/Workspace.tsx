@@ -153,7 +153,6 @@ export default function Workspace({
     const [editingWabaAccountId, setEditingWabaAccountId] = useState<number | null>(null);
     const [tempWabaId, setTempWabaId] = useState('');
     const [testingAccountId, setTestingAccountId] = useState<number | null>(null);
-    const [debugAccount, setDebugAccount] = useState<Account | null>(null);
     const [reconnectAccount, setReconnectAccount] = useState<Account | null>(null);
     const [reconnectPin, setReconnectPin] = useState('');
     const [isRequestingCode, setIsRequestingCode] = useState(false);
@@ -958,7 +957,12 @@ export default function Workspace({
                                                         {acc.status === 'active' ? (
                                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60">
                                                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                                Connected
+                                                                Connected & Registered
+                                                            </span>
+                                                        ) : acc.status === 'unregistered' ? (
+                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60">
+                                                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                                                Registration Required
                                                             </span>
                                                         ) : (
                                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/60">
@@ -977,7 +981,20 @@ export default function Workspace({
                                                 </div>
 
                                                 <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                                                    {acc.status !== 'active' && (
+                                                    {acc.status === 'active' ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setReconnectAccount(acc);
+                                                                setReconnectPin('');
+                                                                setCodeRequested(false);
+                                                            }}
+                                                            className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
+                                                            title="Re-verify 6-digit PIN with Meta Graph API"
+                                                        >
+                                                            <span>Re-register PIN</span>
+                                                        </button>
+                                                    ) : acc.status === 'unregistered' ? (
                                                         <button
                                                             type="button"
                                                             onClick={() => {
@@ -986,6 +1003,23 @@ export default function Workspace({
                                                                 setCodeRequested(false);
                                                             }}
                                                             className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                                                            title="Enter your 6-digit PIN to register this phone number with Meta Cloud API"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            <span>Register Phone Number</span>
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setReconnectAccount(acc);
+                                                                setReconnectPin('');
+                                                                setCodeRequested(false);
+                                                            }}
+                                                            className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                                                            title="Reconnect this number with Meta API"
                                                         >
                                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -1016,11 +1050,15 @@ export default function Workspace({
 
                                                     <button
                                                         type="button"
-                                                        onClick={() => setDebugAccount(acc)}
-                                                        className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 px-2.5 py-2 rounded-xl text-xs font-mono font-bold transition cursor-pointer"
-                                                        title="View actual raw JSON metadata stored for this account"
+                                                        onClick={() => {
+                                                            if (confirm('Are you sure you want to remove this WhatsApp account?')) {
+                                                                router.delete(`/whatsapp-sender/accounts/${acc.id}`);
+                                                            }
+                                                        }}
+                                                        className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 border border-zinc-200 dark:border-zinc-700 hover:border-red-200 dark:hover:border-red-900/50 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
+                                                        title="Remove this WhatsApp account"
                                                     >
-                                                        <span>&lt;/&gt; JSON</span>
+                                                        Remove
                                                     </button>
 
                                                     <button
@@ -1030,20 +1068,6 @@ export default function Workspace({
                                                     >
                                                         Edit
                                                     </button>
-
-                                                    {acc.status === 'active' && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                if (confirm('Are you sure you want to disconnect this number?')) {
-                                                                    router.delete(`/whatsapp-sender/accounts/${acc.id}`);
-                                                                }
-                                                            }}
-                                                            className="text-red-500 hover:text-red-650 text-xs font-semibold px-2 py-1"
-                                                        >
-                                                            Disconnect
-                                                        </button>
-                                                    )}
                                                 </div>
                                             </div>
                                         ))}
@@ -2207,61 +2231,7 @@ export default function Workspace({
                     </div>
                 </div>
             )}
-            {/* Debug Raw JSON Modal */}
-            {debugAccount && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-4">
-                        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-                            <div className="flex items-center gap-2">
-                                <span className="p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-xl font-mono text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                                    {'{ }'}
-                                </span>
-                                <div>
-                                    <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
-                                        Actual JSON Metadata — {debugAccount.name}
-                                    </h3>
-                                    <p className="text-xs text-zinc-500">Phone ID: {debugAccount.phone_number_id} | WABA ID: {debugAccount.waba_id || 'N/A'}</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setDebugAccount(null)}
-                                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
-                            >
-                                ✕
-                            </button>
-                        </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between text-xs text-zinc-500">
-                                <span>Stored Account Metadata & API State:</span>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(JSON.stringify(debugAccount.metadata || debugAccount, null, 2));
-                                        alert('Copied raw JSON to clipboard!');
-                                    }}
-                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
-                                >
-                                    📋 Copy JSON
-                                </button>
-                            </div>
-                            <pre className="bg-zinc-950 text-emerald-400 text-xs p-4 rounded-2xl font-mono overflow-x-auto max-h-96 border border-zinc-800 dir-ltr text-left">
-                                {JSON.stringify(debugAccount.metadata || debugAccount, null, 2)}
-                            </pre>
-                        </div>
-
-                        <div className="flex justify-end pt-2">
-                            <button
-                                type="button"
-                                onClick={() => setDebugAccount(null)}
-                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Reconnect Verification Modal */}
             {reconnectAccount && (

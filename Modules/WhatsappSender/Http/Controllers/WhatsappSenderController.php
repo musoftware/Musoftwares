@@ -227,12 +227,20 @@ class WhatsappSenderController extends Controller
         );
 
         $metadata = [];
-        $status = 'active';
+        $status = 'unregistered';
         if ($verification['valid']) {
             $metadata = $verification['data'];
-            if (isset($metadata['status']) && $metadata['status'] !== 'CONNECTED') {
+            $metaStatus = strtoupper($metadata['phone_number_api_response']['body']['status'] ?? 'CONNECTED');
+            $metadata['meta_connection_status'] = $metaStatus;
+            $metadata['is_registered'] = false;
+
+            if (!in_array($metaStatus, ['CONNECTED', 'APPROVED', 'ACTIVE'])) {
+                $status = 'disconnected';
+            } else {
                 $status = 'unregistered';
             }
+        } else {
+            $status = 'disconnected';
         }
 
         WhatsappAccount::updateOrCreate(

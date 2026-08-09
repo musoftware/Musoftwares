@@ -183,7 +183,12 @@ class MetaWhatsappService
             $errorCode = $responseData['error']['code'] ?? null;
 
             if ($errorCode === 133010) {
-                $account->update(['status' => 'unregistered']);
+                $metadata = $account->metadata ?? [];
+                $metadata['is_registered'] = false;
+                $account->update([
+                    'status' => 'unregistered',
+                    'metadata' => $metadata,
+                ]);
             }
 
             $log = WhatsappLog::create([
@@ -374,13 +379,28 @@ class MetaWhatsappService
         if ($phoneData) {
             $metaStatus = strtoupper($phoneData['status'] ?? 'CONNECTED');
             $isConnected = in_array($metaStatus, ['CONNECTED', 'APPROVED', 'ACTIVE']);
-            $dbStatus = $isConnected ? 'active' : 'unregistered';
 
-            $existingMeta = $account->metadata ?? [];
-            $account->update([
-                'status' => $dbStatus,
-                'metadata' => array_merge($existingMeta, $phoneData, ['waba_info' => $wabaData]),
-            ]);
+            $existingMeta = $account ? ($account->metadata ?? []) : [];
+            $isRegistered = !empty($existingMeta['is_registered']);
+
+            if (!$isConnected) {
+                $dbStatus = 'disconnected';
+            } elseif ($isRegistered) {
+                $dbStatus = 'active';
+            } else {
+                $dbStatus = 'unregistered';
+            }
+
+            if ($account) {
+                $account->update([
+                    'status' => $dbStatus,
+                    'metadata' => array_merge($existingMeta, $phoneData, [
+                        'waba_info' => $wabaData,
+                        'meta_connection_status' => $metaStatus,
+                        'is_registered' => $isRegistered,
+                    ]),
+                ]);
+            }
 
             return [
                 'success' => $isConnected,
@@ -458,10 +478,16 @@ class MetaWhatsappService
     public function registerPhoneNumber(WhatsappAccount $account, string $pin): array
     {
         if ($this->isSandboxToken($account->access_token)) {
-            $account->update(['status' => 'active']);
             $metadata = $account->metadata ?? [];
             $metadata['status'] = 'CONNECTED';
-            $account->update(['metadata' => $metadata]);
+            $metadata['meta_connection_status'] = 'CONNECTED';
+            $metadata['is_registered'] = true;
+            $metadata['registered_at'] = now()->toDateTimeString();
+
+            $account->update([
+                'status' => 'active',
+                'metadata' => $metadata,
+            ]);
 
             return [
                 'success' => true,
@@ -483,13 +509,17 @@ class MetaWhatsappService
             $responseData = $response->json();
 
             if ($response->successful() && isset($responseData['success']) && $responseData['success'] === true) {
-                // Update status of the account to active
-                $account->update(['status' => 'active']);
-
-                // Also update status in metadata
+                // Update status of the account to active and set is_registered to true
                 $metadata = $account->metadata ?? [];
                 $metadata['status'] = 'CONNECTED';
-                $account->update(['metadata' => $metadata]);
+                $metadata['meta_connection_status'] = 'CONNECTED';
+                $metadata['is_registered'] = true;
+                $metadata['registered_at'] = now()->toDateTimeString();
+
+                $account->update([
+                    'status' => 'active',
+                    'metadata' => $metadata,
+                ]);
 
                 return [
                     'success' => true,
