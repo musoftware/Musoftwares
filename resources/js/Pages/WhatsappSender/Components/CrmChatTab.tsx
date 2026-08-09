@@ -13,7 +13,8 @@ import {
     Clock,
     Sparkles,
     X,
-    FileText
+    FileText,
+    Smartphone
 } from 'lucide-react';
 
 interface Conversation {
@@ -77,9 +78,11 @@ interface Props {
     business: Business;
     accounts: Account[];
     templates: Template[];
+    selectedAccountId?: number;
+    setSelectedAccountId?: (id: number) => void;
 }
 
-export default function CrmChatTab({ business, accounts, templates }: Props) {
+export default function CrmChatTab({ business, accounts, templates, selectedAccountId: propAccountId, setSelectedAccountId: propSetAccountId }: Props) {
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -91,8 +94,13 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
     const [searchQuery, setSearchQuery] = useState('');
     const [channelFilter, setChannelFilter] = useState<'all' | 'ctwa' | 'whatsapp' | 'telegram'>('all');
 
-    // Message input form
-    const [selectedAccountId, setSelectedAccountId] = useState<number>(accounts[0]?.id || 0);
+    // Internal state synced with parent prop if provided
+    const firstActiveAccount = accounts.find(a => a.status === 'active') || accounts[0];
+    const [internalAccountId, setInternalAccountId] = useState<number>(propAccountId || firstActiveAccount?.id || 0);
+
+    const selectedAccountId = propAccountId !== undefined ? propAccountId : internalAccountId;
+    const setSelectedAccountId = propSetAccountId || setInternalAccountId;
+
     const [messageText, setMessageText] = useState('');
     const [messageType, setMessageType] = useState<'text' | 'template'>('text');
     const [selectedTemplate, setSelectedTemplate] = useState<string>('');
@@ -100,6 +108,16 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Keep selectedAccountId synced if accounts list changes
+    useEffect(() => {
+        if (!selectedAccountId || !accounts.some(a => a.id === selectedAccountId)) {
+            const activeAcc = accounts.find(a => a.status === 'active') || accounts[0];
+            if (activeAcc) {
+                setSelectedAccountId(activeAcc.id);
+            }
+        }
+    }, [accounts]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -176,8 +194,14 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
         if (messageType === 'text' && !messageText.trim()) return;
         if (messageType === 'template' && !selectedTemplate) return;
 
-        if (!selectedAccountId) {
+        const currentAccount = accounts.find(a => a.id === selectedAccountId);
+        if (!currentAccount) {
             setErrorMsg('Please connect or select a valid WhatsApp Account first.');
+            return;
+        }
+
+        if (currentAccount.status !== 'active') {
+            setErrorMsg(`Selected account "${currentAccount.name}" is not registered (${currentAccount.status}). Please switch to an Active account.`);
             return;
         }
 
@@ -255,13 +279,14 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
     };
 
     const activeReferral = messages.find(m => m.referral)?.referral;
+    const selectedAccount = accounts.find(a => a.id === selectedAccountId);
 
     return (
         <div className="flex flex-col h-[calc(100vh-180px)] min-h-[650px] bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden text-zinc-900 dark:text-zinc-100">
             {/* Top Toolbar */}
-            <div className="flex items-center justify-between px-6 py-4 bg-zinc-50/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 backdrop-blur-md">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 bg-zinc-50/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 backdrop-blur-md gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shrink-0">
                         <MessageSquare className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -277,12 +302,12 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     {/* Balance Badge */}
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-xs">
-                        <span className="text-zinc-500">Wallet Balance:</span>
+                        <span className="text-zinc-500">Balance:</span>
                         <span className={`font-semibold font-mono ${parseFloat(business.wallet_balance) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                            ${parseFloat(business.wallet_balance).toFixed(4)} {business.currency}
+                            ${parseFloat(business.wallet_balance).toFixed(4)}
                         </span>
                     </div>
 
@@ -299,7 +324,7 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
             {/* Main 3-Column Layout */}
             <div className="grid grid-cols-12 flex-1 overflow-hidden">
                 {/* 1. Left Sidebar: Active Conversations List */}
-                <div className="col-span-12 md:col-span-4 lg:col-span-3 bg-zinc-50/50 dark:bg-zinc-950/60 border-r border-zinc-200 dark:border-zinc-800 flex flex-col h-full">
+                <div className="col-span-12 md:col-span-4 lg:col-span-3 bg-zinc-50/50 dark:bg-zinc-950/60 border-r border-zinc-200 dark:border-zinc-800 flex flex-col h-full overflow-hidden relative">
                     {/* Search & Filter Bar */}
                     <div className="p-3 border-b border-zinc-200 dark:border-zinc-800 space-y-2">
                         <div className="relative">
@@ -336,7 +361,7 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
                     </div>
 
                     {/* Conversations List */}
-                    <div className="flex-1 overflow-y-auto divide-y divide-zinc-200/60 dark:divide-zinc-800/40">
+                    <div className="flex-1 overflow-y-auto p-2 space-y-1">
                         {loadingConversations && conversations.length === 0 ? (
                             <div className="p-8 text-center text-zinc-400 text-xs flex flex-col items-center gap-2">
                                 <RefreshCw className="w-5 h-5 animate-spin text-emerald-500" />
@@ -354,16 +379,20 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
                                     <div
                                         key={conv.recipient_phone}
                                         onClick={() => setSelectedPhone(conv.recipient_phone)}
-                                        className={`p-3.5 flex items-start gap-3 cursor-pointer transition-all ${isSelected ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-l-4 border-emerald-500' : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'}`}
+                                        className={`p-3 rounded-xl flex items-start gap-3 cursor-pointer transition-all relative ${
+                                            isSelected
+                                                ? 'bg-emerald-100/70 dark:bg-emerald-950/60 border border-emerald-500/40 shadow-xs'
+                                                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800/40 border border-transparent'
+                                        }`}
                                     >
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 shadow-xs ${isAd ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700' : conv.channel === 'telegram' ? 'bg-sky-100 dark:bg-sky-900/80 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-700' : 'bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700'}`}>
+                                        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${isAd ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700' : conv.channel === 'telegram' ? 'bg-sky-100 dark:bg-sky-900/80 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-700' : 'bg-emerald-600 text-white'}`}>
                                             {conv.contact_name ? conv.contact_name.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
                                         </div>
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-1">
                                                 <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 truncate flex items-center gap-1">
-                                                    {conv.contact_name}
+                                                    {conv.contact_name || `+${conv.recipient_phone}`}
                                                     {isAd && (
                                                         <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40 font-bold text-[9px]">
                                                             🔥 CTWA
@@ -431,23 +460,6 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
                                             <span>24h Customer Window</span>
                                         </div>
                                     )}
-
-                                    {/* Account Switcher */}
-                                    <select
-                                        value={selectedAccountId}
-                                        onChange={(e) => setSelectedAccountId(Number(e.target.value))}
-                                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 rounded-lg px-2.5 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-emerald-500"
-                                    >
-                                        {accounts.length === 0 ? (
-                                            <option value={0}>No WABA Account Connected</option>
-                                        ) : (
-                                            accounts.map(acc => (
-                                                <option key={acc.id} value={acc.id}>
-                                                    {acc.name} ({acc.phone_number_id})
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
                                 </div>
                             </div>
 
@@ -521,6 +533,27 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
                                 <div ref={messagesEndRef} />
                             </div>
 
+                            {/* Unregistered Account Warning Banner if selected account is unregistered */}
+                            {selectedAccount && selectedAccount.status !== 'active' && (
+                                <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/80 border-t border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between">
+                                    <span className="flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                                        Selected account "{selectedAccount.name}" ({selectedAccount.phone_number_id}) is not registered ({selectedAccount.status}).
+                                    </span>
+                                    {accounts.some(a => a.status === 'active') && (
+                                        <button
+                                            onClick={() => {
+                                                const activeAcc = accounts.find(a => a.status === 'active');
+                                                if (activeAcc) setSelectedAccountId(activeAcc.id);
+                                            }}
+                                            className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] font-bold"
+                                        >
+                                            Switch to Active Account
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Error banner */}
                             {errorMsg && (
                                 <div className="px-4 py-2 bg-rose-50 dark:bg-rose-950/80 border-t border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
@@ -537,7 +570,7 @@ export default function CrmChatTab({ business, accounts, templates }: Props) {
                             {/* Composer Bottom Form */}
                             <form onSubmit={handleSendMessage} className="p-3 bg-zinc-50/90 dark:bg-zinc-900/90 border-t border-zinc-200 dark:border-zinc-800 flex flex-col gap-2">
                                 <div className="flex items-center justify-between text-[11px] text-zinc-500">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-3">
                                         <button
                                             type="button"
                                             onClick={() => setMessageType(messageType === 'text' ? 'template' : 'text')}

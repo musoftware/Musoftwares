@@ -42,6 +42,7 @@ interface Props {
     onTestAccount: (id: number) => void;
     testingAccountId: number | null;
     onReconnectAccount: (acc: Account) => void;
+    onDeleteAccount: (id: number) => void;
 }
 
 export default function AccountsHealthTab({
@@ -55,6 +56,7 @@ export default function AccountsHealthTab({
     onTestAccount,
     testingAccountId,
     onReconnectAccount,
+    onDeleteAccount,
 }: Props) {
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
@@ -202,13 +204,15 @@ export default function AccountsHealthTab({
                                 {/* Primary Action & Context Menu */}
                                 <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
                                     {isActive ? (
-                                        <button
-                                            onClick={onOpenInbox}
+                                        <a
+                                            href={`/whatsapp-sender/businesses/${business.id}/live-chat?account_id=${acc.id}`}
+                                            target="_blank"
+                                            rel="noreferrer"
                                             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition shadow-sm"
                                         >
                                             <MessageSquare className="w-4 h-4" />
-                                            Open Inbox
-                                        </button>
+                                            Open WhatsApp Web
+                                        </a>
                                     ) : (
                                         <button
                                             onClick={() => onReconnectAccount(acc)}
@@ -250,6 +254,19 @@ export default function AccountsHealthTab({
                                                 >
                                                     <Shield className="w-3.5 h-3.5" />
                                                     Re-verify 6-Digit PIN
+                                                </button>
+                                                <div className="my-1 border-t border-zinc-200 dark:border-zinc-800"></div>
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm(`Are you sure you want to delete account "${acc.name}"?`)) {
+                                                            onDeleteAccount(acc.id);
+                                                            setOpenMenuId(null);
+                                                        }
+                                                    }}
+                                                    className="w-full text-left px-4 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2 font-medium"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                                                    Delete Account
                                                 </button>
                                             </div>
                                         )}

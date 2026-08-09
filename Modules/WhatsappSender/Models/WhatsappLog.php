@@ -22,6 +22,7 @@ class WhatsappLog extends Model
         'message_type',
         'message_body',
         'status',
+        'direction',
         'meta_message_id',
         'error_message',
         'payload',

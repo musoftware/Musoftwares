@@ -20,6 +20,7 @@ Route::middleware(['auth'])
         Route::get('/', [WhatsappSenderController::class, 'index'])->name('index');
         Route::get('/meta-app-guide', [WhatsappSenderController::class, 'showMetaAppGuide'])->name('meta-app-guide');
         Route::get('/businesses/{id}', [WhatsappSenderController::class, 'showBusinessWorkspace'])->name('businesses.workspace');
+        Route::get('/businesses/{id}/live-chat', [WhatsappSenderController::class, 'showDedicatedLiveChat'])->name('businesses.live-chat');
         Route::post('/accounts', [WhatsappSenderController::class, 'storeAccount'])->name('accounts.store');
         Route::match(['PUT', 'PATCH'], '/accounts/{id}', [WhatsappSenderController::class, 'updateAccount'])->name('accounts.update');
         Route::delete('/accounts/{id}', [WhatsappSenderController::class, 'destroyAccount'])->name('accounts.destroy');
@@ -34,13 +35,19 @@ Route::middleware(['auth'])
         Route::post('/telegram-bots', [TelegramBotController::class, 'store'])->name('telegram-bots.store');
         Route::delete('/telegram-bots/{id}', [TelegramBotController::class, 'destroy'])->name('telegram-bots.destroy');
 
-        // Business Client Profiles & Wallet Recharge routes
+        // Business Client Profiles & Wallet Recharge & CRM Chat routes
         Route::post('/businesses', [WhatsappBusinessController::class, 'storeBusiness'])->name('businesses.store');
         Route::put('/businesses/{id}', [WhatsappBusinessController::class, 'updateBusiness'])->name('businesses.update');
         Route::post('/businesses/{id}/recharge', [WhatsappBusinessController::class, 'rechargeWallet'])->name('businesses.recharge');
         Route::post('/businesses/{id}/webhook-token', [WhatsappBusinessController::class, 'updateWebhookToken'])->name('businesses.webhook-token');
         Route::post('/businesses/{id}/toggle-test-mode', [WhatsappBusinessController::class, 'toggleTestMode'])->name('businesses.toggle-test-mode');
         Route::delete('/businesses/{id}', [WhatsappBusinessController::class, 'destroyBusiness'])->name('businesses.destroy');
+
+        // WhatsApp CRM Chat & CTWA Analytics API routes
+        Route::get('/businesses/{id}/conversations', [WhatsappSenderController::class, 'getConversations'])->name('businesses.conversations');
+        Route::get('/businesses/{id}/chat-messages', [WhatsappSenderController::class, 'getChatMessages'])->name('businesses.chat-messages');
+        Route::post('/businesses/{id}/send-chat-message', [WhatsappSenderController::class, 'sendChatMessage'])->name('businesses.send-chat-message');
+        Route::get('/businesses/{id}/ad-performance', [WhatsappSenderController::class, 'getAdPerformanceStats'])->name('businesses.ad-performance');
 
         // Facebook Login OAuth routes
         Route::get('/auth/facebook', [FacebookAuthController::class, 'redirect'])->name('auth.facebook');

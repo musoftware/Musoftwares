@@ -7,8 +7,12 @@ use App\Models\AdminSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Modules\WhatsappSender\Models\WhatsappAccount;
 use Modules\WhatsappSender\Models\WhatsappBusiness;
+use Modules\WhatsappSender\Models\WhatsappContact;
+use Modules\WhatsappSender\Models\WhatsappContactGroup;
 use Modules\WhatsappSender\Models\WhatsappLog;
+use Modules\WhatsappSender\Services\BotFlowEngineService;
 
 class WhatsappWebhookController extends Controller
 {
@@ -24,7 +28,6 @@ class WhatsappWebhookController extends Controller
         $token = $request->query('hub_verify_token', $request->query('hub.verify_token'));
         $challenge = $request->query('hub_challenge', $request->query('hub.challenge'));
 
-        // Ensure business has a verify token
         if (empty($business->webhook_verify_token)) {
             $business->update(['webhook_verify_token' => 'biz_wt_' . Str::random(24)]);
         }
@@ -58,76 +61,14 @@ class WhatsappWebhookController extends Controller
      */
     public function handleBusiness(Request $request, int $businessId)
     {
-        $business = WhatsappBusiness::findOrFail($businessId);
         $payload = $request->all();
 
-        Log::info("WhatsApp Meta Webhook Event Received for Business Client #{$businessId} ({$business->name})", [
+        Log::info("WhatsApp Meta Webhook Event Received for Business Client #{$businessId}", [
             'business_id' => $businessId,
             'payload' => $payload,
         ]);
 
-        if (empty($payload['entry'])) {
-            return response()->json(['status' => 'ignored'], 200);
-        }
-
-        foreach ($payload['entry'] as $entry) {
-            if (empty($entry['changes'])) {
-                continue;
-            }
-
-            foreach ($entry['changes'] as $change) {
-                $value = $change['value'] ?? [];
-
-                // 1. Process Status Updates (sent, delivered, read, failed)
-                if (! empty($value['statuses'])) {
-                    foreach ($value['statuses'] as $statusItem) {
-                        $metaMsgId = $statusItem['id'] ?? null;
-                        $status = $statusItem['status'] ?? null;
-
-                        if ($metaMsgId && $status) {
-                            $log = WhatsappLog::where('whatsapp_business_id', $businessId)
-                                ->where(function ($query) use ($metaMsgId) {
-                                    $query->where('metadata->messages->0->id', $metaMsgId)
-                                        ->orWhere('metadata->id', $metaMsgId);
-                                })
-                                ->first();
-
-                            if ($log) {
-                                $log->update(['status' => $status]);
-                            }
-                        }
-                    }
-                }
-
-                // 2. Process Inbound Customer Messages
-                if (! empty($value['messages'])) {
-                    $botFlowEngine = app(\Modules\WhatsappSender\Services\BotFlowEngineService::class);
-                    foreach ($value['messages'] as $msg) {
-                        $senderPhone = $msg['from'] ?? null;
-                        if (!$senderPhone) continue;
-
-                        $text = '';
-                        if (isset($msg['interactive']) && $msg['interactive']['type'] === 'button_reply') {
-                            // Extract quick reply button ID (which is the target node ID)
-                            $text = $msg['interactive']['button_reply']['id'] ?? '';
-                        } elseif (isset($msg['text']['body'])) {
-                            $text = $msg['text']['body'];
-                        }
-
-                        Log::info("WhatsApp Inbound Customer Message for Business #{$businessId}", [
-                            'business_id' => $businessId,
-                            'from' => $senderPhone,
-                            'type' => $msg['type'] ?? null,
-                            'body' => $text,
-                        ]);
-
-                        if ($text !== '') {
-                            $botFlowEngine->handleIncomingMessage('whatsapp', $businessId, $senderPhone, $text);
-                        }
-                    }
-                }
-            }
-        }
+        $this->processWebhookPayload($payload, $businessId);
 
         return response()->json(['status' => 'success'], 200);
     }
@@ -165,6 +106,168 @@ class WhatsappWebhookController extends Controller
 
         Log::info('WhatsApp Meta Webhook Global Event Received', ['payload' => $payload]);
 
+        $this->processWebhookPayload($payload, null);
+
         return response()->json(['status' => 'success'], 200);
+    }
+
+    /**
+     * Process incoming Meta Webhook payload for inbound messages, status updates, and CTWA ad referrals.
+     */
+    private function processWebhookPayload(array $payload, ?int $routeBusinessId = null): void
+    {
+        if (empty($payload['entry'])) {
+            return;
+        }
+
+        foreach ($payload['entry'] as $entry) {
+            if (empty($entry['changes'])) {
+                continue;
+            }
+
+            foreach ($entry['changes'] as $change) {
+                $value = $change['value'] ?? [];
+                $phoneNumberId = $value['metadata']['phone_number_id'] ?? null;
+
+                // 1. Resolve account and business ID via phone_number_id or routeBusinessId
+                $account = null;
+                if ($phoneNumberId) {
+                    $account = WhatsappAccount::where('phone_number_id', $phoneNumberId)->first();
+                }
+
+                $businessId = $routeBusinessId ?: ($account?->whatsapp_business_id);
+                if (!$businessId && $account) {
+                    $businessId = $account->whatsapp_business_id;
+                }
+
+                // If still unassigned, fallback to first available business
+                if (!$businessId) {
+                    $businessId = WhatsappBusiness::value('id');
+                }
+
+                if (!$businessId) {
+                    Log::warning('WhatsApp Webhook: Unable to resolve Business ID for incoming payload', [
+                        'phone_number_id' => $phoneNumberId,
+                        'payload' => $value,
+                    ]);
+                    continue;
+                }
+
+                $business = WhatsappBusiness::find($businessId);
+                if (!$business) {
+                    continue;
+                }
+
+                if (!$account) {
+                    $account = WhatsappAccount::where('whatsapp_business_id', $businessId)->first();
+                }
+
+                // 2. Process Status Updates (sent, delivered, read, failed)
+                if (!empty($value['statuses'])) {
+                    foreach ($value['statuses'] as $statusItem) {
+                        $metaMsgId = $statusItem['id'] ?? null;
+                        $status = $statusItem['status'] ?? null;
+
+                        if ($metaMsgId && $status) {
+                            $log = WhatsappLog::where('whatsapp_business_id', $businessId)
+                                ->where(function ($query) use ($metaMsgId) {
+                                    $query->where('metadata->messages->0->id', $metaMsgId)
+                                        ->orWhere('metadata->id', $metaMsgId)
+                                        ->orWhere('meta_message_id', $metaMsgId);
+                                })
+                                ->first();
+
+                            if ($log) {
+                                $log->update(['status' => $status]);
+                            }
+                        }
+                    }
+                }
+
+                // 3. Process Inbound Customer Messages
+                if (!empty($value['messages'])) {
+                    $botFlowEngine = app(BotFlowEngineService::class);
+                    $contactsList = $value['contacts'] ?? [];
+                    $senderName = null;
+                    if (!empty($contactsList)) {
+                        $senderName = $contactsList[0]['profile']['name'] ?? null;
+                    }
+
+                    foreach ($value['messages'] as $msg) {
+                        $senderPhone = $msg['from'] ?? null;
+                        if (!$senderPhone) {
+                            continue;
+                        }
+
+                        $text = '';
+                        $msgType = $msg['type'] ?? 'text';
+                        if (isset($msg['interactive']) && $msg['interactive']['type'] === 'button_reply') {
+                            $text = $msg['interactive']['button_reply']['title'] ?? $msg['interactive']['button_reply']['id'] ?? '';
+                        } elseif (isset($msg['text']['body'])) {
+                            $text = $msg['text']['body'];
+                        } elseif (isset($msg['caption'])) {
+                            $text = $msg['caption'];
+                        }
+
+                        $referral = $msg['referral'] ?? null;
+
+                        Log::info("WhatsApp Inbound Customer Message Processed for Business #{$businessId}", [
+                            'business_id' => $businessId,
+                            'phone_number_id' => $phoneNumberId,
+                            'from' => $senderPhone,
+                            'type' => $msgType,
+                            'body' => $text,
+                            'referral' => $referral,
+                        ]);
+
+                        // Store inbound message into WhatsappLog for live CRM Inbox
+                        WhatsappLog::create([
+                            'user_id' => $business->user_id,
+                            'whatsapp_account_id' => $account?->id,
+                            'whatsapp_business_id' => $businessId,
+                            'recipient_phone' => $senderPhone,
+                            'channel' => 'whatsapp',
+                            'cost_charged' => 0.0000,
+                            'message_type' => $msgType,
+                            'message_body' => $text ?: "[{$msgType} message]",
+                            'status' => 'inbound',
+                            'direction' => 'inbound',
+                            'meta_message_id' => $msg['id'] ?? null,
+                            'payload' => array_merge($msg, [
+                                'referral' => $referral,
+                            ]),
+                        ]);
+
+                        // Auto-upsert contact to business contact group if available
+                        $group = WhatsappContactGroup::firstOrCreate(
+                            ['whatsapp_business_id' => $businessId, 'name' => 'Inbound Customers'],
+                            ['description' => 'Automatically created group for incoming customer inquiries']
+                        );
+
+                        $customFields = [];
+                        if ($referral) {
+                            $customFields['ctwa_clid'] = $referral['ctwa_clid'] ?? null;
+                            $customFields['last_ad_headline'] = $referral['headline'] ?? null;
+                            $customFields['last_ad_id'] = $referral['source_id'] ?? null;
+                        }
+
+                        WhatsappContact::updateOrCreate(
+                            [
+                                'whatsapp_contact_group_id' => $group->id,
+                                'phone' => $senderPhone,
+                            ],
+                            [
+                                'name' => $senderName ?: "Customer {$senderPhone}",
+                                'custom_fields' => $customFields,
+                            ]
+                        );
+
+                        if ($text !== '') {
+                            $botFlowEngine->handleIncomingMessage('whatsapp', $businessId, $senderPhone, $text);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

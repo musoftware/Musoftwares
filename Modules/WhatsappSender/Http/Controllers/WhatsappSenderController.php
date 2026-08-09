@@ -13,6 +13,7 @@ use Modules\WhatsappSender\Models\WhatsappLog;
 use Modules\WhatsappSender\Models\WhatsappTransaction;
 use Modules\WhatsappSender\Models\WhatsappTemplate;
 use Modules\WhatsappSender\Models\WhatsappContactGroup;
+use Modules\WhatsappSender\Models\WhatsappContact;
 use Modules\WhatsappSender\Models\WhatsappSchedule;
 use Modules\WhatsappSender\Models\TelegramBot;
 use Modules\WhatsappSender\Jobs\SendGroupCampaignJob;
@@ -187,6 +188,30 @@ class WhatsappSenderController extends Controller
             'flows' => $flows,
             'isAdmin' => $user->isAdmin(),
             'hasFacebookApp' => $hasFacebookApp,
+        ]);
+    }
+
+    /**
+     * Display the Dedicated Full-Screen WhatsApp Web Live Chat Interface.
+     */
+    public function showDedicatedLiveChat(Request $request, int $id): Response
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $accounts = WhatsappAccount::where('whatsapp_business_id', $business->id)->get();
+        $templates = WhatsappTemplate::where('whatsapp_business_id', $business->id)
+            ->where('status', 'APPROVED')
+            ->get();
+
+        return Inertia::render('WhatsappSender/DedicatedLiveChat', [
+            'business' => $business,
+            'accounts' => $accounts,
+            'templates' => $templates,
         ]);
     }
 
@@ -606,5 +631,282 @@ class WhatsappSenderController extends Controller
     public function showMetaAppGuide(Request $request)
     {
         return \Inertia\Inertia::render('WhatsappSender/MetaAppGuide');
+    }
+
+    /**
+     * Get active conversations for the business CRM inbox.
+     */
+    public function getConversations(Request $request, int $id)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $latestLogs = WhatsappLog::whereIn('id', function ($query) use ($id) {
+                $query->selectRaw('MAX(id)')
+                    ->from('whatsapp_logs')
+                    ->where('whatsapp_business_id', $id)
+                    ->groupBy('recipient_phone');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $contacts = WhatsappContact::whereHas('group', function ($q) use ($id) {
+                $q->where('whatsapp_business_id', $id);
+            })
+            ->get()
+            ->keyBy('phone');
+
+        $conversations = $latestLogs->map(function ($log) use ($contacts) {
+            $phone = $log->recipient_phone;
+            $contact = $contacts->get($phone);
+            $hasReferral = !empty($log->payload['referral']);
+
+            // Calculate free window: 72 hours for CTWA ads, 24 hours for organic customer inbound
+            $hoursWindow = $hasReferral ? 72 : 24;
+            $freeWindowExpiresAt = $log->created_at->addHours($hoursWindow)->toIso8601String();
+
+            return [
+                'recipient_phone' => $phone,
+                'contact_name' => $contact?->name ?: "Customer {$phone}",
+                'group_name' => $contact?->group?->name ?? null,
+                'last_message' => $log->message_body,
+                'last_message_type' => $log->message_type,
+                'last_message_status' => $log->status,
+                'last_message_direction' => $log->direction ?? ($log->status === 'inbound' ? 'inbound' : 'outbound'),
+                'last_message_at' => $log->created_at->toIso8601String(),
+                'channel' => $log->channel ?? 'whatsapp',
+                'is_ctwa_ad' => $hasReferral,
+                'referral' => $log->payload['referral'] ?? null,
+                'free_window_expires_at' => $freeWindowExpiresAt,
+            ];
+        })->values();
+
+        return response()->json(['conversations' => $conversations]);
+    }
+
+    /**
+     * Get chat messages thread for a specific customer phone number.
+     */
+    public function getChatMessages(Request $request, int $id)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $phone = $request->query('phone');
+        if (!$phone) {
+            return response()->json(['messages' => [], 'contact' => null, 'free_window' => null]);
+        }
+
+        $messages = WhatsappLog::where('whatsapp_business_id', $id)
+            ->where('recipient_phone', $phone)
+            ->with(['account:id,name,phone_number_id'])
+            ->orderBy('created_at', 'asc')
+            ->take(500)
+            ->get()
+            ->map(function ($log) {
+                $hasReferral = !empty($log->payload['referral']);
+                $hoursWindow = $hasReferral ? 72 : 24;
+
+                return [
+                    'id' => $log->id,
+                    'recipient_phone' => $log->recipient_phone,
+                    'channel' => $log->channel ?? 'whatsapp',
+                    'cost_charged' => (float) $log->cost_charged,
+                    'message_type' => $log->message_type,
+                    'message_body' => $log->message_body,
+                    'status' => $log->status,
+                    'direction' => $log->direction ?? ($log->status === 'inbound' ? 'inbound' : 'outbound'),
+                    'meta_message_id' => $log->meta_message_id,
+                    'error_message' => $log->error_message,
+                    'referral' => $log->payload['referral'] ?? null,
+                    'payload' => $log->payload,
+                    'created_at' => $log->created_at->toIso8601String(),
+                    'account_name' => $log->account?->name,
+                    'free_window_expires_at' => $log->direction === 'inbound' ? $log->created_at->addHours($hoursWindow)->toIso8601String() : null,
+                ];
+            });
+
+        $contact = WhatsappContact::whereHas('group', function ($q) use ($id) {
+                $q->where('whatsapp_business_id', $id);
+            })
+            ->where('phone', $phone)
+            ->first();
+
+        // Determine active free window from last inbound message
+        $lastInbound = $messages->where('direction', 'inbound')->last();
+        $freeWindowInfo = null;
+        if ($lastInbound) {
+            $isAd = !empty($lastInbound['referral']);
+            $expiresAt = \Carbon\Carbon::parse($lastInbound['created_at'])->addHours($isAd ? 72 : 24);
+            $freeWindowInfo = [
+                'type' => $isAd ? 'ctwa_72h' : 'organic_24h',
+                'expires_at' => $expiresAt->toIso8601String(),
+                'is_active' => $expiresAt->isFuture(),
+                'hours_total' => $isAd ? 72 : 24,
+            ];
+        }
+
+        return response()->json([
+            'messages' => $messages,
+            'contact' => $contact ? [
+                'name' => $contact->name,
+                'phone' => $contact->phone,
+                'group_name' => $contact->group?->name,
+                'custom_fields' => $contact->custom_fields,
+            ] : null,
+            'free_window' => $freeWindowInfo,
+        ]);
+    }
+
+    /**
+     * Get CTWA Meta Ads Performance analytics stats.
+     */
+    public function getAdPerformanceStats(Request $request, int $id)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $adLogs = WhatsappLog::where('whatsapp_business_id', $id)
+            ->where('direction', 'inbound')
+            ->whereNotNull('payload->referral')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $statsByAd = [];
+        foreach ($adLogs as $log) {
+            $referral = $log->payload['referral'] ?? null;
+            if (!$referral) continue;
+
+            $sourceId = $referral['source_id'] ?? 'unknown_ad';
+            $headline = $referral['headline'] ?? 'Meta CTWA Campaign';
+
+            if (!isset($statsByAd[$sourceId])) {
+                $statsByAd[$sourceId] = [
+                    'source_id' => $sourceId,
+                    'headline' => $headline,
+                    'body' => $referral['body'] ?? null,
+                    'total_chats' => 0,
+                    'unique_leads' => [],
+                    'last_lead_at' => $log->created_at->toIso8601String(),
+                ];
+            }
+
+            $statsByAd[$sourceId]['total_chats']++;
+            if (!in_array($log->recipient_phone, $statsByAd[$sourceId]['unique_leads'])) {
+                $statsByAd[$sourceId]['unique_leads'][] = $log->recipient_phone;
+            }
+        }
+
+        $adPerformance = array_values(array_map(function ($item) {
+            return [
+                'source_id' => $item['source_id'],
+                'headline' => $item['headline'],
+                'body' => $item['body'],
+                'total_chats' => $item['total_chats'],
+                'unique_leads_count' => count($item['unique_leads']),
+                'last_lead_at' => $item['last_lead_at'],
+            ];
+        }, $statsByAd));
+
+        return response()->json([
+            'total_ctwa_leads' => count($adLogs),
+            'active_ads_count' => count($adPerformance),
+            'ads' => $adPerformance,
+        ]);
+    }
+
+    /**
+     * Send direct chat message via CRM Chat UI.
+     */
+    public function sendChatMessage(Request $request, int $id)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $validated = $request->validate([
+            'whatsapp_account_id' => ['required', 'exists:whatsapp_accounts,id'],
+            'recipient_phone' => ['required', 'string', 'max:50'],
+            'message_body' => ['nullable', 'required_unless:message_type,template', 'string', 'max:4096'],
+            'message_type' => ['nullable', 'string', 'in:text,template'],
+            'template_name' => ['nullable', 'string'],
+            'template_language' => ['nullable', 'string'],
+            'template_components' => ['nullable', 'array'],
+        ]);
+
+        $account = WhatsappAccount::where('id', $validated['whatsapp_account_id'])
+            ->where('whatsapp_business_id', $id)
+            ->firstOrFail();
+
+        $templateData = null;
+        if (($validated['message_type'] ?? 'text') === 'template') {
+            $templateData = [
+                'name' => $validated['template_name'] ?? 'hello_world',
+                'language' => $validated['template_language'] ?? 'en_US',
+            ];
+            if (!empty($validated['template_components'])) {
+                $templateData['components'] = $validated['template_components'];
+            }
+        }
+
+        $messageBody = $validated['message_body'] ?? '';
+        if (($validated['message_type'] ?? 'text') === 'template' && empty($messageBody)) {
+            $messageBody = "Template: " . ($validated['template_name'] ?? 'Message');
+        }
+
+        $result = $this->whatsappService->sendMessage(
+            $account,
+            $validated['recipient_phone'],
+            $messageBody,
+            $validated['message_type'] ?? 'text',
+            $templateData
+        );
+
+        if ($result['success']) {
+            if (isset($result['log_id'])) {
+                WhatsappLog::where('id', $result['log_id'])->update(['direction' => 'outbound']);
+            }
+
+            $log = WhatsappLog::find($result['log_id'] ?? 0);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Message sent successfully!',
+                'log' => $log ? [
+                    'id' => $log->id,
+                    'recipient_phone' => $log->recipient_phone,
+                    'channel' => $log->channel ?? 'whatsapp',
+                    'cost_charged' => (float) $log->cost_charged,
+                    'message_type' => $log->message_type,
+                    'message_body' => $log->message_body,
+                    'status' => $log->status,
+                    'direction' => 'outbound',
+                    'meta_message_id' => $log->meta_message_id,
+                    'error_message' => null,
+                    'created_at' => $log->created_at->toIso8601String(),
+                    'account_name' => $account->name,
+                ] : null,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => $result['error'] ?? 'Message delivery failed.',
+        ], 422);
     }
 }

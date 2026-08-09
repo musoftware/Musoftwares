@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Head, useForm, router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import FlowBuilder from './FlowBuilder';
-import { ExternalLink } from 'lucide-react';
+import CrmChatTab from './Components/CrmChatTab';
+import AccountsHealthTab from './Components/AccountsHealthTab';
+import AudiencesTab from './Components/AudiencesTab';
+import AdPerformanceTab from './Components/AdPerformanceTab';
+import OnboardingWizard from './Components/OnboardingWizard';
+import { ExternalLink, Smartphone } from 'lucide-react';
 
 interface Business {
     id: number;
@@ -139,8 +144,20 @@ export default function Workspace({
     const flash = pageProps?.flash;
 
     const [activeChannel, setActiveChannel] = useState<'whatsapp' | 'telegram'>('whatsapp');
-    const [activeTab, setActiveTab] = useState<'send' | 'connectors' | 'templates' | 'groups' | 'schedules' | 'logs' | 'flows' | 'bots' | 'subscribers'>('connectors');
+    const [activeTab, setActiveTab] = useState<'connectors' | 'audiences' | 'ad_performance' | 'send' | 'templates' | 'groups' | 'schedules' | 'logs' | 'flows' | 'bots' | 'subscribers'>('connectors');
     const [selectedGroup, setSelectedGroup] = useState<ContactGroup | null>(null);
+
+    const firstActiveAccount = accounts.find(a => a.status === 'active') || accounts[0];
+    const [selectedAccountId, setSelectedAccountId] = useState<number>(firstActiveAccount?.id || 0);
+
+    useEffect(() => {
+        if (!selectedAccountId || !accounts.some(a => a.id === selectedAccountId)) {
+            const activeAcc = accounts.find(a => a.status === 'active') || accounts[0];
+            if (activeAcc) {
+                setSelectedAccountId(activeAcc.id);
+            }
+        }
+    }, [accounts]);
 
     const [editingFlow, setEditingFlow] = useState<any | null>(null);
     const [isCreatingFlow, setIsCreatingFlow] = useState(false);
@@ -201,6 +218,12 @@ export default function Workspace({
             access_token: (acc as any).access_token || '',
         });
         setShowEditAccountModal(true);
+    };
+
+    const handleDeleteAccount = (id: number) => {
+        router.delete(`/whatsapp-sender/accounts/${id}`, {
+            preserveScroll: true,
+        });
     };
 
     const handleUpdateAccount = (e: React.FormEvent) => {
@@ -637,33 +660,88 @@ export default function Workspace({
                         </div>
                     </div>
 
+                    {/* 60-Second Quick Onboarding Wizard */}
+                    <OnboardingWizard
+                        hasConnectedAccount={accounts.length > 0}
+                        hasTemplate={templates.length > 0}
+                        hasSentMessage={logs.length > 0}
+                        onConnectClick={() => setActiveTab('connectors')}
+                        onTemplateClick={() => setActiveTab('templates')}
+                        onSendClick={() => setActiveTab('send')}
+                    />
+
                     {/* Tabs selection */}
-                    <div className="flex border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-px gap-6">
-                        {(activeChannel === 'whatsapp'
-                            ? ['connectors', 'send', 'templates', 'groups', 'schedules', 'logs', 'flows'] as const
-                            : ['bots', 'subscribers', 'send', 'schedules', 'logs', 'flows'] as const
-                        ).map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab as any)}
-                                className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize ${activeTab === tab
-                                        ? 'border-zinc-900 dark:border-zinc-50 text-zinc-900 dark:text-zinc-50'
-                                        : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
-                                    }`}
-                            >
-                                {tab === 'send' ? 'Campaign / Quick Send' :
-                                    tab === 'connectors' ? 'Meta Accounts' :
-                                        tab === 'groups' ? 'WhatsApp Groups' :
-                                            tab === 'bots' ? 'Telegram Bots' :
-                                                tab === 'flows' ? 'Chat Flows (Bot Builder)' :
-                                                    tab === 'subscribers' ? 'Telegram Subscribers' :
-                                                        tab}
-                            </button>
-                        ))}
+                    <div className="flex border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-px gap-6 items-center justify-between">
+                        <div className="flex gap-6 overflow-x-auto">
+                            {(activeChannel === 'whatsapp'
+                                ? ['connectors', 'audiences', 'ad_performance', 'send', 'templates', 'schedules', 'logs', 'flows'] as const
+                                : ['bots', 'subscribers', 'send', 'schedules', 'logs', 'flows'] as const
+                            ).map(tab => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab as any)}
+                                    className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize flex items-center gap-2 ${activeTab === tab
+                                            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
+                                            : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
+                                        }`}
+                                >
+                                    {tab === 'connectors' ? '⚙️ Accounts & Health' :
+                                        tab === 'audiences' ? '👥 Contacts & Audiences' :
+                                            tab === 'ad_performance' ? '📊 CTWA Ad Analytics' :
+                                                tab === 'send' ? '🚀 Broadcast & Campaigns' :
+                                                    tab === 'groups' ? 'WhatsApp Groups' :
+                                                        tab === 'bots' ? 'Telegram Bots' :
+                                                            tab === 'flows' ? 'Chat Flows (Bot Builder)' :
+                                                                tab === 'subscribers' ? 'Telegram Subscribers' :
+                                                                    tab}
+                                </button>
+                            ))}
+                        </div>
+
+                        <a
+                            href={`/whatsapp-sender/businesses/${business.id}/live-chat${selectedAccountId ? `?account_id=${selectedAccountId}` : ''}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mb-3 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition shadow-md whitespace-nowrap shrink-0"
+                        >
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                            💬 Open Full-Screen WhatsApp Live Chat ↗
+                        </a>
                     </div>
 
                     {/* Tab Contents */}
                     <div>
+
+                        {activeTab === 'connectors' && (
+                            <AccountsHealthTab
+                                business={business}
+                                accounts={accounts}
+                                facebookLoginUrl={facebookLoginUrl}
+                                hasFacebookApp={hasFacebookApp}
+                                onOpenInbox={() => window.open(route('whatsapp.businesses.live-chat', business.id), '_blank')}
+                                onAddAccount={() => setShowAddAccountModal(true)}
+                                onEditAccount={openEditAccountModal}
+                                onTestAccount={handleTestAccount}
+                                testingAccountId={testingAccountId}
+                                onReconnectAccount={(acc) => { setReconnectAccount(acc); setCodeRequested(false); setReconnectPin(''); }}
+                                onDeleteAccount={handleDeleteAccount}
+                            />
+                        )}
+
+                        {activeTab === 'audiences' && (
+                            <AudiencesTab
+                                businessId={business.id}
+                                contactGroups={contactGroups}
+                            />
+                        )}
+
+                        {activeTab === 'ad_performance' && (
+                            <AdPerformanceTab
+                                businessId={business.id}
+                                perMessageFee={business.per_message_fee}
+                            />
+                        )}
+
                         {activeTab === 'send' && (
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {/* Unified dispatch form */}
@@ -889,272 +967,6 @@ export default function Workspace({
                                             <li><code>phone</code> - Resolves contact Phone / Telegram Chat ID</li>
                                             <li><code>custom_fields.FIELD_NAME</code> - Resolves CSV imported fields</li>
                                         </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'connectors' && (
-                            <div className="space-y-6">
-                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                        <div>
-                                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">WhatsApp Accounts</h3>
-                                            <p className="text-xs text-zinc-500 mt-1">Direct API integration endpoints powered by Facebook WABA.</p>
-                                        </div>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowAddAccountModal(true)}
-                                                className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-xs flex items-center gap-1.5 cursor-pointer dir-rtl"
-                                            >
-                                                <span>+ إضافة حساب يدوي (Meta Tokens)</span>
-                                            </button>
-
-                                            {hasFacebookApp && (
-                                                <a
-                                                    href={facebookLoginUrl}
-                                                    className="bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200 shadow-xs"
-                                                >
-                                                    Log in with Facebook
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {!hasFacebookApp && (
-                                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div className="space-y-1">
-                                                <p className="text-xs font-bold text-amber-800 dark:text-amber-300">لم يتم إعداد تطبيق فيسبوك (Meta App) لهذا البيزنس</p>
-                                                <p className="text-xxs text-zinc-500 leading-relaxed">يجب إضافة App ID و App Secret للبيزنس من إعدادات الأعمال بالخارج لتفعيل تسجيل الدخول.</p>
-                                            </div>
-                                            <div className="flex gap-2 shrink-0">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowEditModal(true)}
-                                                    className="bg-amber-600 hover:bg-amber-700 text-white text-xxs font-bold px-3 py-2 rounded-xl transition cursor-pointer"
-                                                >
-                                                    تعديل البيزنس
-                                                </button>
-                                                <Link
-                                                    href="/whatsapp-sender/meta-app-guide"
-                                                    target="_blank"
-                                                    className="border border-amber-300 dark:border-amber-800 text-amber-850 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/30 text-xxs font-bold px-3 py-2 rounded-xl transition inline-flex items-center gap-1"
-                                                >
-                                                    دليل الإعداد 📖
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Accounts Cards List */}
-                                    <div className="space-y-4 mt-6">
-                                        {accounts.map(acc => (
-                                            <div key={acc.id} className="border border-zinc-200/70 dark:border-zinc-800 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-50/50 dark:bg-zinc-950/20 hover:border-zinc-300 dark:hover:border-zinc-700 transition">
-                                                <div className="space-y-1.5">
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="font-bold text-base text-zinc-900 dark:text-zinc-100">{acc.name}</span>
-                                                        {acc.status === 'active' ? (
-                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60">
-                                                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                                Connected & Registered
-                                                            </span>
-                                                        ) : acc.status === 'unregistered' ? (
-                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60">
-                                                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                                                                Registration Required
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/60">
-                                                                <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                                                Disconnected
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div className="text-xs text-zinc-500 flex items-center gap-2 flex-wrap">
-                                                        <span className="font-semibold text-zinc-700 dark:text-zinc-300 dir-ltr">
-                                                            {acc.metadata?.display_phone_number || acc.name}
-                                                        </span>
-                                                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                                                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">WABA Approved</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                                                    {acc.status === 'active' ? (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setReconnectAccount(acc);
-                                                                setReconnectPin('');
-                                                                setCodeRequested(false);
-                                                            }}
-                                                            className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
-                                                            title="Re-verify 6-digit PIN with Meta Graph API"
-                                                        >
-                                                            <span>Re-register PIN</span>
-                                                        </button>
-                                                    ) : acc.status === 'unregistered' ? (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setReconnectAccount(acc);
-                                                                setReconnectPin('');
-                                                                setCodeRequested(false);
-                                                            }}
-                                                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-                                                            title="Enter your 6-digit PIN to register this phone number with Meta Cloud API"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
-                                                            <span>Register Phone Number</span>
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setReconnectAccount(acc);
-                                                                setReconnectPin('');
-                                                                setCodeRequested(false);
-                                                            }}
-                                                            className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-                                                            title="Reconnect this number with Meta API"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                                            </svg>
-                                                            <span>Reconnect WhatsApp</span>
-                                                        </button>
-                                                    )}
-
-                                                    <button
-                                                        type="button"
-                                                        disabled={testingAccountId === acc.id}
-                                                        onClick={() => handleTestAccount(acc.id)}
-                                                        className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
-                                                        title="Test connection against Meta Graph API"
-                                                    >
-                                                        {testingAccountId === acc.id ? (
-                                                            <span className="flex items-center gap-1">
-                                                                <svg className="animate-spin h-3.5 w-3.5 text-zinc-600 dark:text-zinc-400" fill="none" viewBox="0 0 24 24">
-                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                                </svg>
-                                                                <span>Testing...</span>
-                                                            </span>
-                                                        ) : (
-                                                            <span>Test Connection</span>
-                                                        )}
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            if (confirm('Are you sure you want to remove this WhatsApp account?')) {
-                                                                router.delete(`/whatsapp-sender/accounts/${acc.id}`);
-                                                            }
-                                                        }}
-                                                        className="inline-flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 border border-zinc-200 dark:border-zinc-700 hover:border-red-200 dark:hover:border-red-900/50 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
-                                                        title="Remove this WhatsApp account"
-                                                    >
-                                                        Remove
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => openEditAccountModal(acc)}
-                                                        className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold px-2 py-1"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {accounts.length === 0 && (
-                                            <p className="text-sm text-zinc-400 text-center py-6">No WhatsApp account connected yet.</p>
-                                        )}
-                                    </div>
-
-                                    {/* Collapsible Webhook Settings Accordion */}
-                                    <div className="mt-8 border-t border-zinc-200/80 dark:border-zinc-800/80 pt-6">
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsWebhookOpen(!isWebhookOpen)}
-                                            className="flex items-center justify-between w-full p-4 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl text-left transition hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                                                    ⚙️ Advanced Developer Settings (Meta Webhook)
-                                                </span>
-                                                <span className="text-xs text-zinc-400 font-normal hidden sm:inline">
-                                                    (Callback URL & Verify Token)
-                                                </span>
-                                            </div>
-                                            <span className="text-zinc-500 font-bold text-xs">
-                                                {isWebhookOpen ? '▲ إخفاء' : '▼ عرض التفاصيل'}
-                                            </span>
-                                        </button>
-
-                                        {isWebhookOpen && (
-                                            <div className="mt-4 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 space-y-5">
-                                                <div>
-                                                    <h4 className="font-bold text-zinc-900 dark:text-zinc-50 text-sm">Meta Webhook Configuration</h4>
-                                                    <p className="text-xs text-zinc-500 mt-1">
-                                                        استخدم هذه البيانات لربط الـ Webhook في لوحة مطوري Meta (Facebook Developer Portal).
-                                                    </p>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {/* Callback URL */}
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Callback URL</label>
-                                                        <div className="flex items-center gap-2">
-                                                            <input
-                                                                type="text"
-                                                                readOnly
-                                                                value={`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`}
-                                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => copyToClipboard(`${window.location.origin}/api/v1/whatsapp/webhook/biz/${business.id}`)}
-                                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
-                                                            >
-                                                                {copied ? 'Copied!' : 'Copy'}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Verify Token */}
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-xxs font-bold text-zinc-500 uppercase tracking-wider block">Verify Token</label>
-                                                        <div className="flex items-center gap-2">
-                                                            <input
-                                                                type="text"
-                                                                readOnly
-                                                                value={business.webhook_verify_token || webhookVerifyToken}
-                                                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2 rounded-xl w-full text-zinc-700 dark:text-zinc-300 font-mono"
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => copyToClipboard(business.webhook_verify_token || webhookVerifyToken)}
-                                                                className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition shrink-0"
-                                                            >
-                                                                {copied ? 'Copied!' : 'Copy'}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="pt-3 border-t border-zinc-200/80 dark:border-zinc-800 space-y-2 dir-rtl text-right">
-                                                    <h4 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">خطوات التفعيل في Meta Portal:</h4>
-                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                                        اذهب إلى <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-semibold">developers.facebook.com</a> &gt; تطبيقك &gt; <strong>WhatsApp</strong> &gt; <strong>Configuration</strong> &gt; الصق Callback URL والتوكن أعلاه ثم اضغط <strong>Verify and Save</strong> واشترك في <code>messages</code>.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
