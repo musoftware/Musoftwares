@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminCurrencyController;
 use App\Http\Controllers\Admin\AdminCurrencyExchangeController;
 use App\Http\Controllers\Admin\AdminFreeDownloadController;
 use App\Http\Controllers\Admin\AdminLanguageLineController;
+use App\Http\Controllers\Admin\AdminOutgoingEmailController;
 use App\Http\Controllers\Admin\AdminPaymentMethodController;
 use App\Http\Controllers\Admin\AdminPointPackageController;
 use App\Http\Controllers\Admin\AdminPointsController;
@@ -560,8 +561,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/notifications/search-users', [BroadcastNotificationController::class, 'searchUsers'])->name('notifications.search_users');
     Route::get('/notifications/broadcast/{id}', [BroadcastNotificationController::class, 'show'])->name('notifications.broadcast.show');
 
-    // Reports
+    // Reports & Outgoing Emails
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/outgoing-emails', [AdminOutgoingEmailController::class, 'index'])->name('outgoing-emails.index');
 
     // Clients (thin ERP-linked view) - removed as per request
 

@@ -91,6 +91,12 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
+    const selectedPhoneRef = useRef<string | null>(selectedPhone);
+
+    useEffect(() => {
+        selectedPhoneRef.current = selectedPhone;
+    }, [selectedPhone]);
+
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [activeContact, setActiveContact] = useState<{ name: string; phone: string; group_name?: string; custom_fields?: any } | null>(null);
     const [loadingConversations, setLoadingConversations] = useState(false);
@@ -118,7 +124,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             const res = await axios.get(`/whatsapp-sender/businesses/${business.id}/conversations`);
             if (res.data && res.data.conversations) {
                 setConversations(res.data.conversations);
-                if (!selectedPhone && res.data.conversations.length > 0) {
+                if (!selectedPhoneRef.current && res.data.conversations.length > 0) {
                     setSelectedPhone(res.data.conversations[0].recipient_phone);
                 }
             }
@@ -156,21 +162,24 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
         }
     };
 
-    // Initial load & Polling interval (4s)
+    // Initial load & Single Polling interval (5s)
     useEffect(() => {
         fetchConversations();
         const interval = setInterval(() => {
             fetchConversations();
-            if (selectedPhone) {
-                fetchChatMessages(selectedPhone);
+            if (selectedPhoneRef.current) {
+                fetchChatMessages(selectedPhoneRef.current);
             }
-        }, 4000);
+        }, 5000);
         return () => clearInterval(interval);
-    }, [business.id, selectedPhone]);
+    }, [business.id]);
 
+    // Fetch messages immediately when selectedPhone changes
     useEffect(() => {
         if (selectedPhone) {
             fetchChatMessages(selectedPhone);
+        } else {
+            setMessages([]);
         }
     }, [selectedPhone]);
 

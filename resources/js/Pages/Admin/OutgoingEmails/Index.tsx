@@ -168,8 +168,9 @@ export default function Index({ emails, stats, filters }: Props) {
                             <Select
                                 value={status}
                                 onValueChange={(val) => {
-                                    setStatus(val);
-                                    applyFilters({ status: val });
+                                    const nextStatus = val || 'all';
+                                    setStatus(nextStatus);
+                                    applyFilters({ status: nextStatus });
                                 }}
                             >
                                 <SelectTrigger>

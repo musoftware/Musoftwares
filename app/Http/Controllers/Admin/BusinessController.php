@@ -7,6 +7,7 @@ use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AdminSettings;
 use App\Models\CostTransaction;
+use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\InvoiceItemTimer;
@@ -1353,6 +1354,151 @@ class BusinessController extends Controller
         $operatingMarginPercent  = $lifetimeIncome > 0 ? round(($netProfit / $lifetimeIncome) * 100, 1) : 0;
         $monthlyBreakEvenRevenue = $avgCosts;
 
+        // ── 4. Current Year Months (Cairo Timezone) ───────────────────────────
+        $nowCairo = now('Africa/Cairo');
+        $currentYear = (int) $nowCairo->year;
+        $currentMonth = (int) $nowCairo->month;
+
+        $currentYearMonths = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $dt = Carbon::createFromDate($currentYear, $m, 1, 'Africa/Cairo');
+            $currentYearMonths[] = [
+                'month'      => $m,
+                'year'       => $currentYear,
+                'name'       => $dt->format('M'),
+                'full_name'  => $dt->format('F'),
+                'from'       => $dt->copy()->startOfMonth()->toDateString(),
+                'to'         => $dt->copy()->endOfMonth()->toDateString(),
+                'is_active'  => $m <= $currentMonth,
+            ];
+        }
+
+        // ── 5. Clients Worked With in Period ──────────────────────────────────
+        $invoiceClientIds = Invoice::query()
+            ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
+            ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($projectId, fn($q) => $q->where('project_id', $projectId))
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->pluck('user_id')
+            ->toArray();
+
+        $projectClientIds = Project::query()
+            ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
+            ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($projectId, fn($q) => $q->where('id', $projectId))
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->pluck('user_id')
+            ->toArray();
+
+        $timerProjectIds = InvoiceItemTimer::query()
+            ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
+            ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($projectId, fn($q) => $q->where('project_id', $projectId))
+            ->whereNotNull('project_id')
+            ->distinct()
+            ->pluck('project_id')
+            ->toArray();
+
+        $timerClientIds = Project::whereIn('id', $timerProjectIds)
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->pluck('user_id')
+            ->toArray();
+
+        $allClientIds = array_values(array_unique(array_filter(array_merge($invoiceClientIds, $projectClientIds, $timerClientIds))));
+
+        $clientsWorkedWith = [];
+
+        if (!empty($allClientIds)) {
+            $clientUsers = User::whereIn('id', $allClientIds)->get();
+
+            foreach ($clientUsers as $client) {
+                $clientProjectIds = Project::where('user_id', $client->id)
+                    ->when($projectId, fn($q) => $q->where('id', $projectId))
+                    ->pluck('id')
+                    ->toArray();
+
+                $workedSeconds = 0;
+                if (!empty($clientProjectIds)) {
+                    $workedSeconds = (int) InvoiceItemTimer::query()
+                        ->whereIn('project_id', $clientProjectIds)
+                        ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
+                        ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+                        ->whereNotNull('date_end')
+                        ->whereNotNull('date_start')
+                        ->selectRaw('SUM(TIMESTAMPDIFF(SECOND, date_start, date_end)) as total_sec')
+                        ->value('total_sec');
+                }
+
+                $clientInvoices = Invoice::query()
+                    ->where('user_id', $client->id)
+                    ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
+                    ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+                    ->when($projectId, fn($q) => $q->where('project_id', $projectId))
+                    ->get();
+
+                $invoicedAmount = 0;
+                $paidAmount = 0;
+                $lastActivity = null;
+                $businessCurrencyId = (int) (AdminSettings::GetValue('business_currency') ?: 2);
+
+                foreach ($clientInvoices as $inv) {
+                    $rawTotal  = abs(method_exists($inv, 'total') ? $inv->total() : ($inv->amount ?? 0));
+                    $rawPaid   = abs($inv->paid ?? 0);
+                    $invCurrId = $inv->currency_id ?: $businessCurrencyId;
+
+                    $busTotal = (float) CurrenciesExchange::RateToday($rawTotal, $invCurrId, $businessCurrencyId);
+                    $busPaid  = (float) CurrenciesExchange::RateToday($rawPaid, $invCurrId, $businessCurrencyId);
+
+                    $invoicedAmount += $busTotal;
+                    $paidAmount     += $busPaid;
+
+                    if (!$lastActivity || (isset($inv->created_at) && $inv->created_at > $lastActivity)) {
+                        $lastActivity = $inv->created_at;
+                    }
+                }
+
+                $activeProjectsCount = Project::where('user_id', $client->id)
+                    ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
+                    ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+                    ->when($projectId, fn($q) => $q->where('id', $projectId))
+                    ->count();
+
+                if (!empty($clientProjectIds)) {
+                    $latestTimer = InvoiceItemTimer::whereIn('project_id', $clientProjectIds)
+                        ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
+                        ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+                        ->latest('created_at')
+                        ->first();
+                    if ($latestTimer && (!$lastActivity || $latestTimer->created_at > $lastActivity)) {
+                        $lastActivity = $latestTimer->created_at;
+                    }
+                }
+
+                $clientsWorkedWith[] = [
+                    'id'                    => $client->id,
+                    'name'                  => $client->name,
+                    'email'                 => $client->email,
+                    'avatar'                => method_exists($client, 'getProfilePhotoUrlAttribute') ? $client->profile_photo_url : null,
+                    'worked_hours'          => round($workedSeconds / 3600, 2),
+                    'worked_seconds'        => $workedSeconds,
+                    'total_invoiced'        => round($invoicedAmount, 2),
+                    'total_paid'            => round($paidAmount, 2),
+                    'active_projects_count' => $activeProjectsCount,
+                    'last_activity'         => $lastActivity ? Carbon::parse($lastActivity)->timezone('Africa/Cairo')->format('Y-m-d H:i') : null,
+                ];
+            }
+
+            usort($clientsWorkedWith, function ($a, $b) {
+                if ($b['worked_seconds'] !== $a['worked_seconds']) {
+                    return $b['worked_seconds'] <=> $a['worked_seconds'];
+                }
+                return $b['total_invoiced'] <=> $a['total_invoiced'];
+            });
+        }
+
         return Inertia::render('Admin/Business/Reports', [
             'stats' => [
                 'total_users'               => $usersQuery->count(),
@@ -1389,9 +1535,11 @@ class BusinessController extends Controller
                 'income_by_category'  => $incomeByCategory,
                 'expenses_by_category'=> $expensesByCategory,
             ],
-            'projects'   => $projects,
-            'categories' => $availableCategories,
-            'filters'    => [
+            'projects'            => $projects,
+            'categories'          => $availableCategories,
+            'current_year_months' => $currentYearMonths,
+            'clients_worked_with' => $clientsWorkedWith,
+            'filters'             => [
                 'from'       => $from,
                 'to'         => $to,
                 'project_id' => $projectId,

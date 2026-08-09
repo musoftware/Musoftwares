@@ -142,6 +142,8 @@ export default function Reports({
     charts,
     projects = [],
     categories = [],
+    current_year_months = [],
+    clients_worked_with = [],
     filters = {},
     hasData = true
 }: {
@@ -149,6 +151,8 @@ export default function Reports({
     charts: any;
     projects?: any[];
     categories?: string[];
+    current_year_months?: any[];
+    clients_worked_with?: any[];
     filters?: any;
     hasData?: boolean
 }) {
@@ -156,7 +160,7 @@ export default function Reports({
     const [to, setTo] = useState(filters.to || '');
     const [projectId, setProjectId] = useState(filters.project_id || '');
     const [category, setCategory] = useState(filters.category || '');
-    const [activeTab, setActiveTab] = useState<'overview' | 'hourly' | 'invoices'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'hourly' | 'invoices' | 'clients'>('overview');
 
     const handleApplyFilters = () => {
         router.get(route('admin.business.reports'), {
@@ -313,6 +317,63 @@ export default function Reports({
                 </CardContent>
             </Card>
 
+            {/* Months Quick Filter Bar */}
+            {current_year_months && current_year_months.length > 0 && (
+                <div className="mb-6 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm shadow-slate-200/40">
+                    <div className="flex items-center justify-between mb-3 px-1">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <Calendar className="w-4 h-4 text-slate-700" />
+                            {__('general.current_year_months') || 'Current Year Months'} ({current_year_months[0]?.year})
+                        </span>
+                        {from && to && (
+                            <span className="text-xs text-slate-500 font-mono">
+                                {from} ~ {to}
+                            </span>
+                        )}
+                    </div>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2">
+                        {current_year_months.map((m: any) => {
+                            const isSelected = from === m.from && to === m.to;
+                            const isActiveMonth = m.is_active;
+
+                            return (
+                                <button
+                                    key={m.month}
+                                    type="button"
+                                    disabled={!isActiveMonth}
+                                    onClick={() => {
+                                        if (!isActiveMonth) return;
+                                        setFrom(m.from);
+                                        setTo(m.to);
+                                        router.get(
+                                            route('admin.business.reports'),
+                                            {
+                                                from: m.from,
+                                                to: m.to,
+                                                project_id: projectId,
+                                                category: category,
+                                            },
+                                            { preserveState: true }
+                                        );
+                                    }}
+                                    className={cn(
+                                        'py-2.5 px-2 rounded-lg text-xs font-bold transition-all text-center flex flex-col items-center justify-center border',
+                                        isSelected
+                                            ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/20'
+                                            : isActiveMonth
+                                            ? 'bg-slate-50 hover:bg-slate-900 hover:text-white border-slate-200 text-slate-800 hover:border-slate-900'
+                                            : 'bg-slate-100/60 text-slate-400 border-slate-100 cursor-not-allowed opacity-40'
+                                    )}
+                                    title={!isActiveMonth ? __('general.future_month_disabled') || 'Future month (disabled)' : `${m.full_name} (${m.from} to ${m.to})`}
+                                >
+                                    <span>{m.name}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
             {/* General Metrics Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <StatCard
@@ -378,6 +439,23 @@ export default function Reports({
                 >
                     <Receipt className="w-4 h-4" />
                     <span>{__('general.invoices_dso_tab') || 'Invoices & Collection (DSO)'}</span>
+                </button>
+                <button
+                    onClick={() => setActiveTab('clients')}
+                    className={cn(
+                        'flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg transition-colors border-b-2 -mb-1',
+                        activeTab === 'clients'
+                            ? 'border-slate-900 text-slate-900 bg-slate-50/80'
+                            : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
+                    )}
+                >
+                    <Users className="w-4 h-4" />
+                    <span>{__('general.clients_worked_with_tab') || 'Clients Worked With'}</span>
+                    {clients_worked_with && clients_worked_with.length > 0 && (
+                        <span className="ml-1 px-2 py-0.5 text-xs bg-slate-200 text-slate-800 rounded-full font-mono font-bold">
+                            {clients_worked_with.length}
+                        </span>
+                    )}
                 </button>
             </div>
 
@@ -819,6 +897,117 @@ export default function Reports({
                         </Card>
                     </div>
                 </div>
+            )}
+
+            {/* TAB 4: CLIENTS WORKED WITH */}
+            {activeTab === 'clients' && (
+                <Card className="border-none shadow-sm shadow-slate-200/50">
+                    <CardHeader className="pb-4 border-b border-slate-100">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                                    <Users className="w-5 h-5 text-slate-700" />
+                                    {__('general.clients_worked_with') || 'Clients Worked With'}
+                                </CardTitle>
+                                <CardDescription className="text-xs text-slate-500 mt-1">
+                                    {__('general.clients_worked_with_desc') || 'List of clients with active projects, logged hours, or invoices in the selected date range.'}
+                                </CardDescription>
+                            </div>
+                            <span className="text-xs font-mono text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 font-bold">
+                                {clients_worked_with.length} {__('general.clients') || 'clients'}
+                            </span>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        {clients_worked_with && clients_worked_with.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-slate-50/80 text-xs text-slate-500 border-b border-slate-200 uppercase tracking-wider font-semibold">
+                                        <tr>
+                                            <th className="py-3.5 px-6">{__('general.client') || 'Client'}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.worked_hours') || 'Worked Hours'}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.total_invoiced') || 'Total Invoiced'}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.total_paid') || 'Total Paid'}</th>
+                                            <th className="py-3.5 px-6 text-center">{__('general.active_projects') || 'Active Projects'}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.last_activity') || 'Last Activity'}</th>
+                                            <th className="py-3.5 px-6 text-center">{__('general.actions') || 'Action'}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 font-mono text-xs">
+                                        {clients_worked_with.map((client: any) => (
+                                            <tr key={client.id} className="hover:bg-slate-50/70 transition-colors">
+                                                <td className="py-4 px-6 font-sans">
+                                                    <Link
+                                                        href={route('admin.users.show', client.id)}
+                                                        className="flex items-center gap-3 group focus:outline-none"
+                                                    >
+                                                        {client.avatar ? (
+                                                            <img
+                                                                src={client.avatar}
+                                                                alt={client.name}
+                                                                className="w-9 h-9 rounded-full object-cover border border-slate-200"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
+                                                                {client.name?.charAt(0)?.toUpperCase() || 'C'}
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <p className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1 text-sm">
+                                                                {client.name}
+                                                                <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                            </p>
+                                                            <p className="text-xs text-slate-500 font-mono">{client.email}</p>
+                                                        </div>
+                                                    </Link>
+                                                </td>
+                                                <td className="py-4 px-6 text-right font-semibold text-slate-900">
+                                                    {client.worked_hours > 0 ? (
+                                                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60 font-bold">
+                                                            <Clock className="w-3 h-3 text-emerald-600" />
+                                                            {client.worked_hours}h
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-slate-400">0h</span>
+                                                    )}
+                                                </td>
+                                                <td className="py-4 px-6 text-right font-medium text-slate-800">
+                                                    {formatMoney(client.total_invoiced, businessCurrency)}
+                                                </td>
+                                                <td className="py-4 px-6 text-right font-semibold text-emerald-600">
+                                                    {formatMoney(client.total_paid, businessCurrency)}
+                                                </td>
+                                                <td className="py-4 px-6 text-center">
+                                                    <span className="inline-flex items-center justify-center px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 font-mono">
+                                                        {client.active_projects_count}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-6 text-right text-slate-500 font-mono text-xs">
+                                                    {client.last_activity || '—'}
+                                                </td>
+                                                <td className="py-4 px-6 text-center font-sans">
+                                                    <Link
+                                                        href={route('admin.users.show', client.id)}
+                                                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors"
+                                                    >
+                                                        <span>{__('general.view_profile') || 'View'}</span>
+                                                        <ArrowUpRight className="w-3.5 h-3.5" />
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="py-12 text-center">
+                                <Users className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                                <p className="text-sm font-semibold text-slate-700">{__('general.no_clients_worked_in_period') || 'No clients worked with in the selected date range.'}</p>
+                                <p className="text-xs text-slate-400 mt-1">{__('general.try_changing_date_range') || 'Try selecting a different date range or project filter.'}</p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             )}
         </AdminSidebarLayout>
     );

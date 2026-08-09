@@ -660,53 +660,31 @@ export default function Workspace({
                         </div>
                     </div>
 
-                    {/* 60-Second Quick Onboarding Wizard */}
-                    <OnboardingWizard
-                        hasConnectedAccount={accounts.length > 0}
-                        hasTemplate={templates.length > 0}
-                        hasSentMessage={logs.length > 0}
-                        onConnectClick={() => setActiveTab('connectors')}
-                        onTemplateClick={() => setActiveTab('templates')}
-                        onSendClick={() => setActiveTab('send')}
-                    />
-
                     {/* Tabs selection */}
-                    <div className="flex border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-px gap-6 items-center justify-between">
-                        <div className="flex gap-6 overflow-x-auto">
-                            {(activeChannel === 'whatsapp'
-                                ? ['connectors', 'audiences', 'ad_performance', 'send', 'templates', 'schedules', 'logs', 'flows'] as const
-                                : ['bots', 'subscribers', 'send', 'schedules', 'logs', 'flows'] as const
-                            ).map(tab => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab as any)}
-                                    className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize flex items-center gap-2 ${activeTab === tab
-                                            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
-                                            : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
-                                        }`}
-                                >
-                                    {tab === 'connectors' ? '⚙️ Accounts & Health' :
-                                        tab === 'audiences' ? '👥 Contacts & Audiences' :
-                                            tab === 'ad_performance' ? '📊 CTWA Ad Analytics' :
-                                                tab === 'send' ? '🚀 Broadcast & Campaigns' :
-                                                    tab === 'groups' ? 'WhatsApp Groups' :
-                                                        tab === 'bots' ? 'Telegram Bots' :
-                                                            tab === 'flows' ? 'Chat Flows (Bot Builder)' :
-                                                                tab === 'subscribers' ? 'Telegram Subscribers' :
-                                                                    tab}
-                                </button>
-                            ))}
-                        </div>
-
-                        <a
-                            href={`/whatsapp-sender/businesses/${business.id}/live-chat${selectedAccountId ? `?account_id=${selectedAccountId}` : ''}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mb-3 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition shadow-md whitespace-nowrap shrink-0"
-                        >
-                            <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                            💬 Open Full-Screen WhatsApp Live Chat ↗
-                        </a>
+                    <div className="flex border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-px gap-6">
+                        {(activeChannel === 'whatsapp'
+                            ? ['connectors', 'audiences', 'ad_performance', 'send', 'templates', 'schedules', 'logs', 'flows'] as const
+                            : ['bots', 'subscribers', 'send', 'schedules', 'logs', 'flows'] as const
+                        ).map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab as any)}
+                                className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize flex items-center gap-2 ${activeTab === tab
+                                        ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
+                                        : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
+                                    }`}
+                            >
+                                {tab === 'connectors' ? '⚙️ Accounts & Health' :
+                                    tab === 'audiences' ? '👥 Contacts & Audiences' :
+                                        tab === 'ad_performance' ? '📊 CTWA Ad Analytics' :
+                                            tab === 'send' ? '🚀 Broadcast & Campaigns' :
+                                                tab === 'groups' ? 'WhatsApp Groups' :
+                                                    tab === 'bots' ? 'Telegram Bots' :
+                                                        tab === 'flows' ? 'Chat Flows (Bot Builder)' :
+                                                            tab === 'subscribers' ? 'Telegram Subscribers' :
+                                                                tab}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Tab Contents */}
