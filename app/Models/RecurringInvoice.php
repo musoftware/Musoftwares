@@ -114,7 +114,22 @@ class RecurringInvoice extends Model
                     // Fire after the transaction commits so any notification
                     // listener that reads the freshly-persisted invoice sees
                     // it (avoids race conditions in ShouldQueue handlers).
-                    DB::afterCommit(function () use ($invoice) {
+                    DB::afterCommit(function () use ($invoice, $user) {
+                        $autoPaid = false;
+                        try {
+                            $user->try_pay_unpaid_invoices();
+                            $freshInvoice = $invoice->fresh();
+                            if ($freshInvoice && $freshInvoice->status === 'paid') {
+                                $autoPaid = true;
+                            }
+                        } catch (\Throwable $e) {
+                            Log::warning('RecurringInvoice: failed during try_pay_unpaid_invoices', [
+                                'recurring_invoice_id' => $this->id,
+                                'user_id' => $user->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+
                         try {
                             event(new InvoiceCreated($invoice->fresh()));
                         } catch (\Throwable $e) {
@@ -123,6 +138,18 @@ class RecurringInvoice extends Model
                                 'invoice_id' => $invoice->id,
                                 'error' => $e->getMessage(),
                             ]);
+                        }
+
+                        if (! $autoPaid) {
+                            try {
+                                $user->notify(new \App\Notifications\RecurringInvoiceInsufficientBalanceNotification($invoice->fresh()));
+                            } catch (\Throwable $e) {
+                                Log::warning('RecurringInvoice: failed to dispatch insufficient balance notification', [
+                                    'recurring_invoice_id' => $this->id,
+                                    'invoice_id' => $invoice->id,
+                                    'error' => $e->getMessage(),
+                                ]);
+                            }
                         }
                     });
                 });

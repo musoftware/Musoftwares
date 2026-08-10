@@ -28,6 +28,32 @@ class WhatsappAccount extends Model
         'metadata' => 'array',
     ];
 
+    protected $appends = [
+        'display_phone_number',
+    ];
+
+    public function getDisplayPhoneNumberAttribute(): ?string
+    {
+        if (!empty($this->metadata['display_phone_number'])) {
+            return $this->metadata['display_phone_number'];
+        }
+
+        if (!empty($this->metadata['phone_number'])) {
+            return $this->metadata['phone_number'];
+        }
+
+        if ($this->relationLoaded('business') && $this->business) {
+            if (!empty($this->business->client_whatsapp)) {
+                return $this->business->client_whatsapp;
+            }
+            if (!empty($this->business->client_mobile)) {
+                return $this->business->client_mobile;
+            }
+        }
+
+        return null;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

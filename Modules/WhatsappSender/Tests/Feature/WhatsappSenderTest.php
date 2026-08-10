@@ -884,4 +884,38 @@ class WhatsappSenderTest extends TestCase
         $response->assertRedirect('/whatsapp-sender');
         $response->assertSessionHas('success');
     }
+
+    public function test_whatsapp_account_display_phone_number_attribute()
+    {
+        $user = User::factory()->create();
+        $business = \Modules\WhatsappSender\Models\WhatsappBusiness::create([
+            'user_id' => $user->id,
+            'name' => 'Test Biz',
+            'client_whatsapp' => '+201015218548',
+        ]);
+
+        $accountWithMeta = WhatsappAccount::create([
+            'user_id' => $user->id,
+            'whatsapp_business_id' => $business->id,
+            'name' => 'Acc With Meta',
+            'phone_number_id' => '111222333',
+            'access_token' => 'token123',
+            'metadata' => [
+                'display_phone_number' => '+201001234567',
+            ],
+        ]);
+
+        $accountWithFallback = WhatsappAccount::create([
+            'user_id' => $user->id,
+            'whatsapp_business_id' => $business->id,
+            'name' => 'Acc Fallback',
+            'phone_number_id' => '444555666',
+            'access_token' => 'token456',
+        ]);
+
+        $accountWithFallback->load('business');
+
+        $this->assertEquals('+201001234567', $accountWithMeta->display_phone_number);
+        $this->assertEquals('+201015218548', $accountWithFallback->display_phone_number);
+    }
 }

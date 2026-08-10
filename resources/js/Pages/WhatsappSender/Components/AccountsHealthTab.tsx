@@ -21,6 +21,7 @@ interface Account {
     phone_number_id: string;
     waba_id: string | null;
     status: string;
+    display_phone_number?: string | null;
     metadata?: any;
 }
 
@@ -194,6 +195,12 @@ export default function AccountsHealthTab({
                                         </div>
 
                                         <div className="text-xs text-zinc-500 flex items-center gap-2 flex-wrap font-mono">
+                                            {acc.display_phone_number && (
+                                                <>
+                                                    <span className="font-bold text-zinc-700 dark:text-zinc-300">Number: {acc.display_phone_number}</span>
+                                                    <span>&bull;</span>
+                                                </>
+                                            )}
                                             <span>WABA: {acc.waba_id || 'N/A'}</span>
                                             <span>&bull;</span>
                                             <span>Phone ID: {acc.phone_number_id}</span>

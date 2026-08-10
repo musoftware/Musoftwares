@@ -19,6 +19,12 @@ import {
     ArrowLeft,
     Shield
 } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/Components/ui/tooltip';
 
 interface Account {
     id: number;
@@ -26,6 +32,8 @@ interface Account {
     phone_number_id: string;
     waba_id: string | null;
     status: string;
+    display_phone_number?: string | null;
+    metadata?: any;
 }
 
 interface Template {
@@ -280,49 +288,57 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
             {/* 1. Leftmost Slim Multi-Account Switcher Drawer */}
             <div className="w-16 md:w-20 bg-[#f0f2f5] border-r border-[#e9edef] flex flex-col items-center py-3 space-y-4 shrink-0 z-10 overflow-hidden">
-                {/* Return to Workspace Button */}
-                <Link
-                    href={route('whatsapp.businesses.workspace', business.id)}
-                    className="w-10 h-10 rounded-full bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-600 flex items-center justify-center transition shadow-xs"
-                    title="Return to Business Workspace"
-                >
-                    <ArrowLeft className="w-5 h-5 text-zinc-700" />
-                </Link>
+                <TooltipProvider>
+                    {/* Return to Workspace Button */}
+                    <Tooltip delayDuration={150}>
+                        <TooltipTrigger asChild>
+                            <Link
+                                href={route('whatsapp.businesses.workspace', business.id)}
+                                className="w-10 h-10 rounded-full bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-600 flex items-center justify-center transition shadow-xs"
+                            >
+                                <ArrowLeft className="w-5 h-5 text-zinc-700" />
+                            </Link>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="bg-zinc-900 text-white font-bold border-zinc-800 text-xs px-3 py-1.5 shadow-xl">
+                            Return to Business Workspace
+                        </TooltipContent>
+                    </Tooltip>
 
-                <div className="w-8 border-b border-zinc-300"></div>
+                    <div className="w-8 border-b border-zinc-300"></div>
 
-                {/* Multi-Account Drawer List */}
-                <div className="flex-1 w-full overflow-y-auto space-y-3 px-2 flex flex-col items-center">
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500 text-center">Numbers</span>
-                    {accounts.length === 0 ? (
-                        <div className="text-[10px] text-zinc-400 text-center">No Numbers</div>
-                    ) : (
-                        accounts.map((acc) => {
-                            const isAccSelected = selectedAccountId === acc.id;
-                            const isAccActive = acc.status === 'active';
-                            return (
-                                <button
-                                    key={acc.id}
-                                    onClick={() => setSelectedAccountId(acc.id)}
-                                    className={`relative group w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
-                                        isAccSelected
-                                            ? 'bg-[#00a884] text-white shadow-sm border-2 border-[#00a884]'
-                                            : 'bg-white hover:bg-zinc-100 text-zinc-600 border border-zinc-200'
-                                    }`}
-                                    title={`${acc.name} (${acc.phone_number_id}) - Status: ${acc.status}`}
-                                >
-                                    <Smartphone className="w-5 h-5" />
-                                    <span className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isAccActive ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-
-                                    {/* Tooltip on hover */}
-                                    <div className="absolute left-full ml-2 px-3 py-1.5 bg-zinc-800 text-white text-xs font-bold rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50">
-                                        {acc.name} ({acc.phone_number_id})
-                                    </div>
-                                </button>
-                            );
-                        })
-                    )}
-                </div>
+                    {/* Multi-Account Drawer List */}
+                    <div className="flex-1 w-full overflow-y-auto space-y-3 px-2 flex flex-col items-center">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500 text-center">Numbers</span>
+                        {accounts.length === 0 ? (
+                            <div className="text-[10px] text-zinc-400 text-center">No Numbers</div>
+                        ) : (
+                            accounts.map((acc) => {
+                                const isAccSelected = selectedAccountId === acc.id;
+                                const isAccActive = acc.status === 'active';
+                                return (
+                                    <Tooltip key={acc.id} delayDuration={150}>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => setSelectedAccountId(acc.id)}
+                                                className={`relative w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                                                    isAccSelected
+                                                        ? 'bg-[#00a884] text-white shadow-sm border-2 border-[#00a884]'
+                                                        : 'bg-white hover:bg-zinc-100 text-zinc-600 border border-zinc-200'
+                                                }`}
+                                            >
+                                                <Smartphone className="w-5 h-5" />
+                                                <span className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isAccActive ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className="bg-zinc-900 text-white font-bold border-zinc-800 text-xs px-3 py-1.5 shadow-xl">
+                                            {acc.name} ({acc.display_phone_number || acc.phone_number_id})
+                                        </TooltipContent>
+                                    </Tooltip>
+                                );
+                            })
+                        )}
+                    </div>
+                </TooltipProvider>
             </div>
 
             {/* 2. Conversations & Search Column */}
@@ -339,7 +355,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             </h2>
                             <p className="text-[11px] text-[#00a884] font-mono font-bold flex items-center gap-1">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-                                {selectedAccount ? `${selectedAccount.name}` : 'No Line'}
+                                {selectedAccount ? `${selectedAccount.name}${selectedAccount.display_phone_number ? ` • ${selectedAccount.display_phone_number}` : ''}` : 'No Line'}
                             </p>
                         </div>
                     </div>

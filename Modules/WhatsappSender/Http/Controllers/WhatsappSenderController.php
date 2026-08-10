@@ -105,7 +105,7 @@ class WhatsappSenderController extends Controller
         }
         $business = $businessQuery->firstOrFail();
 
-        $accounts = WhatsappAccount::where('whatsapp_business_id', $id)
+        $accounts = WhatsappAccount::with('business')->where('whatsapp_business_id', $id)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -203,7 +203,7 @@ class WhatsappSenderController extends Controller
         }
         $business = $businessQuery->firstOrFail();
 
-        $accounts = WhatsappAccount::where('whatsapp_business_id', $business->id)->get();
+        $accounts = WhatsappAccount::with('business')->where('whatsapp_business_id', $business->id)->get();
         $templates = WhatsappTemplate::where('whatsapp_business_id', $business->id)
             ->where('status', 'APPROVED')
             ->get();

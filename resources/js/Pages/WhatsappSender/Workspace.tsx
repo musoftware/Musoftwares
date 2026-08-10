@@ -35,6 +35,7 @@ interface Account {
     phone_number_id: string;
     waba_id: string | null;
     status: string;
+    display_phone_number?: string | null;
     metadata?: any;
     access_token?: string;
 }
