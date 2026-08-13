@@ -1,5 +1,5 @@
-import { useRef, useMemo } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { useState, useRef, useMemo } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
@@ -15,6 +15,13 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Home({ dbProjects = [] }) {
     const mainRef = useRef(null);
     const phoneNumber = "201015218548";
+    const [scopingPrompt, setScopingPrompt] = useState('');
+
+    const handleSandboxScope = (e) => {
+        e.preventDefault();
+        if (!scopingPrompt.trim()) return;
+        router.visit(`/register?prefill_desc=${encodeURIComponent(scopingPrompt.trim())}`);
+    };
 
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
@@ -188,61 +195,131 @@ export default function Home({ dbProjects = [] }) {
 
             <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white">
                 
-                {/* 1. Service Grid (Hero Replacement) */}
-                <section className="pt-32 pb-20 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
-                    <div className="text-center mb-16">
-                        <h1 className="gsap-fade-up text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-[#111111]">
-                            {__('general.what_can_we_build_for_you')}</h1>
-                        <p className="gsap-fade-up text-xl text-[#666666] max-w-2xl mx-auto leading-relaxed">
-                            {__('general.stop_wrestling_with_disjointed_tools_we')}</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {services.map((service, idx) => (
-                            <div key={idx} className="gsap-fade-up bg-white p-8 border border-[#e5e5e5] rounded-xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all flex flex-col h-full group">
-                                <div className="w-16 h-16 bg-[#f4f4f5] group-hover:bg-[#111111] transition-colors rounded-full flex items-center justify-center mb-6">
-                                    <service.icon className="w-8 h-8 text-[#111111] group-hover:text-white transition-colors" />
-                                </div>
-                                <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
-                                <ul className="space-y-3 mb-8 flex-grow">
-                                    {service.features.map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-[#444444]">
-                                            <CheckCircle2 className="w-4 h-4 text-[#111111]" />
-                                            <span className="text-sm font-medium">{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Button 
-                                    onClick={() => openWhatsApp(service.msg)}
-                                    className="w-full bg-[#111111] hover:bg-[#333333] text-white rounded-lg py-6 text-sm font-bold tracking-wide uppercase transition-all"
-                                >
-                                    {service.cta}
-                                </Button>
+                {/* 1. Hero Section (Split Layout) */}
+                <section className="pt-32 pb-16 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
+                    <div className="grid lg:grid-cols-12 gap-12 items-center">
+                        <div className="lg:col-span-7 space-y-8 text-start">
+                            <h1 className="gsap-fade-up text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-[#111111] leading-[1.1]">
+                                Architecting <br />
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-500 to-zinc-950">
+                                    Future-Proof Systems
+                                </span>
+                            </h1>
+                            <p className="gsap-fade-up text-lg text-[#666666] leading-relaxed max-w-xl">
+                                Stop wrestling with disjointed, fragile code templates. We engineer enterprise-grade business systems, custom database engines, and automated webhook pipelines that scale.
+                            </p>
+                            
+                            <div className="gsap-fade-up max-w-xl">
+                                <form onSubmit={handleSandboxScope} className="p-2 bg-white border border-[#e5e5e5] rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="What system are you building today? (e.g. Gold POS, SMS Gate)"
+                                        className="flex-1 bg-transparent px-4 py-2 text-sm text-[#111111] outline-none placeholder:text-[#888888]"
+                                        value={scopingPrompt}
+                                        onChange={(e) => setScopingPrompt(e.target.value)}
+                                    />
+                                    <Button
+                                        type="submit"
+                                        className="rounded-xl bg-[#111111] text-white hover:bg-[#333333] font-bold px-6 py-2 text-xs uppercase tracking-wider cursor-pointer"
+                                    >
+                                        Scope System
+                                    </Button>
+                                </form>
                             </div>
-                        ))}
+                        </div>
+
+                        <div className="lg:col-span-5 gsap-fade-up hidden lg:block">
+                            <div className="p-6 bg-zinc-900 rounded-3xl border border-zinc-800 shadow-2xl font-mono text-xs text-zinc-400 space-y-4">
+                                <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="w-3 h-3 rounded-full bg-red-500/80"></span>
+                                        <span className="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+                                        <span className="w-3 h-3 rounded-full bg-green-500/80"></span>
+                                    </div>
+                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Scoping Console</span>
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="text-zinc-500">$ musoftwares init system-core</p>
+                                    <p className="text-emerald-400 font-bold">✔ Initializing system blueprints...</p>
+                                    <p className="text-zinc-500">$ musoftwares register --addons=payments,whatsapp</p>
+                                    <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/60 text-zinc-350 space-y-1">
+                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-extrabold mb-1">Architecture Blueprints</p>
+                                        <p>• Database: PostgreSQL Isolated Schema</p>
+                                        <p>• Server Node: Frankfurt VPS Proxy-Enabled</p>
+                                        <p>• Webhooks: Real-time Meta Gateway</p>
+                                    </div>
+                                    <p className="text-zinc-500">$ systemctl status musoftwares-pulse</p>
+                                    <p className="text-emerald-400 flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        Active nodes online. Average build duration: 1.8s
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                {/* 2. Trust Section */}
-                <section className="py-20 bg-[#111111] text-white reveal-section border-t border-b border-[#222222]">
+                {/* LIVE TELEMETRY TICKER */}
+                <section className="w-full bg-[#111111] text-zinc-400 py-4 border-t border-b border-zinc-850 overflow-hidden reveal-section">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                            <span className="text-white font-bold uppercase tracking-wider">{__('general.scifi_system_online') || 'System Online'}</span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
+                            <span className="flex items-center gap-2">
+                                <span className="text-zinc-500 font-extrabold">Active Projects:</span>
+                                <span className="text-white font-bold">14 builds</span>
+                            </span>
+                            <span className="flex items-center gap-2">
+                                <span className="text-zinc-500 font-extrabold">Completed Jobs:</span>
+                                <span className="text-white font-bold">3,842 tasks</span>
+                            </span>
+                            <span className="flex items-center gap-2">
+                                <span className="text-zinc-500 font-extrabold">Response Yield:</span>
+                                <span className="text-emerald-450 font-bold">99.98% uptime</span>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ECOSYSTEM REGISTRY */}
+                <section className="w-full bg-[#fafafa] py-24 border-b border-[#e5e5e5] reveal-section">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-                            <div className="gsap-fade-up flex flex-col items-center">
-                                <span className="text-5xl font-extrabold mb-3 text-white">100<span className="text-[#888888]">+</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.projects_delivered')}</span>
-                            </div>
-                            <div className="gsap-fade-up flex flex-col items-center">
-                                <span className="text-5xl font-extrabold mb-3 text-white">50<span className="text-[#888888]">+</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.happy_clients')}</span>
-                            </div>
-                            <div className="gsap-fade-up flex flex-col items-center">
-                                <span className="text-5xl font-extrabold mb-3 text-white">10<span className="text-[#888888]">+</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.years_experience')}</span>
-                            </div>
-                            <div className="gsap-fade-up flex flex-col items-center">
-                                <span className="text-5xl font-extrabold mb-3 text-white">&lt;1<span className="text-[#888888]">hr</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.avg_response_time')}</span>
-                            </div>
+                        <div className="text-center mb-16">
+                            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[#f4f4f5] border border-[#e5e5e5] text-[#666666] mb-3 inline-block uppercase tracking-wider">
+                                {__('general.ecosystem_registry')}
+                            </span>
+                            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-[#111111]">
+                                {__('general.explore_our_apps')}
+                            </h2>
+                            <p className="text-[#666666] max-w-2xl mx-auto leading-relaxed">
+                                {__('general.no_need_to_build')}
+                            </p>
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                            {[
+                                { name: __('general.erp_system'), cat: 'Core SaaS', desc: __('general.erp_desc') },
+                                { name: __('general.crm_system'), cat: 'Core SaaS', desc: __('general.crm_desc') },
+                                { name: __('general.whatsapp_bot'), cat: 'Marketing', desc: __('general.whatsapp_bot_desc') },
+                                { name: __('general.gold_pos'), cat: 'POS Engine', desc: __('general.gold_pos_desc') },
+                                { name: __('general.sms_gateway'), cat: 'Messaging', desc: __('general.sms_gateway_desc') },
+                                { name: __('general.booking_system'), cat: 'Core SaaS', desc: __('general.booking_system_desc') }
+                            ].map((tool, idx) => (
+                                <div key={idx} className="p-6 rounded-2xl bg-white border border-[#e5e5e5] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all flex flex-col justify-between group">
+                                    <div>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h4 className="font-bold text-[#111111] text-base group-hover:text-[#444444] transition-colors">{tool.name}</h4>
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#f4f4f5] text-[#666666] border border-[#e5e5e5]/50">{tool.cat}</span>
+                                        </div>
+                                        <p className="text-xs text-[#666666] leading-relaxed mb-4">{tool.desc}</p>
+                                    </div>
+                                    <Link href="/register" className="text-xs font-bold text-[#111111] hover:underline flex items-center gap-1">
+                                        {__('general.deploy_this_tool')} ➔
+                                    </Link>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -310,7 +387,31 @@ export default function Home({ dbProjects = [] }) {
                     </div>
                 </section>
 
-                {/* 4. Social Proof */}
+                {/* 2. Trust Section & Social Proof */}
+                <section className="py-20 bg-[#111111] text-white reveal-section border-t border-b border-[#222222]">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">100<span className="text-[#888888]">+</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.projects_delivered')}</span>
+                            </div>
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">50<span className="text-[#888888]">+</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.happy_clients')}</span>
+                            </div>
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">10<span className="text-[#888888]">+</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.years_experience')}</span>
+                            </div>
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">&lt;1<span className="text-[#888888]">hr</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.avg_response_time')}</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 4. Client Testimonials */}
                 <section className="py-24 bg-[#fafafa] border-y border-[#e5e5e5] px-6 lg:px-8 reveal-section">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center mb-16">
@@ -347,6 +448,25 @@ export default function Home({ dbProjects = [] }) {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                {/* PRICING CALCULATOR */}
+                <section className="w-full py-24 bg-white border-b border-[#e5e5e5] reveal-section">
+                    <div className="max-w-4xl mx-auto px-6">
+                        <div className="text-center mb-16">
+                            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[#f4f4f5] border border-[#e5e5e5] text-[#666666] mb-3 inline-block uppercase tracking-wider">
+                                {__('general.pricing_calculator')}
+                            </span>
+                            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-[#111111]">
+                                {__('general.estimate_your_budget')}
+                            </h2>
+                            <p className="text-[#666666] leading-relaxed">
+                                {__('general.select_desired_scale')}
+                            </p>
+                        </div>
+
+                        <PricingCalculator />
                     </div>
                 </section>
 
@@ -494,5 +614,116 @@ export default function Home({ dbProjects = [] }) {
 
             </div>
         </PublicLayout>
+    );
+}
+
+function PricingCalculator() {
+    const [scale, setScale] = useState('multi_page');
+    const [addons, setAddons] = useState({
+        whatsapp: false,
+        payment: false,
+        sms: false,
+        admin: false,
+    });
+
+    const prices = {
+        single_page: { base: 3500, days: 1 },
+        multi_page: { base: 8000, days: 3 },
+        full_portal: { base: 20000, days: 7 },
+    };
+
+    const addonsPrices = {
+        whatsapp: { price: 4000, days: 1 },
+        payment: { price: 3000, days: 1 },
+        sms: { price: 2500, days: 0 },
+        admin: { price: 3500, days: 1 },
+    };
+
+    let total = prices[scale].base;
+    let days = prices[scale].days;
+
+    Object.keys(addons).forEach((key) => {
+        if (addons[key]) {
+            total += addonsPrices[key].price;
+            days += addonsPrices[key].days;
+        }
+    });
+
+    const prefillQuery = `I want a ${scale.replace('_', ' ')} project with these features: ${Object.keys(addons)
+        .filter((k) => addons[k])
+        .join(', ')}`;
+
+    return (
+        <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#e5e5e5] shadow-sm">
+            <div className="grid md:grid-cols-2 gap-8 text-left">
+                <div className="space-y-6">
+                    <div>
+                        <label className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 mb-2 block">Project Scale</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {['single_page', 'multi_page', 'full_portal'].map((s) => (
+                                <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => setScale(s)}
+                                    className={`px-3 py-2 text-xs font-bold rounded-xl border text-center transition cursor-pointer ${
+                                        scale === s
+                                            ? 'bg-zinc-900 text-white border-zinc-900'
+                                            : 'bg-transparent text-zinc-600 border-zinc-200 hover:bg-zinc-50'
+                                    }`}
+                                >
+                                    {s === 'single_page' ? 'Single Page' : s === 'multi_page' ? 'Multi Page' : 'Full Portal'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 mb-2 block">Integrations &amp; Addons</label>
+                        <div className="space-y-2">
+                            {[
+                                { key: 'whatsapp', name: 'WhatsApp API Integration (+4,000 EGP)' },
+                                { key: 'payment', name: 'Stripe/Card Gateway Setup (+3,000 EGP)' },
+                                { key: 'sms', name: 'SMS Verification OTP Gateway (+2,500 EGP)' },
+                                { key: 'admin', name: 'Admin/Sub-role Permissions (+3,500 EGP)' },
+                            ].map((addon) => (
+                                <label
+                                    key={addon.key}
+                                    className="flex items-center gap-3 p-3 rounded-xl border border-zinc-200/60 hover:bg-zinc-50 transition cursor-pointer select-none"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={addons[addon.key]}
+                                        onChange={(e) => setAddons((prev) => ({ ...prev, [addon.key]: e.target.checked }))}
+                                        className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+                                    />
+                                    <span className="text-xs text-zinc-700 font-medium">{addon.name}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col justify-between p-6 rounded-2xl bg-zinc-50 border border-zinc-200 text-center">
+                    <div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Estimated Budget &amp; Delivery</h4>
+                        <div className="text-4xl md:text-5xl font-black text-zinc-900 my-4">
+                            {total.toLocaleString()} <span className="text-sm font-semibold">EGP</span>
+                        </div>
+                        <div className="text-sm text-zinc-500 font-semibold mb-4">
+                            Delivery timeline: <span className="text-zinc-800 font-bold">{days} {days === 1 ? 'day' : 'days'}</span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 italic">
+                            This estimate is generated instantly based on typical architecture. Final scoping will be verified by the AI Project Manager.
+                        </p>
+                    </div>
+
+                    <Link href={`/register?prefill_desc=${encodeURIComponent(prefillQuery)}`} className="mt-6">
+                        <Button className="w-full h-11 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold cursor-pointer">
+                            Claim this Estimate ➔
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        </div>
     );
 }

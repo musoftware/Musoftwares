@@ -774,7 +774,12 @@
             },
             "solutions": {
                 "cs1_title": "نظام إدارة علاقات العملاء لفودافون"
-            }
+            },
+            "subscription_expired_subject": "انتهى الاشتراك: الإجراء مطلوب",
+            "subscription_expired_greeting": "مرحباً :name،",
+            "subscription_expired_body": "لقد انتهى اشتراكك في موديل :module بتاريخ :date.",
+            "subscription_expired_action": "تجديد الاشتراك الآن",
+            "subscription_expired_footer": "يرجى تجديد اشتراكك لتجنب فقدان إمكانية الوصول إلى بياناتك وميزاتك."
         },
         "client": {
             "dashboard": {
@@ -10129,7 +10134,28 @@
             "manage_emails": "إدارة البريد الإلكتروني",
             "mark_verified": "تعيين كمتحقق منه",
             "no_additional_emails": "لا توجد عناوين بريد إلكتروني إضافية مضافة.",
-            "whatsapp_float_default_msg": "محمود هنا 👋 أرسل لي تفاصيل مشروعك"
+            "whatsapp_float_default_msg": "محمود هنا 👋 أرسل لي تفاصيل مشروعك",
+            "quick_select": "اختيار سريع",
+            "start_with_preset": "أو ابدأ بنموذج جاهز:",
+            "ecosystem_registry": "سجل النظام البيئي",
+            "explore_our_apps": "استكشف أنظمتنا وتطبيقاتنا الجاهزة للتشغيل",
+            "no_need_to_build": "لا حاجة للبدء من الصفر. تأتي منصتنا متكاملة مع مكتبة من الأدوات والأنظمة الجاهزة للإطلاق الفوري لمؤسستك.",
+            "deploy_this_tool": "قم بتشغيل هذه الأداة الآن",
+            "pricing_calculator": "حاسبة التكاليف المباشرة",
+            "estimate_your_budget": "احسب ميزانية مشروعك المخصصة فورياً",
+            "select_desired_scale": "اختر حجم المشروع والإضافات المطلوبة أدناه للحصول على تقدير فوري للتكلفة وجدول التسليم.",
+            "erp_system": "نظام ERP للمؤسسات",
+            "erp_desc": "نظام إدارة المؤسسات والحسابات المالية والفواتير وشجرة الحسابات المتكاملة والمخازن.",
+            "crm_system": "نظام إدارة العملاء CRM",
+            "crm_desc": "إدارة علاقات العملاء والقيادة، متابعة العروض وسجل التفاعلات والمراحل البيعية للمشاريع.",
+            "whatsapp_bot": "منصة واتساب المؤتمتة",
+            "whatsapp_bot_desc": "أتمتة المحادثات والحملات الترويجية، دعم العملاء والربط البرمجي الكامل لإرسال الرسائل الجماعية.",
+            "gold_pos": "نظام كاشير الذهب POS",
+            "gold_pos_desc": "نظام نقاط بيع مخصص لمحلات وتداول الذهب والمجوهرات ومتابعة الأسعار والبورصة المباشرة.",
+            "sms_gateway": "بوابة الرسائل النصية SMS",
+            "sms_gateway_desc": "بوابة إرسال الرسائل القصيرة OTP، إشعارات الدفع والتحقق الثنائي عبر رسائل الهواتف.",
+            "booking_system": "نظام حجز المواعيد والاستشارات",
+            "booking_system_desc": "منصة متكاملة لحجز المواعيد، الجداول الزمنية ومستشاري حجز الحصص وربطها بالتقويم."
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -10810,6 +10836,20 @@
                 "edit_help_text": "تأكد من تحديث أسعار وباقات الخدمة عند التعديل",
                 "title": "نصيحة هامة"
             }
+        },
+        "presets": {
+            "ecommerce_title": "متجر إلكتروني",
+            "ecommerce_name": "متجري الإلكتروني",
+            "ecommerce_desc": "أريد متجراً إلكترونياً لبيع المنتجات بالتجزئة.\n\nالمميزات الأساسية:\n- كتالوج المنتجات والبحث حسب التصنيفات\n- سلة التسوق وخطوات إتمام الشراء الميسرة\n- بوابات الدفع الإلكتروني (البطاقات الائتمانية والمحافظ الرقمية)\n- تتبع تاريخ طلبات العملاء وحالات الشحن\n- لوحة تحكم الإدارة لمتابعة المخزون والطلبات.",
+            "whatsapp_title": "بوت واتساب",
+            "whatsapp_name": "مساعد التسويق عبر الواتساب",
+            "whatsapp_desc": "أحتاج إلى روبوت محادثة تلقائي (Chatbot) عبر الواتساب لمساعدة العملاء والتسويق.\n\nالمميزات الأساسية:\n- الرد التلقائي على الكلمات المفتاحية الشائعة للعملاء\n- قوائم خيارات تفاعلية لتوجيه العميل\n- نماذج جمع بيانات العملاء المهتمين وتخزينها تلقائياً\n- الربط المباشر مع نظام إدارة العملاء CRM\n- لوحة إرسال وإدارة الحملات الإعلانية الجماعية المجدولة.",
+            "corporate_title": "موقع تعريفي للشركة",
+            "corporate_name": "الموقع التعريفي للشركة",
+            "corporate_desc": "أريد موقعاً تعريفياً وتفصيلياً احترافياً لأعمال وخدمات شركتنا.\n\nالمميزات الأساسية:\n- تصميم متجاوب فائق السرعة والأداء ومتوافق مع الهواتف الذكية\n- أقسام \"من نحن\" واستعراض \"خدماتنا\"\n- معرض أعمال ديناميكي لعرض المشاريع السابقة\n- نموذج تواصل آمن مع إرسال إشعارات فورية للبريد\n- ربط خرائط جوجل ووسائل التواصل الاجتماعي الرسمية.",
+            "saas_title": "بوابة عملاء SaaS",
+            "saas_name": "بوابة العملاء والاشتراكات الخاصة بنا",
+            "saas_desc": "أريد نظام بوابة عملاء آمن ومخصص لإدارة الاشتراكات والخدمات الرقمية.\n\nالمميزات الأساسية:\n- تسجيل الدخول وإنشاء حسابات للعملاء وإدارة الملفات الشخصية\n- ربط باقات الاشتراك والفوترة وتجديد المدفوعات\n- نموذج لتقديم تذاكر الدعم الفني والمتابعة\n- إشعارات حية وتنبيهات فورية للمستخدمين بالجديد\n- لوحة تحكم للعميل تعرض تفاصيل استهلاكه وتقرير الخدمات."
         },
         "reports": {
             "conversion_rate": "معدل التحويل",
@@ -12787,7 +12827,12 @@
             "widget_deleted_successfully": "Widget Deleted Successfully",
             "widget_updated": "Widget Updated",
             "widget_updated_successfully": "Widget Updated Successfully",
-            "your_musoftwares_account": "Your Musoftwares Account"
+            "your_musoftwares_account": "Your Musoftwares Account",
+            "subscription_expired_subject": "Subscription Expired: Action Required",
+            "subscription_expired_greeting": "Hello :name,",
+            "subscription_expired_body": "Your subscription for the :module module has expired on :date.",
+            "subscription_expired_action": "Renew Subscription Now",
+            "subscription_expired_footer": "Please renew your subscription to avoid losing access to your data and features."
         },
         "client": {
             "dashboard": {
@@ -22142,7 +22187,28 @@
             "manage_emails": "Manage Emails",
             "mark_verified": "Mark as Verified",
             "no_additional_emails": "No additional email addresses added.",
-            "whatsapp_float_default_msg": "Mahmoud here 👋 here is my project details"
+            "whatsapp_float_default_msg": "Mahmoud here 👋 here is my project details",
+            "quick_select": "Quick Select",
+            "start_with_preset": "Or start with a preset template:",
+            "ecosystem_registry": "Ecosystem Registry",
+            "explore_our_apps": "Explore Our Apps & SaaS Systems",
+            "no_need_to_build": "No need to build from scratch. Our platform comes pre-integrated with a library of enterprise-grade tools ready to launch instantly.",
+            "deploy_this_tool": "Deploy this tool",
+            "pricing_calculator": "Pricing Calculator",
+            "estimate_your_budget": "Estimate Your Custom Scoped Budget",
+            "select_desired_scale": "Select your desired scale and integrations below to calculate an instant cost and delivery estimate.",
+            "erp_system": "ERP System",
+            "erp_desc": "Enterprise Resource Planning system for financials, invoices, and chart of accounts.",
+            "crm_system": "CRM System",
+            "crm_desc": "Customer Relationship Management with leads tracking, pipelines, and deals registry.",
+            "whatsapp_bot": "WhatsApp Bot",
+            "whatsapp_bot_desc": "Automated campaigns, customer support chats, and bulk WhatsApp broadcast flows.",
+            "gold_pos": "Gold POS System",
+            "gold_pos_desc": "Cashier register, gold trading POS, jewelry weights, and live global price telemetry.",
+            "sms_gateway": "SMS Gateway",
+            "sms_gateway_desc": "Short message gateway, OTP verification, billing notices, and SMS alert APIs.",
+            "booking_system": "Booking System",
+            "booking_system_desc": "Appointment booking platform, availability schedules, and consultant calendars."
         },
         "gold_saver": {
             "achieved": "Achieved",
@@ -22823,6 +22889,20 @@
             "total_value": "Total Value",
             "view_in_admin_panel": "View In Admin Panel",
             "yes_the_android_app_only": "Yes The Android App Only"
+        },
+        "presets": {
+            "ecommerce_title": "E-Commerce App",
+            "ecommerce_name": "My Online Store",
+            "ecommerce_desc": "I want an online store to sell retail products.\n\nKey features:\n- Product catalog and category search\n- Shopping cart and checkout flow\n- Online payment integration (credit card, digital wallets)\n- Customer order history tracking\n- Admin panel for stock and orders management.",
+            "whatsapp_title": "WhatsApp Bot",
+            "whatsapp_name": "WhatsApp Marketing Assistant",
+            "whatsapp_desc": "I need an automated WhatsApp chatbot helper for marketing.\n\nKey features:\n- Auto-reply to common customer keywords\n- Interactive menus with selection options\n- Lead generation form capturing data\n- Integration with our CRM system\n- Scheduled broadcast campaigns dashboard.",
+            "corporate_title": "Corporate Web",
+            "corporate_name": "Company Portfolio Website",
+            "corporate_desc": "I need a professional landing page and portfolio website for my business.\n\nKey features:\n- High-performance, mobile-responsive layout\n- \"About Us\" and \"Our Services\" sections\n- Dynamic portfolio gallery showcasing past work\n- Secure contact form with email notifications\n- Google Maps and social media link integrations.",
+            "saas_title": "SaaS Client Portal",
+            "saas_name": "Custom SaaS Client Portal",
+            "saas_desc": "I want a secure subscription client portal for our services.\n\nKey features:\n- Client login\/signup and profile management\n- Subscription package billing integration\n- Secure ticket submission for help support\n- Live notifications for updates\n- Dynamic user dashboard for metrics."
         },
         "reports": {
             "admin": "Admin",

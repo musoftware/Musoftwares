@@ -15,6 +15,7 @@ Artisan::command('inspire', function () {
 Schedule::command(FetchExchangeRates::class)->dailyAt('00:00');
 
 Schedule::command(RenewSubscriptions::class)->dailyAt('03:00');
+Schedule::command(\App\Console\Commands\SendSubscriptionExpiryReminders::class)->dailyAt('03:15')->timezone('Africa/Cairo');
 Schedule::command(\App\Console\Commands\RenewPlatformSubscriptions::class)->dailyAt('03:30');
 Schedule::command(CleanupExpiredFbmbResults::class)->dailyAt('04:00');
 
@@ -36,8 +37,11 @@ Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::clas
 // Background translation of untranslated marketplace services hourly
 Schedule::command(\App\Console\Commands\TranslateMarketplaceServices::class)->hourly()->withoutOverlapping(10);
 
-// Automatically generate AI blog articles daily at 02:00
-Schedule::command(\App\Console\Commands\GenerateBlogArticles::class, ['--limit' => 5])->dailyAt('02:00')->withoutOverlapping(10);
+// Automatically generate AI blog articles daily at 02:00 Cairo Time
+Schedule::command(\App\Console\Commands\GenerateBlogArticles::class, ['--limit' => 5, '--lang' => 'all'])
+    ->dailyAt('02:00')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(10);
 
 // Send daily new services digest daily at 23:30 Cairo Time
 Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dailyAt('23:30')->timezone('Africa/Cairo');

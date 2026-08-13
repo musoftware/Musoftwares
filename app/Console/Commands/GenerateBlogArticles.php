@@ -20,7 +20,7 @@ class GenerateBlogArticles extends Command
     protected $signature = 'blog:generate-articles 
                             {--service_id= : Specific Service ID to generate for} 
                             {--limit=5 : Maximum number of articles to generate in this run} 
-                            {--lang=en : Language code for the generated articles (en or ar)}';
+                            {--lang=all : Language code for the generated articles (en, ar, or all)}';
 
     /**
      * The console command description.
@@ -40,8 +40,8 @@ class GenerateBlogArticles extends Command
         $limit = (int) $this->option('limit');
         $lang = strtolower($this->option('lang'));
 
-        if (!in_array($lang, ['en', 'ar'])) {
-            $this->error("Invalid language: '{$lang}'. Only 'en' and 'ar' are supported.");
+        if (!in_array($lang, ['en', 'ar', 'all'])) {
+            $this->error("Invalid language: '{$lang}'. Only 'en', 'ar', and 'all' are supported.");
             return self::FAILURE;
         }
 
@@ -72,72 +72,80 @@ class GenerateBlogArticles extends Command
                     break;
                 }
 
-                $existingArticles = BlogArticle::where('service_id', $service->id)
-                    ->where('language', $lang)
-                    ->get();
+                $targetLangs = $lang === 'all' ? ['en', 'ar'] : [$lang];
 
-                if ($existingArticles->count() >= 20) {
-                    $this->info("Service #{$service->id} already has {$existingArticles->count()} articles in '{$lang}'. Skipping.");
-                    continue;
-                }
+                foreach ($targetLangs as $targetLang) {
+                    if ($count >= $limit) {
+                        break;
+                    }
 
-                $this->info("------------------------------------------------------------");
-                $this->info("Generating article {$count} of {$limit} for Service #{$service->id}: '{$service->title}' ({$lang})");
+                    $existingArticles = BlogArticle::where('service_id', $service->id)
+                        ->where('language', $targetLang)
+                        ->get();
 
-                $existingTitles = $existingArticles->pluck('title')->toArray();
-
-                try {
-                    // Call LLM content engine
-                    $articleData = $blogAiService->generateArticleForService($service, $existingTitles, $lang);
-
-                    if (!$articleData || empty($articleData['title'])) {
-                        $this->error("Failed to generate article content from AI.");
+                    if ($existingArticles->count() >= 20) {
+                        $this->info("Service #{$service->id} already has {$existingArticles->count()} articles in '{$targetLang}'. Skipping.");
                         continue;
                     }
 
-                    // Strict duplication check
-                    if (in_array($articleData['title'], $existingTitles)) {
-                        $this->warn("AI generated duplicate title: '{$articleData['title']}'. Skipping.");
-                        continue;
+                    $this->info("------------------------------------------------------------");
+                    $this->info("Generating article " . ($count + 1) . " of {$limit} for Service #{$service->id}: '{$service->title}' ({$targetLang})");
+
+                    $existingTitles = $existingArticles->pluck('title')->toArray();
+
+                    try {
+                        // Call LLM content engine
+                        $articleData = $blogAiService->generateArticleForService($service, $existingTitles, $targetLang);
+
+                        if (!$articleData || empty($articleData['title'])) {
+                            $this->error("Failed to generate article content from AI.");
+                            continue;
+                        }
+
+                        // Strict duplication check
+                        if (in_array($articleData['title'], $existingTitles)) {
+                            $this->warn("AI generated duplicate title: '{$articleData['title']}'. Skipping.");
+                            continue;
+                        }
+
+                        $this->info("Generated Topic: '{$articleData['title']}'");
+
+                        // Call LLM visual engine to generate cover image
+                        $imagePath = null;
+                        $imagePrompt = $articleData['image_prompt'] ?? $articleData['title'];
+
+                        $this->info("Generating visual cover image...");
+                        $imageResult = $marketplaceAiService->generateCoverImage($imagePrompt, $service->seller_id ?: 1);
+                        if (!empty($imageResult['gallery']) && isset($imageResult['gallery'][0])) {
+                            $imagePath = $imageResult['gallery'][0];
+                        }
+
+                        // Create & Publish
+                        $article = BlogArticle::create([
+                            'service_id' => $service->id,
+                            'language' => $targetLang,
+                            'group_id' => (string) Str::uuid(),
+                            'title' => $articleData['title'],
+                            'slug' => BlogArticle::generateUniqueSlug($articleData['title']),
+                            'content' => $articleData['content'],
+                            'excerpt' => $articleData['excerpt'] ?? Str::limit(strip_tags($articleData['content']), 150),
+                            'featured_image' => $imagePath,
+                            'meta_title' => $articleData['meta_title'] ?? $articleData['title'],
+                            'meta_description' => $articleData['meta_description'] ?? $articleData['excerpt'],
+                            'is_published' => true,
+                            'published_at' => now(),
+                        ]);
+
+                        $this->info("Successfully published: [{$article->id}] '{$article->title}'");
+                        $count++;
+                        $generatedInThisRun = true;
+
+                    } catch (\Exception $e) {
+                        $this->error("Error: " . $e->getMessage());
+                        Log::error("Blog generation failed for service {$service->id}: " . $e->getMessage(), [
+                            'exception' => $e
+                        ]);
                     }
-
-                    $this->info("Generated Topic: '{$articleData['title']}'");
-
-                    // Call LLM visual engine to generate cover image
-                    $imagePath = null;
-                    $imagePrompt = $articleData['image_prompt'] ?? $articleData['title'];
-
-                    $this->info("Generating visual cover image...");
-                    $imageResult = $marketplaceAiService->generateCoverImage($imagePrompt, $service->seller_id ?: 1);
-                    if (!empty($imageResult['gallery']) && isset($imageResult['gallery'][0])) {
-                        $imagePath = $imageResult['gallery'][0];
-                    }
-
-                    // Create & Publish
-                    $article = BlogArticle::create([
-                        'service_id' => $service->id,
-                        'language' => $lang,
-                        'group_id' => (string) Str::uuid(),
-                        'title' => $articleData['title'],
-                        'slug' => BlogArticle::generateUniqueSlug($articleData['title']),
-                        'content' => $articleData['content'],
-                        'excerpt' => $articleData['excerpt'] ?? Str::limit(strip_tags($articleData['content']), 150),
-                        'featured_image' => $imagePath,
-                        'meta_title' => $articleData['meta_title'] ?? $articleData['title'],
-                        'meta_description' => $articleData['meta_description'] ?? $articleData['excerpt'],
-                        'is_published' => true,
-                        'published_at' => now(),
-                    ]);
-
-                    $this->info("Successfully published: [{$article->id}] '{$article->title}'");
-                    $count++;
-                    $generatedInThisRun = true;
-
-                } catch (\Exception $e) {
-                    $this->error("Error: " . $e->getMessage());
-                    Log::error("Blog generation failed for service {$service->id}: " . $e->getMessage(), [
-                        'exception' => $e
-                    ]);
                 }
             }
         }

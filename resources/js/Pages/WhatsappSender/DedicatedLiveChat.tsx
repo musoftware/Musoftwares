@@ -180,6 +180,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             }
         }, 5000);
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [business.id]);
 
     // Fetch messages immediately when selectedPhone changes
@@ -189,6 +190,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
         } else {
             setMessages([]);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPhone]);
 
     const handleSendMessage = async (e?: React.FormEvent) => {

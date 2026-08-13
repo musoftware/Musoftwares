@@ -157,5 +157,103 @@ class BlogSystemTest extends TestCase
             'is_published' => true,
         ]);
     }
+
+    public function test_blog_index_filters_articles_by_locale(): void
+    {
+        BlogArticle::create([
+            'title' => 'English Post Title',
+            'slug' => 'english-post-title',
+            'content' => 'English content.',
+            'excerpt' => 'English excerpt',
+            'is_published' => true,
+            'published_at' => now(),
+            'language' => 'en',
+        ]);
+
+        BlogArticle::create([
+            'title' => 'Arabic Post Title',
+            'slug' => 'arabic-post-title',
+            'content' => 'Arabic content.',
+            'excerpt' => 'Arabic excerpt',
+            'is_published' => true,
+            'published_at' => now(),
+            'language' => 'ar',
+        ]);
+
+        // Default locale / English locale index
+        $response = $this->get(route('blog.index', ['lang' => 'en']));
+        $response->assertStatus(200);
+        $response->assertSee('English Post Title');
+        $response->assertDontSee('Arabic Post Title');
+
+        // Arabic locale index
+        $response = $this->get(route('blog.index', ['lang' => 'ar']));
+        $response->assertStatus(200);
+        $response->assertSee('Arabic Post Title');
+        $response->assertDontSee('English Post Title');
+    }
+
+    public function test_artisan_command_generates_articles_for_both_languages_when_lang_is_all(): void
+    {
+        $seller = User::factory()->create();
+
+        $service = Service::create([
+            'seller_id' => $seller->id,
+            'title' => 'AI Service Test',
+            'slug' => 'ai-service-test',
+            'status' => 'active',
+            'description' => 'Test AI generation.',
+        ]);
+
+        $mockAiService = $this->mock(BlogAiService::class);
+        $mockAiService->shouldReceive('generateArticleForService')
+            ->once()
+            ->with(\Mockery::on(function ($arg) use ($service) {
+                return $arg->id === $service->id;
+            }), \Mockery::any(), 'en')
+            ->andReturn([
+                'title' => 'English Service Blog Post',
+                'excerpt' => 'AI Excerpt',
+                'content' => 'AI content body.',
+                'meta_title' => 'AI Meta Title',
+                'meta_description' => 'AI Meta Description',
+                'image_prompt' => 'Visual prompt',
+            ]);
+
+        $mockAiService->shouldReceive('generateArticleForService')
+            ->once()
+            ->with(\Mockery::on(function ($arg) use ($service) {
+                return $arg->id === $service->id;
+            }), \Mockery::any(), 'ar')
+            ->andReturn([
+                'title' => 'Arabic Service Blog Post',
+                'excerpt' => 'AI Excerpt Arabic',
+                'content' => 'AI content body Arabic.',
+                'meta_title' => 'AI Meta Title Arabic',
+                'meta_description' => 'AI Meta Description Arabic',
+                'image_prompt' => 'Visual prompt Arabic',
+            ]);
+
+        $exitCode = $this->artisan('blog:generate-articles', [
+            '--service_id' => $service->id,
+            '--limit' => 2,
+            '--lang' => 'all'
+        ]);
+        $this->assertEquals(0, $exitCode);
+
+        $this->assertDatabaseHas('blog_articles', [
+            'service_id' => $service->id,
+            'title' => 'English Service Blog Post',
+            'language' => 'en',
+            'is_published' => true,
+        ]);
+
+        $this->assertDatabaseHas('blog_articles', [
+            'service_id' => $service->id,
+            'title' => 'Arabic Service Blog Post',
+            'language' => 'ar',
+            'is_published' => true,
+        ]);
+    }
 }
 

@@ -158,6 +158,7 @@ export default function Workspace({
                 setSelectedAccountId(activeAcc.id);
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [accounts]);
 
     const [editingFlow, setEditingFlow] = useState<any | null>(null);

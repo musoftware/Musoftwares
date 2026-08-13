@@ -109,45 +109,49 @@ try {
 if ($dbStatus -eq "ONLINE") {
     Write-Host "-> Database connection is ONLINE. Preparing E2E test users..." -ForegroundColor DarkGray
     cmd.exe /c "C:\tools\php83\php.exe scripts/ensure_e2e_users.php"
-
-    $serverAlreadyRunning = $false
-    $tcpConnection = New-Object System.Net.Sockets.TcpClient
-    try {
-        $tcpConnection.Connect("127.0.0.1", 8000)
-        $serverAlreadyRunning = $true
-        $tcpConnection.Close()
-        Write-Host "-> Local web server is already running on port 8000." -ForegroundColor DarkGray
-    } catch {
-        # Not running
-    }
-
-    $serverProcess = $null
-    $testExitCode = 0
-    try {
-        if (-not $serverAlreadyRunning) {
-            Write-Host "-> Starting local Laravel server on port 8000..." -ForegroundColor DarkGray
-            $serverProcess = Start-Process "C:\tools\php83\php.exe" -ArgumentList "artisan serve --host=127.0.0.1 --port=8000 --env=local" -PassThru -NoNewWindow
-            Start-Sleep -Seconds 3
-        }
-
-        Write-Host "-> Running Playwright console error test suite..." -ForegroundColor DarkGray
-        cmd.exe /c "npx playwright test tests/E2E/console_errors.spec.ts"
-        $testExitCode = $LASTEXITCODE
-    } finally {
-        if (-not $serverAlreadyRunning -and $serverProcess) {
-            Write-Host "-> Stopping local Laravel server..." -ForegroundColor DarkGray
-            Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
-        }
-    }
-
-    if ($testExitCode -ne 0) {
-        Write-Host "E2E Smoke / Console Error check failed! Upload aborted. Please fix the console errors shown above." -ForegroundColor Red
-        exit 1
-    } else {
-        Write-Host "-> E2E Smoke / Console Error check passed successfully." -ForegroundColor Green
-    }
 } else {
-    Write-Host "WARNING: Database connection is OFFLINE. Skipping E2E console error verification tests!" -ForegroundColor Yellow
+    Write-Host "-> Database connection is OFFLINE. Running public static smoke E2E verification only..." -ForegroundColor Yellow
+}
+
+$serverAlreadyRunning = $false
+$tcpConnection = New-Object System.Net.Sockets.TcpClient
+try {
+    $tcpConnection.Connect("127.0.0.1", 8000)
+    $serverAlreadyRunning = $true
+    $tcpConnection.Close()
+    Write-Host "-> Local web server is already running on port 8000." -ForegroundColor DarkGray
+} catch {
+    # Not running
+}
+
+$serverProcess = $null
+$testExitCode = 0
+try {
+    if (-not $serverAlreadyRunning) {
+        Write-Host "-> Starting local Laravel server on port 8000..." -ForegroundColor DarkGray
+        $serverProcess = Start-Process "C:\tools\php83\php.exe" -ArgumentList "artisan serve --host=127.0.0.1 --port=8000 --env=local" -PassThru -NoNewWindow
+        Start-Sleep -Seconds 3
+    }
+
+    Write-Host "-> Running Playwright console error test suite..." -ForegroundColor DarkGray
+    if ($dbStatus -eq "ONLINE") {
+        cmd.exe /c "npx playwright test tests/E2E/console_errors.spec.ts"
+    } else {
+        cmd.exe /c "npx playwright test tests/E2E/console_errors.spec.ts --grep `"Public routes`""
+    }
+    $testExitCode = $LASTEXITCODE
+} finally {
+    if (-not $serverAlreadyRunning -and $serverProcess) {
+        Write-Host "-> Stopping local Laravel server..." -ForegroundColor DarkGray
+        Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
+    }
+}
+
+if ($testExitCode -ne 0) {
+    Write-Host "E2E Smoke / Console Error check failed! Upload aborted. Please fix the console errors shown above." -ForegroundColor Red
+    exit 1
+} else {
+    Write-Host "-> E2E Smoke / Console Error check passed successfully." -ForegroundColor Green
 }
 
 # 3. Archive Files (Using tar.exe which is faster and avoids lock bugs)

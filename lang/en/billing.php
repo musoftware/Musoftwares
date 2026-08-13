@@ -75,5 +75,10 @@ return [
     'widget_deleted_successfully' => 'Widget Deleted Successfully',
     'widget_updated' => 'Widget Updated',
     'widget_updated_successfully' => 'Widget Updated Successfully',
-    'your_musoftwares_account' => 'Your Musoftwares Account'
+    'your_musoftwares_account' => 'Your Musoftwares Account',
+    'subscription_expired_subject' => 'Subscription Expired: Action Required',
+    'subscription_expired_greeting' => 'Hello :name,',
+    'subscription_expired_body' => 'Your subscription for the :module module has expired on :date.',
+    'subscription_expired_action' => 'Renew Subscription Now',
+    'subscription_expired_footer' => 'Please renew your subscription to avoid losing access to your data and features.',
 ];

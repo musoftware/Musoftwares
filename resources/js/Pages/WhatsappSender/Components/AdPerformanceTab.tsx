@@ -48,6 +48,7 @@ export default function AdPerformanceTab({ businessId, perMessageFee }: Props) {
 
     useEffect(() => {
         fetchAdPerformance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [businessId]);
 
     const formatTimestamp = (dateStr: string) => {

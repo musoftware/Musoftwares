@@ -14,6 +14,17 @@ export default function CreateProject() {
         description: '',
     });
 
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const prefill = params.get('prefill_desc');
+            if (prefill) {
+                setData('description', decodeURIComponent(prefill));
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('client.projects.store-new'));
@@ -54,6 +65,53 @@ export default function CreateProject() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="p-6">
+                        {/* Scoping Presets Grid */}
+                        <div className="space-y-2 mb-6 border-b border-slate-100 pb-5">
+                            <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
+                                {__('general.start_with_preset') || 'Or start with a preset template:'}
+                            </label>
+                            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                                {[
+                                    {
+                                        title: __('presets.ecommerce_title') || 'E-Commerce App',
+                                        name: __('presets.ecommerce_name') || 'My Online Store',
+                                        desc: __('presets.ecommerce_desc') || 'I want an online store to sell retail products...',
+                                    },
+                                    {
+                                        title: __('presets.whatsapp_title') || 'WhatsApp Bot',
+                                        name: __('presets.whatsapp_name') || 'WhatsApp Marketing Assistant',
+                                        desc: __('presets.whatsapp_desc') || 'I need an automated WhatsApp chatbot helper...',
+                                    },
+                                    {
+                                        title: __('presets.corporate_title') || 'Corporate Web',
+                                        name: __('presets.corporate_name') || 'Company Portfolio Website',
+                                        desc: __('presets.corporate_desc') || 'I need a professional landing page...',
+                                    },
+                                    {
+                                        title: __('presets.saas_title') || 'SaaS Client Portal',
+                                        name: __('presets.saas_name') || 'Custom SaaS Client Portal',
+                                        desc: __('presets.saas_desc') || 'I want a secure subscription client portal...',
+                                    },
+                                ].map((preset, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={() => {
+                                            setData((prev) => ({
+                                                ...prev,
+                                                project_name: preset.name,
+                                                description: preset.desc,
+                                            }));
+                                        }}
+                                        className="flex flex-col items-center justify-center p-3 text-center border border-slate-200/80 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/20 active:bg-indigo-50 transition cursor-pointer"
+                                    >
+                                        <span className="text-xs font-bold text-slate-800">{preset.title}</span>
+                                        <span className="text-[10px] text-slate-400 mt-1">{__('general.quick_select') || 'Quick Select'}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <form onSubmit={handleSubmit} className="space-y-6">
                             
                             {/* Project Name */}

@@ -20,6 +20,8 @@ class UserSubscription extends Model
         'started_at',
         'expires_at',
         'auto_renew',
+        'expired_reminders_sent',
+        'last_expired_reminder_sent_at',
     ];
 
     protected $casts = [

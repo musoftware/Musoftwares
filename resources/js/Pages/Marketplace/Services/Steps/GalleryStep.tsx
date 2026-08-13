@@ -272,6 +272,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
             }));
             syncState([...items, ...newItems]);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data.gallery, data.kept_gallery, data.gallery_order, setData]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({

@@ -123,6 +123,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                 setSelectedAccountId(activeAcc.id);
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [accounts]);
 
     const scrollToBottom = () => {
@@ -184,6 +185,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
             }
         }, 5000);
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [business.id]);
 
     // Handle selection change
@@ -193,6 +195,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
         } else {
             setMessages([]);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPhone]);
 
     // Send direct text or template message

@@ -15,9 +15,11 @@ class BlogController extends Controller
     public function index()
     {
         $search = request('search');
+        $locale = app()->getLocale();
 
         $articles = BlogArticle::with('service.seller')
             ->published()
+            ->where('language', $locale)
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")

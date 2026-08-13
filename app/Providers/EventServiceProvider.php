@@ -69,6 +69,9 @@ class EventServiceProvider extends ServiceProvider
         TimerUpdated::class => [ActivityEventListener::class],
 
         // Mail Logging
+        \Illuminate\Mail\Events\MessageSending::class => [
+            \App\Listeners\LogOutgoingMailListener::class,
+        ],
         \Illuminate\Mail\Events\MessageSent::class => [
             \App\Listeners\LogOutgoingMailListener::class,
         ],

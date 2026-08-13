@@ -122,6 +122,7 @@ export default function ProjectShow({
         if (discussions && discussions.length >= chatFeed.length) {
             setChatFeed(discussions);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [discussions]);
 
     // Auto-scroll chat to bottom
@@ -190,10 +191,8 @@ export default function ProjectShow({
                     setChatFeed((prev) => [...prev.filter((m) => String(m.id) !== String(tempMsgId)), res.data.comment]);
                 }
 
-                // Display Token Deduction Toast Notification
-                if (res.data.billed_amount && parseFloat(res.data.billed_amount) > 0) {
-                    toast.info(`تم خصم ${res.data.billed_amount} ${res.data.currency_symbol || 'EGP'} (تكلفة الـ AI الفعالية)`);
-                }
+                // Suppressed billing toast popup to reduce client transaction anxiety.
+                // Wallet updates silently in the background when the view variables reload.
 
                 // Reload to fetch updated stage, context & discussions in background
                 router.reload({ only: ['discussions', 'aiContext', 'aiQuestions', 'aiStage', 'project'] });

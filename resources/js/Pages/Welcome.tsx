@@ -1,5 +1,5 @@
 import { PageProps } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import SafeLink from '@/Components/SafeLink';
 import { __ } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
@@ -61,6 +61,13 @@ export default function Welcome({
     const { isInstallable, isStandalone, install } = usePWAInstall();
     const [showBanner, setShowBanner] = useState(true);
     const [isIOS, setIsIOS] = useState(false);
+    const [scopingPrompt, setScopingPrompt] = useState('');
+
+    const handleSandboxScope = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!scopingPrompt.trim()) return;
+        router.visit(`/register?prefill_desc=${encodeURIComponent(scopingPrompt.trim())}`);
+    };
 
     useEffect(() => {
         const checkIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -145,28 +152,48 @@ export default function Welcome({
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.2 }}
-                                className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+                                className="mt-10 max-w-xl mx-auto space-y-6"
                             >
-                                {auth.user ? (
-                                    <SafeLink href={route('dashboard')}>
-                                        <Button size="lg" className="h-12 px-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-base font-medium w-full sm:w-auto shadow-sm">
-                                            Go to Dashboard
+                                {!auth.user && (
+                                    <form onSubmit={handleSandboxScope} className="p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-md flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="What would you like to build? (e.g. E-Commerce App, WhatsApp Bot)"
+                                            className="flex-1 bg-transparent px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 outline-none placeholder:text-zinc-400"
+                                            value={scopingPrompt}
+                                            onChange={(e) => setScopingPrompt(e.target.value)}
+                                        />
+                                        <Button
+                                            type="submit"
+                                            className="rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 font-semibold px-5 text-sm"
+                                        >
+                                            Generate Scope
                                         </Button>
-                                    </SafeLink>
-                                ) : (
-                                    <>
-                                        <Link href={route('register')}>
-                                            <Button size="lg" className="h-12 px-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-base font-medium w-full sm:w-auto shadow-sm">
-                                                Start your free trial
-                                            </Button>
-                                        </Link>
-                                        <a href="#services">
-                                            <Button size="lg" variant="outline" className="h-12 px-8 rounded-full border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-base font-medium w-full sm:w-auto">
-                                                Explore Services
-                                            </Button>
-                                        </a>
-                                    </>
+                                    </form>
                                 )}
+
+                                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                    {auth.user ? (
+                                        <SafeLink href={route('dashboard')}>
+                                            <Button size="lg" className="h-12 px-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-base font-medium w-full sm:w-auto shadow-sm">
+                                                Go to Dashboard
+                                            </Button>
+                                        </SafeLink>
+                                    ) : (
+                                        <>
+                                            <Link href={route('register')}>
+                                                <Button size="lg" className="h-12 px-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-base font-medium w-full sm:w-auto shadow-sm">
+                                                    Start your free trial
+                                                </Button>
+                                            </Link>
+                                            <a href="#services">
+                                                <Button size="lg" variant="outline" className="h-12 px-8 rounded-full border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-base font-medium w-full sm:w-auto">
+                                                    Explore Services
+                                                </Button>
+                                            </a>
+                                        </>
+                                    )}
+                                </div>
                             </motion.div>
                         </section>
 
@@ -229,6 +256,58 @@ export default function Welcome({
                                         </span>
                                     </a>
                                 </div>
+                            </div>
+                        </section>
+
+                        {/* ECOSYSTEM PREVIEW */}
+                        <section className="w-full bg-zinc-100/50 dark:bg-zinc-950/20 py-24 border-b border-zinc-200 dark:border-zinc-800">
+                            <div className="container mx-auto px-6">
+                                <div className="text-center mb-16">
+                                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 mb-3 inline-block">Ecosystem Registry</span>
+                                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Explore Our Apps &amp; SaaS Systems</h2>
+                                    <p className="text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
+                                        No need to build from scratch. Our platform comes pre-integrated with a library of enterprise-grade tools ready to launch instantly.
+                                    </p>
+                                </div>
+
+                                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                                    {[
+                                        { name: 'ERP System', cat: 'Core SaaS', desc: 'نظام إدارة المؤسسات والحسابات المالية والفواتير وشجرة الحسابات المتكاملة.' },
+                                        { name: 'CRM System', cat: 'Core SaaS', desc: 'إدارة العملاء والقيادة، متابعة العروض وسجل التفاعلات والمراحل البيعية.' },
+                                        { name: 'WhatsApp Bot', cat: 'Marketing', desc: 'منصة إرسال وتأتمة الحملات الترويجية ورسائل الواتساب الجماعية.' },
+                                        { name: 'Gold POS System', cat: 'POS Engine', desc: 'نظام كاشير ونقاط بيع وتداول الذهب والمجوهرات ومتابعة أسعار البورصة.' },
+                                        { name: 'SMS Gateway', cat: 'Messaging', desc: 'بوابة إرسال الرسائل النصية القصيرة OTP وإشعارات الفواتير والتحقق.' },
+                                        { name: 'Booking System', cat: 'Core SaaS', desc: 'منصة حجز المواعيد والاستشارات والجداول الزمانية والمواعيد التلقائية.' }
+                                    ].map((tool, idx) => (
+                                        <div key={idx} className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+                                            <div>
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <h4 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">{tool.name}</h4>
+                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-450 border border-zinc-200/50 dark:border-zinc-700/50">{tool.cat}</span>
+                                                </div>
+                                                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4">{tool.desc}</p>
+                                            </div>
+                                            <Link href="/register" className="text-xs font-bold text-indigo-650 dark:text-indigo-450 hover:underline">
+                                                Deploy this tool ➔
+                                            </Link>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* PRICING CALCULATOR */}
+                        <section className="w-full py-24 border-b border-zinc-200 dark:border-zinc-800">
+                            <div className="container mx-auto px-6 max-w-4xl">
+                                <div className="text-center mb-16">
+                                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-zinc-150 dark:bg-zinc-900 text-zinc-650 dark:text-zinc-450 mb-3 inline-block">Pricing Calculator</span>
+                                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Estimate Your Custom Scoped Budget</h2>
+                                    <p className="text-zinc-500 dark:text-zinc-400">
+                                        Select your desired scale and integrations below to calculate an instant cost and delivery estimate.
+                                    </p>
+                                </div>
+
+                                <PricingCalculator />
                             </div>
                         </section>
 
@@ -394,5 +473,116 @@ export default function Welcome({
                 </div>
             )}
         </>
+    );
+}
+
+function PricingCalculator() {
+    const [scale, setScale] = useState<'single_page' | 'multi_page' | 'full_portal'>('multi_page');
+    const [addons, setAddons] = useState({
+        whatsapp: false,
+        payment: false,
+        sms: false,
+        admin: false,
+    });
+
+    const prices = {
+        single_page: { base: 3500, days: 1 },
+        multi_page: { base: 8000, days: 3 },
+        full_portal: { base: 20000, days: 7 },
+    };
+
+    const addonsPrices = {
+        whatsapp: { price: 4000, days: 1 },
+        payment: { price: 3000, days: 1 },
+        sms: { price: 2500, days: 0 },
+        admin: { price: 3500, days: 1 },
+    };
+
+    let total = prices[scale].base;
+    let days = prices[scale].days;
+
+    Object.keys(addons).forEach((key) => {
+        if (addons[key as keyof typeof addons]) {
+            total += addonsPrices[key as keyof typeof addons].price;
+            days += addonsPrices[key as keyof typeof addons].days;
+        }
+    });
+
+    const prefillQuery = `I want a ${scale.replace('_', ' ')} project with these features: ${Object.keys(addons)
+        .filter((k) => addons[k as keyof typeof addons])
+        .join(', ')}`;
+
+    return (
+        <div className="p-6 md:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md">
+            <div className="grid md:grid-cols-2 gap-8 text-left">
+                <div className="space-y-6">
+                    <div>
+                        <label className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 mb-2 block">Project Scale</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {(['single_page', 'multi_page', 'full_portal'] as const).map((s) => (
+                                <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => setScale(s)}
+                                    className={`px-3 py-2 text-xs font-bold rounded-xl border text-center transition cursor-pointer ${
+                                        scale === s
+                                            ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100'
+                                            : 'bg-transparent text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40'
+                                    }`}
+                                >
+                                    {s === 'single_page' ? 'Single Page' : s === 'multi_page' ? 'Multi Page' : 'Full Portal'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 mb-2 block">Integrations &amp; Addons</label>
+                        <div className="space-y-2">
+                            {[
+                                { key: 'whatsapp', name: 'WhatsApp API Integration (+4,000 EGP)' },
+                                { key: 'payment', name: 'Stripe/Card Gateway Setup (+3,000 EGP)' },
+                                { key: 'sms', name: 'SMS Verification OTP Gateway (+2,500 EGP)' },
+                                { key: 'admin', name: 'Admin/Sub-role Permissions (+3,500 EGP)' },
+                            ].map((addon) => (
+                                <label
+                                    key={addon.key}
+                                    className="flex items-center gap-3 p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition cursor-pointer select-none"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={addons[addon.key as keyof typeof addons]}
+                                        onChange={(e) => setAddons((prev) => ({ ...prev, [addon.key]: e.target.checked }))}
+                                        className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+                                    />
+                                    <span className="text-xs text-zinc-700 dark:text-zinc-300 font-medium">{addon.name}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col justify-between p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-center">
+                    <div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Estimated Budget &amp; Delivery</h4>
+                        <div className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-zinc-100 my-4">
+                            {total.toLocaleString()} <span className="text-sm font-semibold">EGP</span>
+                        </div>
+                        <div className="text-sm text-zinc-500 dark:text-zinc-400 font-semibold mb-4">
+                            Delivery timeline: <span className="text-zinc-800 dark:text-zinc-200 font-bold">{days} {days === 1 ? 'day' : 'days'}</span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 italic">
+                            This estimate is generated instantly based on typical architecture. Final scoping will be verified by the AI Project Manager.
+                        </p>
+                    </div>
+
+                    <Link href={`/register?prefill_desc=${encodeURIComponent(prefillQuery)}`} className="mt-6">
+                        <Button className="w-full h-11 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 font-bold">
+                            Claim this Estimate ➔
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        </div>
     );
 }

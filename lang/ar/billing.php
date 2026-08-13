@@ -75,5 +75,10 @@ return [
     ],
     'solutions' => [
         'cs1_title' => 'نظام إدارة علاقات العملاء لفودافون'
-    ]
+    ],
+    'subscription_expired_subject' => 'انتهى الاشتراك: الإجراء مطلوب',
+    'subscription_expired_greeting' => 'مرحباً :name،',
+    'subscription_expired_body' => 'لقد انتهى اشتراكك في موديل :module بتاريخ :date.',
+    'subscription_expired_action' => 'تجديد الاشتراك الآن',
+    'subscription_expired_footer' => 'يرجى تجديد اشتراكك لتجنب فقدان إمكانية الوصول إلى بياناتك وميزاتك.',
 ];

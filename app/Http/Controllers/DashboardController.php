@@ -25,7 +25,7 @@ class DashboardController extends Controller
         $dashboardService = app(DashboardService::class);
         $data = $dashboardService->getClientDashboardData($user);
 
-        return view('dashboard.v8_directory', $data);
+        return Inertia::render('Client/Directory', $data);
     }
 
     private function clientDashboard($user)
@@ -33,6 +33,6 @@ class DashboardController extends Controller
         $dashboardService = app(DashboardService::class);
         $data = $dashboardService->getClientDashboardData($user);
 
-        return view('dashboard.v8_main', $data);
+        return Inertia::render('Client/Dashboard', $data);
     }
 }
