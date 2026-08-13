@@ -257,6 +257,7 @@ class User extends Authenticatable
         $unpaidInvoices = $this->invoices()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->where('is_suspended', false)
             ->get();
 
         $totalDeduction = 0;
@@ -320,7 +321,8 @@ class User extends Authenticatable
     public function unpaid_invoices_amount($include_pending = false)
     {
         $invoices = $this->invoices()
-            ->whereIn('status', ['unpaid', 'partially_paid']);
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->where('is_suspended', false);
 
         if (! $include_pending) {
             $invoices->whereIn('job_status', ['processing', 'done']);
@@ -335,7 +337,7 @@ class User extends Authenticatable
         return $unpaid;
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
@@ -405,6 +407,7 @@ class User extends Authenticatable
             $oldestUnpaid = $this->invoices()
                 ->where('unpaid', '>', 0)
                 ->whereIn('status', ['unpaid', 'partially_paid'])
+                ->where('is_suspended', false)
                 ->orderBy('id', 'asc')
                 ->first();
                 
@@ -728,6 +731,7 @@ class User extends Authenticatable
         return $this->invoices()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->where('is_suspended', false)
             ->orderBy('id', 'asc')
             ->first();
     }
@@ -740,6 +744,7 @@ class User extends Authenticatable
         $unpaidInvoices = $this->invoices()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->where('is_suspended', false)
             ->get();
 
         $total = 0;

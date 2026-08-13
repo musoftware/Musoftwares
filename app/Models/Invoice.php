@@ -164,7 +164,7 @@ class Invoice extends Model
         $invoices = static::query()->where(function ($query) {
             $query->where('status', 'unpaid');
             $query->orWhere('status', 'partially_paid');
-        })->get();
+        })->where('is_suspended', false)->get();
 
         $unpaid = 0;
 
@@ -185,7 +185,8 @@ class Invoice extends Model
         return static::query()->where(function ($query) {
             $query->where('status', 'unpaid');
             $query->orWhere('status', 'partially_paid');
-        })->where('archive', '0');
+        })->where('archive', '0')
+          ->where('is_suspended', false);
     }
 
     public static function ArchiveInvoices()
@@ -193,7 +194,8 @@ class Invoice extends Model
         return static::query()->where(function ($query) {
             $query->where('status', 'unpaid');
             $query->orWhere('status', 'partially_paid');
-        })->where('archive', '1');
+        })->where('archive', '1')
+          ->where('is_suspended', false);
     }
 
     /**
@@ -257,7 +259,8 @@ class Invoice extends Model
         }
 
         $query = static::where('user_id', $this->user_id)
-            ->whereNotIn('status', ['paid', 'cancelled']);
+            ->whereNotIn('status', ['paid', 'cancelled'])
+            ->where('is_suspended', false);
 
         if ($this->id) {
             $query->where('id', '<', $this->id);

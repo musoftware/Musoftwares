@@ -191,7 +191,9 @@ class GoogleSocialLoginTest extends TestCase
             'source' => UserEmail::SOURCE_ADMIN,
         ]);
 
-        $response = $this->actingAs($admin)->post("/admin/users/{$user->id}/emails/{$alias->id}/make-primary");
+        $response = $this->actingAs($admin)
+            ->from(route('admin.users.emails.index', $user->id))
+            ->post("/admin/users/{$user->id}/emails/{$alias->id}/make-primary");
 
         $response->assertRedirect(route('admin.users.emails.index', $user->id));
         $this->assertSame('newprimary@example.com', $user->fresh()->email);

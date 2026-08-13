@@ -1047,6 +1047,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::get('/invoices/dues', [App\Http\Controllers\Admin\InvoiceController::class, 'duesBoard'])->name('invoices.dues');
     Route::post('/invoices/dues/{user}/send-reminder', [App\Http\Controllers\Admin\InvoiceController::class, 'sendDuesReminder'])->name('invoices.dues.send-reminder');
     Route::get('/invoices/archive', [App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
+    Route::get('/invoices/suspended', [App\Http\Controllers\Admin\InvoiceController::class, 'suspended'])->name('invoices.suspended');
     Route::get('/invoices/create', [App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
     Route::get('/invoices/timer-details/{item_id}', [App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
     Route::post('/invoices/timer-details/{item_id}/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
@@ -1078,6 +1079,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/invoices/{invoice}/pay-service/calculate', [App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
     Route::post('/invoices/{invoice}/pay-service/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
     Route::post('/invoices/{invoice}/share-link', [App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
+    Route::post('/invoices/{invoice}/toggle-suspend', [App\Http\Controllers\Admin\InvoiceController::class, 'toggleSuspend'])->name('invoices.toggle-suspend');
     Route::post('/invoices/{invoice}/reschedule', [App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
     Route::post('/invoices/{invoice}/assign-project', [App\Http\Controllers\Admin\InvoiceController::class, 'assignProject'])->name('invoices.assign-project');
 

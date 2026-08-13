@@ -135,8 +135,9 @@ class InvoiceController extends Controller
         return [
             'total' => $query->clone()->count(),
             'paid' => $query->clone()->where('status', 'paid')->count(),
-            'unpaid' => $query->clone()->where('status', 'unpaid')->count(),
-            'partially_paid' => $query->clone()->where('status', 'partially_paid')->count(),
+            'unpaid' => $query->clone()->where('status', 'unpaid')->where('is_suspended', false)->count(),
+            'partially_paid' => $query->clone()->where('status', 'partially_paid')->where('is_suspended', false)->count(),
+            'suspended' => $query->clone()->where('is_suspended', true)->count(),
         ];
     }
 
@@ -166,7 +167,10 @@ class InvoiceController extends Controller
      */
     public function unpaid(Request $request)
     {
-        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])->whereIn('status', ['unpaid', 'partially_paid'])->latest();
+        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->where('is_suspended', false)
+            ->latest();
         $query = $this->applyFilters($query, $request);
  
         $invoices = $query->paginate($request->input('per_page', 20))
@@ -193,7 +197,10 @@ class InvoiceController extends Controller
      */
     public function archive(Request $request)
     {
-        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])->where('status', 'cancelled')->latest();
+        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
+            ->where('status', 'cancelled')
+            ->where('is_suspended', false)
+            ->latest();
         $query = $this->applyFilters($query, $request);
 
         $invoices = $query->paginate($request->input('per_page', 20))
@@ -208,6 +215,31 @@ class InvoiceController extends Controller
             'projects' => $this->getFilteredProjects($request),
         ]);
     }
+
+    /**
+     * Display suspended invoices.
+     */
+    public function suspended(Request $request)
+    {
+        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
+            ->where('is_suspended', true)
+            ->latest();
+        $query = $this->applyFilters($query, $request);
+
+        $invoices = $query->paginate($request->input('per_page', 20))
+            ->withQueryString()
+            ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
+
+        return Inertia::render('Admin/Invoices/Index', [
+            'invoices' => $invoices,
+            'currentTab' => 'suspended',
+            'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
+            'stats' => $this->getStats($request),
+            'projects' => $this->getFilteredProjects($request),
+        ]);
+    }
+
+
 
     private function getFilteredProjects(Request $request)
     {
@@ -538,6 +570,25 @@ class InvoiceController extends Controller
         }
 
         return redirect()->back()->with('success', __('admin.job_status_updated'));
+    }
+
+    /**
+     * Toggle suspended state of the invoice.
+     */
+    public function toggleSuspend(Request $request, Invoice $invoice)
+    {
+        try {
+            $invoice->is_suspended = ! $invoice->is_suspended;
+            $invoice->save();
+
+            $msg = $invoice->is_suspended
+                ? (__('admin.invoice_suspended') ?: 'Invoice has been suspended')
+                : (__('admin.invoice_unsuspended') ?: 'Invoice has been unsuspended');
+
+            return redirect()->back()->with('success', $msg);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**

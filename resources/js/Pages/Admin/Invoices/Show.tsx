@@ -440,6 +440,18 @@ export default function Show({
         resetState();
     };
 
+    const handleToggleSuspend = () => {
+        router.post(route('admin.invoices.toggle-suspend', { invoice: String(invoice.id) }), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(invoice.is_suspended 
+                    ? (__('admin.invoice_unsuspended') || 'Invoice unsuspended')
+                    : (__('admin.invoice_suspended') || 'Invoice suspended')
+                );
+            }
+        });
+    };
+
     const handleRescheduleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         router.post(route('admin.invoices.reschedule', { invoice: String(invoice.id) }), rescheduleForm as any, {
@@ -485,6 +497,11 @@ export default function Show({
                             #{invoice.invoice_number}
                         </h2>
                         {getStatusBadge(invoice.status)}
+                        {invoice.is_suspended && (
+                            <span className="inline-flex items-center rounded-full bg-amber-500 px-3 py-1 text-sm font-medium text-white">
+                                {__('admin.suspended') || 'Suspended'}
+                            </span>
+                        )}
                         {getJobStatusBadge(invoice.job_status)}
                         {invoice.is_editable === false && (
                             <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
@@ -538,6 +555,21 @@ export default function Show({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
+                            {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                                <DropdownMenuItem onClick={handleToggleSuspend} className="cursor-pointer">
+                                    {invoice.is_suspended ? (
+                                        <>
+                                            <Check className="w-4 h-4 me-2 text-emerald-600" />
+                                            {__('admin.unsuspend') || 'Unsuspend'}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <X className="w-4 h-4 me-2 text-rose-600" />
+                                            {__('admin.suspend') || 'Suspend'}
+                                        </>
+                                    )}
+                                </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem onClick={handleSignedInvoiceRedirect} className="cursor-pointer">
                                 <CreditCard className="w-4 h-4 me-2" /> {__('admin.share_signed_invoice_link') || 'Share Signed Invoice Link'}
                             </DropdownMenuItem>

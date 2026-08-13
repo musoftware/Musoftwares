@@ -60,6 +60,7 @@ const items: MenuItem[] = [
     subItems: [
         { title: "Clients Dues Board", url: "/admin/invoices/dues" },
         { title: "Unpaid Invoices", url: "/admin/invoices/unpaid" },
+        { title: "Suspended Invoices", url: "/admin/invoices/suspended" },
         { title: "Archived Invoices", url: "/admin/invoices/archive" },
         { title: "All Invoices", url: "/admin/invoices" },
     ]

@@ -397,7 +397,7 @@ class DashboardService extends BaseService
         $earnedBalance = (float) ($user->pending_commission ?? 0);
         $pointsBalance = $user->points_balance ?? 0;
 
-        $unpaidInvoices = clone $user->invoices()->whereIn('status', ['unpaid', 'partially_paid']);
+        $unpaidInvoices = clone $user->invoices()->whereIn('status', ['unpaid', 'partially_paid'])->where('is_suspended', false);
         $unpaidCount = $unpaidInvoices->count();
         $unpaidAmount = round($user->unpaid_invoices_amount(true), 2);
 

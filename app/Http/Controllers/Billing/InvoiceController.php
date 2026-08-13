@@ -24,6 +24,7 @@ class InvoiceController extends Controller
         $user = Auth::user();
 
         $invoices = Invoice::where('user_id', $user->id)
+            ->where('is_suspended', false)
             ->with(['currency'])
             ->latest()
             ->paginate(14)
@@ -68,6 +69,7 @@ class InvoiceController extends Controller
 
         $invoice = Invoice::where('uuid', $uuid)
             ->where('user_id', $user->id)
+            ->where('is_suspended', false)
             ->with(['items', 'currency'])
             ->firstOrFail();
 
@@ -120,6 +122,7 @@ class InvoiceController extends Controller
 
         $invoice = Invoice::where('uuid', $uuid)
             ->where('user_id', $user->id)
+            ->where('is_suspended', false)
             ->with(['currency'])
             ->firstOrFail();
 
@@ -265,6 +268,7 @@ class InvoiceController extends Controller
 
         $invoice = Invoice::where('uuid', $uuid)
             ->where('user_id', $user->id)
+            ->where('is_suspended', false)
             ->with(['items'])
             ->firstOrFail();
 

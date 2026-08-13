@@ -53,11 +53,16 @@ class UsersController extends Controller
      */
     public function index(Request $request): InertiaResponse
     {
-        $query = User::query()->with('roles');
+        $type = $request->get('type', 'customers');
+        if (! in_array($type, ['customers', 'leads'])) {
+            $type = 'customers';
+        }
+
+        $baseQuery = User::query();
 
         // Full-text search across name, email, whatsapp, and email aliases
         if ($search = $request->get('search')) {
-            $query->where(function ($q) use ($search) {
+            $baseQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhereHas('emails', function ($eq) use ($search) {
@@ -72,19 +77,37 @@ class UsersController extends Controller
 
         // Role filter
         if ($role = $request->get('role')) {
-            $query->role($role); // Spatie HasRoles scope
+            $baseQuery->role($role); // Spatie HasRoles scope
         }
 
         // Account status filter
         if ($status = $request->get('status')) {
-            $query->where('account_status', $status);
+            $baseQuery->where('account_status', $status);
         }
 
         // KYC filter
         if ($request->get('kyc') === 'verified') {
-            $query->where('kyc_verified', true);
+            $baseQuery->where('kyc_verified', true);
         } elseif ($request->get('kyc') === 'unverified') {
-            $query->where('kyc_verified', false);
+            $baseQuery->where('kyc_verified', false);
+        }
+
+        // Compute tab counts
+        $tabCounts = [
+            'customers' => (clone $baseQuery)->where(function ($q) {
+                $q->whereHas('transactions')->orWhereHas('invoices');
+            })->count(),
+            'leads' => (clone $baseQuery)->whereDoesntHave('transactions')->whereDoesntHave('invoices')->count(),
+        ];
+
+        // Apply tab scope (Customers vs Leads)
+        $query = (clone $baseQuery)->with('roles');
+        if ($type === 'customers') {
+            $query->where(function ($q) {
+                $q->whereHas('transactions')->orWhereHas('invoices');
+            });
+        } else {
+            $query->whereDoesntHave('transactions')->whereDoesntHave('invoices');
         }
 
         // Sorting
@@ -96,18 +119,36 @@ class UsersController extends Controller
 
         $users = $query->paginate(25)->withQueryString()->through(fn ($user) => (new UserResource($user))->resolve());
 
+        // Dynamic statistics computed for the active tab scope
+        $statsQuery = clone $baseQuery;
+        if ($type === 'customers') {
+            $statsQuery->where(function ($q) {
+                $q->whereHas('transactions')->orWhereHas('invoices');
+            });
+        } else {
+            $statsQuery->whereDoesntHave('transactions')->whereDoesntHave('invoices');
+        }
+
         $stats = [
-            'total' => User::count(),
-            'active' => User::where('account_status', 'active')->orWhereNull('account_status')->count(),
-            'blocked' => User::where('account_status', 'blocked')->count(),
-            'kyc_verified' => User::where('kyc_verified', true)->count(),
-            'new_this_week' => User::where('created_at', '>=', now()->subDays(7))->count(),
-            'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count(),
+            'total' => (clone $statsQuery)->count(),
+            'active' => (clone $statsQuery)->where(function ($q) {
+                $q->where('account_status', 'active')->orWhereNull('account_status');
+            })->count(),
+            'blocked' => (clone $statsQuery)->where('account_status', 'blocked')->count(),
+            'kyc_verified' => (clone $statsQuery)->where('kyc_verified', true)->count(),
+            'new_this_week' => (clone $statsQuery)->where('created_at', '>=', now()->subDays(7))->count(),
+            'new_this_month' => (clone $statsQuery)->where('created_at', '>=', now()->startOfMonth())->count(),
         ];
+
+        $filters = array_merge(
+            $request->only(['search', 'role', 'status', 'kyc', 'sort', 'direction']),
+            ['type' => $type]
+        );
 
         return Inertia::render('Admin/Users/Index', [
             'clients' => $users,
-            'filters' => $request->only(['search', 'role', 'status', 'kyc', 'sort', 'direction']),
+            'filters' => $filters,
+            'tabCounts' => $tabCounts,
             'stats' => $stats,
         ]);
     }

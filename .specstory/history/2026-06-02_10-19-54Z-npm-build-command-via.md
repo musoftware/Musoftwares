@@ -15,16 +15,14 @@ _**User (2026-06-02 10:20:29Z)**_
 
 _**Agent (copilot/auto)**_
 
-<think><details><summary>Thought Process</summary>
 دعني أولاً أتحقق من محتويات مجلد deploy الحالية: 
-
-سأنشئ لك سكريبت يقوم بتنفيذ `npm run build` عبر SSH بشكل تلقائي. سأنشئ نسختين: واحدة PowerShell للـ Windows وواحدة Bash:
-</details></think>
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir"><details>
 <summary>Tool use: **list_dir**</summary>
+
+Read `deploy`
 
 **Input:**
 
@@ -33,14 +31,20 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"Folder is empty","type":2}],"ctor":2,"ctorName":"_an","props":{},"references":[],"type":1}}
+Folder is empty
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
+سأنشئ لك سكريبت يقوم بتنفيذ `npm run build` عبر SSH بشكل تلقائي. سأنشئ نسختين: واحدة PowerShell للـ Windows وواحدة Bash: 
+
+_**Agent (copilot/auto)**_
+
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build-remote.ps1`
 
 **Input:**
 
@@ -85,7 +89,50 @@ if ($LASTEXITCODE -eq 0) {
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote.ps1","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote.ps1
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Deploy Build Script - PowerShell
+# تشغيل npm run build على السيرفر عبر SSH
+
+# تعديل هذه المتغيرات حسب بيانات السيرفر الخاص بك
+$SSH_USER = "your_username"           # اسم المستخدم
+$SSH_HOST = "your_server.com"         # عنوان السيرفر
+$SSH_PORT = 22                        # المنفذ (22 افتراضي)
+$REMOTE_PATH = "/path/to/project"    # مسار المشروع على السيرفر
+$SSH_KEY = "C:\path\to\ssh_key"       # مسار المفتاح الخاص (اختياري)
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# تنفيذ الأمر
+Write-Host "جاري الاتصال بالسيرفر وتنفيذ npm run build..." -ForegroundColor Cyan
+
+if ($SSH_KEY) {
+    # مع مفتاح SSH
+    ssh -i $SSH_KEY -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+} else {
+    # بدون مفتاح (سيطلب كلمة مرور)
+    ssh -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+}
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✓ تم البناء بنجاح!" -ForegroundColor Green
+} else {
+    Write-Host "✗ حدث خطأ أثناء البناء" -ForegroundColor Red
+    exit 1
+}
+
 ```
 </details></tool-use>
 
@@ -93,6 +140,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build-remote.sh`
 
 **Input:**
 
@@ -139,7 +188,52 @@ fi
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote.sh","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote.sh
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.sh**</summary>
+
+@@ lines 1-1 @@
+
+```
+#!/bin/bash
+# Deploy Build Script - Bash
+# تشغيل npm run build على السيرفر عبر SSH
+
+# تعديل هذه المتغيرات حسب بيانات السيرفر الخاص بك
+SSH_USER="your_username"           # اسم المستخدم
+SSH_HOST="your_server.com"         # عنوان السيرفر
+SSH_PORT=22                        # المنفذ (22 افتراضي)
+REMOTE_PATH="/path/to/project"    # مسار المشروع على السيرفر
+SSH_KEY=""                         # مسار المفتاح الخاص (اختياري)
+
+# بناء أمر SSH
+SSH_CMD="cd $REMOTE_PATH && npm run build"
+
+# تنفيذ الأمر
+echo "🔄 جاري الاتصال بالسيرفر وتنفيذ npm run build..."
+
+if [ -n "$SSH_KEY" ] && [ -f "$SSH_KEY" ]; then
+    # مع مفتاح SSH
+    ssh -i "$SSH_KEY" -p $SSH_PORT "$SSH_USER@$SSH_HOST" "$SSH_CMD"
+else
+    # بدون مفتاح (سيطلب كلمة مرور)
+    ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST" "$SSH_CMD"
+fi
+
+# التحقق من نجاح التنفيذ
+if [ $? -eq 0 ]; then
+    echo "✅ تم البناء بنجاح!"
+else
+    echo "❌ حدث خطأ أثناء البناء"
+    exit 1
+fi
+
 ```
 </details></tool-use>
 
@@ -147,6 +241,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `.ssh-config`
 
 **Input:**
 
@@ -175,7 +271,34 @@ ENVIRONMENT=production
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\.ssh-config","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\.ssh-config
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **.ssh-config**</summary>
+
+@@ lines 1-1 @@
+
+```
+# SSH Server Configuration
+# SSH اعدادات الاتصال بـ
+
+SSH_USER=your_username
+SSH_HOST=your_server.com
+SSH_PORT=22
+REMOTE_PATH=/path/to/project
+
+# اختياري: مسار المفتاح الخاص
+# SSH_KEY=/path/to/private/key
+
+# معلومات إضافية (اختياري)
+PROJECT_NAME=MyProject
+ENVIRONMENT=production
+
 ```
 </details></tool-use>
 
@@ -183,6 +306,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build-remote-advanced.ps1`
 
 **Input:**
 
@@ -287,7 +412,110 @@ try {
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-advanced.ps1","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-advanced.ps1
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote-advanced.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Advanced Deploy Build Script - PowerShell
+# نسخة محسّنة مع دعم الإعدادات والسجلات
+
+param(
+    [switch]$Verbose = $false,
+    [switch]$DryRun = $false,
+    [string]$ConfigFile = ".ssh-config"
+)
+
+# الألوان
+$colors = @{
+    Info = "Cyan"
+    Success = "Green"
+    Warning = "Yellow"
+    Error = "Red"
+}
+
+function Write-Log {
+    param([string]$Message, [string]$Level = "Info")
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $output = "[$timestamp] [$Level] $Message"
+    Write-Host $output -ForegroundColor $colors[$Level]
+}
+
+# قراءة ملف الإعدادات
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$configPath = Join-Path $scriptDir $ConfigFile
+
+if (-not (Test-Path $configPath)) {
+    Write-Log "❌ لم يتم العثور على ملف الإعدادات: $configPath" "Error"
+    exit 1
+}
+
+# تحميل الإعدادات
+$config = @{}
+Get-Content $configPath | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+# استخلاص البيانات
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project"
+
+Write-Log "🚀 بدء البناء للمشروع: $PROJECT_NAME" "Info"
+Write-Log "الاتصال: $SSH_USER@$SSH_HOST:$SSH_PORT" "Info"
+Write-Log "المسار: $REMOTE_PATH" "Info"
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# أوامر إضافية (اختياري)
+if ($config['POST_BUILD_CMD']) {
+    $sshCommand += " && " + $config['POST_BUILD_CMD']
+    Write-Log "سيتم تنفيذ أمر إضافي بعد البناء" "Info"
+}
+
+if ($Verbose) {
+    Write-Log "الأمر: $sshCommand" "Info"
+}
+
+if ($DryRun) {
+    Write-Log "وضع DRY RUN - لن يتم تنفيذ الأمر فعليًا" "Warning"
+    exit 0
+}
+
+Write-Log "جاري الاتصال بالسيرفر..." "Info"
+
+# تنفيذ الأمر
+try {
+    if ($SSH_KEY -and (Test-Path $SSH_KEY)) {
+        ssh -i $SSH_KEY -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+    } else {
+        ssh -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+    }
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Log "✓ تم البناء بنجاح!" "Success"
+    } else {
+        Write-Log "✗ فشل البناء (exit code: $LASTEXITCODE)" "Error"
+        exit 1
+    }
+} catch {
+    Write-Log "❌ حدث خطأ: $_" "Error"
+    exit 1
+}
+
 ```
 </details></tool-use>
 
@@ -295,6 +523,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `README.md`
 
 **Input:**
 
@@ -483,14 +713,203 @@ ssh admin@server.example.com "ls -la /home/admin/musoftwares/dist"
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\README.md","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\README.md
 ```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **README.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# Deploy Build Script 🚀
+
+سكريبتات لتشغيل `npm run build` على السيرفر بشكل تلقائي عبر SSH
+
+## الملفات المتاحة
+
+### 1. `build-remote.ps1` - نسخة أساسية (PowerShell)
+سكريبت بسيط لتنفيذ البناء على السيرفر البعيد.
+
+**الاستخدام:**
+```powershell
+# قم بتعديل البيانات أولاً في الملف:
+# - SSH_USER
+# - SSH_HOST
+# - SSH_PORT (اختياري، الافتراضي: 22)
+# - REMOTE_PATH
+# - SSH_KEY (اختياري)
+
+.\build-remote.ps1
+```
+
+### 2. `build-remote-advanced.ps1` - نسخة محسّنة (PowerShell)
+نسخة متقدمة مع دعم الإعدادات من ملف خارجي والسجلات والخيارات الإضافية.
+
+**الاستخدام:**
+```powershell
+# التشغيل العادي
+.\build-remote-advanced.ps1
+
+# مع إظهار التفاصيل
+.\build-remote-advanced.ps1 -Verbose
+
+# بدون تنفيذ فعلي (جرب أولاً)
+.\build-remote-advanced.ps1 -DryRun
+
+# مع ملف إعدادات مخصص
+.\build-remote-advanced.ps1 -ConfigFile "custom-config"
+```
+
+### 3. `build-remote.sh` - نسخة Bash
+سكريبت بسيط لـ Bash (Linux/macOS أو WSL).
+
+**الاستخدام:**
+```bash
+# اجعل الملف قابل للتنفيذ
+chmod +x build-remote.sh
+
+# ثم شغله
+./build-remote.sh
+```
+
+### 4. `.ssh-config` - ملف الإعدادات
+ملف إعدادات يحتوي على بيانات الاتصال بالسيرفر.
+
+**محتوى المثال:**
+```ini
+SSH_USER=your_username
+SSH_HOST=your_server.com
+SSH_PORT=22
+REMOTE_PATH=/path/to/project
+SSH_KEY=/path/to/private/key    # اختياري
+PROJECT_NAME=MyProject            # اختياري
+POST_BUILD_CMD=npm run seed       # اختياري
+```
+
+---
+
+## إعداد الاتصال SSH
+
+### على Windows (PowerShell):
+
+1. **التحقق من SSH:**
+   ```powershell
+   ssh -V
+   ```
+
+2. **إضافة مفتاح SSH (اختياري):**
+   ```powershell
+   # إذا لم تمتلك مفتاح
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   
+   # نسخ المفتاح العام للسيرفر
+   Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub | ssh user@host "cat >> ~/.ssh/authorized_keys"
+   ```
+
+3. **تعديل ملف الإعدادات (`.ssh-config`):**
+   ```ini
+   SSH_USER=your_username
+   SSH_HOST=your_server.com
+   SSH_PORT=22
+   REMOTE_PATH=/var/www/myapp
+   SSH_KEY=C:\Users\YourName\.ssh\id_ed25519
+   ```
+
+4. **تشغيل السكريبت:**
+   ```powershell
+   # اسمح بتنفيذ السكريبتات (إذا لم تفعل قبلاً)
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   
+   # شغل السكريبت
+   .\build-remote-advanced.ps1
+   ```
+
+---
+
+## الميزات الإضافية
+
+### تشغيل أوامر بعد البناء
+أضف في `.ssh-config`:
+```ini
+POST_BUILD_CMD=npm run seed && npm run migrate
+```
+
+### جدولة البناء التلقائي
+
+**على Windows (Task Scheduler):**
+1. اضغط `Win + R` واكتب `taskschd.msc`
+2. انقر على "Create Basic Task"
+3. سمّه واختر الجدول الزمني
+4. في الإجراء: استخدم PowerShell
+   ```
+   Program: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+   Arguments: -File "C:\path\to\deploy\build-remote-advanced.ps1"
+   ```
+
+---
+
+## استكشاف الأخطاء
+
+| المشكلة | الحل |
+|--------|------|
+| SSH: Permission denied | تأكد من أن مفتاح SSH صحيح أو كلمة المرور |
+| Command not found: npm | تأكد أن npm مثبت على السيرفر |
+| Connection refused | تحقق من عنوان السيرفر والمنفذ |
+| Access denied: private key | غير صلاحيات المفتاح: `chmod 600 ~/.ssh/id_ed25519` |
+
+---
+
+## مثال عملي كامل
+
+```powershell
+# 1. تعديل الإعدادات
+# افتح .ssh-config وأكمل:
+# SSH_USER=admin
+# SSH_HOST=server.example.com
+# REMOTE_PATH=/home/admin/musoftwares
+
+# 2. اختبر الاتصال
+ssh admin@server.example.com "echo 'Success'"
+
+# 3. شغل السكريبت
+.\build-remote-advanced.ps1 -Verbose
+
+# 4. تحقق من النتائج على السيرفر
+ssh admin@server.example.com "ls -la /home/admin/musoftwares/dist"
+```
+
+---
+
+## ملاحظات أمان
+
+⚠️ **نصائح مهمة:**
+- لا تخزن بيانات الدخول في ملفات عادية
+- استخدم مفاتيح SSH بدلاً من كلمات المرور
+- اجعل ملف `.ssh-config` بصلاحيات مقيدة (600)
+- استخدم `git-crypt` أو `sealed-secrets` لتشفير البيانات الحساسة
+
+---
+
+## دعم إضافي
+
+للمزيد من المعلومات عن SSH، اقرأ:
+- [SSH Documentation](https://linux.die.net/man/1/ssh)
+- [GitHub SSH Setup](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+````
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build-remote-full.ps1`
 
 **Input:**
 
@@ -735,7 +1154,250 @@ if ($success) {
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote-full.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Full Automation Deploy Script - PowerShell
+# نسخة شاملة مع دعم العديد من الميزات
+
+param(
+    [switch]$Verbose = $false,
+    [switch]$DryRun = $false,
+    [string]$ConfigFile = ".ssh-config",
+    [switch]$ShowLog = $false,
+    [switch]$UpdateDeps = $false  # تحديث المتعلقات قبل البناء
+)
+
+# إعدادات السكريبت
+$scriptVersion = "1.0.0"
+$logDir = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "logs"
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$logFile = Join-Path $logDir "build_$timestamp.log"
+
+# الألوان
+$colors = @{
+    Info = "Cyan"
+    Success = "Green"
+    Warning = "Yellow"
+    Error = "Red"
+    Debug = "Gray"
+}
+
+# إنشاء مجلد السجلات
+if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir | Out-Null
+}
+
+function Write-Log {
+    param(
+        [string]$Message,
+        [string]$Level = "Info",
+        [switch]$NoNewline = $false
+    )
+    
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logMessage = "[$timestamp] [$Level] $Message"
+    
+    # اطبع في الكونسول
+    if ($noNewline) {
+        Write-Host $Message -ForegroundColor $colors[$Level] -NoNewline
+    } else {
+        Write-Host $logMessage -ForegroundColor $colors[$Level]
+    }
+    
+    # احفظ في السجل
+    Add-Content -Path $logFile -Value $logMessage -Encoding UTF8
+}
+
+function Read-ConfigFile {
+    param([string]$Path)
+    
+    $config = @{}
+    if (-not (Test-Path $Path)) {
+        Write-Log "❌ ملف الإعدادات غير موجود: $Path" "Error"
+        exit 1
+    }
+    
+    Get-Content $Path | Where-Object {
+        $_ -notmatch "^#" -and $_ -notmatch "^$"
+    } | ForEach-Object {
+        $parts = $_ -split "=", 2
+        if ($parts.Count -eq 2) {
+            $config[$parts[0].Trim()] = $parts[1].Trim().Trim('"')
+        }
+    }
+    
+    return $config
+}
+
+function Test-SSHConnection {
+    param(
+        [string]$User,
+        [string]$Host,
+        [string]$Port,
+        [string]$Key
+    )
+    
+    Write-Log "🔍 اختبار الاتصال SSH..." "Info"
+    
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            $result = ssh -i $Key -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        } else {
+            $result = ssh -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        }
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "✓ الاتصال نجح" "Success"
+            return $true
+        } else {
+            Write-Log "✗ فشل الاتصال: $result" "Error"
+            return $false
+        }
+    } catch {
+        Write-Log "❌ خطأ في الاتصال: $_" "Error"
+        return $false
+    }
+}
+
+function Execute-RemoteCommand {
+    param(
+        [string]$User,
+        [string]$Host,
+        [string]$Port,
+        [string]$Command,
+        [string]$Key
+    )
+    
+    Write-Log "⚙️  تنفيذ: $Command" "Info"
+    
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            ssh -i $Key -p $Port $User@$Host $Command
+        } else {
+            ssh -p $Port $User@$Host $Command
+        }
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "✓ تم التنفيذ بنجاح" "Success"
+            return $true
+        } else {
+            Write-Log "✗ فشل التنفيذ (exit code: $LASTEXITCODE)" "Error"
+            return $false
+        }
+    } catch {
+        Write-Log "❌ خطأ: $_" "Error"
+        return $false
+    }
+}
+
+# ===== البرنامج الرئيسي =====
+
+Write-Log "════════════════════════════════════════════════" "Info"
+Write-Log "🚀 Deploy Build Automation v$scriptVersion" "Info"
+Write-Log "════════════════════════════════════════════════" "Info"
+
+# قراءة الإعدادات
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$configPath = Join-Path $scriptDir $ConfigFile
+$config = Read-ConfigFile $configPath
+
+# استخلاص البيانات
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project"
+
+Write-Log ""
+Write-Log "📋 تفاصيل الاتصال:" "Info"
+Write-Log "  المشروع: $PROJECT_NAME" "Info"
+Write-Log "  المستخدم: $SSH_USER" "Info"
+Write-Log "  السيرفر: $SSH_HOST:$SSH_PORT" "Info"
+Write-Log "  المسار: $REMOTE_PATH" "Info"
+Write-Log ""
+
+# اختبر الاتصال
+if (-not (Test-SSHConnection -User $SSH_USER -Host $SSH_HOST -Port $SSH_PORT -Key $SSH_KEY)) {
+    exit 1
+}
+
+if ($DryRun) {
+    Write-Log ""
+    Write-Log "🔔 وضع DRY RUN - لن يتم تنفيذ الأوامر" "Warning"
+    Write-Log ""
+}
+
+# بناء قائمة الأوامر
+$commands = @()
+
+if ($UpdateDeps) {
+    $commands += "npm install"
+}
+
+$commands += "npm run build"
+
+if ($config['POST_BUILD_CMD']) {
+    $commands += $config['POST_BUILD_CMD']
+}
+
+# التنفيذ
+Write-Log ""
+Write-Log "📊 الأوامر المطلوب تنفيذها:" "Info"
+for ($i = 0; $i -lt $commands.Count; $i++) {
+    Write-Log "  $($i+1). $($commands[$i])" "Debug"
+}
+Write-Log ""
+
+if ($DryRun) {
+    Write-Log "✓ اختبار DRY RUN اكتمل بنجاح (لم يتم تنفيذ الأوامر)" "Success"
+    exit 0
+}
+
+# إنشاء سكريبت بعيد
+$remoteScript = "cd $REMOTE_PATH && " + ($commands -join " && ")
+
+Write-Log "🔄 جاري البدء..." "Info"
+Write-Log ""
+
+$success = Execute-RemoteCommand `
+    -User $SSH_USER `
+    -Host $SSH_HOST `
+    -Port $SSH_PORT `
+    -Command $remoteScript `
+    -Key $SSH_KEY
+
+Write-Log ""
+if ($success) {
+    Write-Log "════════════════════════════════════════════════" "Success"
+    Write-Log "✅ اكتمل البناء بنجاح!" "Success"
+    Write-Log "════════════════════════════════════════════════" "Success"
+    Write-Log "📄 السجل: $logFile" "Info"
+    
+    if ($ShowLog) {
+        Write-Log ""
+        Write-Log "📋 محتوى السجل:" "Info"
+        Get-Content $logFile
+    }
+} else {
+    Write-Log "════════════════════════════════════════════════" "Error"
+    Write-Log "❌ فشل البناء!" "Error"
+    Write-Log "════════════════════════════════════════════════" "Error"
+    Write-Log "📄 السجل: $logFile" "Warning"
+    exit 1
+}
+
 ```
 </details></tool-use>
 
@@ -743,6 +1405,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build-remote.bat`
 
 **Input:**
 
@@ -823,7 +1487,86 @@ endlocal
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote.bat","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote.bat
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.bat**</summary>
+
+@@ lines 1-1 @@
+
+```
+@echo off
+REM Deploy Build Script - Batch File
+REM نسخة بسيطة لـ Windows CMD
+
+setlocal enabledelayedexpansion
+
+REM قراءة الإعدادات من .ssh-config
+for /f "tokens=1,2 delims==" %%A in (.ssh-config) do (
+    set "%%A=%%B"
+)
+
+REM متغيرات
+set "SSH_USER=%SSH_USER:~0,50%"
+set "SSH_HOST=%SSH_HOST:~0,50%"
+set "SSH_PORT=%SSH_PORT:~0,5%"
+set "REMOTE_PATH=%REMOTE_PATH:~0,100%"
+set "PROJECT_NAME=%PROJECT_NAME:~0,50%"
+
+if not defined SSH_USER (
+    echo.
+    echo [ERROR] ملف الاعدادات غير صحيح
+    echo الرجاء تعديل .ssh-config
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo ========================================
+echo.
+echo 🚀 Deploy Build Script - Remote Execute
+echo.
+echo ========================================
+echo.
+echo Project: %PROJECT_NAME%
+echo Server: %SSH_USER%@%SSH_HOST%:%SSH_PORT%
+echo Path: %REMOTE_PATH%
+echo.
+
+REM أمر SSH
+set "SSH_CMD=cd %REMOTE_PATH% && npm run build"
+
+echo 🔄 جاري الاتصال...
+echo.
+
+REM تنفيذ الأمر
+if defined SSH_KEY (
+    ssh -i "%SSH_KEY%" -p %SSH_PORT% %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else (
+    ssh -p %SSH_PORT% %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+)
+
+REM التحقق من النتيجة
+if %ERRORLEVEL% EQU 0 (
+    echo.
+    echo ✅ تم البناء بنجاح!
+    echo.
+) else (
+    echo.
+    echo ❌ فشل البناء (Error: %ERRORLEVEL%)
+    echo.
+    pause
+    exit /b 1
+)
+
+endlocal
+
 ```
 </details></tool-use>
 
@@ -831,6 +1574,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `.ssh-config.example`
 
 **Input:**
 
@@ -882,7 +1627,57 @@ ENVIRONMENT=production
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\.ssh-config.example","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\.ssh-config.example
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **.ssh-config.example**</summary>
+
+@@ lines 1-1 @@
+
+```
+# SSH Server Configuration - Advanced Example
+# SSH اعدادات متقدمة مع جميع الخيارات
+
+# ===== المتغيرات المطلوبة (Required) =====
+SSH_USER=your_username
+SSH_HOST=your_server.com
+SSH_PORT=22
+REMOTE_PATH=/path/to/project
+
+# ===== المتغيرات الاختيارية (Optional) =====
+
+# مسار المفتاح الخاص (Private Key)
+# استخدم المسار الكامل (Full Path)
+# SSH_KEY=C:\Users\Username\.ssh\id_ed25519
+# SSH_KEY=/home/user/.ssh/id_rsa
+
+# اسم المشروع
+PROJECT_NAME=Musoftwares
+
+# بيئة التشغيل
+ENVIRONMENT=production
+# ENVIRONMENT=staging
+# ENVIRONMENT=development
+
+# أوامر إضافية يتم تنفيذها بعد npm run build
+# مثال: تشغيل الـ migrations أو الـ seeders
+# POST_BUILD_CMD=npm run migrate && npm run seed
+
+# تعطيل SSH Key Check (غير آمن - فقط للاختبار)
+# SSH_STRICT_HOST_KEY_CHECKING=no
+
+# ===== معلومات إضافية للمرجعية =====
+# تاريخ آخر تحديث: 2026-06-02
+# ملاحظات: 
+#   - لا تنسى تعديل البيانات قبل الاستخدام
+#   - اجعل صلاحيات المفتاح 600 على Linux/Mac
+#   - استخدم مفاتيح SSH بدلاً من كلمات المرور
+
 ```
 </details></tool-use>
 
@@ -890,6 +1685,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `QUICK_START.md`
 
 **Input:**
 
@@ -1063,14 +1860,188 @@ ssh admin@192.168.1.100 "ls -la ~/musoftwares/dist"
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\QUICK_START.md","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\QUICK_START.md
 ```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **QUICK_START.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# 🚀 Quick Start Guide - البدء السريع
+
+## الخطوة الأولى: تحضير بيانات الاتصال
+
+### 1️⃣ استخدم ملف الإعدادات (.ssh-config)
+
+اتبع الخطوات التالية:
+
+```bash
+# 1. انسخ ملف الإعدادات المثالي
+cp .ssh-config.example .ssh-config
+
+# 2. اعدل البيانات (استخدم محرر نصوص)
+# Windows: ابدأ → notepad
+# اضغط على الملف بزر الفأرة الأيمن واختر "Edit"
+```
+
+### 2️⃣ ملء البيانات المطلوبة
+
+اجعل الملف يبدو هكذا:
+
+```ini
+SSH_USER=admin
+SSH_HOST=192.168.1.100
+SSH_PORT=22
+REMOTE_PATH=/home/admin/musoftwares
+SSH_KEY=C:\Users\YourName\.ssh\id_rsa
+PROJECT_NAME=Musoftwares
+```
+
+---
+
+## الخطوة الثانية: تشغيل البناء
+
+### ✅ على Windows (الطريقة الأبسط)
+
+**الخيار 1: استخدام Batch File**
+```cmd
+# انقر نقرة مزدوجة على:
+build-remote.bat
+```
+
+**الخيار 2: استخدام PowerShell**
+```powershell
+# افتح PowerShell في هذا المجلد وشغل:
+.\build-remote-advanced.ps1
+
+# أو النسخة الكاملة:
+.\build-remote-full.ps1
+```
+
+### ✅ على Linux/Mac (WSL)
+
+```bash
+# اجعل الملف قابل للتنفيذ
+chmod +x build-remote.sh
+
+# شغله
+./build-remote.sh
+```
+
+---
+
+## الخيارات المتقدمة
+
+### إظهار التفاصيل أثناء التنفيذ
+```powershell
+.\build-remote-full.ps1 -Verbose
+```
+
+### اختبر قبل التنفيذ (Dry Run)
+```powershell
+.\build-remote-full.ps1 -DryRun
+```
+
+### تحديث المتعلقات قبل البناء
+```powershell
+.\build-remote-full.ps1 -UpdateDeps
+```
+
+### عرض السجل بعد الانتهاء
+```powershell
+.\build-remote-full.ps1 -ShowLog
+```
+
+---
+
+## استكشاف الأخطاء السريع
+
+| المشكلة | الحل |
+|--------|------|
+| **Permission denied** | تأكد من كلمة المرور أو المفتاح |
+| **Connection refused** | تحقق من IP والمنفذ |
+| **npm: command not found** | npm غير مثبت على السيرفر |
+| **Path not found** | غلط في مسار المشروع REMOTE_PATH |
+
+---
+
+## جدولة التشغيل التلقائي
+
+### 🖥️ Windows Task Scheduler
+
+1. اضغط `Win + R` واكتب: `taskschd.msc`
+2. انقر: **Create Basic Task**
+3. اختر الجدول الزمني (يومي، أسبوعي، إلخ)
+4. في الإجراء، استخدم:
+   ```
+   Program: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+   Args: -File "d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1"
+   ```
+
+### 🐧 Linux/Mac Cron
+
+```bash
+# افتح محرر Cron
+crontab -e
+
+# أضف هذا السطر لتشغيل البناء كل يوم في الساعة 2 صباحًا
+0 2 * * * /path/to/deploy/build-remote.sh
+```
+
+---
+
+## ملاحظات أمان ⚠️
+
+- ❌ **لا** تخزن كلمات المرور في الملفات
+- ✅ **استخدم** مفاتيح SSH بدلاً من كلمات المرور
+- 🔐 **اجعل** صلاحيات المفتاح 600:
+  ```bash
+  chmod 600 ~/.ssh/id_rsa
+  ```
+
+---
+
+## للمزيد من المساعدة
+
+- اقرأ [README.md](README.md) للتفاصيل الكاملة
+- تحقق من السجلات: `logs/build_*.log`
+- جرّب `-DryRun` قبل التنفيذ الفعلي
+
+---
+
+## مثال عملي 📋
+
+```powershell
+# 1. تحضير
+# - عدّل .ssh-config بـ بيانات السيرفر
+
+# 2. اختبر الاتصال
+ssh admin@192.168.1.100 "echo Success"
+
+# 3. شغل البناء
+.\build-remote-full.ps1 -Verbose
+
+# 4. تحقق من النتائج
+ssh admin@192.168.1.100 "ls -la ~/musoftwares/dist"
+```
+
+**بس! 🎉 خلصنا!**
+
+````
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `USAGE_EXAMPLES.md`
 
 **Input:**
 
@@ -1323,14 +2294,267 @@ ssh admin@server.com "tail -f /home/admin/app/build.log"
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\USAGE_EXAMPLES.md","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\USAGE_EXAMPLES.md
 ```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **USAGE_EXAMPLES.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# Usage Examples - أمثلة الاستخدام
+
+## مثال 1: البناء البسيط
+
+```powershell
+# النسخة الأساسية
+.\build-remote.ps1
+
+# أو النسخة المتقدمة
+.\build-remote-advanced.ps1
+```
+
+---
+
+## مثال 2: البناء مع التفاصيل
+
+```powershell
+# إظهار جميع التفاصيل
+.\build-remote-full.ps1 -Verbose
+
+# الإخراج:
+# [2026-06-02 14:30:45] [Info] 🚀 Deploy Build Automation v1.0.0
+# [2026-06-02 14:30:45] [Info] 🔍 اختبار الاتصال SSH...
+# [2026-06-02 14:30:46] [Success] ✓ الاتصال نجح
+# ...
+```
+
+---
+
+## مثال 3: اختبار قبل التنفيذ
+
+```powershell
+# جرّب بدون تنفيذ فعلي
+.\build-remote-full.ps1 -DryRun
+
+# الإخراج:
+# 🔔 وضع DRY RUN - لن يتم تنفيذ الأوامر
+# ✓ اختبار DRY RUN اكتمل بنجاح
+```
+
+---
+
+## مثال 4: تحديث المتعلقات + البناء
+
+```powershell
+# npm install يتم قبل npm run build
+.\build-remote-full.ps1 -UpdateDeps
+
+# الأوامر:
+# 1. npm install
+# 2. npm run build
+# 3. أي أوامر POST_BUILD_CMD
+```
+
+---
+
+## مثال 5: إعدادات مخصصة
+
+```powershell
+# استخدام ملف إعدادات مخصص
+.\build-remote-advanced.ps1 -ConfigFile "staging-config"
+
+# أو
+.\build-remote-full.ps1 -ConfigFile "production-config"
+```
+
+---
+
+## مثال 6: عرض السجل
+
+```powershell
+# تشغيل + عرض السجل
+.\build-remote-full.ps1 -ShowLog
+
+# أو اقرأ السجل بعداً:
+Get-Content logs/build_*.log -Tail 50
+```
+
+---
+
+## مثال 7: مع أوامر إضافية
+
+في ملف `.ssh-config`:
+
+```ini
+SSH_USER=admin
+SSH_HOST=server.com
+REMOTE_PATH=/home/admin/app
+POST_BUILD_CMD=npm run migrate && npm run seed && systemctl restart app
+```
+
+ثم شغل:
+
+```powershell
+.\build-remote-full.ps1
+```
+
+**النتيجة:**
+```
+cd /home/admin/app && npm install && npm run build && npm run migrate && npm run seed && systemctl restart app
+```
+
+---
+
+## مثال 8: استخدام BAT File
+
+```cmd
+REM انقر نقرة مزدوجة على
+build-remote.bat
+
+REM أو من سطر الأوامر
+cmd /c build-remote.bat
+```
+
+---
+
+## مثال 9: البناء المجدول على Windows
+
+**إنشاء مهمة محددة:**
+
+```powershell
+# إنشاء مهمة تشغل البناء يومياً الساعة 2 صباحاً
+$trigger = New-JobTrigger -Daily -At 2:00AM
+$action = New-ScheduledJobOption -RunElevated
+Register-ScheduledJob -Name "BuildProject" `
+    -Trigger $trigger `
+    -ScriptBlock {
+        cd "d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy"
+        .\build-remote-full.ps1
+    }
+```
+
+---
+
+## مثال 10: البناء مع معالجة الأخطاء
+
+```powershell
+# قم بإرسال تنبيه عند الفشل
+$result = & .\build-remote-full.ps1
+
+if ($LASTEXITCODE -ne 0) {
+    # أرسل بريد إلكتروني أو إشعار
+    Write-Host "فشل البناء!" -ForegroundColor Red
+    
+    # أو أعد محاولة:
+    Start-Sleep -Seconds 60
+    & .\build-remote-full.ps1
+}
+```
+
+---
+
+## مثال 11: البناء مع Logging متقدم
+
+```powershell
+# احفظ جميع النتائج
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+.\build-remote-full.ps1 -Verbose | Tee-Object -FilePath "results_$timestamp.log"
+```
+
+---
+
+## مثال 12: بدء وإيقاف الخدمات
+
+في `.ssh-config`:
+
+```ini
+SSH_USER=admin
+SSH_HOST=server.com
+REMOTE_PATH=/home/admin/app
+POST_BUILD_CMD=systemctl restart nginx && sleep 5 && curl -f http://localhost/health || exit 1
+```
+
+---
+
+## أسطر الأوامر المتقدمة
+
+### جميع الخيارات معاً
+
+```powershell
+.\build-remote-full.ps1 `
+    -ConfigFile ".ssh-config" `
+    -Verbose `
+    -UpdateDeps `
+    -ShowLog
+```
+
+### مع معالجة الأخطاء
+
+```powershell
+try {
+    $result = & .\build-remote-full.ps1 -Verbose
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ نجح!" -ForegroundColor Green
+    } else {
+        Write-Host "❌ فشل!" -ForegroundColor Red
+        exit 1
+    }
+} catch {
+    Write-Host "خطأ: $_" -ForegroundColor Red
+    exit 1
+}
+```
+
+---
+
+## استكشاف الأخطاء
+
+### عرض السجلات الأخيرة
+
+```powershell
+Get-ChildItem logs/ -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content
+```
+
+### اختبر SSH مباشرة
+
+```powershell
+ssh -p 22 admin@192.168.1.100 "pwd"
+ssh -i C:\Users\User\.ssh\id_rsa admin@192.168.1.100 "pwd"
+```
+
+### تتبع العمليات على السيرفر
+
+```bash
+# أثناء تشغيل البناء:
+ssh admin@server.com "top" # أو "htop"
+ssh admin@server.com "tail -f /home/admin/app/build.log"
+```
+
+---
+
+## ملاحظات مهمة 📌
+
+- كل أمر يُظهر `[Success]` أو `[Error]` واضح
+- السجلات تُحفظ في مجلد `logs/`
+- استخدم `-DryRun` قبل التنفيذ الحقيقي
+- اختبر الاتصال بـ `Test-SSHConnection` أولاً
+
+
+````
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `FILE_GUIDE.md`
 
 **Input:**
 
@@ -1596,14 +2820,280 @@ Get-ChildItem logs/ | Sort-Object LastWriteTime -Descending | Select-Object -Fir
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\FILE_GUIDE.md","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\FILE_GUIDE.md
 ```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **FILE_GUIDE.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# 📁 File Structure & Description - وصف الملفات
+
+## 📊 جدول المقارنة
+
+| الملف | النوع | الاستخدام | التعقيد |
+|------|-------|----------|--------|
+| `build-remote.bat` | Batch | شغيل من CMD مباشرة | ⭐ بسيط |
+| `build-remote.ps1` | PowerShell | نسخة أساسية بسيطة | ⭐ بسيط |
+| `build-remote.sh` | Bash | Linux/Mac/WSL | ⭐ بسيط |
+| `build-remote-advanced.ps1` | PowerShell | مع الإعدادات والسجلات | ⭐⭐ متوسط |
+| `build-remote-full.ps1` | PowerShell | نسخة شاملة كاملة | ⭐⭐⭐ متقدم |
+| `.ssh-config` | نصي | ملف الإعدادات | - |
+| `.ssh-config.example` | نصي | مثال للإعدادات | - |
+
+---
+
+## 📖 وصف كل ملف
+
+### 1️⃣ `build-remote.bat` (Windows Batch)
+**الأفضل لـ:** المستخدمين الذين يريدون الشغيل المباشر
+
+```
+✅ المميزات:
+- انقر نقرة مزدوجة = يشتغل مباشرة
+- لا يحتاج PowerShell
+- بسيط جداً
+
+❌ القيود:
+- ميزات محدودة
+- قراءة بسيطة من .ssh-config فقط
+```
+
+**الاستخدام:**
+```cmd
+build-remote.bat
+```
+
+---
+
+### 2️⃣ `build-remote.ps1` (PowerShell بسيط)
+**الأفضل لـ:** من يريد سكريبت مباشر وبسيط
+
+```
+✅ المميزات:
+- سهل التعديل
+- أساسي وبسيط
+
+❌ القيود:
+- بدون سجلات
+- بدون معالجة أخطاء متقدمة
+- بدون خيارات إضافية
+```
+
+**الاستخدام:**
+```powershell
+.\build-remote.ps1
+```
+
+---
+
+### 3️⃣ `build-remote.sh` (Bash)
+**الأفضل لـ:** مستخدمي Linux/Mac/WSL
+
+```
+✅ المميزات:
+- متوافق مع Unix
+- بسيط وخفيف
+
+❌ القيود:
+- لا يعمل على Windows CMD
+- ميزات محدودة
+```
+
+**الاستخدام:**
+```bash
+chmod +x build-remote.sh
+./build-remote.sh
+```
+
+---
+
+### 4️⃣ `build-remote-advanced.ps1` (PowerShell متقدم)
+**الأفضل لـ:** من يريد توازن بين البساطة والميزات
+
+```
+✅ المميزات:
+- قراءة الإعدادات من ملف خارجي
+- معالجة أخطاء جيدة
+- خيارات: -Verbose, -DryRun, -ConfigFile
+- ألوان ملونة وسهل المتابعة
+
+❌ القيود:
+- بدون سجلات دائمة
+- بدون تنفيذ مراحل متعددة
+```
+
+**الاستخدام:**
+```powershell
+.\build-remote-advanced.ps1
+.\build-remote-advanced.ps1 -Verbose
+.\build-remote-advanced.ps1 -DryRun
+```
+
+---
+
+### 5️⃣ `build-remote-full.ps1` (PowerShell شامل)
+**الأفضل لـ:** الإنتاج والأتمتة الاحترافية
+
+```
+✅ المميزات:
+- ✅ سجلات دائمة (logs/)
+- ✅ اختبار الاتصال تلقائي
+- ✅ تنفيذ مراحل متعددة
+- ✅ معالجة أخطاء شاملة
+- ✅ عرض التفاصيل الكاملة
+- ✅ Dry-run للاختبار
+- ✅ خيارات متقدمة (-UpdateDeps, -ShowLog)
+- ✅ شيء بسيط وسهل الاستخدام
+
+❌ القيود:
+- ملف أكبر حجماً
+- يحتاج PowerShell 5.1 أو أعلى
+```
+
+**الاستخدام:**
+```powershell
+# أساسي
+.\build-remote-full.ps1
+
+# متقدم
+.\build-remote-full.ps1 -Verbose -UpdateDeps -ShowLog
+
+# اختبار فقط
+.\build-remote-full.ps1 -DryRun
+```
+
+---
+
+### 📋 `.ssh-config` (ملف الإعدادات)
+**الغرض:** تخزين بيانات الاتصال
+
+```ini
+SSH_USER=admin
+SSH_HOST=server.com
+SSH_PORT=22
+REMOTE_PATH=/home/admin/app
+SSH_KEY=C:\Users\User\.ssh\id_rsa
+PROJECT_NAME=MyProject
+POST_BUILD_CMD=npm run migrate
+```
+
+---
+
+### 📋 `.ssh-config.example` (مثال)
+نسخة مثالية تحتوي على جميع الخيارات مع التعليقات.
+
+---
+
+## 🎯 أيهما أختار؟
+
+### 👶 للمبتدئين
+```
+اختر: build-remote.bat
+لماذا: انقر نقرة مزدوجة وخلصت
+```
+
+### 👨‍💻 للمطورين
+```
+اختر: build-remote-advanced.ps1
+لماذا: يحتوي ميزات مع البساطة
+```
+
+### 🚀 للإنتاج
+```
+اختر: build-remote-full.ps1
+لماذا: مميزات كاملة + سجلات + أتمتة
+```
+
+### 🐧 على Linux/Mac
+```
+اختر: build-remote.sh
+لماذا: الخيار الوحيد المتوافق
+```
+
+---
+
+## 📂 مجلد Logs
+
+السكريبتات المتقدمة تنشئ سجلات تلقائية:
+
+```
+logs/
+├── build_2026-06-02_14-30-45.log
+├── build_2026-06-02_15-45-30.log
+└── build_2026-06-02_16-20-15.log
+```
+
+**اقرأ آخر سجل:**
+```powershell
+Get-ChildItem logs/ | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content
+```
+
+---
+
+## 🔄 سير العمل الموصى به
+
+### المرة الأولى:
+```
+1. عدّل .ssh-config
+2. اختبر SSH: ssh user@host "echo OK"
+3. شغل: build-remote-full.ps1 -DryRun
+4. اقرأ المخرجات
+5. شغل: build-remote-full.ps1
+```
+
+### التشغيل الروتيني:
+```
+الطريقة 1: انقر على build-remote.bat
+الطريقة 2: شغل build-remote-advanced.ps1
+الطريقة 3: جدولة مع Task Scheduler
+```
+
+---
+
+## ⚡ النصائح المهمة
+
+1. **استخدم النسخة المناسبة:** ابدأ بـ BAT، ارتق لـ Advanced عند الحاجة
+2. **احتفظ بـ .ssh-config محدثاً:** تأكد أن البيانات صحيحة
+3. **اختبر مع -DryRun أولاً:** قبل التشغيل الفعلي
+4. **راقب السجلات:** ابدأ من آخر سجل عند وجود مشاكل
+5. **استخدم مفاتيح SSH:** بدلاً من كلمات المرور
+
+---
+
+## 🐛 استكشاف الأخطاء
+
+| المشكلة | الحل |
+|--------|------|
+| "لا يعمل BAT" | استخدم PowerShell بدلاً منه |
+| "PowerShell لا يفتح" | اضغط `Win + X` واختر "PowerShell" |
+| "Permission denied" | تأكد من صحة البيانات في .ssh-config |
+| "npm not found" | npm غير مثبت على السيرفر |
+
+---
+
+## 📞 دعم إضافي
+
+- اقرأ: [README.md](README.md)
+- ابدأ من: [QUICK_START.md](QUICK_START.md)
+- أمثلة: [USAGE_EXAMPLES.md](USAGE_EXAMPLES.md)
+
+
+````
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `TROUBLESHOOTING.md`
 
 **Input:**
 
@@ -2035,14 +3525,446 @@ Get-Content logs/build_*.log | Select-String "Error|Failed"
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\TROUBLESHOOTING.md","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\TROUBLESHOOTING.md
 ```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **TROUBLESHOOTING.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# ❌ Troubleshooting Guide - دليل استكشاف الأخطاء
+
+## الأخطاء الشائعة والحلول
+
+---
+
+## 1️⃣ Connection Refused
+
+### ❌ الخطأ:
+```
+ssh: connect to host 192.168.1.100 port 22: Connection refused
+```
+
+### ✅ الحلول:
+
+**الحل 1: تحقق من عنوان الـ IP**
+```powershell
+# اختبر Ping أولاً
+ping 192.168.1.100
+
+# أو استخدم الـ hostname
+ping server.example.com
+```
+
+**الحل 2: تحقق من المنفذ**
+```powershell
+# اختبر المنفذ
+Test-NetConnection -ComputerName 192.168.1.100 -Port 22
+
+# النتيجة المتوقعة:
+# TcpTestSucceeded : True
+```
+
+**الحل 3: تحقق من SSH على السيرفر**
+```bash
+# على السيرفر، تأكد أن SSH يعمل:
+sudo systemctl status ssh
+sudo service ssh status
+
+# ابدأ SSH إذا لم يكن يعمل:
+sudo systemctl start ssh
+```
+
+---
+
+## 2️⃣ Permission Denied
+
+### ❌ الخطأ:
+```
+Permission denied (publickey,password)
+```
+
+### ✅ الحلول:
+
+**الحل 1: استخدم كلمة مرور صحيحة**
+```powershell
+# اختبر الاتصال بدون مفتاح
+ssh admin@192.168.1.100
+
+# سيطلب كلمة مرور
+# أدخل الكلمة بحذر (قد لا تظهر النقاط)
+```
+
+**الحل 2: تحقق من مفتاح SSH**
+```powershell
+# تأكد أن المفتاح موجود
+Test-Path C:\Users\YourName\.ssh\id_rsa
+
+# جرّب مع مفتاح محدد
+ssh -i C:\Users\YourName\.ssh\id_rsa admin@192.168.1.100
+```
+
+**الحل 3: أصلح صلاحيات المفتاح على السيرفر**
+```bash
+# على السيرفر:
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/id_rsa
+```
+
+**الحل 4: أضف المفتاح العام للسيرفر**
+```powershell
+# من Windows:
+# 1. انسخ المفتاح العام
+$pubKey = Get-Content C:\Users\YourName\.ssh\id_rsa.pub
+
+# 2. أرسله للسيرفر عبر SSH
+ssh admin@192.168.1.100 "echo '$pubKey' >> ~/.ssh/authorized_keys"
+```
+
+---
+
+## 3️⃣ npm: command not found
+
+### ❌ الخطأ:
+```
+cd /home/admin/app && npm run build
+-bash: npm: command not found
+```
+
+### ✅ الحلول:
+
+**الحل 1: تحقق من تثبيت npm**
+```bash
+# على السيرفر:
+npm -v
+node -v
+
+# إذا لم تظهر إصدارات، npm غير مثبت
+```
+
+**الحل 2: ثبّت npm و Node.js**
+```bash
+# على Ubuntu/Debian:
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# على CentOS/RHEL:
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+
+# على macOS:
+brew install node
+```
+
+**الحل 3: استخدم مسار npm الكامل**
+```bash
+# اعثر على npm
+which npm
+
+# استخدم المسار الكامل في السكريبت
+/usr/bin/npm run build
+# أو
+/usr/local/bin/npm run build
+```
+
+---
+
+## 4️⃣ Remote Path Not Found
+
+### ❌ الخطأ:
+```
+bash: cd: /home/admin/wrong-path: No such file or directory
+```
+
+### ✅ الحلول:
+
+**الحل 1: تحقق من المسار**
+```bash
+# من السيرفر، اختبر المسار:
+ls -la /home/admin/app
+
+# أو ادرج المجلدات:
+ls -la /home/admin/
+```
+
+**الحل 2: عدّل REMOTE_PATH في .ssh-config**
+```ini
+# المسار الخاطئ:
+REMOTE_PATH=/home/admin/wrong-path
+
+# المسار الصحيح:
+REMOTE_PATH=/home/admin/musoftwares
+```
+
+**الحل 3: استخدم المسار المطلق**
+```bash
+# اعثر على المسار الكامل:
+pwd
+
+# ثم استخدمه في .ssh-config:
+REMOTE_PATH=/home/admin/musoftwares  # مثال صحيح
+```
+
+---
+
+## 5️⃣ Build Fails
+
+### ❌ الخطأ:
+```
+npm ERR! code EACCES
+npm ERR! syscall open
+npm ERR! path /home/admin/app/package-lock.json
+npm ERR! errno -13
+npm ERR! Error: EACCES: permission denied
+```
+
+### ✅ الحلول:
+
+**الحل 1: أصلح الصلاحيات**
+```bash
+# من السيرفر:
+cd /home/admin/app
+ls -la
+
+# جعل الملفات قابلة للقراءة:
+chmod -R 755 .
+
+# أو إذا كان المالك مختلف:
+sudo chown -R admin:admin /home/admin/app
+```
+
+**الحل 2: امسح node_modules والملفات المؤقتة**
+```bash
+cd /home/admin/app
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+**الحل 3: استخدم Verbose للتفاصيل**
+```powershell
+.\build-remote-full.ps1 -Verbose
+
+# اقرأ السجل:
+Get-Content logs/build_*.log -Tail 100
+```
+
+---
+
+## 6️⃣ Timeout
+
+### ❌ الخطأ:
+```
+Connection timed out
+Operation timed out
+```
+
+### ✅ الحلول:
+
+**الحل 1: قد يكون البناء يستغرق وقتاً**
+```bash
+# اتصل مباشرة واترك الوقت:
+ssh admin@192.168.1.100 "cd /app && npm run build"
+
+# اصبر قليلاً (قد يستغرق 5-10 دقائق)
+```
+
+**الحل 2: زد Timeout على SSH**
+```powershell
+# في السكريبت، أضف:
+ssh -o ConnectTimeout=30 -o StrictHostKeyChecking=no admin@192.168.1.100 "..."
+```
+
+**الحل 3: شغّل البناء في Screen أو Tmux**
+```bash
+# من السيرفر:
+screen -S build
+
+# ثم:
+cd /home/admin/app
+npm run build
+
+# اضغط Ctrl+A ثم D للخروج
+```
+
+---
+
+## 7️⃣ Config File Not Found
+
+### ❌ الخطأ:
+```
+ملف الإعدادات غير موجود: .ssh-config
+```
+
+### ✅ الحل:
+
+```powershell
+# انسخ المثال:
+Copy-Item .ssh-config.example .ssh-config
+
+# عدّل الملف:
+notepad .ssh-config
+
+# ملء البيانات:
+SSH_USER=admin
+SSH_HOST=192.168.1.100
+REMOTE_PATH=/home/admin/app
+```
+
+---
+
+## 8️⃣ PowerShell Not Allowed
+
+### ❌ الخطأ:
+```
+PowerShell scripts are disabled on this system
+```
+
+### ✅ الحل:
+
+```powershell
+# اسمح بتشغيل السكريبتات:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# أو:
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
+
+# تحقق من الإعدادات:
+Get-ExecutionPolicy
+```
+
+---
+
+## 9️⃣ SSH Key Permissions
+
+### ❌ الخطأ:
+```
+WARNING: UNPROTECTED PRIVATE KEY FILE!
+It is required that your private key files are NOT accessible by others.
+```
+
+### ✅ الحل:
+
+**على Windows:**
+```powershell
+# الحقول → الخصائص → الأمان → تحرير
+# أزل المستخدمين ما عدا المالك
+
+# أو استخدم PowerShell:
+$keyPath = "C:\Users\YourName\.ssh\id_rsa"
+icacls $keyPath /inheritance:r /grant:r "$($env:USERNAME):(F)"
+```
+
+**على Linux/Mac:**
+```bash
+chmod 600 ~/.ssh/id_rsa
+chmod 700 ~/.ssh
+```
+
+---
+
+## 🔟 Git Errors
+
+### ❌ الخطأ:
+```
+fatal: not a git repository
+```
+
+### ✅ الحل:
+
+```bash
+# على السيرفر:
+cd /home/admin/app
+
+# تحقق من وجود .git:
+ls -la | grep git
+
+# أو:
+git status
+```
+
+---
+
+## 🔍 أدوات التشخيص
+
+### اختبر الاتصال SSH
+
+```powershell
+# الاختبار الأساسي:
+ssh -v admin@192.168.1.100 "echo OK"
+
+# مع تفاصيل كاملة:
+ssh -vvv admin@192.168.1.100 "echo OK"
+```
+
+### اختبر npm على السيرفر
+
+```bash
+ssh admin@192.168.1.100 "npm run build --verbose"
+ssh admin@192.168.1.100 "npm list"
+```
+
+### عرض السجلات
+
+```powershell
+# آخر 50 سطر:
+Get-Content logs/build_*.log -Tail 50
+
+# البحث عن الأخطاء:
+Get-Content logs/build_*.log | Select-String "Error|Failed"
+```
+
+---
+
+## 📋 قائمة التحقق
+
+قبل كل تشغيل:
+
+- [ ] هل البيانات في .ssh-config صحيحة؟
+- [ ] هل يمكنك الاتصال بـ SSH يدويًا؟
+- [ ] هل npm مثبت على السيرفر؟
+- [ ] هل المسار البعيد صحيح؟
+- [ ] هل لديك صلاحيات الكتابة؟
+- [ ] هل المشروع به package.json؟
+
+---
+
+## 📞 طلب المساعدة
+
+إذا لم تجد الحل:
+
+1. اجمع المعلومات:
+   ```powershell
+   # الملفات المهمة:
+   - .ssh-config (بدون معلومات حساسة)
+   - آخر سجل
+   - رسالة الخطأ الكاملة
+   ```
+
+2. جرّب `-Verbose`:
+   ```powershell
+   .\build-remote-full.ps1 -Verbose -ShowLog
+   ```
+
+3. اقرأ السجل بعناية واتخذ الإجراء
+
+
+````
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir"><details>
 <summary>Tool use: **list_dir**</summary>
+
+Read `deploy`
 
 **Input:**
 
@@ -2051,14 +3973,1909 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":".ssh-config","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote-advanced.ps1","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote-full.ps1","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote.bat","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote.ps1","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote.sh","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"FILE_GUIDE.md","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"QUICK_START.md","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"README.md","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"TROUBLESHOOTING.md","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"USAGE_EXAMPLES.md","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[]
-… (output truncated)
+.ssh-config
+build-remote-advanced.ps1
+build-remote-full.ps1
+build-remote.bat
+build-remote.ps1
+build-remote.sh
+FILE_GUIDE.md
+QUICK_START.md
+README.md
+TROUBLESHOOTING.md
+USAGE_EXAMPLES.md
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
-دعني أولاً أتحقق من محتويات مجلد deploy الحالية: سأنشئ لك سكريبت يقوم بتنفيذ `npm run build` عبر SSH بشكل تلقائي. سأنشئ نسختين: واحدة PowerShell للـ Windows وواحدة Bash: أنشأت لك حزمة أنشأت لك حزمة كاملة للبناء التلقائي عبر SSH! 🎉
+أنشأت لك حزمة 
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Deploy Build Script - PowerShell
+# تشغيل npm run build على السيرفر عبر SSH
+
+# تعديل هذه المتغيرات حسب بيانات السيرفر الخاص بك
+$SSH_USER = "your_username"           # اسم المستخدم
+$SSH_HOST = "your_server.com"         # عنوان السيرفر
+$SSH_PORT = 22                        # المنفذ (22 افتراضي)
+$REMOTE_PATH = "/path/to/project"    # مسار المشروع على السيرفر
+$SSH_KEY = "C:\path\to\ssh_key"       # مسار المفتاح الخاص (اختياري)
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# تنفيذ الأمر
+Write-Host "جاري الاتصال بالسيرفر وتنفيذ npm run build..." -ForegroundColor Cyan
+
+if ($SSH_KEY) {
+    # مع مفتاح SSH
+    ssh -i $SSH_KEY -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+} else {
+    # بدون مفتاح (سيطلب كلمة مرور)
+    ssh -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+}
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✓ تم البناء بنجاح!" -ForegroundColor Green
+} else {
+    Write-Host "✗ حدث خطأ أثناء البناء" -ForegroundColor Red
+    exit 1
+}
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.sh**</summary>
+
+@@ lines 1-1 @@
+
+```
+#!/bin/bash
+# Deploy Build Script - Bash
+# تشغيل npm run build على السيرفر عبر SSH
+
+# تعديل هذه المتغيرات حسب بيانات السيرفر الخاص بك
+SSH_USER="your_username"           # اسم المستخدم
+SSH_HOST="your_server.com"         # عنوان السيرفر
+SSH_PORT=22                        # المنفذ (22 افتراضي)
+REMOTE_PATH="/path/to/project"    # مسار المشروع على السيرفر
+SSH_KEY=""                         # مسار المفتاح الخاص (اختياري)
+
+# بناء أمر SSH
+SSH_CMD="cd $REMOTE_PATH && npm run build"
+
+# تنفيذ الأمر
+echo "🔄 جاري الاتصال بالسيرفر وتنفيذ npm run build..."
+
+if [ -n "$SSH_KEY" ] && [ -f "$SSH_KEY" ]; then
+    # مع مفتاح SSH
+    ssh -i "$SSH_KEY" -p $SSH_PORT "$SSH_USER@$SSH_HOST" "$SSH_CMD"
+else
+    # بدون مفتاح (سيطلب كلمة مرور)
+    ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST" "$SSH_CMD"
+fi
+
+# التحقق من نجاح التنفيذ
+if [ $? -eq 0 ]; then
+    echo "✅ تم البناء بنجاح!"
+else
+    echo "❌ حدث خطأ أثناء البناء"
+    exit 1
+fi
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **.ssh-config**</summary>
+
+@@ lines 1-1 @@
+
+```
+# SSH Server Configuration
+# SSH اعدادات الاتصال بـ
+
+SSH_USER=your_username
+SSH_HOST=your_server.com
+SSH_PORT=22
+REMOTE_PATH=/path/to/project
+
+# اختياري: مسار المفتاح الخاص
+# SSH_KEY=/path/to/private/key
+
+# معلومات إضافية (اختياري)
+PROJECT_NAME=MyProject
+ENVIRONMENT=production
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote-advanced.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Advanced Deploy Build Script - PowerShell
+# نسخة محسّنة مع دعم الإعدادات والسجلات
+
+param(
+    [switch]$Verbose = $false,
+    [switch]$DryRun = $false,
+    [string]$ConfigFile = ".ssh-config"
+)
+
+# الألوان
+$colors = @{
+    Info = "Cyan"
+    Success = "Green"
+    Warning = "Yellow"
+    Error = "Red"
+}
+
+function Write-Log {
+    param([string]$Message, [string]$Level = "Info")
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $output = "[$timestamp] [$Level] $Message"
+    Write-Host $output -ForegroundColor $colors[$Level]
+}
+
+# قراءة ملف الإعدادات
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$configPath = Join-Path $scriptDir $ConfigFile
+
+if (-not (Test-Path $configPath)) {
+    Write-Log "❌ لم يتم العثور على ملف الإعدادات: $configPath" "Error"
+    exit 1
+}
+
+# تحميل الإعدادات
+$config = @{}
+Get-Content $configPath | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+# استخلاص البيانات
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project"
+
+Write-Log "🚀 بدء البناء للمشروع: $PROJECT_NAME" "Info"
+Write-Log "الاتصال: $SSH_USER@$SSH_HOST:$SSH_PORT" "Info"
+Write-Log "المسار: $REMOTE_PATH" "Info"
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# أوامر إضافية (اختياري)
+if ($config['POST_BUILD_CMD']) {
+    $sshCommand += " && " + $config['POST_BUILD_CMD']
+    Write-Log "سيتم تنفيذ أمر إضافي بعد البناء" "Info"
+}
+
+if ($Verbose) {
+    Write-Log "الأمر: $sshCommand" "Info"
+}
+
+if ($DryRun) {
+    Write-Log "وضع DRY RUN - لن يتم تنفيذ الأمر فعليًا" "Warning"
+    exit 0
+}
+
+Write-Log "جاري الاتصال بالسيرفر..." "Info"
+
+# تنفيذ الأمر
+try {
+    if ($SSH_KEY -and (Test-Path $SSH_KEY)) {
+        ssh -i $SSH_KEY -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+    } else {
+        ssh -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+    }
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Log "✓ تم البناء بنجاح!" "Success"
+    } else {
+        Write-Log "✗ فشل البناء (exit code: $LASTEXITCODE)" "Error"
+        exit 1
+    }
+} catch {
+    Write-Log "❌ حدث خطأ: $_" "Error"
+    exit 1
+}
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **README.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# Deploy Build Script 🚀
+
+سكريبتات لتشغيل `npm run build` على السيرفر بشكل تلقائي عبر SSH
+
+## الملفات المتاحة
+
+### 1. `build-remote.ps1` - نسخة أساسية (PowerShell)
+سكريبت بسيط لتنفيذ البناء على السيرفر البعيد.
+
+**الاستخدام:**
+```powershell
+# قم بتعديل البيانات أولاً في الملف:
+# - SSH_USER
+# - SSH_HOST
+# - SSH_PORT (اختياري، الافتراضي: 22)
+# - REMOTE_PATH
+# - SSH_KEY (اختياري)
+
+.\build-remote.ps1
+```
+
+### 2. `build-remote-advanced.ps1` - نسخة محسّنة (PowerShell)
+نسخة متقدمة مع دعم الإعدادات من ملف خارجي والسجلات والخيارات الإضافية.
+
+**الاستخدام:**
+```powershell
+# التشغيل العادي
+.\build-remote-advanced.ps1
+
+# مع إظهار التفاصيل
+.\build-remote-advanced.ps1 -Verbose
+
+# بدون تنفيذ فعلي (جرب أولاً)
+.\build-remote-advanced.ps1 -DryRun
+
+# مع ملف إعدادات مخصص
+.\build-remote-advanced.ps1 -ConfigFile "custom-config"
+```
+
+### 3. `build-remote.sh` - نسخة Bash
+سكريبت بسيط لـ Bash (Linux/macOS أو WSL).
+
+**الاستخدام:**
+```bash
+# اجعل الملف قابل للتنفيذ
+chmod +x build-remote.sh
+
+# ثم شغله
+./build-remote.sh
+```
+
+### 4. `.ssh-config` - ملف الإعدادات
+ملف إعدادات يحتوي على بيانات الاتصال بالسيرفر.
+
+**محتوى المثال:**
+```ini
+SSH_USER=your_username
+SSH_HOST=your_server.com
+SSH_PORT=22
+REMOTE_PATH=/path/to/project
+SSH_KEY=/path/to/private/key    # اختياري
+PROJECT_NAME=MyProject            # اختياري
+POST_BUILD_CMD=npm run seed       # اختياري
+```
+
+---
+
+## إعداد الاتصال SSH
+
+### على Windows (PowerShell):
+
+1. **التحقق من SSH:**
+   ```powershell
+   ssh -V
+   ```
+
+2. **إضافة مفتاح SSH (اختياري):**
+   ```powershell
+   # إذا لم تمتلك مفتاح
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   
+   # نسخ المفتاح العام للسيرفر
+   Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub | ssh user@host "cat >> ~/.ssh/authorized_keys"
+   ```
+
+3. **تعديل ملف الإعدادات (`.ssh-config`):**
+   ```ini
+   SSH_USER=your_username
+   SSH_HOST=your_server.com
+   SSH_PORT=22
+   REMOTE_PATH=/var/www/myapp
+   SSH_KEY=C:\Users\YourName\.ssh\id_ed25519
+   ```
+
+4. **تشغيل السكريبت:**
+   ```powershell
+   # اسمح بتنفيذ السكريبتات (إذا لم تفعل قبلاً)
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   
+   # شغل السكريبت
+   .\build-remote-advanced.ps1
+   ```
+
+---
+
+## الميزات الإضافية
+
+### تشغيل أوامر بعد البناء
+أضف في `.ssh-config`:
+```ini
+POST_BUILD_CMD=npm run seed && npm run migrate
+```
+
+### جدولة البناء التلقائي
+
+**على Windows (Task Scheduler):**
+1. اضغط `Win + R` واكتب `taskschd.msc`
+2. انقر على "Create Basic Task"
+3. سمّه واختر الجدول الزمني
+4. في الإجراء: استخدم PowerShell
+   ```
+   Program: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+   Arguments: -File "C:\path\to\deploy\build-remote-advanced.ps1"
+   ```
+
+---
+
+## استكشاف الأخطاء
+
+| المشكلة | الحل |
+|--------|------|
+| SSH: Permission denied | تأكد من أن مفتاح SSH صحيح أو كلمة المرور |
+| Command not found: npm | تأكد أن npm مثبت على السيرفر |
+| Connection refused | تحقق من عنوان السيرفر والمنفذ |
+| Access denied: private key | غير صلاحيات المفتاح: `chmod 600 ~/.ssh/id_ed25519` |
+
+---
+
+## مثال عملي كامل
+
+```powershell
+# 1. تعديل الإعدادات
+# افتح .ssh-config وأكمل:
+# SSH_USER=admin
+# SSH_HOST=server.example.com
+# REMOTE_PATH=/home/admin/musoftwares
+
+# 2. اختبر الاتصال
+ssh admin@server.example.com "echo 'Success'"
+
+# 3. شغل السكريبت
+.\build-remote-advanced.ps1 -Verbose
+
+# 4. تحقق من النتائج على السيرفر
+ssh admin@server.example.com "ls -la /home/admin/musoftwares/dist"
+```
+
+---
+
+## ملاحظات أمان
+
+⚠️ **نصائح مهمة:**
+- لا تخزن بيانات الدخول في ملفات عادية
+- استخدم مفاتيح SSH بدلاً من كلمات المرور
+- اجعل ملف `.ssh-config` بصلاحيات مقيدة (600)
+- استخدم `git-crypt` أو `sealed-secrets` لتشفير البيانات الحساسة
+
+---
+
+## دعم إضافي
+
+للمزيد من المعلومات عن SSH، اقرأ:
+- [SSH Documentation](https://linux.die.net/man/1/ssh)
+- [GitHub SSH Setup](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+````
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote-full.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Full Automation Deploy Script - PowerShell
+# نسخة شاملة مع دعم العديد من الميزات
+
+param(
+    [switch]$Verbose = $false,
+    [switch]$DryRun = $false,
+    [string]$ConfigFile = ".ssh-config",
+    [switch]$ShowLog = $false,
+    [switch]$UpdateDeps = $false  # تحديث المتعلقات قبل البناء
+)
+
+# إعدادات السكريبت
+$scriptVersion = "1.0.0"
+$logDir = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "logs"
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$logFile = Join-Path $logDir "build_$timestamp.log"
+
+# الألوان
+$colors = @{
+    Info = "Cyan"
+    Success = "Green"
+    Warning = "Yellow"
+    Error = "Red"
+    Debug = "Gray"
+}
+
+# إنشاء مجلد السجلات
+if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir | Out-Null
+}
+
+function Write-Log {
+    param(
+        [string]$Message,
+        [string]$Level = "Info",
+        [switch]$NoNewline = $false
+    )
+    
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logMessage = "[$timestamp] [$Level] $Message"
+    
+    # اطبع في الكونسول
+    if ($noNewline) {
+        Write-Host $Message -ForegroundColor $colors[$Level] -NoNewline
+    } else {
+        Write-Host $logMessage -ForegroundColor $colors[$Level]
+    }
+    
+    # احفظ في السجل
+    Add-Content -Path $logFile -Value $logMessage -Encoding UTF8
+}
+
+function Read-ConfigFile {
+    param([string]$Path)
+    
+    $config = @{}
+    if (-not (Test-Path $Path)) {
+        Write-Log "❌ ملف الإعدادات غير موجود: $Path" "Error"
+        exit 1
+    }
+    
+    Get-Content $Path | Where-Object {
+        $_ -notmatch "^#" -and $_ -notmatch "^$"
+    } | ForEach-Object {
+        $parts = $_ -split "=", 2
+        if ($parts.Count -eq 2) {
+            $config[$parts[0].Trim()] = $parts[1].Trim().Trim('"')
+        }
+    }
+    
+    return $config
+}
+
+function Test-SSHConnection {
+    param(
+        [string]$User,
+        [string]$Host,
+        [string]$Port,
+        [string]$Key
+    )
+    
+    Write-Log "🔍 اختبار الاتصال SSH..." "Info"
+    
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            $result = ssh -i $Key -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        } else {
+            $result = ssh -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        }
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "✓ الاتصال نجح" "Success"
+            return $true
+        } else {
+            Write-Log "✗ فشل الاتصال: $result" "Error"
+            return $false
+        }
+    } catch {
+        Write-Log "❌ خطأ في الاتصال: $_" "Error"
+        return $false
+    }
+}
+
+function Execute-RemoteCommand {
+    param(
+        [string]$User,
+        [string]$Host,
+        [string]$Port,
+        [string]$Command,
+        [string]$Key
+    )
+    
+    Write-Log "⚙️  تنفيذ: $Command" "Info"
+    
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            ssh -i $Key -p $Port $User@$Host $Command
+        } else {
+            ssh -p $Port $User@$Host $Command
+        }
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "✓ تم التنفيذ بنجاح" "Success"
+            return $true
+        } else {
+            Write-Log "✗ فشل التنفيذ (exit code: $LASTEXITCODE)" "Error"
+            return $false
+        }
+    } catch {
+        Write-Log "❌ خطأ: $_" "Error"
+        return $false
+    }
+}
+
+# ===== البرنامج الرئيسي =====
+
+Write-Log "════════════════════════════════════════════════" "Info"
+Write-Log "🚀 Deploy Build Automation v$scriptVersion" "Info"
+Write-Log "════════════════════════════════════════════════" "Info"
+
+# قراءة الإعدادات
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$configPath = Join-Path $scriptDir $ConfigFile
+$config = Read-ConfigFile $configPath
+
+# استخلاص البيانات
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project"
+
+Write-Log ""
+Write-Log "📋 تفاصيل الاتصال:" "Info"
+Write-Log "  المشروع: $PROJECT_NAME" "Info"
+Write-Log "  المستخدم: $SSH_USER" "Info"
+Write-Log "  السيرفر: $SSH_HOST:$SSH_PORT" "Info"
+Write-Log "  المسار: $REMOTE_PATH" "Info"
+Write-Log ""
+
+# اختبر الاتصال
+if (-not (Test-SSHConnection -User $SSH_USER -Host $SSH_HOST -Port $SSH_PORT -Key $SSH_KEY)) {
+    exit 1
+}
+
+if ($DryRun) {
+    Write-Log ""
+    Write-Log "🔔 وضع DRY RUN - لن يتم تنفيذ الأوامر" "Warning"
+    Write-Log ""
+}
+
+# بناء قائمة الأوامر
+$commands = @()
+
+if ($UpdateDeps) {
+    $commands += "npm install"
+}
+
+$commands += "npm run build"
+
+if ($config['POST_BUILD_CMD']) {
+    $commands += $config['POST_BUILD_CMD']
+}
+
+# التنفيذ
+Write-Log ""
+Write-Log "📊 الأوامر المطلوب تنفيذها:" "Info"
+for ($i = 0; $i -lt $commands.Count; $i++) {
+    Write-Log "  $($i+1). $($commands[$i])" "Debug"
+}
+Write-Log ""
+
+if ($DryRun) {
+    Write-Log "✓ اختبار DRY RUN اكتمل بنجاح (لم يتم تنفيذ الأوامر)" "Success"
+    exit 0
+}
+
+# إنشاء سكريبت بعيد
+$remoteScript = "cd $REMOTE_PATH && " + ($commands -join " && ")
+
+Write-Log "🔄 جاري البدء..." "Info"
+Write-Log ""
+
+$success = Execute-RemoteCommand `
+    -User $SSH_USER `
+    -Host $SSH_HOST `
+    -Port $SSH_PORT `
+    -Command $remoteScript `
+    -Key $SSH_KEY
+
+Write-Log ""
+if ($success) {
+    Write-Log "════════════════════════════════════════════════" "Success"
+    Write-Log "✅ اكتمل البناء بنجاح!" "Success"
+    Write-Log "════════════════════════════════════════════════" "Success"
+    Write-Log "📄 السجل: $logFile" "Info"
+    
+    if ($ShowLog) {
+        Write-Log ""
+        Write-Log "📋 محتوى السجل:" "Info"
+        Get-Content $logFile
+    }
+} else {
+    Write-Log "════════════════════════════════════════════════" "Error"
+    Write-Log "❌ فشل البناء!" "Error"
+    Write-Log "════════════════════════════════════════════════" "Error"
+    Write-Log "📄 السجل: $logFile" "Warning"
+    exit 1
+}
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.bat**</summary>
+
+@@ lines 1-1 @@
+
+```
+@echo off
+REM Deploy Build Script - Batch File
+REM نسخة بسيطة لـ Windows CMD
+
+setlocal enabledelayedexpansion
+
+REM قراءة الإعدادات من .ssh-config
+for /f "tokens=1,2 delims==" %%A in (.ssh-config) do (
+    set "%%A=%%B"
+)
+
+REM متغيرات
+set "SSH_USER=%SSH_USER:~0,50%"
+set "SSH_HOST=%SSH_HOST:~0,50%"
+set "SSH_PORT=%SSH_PORT:~0,5%"
+set "REMOTE_PATH=%REMOTE_PATH:~0,100%"
+set "PROJECT_NAME=%PROJECT_NAME:~0,50%"
+
+if not defined SSH_USER (
+    echo.
+    echo [ERROR] ملف الاعدادات غير صحيح
+    echo الرجاء تعديل .ssh-config
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo ========================================
+echo.
+echo 🚀 Deploy Build Script - Remote Execute
+echo.
+echo ========================================
+echo.
+echo Project: %PROJECT_NAME%
+echo Server: %SSH_USER%@%SSH_HOST%:%SSH_PORT%
+echo Path: %REMOTE_PATH%
+echo.
+
+REM أمر SSH
+set "SSH_CMD=cd %REMOTE_PATH% && npm run build"
+
+echo 🔄 جاري الاتصال...
+echo.
+
+REM تنفيذ الأمر
+if defined SSH_KEY (
+    ssh -i "%SSH_KEY%" -p %SSH_PORT% %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else (
+    ssh -p %SSH_PORT% %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+)
+
+REM التحقق من النتيجة
+if %ERRORLEVEL% EQU 0 (
+    echo.
+    echo ✅ تم البناء بنجاح!
+    echo.
+) else (
+    echo.
+    echo ❌ فشل البناء (Error: %ERRORLEVEL%)
+    echo.
+    pause
+    exit /b 1
+)
+
+endlocal
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **.ssh-config.example**</summary>
+
+@@ lines 1-1 @@
+
+```
+# SSH Server Configuration - Advanced Example
+# SSH اعدادات متقدمة مع جميع الخيارات
+
+# ===== المتغيرات المطلوبة (Required) =====
+SSH_USER=your_username
+SSH_HOST=your_server.com
+SSH_PORT=22
+REMOTE_PATH=/path/to/project
+
+# ===== المتغيرات الاختيارية (Optional) =====
+
+# مسار المفتاح الخاص (Private Key)
+# استخدم المسار الكامل (Full Path)
+# SSH_KEY=C:\Users\Username\.ssh\id_ed25519
+# SSH_KEY=/home/user/.ssh/id_rsa
+
+# اسم المشروع
+PROJECT_NAME=Musoftwares
+
+# بيئة التشغيل
+ENVIRONMENT=production
+# ENVIRONMENT=staging
+# ENVIRONMENT=development
+
+# أوامر إضافية يتم تنفيذها بعد npm run build
+# مثال: تشغيل الـ migrations أو الـ seeders
+# POST_BUILD_CMD=npm run migrate && npm run seed
+
+# تعطيل SSH Key Check (غير آمن - فقط للاختبار)
+# SSH_STRICT_HOST_KEY_CHECKING=no
+
+# ===== معلومات إضافية للمرجعية =====
+# تاريخ آخر تحديث: 2026-06-02
+# ملاحظات: 
+#   - لا تنسى تعديل البيانات قبل الاستخدام
+#   - اجعل صلاحيات المفتاح 600 على Linux/Mac
+#   - استخدم مفاتيح SSH بدلاً من كلمات المرور
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **QUICK_START.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# 🚀 Quick Start Guide - البدء السريع
+
+## الخطوة الأولى: تحضير بيانات الاتصال
+
+### 1️⃣ استخدم ملف الإعدادات (.ssh-config)
+
+اتبع الخطوات التالية:
+
+```bash
+# 1. انسخ ملف الإعدادات المثالي
+cp .ssh-config.example .ssh-config
+
+# 2. اعدل البيانات (استخدم محرر نصوص)
+# Windows: ابدأ → notepad
+# اضغط على الملف بزر الفأرة الأيمن واختر "Edit"
+```
+
+### 2️⃣ ملء البيانات المطلوبة
+
+اجعل الملف يبدو هكذا:
+
+```ini
+SSH_USER=admin
+SSH_HOST=192.168.1.100
+SSH_PORT=22
+REMOTE_PATH=/home/admin/musoftwares
+SSH_KEY=C:\Users\YourName\.ssh\id_rsa
+PROJECT_NAME=Musoftwares
+```
+
+---
+
+## الخطوة الثانية: تشغيل البناء
+
+### ✅ على Windows (الطريقة الأبسط)
+
+**الخيار 1: استخدام Batch File**
+```cmd
+# انقر نقرة مزدوجة على:
+build-remote.bat
+```
+
+**الخيار 2: استخدام PowerShell**
+```powershell
+# افتح PowerShell في هذا المجلد وشغل:
+.\build-remote-advanced.ps1
+
+# أو النسخة الكاملة:
+.\build-remote-full.ps1
+```
+
+### ✅ على Linux/Mac (WSL)
+
+```bash
+# اجعل الملف قابل للتنفيذ
+chmod +x build-remote.sh
+
+# شغله
+./build-remote.sh
+```
+
+---
+
+## الخيارات المتقدمة
+
+### إظهار التفاصيل أثناء التنفيذ
+```powershell
+.\build-remote-full.ps1 -Verbose
+```
+
+### اختبر قبل التنفيذ (Dry Run)
+```powershell
+.\build-remote-full.ps1 -DryRun
+```
+
+### تحديث المتعلقات قبل البناء
+```powershell
+.\build-remote-full.ps1 -UpdateDeps
+```
+
+### عرض السجل بعد الانتهاء
+```powershell
+.\build-remote-full.ps1 -ShowLog
+```
+
+---
+
+## استكشاف الأخطاء السريع
+
+| المشكلة | الحل |
+|--------|------|
+| **Permission denied** | تأكد من كلمة المرور أو المفتاح |
+| **Connection refused** | تحقق من IP والمنفذ |
+| **npm: command not found** | npm غير مثبت على السيرفر |
+| **Path not found** | غلط في مسار المشروع REMOTE_PATH |
+
+---
+
+## جدولة التشغيل التلقائي
+
+### 🖥️ Windows Task Scheduler
+
+1. اضغط `Win + R` واكتب: `taskschd.msc`
+2. انقر: **Create Basic Task**
+3. اختر الجدول الزمني (يومي، أسبوعي، إلخ)
+4. في الإجراء، استخدم:
+   ```
+   Program: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+   Args: -File "d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1"
+   ```
+
+### 🐧 Linux/Mac Cron
+
+```bash
+# افتح محرر Cron
+crontab -e
+
+# أضف هذا السطر لتشغيل البناء كل يوم في الساعة 2 صباحًا
+0 2 * * * /path/to/deploy/build-remote.sh
+```
+
+---
+
+## ملاحظات أمان ⚠️
+
+- ❌ **لا** تخزن كلمات المرور في الملفات
+- ✅ **استخدم** مفاتيح SSH بدلاً من كلمات المرور
+- 🔐 **اجعل** صلاحيات المفتاح 600:
+  ```bash
+  chmod 600 ~/.ssh/id_rsa
+  ```
+
+---
+
+## للمزيد من المساعدة
+
+- اقرأ [README.md](README.md) للتفاصيل الكاملة
+- تحقق من السجلات: `logs/build_*.log`
+- جرّب `-DryRun` قبل التنفيذ الفعلي
+
+---
+
+## مثال عملي 📋
+
+```powershell
+# 1. تحضير
+# - عدّل .ssh-config بـ بيانات السيرفر
+
+# 2. اختبر الاتصال
+ssh admin@192.168.1.100 "echo Success"
+
+# 3. شغل البناء
+.\build-remote-full.ps1 -Verbose
+
+# 4. تحقق من النتائج
+ssh admin@192.168.1.100 "ls -la ~/musoftwares/dist"
+```
+
+**بس! 🎉 خلصنا!**
+
+````
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **USAGE_EXAMPLES.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# Usage Examples - أمثلة الاستخدام
+
+## مثال 1: البناء البسيط
+
+```powershell
+# النسخة الأساسية
+.\build-remote.ps1
+
+# أو النسخة المتقدمة
+.\build-remote-advanced.ps1
+```
+
+---
+
+## مثال 2: البناء مع التفاصيل
+
+```powershell
+# إظهار جميع التفاصيل
+.\build-remote-full.ps1 -Verbose
+
+# الإخراج:
+# [2026-06-02 14:30:45] [Info] 🚀 Deploy Build Automation v1.0.0
+# [2026-06-02 14:30:45] [Info] 🔍 اختبار الاتصال SSH...
+# [2026-06-02 14:30:46] [Success] ✓ الاتصال نجح
+# ...
+```
+
+---
+
+## مثال 3: اختبار قبل التنفيذ
+
+```powershell
+# جرّب بدون تنفيذ فعلي
+.\build-remote-full.ps1 -DryRun
+
+# الإخراج:
+# 🔔 وضع DRY RUN - لن يتم تنفيذ الأوامر
+# ✓ اختبار DRY RUN اكتمل بنجاح
+```
+
+---
+
+## مثال 4: تحديث المتعلقات + البناء
+
+```powershell
+# npm install يتم قبل npm run build
+.\build-remote-full.ps1 -UpdateDeps
+
+# الأوامر:
+# 1. npm install
+# 2. npm run build
+# 3. أي أوامر POST_BUILD_CMD
+```
+
+---
+
+## مثال 5: إعدادات مخصصة
+
+```powershell
+# استخدام ملف إعدادات مخصص
+.\build-remote-advanced.ps1 -ConfigFile "staging-config"
+
+# أو
+.\build-remote-full.ps1 -ConfigFile "production-config"
+```
+
+---
+
+## مثال 6: عرض السجل
+
+```powershell
+# تشغيل + عرض السجل
+.\build-remote-full.ps1 -ShowLog
+
+# أو اقرأ السجل بعداً:
+Get-Content logs/build_*.log -Tail 50
+```
+
+---
+
+## مثال 7: مع أوامر إضافية
+
+في ملف `.ssh-config`:
+
+```ini
+SSH_USER=admin
+SSH_HOST=server.com
+REMOTE_PATH=/home/admin/app
+POST_BUILD_CMD=npm run migrate && npm run seed && systemctl restart app
+```
+
+ثم شغل:
+
+```powershell
+.\build-remote-full.ps1
+```
+
+**النتيجة:**
+```
+cd /home/admin/app && npm install && npm run build && npm run migrate && npm run seed && systemctl restart app
+```
+
+---
+
+## مثال 8: استخدام BAT File
+
+```cmd
+REM انقر نقرة مزدوجة على
+build-remote.bat
+
+REM أو من سطر الأوامر
+cmd /c build-remote.bat
+```
+
+---
+
+## مثال 9: البناء المجدول على Windows
+
+**إنشاء مهمة محددة:**
+
+```powershell
+# إنشاء مهمة تشغل البناء يومياً الساعة 2 صباحاً
+$trigger = New-JobTrigger -Daily -At 2:00AM
+$action = New-ScheduledJobOption -RunElevated
+Register-ScheduledJob -Name "BuildProject" `
+    -Trigger $trigger `
+    -ScriptBlock {
+        cd "d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy"
+        .\build-remote-full.ps1
+    }
+```
+
+---
+
+## مثال 10: البناء مع معالجة الأخطاء
+
+```powershell
+# قم بإرسال تنبيه عند الفشل
+$result = & .\build-remote-full.ps1
+
+if ($LASTEXITCODE -ne 0) {
+    # أرسل بريد إلكتروني أو إشعار
+    Write-Host "فشل البناء!" -ForegroundColor Red
+    
+    # أو أعد محاولة:
+    Start-Sleep -Seconds 60
+    & .\build-remote-full.ps1
+}
+```
+
+---
+
+## مثال 11: البناء مع Logging متقدم
+
+```powershell
+# احفظ جميع النتائج
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+.\build-remote-full.ps1 -Verbose | Tee-Object -FilePath "results_$timestamp.log"
+```
+
+---
+
+## مثال 12: بدء وإيقاف الخدمات
+
+في `.ssh-config`:
+
+```ini
+SSH_USER=admin
+SSH_HOST=server.com
+REMOTE_PATH=/home/admin/app
+POST_BUILD_CMD=systemctl restart nginx && sleep 5 && curl -f http://localhost/health || exit 1
+```
+
+---
+
+## أسطر الأوامر المتقدمة
+
+### جميع الخيارات معاً
+
+```powershell
+.\build-remote-full.ps1 `
+    -ConfigFile ".ssh-config" `
+    -Verbose `
+    -UpdateDeps `
+    -ShowLog
+```
+
+### مع معالجة الأخطاء
+
+```powershell
+try {
+    $result = & .\build-remote-full.ps1 -Verbose
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ نجح!" -ForegroundColor Green
+    } else {
+        Write-Host "❌ فشل!" -ForegroundColor Red
+        exit 1
+    }
+} catch {
+    Write-Host "خطأ: $_" -ForegroundColor Red
+    exit 1
+}
+```
+
+---
+
+## استكشاف الأخطاء
+
+### عرض السجلات الأخيرة
+
+```powershell
+Get-ChildItem logs/ -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content
+```
+
+### اختبر SSH مباشرة
+
+```powershell
+ssh -p 22 admin@192.168.1.100 "pwd"
+ssh -i C:\Users\User\.ssh\id_rsa admin@192.168.1.100 "pwd"
+```
+
+### تتبع العمليات على السيرفر
+
+```bash
+# أثناء تشغيل البناء:
+ssh admin@server.com "top" # أو "htop"
+ssh admin@server.com "tail -f /home/admin/app/build.log"
+```
+
+---
+
+## ملاحظات مهمة 📌
+
+- كل أمر يُظهر `[Success]` أو `[Error]` واضح
+- السجلات تُحفظ في مجلد `logs/`
+- استخدم `-DryRun` قبل التنفيذ الحقيقي
+- اختبر الاتصال بـ `Test-SSHConnection` أولاً
+
+
+````
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **FILE_GUIDE.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# 📁 File Structure & Description - وصف الملفات
+
+## 📊 جدول المقارنة
+
+| الملف | النوع | الاستخدام | التعقيد |
+|------|-------|----------|--------|
+| `build-remote.bat` | Batch | شغيل من CMD مباشرة | ⭐ بسيط |
+| `build-remote.ps1` | PowerShell | نسخة أساسية بسيطة | ⭐ بسيط |
+| `build-remote.sh` | Bash | Linux/Mac/WSL | ⭐ بسيط |
+| `build-remote-advanced.ps1` | PowerShell | مع الإعدادات والسجلات | ⭐⭐ متوسط |
+| `build-remote-full.ps1` | PowerShell | نسخة شاملة كاملة | ⭐⭐⭐ متقدم |
+| `.ssh-config` | نصي | ملف الإعدادات | - |
+| `.ssh-config.example` | نصي | مثال للإعدادات | - |
+
+---
+
+## 📖 وصف كل ملف
+
+### 1️⃣ `build-remote.bat` (Windows Batch)
+**الأفضل لـ:** المستخدمين الذين يريدون الشغيل المباشر
+
+```
+✅ المميزات:
+- انقر نقرة مزدوجة = يشتغل مباشرة
+- لا يحتاج PowerShell
+- بسيط جداً
+
+❌ القيود:
+- ميزات محدودة
+- قراءة بسيطة من .ssh-config فقط
+```
+
+**الاستخدام:**
+```cmd
+build-remote.bat
+```
+
+---
+
+### 2️⃣ `build-remote.ps1` (PowerShell بسيط)
+**الأفضل لـ:** من يريد سكريبت مباشر وبسيط
+
+```
+✅ المميزات:
+- سهل التعديل
+- أساسي وبسيط
+
+❌ القيود:
+- بدون سجلات
+- بدون معالجة أخطاء متقدمة
+- بدون خيارات إضافية
+```
+
+**الاستخدام:**
+```powershell
+.\build-remote.ps1
+```
+
+---
+
+### 3️⃣ `build-remote.sh` (Bash)
+**الأفضل لـ:** مستخدمي Linux/Mac/WSL
+
+```
+✅ المميزات:
+- متوافق مع Unix
+- بسيط وخفيف
+
+❌ القيود:
+- لا يعمل على Windows CMD
+- ميزات محدودة
+```
+
+**الاستخدام:**
+```bash
+chmod +x build-remote.sh
+./build-remote.sh
+```
+
+---
+
+### 4️⃣ `build-remote-advanced.ps1` (PowerShell متقدم)
+**الأفضل لـ:** من يريد توازن بين البساطة والميزات
+
+```
+✅ المميزات:
+- قراءة الإعدادات من ملف خارجي
+- معالجة أخطاء جيدة
+- خيارات: -Verbose, -DryRun, -ConfigFile
+- ألوان ملونة وسهل المتابعة
+
+❌ القيود:
+- بدون سجلات دائمة
+- بدون تنفيذ مراحل متعددة
+```
+
+**الاستخدام:**
+```powershell
+.\build-remote-advanced.ps1
+.\build-remote-advanced.ps1 -Verbose
+.\build-remote-advanced.ps1 -DryRun
+```
+
+---
+
+### 5️⃣ `build-remote-full.ps1` (PowerShell شامل)
+**الأفضل لـ:** الإنتاج والأتمتة الاحترافية
+
+```
+✅ المميزات:
+- ✅ سجلات دائمة (logs/)
+- ✅ اختبار الاتصال تلقائي
+- ✅ تنفيذ مراحل متعددة
+- ✅ معالجة أخطاء شاملة
+- ✅ عرض التفاصيل الكاملة
+- ✅ Dry-run للاختبار
+- ✅ خيارات متقدمة (-UpdateDeps, -ShowLog)
+- ✅ شيء بسيط وسهل الاستخدام
+
+❌ القيود:
+- ملف أكبر حجماً
+- يحتاج PowerShell 5.1 أو أعلى
+```
+
+**الاستخدام:**
+```powershell
+# أساسي
+.\build-remote-full.ps1
+
+# متقدم
+.\build-remote-full.ps1 -Verbose -UpdateDeps -ShowLog
+
+# اختبار فقط
+.\build-remote-full.ps1 -DryRun
+```
+
+---
+
+### 📋 `.ssh-config` (ملف الإعدادات)
+**الغرض:** تخزين بيانات الاتصال
+
+```ini
+SSH_USER=admin
+SSH_HOST=server.com
+SSH_PORT=22
+REMOTE_PATH=/home/admin/app
+SSH_KEY=C:\Users\User\.ssh\id_rsa
+PROJECT_NAME=MyProject
+POST_BUILD_CMD=npm run migrate
+```
+
+---
+
+### 📋 `.ssh-config.example` (مثال)
+نسخة مثالية تحتوي على جميع الخيارات مع التعليقات.
+
+---
+
+## 🎯 أيهما أختار؟
+
+### 👶 للمبتدئين
+```
+اختر: build-remote.bat
+لماذا: انقر نقرة مزدوجة وخلصت
+```
+
+### 👨‍💻 للمطورين
+```
+اختر: build-remote-advanced.ps1
+لماذا: يحتوي ميزات مع البساطة
+```
+
+### 🚀 للإنتاج
+```
+اختر: build-remote-full.ps1
+لماذا: مميزات كاملة + سجلات + أتمتة
+```
+
+### 🐧 على Linux/Mac
+```
+اختر: build-remote.sh
+لماذا: الخيار الوحيد المتوافق
+```
+
+---
+
+## 📂 مجلد Logs
+
+السكريبتات المتقدمة تنشئ سجلات تلقائية:
+
+```
+logs/
+├── build_2026-06-02_14-30-45.log
+├── build_2026-06-02_15-45-30.log
+└── build_2026-06-02_16-20-15.log
+```
+
+**اقرأ آخر سجل:**
+```powershell
+Get-ChildItem logs/ | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content
+```
+
+---
+
+## 🔄 سير العمل الموصى به
+
+### المرة الأولى:
+```
+1. عدّل .ssh-config
+2. اختبر SSH: ssh user@host "echo OK"
+3. شغل: build-remote-full.ps1 -DryRun
+4. اقرأ المخرجات
+5. شغل: build-remote-full.ps1
+```
+
+### التشغيل الروتيني:
+```
+الطريقة 1: انقر على build-remote.bat
+الطريقة 2: شغل build-remote-advanced.ps1
+الطريقة 3: جدولة مع Task Scheduler
+```
+
+---
+
+## ⚡ النصائح المهمة
+
+1. **استخدم النسخة المناسبة:** ابدأ بـ BAT، ارتق لـ Advanced عند الحاجة
+2. **احتفظ بـ .ssh-config محدثاً:** تأكد أن البيانات صحيحة
+3. **اختبر مع -DryRun أولاً:** قبل التشغيل الفعلي
+4. **راقب السجلات:** ابدأ من آخر سجل عند وجود مشاكل
+5. **استخدم مفاتيح SSH:** بدلاً من كلمات المرور
+
+---
+
+## 🐛 استكشاف الأخطاء
+
+| المشكلة | الحل |
+|--------|------|
+| "لا يعمل BAT" | استخدم PowerShell بدلاً منه |
+| "PowerShell لا يفتح" | اضغط `Win + X` واختر "PowerShell" |
+| "Permission denied" | تأكد من صحة البيانات في .ssh-config |
+| "npm not found" | npm غير مثبت على السيرفر |
+
+---
+
+## 📞 دعم إضافي
+
+- اقرأ: [README.md](README.md)
+- ابدأ من: [QUICK_START.md](QUICK_START.md)
+- أمثلة: [USAGE_EXAMPLES.md](USAGE_EXAMPLES.md)
+
+
+````
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **TROUBLESHOOTING.md**</summary>
+
+@@ lines 1-1 @@
+
+````
+# ❌ Troubleshooting Guide - دليل استكشاف الأخطاء
+
+## الأخطاء الشائعة والحلول
+
+---
+
+## 1️⃣ Connection Refused
+
+### ❌ الخطأ:
+```
+ssh: connect to host 192.168.1.100 port 22: Connection refused
+```
+
+### ✅ الحلول:
+
+**الحل 1: تحقق من عنوان الـ IP**
+```powershell
+# اختبر Ping أولاً
+ping 192.168.1.100
+
+# أو استخدم الـ hostname
+ping server.example.com
+```
+
+**الحل 2: تحقق من المنفذ**
+```powershell
+# اختبر المنفذ
+Test-NetConnection -ComputerName 192.168.1.100 -Port 22
+
+# النتيجة المتوقعة:
+# TcpTestSucceeded : True
+```
+
+**الحل 3: تحقق من SSH على السيرفر**
+```bash
+# على السيرفر، تأكد أن SSH يعمل:
+sudo systemctl status ssh
+sudo service ssh status
+
+# ابدأ SSH إذا لم يكن يعمل:
+sudo systemctl start ssh
+```
+
+---
+
+## 2️⃣ Permission Denied
+
+### ❌ الخطأ:
+```
+Permission denied (publickey,password)
+```
+
+### ✅ الحلول:
+
+**الحل 1: استخدم كلمة مرور صحيحة**
+```powershell
+# اختبر الاتصال بدون مفتاح
+ssh admin@192.168.1.100
+
+# سيطلب كلمة مرور
+# أدخل الكلمة بحذر (قد لا تظهر النقاط)
+```
+
+**الحل 2: تحقق من مفتاح SSH**
+```powershell
+# تأكد أن المفتاح موجود
+Test-Path C:\Users\YourName\.ssh\id_rsa
+
+# جرّب مع مفتاح محدد
+ssh -i C:\Users\YourName\.ssh\id_rsa admin@192.168.1.100
+```
+
+**الحل 3: أصلح صلاحيات المفتاح على السيرفر**
+```bash
+# على السيرفر:
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/id_rsa
+```
+
+**الحل 4: أضف المفتاح العام للسيرفر**
+```powershell
+# من Windows:
+# 1. انسخ المفتاح العام
+$pubKey = Get-Content C:\Users\YourName\.ssh\id_rsa.pub
+
+# 2. أرسله للسيرفر عبر SSH
+ssh admin@192.168.1.100 "echo '$pubKey' >> ~/.ssh/authorized_keys"
+```
+
+---
+
+## 3️⃣ npm: command not found
+
+### ❌ الخطأ:
+```
+cd /home/admin/app && npm run build
+-bash: npm: command not found
+```
+
+### ✅ الحلول:
+
+**الحل 1: تحقق من تثبيت npm**
+```bash
+# على السيرفر:
+npm -v
+node -v
+
+# إذا لم تظهر إصدارات، npm غير مثبت
+```
+
+**الحل 2: ثبّت npm و Node.js**
+```bash
+# على Ubuntu/Debian:
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# على CentOS/RHEL:
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+
+# على macOS:
+brew install node
+```
+
+**الحل 3: استخدم مسار npm الكامل**
+```bash
+# اعثر على npm
+which npm
+
+# استخدم المسار الكامل في السكريبت
+/usr/bin/npm run build
+# أو
+/usr/local/bin/npm run build
+```
+
+---
+
+## 4️⃣ Remote Path Not Found
+
+### ❌ الخطأ:
+```
+bash: cd: /home/admin/wrong-path: No such file or directory
+```
+
+### ✅ الحلول:
+
+**الحل 1: تحقق من المسار**
+```bash
+# من السيرفر، اختبر المسار:
+ls -la /home/admin/app
+
+# أو ادرج المجلدات:
+ls -la /home/admin/
+```
+
+**الحل 2: عدّل REMOTE_PATH في .ssh-config**
+```ini
+# المسار الخاطئ:
+REMOTE_PATH=/home/admin/wrong-path
+
+# المسار الصحيح:
+REMOTE_PATH=/home/admin/musoftwares
+```
+
+**الحل 3: استخدم المسار المطلق**
+```bash
+# اعثر على المسار الكامل:
+pwd
+
+# ثم استخدمه في .ssh-config:
+REMOTE_PATH=/home/admin/musoftwares  # مثال صحيح
+```
+
+---
+
+## 5️⃣ Build Fails
+
+### ❌ الخطأ:
+```
+npm ERR! code EACCES
+npm ERR! syscall open
+npm ERR! path /home/admin/app/package-lock.json
+npm ERR! errno -13
+npm ERR! Error: EACCES: permission denied
+```
+
+### ✅ الحلول:
+
+**الحل 1: أصلح الصلاحيات**
+```bash
+# من السيرفر:
+cd /home/admin/app
+ls -la
+
+# جعل الملفات قابلة للقراءة:
+chmod -R 755 .
+
+# أو إذا كان المالك مختلف:
+sudo chown -R admin:admin /home/admin/app
+```
+
+**الحل 2: امسح node_modules والملفات المؤقتة**
+```bash
+cd /home/admin/app
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+**الحل 3: استخدم Verbose للتفاصيل**
+```powershell
+.\build-remote-full.ps1 -Verbose
+
+# اقرأ السجل:
+Get-Content logs/build_*.log -Tail 100
+```
+
+---
+
+## 6️⃣ Timeout
+
+### ❌ الخطأ:
+```
+Connection timed out
+Operation timed out
+```
+
+### ✅ الحلول:
+
+**الحل 1: قد يكون البناء يستغرق وقتاً**
+```bash
+# اتصل مباشرة واترك الوقت:
+ssh admin@192.168.1.100 "cd /app && npm run build"
+
+# اصبر قليلاً (قد يستغرق 5-10 دقائق)
+```
+
+**الحل 2: زد Timeout على SSH**
+```powershell
+# في السكريبت، أضف:
+ssh -o ConnectTimeout=30 -o StrictHostKeyChecking=no admin@192.168.1.100 "..."
+```
+
+**الحل 3: شغّل البناء في Screen أو Tmux**
+```bash
+# من السيرفر:
+screen -S build
+
+# ثم:
+cd /home/admin/app
+npm run build
+
+# اضغط Ctrl+A ثم D للخروج
+```
+
+---
+
+## 7️⃣ Config File Not Found
+
+### ❌ الخطأ:
+```
+ملف الإعدادات غير موجود: .ssh-config
+```
+
+### ✅ الحل:
+
+```powershell
+# انسخ المثال:
+Copy-Item .ssh-config.example .ssh-config
+
+# عدّل الملف:
+notepad .ssh-config
+
+# ملء البيانات:
+SSH_USER=admin
+SSH_HOST=192.168.1.100
+REMOTE_PATH=/home/admin/app
+```
+
+---
+
+## 8️⃣ PowerShell Not Allowed
+
+### ❌ الخطأ:
+```
+PowerShell scripts are disabled on this system
+```
+
+### ✅ الحل:
+
+```powershell
+# اسمح بتشغيل السكريبتات:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# أو:
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
+
+# تحقق من الإعدادات:
+Get-ExecutionPolicy
+```
+
+---
+
+## 9️⃣ SSH Key Permissions
+
+### ❌ الخطأ:
+```
+WARNING: UNPROTECTED PRIVATE KEY FILE!
+It is required that your private key files are NOT accessible by others.
+```
+
+### ✅ الحل:
+
+**على Windows:**
+```powershell
+# الحقول → الخصائص → الأمان → تحرير
+# أزل المستخدمين ما عدا المالك
+
+# أو استخدم PowerShell:
+$keyPath = "C:\Users\YourName\.ssh\id_rsa"
+icacls $keyPath /inheritance:r /grant:r "$($env:USERNAME):(F)"
+```
+
+**على Linux/Mac:**
+```bash
+chmod 600 ~/.ssh/id_rsa
+chmod 700 ~/.ssh
+```
+
+---
+
+## 🔟 Git Errors
+
+### ❌ الخطأ:
+```
+fatal: not a git repository
+```
+
+### ✅ الحل:
+
+```bash
+# على السيرفر:
+cd /home/admin/app
+
+# تحقق من وجود .git:
+ls -la | grep git
+
+# أو:
+git status
+```
+
+---
+
+## 🔍 أدوات التشخيص
+
+### اختبر الاتصال SSH
+
+```powershell
+# الاختبار الأساسي:
+ssh -v admin@192.168.1.100 "echo OK"
+
+# مع تفاصيل كاملة:
+ssh -vvv admin@192.168.1.100 "echo OK"
+```
+
+### اختبر npm على السيرفر
+
+```bash
+ssh admin@192.168.1.100 "npm run build --verbose"
+ssh admin@192.168.1.100 "npm list"
+```
+
+### عرض السجلات
+
+```powershell
+# آخر 50 سطر:
+Get-Content logs/build_*.log -Tail 50
+
+# البحث عن الأخطاء:
+Get-Content logs/build_*.log | Select-String "Error|Failed"
+```
+
+---
+
+## 📋 قائمة التحقق
+
+قبل كل تشغيل:
+
+- [ ] هل البيانات في .ssh-config صحيحة؟
+- [ ] هل يمكنك الاتصال بـ SSH يدويًا؟
+- [ ] هل npm مثبت على السيرفر؟
+- [ ] هل المسار البعيد صحيح؟
+- [ ] هل لديك صلاحيات الكتابة؟
+- [ ] هل المشروع به package.json؟
+
+---
+
+## 📞 طلب المساعدة
+
+إذا لم تجد الحل:
+
+1. اجمع المعلومات:
+   ```powershell
+   # الملفات المهمة:
+   - .ssh-config (بدون معلومات حساسة)
+   - آخر سجل
+   - رسالة الخطأ الكاملة
+   ```
+
+2. جرّب `-Verbose`:
+   ```powershell
+   .\build-remote-full.ps1 -Verbose -ShowLog
+   ```
+
+3. اقرأ السجل بعناية واتخذ الإجراء
+
+
+````
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+أنشأت لك حزمة كاملة للبناء التلقائي عبر SSH! 🎉
 
 ## 📦 الملفات المُنشأة:
 
@@ -2168,6 +5985,8 @@ _**Agent (copilot/auto)**_
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
 
+Read `.ssh-config`
+
 **Input:**
 
 - endLine: `20`
@@ -2177,8 +5996,16 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":11,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\.ssh-config","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","scheme":"file"},"options":{"isFromTool":true}}],"text":"# SSH Server Configuration\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":11},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":10,"references":[],"text":"# SSH اعدادات الاتصال بـ\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":10},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":9},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":8,"references":[],"text":"SSH_USER=u962989541\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":8},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":7,"references":[],"text":"SSH_HOST=147.79.103.131\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":7},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":6,"references":[],"text":"SSH_PORT=65002\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":6},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":5,"references":[],"text":"REMOTE_PATH=/domains/musoftwares.com/public_html/\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":5},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":4,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":4},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":3,"references":[],"text":"# اختياري: مسار المفتاح الخاص\n","type"
-… (output truncated)
+# SSH Server Configuration
+# SSH اعدادات الاتصال بـ
+
+SSH_USER=u962989541
+SSH_HOST=147.79.103.131
+SSH_PORT=65002
+REMOTE_PATH=/domains/musoftwares.com/public_html/
+
+# اختياري: مسار المفتاح الخاص
+# SSH_KEY=/path/to/private/key
 ```
 </details></tool-use>
 
@@ -2243,18 +6070,10 @@ _**User (2026-06-02 10:32:18Z)**_
 
 _**Agent (copilot/auto)**_
 
-<think><details><summary>Thought Process</summary>
-سأضيف حقل كلمة المرور وأحدّث السكريبتات لاستخدامها: 
-
-سأحدّث السكريبتات لدعم كلمة المرور: 
-
-دعني أتحقق من الملفات الموجودة:
-</details></think>
-
-_**Agent (copilot/auto)**_
-
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `.ssh-config`
 
 **Input:**
 
@@ -2265,8 +6084,16 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":11,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\.ssh-config","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","scheme":"file"},"options":{"isFromTool":true}}],"text":"# SSH Server Configuration\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":11},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":10,"references":[],"text":"# SSH اعدادات الاتصال بـ\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":10},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":9},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":8,"references":[],"text":"SSH_USER=u962989541\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":8},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":7,"references":[],"text":"SSH_HOST=147.79.103.131\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":7},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":6,"references":[],"text":"SSH_PORT=65002\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":6},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":5,"references":[],"text":"REMOTE_PATH=/domains/musoftwares.com/public_html/\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":5},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":4,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":4},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":3,"references":[],"text":"# اختياري: مسار المفتاح الخاص\n","type"
-… (output truncated)
+# SSH Server Configuration
+# SSH اعدادات الاتصال بـ
+
+SSH_USER=u962989541
+SSH_HOST=147.79.103.131
+SSH_PORT=65002
+REMOTE_PATH=/domains/musoftwares.com/public_html/
+
+# اختياري: مسار المفتاح الخاص
+# SSH_KEY=/path/to/private/key
 ```
 </details></tool-use>
 
@@ -2274,6 +6101,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build-remote-full.ps1`, lines 1 to 50
 
 **Input:**
 
@@ -2284,8 +6113,56 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":50,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"# Full Automation Deploy Script - PowerShell\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":50},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":49,"references":[],"text":"# نسخة شاملة مع دعم العديد من الميزات\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":49},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":48,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":48},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":47,"references":[],"text":"param(\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":47},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":46,"references":[],"text":"    [switch]$Verbose = $false,\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":46},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":45,"references":[],"text":"    [switch]$DryRun = $false,\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":45},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":44,"references":[],"text":"    [string]$ConfigFile = \".ssh-config\",\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":44},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":43,"references":[],"text":"    [switch]$ShowLog = $false,\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":43},"references":[],"type":1},{"childr
-… (output truncated)
+# Full Automation Deploy Script - PowerShell
+# نسخة شاملة مع دعم العديد من الميزات
+
+param(
+    [switch]$Verbose = $false,
+    [switch]$DryRun = $false,
+    [string]$ConfigFile = ".ssh-config",
+    [switch]$ShowLog = $false,
+    [switch]$UpdateDeps = $false  # تحديث المتعلقات قبل البناء
+)
+
+# إعدادات السكريبت
+$scriptVersion = "1.0.0"
+$logDir = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "logs"
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$logFile = Join-Path $logDir "build_$timestamp.log"
+
+# الألوان
+$colors = @{
+    Info = "Cyan"
+    Success = "Green"
+    Warning = "Yellow"
+    Error = "Red"
+    Debug = "Gray"
+}
+
+# إنشاء مجلد السجلات
+if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir | Out-Null
+}
+
+function Write-Log {
+    param(
+        [string]$Message,
+        [string]$Level = "Info",
+        [switch]$NoNewline = $false
+    )
+
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logMessage = "[$timestamp] [$Level] $Message"
+
+    # اطبع في الكونسول
+    if ($noNewline) {
+        Write-Host $Message -ForegroundColor $colors[$Level] -NoNewline
+    } else {
+        Write-Host $logMessage -ForegroundColor $colors[$Level]
+    }
+
+    # احفظ في السجل
+    Add-Content -Path $logFile -Value $logMessage -Encoding UTF8
 ```
 </details></tool-use>
 
@@ -2293,6 +6170,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build-remote-full.ps1`, lines 80 to 120
 
 **Input:**
 
@@ -2303,8 +6182,64 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":41,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"    )\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":41},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":40,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":40},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":39,"references":[],"text":"    Write-Log \"🔍 اختبار الاتصال SSH...\" \"Info\"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":39},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":38,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":38},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":37,"references":[],"text":"    try {\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":37},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":36,"references":[],"text":"        if ($Key -and (Test-Path $Key)) {\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":36},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":35,"references":[],"text":"            $result = ssh -i $Key -p $Port $User@$Host \"echo 'SSH OK'\" 2\u003e\u00261\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":35},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":34,"references":[],"text":"        } else {\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":34},"references":[],"type":1},{"children":[{"lin
-… (output truncated)
+    )
+
+    Write-Log "🔍 اختبار الاتصال SSH..." "Info"
+
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            $result = ssh -i $Key -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        } else {
+            $result = ssh -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        }
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "✓ الاتصال نجح" "Success"
+            return $true
+        } else {
+            Write-Log "✗ فشل الاتصال: $result" "Error"
+            return $false
+        }
+    } catch {
+        Write-Log "❌ خطأ في الاتصال: $_" "Error"
+        return $false
+    }
+}
+
+function Execute-RemoteCommand {
+    param(
+        [string]$User,
+        [string]$Host,
+        [string]$Port,
+        [string]$Command,
+        [string]$Key
+    )
+
+    Write-Log "⚙️  تنفيذ: $Command" "Info"
+
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            ssh -i $Key -p $Port $User@$Host $Command
+        } else {
+            ssh -p $Port $User@$Host $Command
+        }
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+سأضيف حقل كلمة المرور وأحدّث السكريبتات لاستخدامها: 
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **.ssh-config**</summary>
+
+@@ lines 8-8 @@
+
+```
+SSH_PASSWORD=your_password_here
+
 ```
 </details></tool-use>
 
@@ -2312,6 +6247,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build-remote-full.ps1`, lines 140 to 200
 
 **Input:**
 
@@ -2322,8 +6259,67 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":61,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":61},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":60,"references":[],"text":"# قراءة الإعدادات\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":60},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":59,"references":[],"text":"$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":59},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":58,"references":[],"text":"$configPath = Join-Path $scriptDir $ConfigFile\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":58},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":57,"references":[],"text":"$config = Read-ConfigFile $configPath\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":57},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":56,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":56},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":55,"references":[],"text":"# استخلاص البيانات\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":55},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":54,"references":[],"text":"$SSH_USER = $config['SSH_USER']\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":54},"references":[],"type":1},{"children":[{"li
-… (output truncated)
+
+# قراءة الإعدادات
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$configPath = Join-Path $scriptDir $ConfigFile
+$config = Read-ConfigFile $configPath
+
+# استخلاص البيانات
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project"
+
+Write-Log ""
+Write-Log "📋 تفاصيل الاتصال:" "Info"
+Write-Log "  المشروع: $PROJECT_NAME" "Info"
+Write-Log "  المستخدم: $SSH_USER" "Info"
+Write-Log "  السيرفر: $SSH_HOST:$SSH_PORT" "Info"
+Write-Log "  المسار: $REMOTE_PATH" "Info"
+Write-Log ""
+
+# اختبر الاتصال
+if (-not (Test-SSHConnection -User $SSH_USER -Host $SSH_HOST -Port $SSH_PORT -Key $SSH_KEY)) {
+    exit 1
+}
+
+if ($DryRun) {
+    Write-Log ""
+    Write-Log "🔔 وضع DRY RUN - لن يتم تنفيذ الأوامر" "Warning"
+    Write-Log ""
+}
+
+# بناء قائمة الأوامر
+$commands = @()
+
+if ($UpdateDeps) {
+    $commands += "npm install"
+}
+
+$commands += "npm run build"
+
+if ($config['POST_BUILD_CMD']) {
+    $commands += $config['POST_BUILD_CMD']
+}
+
+# التنفيذ
+Write-Log ""
+Write-Log "📊 الأوامر المطلوب تنفيذها:" "Info"
+for ($i = 0; $i -lt $commands.Count; $i++) {
+    Write-Log "  $($i+1). $($commands[$i])" "Debug"
+}
+Write-Log ""
+
+if ($DryRun) {
+    Write-Log "✓ اختبار DRY RUN اكتمل بنجاح (لم يتم تنفيذ الأوامر)" "Success"
+    exit 0
+}
+
+# إنشاء سكريبت بعيد
+$remoteScript = "cd $REMOTE_PATH && " + ($commands -join " && ")
 ```
 </details></tool-use>
 
@@ -2331,6 +6327,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build-remote-full.ps1`, lines 70 to 231
 
 **Input:**
 
@@ -2341,15 +6339,101 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":162,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-full.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":162},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":161,"references":[],"text":"    return $config\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":161},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":160,"references":[],"text":"}\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":160},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":159,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":159},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":158,"references":[],"text":"function Test-SSHConnection {\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":158},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":157,"references":[],"text":"    param(\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":157},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":156,"references":[],"text":"        [string]$User,\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":156},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":155,"references":[],"text":"        [string]$Host,\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":155},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":154,"references":[],"text":"        [string]$Port,\n","type"
+
+    return $config
+}
+
+function Test-SSHConnection {
+    param(
+        [string]$User,
+        [string]$Host,
+        [string]$Port,
+        [string]$Key
+    )
+
+    Write-Log "🔍 اختبار الاتصال SSH..." "Info"
+
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            $result = ssh -i $Key -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        } else {
+            $result = ssh -p $Port $User@$Host "echo 'SSH OK'" 2>&1
+        }
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "✓ الاتصال نجح" "Success"
+            return $true
+        } else {
+            Write-Log "✗ فشل الاتصال: $result" "Error"
+            return $false
+        }
+    } catch {
+        Write-Log "❌ خطأ في الاتصال: $_" "Error"
+        return $false
+    }
+}
+
+function Execute-RemoteCommand {
+    param(
+        [string]$User,
+        [string]$Host,
+        [string]$Port,
+        [string]$Command,
+        [string]$Key
+    )
+
+    Write-Log "⚙️  تنفيذ: $Command" "Info"
+
+    try {
+        if ($Key -and (Test-Path $Key)) {
+            ssh -i $Key -p $Port $User@$Host $Command
+        } else {
+            ssh -p $Port $User@$Host $Command
+        }
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "✓ تم التنفيذ بنجاح" "Success"
+            return $true
+        } else {
+            Write-Log "✗ فشل التنفيذ (exit code: $LASTEXITCODE)" "Error"
+            return $false
+        }
+    } catch {
+        Write-Log "❌ خطأ: $_" "Error"
+        return $false
+    }
+}
+
+# ===== البرنامج الرئيسي =====
+
+Write-Log "════════════════════════════════════════════════" "Info"
+Write-Log "🚀 Deploy Build Automation v$scriptVersion" "Info"
+Write-Log "════════════════════════════════════════════════" "Info"
+
+# قراءة الإعدادات
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$configPath = Join-Path $scriptDir $ConfigFile
+$config = Read-ConfigFile $configPath
+
+# استخلاص البيانات
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMO
 … (output truncated)
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
+سأحدّث السكريبتات لدعم كلمة المرور: 
+
+_**Agent (copilot/auto)**_
+
 <tool-use data-tool-type="generic" data-tool-name="multi_replace_string_in_file"><details>
 <summary>Tool use: **multi_replace_string_in_file**</summary>
+
+Multi-Replace String in Files
 
 **Input:**
 
@@ -2398,184 +6482,16 @@ Please check your input and try again.
 
 _**Agent (copilot/auto)**_
 
-<tool-use data-tool-type="generic" data-tool-name="multi_replace_string_in_file"><details>
-<summary>Tool use: **multi_replace_string_in_file**</summary>
+سأحدّث السكريبتات لدعم كلمة المرور: 
 
-**Input:**
-
-- explanation: `تحديث السكريبتات لدعم كلمة المرور وتفادي طلب التصديق على المفتاح أول مرة`
-- replacements:
-
-```
-[map[filePath:d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1 newString:function Test-SSHConnection {
-    param(
-        [string]$User,
-        [string]$Host,
-        [string]$Port,
-        [string]$Key,
-        [string]$Password
-    )
-
-    Write-Log "🔍 اختبار الاتصال SSH..." "Info"
-
-    try {
-        if ($Key -and (Test-Path $Key)) {
-            $result = ssh -i $Key -p $Port -o StrictHostKeyChecking=no $User@$Host "echo 'SSH OK'" 2>&1
-        } elseif ($Password) {
-            $env:SSHPASS = $Password
-            $result = sshpass -e ssh -p $Port -o StrictHostKeyChecking=no -o PubkeyAuthentication=no $User@$Host "echo 'SSH OK'" 2>&1
-            Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
-        } else {
-            $result = ssh -p $Port -o StrictHostKeyChecking=no $User@$Host "echo 'SSH OK'" 2>&1
-        }
-
-        if ($LASTEXITCODE -eq 0) {
-            Write-Log "✓ الاتصال نجح" "Success"
-            return $true
-        } else {
-            Write-Log "✗ فشل الاتصال: $result" "Error"
-            return $false
-        }
-    } catch {
-        Write-Log "❌ خطأ في الاتصال: $_" "Error"
-        return $false
-    }
-} oldString:function Test-SSHConnection {
-    param(
-        [string]$User,
-        [string]$Host,
-        [string]$Port,
-        [string]$Key
-    )
-
-    Write-Log "🔍 اختبار الاتصال SSH..." "Info"
-
-    try {
-        if ($Key -and (Test-Path $Key)) {
-            $result = ssh -i $Key -p $Port $User@$Host "echo 'SSH OK'" 2>&1
-        } else {
-            $result = ssh -p $Port $User@$Host "echo 'SSH OK'" 2>&1
-        }
-
-        if ($LASTEXITCODE -eq 0) {
-            Write-Log "✓ الاتصال نجح" "Success"
-            return $true
-        } else {
-            Write-Log "✗ فشل الاتصال: $result" "Error"
-            return $false
-        }
-    } catch {
-        Write-Log "❌ خطأ في الاتصال: $_" "Error"
-        return $false
-    }
-}] map[filePath:d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1 newString:function Execute-RemoteCommand {
-    param(
-        [string]$User,
-        [string]$Host,
-        [string]$Port,
-        [string]$Command,
-        [string]$Key,
-        [string]$Password
-    )
-
-    Write-Log "⚙️  تنفيذ: $Command" "Info"
-
-    try {
-        if ($Key -and (Test-Path $Key)) {
-            ssh -i $Key -p $Port -o StrictHostKeyChecking=no $User@$Host $Command
-        } elseif ($Password) {
-            $env:SSHPASS = $Password
-            sshpass -e ssh -p $Port -o StrictHostKeyChecking=no -o PubkeyAuthentication=no $User@$Host $Command
-            Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
-        } else {
-            ssh -p $Port -o StrictHostKeyChecking=no $User@$Host $Command
-        }
-
-        if ($LASTEXITCODE -eq 0) {
-            Write-Log "✓ تم التنفيذ بنجاح" "Success"
-            return $true
-        } else {
-            Write-Log "✗ فشل التنفيذ (exit code: $LASTEXITCODE)" "Error"
-            return $false
-        }
-    } catch {
-        Write-Log "❌ خطأ: $_" "Error"
-        return $false
-    }
-} oldString:function Execute-RemoteCommand {
-    param(
-        [string]$User,
-        [string]$Host,
-        [string]$Port,
-        [string]$Command,
-        [string]$Key
-    )
-
-    Write-Log "⚙️  تنفيذ: $Command" "Info"
-
-    try {
-        if ($Key -and (Test-Path $Key)) {
-            ssh -i $Key -p $Port $User@$Host $Command
-        } else {
-            ssh -p $Port $User@$Host $Command
-        }
-
-        if ($LASTEXITCODE -eq 0) {
-            Write-Log "✓ تم التنفيذ بنجاح" "Success"
-            return $true
-        } else {
-            Write-Log "✗ فشل التنفيذ (exit code: $LASTEXITCODE)" "Error"
-            return $false
-        }
-    } catch {
-        Write-Log "❌ خطأ: $_" "Error"
-        return $false
-    }
-}] map[filePath:d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1 newString:# استخلاص البيانات
-$SSH_USER = $config['SSH_USER']
-$SSH_HOST = $config['SSH_HOST']
-$SSH_PORT = $config['SSH_PORT'] ?? 22
-$REMOTE_PATH = $config['REMOTE_PATH']
-$SSH_KEY = $config['SSH_KEY']
-$SSH_PASSWORD = $config['SSH_PASSWORD']
-$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project" oldString:# استخلاص البيانات
-$SSH_USER = $config['SSH_USER']
-$SSH_HOST = $config['SSH_HOST']
-$SSH_PORT = $config['SSH_PORT'] ?? 22
-$REMOTE_PATH = $config['REMOTE_PATH']
-$SSH_KEY = $config['SSH_KEY']
-$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project"] map[filePath:d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1 newString:# اختبر الاتصال
-if (-not (Test-SSHConnection -User $SSH_USER -Host $SSH_HOST -Port $SSH_PORT -Key $SSH_KEY -Password $SSH_PASSWORD)) {
-    exit 1
-} oldString:# اختبر الاتصال
-if (-not (Test-SSHConnection -User $SSH_USER -Host $SSH_HOST -Port $SSH_PORT -Key $SSH_KEY)) {
-    exit 1
-}] map[filePath:d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-full.ps1 newString:$success = Execute-RemoteCommand `
-    -User $SSH_USER `
-    -Host $SSH_HOST `
-    -Port $SSH_PORT `
-    -Command $remoteScript `
-    -Key $SSH_KEY `
-    -Password $SSH_PASSWORD oldString:$success = Execute-RemoteCommand `
-    -User $SSH_USER `
-    -Host $SSH_HOST `
-    -Port $SSH_PORT `
-    -Command $remoteScript `
-    -Key $SSH_KEY]]
-```
-
-
-**Result:**
-
-```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"File does not exist: d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1. Use the create_file tool to create it, or correct your filepath.\nFile does not exist: d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1. Use the create_file tool to create it, or correct your filepath.\nFile does not exist: d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1. Use the create_file tool to create it, or correct your filepath.\nFile does not exist: d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1. Use the create_file tool to create it, or correct your filepath.\nFile does not exist: d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-full.ps1. Use the create_file tool to create it, or correct your filepath.","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
-```
-</details></tool-use>
+دعني أتحقق من الملفات الموجودة: 
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir"><details>
 <summary>Tool use: **list_dir**</summary>
+
+Read `deploy`
 
 **Input:**
 
@@ -2584,7 +6500,10 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":".ssh-config","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote.bat","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote.ps1","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9007199254740991,"references":[],"text":"build-remote.sh","type":2}],"ctor":2,"ctorName":"V5e","props":{},"references":[],"type":1}],"ctor":2,"ctorName":"_an","props":{},"references":[],"type":1}}
+.ssh-config
+build-remote.bat
+build-remote.ps1
+build-remote.sh
 ```
 </details></tool-use>
 
@@ -2592,6 +6511,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build-remote.ps1`
 
 **Input:**
 
@@ -2602,8 +6523,87 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":31,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"# Deploy Build Script - PowerShell\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":31},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":30,"references":[],"text":"# تشغيل npm run build على السيرفر عبر SSH\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":30},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":29,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":29},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":28,"references":[],"text":"# تعديل هذه المتغيرات حسب بيانات السيرفر الخاص بك\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":28},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":27,"references":[],"text":"$SSH_USER = \"u962989541\"           # اسم المستخدم\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":27},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":26,"references":[],"text":"$SSH_HOST = \"147.79.103.131\"         # عنوان السيرفر\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":26},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":25,"references":[],"text":"$SSH_PORT = 65002                        # المنفذ (22 افتراضي)\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":25},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":24,"references":[],"text":"$REMOTE_PATH = \"/domains/musoftwares.com
-… (output truncated)
+# Deploy Build Script - PowerShell
+# تشغيل npm run build على السيرفر عبر SSH
+
+# تعديل هذه المتغيرات حسب بيانات السيرفر الخاص بك
+$SSH_USER = "u962989541"           # اسم المستخدم
+$SSH_HOST = "147.79.103.131"         # عنوان السيرفر
+$SSH_PORT = 65002                        # المنفذ (22 افتراضي)
+$REMOTE_PATH = "/domains/musoftwares.com/public_html/"    # مسار المشروع على السيرفر
+$SSH_KEY = ""       # مسار المفتاح الخاص (اختياري)
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# تنفيذ الأمر
+Write-Host "جاري الاتصال بالسيرفر وتنفيذ npm run build..." -ForegroundColor Cyan
+
+if ($SSH_KEY) {
+    # مع مفتاح SSH
+    ssh -i $SSH_KEY -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+} else {
+    # بدون مفتاح (سيطلب كلمة مرور)
+    ssh -p $SSH_PORT $SSH_USER@$SSH_HOST $sshCommand
+}
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✓ تم البناء بنجاح!" -ForegroundColor Green
+} else {
+    Write-Host "✗ حدث خطأ أثناء البناء" -ForegroundColor Red
+    exit 1
+}
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.ps1**</summary>
+
+@@ lines 4-28 @@
+
+```
+قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# تنفيذ الأمر
+Write-Host "جاري الاتصال بالسيرفر وتنفيذ npm run build..." -ForegroundColor Cyan
+Write-Host "السيرفر: $SSH_USER@$SSH_HOST:$SSH_PORT" -ForegroundColor Cyan
+
+if ($SSH_KEY -and (Test-Path $SSH_KEY)) {
+    # مع مفتاح SSH
+    ssh -i $SSH_KEY -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST $sshCommand
+} elseif ($SSH_PASSWORD) {
+    # مع كلمة مرور
+    $env:SSHPASS = $SSH_PASSWORD
+    sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o PubkeyAuthentication=no $SSH_USER@$SSH_HOST $sshCommand
+    Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+} else {
+    # بدون مفتاح (سيطلب كلمة مرور)
+    ssh -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST $sshCommand
+}
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✓ تم البناء بنجاح!" -ForegroundColor Green
+} else {
+    Write-Host "✗ حدث خطأ أثناء البناء (exit code: $LASTEXITCODE)
 ```
 </details></tool-use>
 
@@ -2612,6 +6612,8 @@ _**Agent (copilot/auto)**_
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
 
+Read `build-remote.bat`, lines 1 to 50
+
 **Input:**
 
 - endLine: `50`
@@ -2619,81 +6621,6 @@ _**Agent (copilot/auto)**_
 - startLine: `1`
 
 **Result:**
-
-```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":50,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote.bat","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote.bat","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote.bat","scheme":"file"},"options":{"isFromTool":true}}],"text":"@echo off\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":50},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":49,"references":[],"text":"REM Deploy Build Script - Batch File\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":49},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":48,"references":[],"text":"REM نسخة بسيطة لـ Windows CMD\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":48},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":47,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":47},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":46,"references":[],"text":"setlocal enabledelayedexpansion\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":46},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":45,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":45},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":44,"references":[],"text":"REM قراءة الإعدادات من .ssh-config\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":44},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":43,"references":[],"text":"for /f \"tokens=1,2 delims==\" %%A in (.ssh-config) do (\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":43},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority
-… (output truncated)
-```
-</details></tool-use>
-
-_**Agent (copilot/auto)**_
-
-<tool-use data-tool-type="generic" data-tool-name="replace_string_in_file"><details>
-<summary>Tool use: **replace_string_in_file**</summary>
-
-**Input:**
-
-- filePath: `d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote.bat`
-- newString:
-
-```
-@echo off
-REM Deploy Build Script - Batch File
-REM نسخة بسيطة لـ Windows CMD
-
-setlocal enabledelayedexpansion
-
-REM قراءة الإعدادات من .ssh-config
-for /f "tokens=1,2 delims==" %%A in (.ssh-config) do (
-    set "%%A=%%B"
-)
-
-REM متغيرات
-set "SSH_USER=%SSH_USER:~0,50%"
-set "SSH_HOST=%SSH_HOST:~0,50%"
-set "SSH_PORT=%SSH_PORT:~0,5%"
-set "REMOTE_PATH=%REMOTE_PATH:~0,100%"
-set "SSH_PASSWORD=%SSH_PASSWORD:~0,100%"
-set "PROJECT_NAME=%PROJECT_NAME:~0,50%"
-
-if not defined SSH_USER (
-    echo.
-    echo [ERROR] ملف الاعدادات غير صحيح
-    echo الرجاء تعديل .ssh-config
-    echo.
-    pause
-    exit /b 1
-)
-
-echo.
-echo ========================================
-echo.
-echo 🚀 Deploy Build Script - Remote Execute
-echo.
-echo ========================================
-echo.
-echo Project: %PROJECT_NAME%
-echo Server: %SSH_USER%@%SSH_HOST%:%SSH_PORT%
-echo Path: %REMOTE_PATH%
-echo.
-
-REM أمر SSH
-set "SSH_CMD=cd %REMOTE_PATH% && npm run build"
-
-echo 🔄 جاري الاتصال...
-echo.
-
-REM تنفيذ الأمر
-if defined SSH_KEY (
-    ssh -i "%SSH_KEY%" -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-) else if defined SSH_PASSWORD (
-    sshpass -p %SSH_PASSWORD% ssh -p %SSH_PORT% -o StrictHostKeyChecking=no -o PubkeyAuthentication=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-) else (
-    ssh -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-)
-```
-
-- oldString:
 
 ```
 @echo off
@@ -2747,93 +6674,325 @@ if defined SSH_KEY (
 ) else (
     ssh -p %SSH_PORT% %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
 ```
+</details></tool-use>
 
+_**Agent (copilot/auto)**_
 
-**Result:**
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.bat**</summary>
+
+@@ lines 17-50 @@
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote.bat","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+SSH_PASSWORD=%SSH_PASSWORD:~0,100%"
+set "PROJECT_NAME=%PROJECT_NAME:~0,50%"
+
+if not defined SSH_USER (
+    echo.
+    echo [ERROR] ملف الاعدادات غير صحيح
+    echo الرجاء تعديل .ssh-config
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo ========================================
+echo.
+echo 🚀 Deploy Build Script - Remote Execute
+echo.
+echo ========================================
+echo.
+echo Project: %PROJECT_NAME%
+echo Server: %SSH_USER%@%SSH_HOST%:%SSH_PORT%
+echo Path: %REMOTE_PATH%
+echo.
+
+REM أمر SSH
+set "SSH_CMD=cd %REMOTE_PATH% && npm run build"
+
+echo 🔄 جاري الاتصال...
+echo.
+
+REM تنفيذ الأمر
+if defined SSH_KEY (
+    ssh -i "%SSH_KEY%" -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else if defined SSH_PASSWORD (
+    sshpass -p %SSH_PASSWORD% ssh -p %SSH_PORT% -o StrictHostKeyChecking=no -o PubkeyAuthentication=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else (
+    ssh -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+)
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
-<tool-use data-tool-type="generic" data-tool-name="replace_string_in_file"><details>
-<summary>Tool use: **replace_string_in_file**</summary>
+<tool-use data-tool-type="read" data-tool-name="read_file"><details>
+<summary>Tool use: **read_file**</summary>
+
+Read `build-remote.bat`, lines 45 to 65
 
 **Input:**
 
+- endLine: `65`
 - filePath: `d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote.bat`
-- newString:
-
-```
-REM تنفيذ الأمر
-if defined SSH_KEY (
-    ssh -i "%SSH_KEY%" -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-) else if defined SSH_PASSWORD (
-    sshpass -p %SSH_PASSWORD% ssh -p %SSH_PORT% -o StrictHostKeyChecking=no -o PubkeyAuthentication=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-) else (
-    ssh -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-)
-
-REM التحقق من النتيجة
-```
-
-- oldString:
-
-```
-REM تنفيذ الأمر
-if defined SSH_KEY (
-    ssh -i "%SSH_KEY%" -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-) else if defined SSH_PASSWORD (
-    sshpass -p %SSH_PASSWORD% ssh -p %SSH_PORT% -o StrictHostKeyChecking=no -o PubkeyAuthentication=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-) else (
-    ssh -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
-)
-)
-
-REM التحقق من النتيجة
-```
-
+- startLine: `45`
 
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote.bat","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+echo.
+
+REM تنفيذ الأمر
+if defined SSH_KEY (
+    ssh -i "%SSH_KEY%" -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else if defined SSH_PASSWORD (
+    sshpass -p %SSH_PASSWORD% ssh -p %SSH_PORT% -o StrictHostKeyChecking=no -o PubkeyAuthentication=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else (
+    ssh -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+)
+)
+
+REM التحقق من النتيجة
+if %ERRORLEVEL% EQU 0 (
+    echo.
+    echo ✅ تم البناء بنجاح!
+    echo.
+) else (
+    echo.
+    echo ❌ فشل البناء (Error: %ERRORLEVEL%)
+    echo.
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
-سأضيف حقل كلمة المرور وأحدّث السكريبتات لاستخدامها: 
-```
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.bat**</summary>
+
+@@ lines 55-56 @@ (deleted)
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.ps1**</summary>
+
+@@ lines 4-28 @@
 
 ```
-سأحدّث السكريبتات لدعم كلمة المرور: سأحدّث السكريبتات لدعم كلمة المرور: دعني أتحقق من الملفات الموجودة: 
+قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# تنفيذ الأمر
+Write-Host "جاري الاتصال بالسيرفر وتنفيذ npm run build..." -ForegroundColor Cyan
+Write-Host "السيرفر: $SSH_USER@$SSH_HOST:$SSH_PORT" -ForegroundColor Cyan
+
+if ($SSH_KEY -and (Test-Path $SSH_KEY)) {
+    # مع مفتاح SSH
+    ssh -i $SSH_KEY -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST $sshCommand
+} elseif ($SSH_PASSWORD) {
+    # مع كلمة مرور
+    $env:SSHPASS = $SSH_PASSWORD
+    sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o PubkeyAuthentication=no $SSH_USER@$SSH_HOST $sshCommand
+    Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+} else {
+    # بدون مفتاح (سيطلب كلمة مرور)
+    ssh -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST $sshCommand
+}
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✓ تم البناء بنجاح!" -ForegroundColor Green
+} else {
+    Write-Host "✗ حدث خطأ أثناء البناء (exit code: $LASTEXITCODE)
 ```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.bat**</summary>
+
+@@ lines 17-50 @@
+
+```
+SSH_PASSWORD=%SSH_PASSWORD:~0,100%"
+set "PROJECT_NAME=%PROJECT_NAME:~0,50%"
+
+if not defined SSH_USER (
+    echo.
+    echo [ERROR] ملف الاعدادات غير صحيح
+    echo الرجاء تعديل .ssh-config
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo ========================================
+echo.
+echo 🚀 Deploy Build Script - Remote Execute
+echo.
+echo ========================================
+echo.
+echo Project: %PROJECT_NAME%
+echo Server: %SSH_USER%@%SSH_HOST%:%SSH_PORT%
+echo Path: %REMOTE_PATH%
+echo.
+
+REM أمر SSH
+set "SSH_CMD=cd %REMOTE_PATH% && npm run build"
+
+echo 🔄 جاري الاتصال...
+echo.
+
+REM تنفيذ الأمر
+if defined SSH_KEY (
+    ssh -i "%SSH_KEY%" -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else if defined SSH_PASSWORD (
+    sshpass -p %SSH_PASSWORD% ssh -p %SSH_PORT% -o StrictHostKeyChecking=no -o PubkeyAuthentication=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+) else (
+    ssh -p %SSH_PORT% -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "%SSH_CMD%"
+)
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote.bat**</summary>
+
+@@ lines 55-56 @@ (deleted)
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="create_file"><details>
+<summary>Tool use: **create_file**</summary>
+
+Create File
+
+**Input:**
+
+- content:
+
+```
+# Advanced Deploy Build Script - PowerShell
+# نسخة محسّنة مع دعم الإعدادات والسجلات وكلمة المرور
+
+param(
+    [switch]$Verbose = $false,
+    [switch]$DryRun = $false,
+    [string]$ConfigFile = ".ssh-config"
+)
+
+# الألوان
+$colors = @{
+    Info = "Cyan"
+    Success = "Green"
+    Warning = "Yellow"
+    Error = "Red"
+}
+
+function Write-Log {
+    param([string]$Message, [string]$Level = "Info")
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $output = "[$timestamp] [$Level] $Message"
+    Write-Host $output -ForegroundColor $colors[$Level]
+}
+
+# قراءة ملف الإعدادات
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$configPath = Join-Path $scriptDir $ConfigFile
+
+if (-not (Test-Path $configPath)) {
+    Write-Log "❌ لم يتم العثور على ملف الإعدادات: $configPath" "Error"
+    exit 1
+}
+
+# تحميل الإعدادات
+$config = @{}
+Get-Content $configPath | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+# استخلاص البيانات
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_KEY = $config['SSH_KEY']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+$PROJECT_NAME = $config['PROJECT_NAME'] ?? "Project"
+
+Write-Log "🚀 بدء البناء للمشروع: $PROJECT_NAME" "Info"
+Write-Log "الاتصال: $SSH_USER@$SSH_HOST:$SSH_PORT" "Info"
+Write-Log "المسار: $REMOTE_PATH" "Info"
+
+# بناء أمر SSH
+$sshCommand = "cd $REMOTE_PATH && npm run build"
+
+# أوامر إضافية (اختياري)
+if ($config['POST_BUILD_CMD']) {
+    $sshCommand += " && " + $config['POST_BUILD_CMD']
+    Write-Log "سيتم تنفيذ أمر إضافي بعد البناء" "Info"
+}
+
+if ($Verbose) {
+    Write-Log "الأمر: $sshCommand" "Info"
+}
+
+if ($DryRun) {
+    Write-Log "وضع DRY RUN - لن يتم تنفيذ الأمر فعليًا" "Warning"
+    exit 0
+}
+
+Write-Log "جاري الاتصال بالسيرفر..." "Info"
+
+# تنفيذ الأمر
+try {
+    if ($SSH_KEY -and (Test-Path $SSH_KEY)) {
+        ssh -i $SSH_KEY -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST $sshCommand
+    } elseif ($SSH_PASSWORD) {
+        $env:SSHPASS = $SSH_PASSWORD
+        sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o PubkeyAuthentication=no $SSH_USER@$SSH_HOST $sshCommand
+        Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+    } else {
+        ssh -p $SSH_PORT -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST $sshCommand
+    }
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Log "✓ تم البناء بنجاح!" "Success"
+    } else {
+        Write-Log "✗ فشل البناء (exit code: $LASTEXITCODE)" "Error"
+        exit 1
+    }
+} catch {
+    Write-Log "❌ حدث خطأ: $_" "Error"
+    exit 1
+}
 
 ```
 
-```
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
-
+- filePath: `d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-advanced.ps1`
+</details></tool-use>
 
 ---
 
@@ -2862,16 +7021,10 @@ operable program or batch file.
 
 _**Agent (copilot/auto)**_
 
-<think><details><summary>Thought Process</summary>
-المشكلة أن `sshpass` غير مثبت على جهازك. سأنشئ سكريبت PowerShell بديل يعمل بدون الحاجة لـ sshpass: 
-
-الآن سأنشئ سكريبت PowerShell محسّن يعمل بدون `sshpass`:
-</details></think>
-
-_**Agent (copilot/auto)**_
-
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `.ssh-config`
 
 **Input:**
 
@@ -2882,15 +7035,30 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":12,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\.ssh-config","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","scheme":"file"},"options":{"isFromTool":true}}],"text":"# SSH Server Configuration\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":12},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":11,"references":[],"text":"# SSH اعدادات الاتصال بـ\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":11},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":10,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":10},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9,"references":[],"text":"SSH_USER=u962989541\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":9},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":8,"references":[],"text":"SSH_HOST=147.79.103.131\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":8},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":7,"references":[],"text":"SSH_PORT=65002\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":7},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":6,"references":[],"text":"REMOTE_PATH=/domains/musoftwares.com/public_html/\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":6},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":5,"references":[],"text":"SSH_PASSWORD=MKK8wjq8\u0026\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":5},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":4,"references":[],"text":"\n","type"
-… (output truncated)
+# SSH Server Configuration
+# SSH اعدادات الاتصال بـ
+
+SSH_USER=u962989541
+SSH_HOST=147.79.103.131
+SSH_PORT=65002
+REMOTE_PATH=/domains/musoftwares.com/public_html/
+SSH_PASSWORD=MKK8wjq8&
+
+# اختياري: مسار المفتاح الخاص
+# SSH_KEY=/path/to/private/key
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
+المشكلة أن `sshpass` غير مثبت على جهازك. سأنشئ سكريبت PowerShell بديل يعمل بدون الحاجة لـ sshpass: 
+
+_**Agent (copilot/auto)**_
+
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build-remote-simple.ps1`
 
 **Input:**
 
@@ -2994,14 +7162,122 @@ if ($LASTEXITCODE -eq 0) {
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-simple.ps1","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build-remote-simple.ps1
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build-remote-simple.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Deploy Build Script - PowerShell (بسيط وسهل)
+# تشغيل npm run build على السيرفر عبر SSH
+
+# قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "❌ ملف الإعدادات غير موجود: $configFile" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "🚀 Deploy Build Script" -ForegroundColor Cyan
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "📋 تفاصيل الاتصال:" -ForegroundColor Yellow
+Write-Host "  المستخدم: $SSH_USER" -ForegroundColor Gray
+Write-Host "  السيرفر: $SSH_HOST:$SSH_PORT" -ForegroundColor Gray
+Write-Host "  المسار: $REMOTE_PATH" -ForegroundColor Gray
+Write-Host ""
+
+# الأمر المراد تنفيذه
+$command = "cd '$REMOTE_PATH' && npm run build"
+
+Write-Host "⚙️  الأمر: $command" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "🔄 جاري الاتصال بالسيرفر..." -ForegroundColor Cyan
+Write-Host ""
+
+# استخدام SSH مع StrictHostKeyChecking=no لتجنب طلب التصديق
+# إذا كانت هناك كلمة مرور، استخدم stdin
+if ($SSH_PASSWORD) {
+    # استخدم echo لإرسال كلمة المرور عبر stdin
+    $command | ssh -p $SSH_PORT `
+        -o StrictHostKeyChecking=no `
+        -o PubkeyAuthentication=no `
+        -o PasswordAuthentication=yes `
+        -o ConnectTimeout=10 `
+        "$SSH_USER@$SSH_HOST" `
+        -c "echo '$SSH_PASSWORD' | script --quiet --return --command 'cd $REMOTE_PATH && npm run build' /dev/null"
+    
+    # طريقة بديلة: استخدم heredoc
+    # (Get-Content -Raw <<-"EOF" | ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST") -f function:Get-SomethingPrivate
+    
+    # الطريقة الأفضل: استخدم sshpass إذا كان متوفراً، وإلا اطلب البيانات يدويًا
+    
+    # اختبر ما إذا كان sshpass متوفراً
+    $hasSSHPass = $null -ne (Get-Command sshpass -ErrorAction SilentlyContinue)
+    
+    if ($hasSSHPass) {
+        $env:SSHPASS = $SSH_PASSWORD
+        sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o PubkeyAuthentication=no "$SSH_USER@$SSH_HOST" "$command"
+        Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+    } else {
+        # بدون sshpass، استخدم SSH بدون كلمة مرور (التفاعل اليدوي)
+        Write-Host "⚠️  sshpass غير مثبت. سيطلب منك إدخال كلمة المرور يدويًا..." -ForegroundColor Yellow
+        Write-Host ""
+        ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "$command"
+    }
+} else {
+    # بدون كلمة مرور (استخدم مفتاح SSH أو المفتاح الافتراضي)
+    ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "$command"
+}
+
+# التحقق من النتيجة
+Write-Host ""
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "════════════════════════════════════════" -ForegroundColor Green
+    Write-Host "✅ تم البناء بنجاح!" -ForegroundColor Green
+    Write-Host "════════════════════════════════════════" -ForegroundColor Green
+} else {
+    Write-Host "════════════════════════════════════════" -ForegroundColor Red
+    Write-Host "❌ فشل البناء (exit code: $LASTEXITCODE)" -ForegroundColor Red
+    Write-Host "════════════════════════════════════════" -ForegroundColor Red
+    exit 1
+}
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+الآن سأنشئ سكريبت PowerShell محسّن يعمل بدون `sshpass`: 
+
+_**Agent (copilot/auto)**_
+
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build.ps1`
 
 **Input:**
 
@@ -3111,13 +7387,121 @@ if ($LASTEXITCODE -eq 0) {
 **Result:**
 
 ```
-{"node":{"children":[{"lineBreakBefore":false,"priority":9007199254740991,"text":"The following files were successfully edited:","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build.ps1","type":2},{"lineBreakBefore":false,"priority":9007199254740991,"text":"\n","type":2}],"ctor":2,"ctorName":"ak","props":{},"references":[],"type":1}}
+The following files were successfully edited:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy\build.ps1
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
-المشكلة أن `sshpass` غير مثبت على جهازك. سأنشئ سكريبت PowerShell بديل يعمل بدون الحاجة لـ sshpass: الآن سأنشئ سكريبت PowerShell محسّن يعمل بدون `sshpass`: الآن أنشأت لك حلاً! هناك **حلّان**:
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build.ps1**</summary>
+
+@@ lines 1-1 @@
+
+```
+# Deploy Build Script - PowerShell
+# اعمل npm run build على السيرفر عبر SSH (بدون الحاجة لـ sshpass)
+
+param(
+    [switch]$NoPassword = $false  # اترك SSH تطلب كلمة المرور يدويًا
+)
+
+# قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "❌ ملف الإعدادات غير موجود: $configFile" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "🚀 Deploy Build Script" -ForegroundColor Cyan
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "📋 البيانات:" -ForegroundColor Yellow
+Write-Host "  المستخدم: $SSH_USER" -ForegroundColor Gray
+Write-Host "  السيرفر: $SSH_HOST:$SSH_PORT" -ForegroundColor Gray
+Write-Host "  المسار: $REMOTE_PATH" -ForegroundColor Gray
+Write-Host ""
+
+# الأمر المراد تنفيذه
+$command = "cd $REMOTE_PATH && npm run build"
+
+Write-Host "⚙️  الأمر: $command" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "🔄 جاري الاتصال..." -ForegroundColor Cyan
+Write-Host ""
+
+# الطريقة 1: اختبر ما إذا كان sshpass متوفراً
+$hasSshpass = $null -ne (Get-Command sshpass -ErrorAction SilentlyContinue)
+
+if ($hasSshpass -and $SSH_PASSWORD -and -not $NoPassword) {
+    Write-Host "✓ استخدام sshpass..." -ForegroundColor Green
+    $env:SSHPASS = $SSH_PASSWORD
+    
+    sshpass -e ssh `
+        -p $SSH_PORT `
+        -o StrictHostKeyChecking=no `
+        -o PubkeyAuthentication=no `
+        "$SSH_USER@$SSH_HOST" `
+        "$command"
+    
+    Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+} else {
+    # الطريقة 2: استخدم SSH مباشرة (قد تطلب كلمة مرور يدويًا)
+    if ($NoPassword) {
+        Write-Host "⚠️  مضغوط -NoPassword. SSH لن يستخدم كلمة المرور المحفوظة." -ForegroundColor Yellow
+    } elseif ($SSH_PASSWORD) {
+        Write-Host "⚠️  sshpass غير مثبت. سيطلب كلمة المرور يدويًا..." -ForegroundColor Yellow
+        Write-Host "    تلميح: اضغط Ctrl+C لإلغاء إذا كنت تريد تثبيت sshpass أولاً" -ForegroundColor Yellow
+    }
+    
+    Write-Host ""
+    
+    ssh `
+        -p $SSH_PORT `
+        -o StrictHostKeyChecking=no `
+        "$SSH_USER@$SSH_HOST" `
+        "$command"
+}
+
+# التحقق من النتيجة
+Write-Host ""
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "════════════════════════════════════════" -ForegroundColor Green
+    Write-Host "✅ تم البناء بنجاح!" -ForegroundColor Green
+    Write-Host "════════════════════════════════════════" -ForegroundColor Green
+} else {
+    Write-Host "════════════════════════════════════════" -ForegroundColor Red
+    Write-Host "❌ فشل البناء (exit code: $LASTEXITCODE)" -ForegroundColor Red
+    Write-Host "════════════════════════════════════════" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "💡 الحل:" -ForegroundColor Yellow
+    Write-Host "   - تأكد من أن كلمة المرور صحيحة" -ForegroundColor Gray
+    Write-Host "   - أو ثبّت sshpass: choco install sshpass" -ForegroundColor Gray
+    exit 1
+}
+
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+الآن أنشأت لك حلاً! هناك **حلّان**:
 
 ## ✅ الحل 1: استخدم `build.ps1` (الأسهل الآن)
 
@@ -3209,14 +7593,14 @@ PS D:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\deploy>
 
 _**Agent (copilot/auto)**_
 
-<think><details><summary>Thought Process</summary>
-المشكلة أن PowerShell الإصدار القديم لديك لا يدعم بعض الميزات. سأنشئ نسخة متوافقة:
-</details></think>
+المشكلة أن PowerShell الإصدار القديم لديك لا يدعم بعض الميزات. سأنشئ نسخة متوافقة: 
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="write" data-tool-name="create_file"><details>
 <summary>Tool use: **create_file**</summary>
+
+Created `build.ps1`
 
 **Input:**
 
@@ -3310,6 +7694,8 @@ _**Agent (copilot/auto)**_
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
 
+Read `build.ps1`, lines 1 to 30
+
 **Input:**
 
 - endLine: `30`
@@ -3319,8 +7705,36 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":30,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"# Deploy Build Script - PowerShell\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":30},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":29,"references":[],"text":"# اعمل npm run build على السيرفر عبر SSH (بدون الحاجة لـ sshpass)\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":29},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":28,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":28},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":27,"references":[],"text":"param(\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":27},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":26,"references":[],"text":"    [switch]$NoPassword = $false  # اترك SSH تطلب كلمة المرور يدويًا\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":26},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":25,"references":[],"text":")\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":25},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":24,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":24},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":23,"references":[],"text":"# قراءة الإعدادات من .ssh-config\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":23},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":22,"refe
-… (output truncated)
+# Deploy Build Script - PowerShell
+# اعمل npm run build على السيرفر عبر SSH (بدون الحاجة لـ sshpass)
+
+param(
+    [switch]$NoPassword = $false  # اترك SSH تطلب كلمة المرور يدويًا
+)
+
+# قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "❌ ملف الإعدادات غير موجود: $configFile" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "🚀 Deploy Build Script" -ForegroundColor Cyan
 ```
 </details></tool-use>
 
@@ -3328,6 +7742,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build.ps1`
 
 **Input:**
 
@@ -3338,8 +7754,147 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":96,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"# Deploy Build Script - PowerShell\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":96},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":95,"references":[],"text":"# اعمل npm run build على السيرفر عبر SSH (بدون الحاجة لـ sshpass)\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":95},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":94,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":94},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":93,"references":[],"text":"param(\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":93},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":92,"references":[],"text":"    [switch]$NoPassword = $false  # اترك SSH تطلب كلمة المرور يدويًا\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":92},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":91,"references":[],"text":")\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":91},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":90,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":90},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":89,"references":[],"text":"# قراءة الإعدادات من .ssh-config\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":89},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":88,"refe
+# Deploy Build Script - PowerShell
+# اعمل npm run build على السيرفر عبر SSH (بدون الحاجة لـ sshpass)
+
+param(
+    [switch]$NoPassword = $false  # اترك SSH تطلب كلمة المرور يدويًا
+)
+
+# قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "❌ ملف الإعدادات غير موجود: $configFile" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "🚀 Deploy Build Script" -ForegroundColor Cyan
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "📋 البيانات:" -ForegroundColor Yellow
+Write-Host "  المستخدم: $SSH_USER" -ForegroundColor Gray
+Write-Host "  السيرفر: $SSH_HOST:$SSH_PORT" -ForegroundColor Gray
+Write-Host "  المسار: $REMOTE_PATH" -ForegroundColor Gray
+Write-Host ""
+
+# الأمر المراد تنفيذه
+$command = "cd $REMOTE_PATH && npm run build"
+
+Write-Host "⚙️  الأمر: $command" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "🔄 جاري الاتصال..." -ForegroundColor Cyan
+Write-Host ""
+
+# الطريقة 1: اختبر ما إذا كان sshpass متوفراً
+$hasSshpass = $null -ne (Get-Command sshpass -ErrorAction SilentlyContinue)
+
+if ($hasSshpass -and $SSH_PASSWORD -and -not $NoPassword) {
+    Write-Host "✓ استخدام sshpass..." -ForegroundColor Green
+    $env:SSHPASS = $SSH_PASSWORD
+
+    sshpass -e ssh `
+        -p $SSH_PORT `
+        -o StrictHostKeyChecking=no `
+        -o PubkeyAuthentication=no `
+        "$SSH_USER@$SSH_HOST" `
+        "$command"
+
+    Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+} else {
+    # الطريقة 2: استخدم SSH مباشرة (قد
 … (output truncated)
+```
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build.ps1**</summary>
+
+@@ lines 2-93 @@
+
+```
+Build npm على السيرفر عبر SSH
+
+param(
+    [switch]$NoPassword
+)
+
+# قراءة ملف الاعدادات
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "خطأ: ملف الاعدادات غير موجود" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $parts = $_ -split "=", 2
+    if ($parts.Count -eq 2) {
+        $config[$parts[0].Trim()] = $parts[1].Trim().Trim('"')
+    }
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT']
+if ([string]::IsNullOrEmpty($SSH_PORT)) { $SSH_PORT = 22 }
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "=== Deploy Build ===" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Username: $SSH_USER" -ForegroundColor Gray
+Write-Host "Server: $SSH_HOST`:`$SSH_PORT" -ForegroundColor Gray
+Write-Host "Path: $REMOTE_PATH" -ForegroundColor Gray
+Write-Host ""
+
+# امر البناء
+$command = "cd $REMOTE_PATH; npm run build"
+
+Write-Host "Command: $command" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Connecting..." -ForegroundColor Cyan
+Write-Host ""
+
+# اختبر sshpass
+$hasSshpass = $null -ne (Get-Command sshpass -ErrorAction SilentlyContinue)
+
+if ($hasSshpass -and $SSH_PASSWORD -and -not $NoPassword) {
+    $env:SSHPASS = $SSH_PASSWORD
+    & sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o PubkeyAuthentication=no "$SSH_USER@$SSH_HOST" $command
+    if ($env:SSHPASS) {
+        Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+    }
+} else {
+    & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $command
+}
+
+# النتيجة
+Write-Host ""
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "=== SUCCESS ===" -ForegroundColor Green
+    Write-Host "Build completed!" -ForegroundColor Green
+} else {
+    Write-Host "=== FAILED ===" -ForegroundColor Red
+    Write-Host "Build failed (exit code: $LASTEXITCODE)" -ForegroundColor Red
 ```
 </details></tool-use>
 
@@ -3347,6 +7902,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build-remote-simple.ps1`, lines 1 to 30
 
 **Input:**
 
@@ -3357,8 +7914,36 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":30,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-simple.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-simple.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-simple.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"# Deploy Build Script - PowerShell (بسيط وسهل)\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":30},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":29,"references":[],"text":"# تشغيل npm run build على السيرفر عبر SSH\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":29},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":28,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":28},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":27,"references":[],"text":"# قراءة الإعدادات من .ssh-config\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":27},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":26,"references":[],"text":"$configFile = \".ssh-config\"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":26},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":25,"references":[],"text":"$config = @{}\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":25},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":24,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":24},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":23,"references":[],"text":"if (-not (Test-Path $configFile)) {\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":23},"references":[],"type":1},{"children":[{"lineBreak
-… (output truncated)
+# Deploy Build Script - PowerShell (بسيط وسهل)
+# تشغيل npm run build على السيرفر عبر SSH
+
+# قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "❌ ملف الإعدادات غير موجود: $configFile" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "🚀 Deploy Build Script" -ForegroundColor Cyan
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "📋 تفاصيل الاتصال:" -ForegroundColor Yellow
+Write-Host "  المستخدم: $SSH_USER" -ForegroundColor Gray
 ```
 </details></tool-use>
 
@@ -3366,6 +7951,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `build-remote-simple.ps1`, lines 1 to 80
 
 **Input:**
 
@@ -3376,7 +7963,62 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":80,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-simple.ps1","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\build-remote-simple.ps1","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/build-remote-simple.ps1","scheme":"file"},"options":{"isFromTool":true}}],"text":"# Deploy Build Script - PowerShell (بسيط وسهل)\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":80},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":79,"references":[],"text":"# تشغيل npm run build على السيرفر عبر SSH\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":79},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":78,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":78},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":77,"references":[],"text":"# قراءة الإعدادات من .ssh-config\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":77},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":76,"references":[],"text":"$configFile = \".ssh-config\"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":76},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":75,"references":[],"text":"$config = @{}\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":75},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":74,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":74},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":73,"references":[],"text":"if (-not (Test-Path $configFile)) {\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":73},"references":[],"type":1},{"children":[{"lineBreak
+# Deploy Build Script - PowerShell (بسيط وسهل)
+# تشغيل npm run build على السيرفر عبر SSH
+
+# قراءة الإعدادات من .ssh-config
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "❌ ملف الإعدادات غير موجود: $configFile" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $key, $value = $_ -split "=", 2
+    $config[$key.Trim()] = $value.Trim().Trim('"')
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT'] ?? 22
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "🚀 Deploy Build Script" -ForegroundColor Cyan
+Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "📋 تفاصيل الاتصال:" -ForegroundColor Yellow
+Write-Host "  المستخدم: $SSH_USER" -ForegroundColor Gray
+Write-Host "  السيرفر: $SSH_HOST:$SSH_PORT" -ForegroundColor Gray
+Write-Host "  المسار: $REMOTE_PATH" -ForegroundColor Gray
+Write-Host ""
+
+# الأمر المراد تنفيذه
+$command = "cd '$REMOTE_PATH' && npm run build"
+
+Write-Host "⚙️  الأمر: $command" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "🔄 جاري الاتصال بالسيرفر..." -ForegroundColor Cyan
+Write-Host ""
+
+# استخدام SSH مع StrictHostKeyChecking=no لتجنب طلب التصديق
+# إذا كانت هناك كلمة مرور، استخدم stdin
+if ($SSH_PASSWORD) {
+    # استخدم echo لإرسال كلمة المرور عبر stdin
+    $command | ssh -p $SSH_PORT `
+        -o StrictHostKeyChecking=no `
+        -o PubkeyAuthentication=no `
+        -o PasswordAuthentication=yes `
+        -o ConnectTimeout=10 `
+        "$SSH_USER@$SSH_HOST" `
+        -c "echo '$SSH_PASSWORD' | script --quiet --return --command 'cd $REMOTE_PATH && npm run build' /dev/null"
+
+    # طريقة بديلة: استخدم heredoc
+    # (Get-Content -Raw <<-"EOF" | ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST") -f function:Get-Somethi
 … (output truncated)
 ```
 </details></tool-use>
@@ -3385,6 +8027,8 @@ _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="generic" data-tool-name="replace_string_in_file"><details>
 <summary>Tool use: **replace_string_in_file**</summary>
+
+Replace String in File
 
 **Input:**
 
@@ -3544,15 +8188,80 @@ if ($LASTEXITCODE -eq 0) {
 
 _**Agent (copilot/auto)**_
 
-المشكلة أن PowerShell الإصدار القديم لديك لا يدعم بعض الميزات. سأنشئ نسخة متوافقة: 
-```
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build.ps1**</summary>
+
+@@ lines 2-93 @@
 
 ```
+Build npm على السيرفر عبر SSH
 
+param(
+    [switch]$NoPassword
+)
+
+# قراءة ملف الاعدادات
+$configFile = ".ssh-config"
+$config = @{}
+
+if (-not (Test-Path $configFile)) {
+    Write-Host "خطأ: ملف الاعدادات غير موجود" -ForegroundColor Red
+    exit 1
+}
+
+Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^$" } | ForEach-Object {
+    $parts = $_ -split "=", 2
+    if ($parts.Count -eq 2) {
+        $config[$parts[0].Trim()] = $parts[1].Trim().Trim('"')
+    }
+}
+
+$SSH_USER = $config['SSH_USER']
+$SSH_HOST = $config['SSH_HOST']
+$SSH_PORT = $config['SSH_PORT']
+if ([string]::IsNullOrEmpty($SSH_PORT)) { $SSH_PORT = 22 }
+$REMOTE_PATH = $config['REMOTE_PATH']
+$SSH_PASSWORD = $config['SSH_PASSWORD']
+
+Write-Host ""
+Write-Host "=== Deploy Build ===" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Username: $SSH_USER" -ForegroundColor Gray
+Write-Host "Server: $SSH_HOST`:`$SSH_PORT" -ForegroundColor Gray
+Write-Host "Path: $REMOTE_PATH" -ForegroundColor Gray
+Write-Host ""
+
+# امر البناء
+$command = "cd $REMOTE_PATH; npm run build"
+
+Write-Host "Command: $command" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Connecting..." -ForegroundColor Cyan
+Write-Host ""
+
+# اختبر sshpass
+$hasSshpass = $null -ne (Get-Command sshpass -ErrorAction SilentlyContinue)
+
+if ($hasSshpass -and $SSH_PASSWORD -and -not $NoPassword) {
+    $env:SSHPASS = $SSH_PASSWORD
+    & sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o PubkeyAuthentication=no "$SSH_USER@$SSH_HOST" $command
+    if ($env:SSHPASS) {
+        Remove-Item env:SSHPASS -ErrorAction SilentlyContinue
+    }
+} else {
+    & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $command
+}
+
+# النتيجة
+Write-Host ""
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "=== SUCCESS ===" -ForegroundColor Green
+    Write-Host "Build completed!" -ForegroundColor Green
+} else {
+    Write-Host "=== FAILED ===" -ForegroundColor Red
+    Write-Host "Build failed (exit code: $LASTEXITCODE)" -ForegroundColor Red
 ```
-
-```
-
+</details></tool-use>
 
 ---
 
@@ -3574,24 +8283,6 @@ u962989541@147.79.103.131's password:
 
 _**Agent (copilot/auto)**_
 
-<think><details><summary>Thought Process</summary>
-✅ **ممتاز! السكريبت يعمل بشكل صحيح الآن!**
-
-الآن يطلب منك كلمة المرور. اكتب كلمة المرور وادخل:
-
-```
-MKK8wjq8&
-```
-
-ثم اضغط **Enter** ✨
-
----
-
-**ملاحظة:** هناك مشكلة صغيرة في عرض المنفذ. دعني أصلحها بسرعة:
-</details></think>
-
-_**Agent (copilot/auto)**_
-
 ✅ **ممتاز! السكريبت يعمل بشكل صحيح الآن!**
 
 الآن يطلب منك كلمة المرور. اكتب كلمة المرور وادخل:
@@ -3605,9 +8296,17 @@ MKK8wjq8&
 ---
 
 **ملاحظة:** هناك مشكلة صغيرة في عرض المنفذ. دعني أصلحها بسرعة: 
-```
 
-```
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="write" data-tool-name="textEditGroup"><details>
+<summary>Edit: **build.ps1**</summary>
+
+@@ lines 35-35 @@ (deleted)
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
 الآن كل شيء تمام! 🎉
 
 **الخطوات:**
@@ -3845,20 +8544,20 @@ operable program or batch file.
 
 _**Agent (copilot/auto)**_
 
-<think><details><summary>Thought Process</summary>
 ✅ **ممتاز! وجدنا المسار الصحيح:**
 
 ```
 /home/u962989541/domains/musoftwares.com/public_html/
 ```
 
-الآن دعني أحدّث `.ssh-config` بالمسار الصحيح:
-</details></think>
+الآن دعني أحدّث `.ssh-config` بالمسار الصحيح: 
 
 _**Agent (copilot/auto)**_
 
 <tool-use data-tool-type="read" data-tool-name="read_file"><details>
 <summary>Tool use: **read_file**</summary>
+
+Read `.ssh-config`
 
 **Input:**
 
@@ -3869,20 +8568,23 @@ _**Agent (copilot/auto)**_
 **Result:**
 
 ```
-{"node":{"children":[{"children":[{"children":[{"lineBreakBefore":true,"priority":12,"references":[{"anchor":{"$mid":1,"_sep":1,"external":"file:///d%3A/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","fsPath":"d:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\Musoftwares\\deploy\\.ssh-config","path":"/d:/Projects/1AOrganized/PhpProject/MusoftwareBusiness/Musoftwares/deploy/.ssh-config","scheme":"file"},"options":{"isFromTool":true}}],"text":"# SSH Server Configuration\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":12},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":11,"references":[],"text":"# SSH اعدادات الاتصال بـ\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":11},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":10,"references":[],"text":"\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":10},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":9,"references":[],"text":"SSH_USER=u962989541\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":9},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":8,"references":[],"text":"SSH_HOST=147.79.103.131\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":8},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":7,"references":[],"text":"SSH_PORT=65002\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":7},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":6,"references":[],"text":"REMOTE_PATH=/home/u962989541/domains/musoftwares.com/public_html/\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":6},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":5,"references":[],"text":"SSH_PASSWORD=MKK8wjq8\u0026\n","type":2}],"ctor":2,"ctorName":"V5e","props":{"priority":5},"references":[],"type":1},{"children":[{"lineBreakBefore":true,"priority":4,"references":[],"t
-… (output truncated)
+# SSH Server Configuration
+# SSH اعدادات الاتصال بـ
+
+SSH_USER=u962989541
+SSH_HOST=147.79.103.131
+SSH_PORT=65002
+REMOTE_PATH=/home/u962989541/domains/musoftwares.com/public_html/
+SSH_PASSWORD=MKK8wjq8&
+
+# اختياري: مسار المفتاح الخاص
+# SSH_KEY=/path/to/private/key
 ```
 </details></tool-use>
 
 _**Agent (copilot/auto)**_
 
-✅ **ممتاز! وجدنا المسار الصحيح:**
-
-```
-/home/u962989541/domains/musoftwares.com/public_html/
-```
-
-الآن دعني أحدّث `.ssh-config` بالمسار الصحيح: ✅ **الملف محدّث بالفعل بالمسار الصحيح!**
+✅ **الملف محدّث بالفعل بالمسار الصحيح!**
 
 الآن استخدم `build.ps1` (بدون الـ BAT):
 

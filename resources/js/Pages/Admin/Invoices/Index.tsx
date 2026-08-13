@@ -153,6 +153,18 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
     const handleCancel = (id: any) => setPendingAction({ type: 'cancel', id });
 
+    const handleToggleSuspend = (id: any) => {
+        router.post(route('admin.invoices.toggle-suspend', id), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(__('admin.invoice_updated') || 'Invoice updated');
+            },
+            onError: () => {
+                toast.error(__('general.error_occurred') || 'Something went wrong');
+            },
+        });
+    };
+
     const confirmCancel = () => {
         if (!pendingAction || pendingAction.type !== 'cancel') return;
         router.post(route('admin.invoices.cancel', pendingAction.id), {}, {
@@ -262,7 +274,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         <AdminSidebarLayout title={__('general.platform_invoices')} header="Invoices Manager">
             
             {stats && (
-                <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     <Card>
                         <CardContent className="p-5">
                             <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.total_invoices')}</dt>
@@ -287,6 +299,12 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.partially_paid}</dd>
                         </CardContent>
                     </Card>
+                    <Card>
+                        <CardContent className="p-5">
+                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('admin.suspended_invoices') || 'Suspended Invoices'}</dt>
+                            <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.suspended || 0}</dd>
+                        </CardContent>
+                    </Card>
                 </div>
             )}
 
@@ -301,6 +319,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'unpaid' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                     >
                         {__('general.unpaid')}</Link>
+                    <Link
+                        href={buildTabUrl('suspended')}
+                        className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'suspended' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                    >
+                        {__('admin.suspended_invoices') || 'Suspended Invoices'}</Link>
                     <Link
                         href={buildTabUrl('archive')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'archive' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
@@ -475,8 +498,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             </button>
                                         </TableCell>
                                         <TableCell className="text-center" data-label={__('general.invoice_status')}>
-                                            <div className="inline-block">
+                                            <div className="flex flex-col items-center gap-1 justify-center">
                                                 {getStatusBadge(invoice.status)}
+                                                {invoice.is_suspended && (
+                                                    <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded uppercase leading-none">
+                                                        {__('admin.suspended') || 'Suspended'}
+                                                    </span>
+                                                )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-end" data-label={__('general.actions')}>
@@ -532,6 +560,17 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 
                                                     {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                                                         <>
+                                                            <DropdownMenuItem onClick={() => handleToggleSuspend(invoice.id)}>
+                                                                {invoice.is_suspended ? (
+                                                                    <>
+                                                                        <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.unsuspend') || 'Unsuspend'}
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <XCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.suspend') || 'Suspend'}
+                                                                    </>
+                                                                )}
+                                                            </DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
                                                                 <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('general.mark_as_paid')}</DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleBillBalance(invoice.id)}>

@@ -106,4 +106,26 @@ class InvoiceSequentialPaymentTest extends TestCase
 
         $service->markPaid($newerInvoice);
     }
+
+    public function test_can_pay_newer_invoice_if_older_invoice_is_suspended()
+    {
+        $client = User::factory()->create();
+
+        $olderInvoice = Invoice::create([
+            'user_id' => $client->id,
+            'status' => 'unpaid',
+            'currency_id' => 1,
+            'is_suspended' => true,
+        ]);
+
+        $newerInvoice = Invoice::create([
+            'user_id' => $client->id,
+            'status' => 'unpaid',
+            'currency_id' => 1,
+        ]);
+
+        // Paying newer invoice succeeds because the older invoice is suspended
+        $newerInvoice->mark_as_paid();
+        $this->assertEquals('paid', $newerInvoice->fresh()->status);
+    }
 }

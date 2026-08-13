@@ -23,6 +23,10 @@ class GuestInvoiceController extends Controller
             abort(403, 'Invalid or expired signature.');
         }
 
+        if ($invoice->is_suspended) {
+            abort(404, 'Invoice not found.');
+        }
+
         $invoice->load(['user', 'project', 'items.timers', 'currency']);
 
         return Inertia::render('Guest/InvoiceShow', [
@@ -39,6 +43,10 @@ class GuestInvoiceController extends Controller
     {
         if (! $request->hasValidSignature()) {
             abort(403, 'Invalid or expired signature.');
+        }
+
+        if ($invoice->is_suspended) {
+            abort(404, 'Invoice not found.');
         }
 
         if ($invoice->status === 'paid') {

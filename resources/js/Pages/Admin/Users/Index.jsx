@@ -29,7 +29,7 @@ import { useToast } from '@/Components/ui/use-toast';
 import axios from 'axios';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
-export default function Index({ clients, filters, stats }) {
+export default function Index({ clients, filters, stats, tabCounts = { customers: 0, leads: 0 } }) {
     const { toast } = useToast();
     const [selectedClient, setSelectedClient] = useState(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -37,6 +37,17 @@ export default function Index({ clients, filters, stats }) {
     const [selectedRoleUser, setSelectedRoleUser] = useState(null);
     const [selectedRole, setSelectedRole] = useState('client');
     const [resetPasswordState, setResetPasswordState] = useState({ isOpen: false, clientId: null, client: null, status: 'confirm', info: null });
+
+    const activeTab = filters.type || 'customers';
+
+    const handleTabChange = (type) => {
+        if (type === activeTab) return;
+        router.get(
+            '/admin/users',
+            { ...filters, type, page: 1 },
+            { preserveState: true, replace: true }
+        );
+    };
 
     const copyToClipboard = (value, label) => {
         if (!value) return;
@@ -317,8 +328,43 @@ export default function Index({ clients, filters, stats }) {
                 </div>
             )}
 
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">{__('general.clients_list') || 'Clients List'}</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-200 pb-4">
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() => handleTabChange('customers')}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                            activeTab === 'customers'
+                                ? 'bg-slate-900 text-white shadow-sm'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                        }`}
+                    >
+                        <span>{__('general.customers') || 'Customers'}</span>
+                        <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${
+                            activeTab === 'customers' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                        }`}>
+                            {tabCounts.customers ?? 0}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => handleTabChange('leads')}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                            activeTab === 'leads'
+                                ? 'bg-slate-900 text-white shadow-sm'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                        }`}
+                    >
+                        <span>{__('general.leads') || 'Leads'}</span>
+                        <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${
+                            activeTab === 'leads' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                        }`}>
+                            {tabCounts.leads ?? 0}
+                        </span>
+                    </button>
+                </div>
+
                 <div className="flex items-center gap-2">
                     <Link href="/admin/users/bulk-create">
                         <Button variant="outline">{__('general.bulk_create') || 'Bulk Create'}</Button>
@@ -337,7 +383,7 @@ export default function Index({ clients, filters, stats }) {
                     filters={{ ...filters, extra: advancedFilters }}
                     onSearch={handleSearch}
                     onSort={handleSort}
-                    emptyTitle="No clients found"
+                    emptyTitle={activeTab === 'customers' ? "No customers found" : "No leads found"}
                     emptyDescription="Try adjusting your search filters."
                 />
             </div>

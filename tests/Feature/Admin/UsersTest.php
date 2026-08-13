@@ -244,6 +244,12 @@ class UsersTest extends TestCase
 
     public function test_admin_can_search_user_by_alias_email(): void
     {
+        \App\Models\Transaction::create([
+            'user_id' => $this->clientUser->id,
+            'amount' => 100,
+            'type' => 'received',
+        ]);
+
         // Create an alias email for our clientUser
         $alias = \App\Models\UserEmail::create([
             'user_id' => $this->clientUser->id,
