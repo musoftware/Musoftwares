@@ -56,6 +56,22 @@ class BlogArticle extends Model
                 $article->published_at = now();
             }
         });
+
+        static::saved(function ($article) {
+            try {
+                \Illuminate\Support\Facades\Artisan::queue('marketplace:generate-ai-files');
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Queueing generate-ai-files failed on blog saved: ' . $e->getMessage());
+            }
+        });
+
+        static::deleted(function ($article) {
+            try {
+                \Illuminate\Support\Facades\Artisan::queue('marketplace:generate-ai-files');
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Queueing generate-ai-files failed on blog deleted: ' . $e->getMessage());
+            }
+        });
     }
 
     public static function generateUniqueSlug($title)

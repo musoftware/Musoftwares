@@ -73,5 +73,11 @@ Schedule::command(\Modules\Marketplace\Console\SendDailyDiscountNotificationsCom
     ->dailyAt('12:00')
     ->timezone('Africa/Cairo');
 
+// Generate Marketplace AI agent files & robots.txt daily at 03:45 Cairo Time
+Schedule::command('marketplace:generate-ai-files')
+    ->dailyAt('03:45')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(10);
+
 
 

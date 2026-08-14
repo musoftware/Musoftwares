@@ -62,6 +62,7 @@ return [
     'back_to_profile' => 'Back to Profile',
     'back_to_services' => 'Back To Services',
     'base_system_rate' => 'Base System Rate',
+    'blog_generated_successfully' => 'Blog article(s) generated successfully.',
     'broadcast_confirmation_required' => 'Please confirm before sending this broadcast.',
     'broadcast_info_message' => 'This notification will be pushed to user devices immediately. It will not be saved in their notification history.',
     'broadcast_notification' => 'Broadcast Notification',

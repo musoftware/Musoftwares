@@ -4,4 +4,24 @@ Disallow: /admin/
 Disallow: /seller/
 Disallow: /marketplace/dashboard
 
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+
 Sitemap: https://www.musoftwares.com/sitemap.xml

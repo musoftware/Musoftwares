@@ -351,6 +351,7 @@ class ServiceController extends Controller
                 'canonical_url' => $canonicalUrl,
                 'en_url' => $canonicalUrl.'?lang=en',
                 'ar_url' => $canonicalUrl.'?lang=ar',
+                'schema_json' => $schemaJson,
             ],
         ]);
     }

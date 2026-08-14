@@ -1,0 +1,20 @@
+# ميوزوفت ويرز - الفهرس الشامل للبرمجيات وقاعدة المعرفة
+
+> قاعدة المعرفة والخدمات التفصيلية لدعم تقنية توليد الإجابات المعزز بالاسترجاع (RAG) وعملاء الذكاء الاصطناعي.
+
+## نظرة عامة على المنصة
+ميوزوفت ويرز تقدم برمجيات ممتازة، إضافات جاهزة، وتطوير برمجيات وحلول رقمية مخصصة.
+رابط المنصة الرئيسي: https://www.musoftwares.com
+
+## الروابط البرمجية والمواصفات المعيارية
+- واجهة برمجة الخدمات: https://www.musoftwares.com/marketplace/api/v1/services
+- واجهة برمجة التصنيفات: https://www.musoftwares.com/marketplace/api/v1/categories
+- واجهة برمجة البحث: https://www.musoftwares.com/marketplace/api/v1/search
+- مواصفات OpenAPI: https://www.musoftwares.com/marketplace/api/v1/openapi.json
+
+## تصنيفات الخدمات
+
+## دليل الخدمات الشامل
+
+## فهرس المقالات الكامل باللغة العربية
+

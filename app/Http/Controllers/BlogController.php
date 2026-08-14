@@ -72,16 +72,55 @@ class BlogController extends Controller
             });
         }
 
+        $canonicalUrl = route('blog.show', $article->slug);
+        $imageUrl = $article->featured_image
+            ? (str_starts_with($article->featured_image, 'http') ? $article->featured_image : asset('storage/'.$article->featured_image))
+            : ($article->service?->cover_image ?: asset('images/default-meta.png'));
+
+        $schemaJson = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'BlogPosting',
+                    '@id' => $canonicalUrl.'#blogpost',
+                    'isPartOf' => [
+                        '@type' => 'WebPage',
+                        '@id' => $canonicalUrl,
+                        'url' => $canonicalUrl,
+                        'name' => ($article->meta_title ?: $article->title).' | Musoftware',
+                    ],
+                    'headline' => $article->title,
+                    'description' => $article->meta_description ?: $article->excerpt,
+                    'image' => array_filter([$imageUrl]),
+                    'datePublished' => $article->published_at ? $article->published_at->toIso8601String() : $article->created_at->toIso8601String(),
+                    'dateModified' => $article->updated_at ? $article->updated_at->toIso8601String() : $article->created_at->toIso8601String(),
+                    'author' => [
+                        '@type' => 'Person',
+                        'name' => $article->service?->seller?->name ?: 'Musoftware Writer',
+                    ],
+                    'publisher' => [
+                        '@type' => 'Organization',
+                        'name' => 'Musoftware',
+                        'logo' => [
+                            '@type' => 'ImageObject',
+                            'url' => asset('v8main/img/logo.png'),
+                        ]
+                    ],
+                    'mainEntityOfPage' => $canonicalUrl,
+                    'inLanguage' => $article->language ?: 'en',
+                ]
+            ]
+        ];
+
         return Inertia::render('Public/Blog/Show', [
             'article' => $article,
         ])->withViewData([
             'meta' => [
                 'title' => ($article->meta_title ?: $article->title).' | Musoftware',
                 'description' => $article->meta_description ?: $article->excerpt,
-                'image' => $article->featured_image
-                    ? (str_starts_with($article->featured_image, 'http') ? $article->featured_image : asset('storage/'.$article->featured_image))
-                    : ($article->service?->cover_image ?: asset('images/default-meta.png')),
-                'url' => url()->current(),
+                'image' => $imageUrl,
+                'url' => $canonicalUrl,
+                'schema_json' => $schemaJson,
             ],
         ]);
     }

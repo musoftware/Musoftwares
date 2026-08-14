@@ -574,6 +574,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/kyc/{user}/reject', [App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
 
     // ── Admin Blog Articles ─────────────────────────────────────────
+    Route::post('/blog-articles/generate', [AdminBlogArticleController::class, 'generate'])->name('blog-articles.generate');
     Route::resource('/blog-articles', AdminBlogArticleController::class);
 
     // ── Admin Employee Todos ────────────────────────────────────────

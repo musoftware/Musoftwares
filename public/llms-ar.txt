@@ -1,0 +1,21 @@
+# ميوزوفت ويرز - دليل وعملاء الذكاء الاصطناعي
+
+> الفهرس الرسمي للخدمات والبرمجيات والمقالات المتاحة لوكلاء ونماذج الذكاء الاصطناعي.
+
+## نظرة عامة على المنصة
+توفر ميوزوفت ويرز خدمات تطوير المواقع، البرمجيات الجاهزة، الإضافات البرمجية للمتاجر والمواقع، وحلول الأتمتة المخصصة.
+رابط المنصة الرئيسي: https://www.musoftwares.com
+الفهرس الشامل والتفصيلي: https://www.musoftwares.com/llms-full-ar.txt
+
+## روابط برمجية سهلة القراءة
+- واجهة برمجة الخدمات: https://www.musoftwares.com/marketplace/api/v1/services
+- واجهة برمجة التصنيفات: https://www.musoftwares.com/marketplace/api/v1/categories
+- واجهة برمجة البحث: https://www.musoftwares.com/marketplace/api/v1/search
+- مواصفات OpenAPI: https://www.musoftwares.com/marketplace/api/v1/openapi.json
+
+## تصنيفات الخدمات
+
+## الخدمات المميزة
+
+## مقالات المدونة الحديثة
+

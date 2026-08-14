@@ -9,6 +9,8 @@ use App\Models\BlogArticle;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Marketplace\Models\Service;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class AdminBlogArticleController extends Controller
 {
@@ -29,12 +31,53 @@ class AdminBlogArticleController extends Controller
 
         $articles = $query->paginate(20)->withQueryString();
 
+        // Retrieve active services and calculate post counts for each language
+        $services = Service::where('status', 'active')->get();
+
+        $articlesCount = BlogArticle::select('service_id', 'language', DB::raw('count(*) as count'))
+            ->whereIn('service_id', $services->pluck('id'))
+            ->groupBy('service_id', 'language')
+            ->get()
+            ->groupBy('service_id');
+
+        $services->each(function ($service) use ($articlesCount) {
+            $serviceCounts = $articlesCount->get($service->id) ?? collect();
+            $service->articles_en_count = $serviceCounts->where('language', 'en')->first()?->count ?? 0;
+            $service->articles_ar_count = $serviceCounts->where('language', 'ar')->first()?->count ?? 0;
+        });
+
         return Inertia::render('Admin/BlogArticles/Index', [
             'articles' => $articles,
+            'services' => $services,
             'filters' => [
                 'q' => $request->q,
             ],
         ]);
+    }
+
+    /**
+     * Manually trigger AI blog article generation for a specific service.
+     */
+    public function generate(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|exists:marketplace_services,id',
+            'lang' => 'required|in:en,ar,all',
+        ]);
+
+        $service = Service::findOrFail($request->service_id);
+
+        try {
+            Artisan::call('blog:generate-articles', [
+                '--service_id' => $service->id,
+                '--limit' => $request->lang === 'all' ? 2 : 1,
+                '--lang' => $request->lang,
+            ]);
+
+            return back()->with('success', __('admin.blog_generated_successfully') ?: 'AI Blog Article(s) generated successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to generate articles: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -148,6 +148,27 @@ class Service extends Model
         return \Illuminate\Support\Str::slug($titleStr !== '' ? $titleStr : ('service-' . $this->id));
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($service) {
+            try {
+                \Illuminate\Support\Facades\Artisan::queue('marketplace:generate-ai-files');
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Queueing generate-ai-files failed on service saved: ' . $e->getMessage());
+            }
+        });
+
+        static::deleted(function ($service) {
+            try {
+                \Illuminate\Support\Facades\Artisan::queue('marketplace:generate-ai-files');
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Queueing generate-ai-files failed on service deleted: ' . $e->getMessage());
+            }
+        });
+    }
+
     public function getUrlAttribute(): string
     {
         return route('marketplace.services.show', ['id' => $this->id, 'slug' => $this->slug]);

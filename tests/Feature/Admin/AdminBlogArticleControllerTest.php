@@ -7,6 +7,7 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Modules\Marketplace\Models\Service;
 
 class AdminBlogArticleControllerTest extends TestCase
 {
@@ -99,5 +100,43 @@ class AdminBlogArticleControllerTest extends TestCase
         $response->assertRedirect(route('admin.blog-articles.index'));
         $response->assertSessionHas('success');
         $this->assertSoftDeleted('blog_articles', ['id' => $article->id]);
+    }
+
+    public function test_admin_can_trigger_manual_ai_blog_article_generation(): void
+    {
+        $service = Service::create([
+            'seller_id' => $this->admin->id,
+            'title' => 'Manual AI Gen Service',
+            'slug' => 'manual-ai-gen-service',
+            'status' => 'active',
+            'description' => 'Test AI manual generation.',
+        ]);
+
+        // Mock BlogAiService
+        $mockAiService = $this->mock(\App\Services\AI\BlogAiService::class);
+        $mockAiService->shouldReceive('generateArticleForService')
+            ->once()
+            ->andReturn([
+                'title' => 'Manual Gen Article English',
+                'excerpt' => 'AI Excerpt',
+                'content' => 'AI content body.',
+                'meta_title' => 'AI Meta Title',
+                'meta_description' => 'AI Meta Description',
+                'image_prompt' => 'Visual prompt',
+            ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.blog-articles.generate'), [
+            'service_id' => $service->id,
+            'lang' => 'en',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('blog_articles', [
+            'service_id' => $service->id,
+            'title' => 'Manual Gen Article English',
+            'language' => 'en',
+        ]);
     }
 }

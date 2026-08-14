@@ -62,6 +62,7 @@ return [
     'back_to_profile' => 'العودة للملف الشخصي',
     'back_to_services' => 'العودة إلى الخدمات',
     'base_system_rate' => 'سعر النظام الأساسي',
+    'blog_generated_successfully' => 'تم توليد مقالات المدونة بنجاح.',
     'broadcast_confirmation_required' => 'يرجى التأكيد قبل إرسال هذا الإشعار.',
     'broadcast_info_message' => 'سيتم إرسال هذا الإشعار إلى أجهزة المستخدمين على الفور. لن يتم حفظه في سجل الإشعارات الخاص بهم.',
     'broadcast_notification' => 'إرسال إشعار عام',

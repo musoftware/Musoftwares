@@ -1,19 +1,21 @@
-# Musoftwares Marketplace - AI Agent Guide
+# Musoftwares - AI Agent Guide & Directory
 
-> Official documentation and index of services for LLMs and AI Agents.
+> Official index of services, plugins, and blog resources for LLMs and AI Agents.
 
 ## Platform Overview
-Musoftwares Marketplace provides web development, automation tools, SaaS plugins, and custom software services.
+Musoftwares provides professional web development, automation playbooks, SaaS plugins, and custom software services.
 Base URL: https://www.musoftwares.com
+Full Comprehensive Index: https://www.musoftwares.com/llms-full.txt
 
 ## Machine Readable Endpoints
 - Services API: https://www.musoftwares.com/marketplace/api/v1/services
 - Categories API: https://www.musoftwares.com/marketplace/api/v1/categories
 - Search API: https://www.musoftwares.com/marketplace/api/v1/search
-- Autocomplete API: https://www.musoftwares.com/marketplace/api/v1/search/autocomplete
 - OpenAPI Spec: https://www.musoftwares.com/marketplace/api/v1/openapi.json
 
 ## Service Categories
 
-## Available Services
+## Featured Services
+
+## Recent Blog Insights
 
