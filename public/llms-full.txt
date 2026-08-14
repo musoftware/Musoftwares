@@ -1,0 +1,20 @@
+# Musoftwares - Full AI Agent Catalog & Knowledge Base
+
+> Deep, comprehensive documentation and full indexes for retrieval-augmented generation (RAG) and agents.
+
+## Platform Overview
+Musoftwares provides premium software products, plugins, and custom development services.
+Base URL: https://www.musoftwares.com
+
+## Machine Readable Endpoints & Specifications
+- Services API: https://www.musoftwares.com/marketplace/api/v1/services
+- Categories API: https://www.musoftwares.com/marketplace/api/v1/categories
+- Search API: https://www.musoftwares.com/marketplace/api/v1/search
+- OpenAPI Spec: https://www.musoftwares.com/marketplace/api/v1/openapi.json
+
+## Service Categories
+
+## Full Services Catalog
+
+## Full Blog Articles Catalog
+
