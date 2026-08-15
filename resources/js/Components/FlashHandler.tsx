@@ -72,26 +72,28 @@ export function FlashHandler() {
 
     // Handle validation errors automatically
     useEffect(() => {
-        if (!errors || Object.keys(errors).length === 0) return;
+        const safeErrors = (errors && typeof errors === 'object' && !Array.isArray(errors)) ? errors : {};
+        const errorKeys = Object.keys(safeErrors);
+        if (errorKeys.length === 0) return;
 
         // Determine if these are the exact same errors we've already toasted
         const isIdentical =
             lastErrorsRef.current &&
-            JSON.stringify(lastErrorsRef.current) === JSON.stringify(errors);
+            JSON.stringify(lastErrorsRef.current) === JSON.stringify(safeErrors);
 
         if (isIdentical) return;
 
         // Keep track of what we toasted
-        lastErrorsRef.current = { ...errors };
+        lastErrorsRef.current = { ...safeErrors };
 
         // Display the first validation error
-        const firstErrorKey = Object.keys(errors)[0];
-        const firstErrorMessage = errors[firstErrorKey];
+        const firstErrorKey = errorKeys[0];
+        const firstErrorMessage = safeErrors[firstErrorKey];
         
         if (firstErrorMessage) {
             toast({
                 title: "Validation Error",
-                description: firstErrorMessage,
+                description: String(firstErrorMessage),
                 variant: "destructive",
             });
         }

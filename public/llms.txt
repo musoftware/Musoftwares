@@ -4,18 +4,22 @@
 
 ## Platform Overview
 Musoftwares provides professional web development, automation playbooks, SaaS plugins, and custom software services.
-Base URL: https://www.musoftwares.com
-Full Comprehensive Index: https://www.musoftwares.com/llms-full.txt
+Base URL: http://localhost
+Full Comprehensive Index: http://localhost/llms-full.txt
 
 ## Machine Readable Endpoints
-- Services API: https://www.musoftwares.com/marketplace/api/v1/services
-- Categories API: https://www.musoftwares.com/marketplace/api/v1/categories
-- Search API: https://www.musoftwares.com/marketplace/api/v1/search
-- OpenAPI Spec: https://www.musoftwares.com/marketplace/api/v1/openapi.json
+- Services API: http://localhost/marketplace/api/v1/services
+- Categories API: http://localhost/marketplace/api/v1/categories
+- Search API: http://localhost/marketplace/api/v1/search
+- OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
 
 ## Service Categories
 
 ## Featured Services
 
 ## Recent Blog Insights
+
+### Test Article
+- **Excerpt**: 
+- **URL**: http://localhost/blog/test-article
 

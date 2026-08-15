@@ -62,20 +62,23 @@ export function useInertiaNotifications() {
     }, [flash, toast]);
 
     useEffect(() => {
-        const errorsSerialized = JSON.stringify(errors || {});
-        if (errors && Object.keys(errors).length > 0) {
+        const safeErrors = (errors && typeof errors === 'object' && !Array.isArray(errors)) ? errors : {};
+        const errorKeys = Object.keys(safeErrors);
+        const errorsSerialized = JSON.stringify(safeErrors);
+
+        if (errorKeys.length > 0) {
             if (lastToastRef.current.errorsSerialized !== errorsSerialized) {
-                if (errors.error) {
+                if (safeErrors.error) {
                     toast({
-                        title: __('general.system_error'),
-                        description: errors.error,
+                        title: __('general.system_error') || 'System Error',
+                        description: safeErrors.error,
                         variant: 'destructive',
                     });
                 } else {
-                    const firstVal = Object.values(errors)[0];
+                    const firstVal = Object.values(safeErrors)[0];
                     toast({
-                        title: __('general.please_fix_the_following'),
-                        description: firstVal as string,
+                        title: __('general.please_fix_the_following') || 'Notice',
+                        description: String(firstVal),
                         variant: 'destructive',
                     });
                 }

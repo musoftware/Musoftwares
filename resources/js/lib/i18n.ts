@@ -1,9 +1,10 @@
 import translationsData from '../translations.json';
 
-const translations: Record<string, any> = translationsData;
+const translations: Record<string, any> = (translationsData && typeof translationsData === 'object') ? translationsData : {};
 
 function getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    if (!obj || typeof obj !== 'object') return undefined;
+    return path.split('.').reduce((acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj);
 }
 
 /**
@@ -23,21 +24,23 @@ export function syncDocumentDirection(locale?: string): void {
  * via `php artisan translations:export`.
  */
 export function __(key: string, replacements?: Record<string, string | number>, fallback?: string, overrideLocale?: string): string {
+    if (!key || typeof key !== 'string') return '';
+
     const locale = overrideLocale || (typeof document !== 'undefined' ? document.documentElement.lang || 'en' : 'en');
-    const localeTranslations = translations[locale] || translations['en'] || {};
+    const localeTranslations = (translations && typeof translations === 'object' && translations[locale]) ? translations[locale] : (translations?.['en'] || {});
 
     let result = getNestedValue(localeTranslations, key);
 
     if (result === undefined) {
         // Check if it's a flat key with dots from the root JSON file
-        if (localeTranslations[key] !== undefined) {
+        if (localeTranslations && localeTranslations[key] !== undefined) {
             result = localeTranslations[key];
         } else {
             result = fallback || key; // Fallback to raw key or fallback
         }
     }
 
-    if (replacements && typeof result === 'string') {
+    if (replacements && typeof replacements === 'object' && typeof result === 'string') {
         Object.entries(replacements).forEach(([k, v]) => {
             result = result.replace(new RegExp(`:${k}`, 'gi'), String(v));
         });
@@ -45,4 +48,3 @@ export function __(key: string, replacements?: Record<string, string | number>, 
 
     return String(result);
 }
-

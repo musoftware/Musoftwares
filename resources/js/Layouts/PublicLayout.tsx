@@ -12,6 +12,7 @@ import { Label } from '@/Components/ui/label';
 import { useToast } from '@/Components/ui/use-toast';
 import { Toaster } from '@/Components/ui/toaster';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
+import MobileBottomActionBar from '@/Components/Public/MobileBottomActionBar';
 interface PublicLayoutProps extends PropsWithChildren {
     auth?: {
         user: any;
@@ -96,6 +97,12 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     };
 
     const navItems: NavItem[] = [
+        {
+            id: 'portfolio',
+            label: __('general.portfolio') || 'Work',
+            href: '/portfolio',
+            items: []
+        },
         {
             id: 'pricing',
             label: __('general.pricing') || 'Pricing',
@@ -325,7 +332,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             <main className="flex flex-1 flex-col relative z-10">{children}</main>
 
             {/* Structured Enterprise Footer */}
-            <footer className="border-t border-slate-200 bg-slate-50 pt-20 pb-12 text-slate-600">
+            <footer className="border-t border-slate-200 bg-slate-50 pt-16 pb-24 lg:pb-12 text-slate-600">
                 <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-8 lg:gap-12 mb-16">
                         {/* Brand Column */}
@@ -382,37 +389,60 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </div>
                         </div>
 
-                        {/* Services */}
+                        {/* Cloud SaaS Platforms */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.services') || 'Services'}</h3>
-                            <ul className="space-y-4">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Cloud SaaS Platforms</h3>
+                            <ul className="space-y-3.5">
+                                <li><Link href="/pricing?module=gold_saver" className="text-sm hover:text-slate-900 transition-colors">Gold POS &amp; Savings</Link></li>
+                                <li><Link href="/platforms/erp" className="text-sm hover:text-slate-900 transition-colors">Cloud ERP Suite</Link></li>
+                                <li><Link href="/platforms/crm" className="text-sm hover:text-slate-900 transition-colors">CRM &amp; Sales Pipeline</Link></li>
+                                <li><Link href="/pricing?module=booking" className="text-sm hover:text-slate-900 transition-colors">Booking &amp; Appointments</Link></li>
+                                <li><Link href="/pricing?tool=whatsapp" className="text-sm hover:text-slate-900 transition-colors">WhatsApp Bots &amp; Automation</Link></li>
+                                <li><Link href="/pricing?tool=sms" className="text-sm hover:text-slate-900 transition-colors">SMS &amp; OTP Gateway</Link></li>
                                 <li>
-                                    <Link href="/marketplace/services" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1.5">
-                                        <Briefcase className="w-4 h-4 text-emerald-600" />
-                                        {__('general.services') || 'Services'}
+                                    <Link href="/platforms" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                        View All Platforms &rarr;
                                     </Link>
                                 </li>
                             </ul>
                         </div>
 
-                        {/* Company */}
+                        {/* Engineering & Custom Solutions */}
+                        <div>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Engineering &amp; Solutions</h3>
+                            <ul className="space-y-3.5">
+                                <li><Link href="/custom-solutions" className="text-sm hover:text-slate-900 transition-colors">Custom Architecture</Link></li>
+                                <li><Link href="/estimator" className="text-sm hover:text-slate-900 transition-colors">Budget Estimator</Link></li>
+                                <li><Link href="/marketplace/services" className="text-sm hover:text-slate-900 transition-colors">Marketplace Services</Link></li>
+                                <li><Link href="/solutions/ecommerce" className="text-sm hover:text-slate-900 transition-colors">E-Commerce Systems</Link></li>
+                                <li><Link href="/solutions/healthcare" className="text-sm hover:text-slate-900 transition-colors">Healthcare Systems</Link></li>
+                                <li><Link href="/solutions/education" className="text-sm hover:text-slate-900 transition-colors">Education &amp; LMS</Link></li>
+                            </ul>
+                        </div>
+
+                        {/* Company & Work */}
                         <div>
                             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.company')}</h3>
-                            <ul className="space-y-4">
-                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.about_us')}</Link></li>
+                            <ul className="space-y-3.5">
+                                <li><Link href="/portfolio" className="text-sm hover:text-slate-900 transition-colors">{__('general.case_studies') || 'Portfolio & Work'}</Link></li>
                                 <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.pricing')}</Link></li>
+                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.about_us')}</Link></li>
                                 <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.contact')}</Link></li>
                             </ul>
                         </div>
 
-                        {/* Resources */}
+                        {/* Resources & Free Tools */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.resources')}</h3>
-                            <ul className="space-y-4">
-                                <li><Link href="/portfolio" className="text-sm hover:text-slate-900 transition-colors">{__('general.case_studies')}</Link></li>
-                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">{__('general.documentation')}</a></li>
-                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">{__('general.api_reference')}</a></li>
-                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.security')}</Link></li>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Free Business Tools</h3>
+                            <ul className="space-y-3.5">
+                                <li><Link href="/tools" className="text-sm font-semibold text-slate-900 hover:text-blue-600 transition-colors">{__('tools.tools_directory') || 'Tools Directory &rarr;'}</Link></li>
+                                <li><Link href="/tools/invoice-generator" className="text-sm hover:text-slate-900 transition-colors">{__('tools.invoice_title') || 'Invoice Generator'}</Link></li>
+                                <li><Link href="/tools/website-checker" className="text-sm hover:text-slate-900 transition-colors">{__('tools.audit_title') || 'Website Auditor'}</Link></li>
+                                <li><Link href="/tools/speed-loss-calculator" className="text-sm hover:text-slate-900 transition-colors">{__('tools.speed_loss_title') || 'Speed Loss Calculator'}</Link></li>
+                                <li><Link href="/tools/facebook-page-cost" className="text-sm hover:text-slate-900 transition-colors">{__('tools.fb_title') || 'Page Valuation'}</Link></li>
+                                <li><Link href="/tools/payment-gateway-auditor" className="text-sm hover:text-slate-900 transition-colors">{__('tools.pay_audit_title') || 'Payment Gateway Auditor'}</Link></li>
+                                <li><Link href="/tools/pixel-tracker-auditor" className="text-sm hover:text-slate-900 transition-colors">{__('tools.pixel_title') || 'Pixel Tracker Auditor'}</Link></li>
+                                <li><Link href="/tools/competitor-tech-spy" className="text-sm hover:text-slate-900 transition-colors">{__('tools.spy_title') || 'Competitor Tech Spy'}</Link></li>
                             </ul>
                         </div>
                     </div>
@@ -469,7 +499,8 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                 </DialogContent>
             </Dialog>
             <Toaster />
-            <FloatingWhatsAppButton />
+            <FloatingWhatsAppButton className="hidden lg:flex" />
+            <MobileBottomActionBar onOpenTicket={() => setIsGuestTicketOpen(true)} />
         </div>
     );
 }

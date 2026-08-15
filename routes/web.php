@@ -58,6 +58,7 @@ use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\BackgroundTaskController;
 use App\Http\Controllers\Billing\InvoiceController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\PublicToolsController;
 use App\Http\Controllers\Client\ClientProjectBoardController;
 use App\Http\Controllers\Client\ClientProjectCalendarController;
 use App\Http\Controllers\Client\ClientProjectCommentController;
@@ -173,6 +174,11 @@ Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('l
 Route::get('/terms-of-service', [HomeController::class, 'termsOfService'])->name('legal.terms');
 Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('legal.cookies');
 
+// Estimator & Custom Solutions
+Route::get('/estimator', [HomeController::class, 'estimator'])->name('estimator');
+Route::get('/custom-solutions', [HomeController::class, 'customSolutions'])->name('custom-solutions');
+
+
 // Short Alias Redirects (301) to prevent 404
 Route::redirect('/privacy', '/privacy-policy', 301);
 Route::redirect('/terms', '/terms-of-service', 301);
@@ -189,6 +195,25 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Public Free Tools
+Route::get('/tools', [PublicToolsController::class, 'index'])->name('public.tools.index');
+Route::get('/tools/image-cropper', [PublicToolsController::class, 'imageCropper'])->name('public.tools.image-cropper');
+
+Route::get('/tools/facebook-page-cost', [PublicToolsController::class, 'facebookCostCalculator'])->name('public.tools.facebook-cost');
+Route::get('/tools/website-cost', [PublicToolsController::class, 'websiteCostCalculator'])->name('public.tools.website-cost');
+Route::get('/tools/invoice-generator', [PublicToolsController::class, 'invoiceGenerator'])->name('public.tools.invoice-generator');
+Route::get('/tools/website-checker', [PublicToolsController::class, 'websiteChecker'])->name('public.tools.website-checker');
+Route::post('/tools/inspect-website', [PublicToolsController::class, 'inspectWebsite'])->name('public.tools.inspect-website');
+Route::get('/tools/speed-loss-calculator', [PublicToolsController::class, 'speedLossCalculator'])->name('public.tools.speed-loss-calculator');
+Route::post('/tools/inspect-speed-loss', [PublicToolsController::class, 'inspectSpeedLoss'])->name('public.tools.inspect-speed-loss');
+Route::get('/tools/payment-gateway-auditor', [PublicToolsController::class, 'paymentGatewayAuditor'])->name('public.tools.payment-gateway-auditor');
+Route::post('/tools/inspect-payment-gateway', [PublicToolsController::class, 'inspectPaymentGateway'])->name('public.tools.inspect-payment-gateway');
+Route::get('/tools/pixel-tracker-auditor', [PublicToolsController::class, 'pixelAuditor'])->name('public.tools.pixel-tracker-auditor');
+Route::post('/tools/inspect-pixel', [PublicToolsController::class, 'inspectPixel'])->name('public.tools.inspect-pixel');
+Route::get('/tools/competitor-tech-spy', [PublicToolsController::class, 'competitorSpy'])->name('public.tools.competitor-tech-spy');
+Route::post('/tools/inspect-competitor', [PublicToolsController::class, 'inspectCompetitor'])->name('public.tools.inspect-competitor');
+Route::post('/tools/lead-capture', [PublicToolsController::class, 'captureLead'])->name('public.tools.lead-capture');
 
 // Shared project board (public guest view)
 Route::get('/shared-board/{token}/{date}', [\App\Http\Controllers\PublicProjectBoardController::class, 'show'])
@@ -1211,3 +1236,4 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
 });
 
 Route::get('/sso/{system}', [SsoController::class, 'redirect'])->name('sso.redirect');
+Route::get('/sso/redirect/{system}', [SsoController::class, 'redirect']);

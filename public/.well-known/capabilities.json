@@ -1,12 +1,12 @@
 {
-    "updated_at": "2026-08-13T23:59:01+00:00",
+    "updated_at": "2026-08-15T11:52:52+00:00",
     "platform": "Musoftwares Marketplace Engine",
     "version": "1.0.0",
     "capabilities": [
         {
             "capability_id": "search_services",
             "name": "Search Marketplace Services",
-            "endpoint": "https://www.musoftwares.com/marketplace/api/v1/search",
+            "endpoint": "http://localhost/marketplace/api/v1/search",
             "method": "GET",
             "parameters": [
                 "q",
@@ -19,7 +19,7 @@
         {
             "capability_id": "create_order",
             "name": "Create Service Order",
-            "endpoint": "https://www.musoftwares.com/marketplace/api/v1/orders",
+            "endpoint": "http://localhost/marketplace/api/v1/orders",
             "method": "POST",
             "parameters": [
                 "service_id",

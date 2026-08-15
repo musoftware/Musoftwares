@@ -16,8 +16,18 @@ class SsoController extends Controller
      */
     public function redirect(Request $request, $system)
     {
-        // Must be logged in
+        // Handle /sso/redirect/toolsys matching by checking if system segment is 'redirect'
+        if ($system === 'redirect') {
+            // Fetch next segment or default to toolsys
+            $system = $request->segment(3) ?: 'toolsys';
+        }
+
+        // Must be logged in, except for toolsys which supports guest/free tools
         if (! Auth::check()) {
+            if ($system === 'toolsys') {
+                $targetUrl = config('services.toolsys.url', 'https://tools.musoftwares.com');
+                return redirect()->away(rtrim($targetUrl, '/') . '/tools');
+            }
             return redirect()->route('login');
         }
 

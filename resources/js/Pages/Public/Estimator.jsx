@@ -1,18 +1,30 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
-import { Calculator, ArrowRight, CheckCircle2, Sparkles, ShieldCheck, Clock, Layers } from 'lucide-react';
+import { Calculator, ArrowRight, CheckCircle2, Sparkles, ShieldCheck, Clock, Layers, MessageSquare } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function Estimator() {
+    const phoneNumber = "201015218548";
     const [scale, setScale] = useState('multi_page');
+    const [customPrompt, setCustomPrompt] = useState('');
     const [addons, setAddons] = useState({
         whatsapp: false,
         payment: false,
         sms: false,
         admin: false,
     });
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const prompt = params.get('prompt') || params.get('prefill_desc');
+            if (prompt) {
+                setCustomPrompt(prompt);
+            }
+        }
+    }, []);
 
     const prices = {
         single_page: { base: 3500, days: 1 },
@@ -43,8 +55,7 @@ export default function Estimator() {
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{__('home.estimator_title') || 'Project Budget Estimator | Musoftware'}</title>
+            <Head title={__('home.estimator_title') || 'Project Budget Estimator | Musoftware'}>
                 <meta name="description" content="Calculate your software development budget and delivery timeline transparently." />
             </Head>
 
@@ -149,12 +160,26 @@ export default function Estimator() {
                                     </p>
                                 </div>
 
-                                <Link href={`/register?prefill_desc=${encodeURIComponent(prefillQuery)}`} className="mt-6">
-                                    <Button className="w-full h-12 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 font-bold text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2">
-                                        <span>{__('home.claim_estimate') || 'Claim this Estimate'}</span>
-                                        <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
-                                    </Button>
-                                </Link>
+                                <div className="mt-6 space-y-2.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const msg = encodeURIComponent(`Hello Mahmoud, I calculated an estimate on Musoftware:\n• System: ${scale.replace('_', ' ')}\n• Features: ${Object.keys(addons).filter(k => addons[k]).join(', ') || 'Standard'}\n• Estimated Total: ${total.toLocaleString()} EGP\n• Timeline: ${days} days\nI'd like to discuss starting!`);
+                                            window.open(`https://wa.me/${phoneNumber}?text=${msg}`, '_blank');
+                                        }}
+                                        className="w-full h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 transition shadow-md"
+                                    >
+                                        <MessageSquare className="w-4 h-4 fill-zinc-950" />
+                                        <span>{__('home.final_cta_btn') || 'Discuss on WhatsApp'}</span>
+                                    </button>
+
+                                    <Link href={`/register?prefill_desc=${encodeURIComponent(prefillQuery)}`} className="block">
+                                        <Button variant="outline" className="w-full h-10 rounded-xl bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 text-[11px] font-bold uppercase tracking-wider">
+                                            <span>{__('home.claim_estimate') || 'Create Account / Register'}</span>
+                                            <ArrowRight className="w-3 h-3 ms-1 rtl:rotate-180" />
+                                        </Button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -84,10 +84,19 @@ export default function GpsConverter() {
                 ? (val >= 0 ? 'N' : 'S') 
                 : (val >= 0 ? 'E' : 'W');
             const absVal = Math.abs(val);
-            const deg = Math.floor(absVal);
+            let deg = Math.floor(absVal);
             const minFull = (absVal - deg) * 60;
-            const min = Math.floor(minFull);
-            const sec = parseFloat(((minFull - min) * 60).toFixed(4));
+            let min = Math.floor(minFull);
+            let sec = parseFloat(((minFull - min) * 60).toFixed(4));
+            
+            if (sec >= 60) {
+                sec = 0;
+                min += 1;
+                if (min >= 60) {
+                    min = 0;
+                    deg += 1;
+                }
+            }
             
             return {
                 deg,

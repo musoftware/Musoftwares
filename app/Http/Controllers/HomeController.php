@@ -497,5 +497,35 @@ class HomeController extends Controller
             ],
         ]);
     }
+
+    public function estimator()
+    {
+        return Inertia::render('Public/Estimator', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Project Budget Estimator | Musoftware',
+                'description' => 'Instantly calculate your system development budget, scale, and delivery timeline with transparency.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ],
+        ]);
+    }
+
+    public function customSolutions()
+    {
+        return Inertia::render('Public/CustomSolutions', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Custom Architecture & Solutions | Musoftware',
+                'description' => 'Bespoke software architecture, scalable database engineering, and direct developer communication for complex requirements.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ],
+        ]);
+    }
 }
-// Trigger upload
+

@@ -3,6 +3,7 @@ import { __ } from '@/lib/i18n';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { portfolioItems } from '@/lib/portfolioData';
+import { Sparkles, ArrowRight, ChevronRight, ExternalLink } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -19,11 +20,13 @@ export default function Portfolio({ dbProjects = [] }) {
         
         portfolioItems.forEach(item => {
             if (!dbSlugs.has(item.slug)) {
+                const rawTitle = __(`general.${item.titleKey}`);
+                const rawDesc = __(`general.${item.descKey}`);
                 combined.push({
                     slug: item.slug,
                     img: item.img,
-                    title: __(`general.${item.titleKey}`),
-                    desc: __(`general.${item.descKey}`),
+                    title: (rawTitle && !rawTitle.startsWith('general.')) ? rawTitle : item.slug,
+                    desc: (rawDesc && !rawDesc.startsWith('general.')) ? rawDesc : '',
                     cat: item.cat,
                     is_db: false
                 });
@@ -35,104 +38,96 @@ export default function Portfolio({ dbProjects = [] }) {
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
         sections.forEach((section) => {
-            const elements = section.querySelectorAll('.gsap-fade-up');
-            gsap.fromTo(elements, 
-                { opacity: 0, y: 20 },
-                {
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 0.7,
-                    stagger: 0.08,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse"
+            const elements = gsap.utils.toArray(section.querySelectorAll('.gsap-fade-up'));
+            if (elements && elements.length > 0) {
+                gsap.fromTo(elements, 
+                    { opacity: 0, y: 20 },
+                    {
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.6,
+                        stagger: 0.05,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        }
                     }
-                }
-            );
+                );
+            }
         });
-
-        document.documentElement.style.scrollSnapType = 'y proximity';
-        document.documentElement.style.overflowY = 'scroll';
-        
-        return () => {
-            document.documentElement.style.scrollSnapType = '';
-            document.documentElement.style.overflowY = '';
-        };
-    }, { scope: mainRef });
+    }, { scope: mainRef, dependencies: [allItems] });
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`${__('general.landing_portfolio_title')} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}</title>
-                <meta name="description" content={__('general.landing_portfolio_desc')} />
+            <Head title={`${__('general.landing_portfolio_title') || 'Work'} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}>
+                <meta name="description" content={__('general.landing_portfolio_desc') || "Explore our engineered platforms, enterprise SaaS, and desktop utilities."} />
             </Head>
 
-            <style>{`
-                .snap-section { scroll-snap-align: start; }
-                html { scroll-behavior: smooth; }
-            `}</style>
-
-            <div ref={mainRef} className="w-full bg-[#fafafa] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
+            <div ref={mainRef} className="w-full bg-white text-[#1d1d1f] font-sans selection:bg-[#1d1d1f] selection:text-white pt-12 sm:pt-20 pb-20 sm:pb-32">
+                
                 {/* HERO SECTION */}
-                <section className="snap-section pt-32 pb-24 lg:pt-48 lg:pb-32 bg-[#fafafa] border-b border-[#e5e5e5] reveal-section">
-                    <div className="max-w-[80rem] mx-auto px-6 lg:px-8 text-center">
-                        <div className="max-w-4xl mx-auto">
-                            <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white mx-auto">
-                                <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                                {__('general.landing_portfolio_badge') || 'Our Work'}
-                            </div>
-                            <h1 className="gsap-fade-up text-5xl lg:text-7xl font-bold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                                {__('general.landing_portfolio_title')}
-                            </h1>
-                            <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mx-auto">
-                                {__('general.landing_portfolio_desc')}
-                            </p>
-                        </div>
+                <section className="px-6 max-w-5xl mx-auto flex flex-col items-center text-center mb-16 sm:mb-24 reveal-section">
+                    <p className="text-base sm:text-xl text-[#86868b] font-medium mb-3 sm:mb-4 tracking-tight">
+                        {__('general.landing_portfolio_badge') || 'Proven in Production'}
+                    </p>
+
+                    <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[86px] leading-[1.05] font-bold text-[#1d1d1f] max-w-5xl mb-6 tracking-tight">
+                        {__('general.landing_portfolio_title') || 'Engineered products.'} <br className="hidden sm:inline" />
+                        <span className="bg-gradient-to-r from-[#0066cc] to-[#3399ff] bg-clip-text text-transparent">
+                            Shipped in the real world.
+                        </span>
+                    </h1>
+
+                    <p className="text-lg sm:text-2xl md:text-[26px] text-[#86868b] max-w-3xl mb-4 font-medium leading-snug tracking-tight">
+                        {__('general.landing_portfolio_desc') || 'See how we have helped businesses transform their operations through custom software.'}
+                    </p>
+                </section>
+
+                {/* PORTFOLIO PRODUCT GRID */}
+                <section className="px-6 max-w-7xl mx-auto reveal-section">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                        {allItems.map((item, index) => (
+                            <Link 
+                                key={index} 
+                                href={route('portfolio.show', item.slug)}
+                                className="group bg-[#f5f5f7] rounded-[28px] p-6 sm:p-7 flex flex-col justify-between border border-[#d2d2d7]/50 hover:border-[#0066cc]/40 hover:shadow-md transition-all duration-300"
+                            >
+                                <div>
+                                    {/* Image Preview Container */}
+                                    <div className="h-44 sm:h-48 rounded-2xl overflow-hidden bg-white border border-[#d2d2d7]/50 mb-5 relative">
+                                        <img 
+                                            src={item.img} 
+                                            alt={item.title} 
+                                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
+                                            loading="lazy"
+                                        />
+                                        <div className="absolute top-3 end-3">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/95 text-zinc-800 shadow-xs border border-zinc-200 backdrop-blur-xs">
+                                                {item.cat}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Titles and descriptions */}
+                                    <h3 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight mb-2 group-hover:text-[#0066cc] transition-colors">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-xs sm:text-sm text-[#86868b] leading-relaxed line-clamp-2 mb-4 font-medium">
+                                        {item.desc}
+                                    </p>
+                                </div>
+
+                                <div className="pt-4 border-t border-[#d2d2d7]/40 flex items-center justify-between text-xs font-bold text-[#1d1d1f] group-hover:text-[#0066cc] transition-colors">
+                                    <span>Explore Case Study</span>
+                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
+                                </div>
+                            </Link>
+                        ))}
                     </div>
                 </section>
 
-                {/* PORTFOLIO GRID */}
-                <section className="snap-section py-24 lg:py-32 bg-white reveal-section">
-                    <div className="max-w-[80rem] mx-auto px-6 lg:px-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e5e5e5] border border-[#e5e5e5]">
-                            {allItems.map((item, index) => (
-                                <Link 
-                                    href={route('portfolio.show', item.slug)} 
-                                    key={index} 
-                                    className="gsap-fade-up group relative bg-white flex flex-col h-[400px] overflow-hidden"
-                                >
-                                    <div className="h-2/3 w-full overflow-hidden relative">
-                                        <div className="absolute inset-0 bg-[#111111]/10 group-hover:bg-transparent transition-colors duration-500 z-10 mix-blend-multiply"></div>
-                                        {item.img ? (
-                                            <img 
-                                                src={item.img} 
-                                                alt={item.title} 
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out grayscale group-hover:grayscale-0"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-medium">
-                                                No Image
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="h-1/3 p-6 flex flex-col justify-center border-t border-[#e5e5e5] bg-white transition-colors group-hover:bg-[#fafafa]">
-                                        <span className="text-[10px] font-bold tracking-widest uppercase text-[#888888] mb-2">
-                                            {item.cat}
-                                        </span>
-                                        <h3 className="text-lg font-bold text-[#111111] mb-2 line-clamp-1">
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-[#666666] text-xs leading-relaxed line-clamp-2">
-                                            {item.desc}
-                                        </p>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
             </div>
         </PublicLayout>
     );

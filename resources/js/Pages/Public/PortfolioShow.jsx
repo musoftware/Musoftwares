@@ -17,13 +17,17 @@ export default function PortfolioShow({ slug, dbProject = null }) {
         if (dbProject) return dbProject;
         const staticItem = portfolioItems.find((p) => p.slug === slug);
         if (staticItem) {
+            const rawTitle = __(`general.${staticItem.titleKey}`);
+            const rawDesc = __(`general.${staticItem.descKey}`);
+            const rawContent = __(`general.${staticItem.contentKey}`);
+
             return {
                 slug: staticItem.slug,
                 img: staticItem.img,
                 img_original: staticItem.img, // fallback to standard
-                title: __(`general.${staticItem.titleKey}`),
-                desc: __(`general.${staticItem.descKey}`),
-                content: __(`general.${staticItem.contentKey}`),
+                title: (rawTitle && !rawTitle.startsWith('general.')) ? rawTitle : staticItem.slug,
+                desc: (rawDesc && !rawDesc.startsWith('general.')) ? rawDesc : '',
+                content: (rawContent && !rawContent.startsWith('general.')) ? rawContent : `<p>${rawDesc || ''}</p>`,
                 cat: staticItem.cat,
                 is_db: false,
                 live_url: null,
@@ -74,8 +78,7 @@ export default function PortfolioShow({ slug, dbProject = null }) {
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`${item.title} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}</title>
+            <Head title={`${item.title} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}>
                 <meta name="description" content={item.desc} />
             </Head>
 

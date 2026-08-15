@@ -4,17 +4,25 @@
 
 ## Platform Overview
 Musoftwares provides premium software products, plugins, and custom development services.
-Base URL: https://www.musoftwares.com
+Base URL: http://localhost
 
 ## Machine Readable Endpoints & Specifications
-- Services API: https://www.musoftwares.com/marketplace/api/v1/services
-- Categories API: https://www.musoftwares.com/marketplace/api/v1/categories
-- Search API: https://www.musoftwares.com/marketplace/api/v1/search
-- OpenAPI Spec: https://www.musoftwares.com/marketplace/api/v1/openapi.json
+- Services API: http://localhost/marketplace/api/v1/services
+- Categories API: http://localhost/marketplace/api/v1/categories
+- Search API: http://localhost/marketplace/api/v1/search
+- OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
 
 ## Service Categories
 
 ## Full Services Catalog
 
 ## Full Blog Articles Catalog
+
+### Test Article
+- **Slug**: test-article
+- **URL**: http://localhost/blog/test-article
+- **Published At**: 2026-08-15T11:52:52+00:00
+- **Excerpt**: 
+- **Content**:
+This is a test article.
 

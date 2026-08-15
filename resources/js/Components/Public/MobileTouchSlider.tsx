@@ -48,6 +48,7 @@ export default function MobileTouchSlider({
         updateScrollState();
 
         return () => container.removeEventListener('scroll', updateScrollState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [children.length]);
 
     const scrollToIndex = (index: number) => {

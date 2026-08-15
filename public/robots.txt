@@ -24,4 +24,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /seller/
 
-Sitemap: https://www.musoftwares.com/sitemap.xml
+Sitemap: http://localhost/sitemap.xml

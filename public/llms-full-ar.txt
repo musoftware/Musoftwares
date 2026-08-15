@@ -4,13 +4,13 @@
 
 ## نظرة عامة على المنصة
 ميوزوفت ويرز تقدم برمجيات ممتازة، إضافات جاهزة، وتطوير برمجيات وحلول رقمية مخصصة.
-رابط المنصة الرئيسي: https://www.musoftwares.com
+رابط المنصة الرئيسي: http://localhost
 
 ## الروابط البرمجية والمواصفات المعيارية
-- واجهة برمجة الخدمات: https://www.musoftwares.com/marketplace/api/v1/services
-- واجهة برمجة التصنيفات: https://www.musoftwares.com/marketplace/api/v1/categories
-- واجهة برمجة البحث: https://www.musoftwares.com/marketplace/api/v1/search
-- مواصفات OpenAPI: https://www.musoftwares.com/marketplace/api/v1/openapi.json
+- واجهة برمجة الخدمات: http://localhost/marketplace/api/v1/services
+- واجهة برمجة التصنيفات: http://localhost/marketplace/api/v1/categories
+- واجهة برمجة البحث: http://localhost/marketplace/api/v1/search
+- مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
 
