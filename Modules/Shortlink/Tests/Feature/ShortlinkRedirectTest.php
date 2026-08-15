@@ -146,6 +146,42 @@ class ShortlinkRedirectTest extends TestCase
         $this->assertSame(1, ShortlinkLink::where('destination_url', $url)->count());
     }
 
+    public function test_crawler_receives_preview_page_with_og_tags(): void
+    {
+        $link = $this->makeLink([
+            'destination_url' => 'https://example.com/target-page',
+            'title' => 'Custom Landing Page Title',
+            'description' => 'Custom OpenGraph description for WhatsApp',
+            'image_url' => 'https://example.com/cover.jpg',
+        ]);
+
+        // Simulate WhatsApp user agent
+        $response = $this->withHeaders([
+            'User-Agent' => 'WhatsApp/2.21.12.21 A',
+        ])->get('/l/' . $link->short_code);
+
+        $response->assertStatus(200);
+        $response->assertSee('Custom Landing Page Title');
+        $response->assertSee('Custom OpenGraph description for WhatsApp');
+        $response->assertSee('https://example.com/cover.jpg');
+        $response->assertSee('property="og:title"', false);
+        $response->assertSee('property="og:image"', false);
+        $response->assertSee('name="twitter:card"', false);
+    }
+
+    public function test_preview_query_param_renders_preview_page(): void
+    {
+        $link = $this->makeLink([
+            'title' => 'Preview Title Via Query',
+            'description' => 'Preview Description',
+        ]);
+
+        $response = $this->get('/l/' . $link->short_code . '?preview=1');
+
+        $response->assertStatus(200);
+        $response->assertSee('Preview Title Via Query');
+    }
+
     protected function tearDown(): void
     {
         \Mockery::close();

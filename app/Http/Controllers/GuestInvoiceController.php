@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Builders\KashierCheckoutBuilder;
 use App\Helpers\KashierHelper;
 use App\Http\Resources\InvoiceResource;
+use App\Models\Currency;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -63,10 +64,11 @@ class GuestInvoiceController extends Controller
             return redirect()->back()->with('error', __('general.invoice_total_zero'));
         }
 
-        if (! $invoice->currency) {
+        $currencyModel = Currency::findCached($invoice->currency_id ?? $invoice->currency);
+        if (! $currencyModel) {
             throw new \Exception("Invoice {$invoice->id} is missing an associated currency relation.");
         }
-        $currency = $invoice->currency->currency;
+        $currency = $currencyModel->currency;
 
         $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($amount, $currency)

@@ -1084,6 +1084,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::get('/invoices/{invoice}/linked-transactions', [App\Http\Controllers\Admin\InvoiceController::class, 'linkedTransactions'])->name('invoices.linked-transactions');
     Route::get('/invoices/{invoice}/download-pdf', [App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
     Route::get('/invoices/{invoice}/print-pdf', [App\Http\Controllers\Admin\InvoiceController::class, 'printPdf'])->name('invoices.print-pdf');
+    Route::post('/invoices/{invoice}/share-link', [App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
 
     // ── Admin Payouts ───────────────────────
     Route::get('/payouts', [PayoutController::class, 'index'])->name('payouts.index');

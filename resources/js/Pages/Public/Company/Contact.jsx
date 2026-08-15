@@ -2,7 +2,7 @@ import React from 'react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { MapPin, Mail, Phone, MessageSquare, Sparkles, Clock, Globe } from 'lucide-react';
+import { MapPin, Mail, Phone, MessageSquare, Sparkles, Clock, Globe, ChevronRight } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function Contact({ canLogin, canRegister }) {

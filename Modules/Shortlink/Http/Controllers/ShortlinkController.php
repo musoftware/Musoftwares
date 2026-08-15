@@ -37,6 +37,12 @@ class ShortlinkController extends Controller
             'short_url' => $this->service->shortUrl($link),
             'destination_url' => $link->destination_url,
             'label' => $link->label,
+            'title' => $link->title,
+            'description' => $link->description,
+            'image_url' => $link->image_url,
+            'effective_title' => $link->getEffectiveTitle(),
+            'effective_description' => $link->getEffectiveDescription(),
+            'effective_image' => $link->getEffectiveImage(),
             'is_active' => (bool) $link->is_active,
             'clicks' => (int) $link->clicks,
             'expires_at' => optional($link->expires_at)->toIso8601String(),
@@ -81,8 +87,28 @@ class ShortlinkController extends Controller
                 'toggle_status' => __('shortlink.toggle_status'),
                 'confirm_delete' => __('shortlink.confirm_delete'),
                 'search_placeholder' => __('shortlink.search_placeholder'),
+                'seo_preview_title' => __('shortlink.seo_preview_title', [], 'ar') ?: 'بيانات ومعاينة الرابط (SEO & Social Preview)',
+                'seo_title' => __('shortlink.seo_title', [], 'ar') ?: 'عنوان المعاينة (Title)',
+                'seo_description' => __('shortlink.seo_description', [], 'ar') ?: 'وصف المعاينة (Description)',
+                'seo_image' => __('shortlink.seo_image', [], 'ar') ?: 'رابط صورة المعاينة (Image URL)',
+                'fetch_meta' => __('shortlink.fetch_meta', [], 'ar') ?: 'جلب البيانات تلقائياً من الرابط',
+                'fetching_meta' => __('shortlink.fetching_meta', [], 'ar') ?: 'جاري الجلب...',
+                'preview_card_heading' => __('shortlink.preview_card_heading', [], 'ar') ?: 'معاينة المشاركة (WhatsApp / Social Card)',
             ],
         ]);
+    }
+
+    public function fetchMeta(Request $request)
+    {
+        $this->authorize('viewAny', ShortlinkLink::class);
+
+        $request->validate([
+            'url' => ['required', 'string', 'url', 'max:5000'],
+        ]);
+
+        $meta = $this->service->fetchUrlMetadata($request->input('url'));
+
+        return response()->json($meta);
     }
 
     public function store(StoreShortlinkRequest $request)
@@ -91,6 +117,13 @@ class ShortlinkController extends Controller
 
         $data = $request->validated();
         $data['created_by_user_id'] = $request->user()?->id;
+
+        if (empty($data['title']) && empty($data['description']) && empty($data['image_url'])) {
+            $meta = $this->service->fetchUrlMetadata($data['destination_url']);
+            $data['title'] = $meta['title'] ?? null;
+            $data['description'] = $meta['description'] ?? null;
+            $data['image_url'] = $meta['image_url'] ?? null;
+        }
 
         $link = $this->service->create($data);
 

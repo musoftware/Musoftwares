@@ -4,6 +4,38 @@ import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import gsap from 'gsap';
 import { __ } from '@/lib/i18n';
+import '../../../css/dashboard-v8.css';
+import {
+    Wallet,
+    PlusCircle,
+    Banknote,
+    Folder,
+    Receipt,
+    History,
+    Headphones,
+    Users,
+    Landmark,
+    User,
+    FileSignature,
+    Database,
+    Contact,
+    Coins,
+    Smartphone,
+    Terminal,
+    MessageSquare,
+    Store,
+    ShieldCheck,
+    Search,
+    Bell,
+    Settings,
+    LogOut,
+    Star,
+    Volume2,
+    VolumeX,
+    Check,
+    AlertCircle,
+    X,
+} from 'lucide-react';
 
 interface DashboardProps {
     stats: any;
@@ -721,13 +753,13 @@ export default function Dashboard({
                         {/* Center Dials */}
                         <div className="d-none d-lg-flex align-items-center justify-content-center gap-3">
                             <Link href="/financial/add-balance" className="d-flex align-items-center px-3 py-1 text-decoration-none rounded-pill" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.35)', backdropFilter: 'blur(8px)' }}>
-                                <i className="icon-wallet mr-2" style={{ color: '#10b981', fontSize: '13px' }}></i>
+                                <Wallet className="w-3.5 h-3.5 text-emerald-400 mr-1.5" />
                                 <span style={{ fontSize: '11px', fontWeight: 600, color: '#d1fae5', marginRight: '4px' }}>{__('dashboard.wallet')}:</span>
                                 <span style={{ fontSize: '12px', fontWeight: 800, color: '#10b981', letterSpacing: '0.5px' }}>{userBalanceFormatted}</span>
                             </Link>
 
                             <div className="d-flex align-items-center px-3 py-1 rounded-pill ml-2" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.35)', backdropFilter: 'blur(8px)' }}>
-                                <i className="icon-star mr-2" style={{ color: '#f59e0b', fontSize: '13px' }}></i>
+                                <Star className="w-3.5 h-3.5 text-amber-400 mr-1.5" />
                                 <span style={{ fontSize: '11px', fontWeight: 600, color: '#fef3c7', marginRight: '4px' }}>{__('dashboard.points')}:</span>
                                 <span style={{ fontSize: '12px', fontWeight: 800, color: '#f59e0b', letterSpacing: '0.5px' }}>{userPoints.toLocaleString()} {__('dashboard.pts')}</span>
                             </div>
@@ -738,13 +770,13 @@ export default function Dashboard({
                             {/* Soundtrack control */}
                             {audioAllowed && (
                                 <button onClick={toggleMute} className={`btn mr-2 d-flex align-items-center justify-content-center pointer ${audioMuted ? 'text-muted' : 'text-info'}`} style={{ width: '34px', height: '34px', background: 'rgba(35, 16, 70, 0.6)', border: '1px solid rgba(168, 85, 247, 0.4)', borderRadius: '50%', outline: 'none' }} title="Toggle Background Music">
-                                    <i className={audioMuted ? 'icon-volume-off' : 'icon-volume-up'} />
+                                    {audioMuted ? <VolumeX className="w-4 h-4 text-muted" /> : <Volume2 className="w-4 h-4 text-cyan" />}
                                 </button>
                             )}
 
                             {/* Search Trigger */}
                             <div onClick={() => setIsCommandBarOpen(true)} className="command-bar-trigger mr-2 d-flex align-items-center pointer px-2 py-1 rounded-pill" style={{ background: 'rgba(35, 16, 70, 0.6)', border: '1px solid rgba(168, 85, 247, 0.4)', backdropFilter: 'blur(8px)', cursor: 'pointer' }} title="Universal Spotlight Search (Ctrl + K)">
-                                <i className="icon-search mr-1" style={{ fontSize: '12px', color: '#00f0ff' }}></i>
+                                <Search className="w-3 h-3 mr-1" style={{ color: '#00f0ff' }} />
                                 <span className="mr-2 d-none d-sm-inline" style={{ color: '#f3e8ff', fontSize: '11px', fontWeight: 600 }}>{__('dashboard.search')}</span>
                                 <kbd className="command-bar-kbd" style={{ background: 'rgba(0, 240, 255, 0.15)', color: '#00f0ff', border: '1px solid rgba(0, 240, 255, 0.4)', fontSize: '9px', padding: '1px 5px', borderRadius: '4px' }}>Ctrl K</kbd>
                             </div>
@@ -752,7 +784,7 @@ export default function Dashboard({
                             {/* Notifications Dropdown */}
                             <div className="dropdown mr-2">
                                 <div className="d-flex align-items-center justify-content-center pointer position-relative dropdown-toggle" id="notificationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style={{ width: '34px', height: '34px', background: 'rgba(35, 16, 70, 0.6)', border: '1px solid rgba(168, 85, 247, 0.4)', borderRadius: '50%' }}>
-                                    <i className="icon-bell" style={{ color: '#a855f7', fontSize: '13px' }}></i>
+                                    <Bell className="w-3.5 h-3.5" style={{ color: '#a855f7' }} />
                                     {realNotifications.length > 0 && (
                                         <span className="status-dot-led position-absolute" style={{ top: '3px', right: '3px', width: '6px', height: '6px', backgroundColor: '#00f0ff', boxShadow: '0 0 8px #00f0ff' }}></span>
                                     )}
@@ -760,7 +792,7 @@ export default function Dashboard({
                                 <div className="dropdown-menu dropdown-menu-right p-3" aria-labelledby="notificationDropdown" style={{ background: '#130924', border: '1px solid #8A4FFF', borderRadius: '12px', width: '290px', boxShadow: '0 15px 35px rgba(0,0,0,0.95), 0 0 20px rgba(138,79,255,0.35)' }}>
                                     <div className="d-flex align-items-center justify-content-between pb-2 mb-2" style={{ borderBottom: '1px solid rgba(138,79,255,0.25)' }}>
                                         <div className="font-weight-bold" style={{ color: '#f3e8ff', fontSize: '13px' }}>
-                                            <i className="icon-bell mr-1" style={{ color: '#8A4FFF' }}></i> {__('dashboard.notifications')}
+                                            <Bell className="w-3.5 h-3.5 mr-1 d-inline" style={{ color: '#8A4FFF' }} /> {__('dashboard.notifications')}
                                         </div>
                                         <Link href="/notifications" className="small font-weight-bold" style={{ color: '#a855f7' }}>{__('dashboard.view_all')}</Link>
                                     </div>
@@ -799,12 +831,12 @@ export default function Dashboard({
                                     <span className="user-name d-none d-sm-inline ml-2 text-truncate" style={{ maxWidth: '90px', fontSize: '11px', fontWeight: 600 }}>{authUser?.name}</span>
                                 </div>
                                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuDropdown" style={{ background: '#130924', border: '1px solid #8A4FFF', borderRadius: '12px', minWidth: '170px' }}>
-                                    {authUser?.roles?.[0] === 'admin' && (
-                                        <Link className="dropdown-item py-2" href="/admin" style={{ color: '#d8b4fe', fontSize: '12px' }}><i className="icon-cog mr-2"></i>{__('dashboard.admin_panel')}</Link>
+                                    {(authUser?.is_admin || authUser?.role === 'admin' || (Array.isArray(authUser?.roles) && authUser.roles.some((r: any) => (typeof r === 'string' ? r === 'admin' : r?.name === 'admin')))) && (
+                                        <Link className="dropdown-item py-2" href="/admin" style={{ color: '#d8b4fe', fontSize: '12px' }}><Settings className="w-3.5 h-3.5 mr-2 d-inline" />{__('dashboard.admin_panel')}</Link>
                                     )}
-                                    <Link className="dropdown-item py-2" href="/profile" style={{ color: '#d8b4fe', fontSize: '12px' }}><i className="icon-user mr-2"></i>{__('dashboard.my_profile')}</Link>
+                                    <Link className="dropdown-item py-2" href="/profile" style={{ color: '#d8b4fe', fontSize: '12px' }}><User className="w-3.5 h-3.5 mr-2 d-inline" />{__('dashboard.my_profile')}</Link>
                                     <div className="dropdown-divider" style={{ borderColor: 'rgba(138, 79, 255, 0.25)' }}></div>
-                                    <Link className="dropdown-item py-2" href="/logout" method="post" as="button" style={{ color: '#f43f5e', fontSize: '12px', width: '100%', textAlign: 'left' }}><i className="icon-logout mr-2"></i>{__('dashboard.logout')}</Link>
+                                    <Link className="dropdown-item py-2" href="/logout" method="post" as="button" style={{ color: '#f43f5e', fontSize: '12px', width: '100%', textAlign: 'left' }}><LogOut className="w-3.5 h-3.5 mr-2 d-inline" />{__('dashboard.logout')}</Link>
                                 </div>
                             </div>
                         </div>
@@ -826,7 +858,13 @@ export default function Dashboard({
 
                     <div className="orbital-identity">
                         <div className="c-name">{authUser?.name}</div>
-                        <div className="c-role">{authUser?.roles?.[0] ? authUser.roles[0].replace('_', ' ').toUpperCase() : 'CLIENT'}</div>
+                        <div className="c-role">
+                            {(() => {
+                                const r = authUser?.roles?.[0];
+                                const name = typeof r === 'object' && r !== null ? r.name : (typeof r === 'string' ? r : (authUser?.role || 'CLIENT'));
+                                return typeof name === 'string' ? name.replace('_', ' ').toUpperCase() : 'CLIENT';
+                            })()}
+                        </div>
                     </div>
 
                     <div className="dashboard-side-gauges">
@@ -857,7 +895,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-emerald">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="wallet"></i>
+                                        <Wallet className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.wallet')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -873,7 +911,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-emerald">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="plus-circle"></i>
+                                        <PlusCircle className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.add_balance')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -889,7 +927,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-red">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="banknote"></i>
+                                        <Banknote className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.pay_due_amount')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -906,7 +944,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-pink">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="folder"></i>
+                                        <Folder className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.my_projects_btn')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -922,7 +960,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-pink">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="receipt"></i>
+                                        <Receipt className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.invoices')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -938,7 +976,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-emerald">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="history"></i>
+                                        <History className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.transactions')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -954,7 +992,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-amber">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="headset"></i>
+                                        <Headphones className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.support')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -970,7 +1008,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-cyan">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="users"></i>
+                                        <Users className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.referrals')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -986,7 +1024,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-emerald">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="landmark"></i>
+                                        <Landmark className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.payout_methods')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1002,7 +1040,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-gold">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="user"></i>
+                                        <User className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.profile')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1023,7 +1061,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-cyan">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="file-signature"></i>
+                                        <FileSignature className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.contracts')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1039,7 +1077,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-cyan">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="database"></i>
+                                        <Database className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.erp_system')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1055,7 +1093,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-pink">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="contact"></i>
+                                        <Contact className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.crm_system')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1071,7 +1109,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-gold">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="coins"></i>
+                                        <Coins className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.gold_saver_sys')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1087,7 +1125,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-amber">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="smartphone"></i>
+                                        <Smartphone className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.sms_gateway')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1103,7 +1141,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-cyan">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="terminal"></i>
+                                        <Terminal className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.runtime_tools')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1119,7 +1157,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-emerald">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="message-square"></i>
+                                        <MessageSquare className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.whatsapp')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1135,7 +1173,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-pink">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-custom-fb">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                                         </svg>
                                         <span className="cube-inner-label">{__('dashboard.fb_lookup')}</span>
@@ -1153,7 +1191,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-amber">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="store"></i>
+                                        <Store className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.browse_marketplace')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
@@ -1169,7 +1207,7 @@ export default function Dashboard({
                             <div className="cube-3d-scene cube-theme-pink">
                                 <div className="cube-3d">
                                     <div className="cube-face cube-face-front">
-                                        <i data-lucide="shield-check"></i>
+                                        <ShieldCheck className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.subscriptions')}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>

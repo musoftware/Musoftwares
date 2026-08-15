@@ -54,6 +54,7 @@ return [
     'referral_slug_taken' => 'Referral Slug Taken',
     'referral_system_activated' => 'Referral System Activated',
     'search_placeholder' => 'Search by code, URL or label...',
+    'share_invoice_shortlink_desc' => 'A secure, shortened link for the client to view and pay invoice',
     'short_code' => 'Code',
     'short_link' => 'Short link',
     'short_url' => 'Short URL',
@@ -85,5 +86,12 @@ return [
     'webhook_endpoint_returned_error' => 'Webhook Endpoint Returned Error',
     'webhook_registered_success_v2' => 'Webhook Registered Success V2',
     'webhook_send_failed' => 'Webhook Send Failed',
-    'webhook_updated_success' => 'Webhook Updated Success'
+    'webhook_updated_success' => 'Webhook Updated Success',
+    'fetch_meta' => 'Auto-fetch metadata from URL',
+    'fetching_meta' => 'Fetching metadata...',
+    'preview_card_heading' => 'Social Share Preview (WhatsApp / Facebook)',
+    'seo_description' => 'Preview Description',
+    'seo_image' => 'Preview Image URL',
+    'seo_preview_title' => 'Link Metadata (SEO & Social Preview)',
+    'seo_title' => 'Preview Title'
 ];

@@ -75,6 +75,7 @@ export default function Login({
                         <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.email_address_1')}</Label>
                         <Input
                             id="email"
+                            name="email"
                             type="email"
                             placeholder={__('general.name_company_com')}
                             value={data.email}
@@ -103,6 +104,7 @@ export default function Login({
                         <div className="relative">
                             <Input
                                 id="password"
+                                name="password"
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 value={data.password}

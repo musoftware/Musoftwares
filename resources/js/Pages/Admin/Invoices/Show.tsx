@@ -16,7 +16,7 @@ import {
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt,
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
     ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown,
-    Bell, Mail, FolderKanban, ListTodo, StickyNote
+    Bell, Mail, FolderKanban, ListTodo, StickyNote, Copy, ExternalLink, Link2
 } from 'lucide-react';
 
 const NOTE_COLORS: Record<string, { bg: string; border: string; text: string; swatch: string }> = {
@@ -135,31 +135,55 @@ export default function Show({
     const [deletedItems, setDeletedItems] = useState<number[]>([]);
     const [deletedCostLines, setDeletedCostLines] = useState<number[]>([]);
 
-    const handleShareLink = async (duration: string) => {
+    const [shareModalState, setShareModalState] = useState<{
+        isOpen: boolean;
+        duration: string;
+        loading: boolean;
+        shortUrl: string;
+        destinationUrl: string;
+        expiresAt: string | null;
+    }>({
+        isOpen: false,
+        duration: '1_month',
+        loading: false,
+        shortUrl: '',
+        destinationUrl: '',
+        expiresAt: null,
+    });
+
+    const handleOpenShareModal = async (duration: string = '1_month') => {
+        setShareModalState(prev => ({ ...prev, isOpen: true, duration, loading: true }));
         try {
             const response = await axios.post(route('admin.invoices.share-link', { invoice: String(invoice.id) }), { duration });
-            if (response.data?.url) {
-                navigator.clipboard.writeText(response.data.url);
-                alert(__('admin.link_copied') + '\n' + __('admin.expires_at') + ': ' + response.data.expires_at);
+            if (response.data?.success) {
+                const sUrl = response.data.short_url || response.data.url;
+                setShareModalState({
+                    isOpen: true,
+                    duration,
+                    loading: false,
+                    shortUrl: sUrl,
+                    destinationUrl: response.data.destination_url,
+                    expiresAt: response.data.expires_at,
+                });
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(sUrl);
+                    toast.success(__('admin.link_copied') || 'Shortlink copied to clipboard!');
+                }
+            } else {
+                toast.error(__('general.error_occurred') || 'Failed to generate shortlink');
+                setShareModalState(prev => ({ ...prev, loading: false }));
             }
         } catch (error: any) {
-            console.error("Failed to generate share link", error);
-            alert(__('general.error_occurred'));
+            console.error("Failed to generate shortlink", error);
+            toast.error(__('general.error_occurred') || 'Failed to generate shortlink');
+            setShareModalState(prev => ({ ...prev, loading: false }));
         }
     };
 
-    const handleSignedInvoiceRedirect = async () => {
-        try {
-            const response = await axios.post(route('admin.invoices.share-link', { invoice: String(invoice.id) }), { duration: '1_month' });
-            if (response.data?.url) {
-                window.open(response.data.url, '_blank');
-            } else {
-                alert(__('general.error_occurred'));
-            }
-        } catch (error: any) {
-            console.error("Failed to generate signed invoice link", error);
-            alert(__('general.error_occurred'));
-        }
+    const handleCopyText = (text: string, label: string = 'Link') => {
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+        toast.success(`${label} ${__('general.copied_to_clipboard') || 'copied to clipboard!'}`);
     };
 
     const [isSendingNotification, setIsSendingNotification] = useState<'fcm' | 'email' | null>(null);
@@ -570,7 +594,7 @@ export default function Show({
                                     )}
                                 </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={handleSignedInvoiceRedirect} className="cursor-pointer">
+                            <DropdownMenuItem onClick={() => handleOpenShareModal('1_month')} className="cursor-pointer">
                                 <CreditCard className="w-4 h-4 me-2" /> {__('admin.share_signed_invoice_link') || 'Share Signed Invoice Link'}
                             </DropdownMenuItem>
                             {invoice.status !== 'paid' && (
@@ -587,17 +611,25 @@ export default function Show({
                                 </DropdownMenuItem>
                             )}
                             <div className="h-px bg-slate-100 my-1" />
-                            <div className="px-2 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                {__('admin.share') || 'Share Link'}
+                            <div className="px-2 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                                <span>{__('admin.share') || 'Share Shortlink'}</span>
+                                <span className="text-[10px] text-emerald-600 font-semibold uppercase">Shortlink</span>
                             </div>
-                            <DropdownMenuItem onClick={() => handleShareLink('24_hours')} className="cursor-pointer">
+                            <DropdownMenuItem onClick={() => handleOpenShareModal('24_hours')} className="cursor-pointer">
+                                <Clock className="w-3.5 h-3.5 me-2 text-slate-500" />
                                 {__('admin.share_24_hours')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleShareLink('3_days')} className="cursor-pointer">
+                            <DropdownMenuItem onClick={() => handleOpenShareModal('3_days')} className="cursor-pointer">
+                                <Clock className="w-3.5 h-3.5 me-2 text-slate-500" />
                                 {__('admin.share_3_days')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleShareLink('1_month')} className="cursor-pointer">
+                            <DropdownMenuItem onClick={() => handleOpenShareModal('1_month')} className="cursor-pointer">
+                                <Clock className="w-3.5 h-3.5 me-2 text-slate-500" />
                                 {__('admin.share_1_month')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleOpenShareModal('never')} className="cursor-pointer">
+                                <Link2 className="w-3.5 h-3.5 me-2 text-slate-500" />
+                                {__('general.no_expiry') || 'No Expiry'}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -2014,6 +2046,125 @@ export default function Show({
                             className="bg-slate-900 hover:bg-slate-900 text-white"
                         >
                             {__('general.transfer')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Share Signed Invoice Shortlink Modal */}
+            <Dialog open={shareModalState.isOpen} onOpenChange={(open) => setShareModalState(prev => ({ ...prev, isOpen: open }))}>
+                <DialogContent className="sm:max-w-[520px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-900">
+                            <CreditCard className="w-5 h-5 text-emerald-600" />
+                            {__('admin.share_signed_invoice_link') || 'Share Signed Invoice Shortlink'}
+                        </DialogTitle>
+                        <DialogDescription className="text-xs text-slate-500">
+                            {__('shortlink.share_invoice_shortlink_desc') || 'A secure, shortened link for the client to view and pay invoice'} #{invoice.invoice_number}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-3">
+                        {/* Expiration selector */}
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-slate-600">
+                                {__('admin.duration') || 'Link Validity'}
+                            </Label>
+                            <div className="grid grid-cols-4 gap-2">
+                                {[
+                                    { id: '24_hours', label: __('admin.share_24_hours') || '24h' },
+                                    { id: '3_days', label: __('admin.share_3_days') || '3 Days' },
+                                    { id: '1_month', label: __('admin.share_1_month') || '1 Month' },
+                                    { id: 'never', label: __('general.no_expiry') || 'No Expiry' },
+                                ].map(opt => (
+                                    <button
+                                        key={opt.id}
+                                        type="button"
+                                        disabled={shareModalState.loading}
+                                        onClick={() => handleOpenShareModal(opt.id)}
+                                        className={cn(
+                                            "h-9 px-2 text-xs font-medium rounded-lg border transition-all cursor-pointer text-center",
+                                            shareModalState.duration === opt.id
+                                                ? "border-slate-900 bg-slate-900 text-white font-semibold shadow-sm"
+                                                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                        )}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Short Link Display */}
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                                    <Link2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    {__('shortlink.short_link') || 'Short Link'}
+                                </span>
+                                <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                    {__('shortlink.recommended_for_sharing') || 'Recommended'}
+                                </span>
+                            </div>
+                            <div className="relative">
+                                <Input
+                                    readOnly
+                                    value={shareModalState.loading ? 'Generating...' : (shareModalState.shortUrl || '')}
+                                    className="h-10 pe-24 font-mono text-xs bg-slate-50 border-slate-300 text-slate-900 select-all"
+                                />
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    disabled={shareModalState.loading || !shareModalState.shortUrl}
+                                    onClick={() => handleCopyText(shareModalState.shortUrl, 'Shortlink')}
+                                    className="absolute end-1.5 top-1.5 h-7 px-3 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-semibold"
+                                >
+                                    <Copy className="w-3.5 h-3.5 me-1.5" />
+                                    {__('general.copy') || 'Copy'}
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Full Destination Link Display */}
+                        {shareModalState.destinationUrl && (
+                            <div className="space-y-1">
+                                <span className="text-[11px] font-medium text-slate-400">
+                                    {__('shortlink.destination_url') || 'Full Signed URL'}:
+                                </span>
+                                <div className="p-2 bg-slate-50 border border-slate-100 rounded-md text-[10px] font-mono text-slate-500 break-all max-h-16 overflow-y-auto">
+                                    {shareModalState.destinationUrl}
+                                </div>
+                            </div>
+                        )}
+
+                        {shareModalState.expiresAt && (
+                            <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-3 py-2 rounded-lg">
+                                <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                                <span>
+                                    {__('admin.expires_at') || 'Expires at'}: <strong>{shareModalState.expiresAt}</strong>
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    <DialogFooter className="flex-row sm:justify-between items-center gap-2 pt-2 border-t">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            disabled={!shareModalState.shortUrl}
+                            onClick={() => window.open(shareModalState.shortUrl, '_blank')}
+                            className="text-xs text-slate-600 hover:text-slate-900"
+                        >
+                            <ExternalLink className="w-3.5 h-3.5 me-1.5" />
+                            {__('general.open_in_new_tab') || 'Test Link'}
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={() => setShareModalState(prev => ({ ...prev, isOpen: false }))}
+                            className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-9 px-4"
+                        >
+                            {__('general.done') || 'Done'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -87,13 +87,13 @@ export default function Settings({ settings, devices }: Props) {
                             <CardDescription>{__('general.this_is_the_number_that_will_appear_to_the_buyer_to_transfer_the_amount_to')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="wallet_phone_number">{__('erp.primary_number_for_wallets_instapay')}</Label>
                                 <Input
                                     id="wallet_phone_number"
                                     type="text"
-                                    
+
                                     className="text-start font-mono max-w-md"
                                     value={data.wallet_phone_number}
                                     onChange={(e) => setData('wallet_phone_number', e.target.value)}
@@ -148,7 +148,7 @@ export default function Settings({ settings, devices }: Props) {
 
                             <div className="space-y-4">
                                 <h3 className="text-lg font-medium">{__('payment.available_payment_methods_and_dedicated')}</h3>
-                                
+
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50">
                                         <div className="space-y-0.5">
@@ -166,14 +166,14 @@ export default function Settings({ settings, devices }: Props) {
                                             <Input
                                                 id="instapay_phone_number"
                                                 type="text"
-                                                
+
                                                 className="text-start font-mono mt-2"
                                                 value={data.instapay_phone_number}
                                                 onChange={(e) => setData('instapay_phone_number', e.target.value)}
                                                 placeholder={__('general.example_userinstapay')}
                                             />
                                             {errors.instapay_phone_number && <p className="text-sm text-red-600 mt-1">{errors.instapay_phone_number}</p>}
-                                            
+
                                             <div className="mt-4 pt-4 border-t border-indigo-100">
                                                 <Label htmlFor="instapay_device_id">{__('general.dedicated_device_for_validation_internal')}</Label>
                                                 <select
@@ -194,7 +194,7 @@ export default function Settings({ settings, devices }: Props) {
                                                 <Input
                                                     id="instapay_allowed_sender"
                                                     type="text"
-                                                    
+
                                                     className="text-start font-mono mt-2"
                                                     value={data.instapay_allowed_sender}
                                                     onChange={(e) => setData('instapay_allowed_sender', e.target.value)}
@@ -213,9 +213,9 @@ export default function Settings({ settings, devices }: Props) {
                                                 <Label className="text-base">{__('erp.vodafone_cash_wallets')}</Label>
                                                 <div className="flex items-center gap-1.5">
                                                     <img src="/assets/images/gateways/vodafone-cash.svg" alt="Vodafone" className="h-5 object-contain" />
-                                                    <img src="/assets/images/gateways/orange-cash.svg" alt="Orange" className="h-5 rounded-sm object-contain" />
-                                                    <img src="/assets/images/gateways/etisalat-cash.svg" alt="Etisalat" className="h-5 rounded-sm object-contain" />
-                                                    <img src="/assets/images/gateways/we-pay.svg" alt="WE" className="h-5 rounded-sm object-contain" />
+                                                    <img src="/assets/images/gateways/orange-cash.png" alt="Orange" className="h-5 rounded-sm object-contain" />
+                                                    <img src="/assets/images/gateways/etisalat-cash.png" alt="Etisalat" className="h-5 rounded-sm object-contain" />
+                                                    <img src="/assets/images/gateways/we-pay.png" alt="WE" className="h-5 rounded-sm object-contain" />
                                                 </div>
                                             </div>
                                             <p className="text-sm text-gray-500">{__('general.allow_selecting_electronic_wallets')}</p>
@@ -231,14 +231,14 @@ export default function Settings({ settings, devices }: Props) {
                                             <Input
                                                 id="vodafone_cash_phone_number"
                                                 type="text"
-                                                
+
                                                 className="text-start font-mono mt-2"
                                                 value={data.vodafone_cash_phone_number}
                                                 onChange={(e) => setData('vodafone_cash_phone_number', e.target.value)}
                                                 placeholder={__('general.example_01012345678')}
                                             />
                                             {errors.vodafone_cash_phone_number && <p className="text-sm text-red-600 mt-1">{errors.vodafone_cash_phone_number}</p>}
-                                            
+
                                             <div className="mt-4 pt-4 border-t border-indigo-100">
                                                 <Label htmlFor="vodafone_cash_device_id">{__('general.dedicated_device_for_validation_internal')}</Label>
                                                 <select
@@ -259,7 +259,7 @@ export default function Settings({ settings, devices }: Props) {
                                                 <Input
                                                     id="vodafone_cash_allowed_sender"
                                                     type="text"
-                                                    
+
                                                     className="text-start font-mono mt-2"
                                                     value={data.vodafone_cash_allowed_sender}
                                                     onChange={(e) => setData('vodafone_cash_allowed_sender', e.target.value)}
@@ -271,9 +271,9 @@ export default function Settings({ settings, devices }: Props) {
                                     )}
                                 </div>
                             </div>
-                            
+
                             <hr className="my-6" />
-                            
+
                             <div className="space-y-4">
                                 <h3 className="text-lg font-medium">{__('sms_gateway.allowed_sms_senders_whitelist')}</h3>
                                 <div className="space-y-2">
@@ -281,7 +281,7 @@ export default function Settings({ settings, devices }: Props) {
                                     <textarea
                                         id="whitelist_senders"
                                         className="w-full max-w-md min-h-[100px] flex rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                        
+
                                         value={data.whitelist_senders}
                                         onChange={(e) => setData('whitelist_senders', e.target.value)}
                                         placeholder={__('general.e_money_vf_cash_cib')}
@@ -290,7 +290,7 @@ export default function Settings({ settings, devices }: Props) {
                                     {errors.whitelist_senders && <p className="text-sm text-red-600">{errors.whitelist_senders}</p>}
                                 </div>
                             </div>
-                            
+
                             <hr className="my-6" />
 
                             <div className="space-y-4">
@@ -303,7 +303,7 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.vodafone_cash_logo')}</Label>
                                         <Input
                                             type="url"
-                                            
+
                                             className="text-start font-mono"
                                             value={data.custom_logos?.vodafone || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, vodafone: e.target.value })}
@@ -315,7 +315,7 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.orange_cash_logo')}</Label>
                                         <Input
                                             type="url"
-                                            
+
                                             className="text-start font-mono"
                                             value={data.custom_logos?.orange || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, orange: e.target.value })}
@@ -327,7 +327,7 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.etisalat_cash_logo')}</Label>
                                         <Input
                                             type="url"
-                                            
+
                                             className="text-start font-mono"
                                             value={data.custom_logos?.etisalat || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, etisalat: e.target.value })}
@@ -339,7 +339,7 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.we_pay_logo')}</Label>
                                         <Input
                                             type="url"
-                                            
+
                                             className="text-start font-mono"
                                             value={data.custom_logos?.we || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, we: e.target.value })}
@@ -351,7 +351,7 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('general.instapay_logo')}</Label>
                                         <Input
                                             type="url"
-                                            
+
                                             className="text-start font-mono"
                                             value={data.custom_logos?.instapay || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, instapay: e.target.value })}

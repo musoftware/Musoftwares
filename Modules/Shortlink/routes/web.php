@@ -18,6 +18,7 @@ Route::prefix('admin/shortlinks')
     ->group(function () {
         Route::get('/', [ShortlinkController::class, 'index'])->name('index');
         Route::post('/', [ShortlinkController::class, 'store'])->name('store');
+        Route::post('fetch-meta', [ShortlinkController::class, 'fetchMeta'])->name('fetch_meta');
         Route::delete('{shortlink}', [ShortlinkController::class, 'destroy'])->name('destroy');
         Route::post('{shortlink}/toggle', [ShortlinkController::class, 'toggle'])->name('toggle');
     });

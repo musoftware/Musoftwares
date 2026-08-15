@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClientProjectResource;
 use App\Jobs\AiProcessMessageJob;
+use App\Models\Currency;
 use App\Models\Project;
 use App\Models\ProjectComment;
 use Illuminate\Http\Request;
@@ -338,7 +339,8 @@ class ClientProjectController extends Controller
         $executor->executeApprovedTasks($project, $tasksToCreate);
 
         // 3. Post system comment confirming invoice creation
-        $currencyCode = $invoice->currency?->currency ?? 'EGP';
+        $currencyModel = Currency::findCached($invoice->currency_id ?? $invoice->currency);
+        $currencyCode = $currencyModel?->currency ?? 'EGP';
         ProjectComment::create([
             'project_id'       => $project->id,
             'author_id'        => null,

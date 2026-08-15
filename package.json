@@ -9,6 +9,8 @@
         "dev": "vite",
         "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix",
         "test:e2e": "playwright test",
+        "test:e2e:actions": "playwright test tests/E2E/intelligent_actions.spec.ts",
+        "test:e2e:actions:headed": "playwright test tests/E2E/intelligent_actions.spec.ts --headed",
         "test:e2e:freelance": "playwright test tests/e2e/freelance.spec.ts",
         "test:e2e:ui": "playwright test --ui"
     },

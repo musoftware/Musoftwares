@@ -29,6 +29,7 @@ class PublicRoutesTest extends TestCase
     {
         $this->get('/portfolio')->assertStatus(200);
         $this->get('/portfolio/test-slug')->assertStatus(200);
+        $this->get('/portfolio/trenz-agency')->assertStatus(200);
     }
 
     public function test_solutions_pages_return_successful_response()

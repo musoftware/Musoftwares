@@ -61,17 +61,42 @@ class CheckMissingTranslations extends Command
 
                 $content = file_get_contents($pathname);
 
-                // Match __('group.key', ...), trans('group.key', ...), @lang('group.key', ...), Lang::get('group.key', ...)
-                // Group & key must contain a dot (e.g. general.need_more_balance)
+                // 1. Match static literal keys: __('group.key', ...), trans("group.key"), etc.
                 preg_match_all("/(?:__|trans|@lang|Lang::get)\(\s*['\"]([a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]+)['\"]/i", $content, $matches);
 
                 if (! empty($matches[1])) {
                     foreach ($matches[1] as $key) {
-                        // Skip variables, incomplete keys, or dynamic keys
                         if (str_contains($key, '$') || str_contains($key, '{') || str_ends_with($key, '.')) {
                             continue;
                         }
                         $foundKeys[$key] = true;
+                    }
+                }
+
+                // 2. Match dynamic concatenated prefixes: __('general.status_' + ...), __(`general.status_${...}`), trans('general.priority_' . ...)
+                preg_match_all("/(?:__|trans|@lang|Lang::get)\(\s*(?:['\"]([a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+_?)['\"]\s*[\+\.]|`([a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+_?)\$\{)/i", $content, $dynamicMatches);
+
+                $dynamicPrefixes = array_filter(array_merge($dynamicMatches[1] ?? [], $dynamicMatches[2] ?? []));
+                $commonStatusVariants = [
+                    'status_' => ['unpaid', 'paid', 'pending', 'draft', 'cancelled', 'overdue', 'partial', 'rejected', 'completed', 'open', 'closed', 'hold_on', 'replied', 'in_progress', 'active', 'inactive', 'failed', 'processing'],
+                    'priority_' => ['low', 'medium', 'high', 'urgent'],
+                    'role_' => ['admin', 'user', 'client', 'agent', 'accountant', 'editor'],
+                    'type_' => ['income', 'expense', 'deposit', 'withdrawal', 'transfer'],
+                ];
+
+                foreach ($dynamicPrefixes as $prefix) {
+                    $matchedVariant = false;
+                    foreach ($commonStatusVariants as $variantSuffix => $values) {
+                        if (str_ends_with($prefix, $variantSuffix)) {
+                            $matchedVariant = true;
+                            foreach ($values as $val) {
+                                $foundKeys[$prefix.$val] = true;
+                            }
+                        }
+                    }
+
+                    if (! $matchedVariant) {
+                        $foundKeys[$prefix] = true;
                     }
                 }
             }

@@ -10,8 +10,8 @@
 #   .\deploy\deploy.ps1 -Mode Assets     # Build & upload compiled JS/CSS assets
 
 param(
-    [ValidateSet("QuickPHP", "Full", "Migrate", "Cache", "Assets", "Interactive")]
-    [string]$Mode = "Interactive",
+    [ValidateSet("Full", "QuickPHP", "Migrate", "Cache", "Assets", "Menu")]
+    [string]$Mode = "Full",
     [string]$Commit = "",
     [switch]$SkipTests,
     [switch]$DryRun,
@@ -23,9 +23,8 @@ $PROJECT_ROOT = (Resolve-Path "$PSScriptRoot\..").Path
 Set-Location $PROJECT_ROOT
 
 function Show-Header {
-    Clear-Host
     Write-Host "========================================================" -ForegroundColor Cyan
-    Write-Host "         MUSOFTWARES DEPLOYMENT SYSTEM                 " -ForegroundColor Cyan
+    Write-Host "         MUSOFTWARES AUTOMATED DEPLOYMENT              " -ForegroundColor Cyan
     Write-Host "========================================================" -ForegroundColor Cyan
     Write-Host " Project: $PROJECT_ROOT" -ForegroundColor Gray
     Write-Host ""
@@ -35,8 +34,8 @@ function Show-Menu {
     Show-Header
     Write-Host " Select Deployment Action:" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "  [1] Quick PHP Push (Upload changed PHP files + Clear Cache)" -ForegroundColor Green
-    Write-Host "  [2] Full Production Deploy (Static Checks + Build Assets + PHP + E2E Tests)" -ForegroundColor Green
+    Write-Host "  [1] Full Production Deploy (Checks + Build Assets + Push) [DEFAULT]" -ForegroundColor Green
+    Write-Host "  [2] Quick PHP Push (Upload changed PHP files + Clear Cache)" -ForegroundColor Green
     Write-Host "  [3] Run Migrations & Schema Sync (Remote DB update)" -ForegroundColor Green
     Write-Host "  [4] Upload Build Assets (JS/CSS assets compile & push)" -ForegroundColor Green
     Write-Host "  [5] Clear & Re-optimize Remote Cache" -ForegroundColor Green
@@ -48,11 +47,11 @@ function Show-Menu {
     return $choice
 }
 
-if ($Mode -eq "Interactive") {
+if ($Mode -eq "Menu") {
     $choice = Show-Menu
     switch ($choice.ToUpper()) {
-        "1" { $Mode = "QuickPHP" }
-        "2" { $Mode = "Full" }
+        "1" { $Mode = "Full" }
+        "2" { $Mode = "QuickPHP" }
         "3" { $Mode = "Migrate" }
         "4" { $Mode = "Assets" }
         "5" { $Mode = "Cache" }

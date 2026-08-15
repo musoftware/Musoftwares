@@ -45,12 +45,16 @@ class AdminSettings extends Model
 
     public static function business_currency()
     {
-        return static::GetValue('business_currency', '2');
+        $id = static::GetValue('business_currency', '2');
+        if ($id && Currency::where('id', $id)->exists()) {
+            return (int) $id;
+        }
+        return Currency::first()?->id ?? 1;
     }
 
     public static function business_currency_name()
     {
-        return Currency::find(static::business_currency())->currency;
+        return Currency::find(static::business_currency())?->currency ?? 'USD';
     }
 
     public static function currencies_exist()

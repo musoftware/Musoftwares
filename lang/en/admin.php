@@ -192,6 +192,7 @@ return [
     'edit_service' => 'Edit Service',
     'edit_settings' => 'Edit Settings',
     'equiv' => 'Equiv',
+    'duration' => 'Link Validity',
     'estimate_hours' => 'Estimate Hours',
     'estimated_hours' => 'Estimated Hours',
     'exchange_already_exists_for_pair_on_date' => 'An exchange rate for this pair already exists on the selected date.',

@@ -2,7 +2,7 @@ import React from 'react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { Sparkles, Code, Terminal, Database, ArrowRight, MessageSquare, Briefcase } from 'lucide-react';
+import { Sparkles, Code, Terminal, Database, ArrowRight, MessageSquare, Briefcase, ChevronRight } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function Careers({ canLogin, canRegister }) {

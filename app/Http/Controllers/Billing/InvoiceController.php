@@ -161,11 +161,12 @@ class InvoiceController extends Controller
         }
 
         // Balance insufficient, redirect to Kashier payment gateway
-        if (! $invoice->currency) {
+        $currencyModel = Currency::findCached($invoice->currency_id ?? $invoice->currency);
+        if (! $currencyModel) {
             return response()->json(['success' => false, 'message' => 'Currency is missing'], 500);
         }
 
-        $currencyCode = $invoice->currency->currency;
+        $currencyCode = $currencyModel->currency;
 
         $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($remaining, $currencyCode)

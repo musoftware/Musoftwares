@@ -47,11 +47,29 @@ if (Test-Path "C:\tools\php83\php.exe") {
     $PHP_BIN = (Get-Command php).Source
 }
 
-# 1. Static Analysis
-Write-Host "[1/5] Running static analysis..." -ForegroundColor Yellow
+# 1. Static Analysis & Local Integrity Checks
+Write-Host "[1/5] Running static analysis & backend checks..." -ForegroundColor Yellow
 Set-Location $PROJECT_ROOT
 
-Write-Host "-> Checking PHP Code (PHPStan)..." -ForegroundColor DarkGray
+Write-Host "-> Checking Laravel Views (Blade compilation across core & modules)..." -ForegroundColor DarkGray
+cmd.exe /c "`"$PHP_BIN`" artisan view:cache"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Blade View compilation failed! Please fix the Blade template syntax errors above." -ForegroundColor Red
+    cmd.exe /c "`"$PHP_BIN`" artisan view:clear"
+    exit 1
+}
+cmd.exe /c "`"$PHP_BIN`" artisan view:clear"
+
+Write-Host "-> Checking Laravel Routes & Config..." -ForegroundColor DarkGray
+cmd.exe /c "`"$PHP_BIN`" artisan route:cache"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Route caching failed! Invalid controller or route syntax detected." -ForegroundColor Red
+    cmd.exe /c "`"$PHP_BIN`" artisan route:clear"
+    exit 1
+}
+cmd.exe /c "`"$PHP_BIN`" artisan route:clear"
+
+Write-Host "-> Checking PHP Code (PHPStan / Larastan)..." -ForegroundColor DarkGray
 cmd.exe /c "`"$PHP_BIN`" vendor\bin\phpstan analyse --memory-limit=2G"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "PHPStan check failed! Upload aborted. Please fix the PHP errors." -ForegroundColor Red
@@ -96,21 +114,25 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 2.5 Run E2E Smoke & Console Error Tests
-Write-Host "[2.5/5] Running E2E Smoke / Console Error Tests..." -ForegroundColor Yellow
+# 2.5 Run E2E Dynamic Quality & Console Error Tests
+Write-Host "[2.5/5] Running E2E Dynamic Quality & Health Audit Tests..." -ForegroundColor Yellow
+
+# Generate dynamic route and entity manifest
+Write-Host "-> Generating Dynamic E2E Route Manifest from DB and routes..." -ForegroundColor DarkGray
+cmd.exe /c "`"$PHP_BIN`" scripts/generate_e2e_manifest.php"
 
 $dbStatus = "OFFLINE"
 try {
-    $dbStatus = cmd.exe /c "C:\tools\php83\php.exe -r `"try { require 'vendor/autoload.php'; `$app = require 'bootstrap/app.php'; `$kernel = `$app->make(Illuminate\Contracts\Console\Kernel::class); `$kernel->bootstrap(); DB::connection()->getPdo(); echo 'ONLINE'; } catch (Exception `$e) { echo 'OFFLINE'; }`""
+    $dbStatus = cmd.exe /c "`"$PHP_BIN`" -r `"try { require 'vendor/autoload.php'; `$app = require 'bootstrap/app.php'; `$kernel = `$app->make(Illuminate\Contracts\Console\Kernel::class); `$kernel->bootstrap(); DB::connection()->getPdo(); echo 'ONLINE'; } catch (Exception `$e) { echo 'OFFLINE'; }`""
 } catch {
     $dbStatus = "OFFLINE"
 }
 
 if ($dbStatus -eq "ONLINE") {
     Write-Host "-> Database connection is ONLINE. Preparing E2E test users..." -ForegroundColor DarkGray
-    cmd.exe /c "C:\tools\php83\php.exe scripts/ensure_e2e_users.php"
+    cmd.exe /c "`"$PHP_BIN`" scripts/ensure_e2e_users.php"
 } else {
-    Write-Host "-> Database connection is OFFLINE. Running public static smoke E2E verification only..." -ForegroundColor Yellow
+    Write-Host "-> Database connection is OFFLINE. Running dynamic public/edge verification only..." -ForegroundColor Yellow
 }
 
 $serverAlreadyRunning = $false
@@ -129,15 +151,15 @@ $testExitCode = 0
 try {
     if (-not $serverAlreadyRunning) {
         Write-Host "-> Starting local Laravel server on port 8000..." -ForegroundColor DarkGray
-        $serverProcess = Start-Process "C:\tools\php83\php.exe" -ArgumentList "artisan serve --host=127.0.0.1 --port=8000 --env=local" -PassThru -NoNewWindow
+        $serverProcess = Start-Process "$PHP_BIN" -ArgumentList "artisan serve --host=127.0.0.1 --port=8000 --env=local" -PassThru -NoNewWindow
         Start-Sleep -Seconds 3
     }
 
-    Write-Host "-> Running Playwright console error test suite..." -ForegroundColor DarkGray
+    Write-Host "-> Running Playwright Dynamic Health Audit suite..." -ForegroundColor DarkGray
     if ($dbStatus -eq "ONLINE") {
         cmd.exe /c "npx playwright test tests/E2E/console_errors.spec.ts"
     } else {
-        cmd.exe /c "npx playwright test tests/E2E/console_errors.spec.ts --grep `"Public routes`""
+        cmd.exe /c "npx playwright test tests/E2E/console_errors.spec.ts --grep `"Public`""
     }
     $testExitCode = $LASTEXITCODE
 } finally {
@@ -148,10 +170,10 @@ try {
 }
 
 if ($testExitCode -ne 0) {
-    Write-Host "E2E Smoke / Console Error check failed! Upload aborted. Please fix the console errors shown above." -ForegroundColor Red
+    Write-Host "E2E Health Audit failed! Upload aborted. Please fix the page errors shown above." -ForegroundColor Red
     exit 1
 } else {
-    Write-Host "-> E2E Smoke / Console Error check passed successfully." -ForegroundColor Green
+    Write-Host "-> E2E Health Audit check passed successfully." -ForegroundColor Green
 }
 
 # 3. Archive Files (Using tar.exe which is faster and avoids lock bugs)

@@ -30,9 +30,9 @@ export default function PortfolioShow({ slug, dbProject = null }) {
                 content: (rawContent && !rawContent.startsWith('general.')) ? rawContent : `<p>${rawDesc || ''}</p>`,
                 cat: staticItem.cat,
                 is_db: false,
-                live_url: null,
-                github_url: null,
-                techs: []
+                live_url: staticItem.live_url || null,
+                github_url: staticItem.github_url || null,
+                techs: staticItem.techs || []
             };
         }
         return null;

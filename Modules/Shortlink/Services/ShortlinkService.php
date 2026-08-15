@@ -23,6 +23,9 @@ class ShortlinkService
      * @param array{
      *     destination_url: string,
      *     label?: string|null,
+     *     title?: string|null,
+     *     description?: string|null,
+     *     image_url?: string|null,
      *     created_by_user_id?: int|null,
      *     is_active?: bool,
      *     expires_at?: \Illuminate\Support\Carbon|string|null
@@ -37,6 +40,9 @@ class ShortlinkService
             $link->short_code = $this->generateUniqueCode();
             $link->destination_url = $data['destination_url'];
             $link->label = $data['label'] ?? null;
+            $link->title = $data['title'] ?? null;
+            $link->description = $data['description'] ?? null;
+            $link->image_url = $data['image_url'] ?? null;
             $link->created_by_user_id = $data['created_by_user_id'] ?? auth()->id();
             $link->is_active = $data['is_active'] ?? true;
             $link->expires_at = $data['expires_at'] ?? null;
@@ -133,6 +139,137 @@ class ShortlinkService
         }
 
         return $code;
+    }
+
+    /**
+     * Determine if an incoming HTTP request originates from a social preview bot or search crawler.
+     */
+    public function isCrawler(\Illuminate\Http\Request $request): bool
+    {
+        $userAgent = strtolower($request->header('User-Agent', ''));
+
+        if (empty($userAgent)) {
+            return false;
+        }
+
+        $crawlers = [
+            'whatsapp',
+            'facebookexternalhit',
+            'facebot',
+            'twitterbot',
+            'telegrambot',
+            'linkedinbot',
+            'linkedinapp',
+            'discordbot',
+            'slackbot',
+            'slack-imgproxy',
+            'skypeuripreview',
+            'pinterest',
+            'googlebot',
+            'google-inspectiontool',
+            'bingbot',
+            'applebot',
+            'duckduckbot',
+            'vkshare',
+            'w3c_validator',
+            'viber',
+        ];
+
+        foreach ($crawlers as $crawler) {
+            if (str_contains($userAgent, $crawler)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Fetch and extract title, description, and preview image from a target URL.
+     *
+     * @return array{title: string|null, description: string|null, image_url: string|null}
+     */
+    public function fetchUrlMetadata(string $url): array
+    {
+        $result = [
+            'title' => null,
+            'description' => null,
+            'image_url' => null,
+        ];
+
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return $result;
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)
+                ->withUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                ->withoutVerifying()
+                ->get($url);
+
+            if (!$response->successful()) {
+                return $result;
+            }
+
+            $html = $response->body();
+            if (empty($html)) {
+                return $result;
+            }
+
+            // Extract OpenGraph / Meta Title
+            if (preg_match('/<meta[^>]+property=[\'"]og:title[\'"][^>]+content=[\'"]([^\'"]+)[\'"]/i', $html, $matches)) {
+                $result['title'] = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            } elseif (preg_match('/<meta[^>]+name=[\'"]twitter:title[\'"][^>]+content=[\'"]([^\'"]+)[\'"]/i', $html, $matches)) {
+                $result['title'] = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            } elseif (preg_match('/<title[^>]*>([^<]+)<\/title>/i', $html, $matches)) {
+                $result['title'] = html_entity_decode(trim($matches[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+
+            // Extract OpenGraph / Meta Description
+            if (preg_match('/<meta[^>]+property=[\'"]og:description[\'"][^>]+content=[\'"]([^\'"]+)[\'"]/i', $html, $matches)) {
+                $result['description'] = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            } elseif (preg_match('/<meta[^>]+name=[\'"]twitter:description[\'"][^>]+content=[\'"]([^\'"]+)[\'"]/i', $html, $matches)) {
+                $result['description'] = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            } elseif (preg_match('/<meta[^>]+name=[\'"]description[\'"][^>]+content=[\'"]([^\'"]+)[\'"]/i', $html, $matches)) {
+                $result['description'] = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+
+            // Extract OpenGraph / Meta Image or first suitable img tag
+            if (preg_match('/<meta[^>]+property=[\'"]og:image[\'"][^>]+content=[\'"]([^\'"]+)[\'"]/i', $html, $matches)) {
+                $result['image_url'] = $this->resolveAbsoluteUrl(trim($matches[1]), $url);
+            } elseif (preg_match('/<meta[^>]+name=[\'"]twitter:image[\'"][^>]+content=[\'"]([^\'"]+)[\'"]/i', $html, $matches)) {
+                $result['image_url'] = $this->resolveAbsoluteUrl(trim($matches[1]), $url);
+            } elseif (preg_match('/<img[^>]+src=[\'"]([^\'"]+\.(?:png|jpg|jpeg|webp))[\'"]/i', $html, $matches)) {
+                $result['image_url'] = $this->resolveAbsoluteUrl(trim($matches[1]), $url);
+            }
+        } catch (\Throwable $e) {
+            // Silently swallow fetch exceptions to prevent breaking shortlink creation
+            \Illuminate\Support\Facades\Log::warning('Failed to fetch shortlink destination metadata: ' . $e->getMessage());
+        }
+
+        return $result;
+    }
+
+    private function resolveAbsoluteUrl(string $path, string $baseUrl): string
+    {
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        $parts = parse_url($baseUrl);
+        $scheme = $parts['scheme'] ?? 'https';
+        $host = $parts['host'] ?? '';
+
+        if (str_starts_with($path, '//')) {
+            return $scheme . ':' . $path;
+        }
+
+        if (str_starts_with($path, '/')) {
+            return $scheme . '://' . $host . $path;
+        }
+
+        $basePath = isset($parts['path']) ? dirname($parts['path']) : '';
+        return $scheme . '://' . $host . '/' . ltrim($basePath . '/' . $path, '/');
     }
 
     private function isUniqueViolation(QueryException $e): bool

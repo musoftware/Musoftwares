@@ -34,6 +34,9 @@ class ShortlinkLink extends Model
         'short_code',
         'destination_url',
         'label',
+        'title',
+        'description',
+        'image_url',
         'created_by_user_id',
         'is_active',
         'clicks',
@@ -47,6 +50,37 @@ class ShortlinkLink extends Model
         'clicks' => 'integer',
         'expires_at' => 'datetime',
     ];
+
+    public function getEffectiveTitle(): string
+    {
+        if (!empty($this->title)) {
+            return $this->title;
+        }
+
+        if (!empty($this->label)) {
+            return $this->label . ' | Musoftware';
+        }
+
+        return 'Musoftware | ' . config('app.name', 'Musoftware');
+    }
+
+    public function getEffectiveDescription(): string
+    {
+        if (!empty($this->description)) {
+            return $this->description;
+        }
+
+        return 'High-performance software systems, ERP, CRM, and digital automation solutions by Musoftware.';
+    }
+
+    public function getEffectiveImage(): string
+    {
+        if (!empty($this->image_url)) {
+            return $this->image_url;
+        }
+
+        return asset('images/default-meta.png');
+    }
 
     public function creator(): BelongsTo
     {

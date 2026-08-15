@@ -6,13 +6,17 @@ export function usePermissions() {
 
     const hasRole = (role: string | string[]) => {
         const userRoles = auth?.user?.roles;
-        if (!userRoles) return false;
+        if (!userRoles || !Array.isArray(userRoles)) return false;
         
+        const roleNames = userRoles.map((r: any) => 
+            typeof r === 'object' && r !== null ? (r.name || '').toLowerCase() : String(r).toLowerCase()
+        );
+
         if (Array.isArray(role)) {
-            return role.some(r => userRoles.includes(r.toLowerCase()));
+            return role.some(r => roleNames.includes(r.toLowerCase()));
         }
         
-        return userRoles.includes(role.toLowerCase());
+        return roleNames.includes(role.toLowerCase());
     };
 
     const can = (permission: string | string[]) => {

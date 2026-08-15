@@ -23,6 +23,17 @@
             $canonicalUrl = $meta['canonical_url'] ?? $cleanCurrentUrl;
             $enAlternateUrl = $meta['en_url'] ?? ($cleanCurrentUrl . '?lang=en');
             $arAlternateUrl = $meta['ar_url'] ?? ($cleanCurrentUrl . '?lang=ar');
+            $defaultSiteName = 'Musoftware';
+            $defaultMetaTitle = 'Musoftware | Systems, ERP & Digital Solutions';
+            $defaultMetaDesc = 'Comprehensive ERP and CRM solutions, business management systems, automated workflows, and technical consulting to scale operations.';
+            $defaultMetaImage = asset('images/default-meta.png');
+
+            $effectiveTitle = (!empty($meta) && !empty($meta['title'])) ? $meta['title'] : $defaultMetaTitle;
+            $effectiveDesc = (!empty($meta) && !empty($meta['description'])) ? $meta['description'] : $defaultMetaDesc;
+            $effectiveImage = (!empty($meta) && !empty($meta['image'])) ? $meta['image'] : $defaultMetaImage;
+            $effectiveUrl = (!empty($meta) && !empty($meta['url'])) ? $meta['url'] : $cleanCurrentUrl;
+            $effectiveType = (!empty($meta) && !empty($meta['type'])) ? $meta['type'] : 'website';
+            $effectiveRobots = (!empty($meta) && !empty($meta['robots'])) ? $meta['robots'] : 'index, follow';
         @endphp
 
         <link rel="canonical" href="{{ $canonicalUrl }}">
@@ -30,27 +41,29 @@
         <link rel="alternate" hreflang="ar" href="{{ $arAlternateUrl }}" />
         <link rel="alternate" hreflang="x-default" href="{{ $canonicalUrl }}" />
 
-        @if(isset($meta))
-            <meta name="description" content="{{ $meta['description'] ?? '' }}">
-            <meta property="og:title" content="{{ $meta['title'] ?? '' }}">
-            <meta property="og:description" content="{{ $meta['description'] ?? '' }}">
-            <meta property="og:image" content="{{ $meta['image'] ?? '' }}">
-            <meta property="og:url" content="{{ $meta['url'] ?? $cleanCurrentUrl }}">
-            <meta property="og:type" content="{{ $meta['type'] ?? 'website' }}">
-            <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
-            <meta name="twitter:card" content="summary_large_image">
-            <meta name="twitter:title" content="{{ $meta['title'] ?? '' }}">
-            <meta name="twitter:description" content="{{ $meta['description'] ?? '' }}">
-            <meta name="twitter:image" content="{{ $meta['image'] ?? '' }}">
-            <meta name="robots" content="{{ $meta['robots'] ?? 'index, follow' }}">
-            @if(isset($meta['schema_json']))
-                <script type="application/ld+json">
-                    {!! json_encode($meta['schema_json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-                </script>
-            @endif
-        @else
-            <meta name="robots" content="index, follow">
-            <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
+        <meta name="description" content="{{ $effectiveDesc }}">
+        <meta name="robots" content="{{ $effectiveRobots }}">
+
+        <!-- OpenGraph (WhatsApp, Facebook, LinkedIn, Discord) -->
+        <meta property="og:site_name" content="{{ $defaultSiteName }}">
+        <meta property="og:title" content="{{ $effectiveTitle }}">
+        <meta property="og:description" content="{{ $effectiveDesc }}">
+        <meta property="og:image" content="{{ $effectiveImage }}">
+        <meta property="og:url" content="{{ $effectiveUrl }}">
+        <meta property="og:type" content="{{ $effectiveType }}">
+        <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+        <!-- Twitter Card Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@musoftwares">
+        <meta name="twitter:title" content="{{ $effectiveTitle }}">
+        <meta name="twitter:description" content="{{ $effectiveDesc }}">
+        <meta name="twitter:image" content="{{ $effectiveImage }}">
+
+        @if(isset($meta['schema_json']))
+            <script type="application/ld+json">
+                {!! json_encode($meta['schema_json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+            </script>
         @endif
 
         @php

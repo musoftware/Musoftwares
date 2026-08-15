@@ -2,7 +2,7 @@ import React from 'react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { Sparkles, ShieldCheck, Lock, Cpu, ArrowRight, MessageSquare, Compass, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ShieldCheck, Lock, Cpu, ArrowRight, MessageSquare, Compass, CheckCircle2, ChevronRight } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function About({ canLogin, canRegister }) {

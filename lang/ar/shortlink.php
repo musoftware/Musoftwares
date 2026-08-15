@@ -34,6 +34,7 @@ return [
     'deleted_successfully' => 'تم حذف الرابط المختصر بنجاح.',
     'status_updated_successfully' => 'تم تحديث حالة الرابط المختصر.',
     'short_link' => 'رابط مختصر',
+    'share_invoice_shortlink_desc' => 'رابط مختصر وآمن للعميل لعرض ودفع الفاتورة',
     'recommended_for_sharing' => 'موصى به للمشاركة',
     'gold_saver_portfolio' => 'محفظة مدخرات الذهب',
     'total_grams' => 'إجمالي الجرامات',
@@ -85,5 +86,12 @@ return [
     'webhook_endpoint_returned_error' => 'أرجعت نقطة نهاية الـ Webhook خطأً.',
     'webhook_registered_success_v2' => 'تم تسجيل الـ Webhook بنجاح.',
     'webhook_send_failed' => 'فشل إرسال الـ Webhook.',
-    'webhook_updated_success' => 'تم تحديث الـ Webhook بنجاح.'
+    'webhook_updated_success' => 'تم تحديث الـ Webhook بنجاح.',
+    'fetch_meta' => 'جلب البيانات تلقائياً من الرابط',
+    'fetching_meta' => 'جاري جلب البيانات...',
+    'preview_card_heading' => 'معاينة المشاركة (WhatsApp / Facebook)',
+    'seo_description' => 'وصف المعاينة (Description)',
+    'seo_image' => 'رابط صورة المعاينة (Image URL)',
+    'seo_preview_title' => 'بيانات ومعاينة الرابط (SEO & Social Preview)',
+    'seo_title' => 'عنوان المعاينة (Title)'
 ];

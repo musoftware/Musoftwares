@@ -889,31 +889,43 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Generate a temporary signed link for guest view.
+     * Generate a signed guest link and wrap it in a shortlink.
      */
     public function shareLink(Request $request, Invoice $invoice)
     {
         $duration = $request->input('duration', '1_month');
 
-        $expiresAt = now();
-        if ($duration === '3_days') {
-            $expiresAt->addDays(3);
-        } elseif ($duration === '1_month') {
-            $expiresAt->addMonth();
-        } else {
-            // Default 24 hours
-            $expiresAt->addHours(24);
-        }
+        $expiresAt = match ($duration) {
+            '24_hours' => now()->addHours(24),
+            '3_days' => now()->addDays(3),
+            '1_month' => now()->addMonth(),
+            'never' => null,
+            default => now()->addMonth(),
+        };
 
-        $url = URL::temporarySignedRoute(
-            'guest.invoices.show',
-            $expiresAt,
-            ['invoice' => $invoice->id]
-        );
+        // 1. Create the signed URL for the guest invoice
+        $signedUrl = $expiresAt
+            ? \Illuminate\Support\Facades\URL::temporarySignedRoute('guest.invoices.show', $expiresAt, ['invoice' => $invoice->id])
+            : \Illuminate\Support\Facades\URL::signedRoute('guest.invoices.show', ['invoice' => $invoice->id]);
+
+        // 2. Wrap it with ShortlinkService
+        $shortlinkService = app(\Modules\Shortlink\Services\ShortlinkService::class);
+        $shortlink = $shortlinkService->create([
+            'destination_url' => $signedUrl,
+            'label' => "Invoice #{$invoice->invoice_number} (" . ($expiresAt ? $expiresAt->diffForHumans() : 'No expiry') . ")",
+            'created_by_user_id' => auth()->id(),
+            'expires_at' => $expiresAt,
+        ], $invoice);
+
+        $shortUrl = route('shortlink.redirect', ['code' => $shortlink->short_code]);
 
         return response()->json([
-            'url' => $url,
-            'expires_at' => $expiresAt->toDateTimeString(),
+            'success' => true,
+            'short_url' => $shortUrl,
+            'destination_url' => $signedUrl,
+            'url' => $shortUrl,
+            'short_code' => $shortlink->short_code,
+            'expires_at' => $expiresAt ? $expiresAt->toDateTimeString() : null,
         ]);
     }
 

@@ -109,7 +109,10 @@ class ListingServiceProvider extends ServiceProvider
 
         $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower.'-module-views']);
 
-        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
+        $paths = array_values(array_filter(array_merge($this->getPublishableViewPaths(), [$sourcePath]), 'is_dir'));
+        if (!empty($paths)) {
+            $this->loadViewsFrom($paths, $this->nameLower);
+        }
 
         $componentNamespace = $this->module_namespace($this->name, $this->app_path(config('modules.paths.generator.component-class.path')));
         Blade::componentNamespace($componentNamespace, $this->nameLower);

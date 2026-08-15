@@ -1,4 +1,5 @@
 export const portfolioItems = [
+    { slug: 'trenz-agency', img: '/images/portfolio/trenz-agency.png', titleKey: 'portfolio_trenz_agency_title', descKey: 'portfolio_trenz_agency_desc', contentKey: 'portfolio_trenz_agency_content', cat: 'Agency & Web' },
     { slug: 'kbdny', img: '/images/portfolio/kbdny.png', titleKey: 'portfolio_kbdny_title', descKey: 'portfolio_kbdny_desc', contentKey: 'portfolio_kbdny_content', cat: 'Platform' },
     { slug: 'stock-manager', img: '/images/portfolio/stockmanager.png', titleKey: 'portfolio_stock_manager_title', descKey: 'portfolio_stock_manager_desc', contentKey: 'portfolio_stock_manager_content', cat: 'ERP' },
     { slug: 'mini-fatora', img: '/images/portfolio/minifatora.png', titleKey: 'portfolio_mini_fatora_title', descKey: 'portfolio_mini_fatora_desc', contentKey: 'portfolio_mini_fatora_content', cat: 'SaaS' },

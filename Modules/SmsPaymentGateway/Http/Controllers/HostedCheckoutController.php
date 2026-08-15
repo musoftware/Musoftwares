@@ -107,9 +107,9 @@ class HostedCheckoutController extends Controller
                 'name' => __('sms_gateway.vodafone_cash'),
                 'icon' => !empty($customLogos['vodafone']) ? $customLogos['vodafone'] : asset('assets/images/gateways/vodafone-cash.svg'),
                 'additional_icons' => [
-                    !empty($customLogos['orange']) ? $customLogos['orange'] : asset('assets/images/gateways/orange-cash.svg'),
-                    !empty($customLogos['etisalat']) ? $customLogos['etisalat'] : asset('assets/images/gateways/etisalat-cash.svg'),
-                    !empty($customLogos['we']) ? $customLogos['we'] : asset('assets/images/gateways/we-pay.svg'),
+                    !empty($customLogos['orange']) ? $customLogos['orange'] : asset('assets/images/gateways/orange-cash.png'),
+                    !empty($customLogos['etisalat']) ? $customLogos['etisalat'] : asset('assets/images/gateways/etisalat-cash.png'),
+                    !empty($customLogos['we']) ? $customLogos['we'] : asset('assets/images/gateways/we-pay.png'),
                 ],
                 'phone' => $walletNumbers['vodafone_cash'],
                 'is_etisalat' => $isEtisalatVodafone,

@@ -192,6 +192,7 @@ return [
     'edit_service' => 'تعديل الخدمة',
     'edit_settings' => 'تعديل الإعدادات',
     'equiv' => 'المكافئ',
+    'duration' => 'صلاحية الرابط',
     'estimate_hours' => 'حساب الساعات',
     'estimated_hours' => 'الساعات المقدرة',
     'exchange_already_exists_for_pair_on_date' => 'يوجد سعر صرف لهذا الزوج في التاريخ المحدد بالفعل.',

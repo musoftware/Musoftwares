@@ -37,6 +37,38 @@ class ShortlinkRedirectController extends Controller
 
         $this->service->recordClick($link);
 
+        // If request is from a social preview crawler (WhatsApp, Facebook, Twitter, Telegram, etc.)
+        if ($this->service->isCrawler($request) || $request->query('preview') === '1') {
+            // Auto-enrich metadata if not present
+            if (empty($link->title) || empty($link->description) || empty($link->image_url)) {
+                $meta = $this->service->fetchUrlMetadata($link->destination_url);
+                $updated = false;
+                if (empty($link->title) && !empty($meta['title'])) {
+                    $link->title = $meta['title'];
+                    $updated = true;
+                }
+                if (empty($link->description) && !empty($meta['description'])) {
+                    $link->description = $meta['description'];
+                    $updated = true;
+                }
+                if (empty($link->image_url) && !empty($meta['image_url'])) {
+                    $link->image_url = $meta['image_url'];
+                    $updated = true;
+                }
+                if ($updated) {
+                    $link->save();
+                }
+            }
+
+            return response()->view('shortlink-preview', [
+                'title' => $link->getEffectiveTitle(),
+                'description' => $link->getEffectiveDescription(),
+                'image' => $link->getEffectiveImage(),
+                'url' => $this->service->shortUrl($link),
+                'destination_url' => $link->destination_url,
+            ])->header('Cache-Control', 'public, max-age=300');
+        }
+
         return redirect()->away($link->destination_url, 302)
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate')
             ->header('Pragma', 'no-cache')

@@ -38,11 +38,6 @@ class SmsPaymentGatewayServiceProvider extends BaseModuleServiceProvider
     {
         parent::boot();
 
-        $this->loadViewsFrom(
-            module_path($this->name, 'resources/views'),
-            $this->nameLower
-        );
-
         $router = $this->app['router'];
         $router->aliasMiddleware(
             'sms-gateway.api-key',

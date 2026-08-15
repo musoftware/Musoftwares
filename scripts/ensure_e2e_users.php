@@ -7,7 +7,23 @@ try {
     $kernel->bootstrap();
 
     // Check DB connection
-    \Illuminate\Support\Facades\DB::connection()->getPdo();
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+    } catch (\Throwable $e) {
+        // Fallback to SQLite
+        config(['database.default' => 'sqlite']);
+        config(['database.connections.sqlite.database' => database_path('database.sqlite')]);
+        \Illuminate\Support\Facades\DB::purge();
+        \Illuminate\Support\Facades\DB::connection('sqlite')->getPdo();
+        echo "Using SQLite database for E2E seeding.\n";
+
+        // Ensure deleted_at column exists on admin_settings
+        if (\Illuminate\Support\Facades\Schema::hasTable('admin_settings') && !\Illuminate\Support\Facades\Schema::hasColumn('admin_settings', 'deleted_at')) {
+            \Illuminate\Support\Facades\Schema::table('admin_settings', function ($table) {
+                $table->softDeletes();
+            });
+        }
+    }
 } catch (\Exception $e) {
     echo "Database connection failed: " . $e->getMessage() . "\n";
     echo "Skipping E2E user creation.\n";
@@ -41,14 +57,18 @@ foreach ($users as $userData) {
         $user = User::create([
             'name' => $userData['name'],
             'email' => $userData['email'],
-            'password' => bcrypt('password'),
+            'password' => 'password',
             'email_verified_at' => now(),
             'onboarding_completed' => true,
         ]);
         echo "Created E2E user: {$userData['email']}\n";
     } else {
-        $user->update(['onboarding_completed' => true]);
-        echo "E2E user already exists and marked onboarded: {$userData['email']}\n";
+        $user->update([
+            'password' => 'password',
+            'email_verified_at' => now(),
+            'onboarding_completed' => true,
+        ]);
+        echo "E2E user refreshed: {$userData['email']}\n";
     }
 
     // Ensure they have the correct role assigned
@@ -106,16 +126,18 @@ if ($clientUser) {
     );
     echo "Ensured E2E task exists.\n";
 
-    $boardItem = \App\Models\ProjectBoardItem::updateOrCreate(
-        ['project_id' => $project->id, 'itemable_type' => \App\Models\Task::class, 'itemable_id' => $task->id],
-        [
-            'for_date' => now()->toDateString(),
-            'lane' => 'review',
-            'client_approval_status' => 'pending',
-            'client_feedback' => null
-        ]
-    );
-    echo "Ensured E2E board item pending approval exists.\n";
+    if (\Illuminate\Support\Facades\Schema::hasTable('project_board_items')) {
+        $boardItem = \App\Models\ProjectBoardItem::updateOrCreate(
+            ['project_id' => $project->id, 'itemable_type' => \App\Models\Task::class, 'itemable_id' => $task->id],
+            [
+                'for_date' => now()->toDateString(),
+                'lane' => 'review',
+                'client_approval_status' => 'pending',
+                'client_feedback' => null
+            ]
+        );
+        echo "Ensured E2E board item pending approval exists.\n";
+    }
 
     \App\Models\Ticket::updateOrCreate(
         ['user_id' => $clientUser->id, 'ticket_subject' => 'E2E Urgent Ticket'],

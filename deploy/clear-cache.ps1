@@ -33,7 +33,7 @@ Write-Host "=== Clear Remote Cache ===" -ForegroundColor Cyan
 Write-Host "Server: $SSH_USER@$SSH_HOST`:$SSH_PORT" -ForegroundColor Gray
 Write-Host ""
 
-$remoteCmd = "cd $REMOTE_PATH && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+$remoteCmd = "cd $REMOTE_PATH && rm -f Modules/PasswordSync/resources/views/index.blade.php Modules/SmsPaymentGateway/resources/views/index.blade.php && rm -rf Modules/PasswordSync/resources/views/layouts Modules/SmsPaymentGateway/resources/views/layouts && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"
 
 $hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue) -and $null -ne (Get-Command pscp -ErrorAction SilentlyContinue)
 

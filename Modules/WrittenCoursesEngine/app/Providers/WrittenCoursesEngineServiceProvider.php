@@ -69,7 +69,10 @@ class WrittenCoursesEngineServiceProvider extends ServiceProvider
             $sourcePath => $viewPath
         ], ['views', $this->moduleNameLower . '-module-views']);
 
-        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
+        $paths = array_values(array_filter(array_merge($this->getPublishableViewPaths(), [$sourcePath]), 'is_dir'));
+        if (!empty($paths)) {
+            $this->loadViewsFrom($paths, $this->moduleNameLower);
+        }
     }
 
     /**
