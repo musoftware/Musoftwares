@@ -1,0 +1,706 @@
+/* ════════════════════════════════════════════════════════════
+   CAR CONSOLE DASHBOARD — V8 Sci-Fi Hologram & Orbital HUD CSS
+   Target: 1366×768 | Zero-Scroll | Dynamic Core Glow & 3D Cubes
+════════════════════════════════════════════════════════════ */
+
+/* ── Minimalist Holographic Top-HUD Header ─────────── */
+header.nav.sci-fi-hud-header {
+    background: rgba(13, 6, 26, 0.45) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.3) !important;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    padding: 8px 16px !important;
+    position: relative;
+    z-index: 100;
+}
+
+/* HUD Ticks / Corner Accents */
+header.nav.sci-fi-hud-header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 30px;
+    width: 50px;
+    height: 2px;
+    background: #00f0ff;
+    box-shadow: 0 0 10px #00f0ff;
+}
+header.nav.sci-fi-hud-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    right: 30px;
+    width: 50px;
+    height: 2px;
+    background: #a855f7;
+    box-shadow: 0 0 10px #a855f7;
+}
+
+/* Red Alert Tactical HUD Icons & Tiles */
+.hud-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: rgba(22, 10, 42, 0.75);
+    border: 1px solid rgba(138, 79, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 0 10px rgba(138, 79, 255, 0.1);
+}
+.hud-icon-box svg {
+    width: 22px;
+    height: 22px;
+    stroke: #8A4FFF;
+    fill: none;
+    transition: all 0.3s ease;
+}
+.hud-item:hover .hud-icon-box {
+    border-color: #C77DFF;
+    background: rgba(138, 79, 255, 0.3);
+    box-shadow: 0 0 15px rgba(199, 125, 255, 0.5), inset 0 0 15px rgba(138, 79, 255, 0.3);
+    transform: translateY(-2px);
+}
+.hud-item:hover .hud-icon-box svg {
+    stroke: #C77DFF;
+    filter: drop-shadow(0 0 6px #C77DFF);
+}
+.hud-item:hover .item-captian {
+    color: #E0AAFF !important;
+    text-shadow: 0 0 8px rgba(199, 125, 255, 0.6);
+}
+
+/* ── Seamless Full Viewport Reset ── */
+.v8-dashboard-wrapper {
+    overflow: hidden !important;
+    min-height: 100vh;
+    background: #0d061a !important;
+    color: #f3e8ff;
+    position: relative;
+}
+
+.orbital-viewport {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+    position: relative;
+    padding: 0 20px;
+    box-sizing: border-box;
+    background: radial-gradient(circle at 50% 45%, rgba(138, 79, 255, 0.15) 0%, rgba(13, 6, 26, 0.99) 75%) !important;
+    transition: background 0.6s ease;
+}
+
+/* Subtle digital HUD grid overlay */
+.orbital-viewport::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(138, 79, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(138, 79, 255, 0.03) 1px, transparent 1px);
+    background-size: 45px 45px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ── MAGNIFICENT ENLARGED CENTER HOLOGRAM CORE ──────────────── */
+.orbital-center-core {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    width: 480px;
+}
+
+.orbital-center-core * {
+    pointer-events: auto;
+}
+
+.orbital-center-core #logo-it {
+    zoom: 1.15 !important;
+    width: 320px !important;
+    height: 260px !important;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 8px rgba(168, 85, 247, 0.2));
+    transition: filter 0.5s ease-out, transform 0.5s ease-out;
+    z-index: 5;
+    position: relative;
+}
+
+/* ── SUPERCAR LCD GAUGE HUD CLUSTER ── */
+.hud-dashboard-gauge {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 360px;
+    height: 360px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.hud-ring-outer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px dashed rgba(0, 240, 255, 0.2);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.05);
+    animation: v8-spin-clockwise 24s linear infinite;
+}
+
+.hud-ring-inner {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
+    border-radius: 50%;
+    border: 1.5px solid rgba(168, 85, 247, 0.15);
+    border-left-color: rgba(0, 240, 255, 0.65);
+    border-right-color: rgba(244, 63, 94, 0.65);
+    box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.1);
+    animation: v8-spin-counter-clockwise 18s linear infinite;
+}
+
+.hud-ticks {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: calc(100% - 60px);
+    height: calc(100% - 60px);
+    border-radius: 50%;
+    border: 1px dotted rgba(255, 255, 255, 0.15);
+    background: radial-gradient(circle, transparent 60%, rgba(13, 6, 26, 0.7) 100%);
+}
+
+.dashboard-side-gauges {
+    display: flex;
+    justify-content: space-between;
+    width: 440px;
+    margin-top: 15px;
+    z-index: 12;
+    pointer-events: auto;
+}
+
+.side-gauge-left, .side-gauge-right {
+    display: flex;
+    flex-direction: column;
+    width: 140px;
+    background: rgba(13, 6, 26, 0.9);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 10px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+}
+
+.side-gauge-left { border-left: 3px solid #10b981; }
+.side-gauge-right { border-left: 3px solid #f43f5e; }
+
+.side-gauge-left .label, .side-gauge-right .label {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.gauge-bar-bg {
+    height: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    margin: 5px 0;
+    overflow: hidden;
+}
+
+.gauge-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease-out;
+}
+
+.gauge-bar-fill.emerald { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
+.gauge-bar-fill.red { background: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.6); }
+
+.side-gauge-left .value, .side-gauge-right .value {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.text-emerald { color: #10b981 !important; }
+.text-red { color: #f43f5e !important; }
+
+@keyframes v8-spin-clockwise {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes v8-spin-counter-clockwise {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* 🌟 Dynamic Core Glow Reaction when hovering any 3D button */
+.orbital-viewport[data-core-glow="red"] .orbital-center-core #logo-it {
+    filter: drop-shadow(0 0 95px rgba(244, 63, 94, 0.98)) drop-shadow(0 0 40px rgba(244, 63, 94, 0.8)) drop-shadow(0 0 15px #fff) !important;
+    transform: scale(1.05);
+}
+.orbital-viewport[data-core-glow="emerald"] .orbital-center-core #logo-it {
+    filter: drop-shadow(0 0 95px rgba(16, 185, 129, 0.98)) drop-shadow(0 0 40px rgba(16, 185, 129, 0.8)) drop-shadow(0 0 15px #fff) !important;
+    transform: scale(1.05);
+}
+.orbital-viewport[data-core-glow="cyan"] .orbital-center-core #logo-it {
+    filter: drop-shadow(0 0 95px rgba(0, 240, 255, 0.98)) drop-shadow(0 0 40px rgba(0, 240, 255, 0.8)) drop-shadow(0 0 15px #fff) !important;
+    transform: scale(1.05);
+}
+.orbital-viewport[data-core-glow="pink"] .orbital-center-core #logo-it {
+    filter: drop-shadow(0 0 95px rgba(236, 72, 153, 0.98)) drop-shadow(0 0 40px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 15px #fff) !important;
+    transform: scale(1.05);
+}
+.orbital-viewport[data-core-glow="amber"] .orbital-center-core #logo-it {
+    filter: drop-shadow(0 0 95px rgba(245, 158, 11, 0.98)) drop-shadow(0 0 40px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 15px #fff) !important;
+    transform: scale(1.05);
+}
+.orbital-viewport[data-core-glow="gold"] .orbital-center-core #logo-it {
+    filter: drop-shadow(0 0 95px rgba(251, 191, 36, 0.98)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 15px #fff) !important;
+    transform: scale(1.05);
+}
+
+/* User identity below enlarged hologram - Clean Capsule */
+.orbital-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 45px !important;
+    padding: 5px 22px;
+    background: rgba(13, 6, 26, 0.85);
+    border: 1.5px solid rgba(168, 85, 247, 0.45);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.3);
+    z-index: 12;
+    gap: 2px;
+    position: relative;
+}
+.orbital-identity .c-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: #f3e8ff;
+    text-transform: uppercase;
+    letter-spacing: 3.5px;
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 8px rgba(255, 255, 255, 0.6);
+    transition: text-shadow 0.5s ease;
+}
+.orbital-identity .c-role {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ff7c20;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    text-shadow: 0 0 10px rgba(255, 124, 32, 0.6);
+}
+
+/* ── Two-Column Dashboard Layout (General Left, Services Right) ──────── */
+.orbital-arc-container {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 0 20px;
+    z-index: 5;
+    gap: 60px;
+}
+
+.orbital-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 480px;
+    gap: 12px !important;
+}
+
+.orbital-col.orbital-left {
+    display: grid !important;
+    grid-template-columns: repeat(2, 85px) !important;
+    gap: 25px 45px !important;
+    max-width: 240px !important;
+    justify-content: center !important;
+    justify-items: center !important;
+}
+
+.orbital-col.orbital-right {
+    display: grid !important;
+    grid-template-columns: repeat(2, 85px) !important;
+    gap: 25px 45px !important;
+    max-width: 240px !important;
+    justify-content: center !important;
+    justify-items: center !important;
+}
+
+.orbital-col-header {
+    grid-column: span 2;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(168, 85, 247, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+    text-align: center;
+    width: 100%;
+}
+
+/* Orbital App Node Item */
+.orbital-node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    position: relative;
+    z-index: 6;
+    transform: none !important;
+}
+
+/* ── 85px 3D CUBE SCENE ───────────────────────────────────────── */
+.cube-3d-scene {
+    width: 85px;
+    height: 85px;
+    perspective: 900px;
+    flex-shrink: 0;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.orbital-node:hover .cube-3d-scene {
+    transform: translateY(-5px);
+}
+
+/* Ambient Glowing Aura Ring behind each Cube */
+.cube-3d-scene::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 85px;
+    height: 85px;
+    transform: translate(-50%, -50%) scale(0.85);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(138, 79, 255, 0) 70%);
+    opacity: 0;
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.55s ease;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.orbital-node:hover .cube-3d-scene::before {
+    transform: translate(-50%, -50%) scale(1.45);
+    opacity: 0.9;
+}
+
+.orbital-left .cube-3d, .orbital-right .cube-3d {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform: none !important;
+    transform-style: flat !important;
+    animation: none !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 6 Faces of the 85px 3D Cube */
+.cube-face {
+    position: absolute;
+    width: 85px;
+    height: 85px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
+}
+
+.cube-face:not(.cube-face-front) {
+    display: none !important;
+}
+
+/* FRONT FACE: SVG Icon + Text Label INSIDE */
+.cube-face-front {
+    transform: none !important;
+    position: absolute !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    background: linear-gradient(135deg, rgba(35, 16, 70, 0.96), rgba(16, 7, 34, 0.98)) !important;
+    border: 1.5px solid rgba(168, 85, 247, 0.55) !important;
+    box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.25) !important;
+    padding: 8px 6px !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+}
+.cube-face-front svg {
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
+    transition: filter 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.orbital-node:hover .cube-face-front svg {
+    transform: scale(1.08);
+}
+.cube-face-front .cube-inner-label {
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #f3e8ff;
+    text-transform: uppercase;
+    line-height: 1.1;
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    hyphens: none;
+    transition: color 0.45s ease, text-shadow 0.45s ease;
+}
+.orbital-node:hover .cube-face-front .cube-inner-label {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* 🎨 3D CUBE THEME COLOR ACCENTS WITH ULTRA SMOOTH GLOW */
+/* 🔴 Red Due Cube */
+.cube-theme-red .cube-3d-scene::before { background: radial-gradient(circle, rgba(244, 63, 94, 0.5) 0%, rgba(244, 63, 94, 0) 70%); }
+.cube-theme-red .cube-face-front { background: linear-gradient(135deg, rgba(244, 63, 94, 0.38), rgba(30, 10, 20, 0.98)) !important; border-color: #f43f5e !important; box-shadow: 0 0 20px rgba(244, 63, 94, 0.45), inset 0 0 14px rgba(244, 63, 94, 0.35) !important; }
+.cube-theme-red .cube-face-front svg { stroke: #f43f5e; filter: drop-shadow(0 0 10px #f43f5e); }
+.orbital-node:hover .cube-theme-red .cube-face-front { box-shadow: 0 0 40px rgba(244, 63, 94, 0.95) !important; }
+
+/* 🟢 Emerald Add Balance Cube */
+.cube-theme-emerald .cube-3d-scene::before { background: radial-gradient(circle, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 0) 70%); }
+.cube-theme-emerald .cube-face-front { background: linear-gradient(135deg, rgba(16, 185, 129, 0.38), rgba(10, 30, 20, 0.98)) !important; border-color: #10b981 !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.45) !important; }
+.cube-theme-emerald .cube-face-front svg { stroke: #10b981; filter: drop-shadow(0 0 10px #10b981); }
+.orbital-node:hover .cube-theme-emerald .cube-face-front { box-shadow: 0 0 40px rgba(16, 185, 129, 0.95) !important; }
+
+/* 🩵 Cyan ERP Cube */
+.cube-theme-cyan .cube-3d-scene::before { background: radial-gradient(circle, rgba(0, 240, 255, 0.5) 0%, rgba(0, 240, 255, 0) 70%); }
+.cube-theme-cyan .cube-face-front { background: linear-gradient(135deg, rgba(0, 240, 255, 0.38), rgba(10, 25, 40, 0.98)) !important; border-color: #00f0ff !important; box-shadow: 0 0 20px rgba(0, 240, 255, 0.45) !important; }
+.cube-theme-cyan .cube-face-front svg { stroke: #00f0ff; filter: drop-shadow(0 0 10px #00f0ff); }
+.orbital-node:hover .cube-theme-cyan .cube-face-front { box-shadow: 0 0 40px rgba(0, 240, 255, 0.95) !important; }
+
+/* 🩷 Pink CRM / Projects Cube */
+.cube-theme-pink .cube-3d-scene::before { background: radial-gradient(circle, rgba(236, 72, 153, 0.5) 0%, rgba(236, 72, 153, 0) 70%); }
+.cube-theme-pink .cube-face-front { background: linear-gradient(135deg, rgba(236, 72, 153, 0.38), rgba(35, 10, 30, 0.98)) !important; border-color: #ec4899 !important; box-shadow: 0 0 20px rgba(236, 72, 153, 0.45) !important; }
+.cube-theme-pink .cube-face-front svg { stroke: #ec4899; filter: drop-shadow(0 0 10px #ec4899); }
+.orbital-node:hover .cube-theme-pink .cube-face-front { box-shadow: 0 0 40px rgba(236, 72, 153, 0.95) !important; }
+
+/* 🟧 Amber Marketplace / SMS Cube */
+.cube-theme-amber .cube-3d-scene::before { background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, rgba(245, 158, 11, 0) 70%); }
+.cube-theme-amber .cube-face-front { background: linear-gradient(135deg, rgba(245, 158, 11, 0.38), rgba(35, 20, 10, 0.98)) !important; border-color: #f59e0b !important; box-shadow: 0 0 20px rgba(245, 158, 11, 0.45) !important; }
+.cube-theme-amber .cube-face-front svg { stroke: #f59e0b; filter: drop-shadow(0 0 10px #f59e0b); }
+.orbital-node:hover .cube-theme-amber .cube-face-front { box-shadow: 0 0 40px rgba(245, 158, 11, 0.95) !important; }
+
+/* 🪙 Gold Saver Cube */
+.cube-theme-gold .cube-3d-scene::before { background: radial-gradient(circle, rgba(251, 191, 36, 0.5) 0%, rgba(251, 191, 36, 0) 70%); }
+.cube-theme-gold .cube-face-front { background: linear-gradient(135deg, rgba(251, 191, 36, 0.45), rgba(40, 30, 10, 0.98)) !important; border-color: #fbbf24 !important; box-shadow: 0 0 20px rgba(251, 191, 36, 0.45) !important; }
+.cube-theme-gold .cube-face-front svg { stroke: #fbbf24; filter: drop-shadow(0 0 10px #fbbf24); }
+.orbital-node:hover .cube-theme-gold .cube-face-front { box-shadow: 0 0 40px rgba(251, 191, 36, 0.95) !important; }
+
+/* Notification / Due Badge on Corner of Cube */
+.c-box-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 8px;
+    font-weight: 700;
+    color: #fff;
+    background: #f43f5e;
+    padding: 1px 6px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.9);
+    z-index: 10;
+}
+
+/* ── MOBILE: Responsive Layout ── */
+@media only screen and (max-width: 768px) {
+    .orbital-viewport {
+        height: auto !important;
+        padding: 16px 4px 8px 4px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        position: relative !important;
+        overflow: visible !important;
+        min-height: 100vh !important;
+    }
+
+    .orbital-center-core {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        z-index: 10 !important;
+        width: 100% !important;
+        pointer-events: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-bottom: 16px !important;
+    }
+
+    .orbital-center-core #logo-it {
+        zoom: 0.95 !important;
+        width: 230px !important;
+        height: 180px !important;
+    }
+
+    .orbital-identity {
+        margin-top: 32px !important;
+        padding: 3px 16px !important;
+    }
+
+    .orbital-identity .c-name {
+        font-size: 14px !important;
+        letter-spacing: 2px !important;
+    }
+
+    .orbital-identity .c-role {
+        font-size: 8px !important;
+        letter-spacing: 1.5px !important;
+    }
+
+    .orbital-arc-container {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        height: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 4px !important;
+        gap: 12px !important;
+        z-index: 15 !important;
+        position: relative !important;
+        box-sizing: border-box !important;
+    }
+
+    .orbital-col {
+        width: 100% !important;
+        height: auto !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .orbital-col-header {
+        display: none !important;
+    }
+
+    .orbital-col.orbital-left,
+    .orbital-col.orbital-right {
+        display: flex !important;
+        grid-template-columns: none !important;
+        max-width: 100% !important;
+        align-items: center !important;
+        margin: 0 !important;
+    }
+
+    .cube-3d-scene {
+        width: 68px !important;
+        height: 68px !important;
+        perspective: 500px !important;
+    }
+
+    .cube-3d-scene::before {
+        width: 68px !important;
+        height: 68px !important;
+    }
+
+    .cube-face {
+        width: 68px !important;
+        height: 68px !important;
+        border-radius: 10px !important;
+    }
+
+    .cube-face-front {
+        padding: 4px !important;
+    }
+
+    .cube-face-front svg {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    .cube-face-front .cube-inner-label {
+        font-size: 8px !important;
+        margin-top: 2px !important;
+        line-height: 1.05 !important;
+        letter-spacing: 0.1px !important;
+    }
+
+    .c-box-badge {
+        font-size: 7px !important;
+        padding: 1px 4px !important;
+        top: -4px !important;
+        right: -4px !important;
+    }
+}
+
+@media only screen and (max-width: 380px) {
+    .cube-3d-scene {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    .cube-3d-scene::before {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    .cube-face {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    .cube-face-front svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    .cube-face-front .cube-inner-label {
+        font-size: 7px !important;
+    }
+    .orbital-center-core #logo-it {
+        zoom: 0.65 !important;
+        width: 180px !important;
+        height: 150px !important;
+    }
+}
