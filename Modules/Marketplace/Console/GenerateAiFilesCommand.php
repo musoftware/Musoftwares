@@ -76,6 +76,8 @@ class GenerateAiFilesCommand extends Command
         $llmsContent .= "- Categories API: {$baseUrl}/marketplace/api/v1/categories\n";
         $llmsContent .= "- Search API: {$baseUrl}/marketplace/api/v1/search\n";
         $llmsContent .= "- OpenAPI Spec: {$baseUrl}/marketplace/api/v1/openapi.json\n\n";
+        $llmsContent .= "## Developer Note for Crawlers\n";
+        $llmsContent .= "All endpoints automatically negotiate content and deliver pure JSON payload containing the full page props when accessed by AI user-agents or with `?format=json`.\n\n";
 
         $llmsContent .= "## Service Categories\n";
         foreach ($categories as $cat) {

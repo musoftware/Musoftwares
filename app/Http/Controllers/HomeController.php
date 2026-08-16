@@ -8,6 +8,7 @@ use App\Models\WebsiteService;
 use App\Services\AI\ProjectEstimatorAiService;
 use App\Services\IpGeolocationService;
 use App\Services\PricingService;
+use App\Services\ProjectEstimatorDataService;
 use App\Traits\ConvertsCurrency;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -513,11 +514,13 @@ class HomeController extends Controller
             }
         }
 
-        return Inertia::render('Public/Estimator', [
+        $estimatorData = (new ProjectEstimatorDataService())->getEstimatorData((float)$rate);
+
+        return Inertia::render('Public/Estimator', array_merge($estimatorData, [
             'exchangeRate' => (float)$rate,
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
-        ])->withViewData([
+        ]))->withViewData([
             'meta' => [
                 'title' => 'Project Cost & Budget Estimator | Musoftware',
                 'description' => 'Calculate your website, mobile app, or desktop software development budget instantly with transparent Khamsat-aligned pricing.',

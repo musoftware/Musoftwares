@@ -175,6 +175,11 @@ class HandleInertiaRequests extends Middleware
                     return class_exists(AdminSettings::class) ? AdminSettings::GetValue('business_email', 'admin@musoftwares.com') : 'admin@musoftwares.com';
                 },
             ],
+            'site_info' => [
+                'brand' => 'Musoftwares',
+                'description' => 'Bespoke software architecture, automation pipelines, and custom web applications.',
+                'contact_email' => 'admin@musoftwares.com',
+            ],
             'active_currency' => function () use ($request, $user) {
                 if ($user && $user->currency_id) {
                     $c = Currency::find($user->currency_id);

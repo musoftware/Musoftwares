@@ -1,4 +1,5 @@
 export const portfolioItems = [
+    { slug: 'trenz-whatscrm', img: '/images/portfolio/trenz-whatscrm.png', titleKey: 'portfolio_trenz_whatscrm_title', descKey: 'portfolio_trenz_whatscrm_desc', contentKey: 'portfolio_trenz_whatscrm_content', cat: 'SaaS' },
     { slug: 'trenz-agency', img: '/images/portfolio/trenz-agency.png', titleKey: 'portfolio_trenz_agency_title', descKey: 'portfolio_trenz_agency_desc', contentKey: 'portfolio_trenz_agency_content', cat: 'Agency & Web' },
     { slug: 'kbdny', img: '/images/portfolio/kbdny.png', titleKey: 'portfolio_kbdny_title', descKey: 'portfolio_kbdny_desc', contentKey: 'portfolio_kbdny_content', cat: 'Platform' },
     { slug: 'stock-manager', img: '/images/portfolio/stockmanager.png', titleKey: 'portfolio_stock_manager_title', descKey: 'portfolio_stock_manager_desc', contentKey: 'portfolio_stock_manager_content', cat: 'ERP' },
