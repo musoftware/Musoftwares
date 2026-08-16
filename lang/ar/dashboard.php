@@ -95,5 +95,6 @@ return [
     'cancel'             => 'إلغاء',
     'pay_gateway'        => 'الدفع عبر البوابة',
     'view_all_invoices'  => 'عرض كل الفواتير',
+    'cost_estimator'     => 'حاسبة التكلفة',
 
 ];

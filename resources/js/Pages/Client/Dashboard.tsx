@@ -35,6 +35,7 @@ import {
     Check,
     AlertCircle,
     X,
+    Calculator,
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -1209,6 +1210,22 @@ export default function Dashboard({
                                     <div className="cube-face cube-face-front">
                                         <ShieldCheck className="w-8 h-8" />
                                         <span className="cube-inner-label">{__('dashboard.subscriptions')}</span>
+                                    </div>
+                                    <div className="cube-face cube-face-back"></div>
+                                    <div className="cube-face cube-face-right"></div>
+                                    <div className="cube-face cube-face-left"></div>
+                                    <div className="cube-face cube-face-top"></div>
+                                    <div className="cube-face cube-face-bottom"></div>
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link href="/estimator" className="orbital-node" data-node="21" onMouseEnter={() => handleNodeHoverStart('cyan')} onMouseLeave={handleNodeHoverEnd} onClick={playClickSound}>
+                            <div className="cube-3d-scene cube-theme-cyan">
+                                <div className="cube-3d">
+                                    <div className="cube-face cube-face-front">
+                                        <Calculator className="w-8 h-8" />
+                                        <span className="cube-inner-label">{__('dashboard.cost_estimator') || 'Estimator'}</span>
                                     </div>
                                     <div className="cube-face cube-face-back"></div>
                                     <div className="cube-face cube-face-right"></div>

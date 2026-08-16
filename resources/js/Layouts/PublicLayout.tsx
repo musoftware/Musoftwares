@@ -3,7 +3,7 @@ import { Button } from '@/Components/ui/button';
 import { Link, usePage, useForm, Head } from '@inertiajs/react';
 import SafeLink from '@/Components/SafeLink';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin, Send, Briefcase } from 'lucide-react';
+import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin, Send, Briefcase, Mail, Sparkles, Loader2 } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
@@ -26,7 +26,59 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [isGuestTicketOpen, setIsGuestTicketOpen] = useState(false);
+    const [newsletterEmail, setNewsletterEmail] = useState('');
+    const [newsletterLoading, setNewsletterLoading] = useState(false);
     const { toast } = useToast();
+
+    const handleNewsletterSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newsletterEmail || !newsletterEmail.includes('@')) {
+            toast({
+                title: 'Invalid Email',
+                description: 'Please enter a valid email address.',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        setNewsletterLoading(true);
+        try {
+            const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+            const res = await fetch(route('newsletter.subscribe'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ email: newsletterEmail }),
+            });
+
+            const json = await res.json();
+            if (res.ok && json.success) {
+                setNewsletterEmail('');
+                toast({
+                    title: 'Subscribed Successfully!',
+                    description: json.message || 'Thank you for subscribing to our technical updates.',
+                });
+            } else {
+                toast({
+                    title: 'Subscription Failed',
+                    description: json.message || 'Could not subscribe. Please try again.',
+                    variant: 'destructive',
+                });
+            }
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'An unexpected error occurred. Please try again later.',
+                variant: 'destructive',
+            });
+        } finally {
+            setNewsletterLoading(false);
+        }
+    };
 
     const { data, setData, post, processing, reset } = useForm({
         name: '',
@@ -101,6 +153,12 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             id: 'portfolio',
             label: __('general.portfolio') || 'Work',
             href: '/portfolio',
+            items: []
+        },
+        {
+            id: 'estimator',
+            label: __('general.estimator') || 'Estimator',
+            href: '/estimator',
             items: []
         },
         {
@@ -331,130 +389,248 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             {/* Page Main Content Area */}
             <main className="flex flex-1 flex-col relative z-10">{children}</main>
 
-            {/* Structured Enterprise Footer */}
+            {/* Pre-Footer Call to Action Banner */}
+            <section className="bg-slate-50 py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-200/60">
+                <div className="mx-auto max-w-[90rem]">
+                    <div className="relative overflow-hidden rounded-3xl bg-slate-900 px-6 py-12 sm:px-12 sm:py-16 text-white shadow-2xl border border-slate-800">
+                        {/* Subtle background ambient light */}
+                        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+                        <div className="pointer-events-none absolute -left-20 -bottom-20 h-72 w-72 rounded-full bg-emerald-500/15 blur-3xl" />
+
+                        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-start">
+                            <div className="max-w-2xl space-y-3">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-xs font-semibold text-emerald-400 border border-slate-700">
+                                    <Sparkles className="h-3.5 w-3.5" />
+                                    <span>Enterprise Software Infrastructure</span>
+                                </div>
+                                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
+                                    Ready to Build or Scale Your Software Infrastructure?
+                                </h2>
+                                <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed">
+                                    From Cloud SaaS platforms to custom enterprise software, our team builds reliable, high-performance systems tailored to your business operations.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap items-center justify-center gap-3.5 shrink-0">
+                                <Button
+                                    onClick={() => setIsGuestTicketOpen(true)}
+                                    className="bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold h-12 px-6 shadow-lg shadow-white/10 flex items-center gap-2 transition-all hover:scale-[1.02]"
+                                >
+                                    <span>Talk to Engineering</span>
+                                    <Send className="h-4 w-4" />
+                                </Button>
+                                <Link href="/platforms">
+                                    <Button
+                                        variant="outline"
+                                        className="border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-white rounded-xl font-semibold h-12 px-6 transition-all"
+                                    >
+                                        Explore Platforms
+                                    </Button>
+                                </Link>
+                                <Link href="/estimator">
+                                    <Button
+                                        variant="ghost"
+                                        className="text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl font-medium h-12 px-5 transition-all"
+                                    >
+                                        Budget Estimator &rarr;
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Structured Enterprise 5-Column Footer */}
             <footer className="border-t border-slate-200 bg-slate-50 pt-16 pb-24 lg:pb-12 text-slate-600">
-                <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-8 lg:gap-12 mb-16">
-                        {/* Brand Column */}
-                        <div className="col-span-2 lg:col-span-2 space-y-6">
+                <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 space-y-16">
+                    {/* 5-Column Balanced Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 lg:gap-8">
+                        {/* Column 1: Brand & Direct Contact */}
+                        <div className="space-y-6">
                             <Link href="/" className="flex items-center gap-2 group">
                                 <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center">
                                     <ApplicationLogo className="h-4 w-4 text-white fill-current" />
                                 </div>
-                                <span className="text-xl font-extrabold text-slate-900">musoftware</span>
+                                <span className="text-xl font-extrabold text-slate-900 tracking-tight">musoftware</span>
                             </Link>
-                            <p className="text-sm leading-relaxed text-slate-500 font-light pe-4">
-                                {__('general.we_build_software_infrastructure_and_sys')}</p>
+                            <p className="text-sm leading-relaxed text-slate-500 font-light">
+                                {__('general.we_build_software_infrastructure_and_sys') || 'We build reliable software infrastructure, Cloud SaaS platforms, and enterprise automated workflows.'}
+                            </p>
 
-                            <div className="space-y-3 pt-4 border-t border-slate-200/60">
-                                <a href="tel:201015218548" className="flex items-center gap-3 text-sm text-slate-600 hover:text-slate-900 transition-colors group">
-                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors shrink-0">
-                                        <Phone className="h-4 w-4" />
+                            <div className="space-y-2.5 pt-2">
+                                <a
+                                    href="tel:201015218548"
+                                    className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-slate-200/80 text-xs font-medium text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-all shadow-sm"
+                                >
+                                    <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
+                                        <Phone className="h-3.5 w-3.5" />
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_mobile')}</span>
-                                        <span className="font-medium" >+20 101 521 8548</span>
+                                    <div className="flex flex-col truncate">
+                                        <span className="text-[10px] text-slate-400 font-semibold uppercase">{__('general.contact_mobile') || 'Mobile'}</span>
+                                        <span className="font-semibold">+20 101 521 8548</span>
                                     </div>
                                 </a>
 
-                                <a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-slate-600 hover:text-slate-900 transition-colors group">
-                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-[#25D366]/20 group-hover:text-[#25D366] transition-colors shrink-0">
-                                        <MessageCircle className="h-4 w-4" />
+                                <a
+                                    href="https://wa.me/201015218548"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-slate-200/80 text-xs font-medium text-slate-700 hover:border-emerald-200 hover:text-emerald-700 transition-all shadow-sm group"
+                                >
+                                    <div className="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
+                                        <MessageCircle className="h-3.5 w-3.5" />
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_whatsapp')}</span>
-                                        <span className="font-medium" >+201015218548</span>
-                                    </div>
-                                </a>
-
-                                <a href="https://www.facebook.com/musoftwares.com.page/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-slate-600 hover:text-slate-900 transition-colors group">
-                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-[#1877F2]/20 group-hover:text-[#1877F2] transition-colors shrink-0">
-                                        <Globe className="h-4 w-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_facebook')}</span>
-                                        <span className="font-medium">musoftware</span>
+                                    <div className="flex flex-col truncate">
+                                        <span className="text-[10px] text-slate-400 font-semibold uppercase">{__('general.contact_whatsapp') || 'WhatsApp'}</span>
+                                        <span className="font-semibold">+201015218548</span>
                                     </div>
                                 </a>
 
-                                <div className="flex items-center gap-3 text-sm text-slate-600">
-                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                                        <MapPin className="h-4 w-4" />
+                                <a
+                                    href="https://www.facebook.com/musoftwares.com.page/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-slate-200/80 text-xs font-medium text-slate-700 hover:border-blue-200 hover:text-blue-700 transition-all shadow-sm group"
+                                >
+                                    <div className="h-7 w-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
+                                        <Globe className="h-3.5 w-3.5" />
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_location')}</span>
-                                        <span className="font-medium">{__('general.suez_egypt')}</span>
+                                    <div className="flex flex-col truncate">
+                                        <span className="text-[10px] text-slate-400 font-semibold uppercase">{__('general.contact_facebook') || 'Facebook'}</span>
+                                        <span className="font-semibold">musoftware</span>
+                                    </div>
+                                </a>
+
+                                <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-slate-200/80 text-xs font-medium text-slate-700 shadow-sm">
+                                    <div className="h-7 w-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                                        <MapPin className="h-3.5 w-3.5" />
+                                    </div>
+                                    <div className="flex flex-col truncate">
+                                        <span className="text-[10px] text-slate-400 font-semibold uppercase">{__('general.contact_location') || 'Location'}</span>
+                                        <span className="font-semibold">{__('general.suez_egypt') || 'Suez, Egypt'}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Cloud SaaS Platforms */}
+                        {/* Column 2: Cloud SaaS Platforms */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Cloud SaaS Platforms</h3>
-                            <ul className="space-y-3.5">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-5">Cloud SaaS Platforms</h3>
+                            <ul className="space-y-3">
                                 <li><Link href="/pricing?module=gold_saver" className="text-sm hover:text-slate-900 transition-colors">Gold POS &amp; Savings</Link></li>
                                 <li><Link href="/platforms/erp" className="text-sm hover:text-slate-900 transition-colors">Cloud ERP Suite</Link></li>
                                 <li><Link href="/platforms/crm" className="text-sm hover:text-slate-900 transition-colors">CRM &amp; Sales Pipeline</Link></li>
                                 <li><Link href="/pricing?module=booking" className="text-sm hover:text-slate-900 transition-colors">Booking &amp; Appointments</Link></li>
-                                <li><Link href="/pricing?tool=whatsapp" className="text-sm hover:text-slate-900 transition-colors">WhatsApp Bots &amp; Automation</Link></li>
+                                <li><Link href="/pricing?tool=whatsapp" className="text-sm hover:text-slate-900 transition-colors">WhatsApp Automation</Link></li>
                                 <li><Link href="/pricing?tool=sms" className="text-sm hover:text-slate-900 transition-colors">SMS &amp; OTP Gateway</Link></li>
                                 <li>
-                                    <Link href="/platforms" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                    <Link href="/platforms" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1 mt-1">
                                         View All Platforms &rarr;
                                     </Link>
                                 </li>
                             </ul>
                         </div>
 
-                        {/* Engineering & Custom Solutions */}
+                        {/* Column 3: Engineering & Custom Solutions */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Engineering &amp; Solutions</h3>
-                            <ul className="space-y-3.5">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-5">Engineering &amp; Solutions</h3>
+                            <ul className="space-y-3">
                                 <li><Link href="/custom-solutions" className="text-sm hover:text-slate-900 transition-colors">Custom Architecture</Link></li>
                                 <li><Link href="/estimator" className="text-sm hover:text-slate-900 transition-colors">Budget Estimator</Link></li>
                                 <li><Link href="/marketplace/services" className="text-sm hover:text-slate-900 transition-colors">Marketplace Services</Link></li>
                                 <li><Link href="/solutions/ecommerce" className="text-sm hover:text-slate-900 transition-colors">E-Commerce Systems</Link></li>
                                 <li><Link href="/solutions/healthcare" className="text-sm hover:text-slate-900 transition-colors">Healthcare Systems</Link></li>
                                 <li><Link href="/solutions/education" className="text-sm hover:text-slate-900 transition-colors">Education &amp; LMS</Link></li>
+                                <li><Link href="/solutions/real-estate" className="text-sm hover:text-slate-900 transition-colors">Real Estate Systems</Link></li>
                             </ul>
                         </div>
 
-                        {/* Company & Work */}
+                        {/* Column 4: Company & Insights */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.company')}</h3>
-                            <ul className="space-y-3.5">
-                                <li><Link href="/portfolio" className="text-sm hover:text-slate-900 transition-colors">{__('general.case_studies') || 'Portfolio & Work'}</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.pricing')}</Link></li>
-                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.about_us')}</Link></li>
-                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.contact')}</Link></li>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-5">{__('general.company') || 'Company'}</h3>
+                            <ul className="space-y-3">
+                                <li><Link href="/portfolio" className="text-sm hover:text-slate-900 transition-colors">{__('general.case_studies') || 'Portfolio & Case Studies'}</Link></li>
+                                <li><Link href="/blog" className="text-sm hover:text-slate-900 transition-colors">Engineering Blog</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.pricing') || 'Platform Pricing'}</Link></li>
+                                <li><Link href="/company/about" className="text-sm hover:text-slate-900 transition-colors">{__('general.about_us') || 'About Musoftware'}</Link></li>
+                                <li><Link href="/company/careers" className="text-sm hover:text-slate-900 transition-colors">Careers &amp; Engineering</Link></li>
+                                <li><Link href="/company/contact" className="text-sm hover:text-slate-900 transition-colors">{__('general.contact') || 'Contact Sales'}</Link></li>
                             </ul>
                         </div>
 
-                        {/* Resources & Free Tools */}
+                        {/* Column 5: Free Diagnostic Tools */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Free Business Tools</h3>
-                            <ul className="space-y-3.5">
-                                <li><Link href="/tools" className="text-sm font-semibold text-slate-900 hover:text-blue-600 transition-colors">{__('tools.tools_directory') || 'Tools Directory &rarr;'}</Link></li>
-                                <li><Link href="/tools/invoice-generator" className="text-sm hover:text-slate-900 transition-colors">{__('tools.invoice_title') || 'Invoice Generator'}</Link></li>
-                                <li><Link href="/tools/website-checker" className="text-sm hover:text-slate-900 transition-colors">{__('tools.audit_title') || 'Website Auditor'}</Link></li>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-5">Free Diagnostic Tools</h3>
+                            <ul className="space-y-3">
+                                <li><Link href="/estimator" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">Project Cost Calculator</Link></li>
+                                <li><Link href="/tools/facebook-page-cost" className="text-sm hover:text-slate-900 transition-colors">{__('tools.fb_title') || 'Facebook Page Valuation'}</Link></li>
+                                <li><Link href="/tools/website-checker" className="text-sm hover:text-slate-900 transition-colors">{__('tools.audit_title') || 'Website Health & Security'}</Link></li>
                                 <li><Link href="/tools/speed-loss-calculator" className="text-sm hover:text-slate-900 transition-colors">{__('tools.speed_loss_title') || 'Speed Loss Calculator'}</Link></li>
-                                <li><Link href="/tools/facebook-page-cost" className="text-sm hover:text-slate-900 transition-colors">{__('tools.fb_title') || 'Page Valuation'}</Link></li>
                                 <li><Link href="/tools/payment-gateway-auditor" className="text-sm hover:text-slate-900 transition-colors">{__('tools.pay_audit_title') || 'Payment Gateway Auditor'}</Link></li>
-                                <li><Link href="/tools/pixel-tracker-auditor" className="text-sm hover:text-slate-900 transition-colors">{__('tools.pixel_title') || 'Pixel Tracker Auditor'}</Link></li>
+                                <li><Link href="/tools/pixel-tracker-auditor" className="text-sm hover:text-slate-900 transition-colors">{__('tools.pixel_title') || 'Tracking Pixel Auditor'}</Link></li>
                                 <li><Link href="/tools/competitor-tech-spy" className="text-sm hover:text-slate-900 transition-colors">{__('tools.spy_title') || 'Competitor Tech Spy'}</Link></li>
+                                <li><Link href="/tools/image-cropper" className="text-sm hover:text-slate-900 transition-colors">Image Grid Cropper</Link></li>
+                                <li>
+                                    <Link href="/tools" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1 mt-1">
+                                        All Diagnostic Tools &rarr;
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
                     </div>
 
+                    {/* Interactive Full-Width Newsletter Subscription Bar */}
+                    <div className="rounded-2xl bg-white p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-4 text-center sm:text-start">
+                            <div className="hidden sm:flex h-12 w-12 rounded-xl bg-slate-900 text-white items-center justify-center shrink-0 shadow-md">
+                                <Mail className="h-6 w-6" />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="text-base font-bold text-slate-900">
+                                    Subscribe to Technical Insights &amp; Updates
+                                </h4>
+                                <p className="text-sm text-slate-500 font-light">
+                                    Get architectural breakdowns, release notes, and SaaS engineering insights directly in your inbox.
+                                </p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleNewsletterSubmit} className="flex w-full lg:w-auto items-center gap-2.5 max-w-md shrink-0">
+                            <Input
+                                type="email"
+                                placeholder="Enter your business email..."
+                                required
+                                value={newsletterEmail}
+                                onChange={(e) => setNewsletterEmail(e.target.value)}
+                                className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 h-11 rounded-xl focus-visible:ring-slate-900 w-full"
+                            />
+                            <Button
+                                type="submit"
+                                disabled={newsletterLoading}
+                                className="bg-slate-900 hover:bg-slate-800 text-white h-11 px-6 rounded-xl font-semibold shrink-0 shadow-md transition-all flex items-center gap-2"
+                            >
+                                {newsletterLoading ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <span>Subscribing...</span>
+                                    </>
+                                ) : (
+                                    <span>Subscribe</span>
+                                )}
+                            </Button>
+                        </form>
+                    </div>
+
+                    {/* Bottom Copyright & Legal Links */}
                     <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-sm font-light text-slate-500">
                             &copy; {new Date().getFullYear()} musoftware. All rights reserved.
                         </p>
                         <div className="flex gap-6 text-sm font-light text-slate-500">
-                            <Link href="/privacy-policy" className="hover:text-slate-900">{__('general.privacy_policy')}</Link>
-                            <Link href="/terms-of-service" className="hover:text-slate-900">{__('general.terms_of_service')}</Link>
-                            <Link href="/cookie-policy" className="hover:text-slate-900">{__('general.cookie_policy')}</Link>
+                            <Link href="/privacy-policy" className="hover:text-slate-900 transition-colors">{__('general.privacy_policy') || 'Privacy Policy'}</Link>
+                            <Link href="/terms-of-service" className="hover:text-slate-900 transition-colors">{__('general.terms_of_service') || 'Terms of Service'}</Link>
+                            <Link href="/cookie-policy" className="hover:text-slate-900 transition-colors">{__('general.cookie_policy') || 'Cookie Policy'}</Link>
                         </div>
                     </div>
                 </div>

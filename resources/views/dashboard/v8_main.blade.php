@@ -1505,6 +1505,23 @@
                 </div>
             </a>
 
+            <!-- Cube 21: Cost Estimator -->
+            <a href="{{ url('/estimator') }}" class="orbital-node" data-node="21">
+                <div class="cube-3d-scene cube-theme-cyan">
+                    <div class="cube-3d">
+                        <div class="cube-face cube-face-front">
+                            <i data-lucide="calculator"></i>
+                            <span class="cube-inner-label">{{ __('dashboard.cost_estimator') }}</span>
+                        </div>
+                        <div class="cube-face cube-face-back"></div>
+                        <div class="cube-face cube-face-right"></div>
+                        <div class="cube-face cube-face-left"></div>
+                        <div class="cube-face cube-face-top"></div>
+                        <div class="cube-face cube-face-bottom"></div>
+                    </div>
+                </div>
+            </a>
+
         </div>
 
     </div>

@@ -1187,7 +1187,8 @@
             "pay_from_wallet": "الدفع من المحفظة",
             "cancel": "إلغاء",
             "pay_gateway": "الدفع عبر البوابة",
-            "view_all_invoices": "عرض كل الفواتير"
+            "view_all_invoices": "عرض كل الفواتير",
+            "cost_estimator": "حاسبة التكلفة"
         },
         "debts": {
             "transaction_added_successfully": "تمت إضافة المعاملة بنجاح",
@@ -2137,6 +2138,7 @@
             "manager_response_placeholder": "أدخل ردك أو سبب الرفض هنا..."
         },
         "general": {
+            "estimator": "حاسبة التكلفة",
             "portfolio": "الأعمال والمشاريع",
             "chat_whatsapp": "محادثة واتساب",
             "site_title": "ميوسوفت ويرز | أنظمة سحابية مؤسسية وبرمجة معمارية",
@@ -13581,7 +13583,8 @@
             "pay_from_wallet": "Pay from Wallet",
             "cancel": "Cancel",
             "pay_gateway": "Pay via Gateway",
-            "view_all_invoices": "View All Invoices"
+            "view_all_invoices": "View All Invoices",
+            "cost_estimator": "Cost Estimator"
         },
         "debts": {
             "actions": "Actions",
@@ -14531,6 +14534,7 @@
             "your_musoftwares_account": "Your Musoftwares Account"
         },
         "general": {
+            "estimator": "Estimator",
             "portfolio": "Work",
             "chat_whatsapp": "WhatsApp Chat",
             "site_title": "Musoftware | Enterprise Cloud Systems & Architecture",

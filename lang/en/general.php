@@ -1,6 +1,7 @@
 <?php
 
 return array (
+  'estimator' => 'Estimator',
   'portfolio' => 'Work',
   'chat_whatsapp' => 'WhatsApp Chat',
   'site_title' => 'Musoftware | Enterprise Cloud Systems & Architecture',

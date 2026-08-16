@@ -102,7 +102,7 @@ const items: MenuItem[] = [
         { title: "KYC Verification", url: "/admin/kyc" },
         { title: "Contracts", url: "/admin/contracts" },
         { title: "Contract Price List", url: "/admin/contract-price-items" },
-
+        { title: "Project Cost Estimator", url: "/estimator" },
     ]
   },
   { 

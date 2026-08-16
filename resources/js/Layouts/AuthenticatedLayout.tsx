@@ -25,7 +25,8 @@ import {
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
     MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download,
     FolderKanban,
-    ListTodo
+    ListTodo,
+    Calculator
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
@@ -274,6 +275,19 @@ function AuthenticatedContent({
                                                                     )}
                                                                 >
                                                                     <Briefcase className="w-5 h-5 text-emerald-600" /> {__('general.services')}
+                                                                </Link>
+
+                                                                <Link
+                                                                    href={safeRoute('estimator', undefined, '/estimator')}
+                                                                    onClick={() => setIsMobileOpen(false)}
+                                                                    className={cn(
+                                                                        "flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors",
+                                                                        isRouteActive('estimator')
+                                                                            ? "bg-blue-50 text-blue-700"
+                                                                            : "text-slate-700 hover:bg-slate-50"
+                                                                    )}
+                                                                >
+                                                                    <Calculator className="w-5 h-5 text-blue-600" /> {__('general.estimator') || 'Estimator'}
                                                                 </Link>
 
                                                                 <AccordionItem value="isaas" className="border-b-0">
@@ -788,6 +802,10 @@ function AuthenticatedContent({
                                         </div>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
+
+                                <NavLink href={safeRoute('estimator', undefined, '/estimator')} active={isRouteActive('estimator')}>
+                                    <Calculator className="h-3.5 w-3.5 text-blue-500" /> {__('general.estimator') || 'Estimator'}
+                                </NavLink>
 
                                 <NavLink href={safeRoute('subscriptions.plans')} active={isRouteActive('subscriptions')}>
                                     <CreditCard className="h-3.5 w-3.5 text-amber-500" /> {__('general.subscription')}</NavLink>

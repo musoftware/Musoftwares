@@ -12,7 +12,9 @@ import {
     Terminal,
     Cpu,
     ArrowRight,
-    MessageSquare
+    MessageSquare,
+    Calculator,
+    Sparkles
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
@@ -35,9 +37,13 @@ export default function Home() {
                 {/* 1. HERO SECTION */}
                 <section className="px-6 max-w-5xl mx-auto flex flex-col items-center text-center mb-24 sm:mb-40 relative">
                     <div className="z-10 flex flex-col items-center w-full">
-                        <p className="text-base sm:text-xl text-[#86868b] font-medium mb-3 sm:mb-4 tracking-tight">
-                            Now accepting new projects.
-                        </p>
+                        <Link
+                            href="/estimator"
+                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-xs sm:text-sm font-semibold text-[#0066cc] border border-blue-200/80 shadow-xs mb-5 transition-all group"
+                        >
+                            <Sparkles className="w-4 h-4 text-blue-600" />
+                            <span>Instant Project Cost Calculator &rarr;</span>
+                        </Link>
                         
                         <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[86px] leading-[1.05] font-bold text-[#1d1d1f] max-w-5xl mb-6 tracking-tight">
                             We build the software that <br className="hidden sm:inline" />
@@ -50,18 +56,25 @@ export default function Home() {
                             From a 5-hour bug fix to a full SaaS platform. One studio, 10+ years, 30+ products shipped.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-16 sm:mb-24 w-full sm:w-auto items-center justify-center">
+                        <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 mb-16 sm:mb-24 w-full sm:w-auto items-center justify-center">
                             <button
                                 onClick={() => openWhatsApp("Hello Mahmoud, I want to start a project with Musoftware.")}
-                                className="bg-[#1d1d1f] hover:bg-[#333336] text-white px-8 py-3.5 rounded-full text-[17px] font-semibold w-full sm:w-auto transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-95"
+                                className="bg-[#1d1d1f] hover:bg-[#333336] text-white px-7 py-3.5 rounded-full text-[16px] font-semibold w-full sm:w-auto transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-95"
                             >
                                 Start Your Project
                             </button>
                             <Link
-                                href="/portfolio"
-                                className="text-[#0066cc] hover:text-[#0077ed] text-[17px] font-semibold flex items-center gap-1 group transition-colors cursor-pointer"
+                                href="/estimator"
+                                className="bg-blue-50 hover:bg-blue-100 text-[#0066cc] border border-blue-200/80 px-7 py-3.5 rounded-full text-[16px] font-semibold w-full sm:w-auto transition-all cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95"
                             >
-                                <span>Explore Our Work</span>
+                                <Calculator className="w-4 h-4" />
+                                <span>Calculate Project Cost</span>
+                            </Link>
+                            <Link
+                                href="/portfolio"
+                                className="text-[#0066cc] hover:text-[#0077ed] text-[16px] font-semibold flex items-center justify-center gap-1 group transition-colors cursor-pointer px-4 py-3.5"
+                            >
+                                <span>Explore Work</span>
                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
                             </Link>
                         </div>

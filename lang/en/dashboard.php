@@ -95,5 +95,6 @@ return [
     'cancel'             => 'Cancel',
     'pay_gateway'        => 'Pay via Gateway',
     'view_all_invoices'  => 'View All Invoices',
+    'cost_estimator'     => 'Cost Estimator',
 
 ];

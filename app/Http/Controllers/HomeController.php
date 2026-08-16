@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\WebsiteService;
+use App\Services\AI\ProjectEstimatorAiService;
 use App\Services\IpGeolocationService;
 use App\Services\PricingService;
 use App\Traits\ConvertsCurrency;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -500,17 +502,138 @@ class HomeController extends Controller
 
     public function estimator()
     {
+        $usd = Currency::where('currency', 'USD')->first();
+        $egp = Currency::where('currency', 'EGP')->first();
+        $rate = 50.0;
+        if ($usd && $egp) {
+            try {
+                $rate = CurrenciesExchange::RateToday(1.0, $usd->id, $egp->id);
+            } catch (\Throwable $e) {
+                // Keep default 50.0 fallback on failure
+            }
+        }
+
         return Inertia::render('Public/Estimator', [
+            'exchangeRate' => (float)$rate,
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
         ])->withViewData([
             'meta' => [
-                'title' => 'Project Budget Estimator | Musoftware',
-                'description' => 'Instantly calculate your system development budget, scale, and delivery timeline with transparency.',
+                'title' => 'Project Cost & Budget Estimator | Musoftware',
+                'description' => 'Calculate your website, mobile app, or desktop software development budget instantly with transparent Khamsat-aligned pricing.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
             ],
         ]);
+    }
+
+    /**
+     * Generate an official quotation reference and save payload in cache.
+     */
+    public function generateQuotation(Request $request)
+    {
+        $validated = $request->validate([
+            'platform_items' => 'required|array',
+            'itemized_addons' => 'nullable|array',
+            'subtotal_usd' => 'required|numeric',
+            'is_bundle_discount' => 'nullable|boolean',
+            'discount_usd' => 'nullable|numeric',
+            'total_usd' => 'required|numeric',
+            'total_egp' => 'required|numeric',
+            'exchange_rate' => 'nullable|numeric',
+            'is_usd' => 'nullable|boolean',
+            'client_name' => 'nullable|string|max:255',
+            'client_business' => 'nullable|string|max:255',
+            'client_mobile' => 'nullable|string|max:50',
+            'client_email' => 'nullable|string|max:255',
+            'platforms_summary' => 'nullable|string|max:255',
+        ]);
+
+        $code = 'QT-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+        $nowCairo = now()->timezone('Africa/Cairo');
+
+        $validated['code'] = $code;
+        $validated['cairo_date'] = $nowCairo->format('M d, Y - h:i A') . ' (Cairo Time)';
+        $validated['valid_until'] = $nowCairo->addDays(30)->format('M d, Y');
+        $validated['exchange_rate'] = $validated['exchange_rate'] ?? 50.0;
+        $validated['is_usd'] = $validated['is_usd'] ?? true;
+
+        // Store in cache for 30 days
+        Cache::put("quotation:{$code}", $validated, now()->addDays(30));
+
+        return response()->json([
+            'success' => true,
+            'code' => $code,
+            'url' => route('public.quotation.show', ['code' => $code]),
+        ]);
+    }
+
+    /**
+     * Analyze project requirements using AI to auto-populate Estimator (Admin only).
+     */
+    public function analyzeEstimatorWithAi(Request $request, ProjectEstimatorAiService $aiService)
+    {
+        $user = Auth::user();
+        $isAdmin = $user && method_exists($user, 'isAdmin') ? $user->isAdmin() : false;
+
+        if (!$isAdmin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access. Only administrators can use the AI Estimator Assistant.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'prompt' => 'required|string|min:5|max:5000',
+        ]);
+
+        $result = $aiService->analyze($validated['prompt']);
+
+        if (!$result) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate AI estimation. Please verify AI API keys in settings and try again.',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
+    }
+
+    /**
+     * Display the official printable corporate quotation Blade view.
+     */
+    public function showQuotation($code)
+    {
+        $quote = Cache::get("quotation:{$code}");
+
+        if (!$quote) {
+            // Fallback sample quote or 404
+            abort(404, 'Quotation not found or has expired.');
+        }
+
+        // Formatter closure
+        $quote['formatter'] = function($usdVal) use ($quote) {
+            if (!($quote['is_usd'] ?? true)) {
+                $egp = round($usdVal * ($quote['exchange_rate'] ?? 50.0));
+                return number_format($egp) . ' EGP';
+            }
+            return '$' . number_format($usdVal);
+        };
+
+        // WhatsApp direct link
+        $phoneNumber = '201015218548';
+        $totalDisplay = ($quote['is_usd'] ?? true) 
+            ? '$' . number_format($quote['total_usd']) 
+            : number_format($quote['total_egp']) . ' EGP';
+
+        $summary = $quote['platforms_summary'] ?? 'Custom Software Infrastructure';
+        $whatsappMsg = "Hello Mahmoud, I am reviewing official quotation #{$code} for ({$summary}) totaling {$totalDisplay}. Let's discuss proceeding with this scope!";
+        $whatsappUrl = 'https://wa.me/' . $phoneNumber . '?text=' . urlencode($whatsappMsg);
+
+        return view('quotations.show', compact('quote', 'whatsappUrl'));
     }
 
     public function customSolutions()

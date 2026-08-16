@@ -176,10 +176,16 @@ Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('leg
 
 // Estimator & Custom Solutions
 Route::get('/estimator', [HomeController::class, 'estimator'])->name('estimator');
+Route::post('/estimator/ai-analyze', [HomeController::class, 'analyzeEstimatorWithAi'])->name('estimator.ai-analyze');
+Route::post('/estimator/generate-quotation', [HomeController::class, 'generateQuotation'])->name('public.quotation.generate');
+Route::get('/quotation/{code}', [HomeController::class, 'showQuotation'])->name('public.quotation.show');
 Route::get('/custom-solutions', [HomeController::class, 'customSolutions'])->name('custom-solutions');
 
 
 // Short Alias Redirects (301) to prevent 404
+Route::redirect('/cost', '/estimator', 301);
+Route::redirect('/tools/cost', '/estimator', 301);
+Route::redirect('/tools/website-cost', '/estimator', 301);
 Route::redirect('/privacy', '/privacy-policy', 301);
 Route::redirect('/terms', '/terms-of-service', 301);
 Route::redirect('/cookies', '/cookie-policy', 301);
@@ -200,8 +206,10 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/tools', [PublicToolsController::class, 'index'])->name('public.tools.index');
 Route::get('/tools/image-cropper', [PublicToolsController::class, 'imageCropper'])->name('public.tools.image-cropper');
 
+Route::get('/cost', [PublicToolsController::class, 'websiteCostCalculator'])->name('public.tools.cost');
+Route::get('/tools/cost', [PublicToolsController::class, 'websiteCostCalculator']);
+Route::redirect('/tools/website-cost', '/cost', 301);
 Route::get('/tools/facebook-page-cost', [PublicToolsController::class, 'facebookCostCalculator'])->name('public.tools.facebook-cost');
-Route::get('/tools/website-cost', [PublicToolsController::class, 'websiteCostCalculator'])->name('public.tools.website-cost');
 Route::get('/tools/invoice-generator', [PublicToolsController::class, 'invoiceGenerator'])->name('public.tools.invoice-generator');
 Route::get('/tools/website-checker', [PublicToolsController::class, 'websiteChecker'])->name('public.tools.website-checker');
 Route::post('/tools/inspect-website', [PublicToolsController::class, 'inspectWebsite'])->name('public.tools.inspect-website');
@@ -214,6 +222,7 @@ Route::post('/tools/inspect-pixel', [PublicToolsController::class, 'inspectPixel
 Route::get('/tools/competitor-tech-spy', [PublicToolsController::class, 'competitorSpy'])->name('public.tools.competitor-tech-spy');
 Route::post('/tools/inspect-competitor', [PublicToolsController::class, 'inspectCompetitor'])->name('public.tools.inspect-competitor');
 Route::post('/tools/lead-capture', [PublicToolsController::class, 'captureLead'])->name('public.tools.lead-capture');
+Route::post('/newsletter/subscribe', [PublicToolsController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
 
 // Shared project board (public guest view)
 Route::get('/shared-board/{token}/{date}', [\App\Http\Controllers\PublicProjectBoardController::class, 'show'])

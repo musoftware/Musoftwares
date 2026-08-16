@@ -65,30 +65,11 @@ class PublicToolsController extends Controller
     }
 
     /**
-     * Display the Website & E-commerce Cost Calculator.
+     * Display the Universal Software & Web Cost Calculator.
      */
     public function websiteCostCalculator()
     {
-        $usd = Currency::where('currency', 'USD')->first();
-        $egp = Currency::where('currency', 'EGP')->first();
-        $rate = 50.0;
-        if ($usd && $egp) {
-            try {
-                $rate = CurrenciesExchange::RateToday(1.0, $usd->id, $egp->id);
-            } catch (\Throwable $e) {
-                // Keep default 50.0 fallback on failure
-            }
-        }
-
-        return Inertia::render('Public/Tools/WebsiteCostCalculator', [
-            'exchangeRate' => (float)$rate,
-        ])->withViewData([
-            'meta' => [
-                'title' => __('tools.web_title') . ' | Musoftwares',
-                'description' => __('tools.web_desc'),
-                'url' => route('public.tools.website-cost'),
-            ],
-        ]);
+        return redirect()->route('estimator', [], 301);
     }
 
     /**
@@ -708,4 +689,37 @@ class PublicToolsController extends Controller
         return Inertia::render('Public/Tools/ImageCropper');
     }
 
+    /**
+     * Subscribe email to newsletter / technical updates.
+     */
+    public function subscribeNewsletter(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|max:255',
+        ]);
+
+        $email = $request->input('email');
+
+        // Check if ticket already exists recently for this email
+        $existing = GuestTicket::where('email', $email)
+            ->where('subject', 'LIKE', 'Newsletter Subscription%')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->first();
+
+        if (!$existing) {
+            GuestTicket::create([
+                'name' => 'Newsletter Subscriber',
+                'email' => $email,
+                'mobile' => '',
+                'subject' => 'Newsletter Subscription: ' . $email,
+                'body' => 'User subscribed to technical updates and platform release notes via footer newsletter form.',
+                'status' => 'open',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you for subscribing to our technical updates!',
+        ]);
+    }
 }
