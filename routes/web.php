@@ -176,7 +176,6 @@ Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('leg
 
 // Estimator & Custom Solutions
 Route::get('/estimator', [HomeController::class, 'estimator'])->name('estimator');
-Route::post('/estimator/ai-analyze', [HomeController::class, 'analyzeEstimatorWithAi'])->name('estimator.ai-analyze');
 Route::post('/estimator/generate-quotation', [HomeController::class, 'generateQuotation'])->name('public.quotation.generate');
 Route::get('/quotation/{code}', [HomeController::class, 'showQuotation'])->name('public.quotation.show');
 Route::get('/custom-solutions', [HomeController::class, 'customSolutions'])->name('custom-solutions');
@@ -1012,6 +1011,14 @@ Route::post('/guest/invoices/{invoice}/pay', [GuestInvoiceController::class, 'in
 Route::get('/guest/invoices/payment/success', [GuestInvoiceController::class, 'paymentSuccess'])->name('guest.invoices.payment.success');
 Route::get('/guest/invoices/payment/failure', [GuestInvoiceController::class, 'paymentFailure'])->name('guest.invoices.payment.failure');
 Route::post('/guest/invoices/payment/webhook', [GuestInvoiceController::class, 'paymentWebhook'])->name('guest.invoices.payment.webhook');
+
+// ── Guest Quotation & Public Checkout ────────────────
+Route::get('/guest/quotations/{uuid}', [\App\Http\Controllers\GuestQuotationController::class, 'show'])->name('guest.quotations.show');
+Route::get('/guest/quotations/{uuid}/checkout', [\App\Http\Controllers\GuestQuotationController::class, 'checkout'])->name('guest.quotations.checkout');
+Route::post('/guest/quotations/{uuid}/pay', [\App\Http\Controllers\GuestQuotationController::class, 'initiatePayment'])->name('guest.quotations.pay');
+Route::get('/guest/quotations/payment/success/{orderUuid}', [\App\Http\Controllers\GuestQuotationController::class, 'paymentSuccess'])->name('guest.quotations.payment.success');
+Route::get('/guest/quotations/payment/failure/{orderUuid}', [\App\Http\Controllers\GuestQuotationController::class, 'paymentFailure'])->name('guest.quotations.payment.failure');
+Route::match(['get', 'post'], '/guest/quotations/payment/webhook', [\App\Http\Controllers\GuestQuotationController::class, 'webhook'])->name('guest.quotations.payment.webhook');
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');

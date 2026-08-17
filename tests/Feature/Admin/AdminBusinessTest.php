@@ -94,4 +94,57 @@ class AdminBusinessTest extends TestCase
         $this->assertEquals(15000.00, $currentMonthTrend['income']);
         $this->assertEquals(5000.00, $currentMonthTrend['expenses']);
     }
+
+    public function test_admin_can_view_reports_and_filter_by_client(): void
+    {
+        $otherClient = User::factory()->create([
+            'onboarding_completed' => true,
+            'currency_id' => $this->currency->id,
+        ]);
+        $otherClient->assignRole('client');
+
+        // Transaction for clientUser
+        $t1 = new Transaction;
+        $t1->user_id = $this->clientUser->id;
+        $t1->amount = 10000.00;
+        $t1->type = 'received';
+        $t1->reason = 'Client 1 Payment';
+        $t1->currency_id = $this->currency->id;
+        $t1->created_at = now();
+        $t1->save();
+
+        // Transaction for otherClient
+        $t2 = new Transaction;
+        $t2->user_id = $otherClient->id;
+        $t2->amount = 20000.00;
+        $t2->type = 'received';
+        $t2->reason = 'Client 2 Payment';
+        $t2->currency_id = $this->currency->id;
+        $t2->created_at = now();
+        $t2->save();
+
+        // Request without filter
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.business.reports'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/Business/Reports')
+            ->has('clients')
+            ->has('filters')
+            ->where('filters.client_id', null)
+            ->where('stats.lifetime_income', 30000)
+        );
+
+        // Request filtered by clientUser
+        $filteredResponse = $this->actingAs($this->admin)
+            ->get(route('admin.business.reports', ['client_id' => $this->clientUser->id]));
+
+        $filteredResponse->assertStatus(200);
+        $filteredResponse->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/Business/Reports')
+            ->where('filters.client_id', (string) $this->clientUser->id)
+            ->where('stats.lifetime_income', 10000)
+        );
+    }
 }

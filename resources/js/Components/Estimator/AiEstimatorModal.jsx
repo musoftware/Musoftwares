@@ -4,8 +4,7 @@ import {
     DialogContent, 
     DialogHeader, 
     DialogTitle, 
-    DialogDescription,
-    DialogFooter 
+    DialogDescription 
 } from '@/Components/ui/dialog';
 import { Button } from '@/Components/ui/button';
 import { Textarea } from '@/Components/ui/textarea';
@@ -13,283 +12,193 @@ import { useToast } from '@/Components/ui/use-toast';
 import { 
     Sparkles, 
     Bot, 
-    Loader2, 
-    CheckCircle2, 
-    Globe, 
-    Smartphone, 
-    Monitor, 
-    Layers, 
-    SlidersHorizontal, 
-    ArrowRight,
-    Wand2,
-    Lightbulb
+    Copy, 
+    Check, 
+    ExternalLink, 
+    Code2, 
+    HelpCircle,
+    CheckCircle2,
+    Layers,
+    ArrowUpRight
 } from 'lucide-react';
-import axios from 'axios';
-import { __ } from '@/lib/i18n';
 
-export default function AiEstimatorModal({ isOpen, onClose, onApply, optionsDefinitions = {} }) {
+const BASE_PROMPT_TEMPLATE = `You are a web project estimator. Your ONLY pricing source is https://www.musoftwares.com/estimator?format=json. Never invent any price.
+Estimate unique functional pages, select exact modules from JSON, mark missing features as Custom with no price.
+Calculate: Total = (Pages * Page Price from JSON) + Sum of Modules.
+OUTPUT MUST BE ONLY TABLES, NO TEXT: Table 1: Pages [# | Page | Purpose | User], Table 2: Modules [Module | Price], Table 3: Cost [Item | Calculation | Total]. No paragraphs outside tables.`;
+
+export default function AiEstimatorModal({ isOpen, onClose }) {
     const { toast } = useToast();
-    const [prompt, setPrompt] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState(null);
+    const [copied, setCopied] = useState(false);
+    const [userRequirements, setUserRequirements] = useState('');
 
-    const samplePrompts = [
-        "متجر إلكتروني متكامل لبيع الملابس مع تطبيق موبايل وبوابات دفع وشات ذكاء اصطناعي وفواتير وإشعارات واتساب",
-        "منصة حجز استشارات طبية مع تطبيق أطباء وتطبيق مرضى، دفع إلكتروني، خرائط GPS ومحادثة مباشرة",
-        "برنامج نقاط بيع POS وكاشير لشبكة مطاعم ومخازن يعمل أوفلاين ويدعم الفاتورة الإلكترونية وطباعة الباركود",
-        "SaaS Web & Mobile platform with subscription billing, multi-tenancy, REST APIs, and analytics dashboard"
-    ];
+    const fullPrompt = userRequirements.trim()
+        ? `${BASE_PROMPT_TEMPLATE}\n\nProject Requirements to Estimate:\n"""\n${userRequirements.trim()}\n"""`
+        : BASE_PROMPT_TEMPLATE;
 
-    const handleAnalyze = async () => {
-        if (!prompt.trim() || prompt.trim().length < 10) {
-            toast({
-                title: 'تنبيه',
-                description: 'يرجى كتابة وصف كافٍ للمشروع (10 أحرف على الأقل).',
-                variant: 'destructive'
-            });
-            return;
-        }
-
-        setLoading(true);
-        setResult(null);
-
+    const handleCopy = async () => {
         try {
-            const response = await axios.post(route('estimator.ai-analyze'), {
-                prompt: prompt.trim()
-            });
-
-            if (response.data?.success && response.data?.data) {
-                setResult(response.data.data);
-                toast({
-                    title: 'تم التحليل بنجاح ✨',
-                    description: 'قام الذكاء الاصطناعي بتقدير المنصات، الصفحات، والإضافات المناسبة.',
-                });
-            } else {
-                throw new Error(response.data?.message || 'فشل التحليل');
-            }
-        } catch (error) {
-            const msg = error.response?.data?.message || error.message || 'حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.';
+            await navigator.clipboard.writeText(fullPrompt);
+            setCopied(true);
             toast({
-                title: 'خطأ في التحليل',
-                description: msg,
-                variant: 'destructive'
+                title: 'تم نسخ البرومبت بنجاح! 📋',
+                description: 'الصق البرومبت في ChatGPT للحصول على تسعير فوري ودقيق للمشروع.',
             });
-        } finally {
-            setLoading(false);
+            setTimeout(() => setCopied(false), 3000);
+        } catch (err) {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = fullPrompt;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            setCopied(true);
+            toast({
+                title: 'تم نسخ البرومبت بنجاح! 📋',
+                description: 'الصق البرومبت في ChatGPT للحصول على تسعير فوري ودقيق للمشروع.',
+            });
+            setTimeout(() => setCopied(false), 3000);
         }
     };
 
-    const handleApply = () => {
-        if (!result) return;
-        onApply(result);
-        onClose();
-        toast({
-            title: 'تم تطبيق التقدير على الحاسبة 🚀',
-            description: 'تم تحديث المنصات، عدد الصفحات، والوحدات المحددة تلقائياً.',
-        });
-    };
-
-    // Helper to find human-readable title of option
-    const getOptionTitle = (optId) => {
-        for (const plat of ['web', 'mobile', 'desktop']) {
-            const found = (optionsDefinitions[plat] || []).find(o => o.id === optId);
-            if (found) return found.title;
-        }
-        return optId.replace(/^(web_|mobile_|desktop_)/, '').replace(/_/g, ' ');
+    const handleOpenChatGpt = () => {
+        window.open('https://chatgpt.com/', '_blank', 'noopener,noreferrer');
     };
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-            <DialogContent className="max-w-2xl w-full p-0 overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl">
-                {/* Header with gradient badge */}
-                <div className="bg-slate-900 text-white p-6 relative overflow-hidden">
-                    <div className="absolute top-0 end-0 p-8 opacity-10 pointer-events-none">
-                        <Wand2 className="w-32 h-32 text-white" />
-                    </div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shadow-inner">
-                            <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
+            <DialogContent className="max-w-2xl w-full p-0 overflow-hidden rounded-3xl bg-white border border-slate-200 shadow-2xl">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-6 sm:p-7 relative overflow-hidden">
+                    <div className="flex items-center gap-3.5 mb-2">
+                        <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shadow-inner backdrop-blur-xs">
+                            <Bot className="w-6 h-6 text-amber-300 animate-pulse" />
                         </div>
                         <div>
-                            <div className="flex items-center gap-2">
-                                <h3 className="text-xl font-bold text-white tracking-tight">
-                                    ساحر التسعير الذكي (Admin AI Assistant)
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+                                    تقدير المشروع عبر الذكاء الاصطناعي
                                 </h3>
-                                <span className="px-2 py-0.5 text-[11px] font-semibold bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-full">
-                                    AI Powered
+                                <span className="px-2.5 py-0.5 text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-full">
+                                    ChatGPT Prompt
                                 </span>
                             </div>
-                            <p className="text-xs text-slate-300 mt-0.5">
-                                أدخل وصف المشروع أو متطلبات العميل وسيقوم الذكاء الاصطناعي بتقدير المنصات، عدد الصفحات، واختيار الوحدات تلقائياً.
+                            <p className="text-xs text-slate-300 mt-1">
+                                انسخ البرومبت وضعه في ChatGPT لتسعير مشروعك مباشرة بناءً على الأسعار الرسمية لـ Musoftwares.
                             </p>
                         </div>
                     </div>
                 </div>
 
                 {/* Body */}
-                <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
-                    {/* Prompt input */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
-                            <Bot className="w-4 h-4 text-slate-600" />
-                            وصف المشروع أو متطلبات العميل:
-                        </label>
+                <div className="p-6 space-y-5 max-h-[72vh] overflow-y-auto">
+                    {/* Optional requirements box */}
+                    <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                                وصف مشروعك (اختياري - سيُضاف تلقائياً للبرومبت):
+                            </label>
+                            <span className="text-[11px] text-slate-400">يمكنك كتابته هنا أو إرساله في شات ChatGPT</span>
+                        </div>
                         <Textarea
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="مثال: محتاج متجر إلكتروني مع تطبيق موبايل لبيع العطور، فيه بوابات دفع، تسجيل دخول بالهاتف، شات ذكاء اصطناعي، وإشعارات واتساب..."
-                            rows={4}
-                            className="text-sm resize-none rounded-xl border-slate-300 focus:border-slate-900 focus:ring-slate-900 text-slate-900 placeholder:text-slate-400"
+                            value={userRequirements}
+                            onChange={(e) => setUserRequirements(e.target.value)}
+                            placeholder="مثال: أحتاج متجر لبيع الملابس مع لوحة تحكم، بوابات دفع Paymob، فواتير PDF، وإشعارات واتساب..."
+                            rows={3}
+                            className="text-xs resize-none rounded-xl border-slate-300 focus:border-slate-900 focus:ring-slate-900 text-slate-900 placeholder:text-slate-400"
                         />
                     </div>
 
-                    {/* Quick prompt suggestions */}
-                    <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                            <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-                            نماذج متطلبات جاهزة للتجربة السريعة:
+                    {/* Master Prompt Box */}
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <Code2 className="w-3.5 h-3.5 text-slate-600" />
+                                البرومبت المعتمد للتسعير (Copy & Paste Prompt):
+                            </span>
+                            <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" /> Live JSON Synced
+                            </span>
                         </div>
-                        <div className="flex flex-wrap gap-1.5">
-                            {samplePrompts.map((sp, idx) => (
-                                <button
-                                    key={idx}
-                                    type="button"
-                                    onClick={() => setPrompt(sp)}
-                                    className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition text-start truncate max-w-full"
-                                >
-                                    {sp}
-                                </button>
-                            ))}
+                        <div className="relative group">
+                            <pre className="p-4 rounded-2xl bg-slate-950 text-slate-200 text-xs font-mono leading-relaxed whitespace-pre-wrap select-all border border-slate-800 max-h-48 overflow-y-auto shadow-inner">
+                                {fullPrompt}
+                            </pre>
+                            <button
+                                type="button"
+                                onClick={handleCopy}
+                                className="absolute top-2.5 end-2.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                            >
+                                {copied ? (
+                                    <>
+                                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                        <span className="text-emerald-300 font-bold">تم النسخ</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Copy className="w-3.5 h-3.5 text-slate-300" />
+                                        <span>نسخ</span>
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
 
-                    {/* Submit Button */}
-                    <Button
-                        type="button"
-                        onClick={handleAnalyze}
-                        disabled={loading || !prompt.trim()}
-                        className="w-full bg-slate-900 hover:bg-black text-white font-medium py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
-                    >
-                        {loading ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
-                                جاري تحليل المتطلبات وتقدير البنية البرمجية...
-                            </>
-                        ) : (
-                            <>
-                                <Sparkles className="w-4 h-4 text-amber-300" />
-                                تحليل المشروع واقتراح التقدير بالذكاء الاصطناعي
-                            </>
-                        )}
-                    </Button>
-
-                    {/* AI Results Preview */}
-                    {result && (
-                        <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4 animate-in fade-in-50 duration-200">
-                            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                    نتيجة التحليل المقترحة
-                                </span>
-                                <span className="text-[11px] text-slate-500">
-                                    {result.platforms?.length || 0} منصات | {Object.keys(result.selectedOptions || {}).length} ميزة محددة
-                                </span>
-                            </div>
-
-                            {/* Summary */}
-                            {(result.summary_ar || result.summary_en) && (
-                                <div className="text-xs text-slate-700 bg-white p-3 rounded-lg border border-slate-200">
-                                    <p className="font-semibold text-slate-900 mb-1">ملخص النطاق المقترح:</p>
-                                    <p className="leading-relaxed">{result.summary_ar || result.summary_en}</p>
-                                </div>
-                            )}
-
-                            {/* Platforms & Screen Breakdown */}
-                            <div>
-                                <p className="text-xs font-semibold text-slate-800 mb-2">المنصات وعدد الشاشات المقدرة:</p>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className={`p-2.5 rounded-lg border text-center transition ${result.platforms?.includes('web') ? 'bg-white border-slate-900 text-slate-900 shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60'}`}>
-                                        <Globe className="w-4 h-4 mx-auto mb-1 text-slate-700" />
-                                        <div className="text-xs font-bold">موقع ويب</div>
-                                        <div className="text-[11px] text-slate-500 font-medium">
-                                            {result.platforms?.includes('web') ? `${result.platformScreens?.web || 5} صفحات` : 'غير مشمول'}
-                                        </div>
-                                    </div>
-                                    <div className={`p-2.5 rounded-lg border text-center transition ${result.platforms?.includes('mobile') ? 'bg-white border-slate-900 text-slate-900 shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60'}`}>
-                                        <Smartphone className="w-4 h-4 mx-auto mb-1 text-slate-700" />
-                                        <div className="text-xs font-bold">تطبيق موبايل</div>
-                                        <div className="text-[11px] text-slate-500 font-medium">
-                                            {result.platforms?.includes('mobile') ? `${result.platformScreens?.mobile || 5} شاشات` : 'غير مشمول'}
-                                        </div>
-                                    </div>
-                                    <div className={`p-2.5 rounded-lg border text-center transition ${result.platforms?.includes('desktop') ? 'bg-white border-slate-900 text-slate-900 shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60'}`}>
-                                        <Monitor className="w-4 h-4 mx-auto mb-1 text-slate-700" />
-                                        <div className="text-xs font-bold">برنامج سطح مكتب</div>
-                                        <div className="text-[11px] text-slate-500 font-medium">
-                                            {result.platforms?.includes('desktop') ? `${result.platformScreens?.desktop || 5} شاشات` : 'غير مشمول'}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Selected Addons Badges */}
-                            <div>
-                                <p className="text-xs font-semibold text-slate-800 mb-2">الوحدات والإضافات المختارة:</p>
-                                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
-                                    {Object.entries(result.selectedOptions || {}).map(([key, val]) => (
-                                        <span
-                                            key={key}
-                                            className="inline-flex items-center gap-1 text-[11px] font-medium bg-white text-slate-800 px-2.5 py-1 rounded-md border border-slate-200 shadow-xs"
-                                        >
-                                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                            {getOptionTitle(key)}
-                                            {typeof val === 'number' && val > 1 && (
-                                                <span className="bg-slate-900 text-white text-[10px] px-1 rounded font-bold">
-                                                    x{val}
-                                                </span>
-                                            )}
-                                        </span>
-                                    ))}
-                                    {Object.keys(result.selectedOptions || {}).length === 0 && (
-                                        <span className="text-xs text-slate-400 italic">لا توجد وحدات إضافية محددة</span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Recommendations list */}
-                            {result.recommended_reasons && result.recommended_reasons.length > 0 && (
-                                <div className="text-[11px] text-slate-600 space-y-1 bg-white/70 p-2.5 rounded-lg border border-slate-200">
-                                    <p className="font-semibold text-slate-800">ملاحظات الذكاء الاصطناعي:</p>
-                                    <ul className="list-disc list-inside space-y-0.5">
-                                        {result.recommended_reasons.map((r, i) => (
-                                            <li key={i}>{r}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    {/* How to use steps */}
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                        <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                            <HelpCircle className="w-4 h-4 text-indigo-600" />
+                            كيف يعمل؟
+                        </p>
+                        <ol className="text-xs text-slate-600 space-y-1.5 list-decimal list-inside leading-relaxed">
+                            <li>اضغط على زر <strong>نسخ البرومبت</strong> بالأسفل.</li>
+                            <li>افتح <strong>ChatGPT</strong> والصق البرومبت (مع وصف متطلبات مشروعك).</li>
+                            <li>سيقوم ChatGPT بقراءة أسعار Musoftwares الرسمية مباشرة وعرض جدول الصفحات والوحدات والتكلفة الإجمالية بدقة 100%.</li>
+                        </ol>
+                    </div>
                 </div>
 
-                {/* Footer Actions */}
-                <div className="bg-slate-100 p-4 border-t border-slate-200 flex items-center justify-between gap-3">
+                {/* Footer Buttons */}
+                <div className="bg-slate-100 p-4 sm:p-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <Button
                         type="button"
                         variant="outline"
                         onClick={onClose}
-                        className="rounded-xl border-slate-300 text-slate-700"
+                        className="w-full sm:w-auto rounded-xl border-slate-300 text-slate-700 hover:bg-slate-200"
                     >
-                        إلغاء
+                        إغلاق
                     </Button>
-                    <Button
-                        type="button"
-                        disabled={!result}
-                        onClick={handleApply}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl px-5 flex items-center gap-1.5 shadow-sm"
-                    >
-                        <CheckCircle2 className="w-4 h-4" />
-                        تطبيق التقدير على الحاسبة الآن
-                    </Button>
+                    
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <Button
+                            type="button"
+                            onClick={handleOpenChatGpt}
+                            variant="outline"
+                            className="flex-1 sm:flex-initial rounded-xl border-slate-300 text-slate-800 hover:bg-slate-200 flex items-center justify-center gap-1.5 font-semibold text-xs"
+                        >
+                            <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
+                            فتح ChatGPT
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleCopy}
+                            className="flex-1 sm:flex-initial bg-slate-900 hover:bg-black text-white font-bold rounded-xl px-5 py-2.5 text-xs flex items-center justify-center gap-2 shadow-sm transition"
+                        >
+                            {copied ? (
+                                <>
+                                    <Check className="w-4 h-4 text-emerald-400" />
+                                    <span>تم النسخ بنجاح</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Copy className="w-4 h-4 text-amber-300" />
+                                    <span>نسخ البرومبت (Copy Prompt)</span>
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

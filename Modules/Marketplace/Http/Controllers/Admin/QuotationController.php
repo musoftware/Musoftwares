@@ -59,7 +59,7 @@ class QuotationController extends Controller
         $totalOrders = DB::table('quotation_orders')->where('status', 'paid')->count();
         $totalCollected = DB::table('quotation_orders')->where('status', 'paid')->sum('deposit_amount');
 
-        $currencies = Currency::query()->orderBy('currency')->get(['id', 'currency', 'name', 'symbol']);
+        $currencies = Currency::query()->orderBy('currency')->get(['id', 'currency', 'symbol']);
 
         return Inertia::render('Admin/Quotations/Index', [
             'quotations' => $quotations,
@@ -80,10 +80,10 @@ class QuotationController extends Controller
      */
     public function create()
     {
-        $currencies = Currency::query()->orderBy('currency')->get(['id', 'currency', 'name', 'symbol']);
+        $currencies = Currency::query()->orderBy('currency')->get(['id', 'currency', 'symbol']);
         $defaultCurrency = Currency::where('currency', 'USD')->first() ?? $currencies->first();
 
-        $defaultMarkdown = "### 📌 نطاق العمل والمخرجات (Scope & Deliverables)\n- تصميم واجهات مستخدم احترافية بالكامل متجاوبة مع كافة الشاشات.\n- برمجة وتطوير لوحة تحكم إدارية متقدمة.\n- ربط بوابات الدفع الإلكتروني وتأمين المعاملات المالية.\n- اختبار شامل للأداء والحماية قبل الإطلاق.\n\n### ⏱️ الجدول الزمني للتنفيذ (Roadmap)\n- **المرحلة الأولى:** تصميم الواجهات وتجربة المستخدم (UI/UX).\n- **المرحلة الثانية:** التطوير البرمجي وقواعد البيانات.\n- **المرحلة الثالثة:** الاختبار النهائي والإطلاق الرسمي.\n\n### 📄 الشروط والأحكام (Terms & Conditions)\n- يتم سداد دفعة مقدمة 50% لبدء العمل فوراً.\n- باقي المبلغ 50% يستحق عند تسليم المشروع والاعتماد النهائي.\n- يشمل العرض فترة دعم فني وصيانة مجانية لمدة 30 يوماً بعد التسليم.";
+        $defaultMarkdown = "### 📌 نطاق العمل والمخرجات\n- تصميم واجهات مستخدم احترافية متجاوبة مع كافة الشاشات.\n- برمجة وتطوير لوحة تحكم إدارية متقدمة.\n- ربط بوابات الدفع الإلكتروني وتأمين المعاملات المالية.\n- اختبار شامل للأداء والحماية قبل الإطلاق.\n\n### ⏱️ الجدول الزمني للتنفيذ\n- **المرحلة الأولى:** تصميم الواجهات وتجربة المستخدم.\n- **المرحلة الثانية:** التطوير البرمجي وقواعد البيانات.\n- **المرحلة الثالثة:** الاختبار النهائي والإطلاق الرسمي.\n\n### 📄 الشروط والأحكام\n- يتم سداد دفعة مقدمة 50% لبدء العمل فوراً.\n- باقي المبلغ 50% يستحق عند تسليم المشروع والاعتماد النهائي.\n- يشمل العرض فترة دعم فني وصيانة مجانية لمدة 30 يوماً بعد التسليم.";
 
         return Inertia::render('Admin/Quotations/Create', [
             'currencies' => $currencies,
@@ -117,7 +117,7 @@ class QuotationController extends Controller
             'items.*.link_label' => 'nullable|string|max:255',
         ]);
 
-        $quotation = DB::transaction(function () use ($validated, $request) {
+        $quotation = DB::transaction(function () use ($validated) {
             $currencyModel = null;
             if (!empty($validated['currency_id'])) {
                 $currencyModel = Currency::find($validated['currency_id']);
@@ -219,7 +219,7 @@ class QuotationController extends Controller
     public function edit(Quotation $quotation)
     {
         $quotation->load(['items', 'currencyModel']);
-        $currencies = Currency::query()->orderBy('currency')->get(['id', 'currency', 'name', 'symbol']);
+        $currencies = Currency::query()->orderBy('currency')->get(['id', 'currency', 'symbol']);
 
         return Inertia::render('Admin/Quotations/Edit', [
             'quotation' => $quotation,

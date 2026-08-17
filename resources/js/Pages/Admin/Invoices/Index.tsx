@@ -4,7 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import ClientActionsSheet from '@/Pages/Admin/Users/ClientActionsSheet';
-import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus, List, Receipt, Clock, User, ClipboardList, CreditCard } from 'lucide-react';
+import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus, List, Receipt, Clock, User, ClipboardList, CreditCard, Filter, FilterX, RotateCcw, Search, Briefcase, DollarSign } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
@@ -57,7 +57,7 @@ const bulkActionOptions = [
     { value: 'delete', label: 'Delete' }
 ];
 
-export default function Index({ invoices, currentTab, filters = {}, stats, projects = [] }: any) {
+export default function Index({ invoices, currentTab, filters = {}, stats, projects = [], clients = [] }: any) {
     const filterByOptions = [
         { value: 'all', label: __('general.all') || 'All' },
         { value: 'id', label: 'ID' },
@@ -72,9 +72,17 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const [selectedClient, setSelectedClient] = React.useState(null);
     const paginationLinks = invoices.meta?.links || invoices.links;
 
-    const [searchTerm, setSearchTerm] = React.useState((filters as any).search || '');
-    const [filterBy, setFilterBy] = React.useState((filters as any).filter_by || 'all');
-    const [perPage, setPerPage] = React.useState((filters as any).per_page || '20');
+    const [clientId, setClientId] = useState<string>((filters as any).client_id ? String((filters as any).client_id) : '');
+    const [projectId, setProjectId] = useState<string>((filters as any).project_id ? String((filters as any).project_id) : '');
+    const [dateFrom, setDateFrom] = useState<string>((filters as any).date_from || (filters as any).from || '');
+    const [dateTo, setDateTo] = useState<string>((filters as any).date_to || (filters as any).to || '');
+    const [minAmount, setMinAmount] = useState<string>((filters as any).min_amount || (filters as any).amount_from || '');
+    const [maxAmount, setMaxAmount] = useState<string>((filters as any).max_amount || (filters as any).amount_to || '');
+    const [status, setStatus] = useState<string>((filters as any).status || 'all');
+    const [jobStatus, setJobStatus] = useState<string>((filters as any).job_status || 'all');
+    const [searchTerm, setSearchTerm] = useState<string>((filters as any).search || '');
+    const [filterBy, setFilterBy] = useState<string>((filters as any).filter_by || 'all');
+    const [perPage, setPerPage] = useState<string>((filters as any).per_page || '20');
 
     const [selectedInvoices, setSelectedInvoices] = useState({});
     const [selectAll, setSelectAll] = useState(false);
@@ -83,6 +91,20 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const [jobStatusDialog, setJobStatusDialog] = useState(null);
     const [newJobStatus, setNewJobStatus] = useState('');
     const [pendingAction, setPendingAction] = useState<{ type: 'mark_paid' | 'cancel' | 'bulk' | 'bill_balance'; id?: any } | null>(null);
+
+    useEffect(() => {
+        setClientId((filters as any).client_id ? String((filters as any).client_id) : '');
+        setProjectId((filters as any).project_id ? String((filters as any).project_id) : '');
+        setDateFrom((filters as any).date_from || (filters as any).from || '');
+        setDateTo((filters as any).date_to || (filters as any).to || '');
+        setMinAmount((filters as any).min_amount || (filters as any).amount_from || '');
+        setMaxAmount((filters as any).max_amount || (filters as any).amount_to || '');
+        setStatus((filters as any).status || 'all');
+        setJobStatus((filters as any).job_status || 'all');
+        setSearchTerm((filters as any).search || '');
+        setFilterBy((filters as any).filter_by || 'all');
+        setPerPage((filters as any).per_page || '20');
+    }, [filters]);
 
     useEffect(() => {
         if (selectAll) {
@@ -100,14 +122,104 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         setSelectedInvoices(prev => ({ ...prev, [id]: checked }));
     };
 
-    const handleFilter = () => {
-        router.get(route(`admin.invoices.${currentTab === 'all' ? 'index' : currentTab}`), {
-            ...filters,
-            search: searchTerm,
-            filter_by: filterBy,
-            per_page: perPage,
-        }, { preserveState: true });
+    const handleFilter = (overrides: Record<string, any> = {}) => {
+        const queryParams: Record<string, any> = {
+            client_id: clientId || undefined,
+            project_id: projectId || undefined,
+            date_from: dateFrom || undefined,
+            date_to: dateTo || undefined,
+            min_amount: minAmount || undefined,
+            max_amount: maxAmount || undefined,
+            status: (status && status !== 'all') ? status : undefined,
+            job_status: (jobStatus && jobStatus !== 'all') ? jobStatus : undefined,
+            search: searchTerm || undefined,
+            filter_by: (filterBy && filterBy !== 'all') ? filterBy : undefined,
+            per_page: perPage !== '20' ? perPage : undefined,
+            ...overrides,
+        };
+
+        const cleanParams: Record<string, any> = {};
+        Object.keys(queryParams).forEach((k) => {
+            if (queryParams[k] !== undefined && queryParams[k] !== '' && queryParams[k] !== 'all') {
+                cleanParams[k] = queryParams[k];
+            }
+        });
+
+        router.get(
+            route(`admin.invoices.${currentTab === 'all' ? 'index' : currentTab}`),
+            cleanParams,
+            { preserveState: true }
+        );
     };
+
+    const handleClearFilters = () => {
+        setClientId('');
+        setProjectId('');
+        setDateFrom('');
+        setDateTo('');
+        setMinAmount('');
+        setMaxAmount('');
+        setStatus('all');
+        setJobStatus('all');
+        setSearchTerm('');
+        setFilterBy('all');
+        setPerPage('20');
+
+        router.get(
+            route(`admin.invoices.${currentTab === 'all' ? 'index' : currentTab}`),
+            {},
+            { preserveState: true }
+        );
+    };
+
+    const hasActiveFilters = Boolean(
+        clientId ||
+        projectId ||
+        dateFrom ||
+        dateTo ||
+        minAmount ||
+        maxAmount ||
+        (status && status !== 'all') ||
+        (jobStatus && jobStatus !== 'all') ||
+        searchTerm ||
+        (filterBy && filterBy !== 'all') ||
+        (perPage && perPage !== '20')
+    );
+
+    const availableProjects = clientId
+        ? (projects as any[]).filter((p: any) => String(p.user_id) === String(clientId))
+        : (projects as any[]);
+
+    const clientOptions = [
+        { value: '', label: __('general.all_clients') || 'All Clients' },
+        ...(clients as any[]).map((c: any) => ({
+            value: String(c.id),
+            label: `${c.name}${c.email ? ` (${c.email})` : ''}`,
+        })),
+    ];
+
+    const projectOptions = [
+        { value: '', label: __('general.all_projects') || 'All Projects' },
+        ...availableProjects.map((p: any) => ({
+            value: String(p.id),
+            label: p.project_name,
+        })),
+    ];
+
+    const statusOptions = [
+        { value: 'all', label: __('admin.all_statuses') || __('general.all_statuses') || 'All Statuses' },
+        { value: 'unpaid', label: __('general.unpaid') || 'Unpaid' },
+        { value: 'partially_paid', label: __('general.partially_paid') || 'Partially Paid' },
+        { value: 'paid', label: __('general.paid') || 'Paid' },
+        { value: 'cancelled', label: __('general.archived_cancelled') || 'Cancelled / Archived' },
+    ];
+
+    const jobStatusOptions = [
+        { value: 'all', label: __('general.all_job_statuses') || 'All Job Statuses' },
+        { value: 'pending', label: __('general.pending') || 'Pending' },
+        { value: 'processing', label: __('general.processing') || 'Processing' },
+        { value: 'done', label: __('general.done') || 'Done' },
+    ];
 
     const handleLoginAs = (id) => {
         router.post(route('admin.users.login-as', id));
@@ -332,50 +444,200 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             </div>
 
             {/* Header & Filters */}
-            <Card className="mb-4 bg-white shadow-sm overflow-visible">
-                <CardContent className="p-4">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-end">
-                        {(filters as any).client_id && (
-                            <Link href={`/admin/invoices?client_id=${(filters as any).client_id}${(filters as any).project_id ? `&project_id=${(filters as any).project_id}` : ''}`}>
-                                <Button size="sm">
-                                    <Plus className="me-2 h-4 w-4" />{__('general.add_invoice')}</Button>
-                            </Link>
-                        )}
-
-                        <div className="w-full md:w-48">
-                            <Label className="mb-2 block text-xs uppercase text-muted-foreground">{__('general.filter_by')}</Label>
+            <Card className="mb-4 bg-white shadow-sm overflow-visible border border-slate-200">
+                <CardContent className="p-4 space-y-3">
+                    {/* Primary Filters Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {/* Client Selector */}
+                        <div>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.customer') || 'Client'}</Label>
                             <PremiumCombobox
-                                value={filterBy}
-                                onChange={(val) => { setFilterBy(String(val)); setTimeout(handleFilter, 50); }}
-                                options={filterByOptions}
-                                placeholder={__('general.select_filter')}
-                            />
-                        </div>
-
-                        <div className="w-full md:w-32">
-                            <Label className="mb-2 block text-xs uppercase text-muted-foreground">{__('general.show')}</Label>
-                            <PremiumCombobox
-                                value={perPage}
-                                onChange={(val) => { setPerPage(String(val)); setTimeout(handleFilter, 50); }}
-                                options={perPageOptions}
-                                placeholder={__('general.per_page')}
-                            />
-                        </div>
-
-                        <div className="w-full md:ms-auto md:w-64">
-                            <Label className="mb-2 hidden text-xs uppercase text-muted-foreground md:block">&nbsp;</Label>
-                            <Input
-                                type="text"
-                                className="h-9"
-                                placeholder={__('general.search_invoices')}
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleFilter();
+                                value={clientId}
+                                onChange={(val) => {
+                                    const nextClientId = String(val || '');
+                                    setClientId(nextClientId);
+                                    // If current project does not belong to new client, reset project
+                                    let nextProjectId = projectId;
+                                    if (nextClientId && projectId) {
+                                        const proj = (projects as any[]).find(p => String(p.id) === String(projectId));
+                                        if (proj && String(proj.user_id) !== nextClientId) {
+                                            nextProjectId = '';
+                                            setProjectId('');
+                                        }
                                     }
+                                    setTimeout(() => handleFilter({ client_id: nextClientId, project_id: nextProjectId }), 50);
                                 }}
+                                options={clientOptions}
+                                placeholder={__('general.all_clients') || 'All Clients'}
+                                searchPlaceholder={__('general.search') || 'Search clients...'}
                             />
+                        </div>
+
+                        {/* Project Selector */}
+                        <div>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.project') || 'Project'}</Label>
+                            <PremiumCombobox
+                                value={projectId}
+                                onChange={(val) => {
+                                    const nextProjectId = String(val || '');
+                                    setProjectId(nextProjectId);
+                                    setTimeout(() => handleFilter({ project_id: nextProjectId }), 50);
+                                }}
+                                options={projectOptions}
+                                placeholder={__('general.all_projects') || 'All Projects'}
+                                searchPlaceholder={__('general.search') || 'Search projects...'}
+                            />
+                        </div>
+
+                        {/* Status Selector */}
+                        <div>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.invoice_status') || 'Status'}</Label>
+                            <PremiumCombobox
+                                value={status}
+                                onChange={(val) => {
+                                    const nextStatus = String(val || 'all');
+                                    setStatus(nextStatus);
+                                    setTimeout(() => handleFilter({ status: nextStatus }), 50);
+                                }}
+                                options={statusOptions}
+                                placeholder={__('admin.all_statuses') || 'All Statuses'}
+                            />
+                        </div>
+
+                        {/* Job Status Selector */}
+                        <div>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.job_status') || 'Job Status'}</Label>
+                            <PremiumCombobox
+                                value={jobStatus}
+                                onChange={(val) => {
+                                    const nextJobStatus = String(val || 'all');
+                                    setJobStatus(nextJobStatus);
+                                    setTimeout(() => handleFilter({ job_status: nextJobStatus }), 50);
+                                }}
+                                options={jobStatusOptions}
+                                placeholder={__('general.all_job_statuses') || 'All Job Statuses'}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Secondary Filters Row: Date Range, Amount Range, Search & Actions */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end pt-1">
+                        {/* Date Range: From */}
+                        <div className="lg:col-span-2">
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_from') || 'Date From'}</Label>
+                            <Input
+                                type="date"
+                                className="h-9 text-xs"
+                                value={dateFrom}
+                                onChange={(e) => setDateFrom(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
+                            />
+                        </div>
+
+                        {/* Date Range: To */}
+                        <div className="lg:col-span-2">
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_to') || 'Date To'}</Label>
+                            <Input
+                                type="date"
+                                className="h-9 text-xs"
+                                value={dateTo}
+                                onChange={(e) => setDateTo(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
+                            />
+                        </div>
+
+                        {/* Amount Range: Min & Max */}
+                        <div className="lg:col-span-3">
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.amount') || 'Amount Range'}</Label>
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder={__('general.min') || 'Min'}
+                                    className="h-9 text-xs"
+                                    value={minAmount}
+                                    onChange={(e) => setMinAmount(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
+                                />
+                                <span className="text-muted-foreground text-xs font-medium">-</span>
+                                <Input
+                                    type="number"
+                                    step="any"
+                                    placeholder={__('general.max') || 'Max'}
+                                    className="h-9 text-xs"
+                                    value={maxAmount}
+                                    onChange={(e) => setMaxAmount(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Filter by field + Search */}
+                        <div className="lg:col-span-3">
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.search') || 'Search'}</Label>
+                            <div className="flex items-center gap-2">
+                                <div className="w-28 flex-shrink-0">
+                                    <PremiumCombobox
+                                        value={filterBy}
+                                        onChange={(val) => { setFilterBy(String(val)); setTimeout(() => handleFilter({ filter_by: String(val) }), 50); }}
+                                        options={filterByOptions}
+                                        placeholder={__('general.select_filter')}
+                                    />
+                                </div>
+                                <div className="relative flex-1">
+                                    <Input
+                                        type="text"
+                                        className="h-9 text-xs pe-7"
+                                        placeholder={__('general.search_invoices') || 'Search...'}
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleFilter();
+                                            }
+                                        }}
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            type="button"
+                                            onClick={() => { setSearchTerm(''); setTimeout(() => handleFilter({ search: '' }), 50); }}
+                                            className="absolute end-2 top-2.5 text-muted-foreground hover:text-foreground"
+                                        >
+                                            <XCircle className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Actions: Filter, Reset & Create */}
+                        <div className="lg:col-span-2 flex items-center gap-2 justify-end">
+                            <div className="w-20">
+                                <PremiumCombobox
+                                    value={perPage}
+                                    onChange={(val) => { setPerPage(String(val)); setTimeout(() => handleFilter({ per_page: String(val) }), 50); }}
+                                    options={perPageOptions}
+                                    placeholder={__('general.per_page')}
+                                />
+                            </div>
+
+                            <Button size="sm" className="h-9 px-3" onClick={() => handleFilter()} title={__('general.filter') || 'Filter'}>
+                                <Filter className="h-4 w-4 me-1.5" />
+                                {__('general.filter') || 'Filter'}
+                            </Button>
+
+                            {hasActiveFilters && (
+                                <Button variant="outline" size="sm" className="h-9 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={handleClearFilters} title={__('general.clear_filters') || 'Clear Filters'}>
+                                    <RotateCcw className="h-4 w-4" />
+                                </Button>
+                            )}
+
+                            <Link href={`/admin/invoices/create${clientId ? `?client_id=${clientId}${projectId ? `&project_id=${projectId}` : ''}` : ''}`}>
+                                <Button size="sm" variant="secondary" className="h-9 px-3 whitespace-nowrap" title={__('general.add_invoice')}>
+                                    <Plus className="h-4 w-4 me-1" />
+                                    {__('general.add_invoice') || 'Add Invoice'}
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </CardContent>

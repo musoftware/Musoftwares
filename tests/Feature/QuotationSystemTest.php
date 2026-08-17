@@ -31,18 +31,14 @@ class QuotationSystemTest extends TestCase
         $this->currencyUsd = Currency::firstOrCreate([
             'currency' => 'USD',
         ], [
-            'name' => 'US Dollar',
             'symbol' => '$',
-            'exchange_rate' => 1.0,
             'is_default' => true,
         ]);
 
         $this->currencyEgp = Currency::firstOrCreate([
             'currency' => 'EGP',
         ], [
-            'name' => 'Egyptian Pound',
             'symbol' => 'EGP',
-            'exchange_rate' => 50.0,
             'is_default' => false,
         ]);
 

@@ -86,6 +86,8 @@ return [
     'widget_deleted_successfully' => 'Widget Deleted Successfully',
     'widget_updated' => 'Widget Updated',
     'widget_updated_successfully' => 'Widget Updated Successfully',
+    'saving' => 'Saving...',
+    'success' => 'Operation completed successfully',
     'yes' => 'Yes',
     'your_musoftwares_account' => 'your musoftwares account'
 ];

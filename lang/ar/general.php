@@ -425,6 +425,7 @@ return array (
   'all_frequencies' => 'الكل Frequencies',
   'all_groups' => 'الكل Groups',
   'all_invoices' => 'الكل فواتير',
+  'all_job_statuses' => 'جميع حالات العمل',
   'all_kyc' => 'الكل KYC',
   'all_lanes' => 'جميع الخانات',
   'all_projects_board' => 'لوحة جميع المشاريع',

@@ -425,6 +425,7 @@ return array (
   'all_frequencies' => 'All Frequencies',
   'all_groups' => 'All Groups',
   'all_invoices' => 'All invoices',
+  'all_job_statuses' => 'All Job Statuses',
   'all_kyc' => 'All KYC',
   'all_lanes' => 'All Lanes',
   'all_projects_board' => 'All Projects Board',

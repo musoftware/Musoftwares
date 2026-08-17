@@ -14,6 +14,8 @@ return [
     'no_deadline' => 'لا Deadline',
     'price' => 'السعر',
     'saved_replies' => 'Saved Replies',
+    'saving' => 'جاري الحفظ...',
+    'success' => 'تمت العملية بنجاح',
     'select' => 'اختر',
     'yes' => 'نعم',
     'currency_options_not_configured' => 'العملة خيارات not configured',

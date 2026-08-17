@@ -162,5 +162,9 @@ Route::middleware(['web', 'auth', 'admin'])
         // Service Playbooks (أدلة الخدمات وكيفية العمل)
         Route::get('/service-playbooks/service-details/{service}', [\Modules\Marketplace\Http\Controllers\Admin\ServicePlaybookController::class, 'getServiceDetails'])->name('service-playbooks.service-details');
         Route::resource('service-playbooks', \Modules\Marketplace\Http\Controllers\Admin\ServicePlaybookController::class);
+
+        // Quotations (عروض الأسعار)
+        Route::post('/quotations/{quotation}/duplicate', [\Modules\Marketplace\Http\Controllers\Admin\QuotationController::class, 'duplicate'])->name('quotations.duplicate');
+        Route::resource('quotations', \Modules\Marketplace\Http\Controllers\Admin\QuotationController::class);
     });
 

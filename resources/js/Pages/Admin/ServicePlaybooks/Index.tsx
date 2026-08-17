@@ -5,8 +5,9 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { BookOpen, Plus, Search, Eye, Edit3, Trash2, Copy, Check, FileText, Sparkles } from 'lucide-react';
+import { BookOpen, Plus, Search, Eye, Edit3, Trash2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 interface Playbook {
     id: number;
@@ -49,16 +50,16 @@ export default function Index({ playbooks, filters }: IndexProps) {
     };
 
     const handleDelete = (id: number, title: string) => {
-        if (confirm(`هل أنت تأكد من حذف دليل الخدمة "${title}"؟`)) {
+        if (confirm(__('service_playbooks.delete_confirm', { title }))) {
             router.delete(`/admin/marketplace/service-playbooks/${id}`, {
-                onSuccess: () => toast.success('تم حذف دليل الخدمة بنجاح'),
+                onSuccess: () => toast.success(__('service_playbooks.deleted_success')),
             });
         }
     };
 
     return (
-        <AdminSidebarLayout header="أدلة تقديم الخدمات (Service Playbooks)">
-            <Head title="أدلة تقديم الخدمات - Admin" />
+        <AdminSidebarLayout header={__('service_playbooks.title')}>
+            <Head title={__('service_playbooks.admin_title')} />
 
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Card */}
@@ -69,17 +70,17 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                 <div className="flex items-center gap-2">
                                     <BookOpen className="w-6 h-6 text-sky-400" />
                                     <CardTitle className="text-xl font-bold text-white">
-                                        أدلة تقديم الخدمات والكيفية التنفيذية (Service Playbooks)
+                                        {__('service_playbooks.heading')}
                                     </CardTitle>
                                 </div>
                                 <CardDescription className="text-slate-300 text-sm">
-                                    سجل مرجعي داخلي وشامل لكيفية تنفيذ الخدمات، الرسائل التسويقية، المطلوبة من العميل، والأسعار الجاهزة للنسخ السريع.
+                                    {__('service_playbooks.description')}
                                 </CardDescription>
                             </div>
                             <Link href="/admin/marketplace/service-playbooks/create">
                                 <Button className="bg-sky-500 hover:bg-sky-600 text-white font-medium gap-2 shadow-sm">
                                     <Plus className="w-4 h-4" />
-                                    إضافة دليل خدمة جديد
+                                    {__('service_playbooks.create_new')}
                                 </Button>
                             </Link>
                         </div>
@@ -92,14 +93,14 @@ export default function Index({ playbooks, filters }: IndexProps) {
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input
                             type="text"
-                            placeholder="بحث باسم دليل الخدمة أو اسم الخدمة..."
+                            placeholder={__('service_playbooks.search_placeholder')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="pr-10 bg-white border-slate-200"
                         />
                     </form>
                     <div className="text-xs text-slate-500 font-medium">
-                        إجمالي الأدلة: <span className="font-bold text-slate-900">{playbooks.total}</span>
+                        {__('service_playbooks.total_playbooks', { count: playbooks.total })}
                     </div>
                 </div>
 
@@ -107,14 +108,14 @@ export default function Index({ playbooks, filters }: IndexProps) {
                 {playbooks.data.length === 0 ? (
                     <Card className="p-12 text-center border-dashed border-slate-300">
                         <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                        <h3 className="text-lg font-semibold text-slate-800">لا توجد أدلة خدمات مسجلة حتى الآن</h3>
+                        <h3 className="text-lg font-semibold text-slate-800">{__('service_playbooks.empty_title')}</h3>
                         <p className="text-sm text-slate-500 mt-1 mb-4">
-                            قم بإنشاء أول دليل خدمة لتسهيل التواصل والعمل مع العملاء.
+                            {__('service_playbooks.empty_desc')}
                         </p>
                         <Link href="/admin/marketplace/service-playbooks/create">
                             <Button className="bg-slate-900 hover:bg-slate-800 text-white gap-2">
                                 <Plus className="w-4 h-4" />
-                                إنشاء دليل خدمة
+                                {__('service_playbooks.create_playbook')}
                             </Button>
                         </Link>
                     </Card>
@@ -134,7 +135,7 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                                 </Badge>
                                             ) : (
                                                 <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200 text-xs font-normal">
-                                                    خدمة مخصصة
+                                                    {__('service_playbooks.custom_service')}
                                                 </Badge>
                                             )}
                                         </div>
@@ -143,27 +144,27 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                 <CardContent className="p-5 flex-1 space-y-3">
                                     <div className="text-xs text-slate-600 space-y-1.5">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-slate-400">الرسالة التسويقية:</span>
+                                            <span className="text-slate-400">{__('service_playbooks.marketing_msg')}:</span>
                                             <span className={playbook.marketing_message ? "text-emerald-600 font-medium" : "text-slate-300"}>
-                                                {playbook.marketing_message ? "✓ متوفرة" : "غير مضافة"}
+                                                {playbook.marketing_message ? __('service_playbooks.available') : __('service_playbooks.not_added')}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-slate-400">الأسعار والباقات:</span>
+                                            <span className="text-slate-400">{__('service_playbooks.pricing_and_packages')}:</span>
                                             <span className={playbook.pricing_info ? "text-emerald-600 font-medium" : "text-slate-300"}>
-                                                {playbook.pricing_info ? "✓ متوفرة" : "غير مضافة"}
+                                                {playbook.pricing_info ? __('service_playbooks.available') : __('service_playbooks.not_added')}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-slate-400">المطلوب من العميل:</span>
+                                            <span className="text-slate-400">{__('service_playbooks.client_reqs')}:</span>
                                             <span className={playbook.client_requirements ? "text-emerald-600 font-medium" : "text-slate-300"}>
-                                                {playbook.client_requirements ? "✓ متوفرة" : "غير مضافة"}
+                                                {playbook.client_requirements ? __('service_playbooks.available') : __('service_playbooks.not_added')}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-slate-400">خطوات التنفيذ (SOP):</span>
+                                            <span className="text-slate-400">{__('service_playbooks.sop_workflow')}:</span>
                                             <span className={playbook.execution_workflow ? "text-emerald-600 font-medium" : "text-slate-300"}>
-                                                {playbook.execution_workflow ? "✓ متوفرة" : "غير مضافة"}
+                                                {playbook.execution_workflow ? __('service_playbooks.available') : __('service_playbooks.not_added')}
                                             </span>
                                         </div>
                                     </div>
@@ -172,12 +173,12 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                     <Link href={`/admin/marketplace/service-playbooks/${playbook.id}`}>
                                         <Button variant="outline" size="sm" className="gap-1.5 text-xs text-slate-700 hover:text-slate-900 border-slate-200">
                                             <Eye className="w-3.5 h-3.5" />
-                                            عرض وتطبيق
+                                            {__('service_playbooks.view_and_apply')}
                                         </Button>
                                     </Link>
                                     <div className="flex items-center gap-1">
                                         <Link href={`/admin/marketplace/service-playbooks/${playbook.id}/edit`}>
-                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900">
+                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900" title={__('service_playbooks.edit_this')}>
                                                 <Edit3 className="w-3.5 h-3.5" />
                                             </Button>
                                         </Link>
@@ -186,6 +187,7 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                             size="sm"
                                             onClick={() => handleDelete(playbook.id, playbook.title)}
                                             className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                            title={__('service_playbooks.delete')}
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
                                         </Button>

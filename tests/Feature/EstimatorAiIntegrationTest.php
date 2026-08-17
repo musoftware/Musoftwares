@@ -2,87 +2,80 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Services\AI\ProjectEstimatorAiService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class EstimatorAiIntegrationTest extends TestCase
 {
     use RefreshDatabase;
-
     public function test_estimator_page_is_publicly_accessible()
     {
         $response = $this->get('/estimator');
         $response->assertStatus(200);
     }
 
-    public function test_guest_cannot_access_ai_estimator_analyzer()
+    public function test_estimator_page_serves_json_when_format_json_requested()
     {
-        $response = $this->postJson('/estimator/ai-analyze', [
-            'prompt' => 'Building a multi-vendor marketplace with mobile app and payment gateway',
-        ]);
-
-        $response->assertStatus(403);
-    }
-
-    public function test_regular_user_cannot_access_ai_estimator_analyzer()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->postJson('/estimator/ai-analyze', [
-            'prompt' => 'Building a multi-vendor marketplace with mobile app and payment gateway',
-        ]);
-
-        $response->assertStatus(403);
-    }
-
-    public function test_admin_can_analyze_project_with_ai()
-    {
-        Role::create(['name' => 'admin']);
-        $admin = User::factory()->create();
-        $admin->assignRole('admin');
-
-        // Mock the AI service
-        $mockAiService = Mockery::mock(ProjectEstimatorAiService::class);
-        $mockAiService->shouldReceive('analyze')
-            ->once()
-            ->with('Building a multi-vendor e-commerce store with mobile app and payment gateways')
-            ->andReturn([
-                'platforms' => ['web', 'mobile'],
-                'platformScreens' => ['web' => 8, 'mobile' => 12, 'desktop' => 5],
-                'selectedOptions' => [
-                    'web_admin_panel' => 1,
-                    'web_gateways' => 2,
-                    'mobile_push_notifications' => 1,
-                ],
-                'summary_ar' => 'متجر إلكتروني مع تطبيق موبايل وبوابات دفع',
-                'summary_en' => 'E-commerce platform with mobile app and payment gateways',
-                'recommended_reasons' => ['E-commerce requires online checkout and mobile app.'],
-            ]);
-
-        $this->app->instance(ProjectEstimatorAiService::class, $mockAiService);
-
-        $response = $this->actingAs($admin)->postJson('/estimator/ai-analyze', [
-            'prompt' => 'Building a multi-vendor e-commerce store with mobile app and payment gateways',
-        ]);
-
+        $response = $this->get('/estimator?format=json');
         $response->assertStatus(200)
-            ->assertJson([
-                'success' => true,
-                'data' => [
-                    'platforms' => ['web', 'mobile'],
-                    'platformScreens' => [
-                        'web' => 8,
-                        'mobile' => 12,
-                    ],
-                    'selectedOptions' => [
-                        'web_admin_panel' => 1,
-                        'web_gateways' => 2,
-                    ],
+            ->assertJsonStructure([
+                'platforms' => [
+                    'web',
+                    'mobile',
+                    'desktop',
+                ],
+                'modules' => [
+                    'web',
+                    'mobile',
+                    'desktop',
                 ],
             ]);
+    }
+
+    public function test_estimator_data_service_includes_khamsat_market_modules()
+    {
+        $service = app(\App\Services\ProjectEstimatorDataService::class);
+        $data = $service->getEstimatorData(50.0);
+
+        $this->assertArrayHasKey('modules', $data);
+        $webModules = collect($data['modules']['web'])->keyBy('id');
+
+        $this->assertTrue($webModules->has('web_whatsapp_channels'));
+        $this->assertEquals(35, $webModules['web_whatsapp_channels']['price_usd']);
+        $this->assertEquals(1750, $webModules['web_whatsapp_channels']['price_egp']);
+
+        $this->assertTrue($webModules->has('web_telegram_bot'));
+        $this->assertEquals(30, $webModules['web_telegram_bot']['price_usd']);
+        $this->assertEquals(1500, $webModules['web_telegram_bot']['price_egp']);
+
+        $this->assertTrue($webModules->has('web_telegram_channel_collector'));
+        $this->assertEquals(25, $webModules['web_telegram_channel_collector']['price_usd']);
+        $this->assertEquals(1250, $webModules['web_telegram_channel_collector']['price_egp']);
+
+        $this->assertTrue($webModules->has('web_whatsapp_channel_collector'));
+        $this->assertEquals(30, $webModules['web_whatsapp_channel_collector']['price_usd']);
+        $this->assertEquals(1500, $webModules['web_whatsapp_channel_collector']['price_egp']);
+
+        $this->assertTrue($webModules->has('web_auto_data_jobs'));
+        $this->assertEquals(35, $webModules['web_auto_data_jobs']['price_usd']);
+        $this->assertEquals(1750, $webModules['web_auto_data_jobs']['price_egp']);
+
+        $this->assertTrue($webModules->has('web_content_deduplication'));
+        $this->assertEquals(25, $webModules['web_content_deduplication']['price_usd']);
+        $this->assertEquals(1250, $webModules['web_content_deduplication']['price_egp']);
+    }
+
+    public function test_component_benchmark_rates_includes_new_features()
+    {
+        $components = \App\Services\AI\ComponentBenchmarkRates::getDefaultComponents();
+
+        $this->assertArrayHasKey('whatsapp_channels', $components);
+        $this->assertArrayHasKey('telegram_bot', $components);
+        $this->assertArrayHasKey('telegram_channel_collector', $components);
+        $this->assertArrayHasKey('whatsapp_channel_collector', $components);
+        $this->assertArrayHasKey('auto_data_jobs', $components);
+        $this->assertArrayHasKey('content_deduplication', $components);
+        $this->assertArrayHasKey('upload_google_play', $components);
+        $this->assertArrayHasKey('upload_apple_store', $components);
     }
 }

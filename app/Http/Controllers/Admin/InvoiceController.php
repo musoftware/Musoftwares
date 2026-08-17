@@ -46,10 +46,45 @@ class InvoiceController extends Controller
             $query->where('project_id', $request->project_id);
         }
 
-        if ($request->filled('from') && $request->filled('to')) {
-            $fromUtc = Carbon::parse($request->from)->startOfDay()->setTimezone('UTC');
-            $toUtc = Carbon::parse($request->to)->endOfDay()->setTimezone('UTC');
+        $dateFrom = $request->input('date_from', $request->input('from'));
+        $dateTo = $request->input('date_to', $request->input('to'));
+
+        if (! empty($dateFrom) && ! empty($dateTo)) {
+            $fromUtc = Carbon::parse($dateFrom, 'Africa/Cairo')->startOfDay()->setTimezone('UTC');
+            $toUtc = Carbon::parse($dateTo, 'Africa/Cairo')->endOfDay()->setTimezone('UTC');
             $query->whereBetween('created_at', [$fromUtc, $toUtc]);
+        } elseif (! empty($dateFrom)) {
+            $fromUtc = Carbon::parse($dateFrom, 'Africa/Cairo')->startOfDay()->setTimezone('UTC');
+            $query->where('created_at', '>=', $fromUtc);
+        } elseif (! empty($dateTo)) {
+            $toUtc = Carbon::parse($dateTo, 'Africa/Cairo')->endOfDay()->setTimezone('UTC');
+            $query->where('created_at', '<=', $toUtc);
+        }
+
+        $minAmount = $request->input('min_amount', $request->input('amount_from'));
+        $maxAmount = $request->input('max_amount', $request->input('amount_to'));
+
+        if ($minAmount !== null && $minAmount !== '') {
+            $query->where('final_total', '>=', (float) $minAmount);
+        }
+
+        if ($maxAmount !== null && $maxAmount !== '') {
+            $query->where('final_total', '<=', (float) $maxAmount);
+        }
+
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $status = $request->input('status');
+            if ($status === 'unpaid_partial') {
+                $query->whereIn('status', ['unpaid', 'partially_paid']);
+            } elseif ($status === 'archived') {
+                $query->where('status', 'cancelled');
+            } else {
+                $query->where('status', $status);
+            }
+        }
+
+        if ($request->filled('job_status') && $request->input('job_status') !== 'all') {
+            $query->where('job_status', $request->input('job_status'));
         }
 
         $filterBy = $request->input('filter_by', 'all');
@@ -141,6 +176,39 @@ class InvoiceController extends Controller
         ];
     }
 
+    private function getClients()
+    {
+        return User::select(['id', 'name', 'email'])->orderBy('name')->get();
+    }
+
+    private function getFilteredProjects(Request $request)
+    {
+        return $request->filled('client_id')
+            ? Project::where('user_id', $request->client_id)->select(['id', 'project_name', 'user_id'])->orderBy('project_name')->get()
+            : Project::select(['id', 'project_name', 'user_id'])->orderBy('project_name')->get();
+    }
+
+    private function extractFilterParams(Request $request): array
+    {
+        return $request->only([
+            'client_id',
+            'project_id',
+            'search',
+            'filter_by',
+            'per_page',
+            'date_from',
+            'date_to',
+            'from',
+            'to',
+            'min_amount',
+            'max_amount',
+            'amount_from',
+            'amount_to',
+            'status',
+            'job_status',
+        ]);
+    }
+
     /**
      * Display all invoices.
      */
@@ -148,20 +216,21 @@ class InvoiceController extends Controller
     {
         $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])->latest();
         $query = $this->applyFilters($query, $request);
- 
+
         $invoices = $query->paginate($request->input('per_page', 20))
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
- 
+
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'all',
-            'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
+            'filters' => $this->extractFilterParams($request),
             'stats' => $this->getStats($request),
             'projects' => $this->getFilteredProjects($request),
+            'clients' => $this->getClients(),
         ]);
     }
- 
+
     /**
      * Display unpaid invoices.
      */
@@ -172,26 +241,27 @@ class InvoiceController extends Controller
             ->where('is_suspended', false)
             ->latest();
         $query = $this->applyFilters($query, $request);
- 
+
         $invoices = $query->paginate($request->input('per_page', 20))
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
- 
+
         if ($request->wantsJson()) {
             return response()->json([
                 'invoices' => $invoices,
             ]);
         }
- 
+
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'unpaid',
-            'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
+            'filters' => $this->extractFilterParams($request),
             'stats' => $this->getStats($request),
             'projects' => $this->getFilteredProjects($request),
+            'clients' => $this->getClients(),
         ]);
     }
- 
+
     /**
      * Display archived/cancelled invoices.
      */
@@ -210,9 +280,10 @@ class InvoiceController extends Controller
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'archive',
-            'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
+            'filters' => $this->extractFilterParams($request),
             'stats' => $this->getStats($request),
             'projects' => $this->getFilteredProjects($request),
+            'clients' => $this->getClients(),
         ]);
     }
 
@@ -233,19 +304,11 @@ class InvoiceController extends Controller
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
             'currentTab' => 'suspended',
-            'filters' => $request->only(['client_id', 'project_id', 'search', 'filter_by', 'per_page']),
+            'filters' => $this->extractFilterParams($request),
             'stats' => $this->getStats($request),
             'projects' => $this->getFilteredProjects($request),
+            'clients' => $this->getClients(),
         ]);
-    }
-
-
-
-    private function getFilteredProjects(Request $request)
-    {
-        return $request->filled('client_id')
-            ? Project::where('user_id', $request->client_id)->select(['id', 'project_name'])->get()
-            : Project::select(['id', 'project_name'])->get();
     }
 
     /**

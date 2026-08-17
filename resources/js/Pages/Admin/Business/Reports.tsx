@@ -140,6 +140,7 @@ function CategoryPieChart({ title, data, currency }: { title: string; data: any[
 export default function Reports({
     stats,
     charts,
+    clients = [],
     projects = [],
     categories = [],
     current_year_months = [],
@@ -149,6 +150,7 @@ export default function Reports({
 }: {
     stats: any;
     charts: any;
+    clients?: any[];
     projects?: any[];
     categories?: string[];
     current_year_months?: any[];
@@ -158,14 +160,20 @@ export default function Reports({
 }) {
     const [from, setFrom] = useState(filters.from || '');
     const [to, setTo] = useState(filters.to || '');
+    const [clientId, setClientId] = useState(filters.client_id || '');
     const [projectId, setProjectId] = useState(filters.project_id || '');
     const [category, setCategory] = useState(filters.category || '');
     const [activeTab, setActiveTab] = useState<'overview' | 'hourly' | 'invoices' | 'clients'>('overview');
+
+    const filteredProjects = clientId
+        ? projects.filter((p: any) => String(p.user_id) === String(clientId))
+        : projects;
 
     const handleApplyFilters = () => {
         router.get(route('admin.business.reports'), {
             from,
             to,
+            client_id: clientId,
             project_id: projectId,
             category
         }, { preserveState: true });
@@ -174,6 +182,7 @@ export default function Reports({
     const handleResetFilters = () => {
         setFrom('');
         setTo('');
+        setClientId('');
         setProjectId('');
         setCategory('');
         router.get(route('admin.business.reports'), {}, { preserveState: true });
@@ -220,7 +229,7 @@ export default function Reports({
         return null;
     };
 
-    const hasFiltersActive = from || to || projectId || category;
+    const hasFiltersActive = from || to || clientId || projectId || category;
 
     // Accounts Receivable Aging chart data
     const arAgingData = [
@@ -248,7 +257,7 @@ export default function Reports({
             {/* Filter Bar */}
             <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
                 <CardContent className="p-4 flex flex-col md:flex-row md:items-end gap-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 flex-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 flex-1">
                         <div>
                             <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
                                 <Calendar className="w-3.5 h-3.5" />
@@ -274,7 +283,33 @@ export default function Reports({
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-semibold text-slate-500 block mb-1.5">
+                            <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
+                                <Users className="w-3.5 h-3.5" />
+                                {__('general.client') || 'Client'}
+                            </label>
+                            <select
+                                value={clientId}
+                                onChange={e => {
+                                    const newClientId = e.target.value;
+                                    setClientId(newClientId);
+                                    if (newClientId && projectId) {
+                                        const p = projects.find((proj: any) => String(proj.id) === String(projectId));
+                                        if (p && String(p.user_id) !== String(newClientId)) {
+                                            setProjectId('');
+                                        }
+                                    }
+                                }}
+                                className="w-full text-slate-800 text-sm border border-slate-200 rounded-lg p-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
+                            >
+                                <option value="">{__('general.all_clients') || 'All Clients'}</option>
+                                {clients.map((c: any) => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
+                                <Briefcase className="w-3.5 h-3.5" />
                                 {__('general.project') || 'Project'}
                             </label>
                             <select
@@ -283,13 +318,14 @@ export default function Reports({
                                 className="w-full text-slate-800 text-sm border border-slate-200 rounded-lg p-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
                             >
                                 <option value="">{__('general.all_projects') || 'All Projects'}</option>
-                                {projects.map((p: any) => (
+                                {filteredProjects.map((p: any) => (
                                     <option key={p.id} value={p.id}>{p.name}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
-                            <label className="text-xs font-semibold text-slate-500 block mb-1.5">
+                            <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
+                                <Tag className="w-3.5 h-3.5" />
                                 {__('general.category') || 'Category'}
                             </label>
                             <select
@@ -350,6 +386,7 @@ export default function Reports({
                                             {
                                                 from: m.from,
                                                 to: m.to,
+                                                client_id: clientId,
                                                 project_id: projectId,
                                                 category: category,
                                             },

@@ -44,7 +44,10 @@ import {
     LineChart,
     Layers,
     Share2,
-    SlidersHorizontal
+    SlidersHorizontal,
+    Radio,
+    Clock,
+    Filter
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -65,21 +68,6 @@ export default function Estimator({ exchangeRate = 50.0 }) {
         mobile: 5,
         desktop: 5,
     });
-
-    const handleApplyAi = (aiData) => {
-        if (aiData.platforms && aiData.platforms.length > 0) {
-            setSelectedPlatforms(aiData.platforms);
-        }
-        if (aiData.platformScreens) {
-            setPlatformScreens(prev => ({
-                ...prev,
-                ...aiData.platformScreens
-            }));
-        }
-        if (aiData.selectedOptions) {
-            setSelectedOptions(aiData.selectedOptions);
-        }
-    };
 
     // 3. Category Filter Tab for Modules
     const [activeCategory, setActiveCategory] = useState('all');
@@ -161,6 +149,60 @@ export default function Estimator({ exchangeRate = 50.0 }) {
                 platform: 'web',
                 icon: MessageSquare,
                 desc: 'Instant WhatsApp notifications on new orders, OTP phone verification, and click-to-chat bot.',
+            },
+            {
+                id: 'web_whatsapp_channels',
+                title: 'WhatsApp Channels Integration',
+                category: 'ai_automation',
+                price: 35,
+                platform: 'web',
+                icon: Radio,
+                desc: 'Direct broadcast and interactive communication integration with WhatsApp Channels via official APIs.',
+            },
+            {
+                id: 'web_telegram_bot',
+                title: 'Telegram Bot Management',
+                category: 'ai_automation',
+                price: 30,
+                platform: 'web',
+                icon: Send,
+                desc: 'Custom Telegram bot with command workflows, interactive menus, broadcast controls, and admin management.',
+            },
+            {
+                id: 'web_telegram_channel_collector',
+                title: 'Telegram Channel Collection',
+                category: 'ai_automation',
+                price: 25,
+                platform: 'web',
+                icon: Database,
+                desc: 'Automated data harvesting and continuous tracking of posts, media, and updates from Telegram channels.',
+            },
+            {
+                id: 'web_whatsapp_channel_collector',
+                title: 'WhatsApp Channel Collection',
+                category: 'ai_automation',
+                price: 30,
+                platform: 'web',
+                icon: MessageSquare,
+                desc: 'Real-time and batch extraction of messages, updates, and channel broadcasts from WhatsApp.',
+            },
+            {
+                id: 'web_auto_data_jobs',
+                title: 'Automated Data Collection Jobs',
+                category: 'ai_automation',
+                price: 35,
+                platform: 'web',
+                icon: Clock,
+                desc: 'Automated background cron jobs and scheduled tasks for recurring data fetching and syncing.',
+            },
+            {
+                id: 'web_content_deduplication',
+                title: 'Content Deduplication & Processing',
+                category: 'ai_automation',
+                price: 25,
+                platform: 'web',
+                icon: Filter,
+                desc: 'Advanced similarity matching, duplicate removal, text filtering, and automated content cleanup pipeline.',
             },
             {
                 id: 'web_gateways',
@@ -820,16 +862,14 @@ ${discountStr}
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        {isAdmin && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsAiModalOpen(true)}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-sm hover:shadow transition-all border border-slate-700 cursor-pointer group"
-                                            >
-                                                <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform duration-200" />
-                                                <span>AI Estimator (Admin)</span>
-                                            </button>
-                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsAiModalOpen(true)}
+                                            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 hover:from-black hover:to-slate-900 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all border border-slate-700 cursor-pointer group"
+                                        >
+                                            <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform duration-200" />
+                                            <span>تقدير بالذكاء الاصطناعي (ChatGPT Prompt)</span>
+                                        </button>
                                         {selectedPlatforms.length >= 2 && (
                                             <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full flex items-center gap-1.5 animate-pulse">
                                                 <Tag className="h-3.5 w-3.5" />
@@ -1350,14 +1390,10 @@ ${discountStr}
                 </div>
             </div>
 
-            {isAdmin && (
-                <AiEstimatorModal
-                    isOpen={isAiModalOpen}
-                    onClose={() => setIsAiModalOpen(false)}
-                    onApply={handleApplyAi}
-                    optionsDefinitions={optionsDefinitions}
-                />
-            )}
+            <AiEstimatorModal
+                isOpen={isAiModalOpen}
+                onClose={() => setIsAiModalOpen(false)}
+            />
         </PublicLayout>
     );
 }

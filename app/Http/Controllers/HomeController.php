@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\WebsiteService;
-use App\Services\AI\ProjectEstimatorAiService;
 use App\Services\IpGeolocationService;
 use App\Services\PricingService;
 use App\Services\ProjectEstimatorDataService;
@@ -501,7 +500,7 @@ class HomeController extends Controller
         ]);
     }
 
-    public function estimator()
+    public function estimator(Request $request)
     {
         $usd = Currency::where('currency', 'USD')->first();
         $egp = Currency::where('currency', 'EGP')->first();
@@ -515,6 +514,10 @@ class HomeController extends Controller
         }
 
         $estimatorData = (new ProjectEstimatorDataService())->getEstimatorData((float)$rate);
+
+        if ($request->query('format') === 'json' || $request->wantsJson()) {
+            return response()->json($estimatorData, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
 
         return Inertia::render('Public/Estimator', array_merge($estimatorData, [
             'exchangeRate' => (float)$rate,
@@ -568,40 +571,6 @@ class HomeController extends Controller
             'success' => true,
             'code' => $code,
             'url' => route('public.quotation.show', ['code' => $code]),
-        ]);
-    }
-
-    /**
-     * Analyze project requirements using AI to auto-populate Estimator (Admin only).
-     */
-    public function analyzeEstimatorWithAi(Request $request, ProjectEstimatorAiService $aiService)
-    {
-        $user = Auth::user();
-        $isAdmin = $user && method_exists($user, 'isAdmin') ? $user->isAdmin() : false;
-
-        if (!$isAdmin) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized access. Only administrators can use the AI Estimator Assistant.',
-            ], 403);
-        }
-
-        $validated = $request->validate([
-            'prompt' => 'required|string|min:5|max:5000',
-        ]);
-
-        $result = $aiService->analyze($validated['prompt']);
-
-        if (!$result) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to generate AI estimation. Please verify AI API keys in settings and try again.',
-            ], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $result,
         ]);
     }
 

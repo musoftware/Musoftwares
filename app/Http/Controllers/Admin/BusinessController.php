@@ -1086,11 +1086,13 @@ class BusinessController extends Controller
 
     public function reports(Request $request)
     {
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $clientId  = $request->query('client_id');
+        $from      = $request->query('from');
+        $to        = $request->query('to');
         $projectId = $request->query('project_id');
-        $category = $request->query('category');        $startUtc = null;
-        $endUtc   = null;
+        $category  = $request->query('category');
+        $startUtc  = null;
+        $endUtc    = null;
 
         // Apply Cairo timezone boundaries flexibly
         if (!empty($from)) {
@@ -1100,8 +1102,14 @@ class BusinessController extends Controller
             $endUtc = Carbon::parse($to, 'Africa/Cairo')->endOfDay()->setTimezone('UTC');
         }
 
+        // Client project IDs for relational scoping
+        $clientProjectIds = !empty($clientId)
+            ? Project::where('user_id', $clientId)->pluck('id')->toArray()
+            : [];
+
         // Dropdown options
-        $projects = Project::select('id', 'project_name as name')->get();
+        $clients = User::select('id', 'name', 'email')->orderBy('name')->get();
+        $projects = Project::select('id', 'project_name as name', 'user_id')->get();
         $txnCategories = Transaction::whereNotNull('category')->distinct()->pluck('category')->toArray();
         $costCategories = CostTransaction::whereNotNull('category')->distinct()->pluck('category')->toArray();
         $availableCategories = array_values(array_unique(array_filter(array_merge($txnCategories, $costCategories))));
@@ -1125,6 +1133,13 @@ class BusinessController extends Controller
             $txnsQuery->where('created_at', '<=', $endUtc);
         }
 
+        if ($clientId) {
+            $usersQuery->where('id', $clientId);
+            $projectsQuery->where('user_id', $clientId);
+            $invoicesQuery->where('user_id', $clientId);
+            $txnsQuery->where('user_id', $clientId);
+        }
+
         if ($projectId) {
             $invoicesQuery->where('project_id', $projectId);
             $txnsQuery->where('project_id', $projectId);
@@ -1139,6 +1154,7 @@ class BusinessController extends Controller
             ->whereIn('type', ['received', 'refunded', 'sent'])
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($clientId, fn($q) => $q->where('user_id', $clientId))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
             ->when($category, fn($q) => $q->where('category', $category))
             ->selectRaw("
@@ -1151,6 +1167,14 @@ class BusinessController extends Controller
         $expensesQuery = CostTransaction::query()
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($clientId, function ($q) use ($clientId, $clientProjectIds) {
+                $q->where(function ($sq) use ($clientId, $clientProjectIds) {
+                    $sq->where('user_id', $clientId);
+                    if (!empty($clientProjectIds)) {
+                        $sq->orWhereIn('project_id', $clientProjectIds);
+                    }
+                });
+            })
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
             ->when($category, fn($q) => $q->where('category', $category));
 
@@ -1166,6 +1190,7 @@ class BusinessController extends Controller
         $incomeByCategory = Transaction::where('type', 'received')
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($clientId, fn($q) => $q->where('user_id', $clientId))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
             ->when($category, fn($q) => $q->where('category', $category))
             ->select('category', DB::raw('SUM(business_amount) as value'))
@@ -1184,6 +1209,14 @@ class BusinessController extends Controller
         $expensesByCategory = CostTransaction::query()
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($clientId, function ($q) use ($clientId, $clientProjectIds) {
+                $q->where(function ($sq) use ($clientId, $clientProjectIds) {
+                    $sq->where('user_id', $clientId);
+                    if (!empty($clientProjectIds)) {
+                        $sq->orWhereIn('project_id', $clientProjectIds);
+                    }
+                });
+            })
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
             ->when($category, fn($q) => $q->where('category', $category))
             ->select('category', DB::raw('SUM(business_amount) as value'))
@@ -1206,13 +1239,18 @@ class BusinessController extends Controller
         $trendStartUtc = $startTrend->copy()->startOfMonth()->setTimezone('UTC');
         $trendEndUtc   = $endTrend->copy()->endOfMonth()->setTimezone('UTC');
 
+        $isSqlite     = DB::connection()->getDriverName() === 'sqlite';
+        $dateExpr     = $isSqlite ? "strftime('%Y-%m', created_at)" : "DATE_FORMAT(created_at, '%Y-%m')";
+        $timerSecExpr = $isSqlite ? 'SUM(CAST((julianday(date_end) - julianday(date_start)) * 86400 AS INTEGER)) as total_sec' : 'SUM(TIMESTAMPDIFF(SECOND, date_start, date_end)) as total_sec';
+
         // Single query for all transaction monthly aggregates
         $monthlyTxnsGrouped = Transaction::query()
             ->whereIn('type', ['received', 'refunded', 'sent'])
             ->whereBetween('created_at', [$trendStartUtc, $trendEndUtc])
+            ->when($clientId, fn($q) => $q->where('user_id', $clientId))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
             ->when($category, fn($q) => $q->where('category', $category))
-            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, type, SUM(business_amount) as total_amount")
+            ->selectRaw("{$dateExpr} as ym, type, SUM(business_amount) as total_amount")
             ->groupBy('ym', 'type')
             ->get()
             ->groupBy('ym');
@@ -1220,9 +1258,17 @@ class BusinessController extends Controller
         // Single query for all cost monthly aggregates
         $monthlyCostsGrouped = CostTransaction::query()
             ->whereBetween('created_at', [$trendStartUtc, $trendEndUtc])
+            ->when($clientId, function ($q) use ($clientId, $clientProjectIds) {
+                $q->where(function ($sq) use ($clientId, $clientProjectIds) {
+                    $sq->where('user_id', $clientId);
+                    if (!empty($clientProjectIds)) {
+                        $sq->orWhereIn('project_id', $clientProjectIds);
+                    }
+                });
+            })
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
             ->when($category, fn($q) => $q->where('category', $category))
-            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, SUM(business_amount) as total_amount")
+            ->selectRaw("{$dateExpr} as ym, SUM(business_amount) as total_amount")
             ->groupBy('ym')
             ->pluck('total_amount', 'ym');
 
@@ -1270,9 +1316,10 @@ class BusinessController extends Controller
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
+            ->when(!$projectId && $clientId, fn($q) => $q->whereIn('project_id', $clientProjectIds))
             ->whereNotNull('date_end')
             ->whereNotNull('date_start')
-            ->selectRaw('SUM(TIMESTAMPDIFF(SECOND, date_start, date_end)) as total_sec')
+            ->selectRaw($timerSecExpr)
             ->value('total_sec');
 
         $totalWorkedHours    = round($totalWorkedSeconds / 3600, 2);
@@ -1285,8 +1332,9 @@ class BusinessController extends Controller
         $invoicesList = Invoice::query()
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($clientId, fn($q) => $q->where('user_id', $clientId))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
-            ->select(['id', 'status', 'final_total', 'paid', 'unpaid', 'created_at', 'paid_at'])
+            ->select(['id', 'user_id', 'status', 'final_total', 'paid', 'unpaid', 'created_at', 'paid_at'])
             ->get();
 
         $totalInvoicedAmount = 0;
@@ -1377,6 +1425,7 @@ class BusinessController extends Controller
         $invoiceClientIds = Invoice::query()
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($clientId, fn($q) => $q->where('user_id', $clientId))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
             ->whereNotNull('user_id')
             ->distinct()
@@ -1386,6 +1435,7 @@ class BusinessController extends Controller
         $projectClientIds = Project::query()
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
+            ->when($clientId, fn($q) => $q->where('user_id', $clientId))
             ->when($projectId, fn($q) => $q->where('id', $projectId))
             ->whereNotNull('user_id')
             ->distinct()
@@ -1396,6 +1446,7 @@ class BusinessController extends Controller
             ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
             ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
             ->when($projectId, fn($q) => $q->where('project_id', $projectId))
+            ->when(!$projectId && $clientId, fn($q) => $q->whereIn('project_id', $clientProjectIds))
             ->whereNotNull('project_id')
             ->distinct()
             ->pluck('project_id')
@@ -1409,26 +1460,33 @@ class BusinessController extends Controller
 
         $allClientIds = array_values(array_unique(array_filter(array_merge($invoiceClientIds, $projectClientIds, $timerClientIds))));
 
+        if ($clientId) {
+            $allClientIds = array_values(array_intersect($allClientIds, [(int) $clientId]));
+            if (empty($allClientIds) && User::where('id', $clientId)->exists()) {
+                $allClientIds = [(int) $clientId];
+            }
+        }
+
         $clientsWorkedWith = [];
 
         if (!empty($allClientIds)) {
             $clientUsers = User::whereIn('id', $allClientIds)->get();
 
             foreach ($clientUsers as $client) {
-                $clientProjectIds = Project::where('user_id', $client->id)
+                $cProjectIds = Project::where('user_id', $client->id)
                     ->when($projectId, fn($q) => $q->where('id', $projectId))
                     ->pluck('id')
                     ->toArray();
 
                 $workedSeconds = 0;
-                if (!empty($clientProjectIds)) {
+                if (!empty($cProjectIds)) {
                     $workedSeconds = (int) InvoiceItemTimer::query()
-                        ->whereIn('project_id', $clientProjectIds)
+                        ->whereIn('project_id', $cProjectIds)
                         ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
                         ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
                         ->whereNotNull('date_end')
                         ->whereNotNull('date_start')
-                        ->selectRaw('SUM(TIMESTAMPDIFF(SECOND, date_start, date_end)) as total_sec')
+                        ->selectRaw($timerSecExpr)
                         ->value('total_sec');
                 }
 
@@ -1466,8 +1524,8 @@ class BusinessController extends Controller
                     ->when($projectId, fn($q) => $q->where('id', $projectId))
                     ->count();
 
-                if (!empty($clientProjectIds)) {
-                    $latestTimer = InvoiceItemTimer::whereIn('project_id', $clientProjectIds)
+                if (!empty($cProjectIds)) {
+                    $latestTimer = InvoiceItemTimer::whereIn('project_id', $cProjectIds)
                         ->when($startUtc, fn($q) => $q->where('created_at', '>=', $startUtc))
                         ->when($endUtc, fn($q) => $q->where('created_at', '<=', $endUtc))
                         ->latest('created_at')
@@ -1535,6 +1593,7 @@ class BusinessController extends Controller
                 'income_by_category'  => $incomeByCategory,
                 'expenses_by_category'=> $expensesByCategory,
             ],
+            'clients'             => $clients,
             'projects'            => $projects,
             'categories'          => $availableCategories,
             'current_year_months' => $currentYearMonths,
@@ -1542,6 +1601,7 @@ class BusinessController extends Controller
             'filters'             => [
                 'from'       => $from,
                 'to'         => $to,
+                'client_id'  => $clientId,
                 'project_id' => $projectId,
                 'category'   => $category,
             ],

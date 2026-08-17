@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Modules\Shortlink\Models\Shortlink;
+use Modules\Shortlink\Models\ShortlinkLink;
 
 class Quotation extends Model
 {
@@ -89,7 +89,7 @@ class Quotation extends Model
 
     public function shortlink(): BelongsTo
     {
-        return $this->belongsTo(Shortlink::class, 'shortlink_id');
+        return $this->belongsTo(ShortlinkLink::class, 'shortlink_id');
     }
 
     public function recalculateTotals(): void
