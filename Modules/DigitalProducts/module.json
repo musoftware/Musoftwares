@@ -1,0 +1,11 @@
+{
+    "name": "DigitalProducts",
+    "alias": "digitalproducts",
+    "description": "Digital Products and Ebooks Library Module with Blade SEO and PDF Extraction",
+    "keywords": ["ebooks", "digital products", "pdf", "library", "seo"],
+    "priority": 0,
+    "providers": [
+        "Modules\\DigitalProducts\\Providers\\DigitalProductsServiceProvider"
+    ],
+    "files": []
+}
