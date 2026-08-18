@@ -1,5 +1,17 @@
 {
-    "updated_at": "2026-08-18T11:32:27+00:00",
-    "total_services": 0,
-    "services": []
+    "updated_at": "2026-08-18T17:44:45+00:00",
+    "total_services": 1,
+    "services": [
+        {
+            "id": 1,
+            "title": "Custom Laravel Web Application Development",
+            "slug": "custom-laravel-web-application-development",
+            "category": "Web Development",
+            "url": "http://localhost/marketplace/services/1/custom-laravel-web-application-development",
+            "tagline": "High-performance bespoke Laravel applications built for scale.",
+            "starting_price": 0,
+            "packages": [],
+            "tags": []
+        }
+    ]
 }

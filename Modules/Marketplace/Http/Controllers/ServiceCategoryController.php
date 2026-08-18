@@ -151,7 +151,7 @@ class ServiceCategoryController extends Controller
     /**
      * Display public page for a specific category.
      */
-    public function showCategory(string $slug, Request $request): Response
+    public function showCategory(string $slug, Request $request)
     {
         $category = ServiceCategory::where('slug', $slug)
             ->orWhere('id', is_numeric($slug) ? (int)$slug : 0)
@@ -172,27 +172,30 @@ class ServiceCategoryController extends Controller
             return $service;
         });
 
-
         $schemaJson = \Modules\Marketplace\Helpers\MarketplaceSchemaHelper::forCategory($category, $services->items());
 
-        return Inertia::render('Marketplace/Browse', [
-            'services' => $services,
-            'categories' => $categories,
-            'currentCategory' => $category,
-            'schemaJson' => $schemaJson,
-            'filters' => [
-                'category' => $category->slug,
-                'category_id' => $category->id,
-                'category_name' => $category->name,
-            ],
-        ])->withViewData([
-            'meta' => [
-                'title' => "{$category->name} Services | MuSoftwares Marketplace",
-                'description' => $category->description ?? "Explore {$category->name} services and digital solutions on MuSoftwares Marketplace.",
-                'url' => route('marketplace.categories.show', ['slug' => $category->slug]),
-                'schemaJson' => $schemaJson,
-            ],
-        ]);
+        $canonicalUrl = route('marketplace.categories.show', ['slug' => $category->slug]);
+
+        $filters = [
+            'category' => $category->slug,
+            'category_id' => $category->id,
+            'category_name' => $category->name,
+        ];
+
+        $meta = [
+            'title' => "{$category->name} Services | MuSoftwares Marketplace",
+            'description' => $category->description ?? "Explore {$category->name} services and digital solutions on MuSoftwares Marketplace.",
+            'url' => $canonicalUrl,
+            'canonical_url' => $canonicalUrl,
+            'en_url' => $canonicalUrl.'?lang=en',
+            'ar_url' => $canonicalUrl.'?lang=ar',
+            'type' => 'website',
+            'schema_json' => $schemaJson,
+        ];
+
+        $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
+
+        return view('marketplace::public.index', compact('services', 'categories', 'filters', 'meta', 'viewerCurrency'));
     }
 
     /**

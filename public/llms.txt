@@ -17,12 +17,15 @@ Full Comprehensive Index: http://localhost/llms-full.txt
 All endpoints automatically negotiate content and deliver pure JSON payload containing the full page props when accessed by AI user-agents or with `?format=json`.
 
 ## Service Categories
+- [Web Development](http://localhost/marketplace/categories/web-development): Discover services in this category.
 
 ## Featured Services
 
-## Recent Blog Insights
+### Custom Laravel Web Application Development
+- **Category**: Web Development
+- **Starting Price**: $0
+- **Tagline**: High-performance bespoke Laravel applications built for scale.
+- **URL**: http://localhost/marketplace/services/1/custom-laravel-web-application-development
 
-### Test Article
-- **Excerpt**: 
-- **URL**: http://localhost/blog/test-article
+## Recent Blog Insights
 

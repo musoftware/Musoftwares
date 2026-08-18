@@ -22,6 +22,11 @@ class MarketplaceServiceProvider extends ServiceProvider
             module_path('Marketplace', 'Database/Migrations')
         );
 
+        $this->loadViewsFrom(
+            module_path('Marketplace', 'Resources/views'),
+            'marketplace'
+        );
+
         // Register Policies
         Gate::policy(ServiceOrder::class, ServiceOrderPolicy::class);
         Gate::policy(Service::class, ServicePolicy::class);

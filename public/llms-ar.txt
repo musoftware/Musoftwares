@@ -14,8 +14,15 @@
 - مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
+- [Web Development](http://localhost/marketplace/categories/web-development): تصفح الخدمات المتاحة.
 
 ## الخدمات المميزة
+
+### Custom Laravel Web Application Development
+- **التصنيف**: Web Development
+- **سعر البدء**: $0
+- **الوصف المختصر**: High-performance bespoke Laravel applications built for scale.
+- **الرابط**: http://localhost/marketplace/services/1/custom-laravel-web-application-development?lang=ar
 
 ## مقالات المدونة الحديثة
 

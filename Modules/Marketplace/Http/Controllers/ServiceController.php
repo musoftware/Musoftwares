@@ -129,27 +129,50 @@ class ServiceController extends Controller
         $canonicalUrl = route('marketplace.services.index');
         $isAr = $currentLocale === 'ar';
 
-        return Inertia::render('Marketplace/Browse', [
-            'services' => $services,
-            'categories' => $categories,
-            'filters' => [
-                'search' => $search ?? '',
-                'category' => $resolvedCategory ? $resolvedCategory->slug : ($categoryParam ?? ''),
-                'category_id' => $resolvedCategory ? $resolvedCategory->id : ($categoryParam ?? ''),
-                'category_name' => $resolvedCategory ? $resolvedCategory->name : '',
-            ],
-        ])->withViewData([
-            'meta' => [
-                'title' => __('marketplace.meta_title'),
-                'description' => __('marketplace.meta_description'),
-                'image' => url('/images/og-default.jpg'),
-                'url' => $canonicalUrl,
-                'canonical_url' => $canonicalUrl,
-                'en_url' => $canonicalUrl.'?lang=en',
-                'ar_url' => $canonicalUrl.'?lang=ar',
-                'type' => 'website',
-            ],
-        ]);
+        $schemaJson = [
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'name' => __('general.software_services_marketplace') ?: 'Software Development & IT Services Marketplace',
+            'description' => __('general.marketplace_seo_description') ?: 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
+            'itemListElement' => $services->getCollection()->values()->map(function ($service, $index) {
+                return [
+                    '@type' => 'ListItem',
+                    'position' => $index + 1,
+                    'item' => [
+                        '@type' => 'Service',
+                        'name' => $service->title,
+                        'description' => Str::limit(strip_tags($service->tagline ?: $service->description ?: $service->title), 150),
+                        'url' => route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug]),
+                        'image' => $service->cover_image ? (Str::startsWith($service->cover_image, ['http://', 'https://', '/']) ? $service->cover_image : url('/uploads/'.ltrim($service->cover_image, '/'))) : null,
+                        'provider' => [
+                            '@type' => 'Organization',
+                            'name' => $service->seller->name ?? 'MuSoftwares Marketplace',
+                        ],
+                    ],
+                ];
+            })->toArray(),
+        ];
+
+        $filters = [
+            'search' => $search ?? '',
+            'category' => $resolvedCategory ? $resolvedCategory->slug : ($categoryParam ?? ''),
+            'category_id' => $resolvedCategory ? $resolvedCategory->id : ($categoryParam ?? ''),
+            'category_name' => $resolvedCategory ? $resolvedCategory->name : '',
+        ];
+
+        $meta = [
+            'title' => __('marketplace.meta_title') ?: 'Software & Digital Services Marketplace | MuSoftwares',
+            'description' => __('marketplace.meta_description') ?: 'Discover top software development, IT services, scripts, and digital solutions with secure escrow protection on MuSoftwares.',
+            'image' => url('/v8main/img/logo.png'),
+            'url' => $canonicalUrl,
+            'canonical_url' => $canonicalUrl,
+            'en_url' => $canonicalUrl.'?lang=en',
+            'ar_url' => $canonicalUrl.'?lang=ar',
+            'type' => 'website',
+            'schema_json' => $schemaJson,
+        ];
+
+        return view('marketplace::public.index', compact('services', 'categories', 'filters', 'meta', 'viewerCurrency'));
     }
 
     public function show($id, Request $request, $slug = null)
@@ -340,20 +363,27 @@ class ServiceController extends Controller
             ],
         ];
 
-        return Inertia::render('Marketplace/Services/Show', [
-            'service' => $service,
-        ])->withViewData([
-            'meta' => [
-                'title' => $shareTitle,
-                'description' => $shareDesc,
-                'image' => $shareImage,
-                'url' => $canonicalUrl,
-                'canonical_url' => $canonicalUrl,
-                'en_url' => $canonicalUrl.'?lang=en',
-                'ar_url' => $canonicalUrl.'?lang=ar',
-                'schema_json' => $schemaJson,
-            ],
-        ]);
+        $relatedServices = Service::with(['seller', 'category', 'packages.currency'])
+            ->where('status', 'active')
+            ->where('id', '!=', $service->id)
+            ->when($service->category_id, fn($q) => $q->where('category_id', $service->category_id))
+            ->latest()
+            ->take(4)
+            ->get();
+
+        $meta = [
+            'title' => $shareTitle,
+            'description' => $shareDesc,
+            'image' => $shareImage,
+            'url' => $canonicalUrl,
+            'canonical_url' => $canonicalUrl,
+            'en_url' => $canonicalUrl.'?lang=en',
+            'ar_url' => $canonicalUrl.'?lang=ar',
+            'type' => 'product',
+            'schema_json' => $schemaJson,
+        ];
+
+        return view('marketplace::public.show', compact('service', 'relatedServices', 'meta', 'viewerCurrency'));
     }
 
     protected function localizeService(Service $service, string $targetLocale): Service
@@ -931,22 +961,25 @@ class ServiceController extends Controller
             ['name' => "Technology: {$tagClean}", 'url' => $canonicalUrl],
         ]);
 
-        return Inertia::render('Marketplace/Browse', [
-            'services' => $services,
-            'categories' => $categories,
-            'schemaJson' => $schemaJson,
-            'filters' => [
-                'tag' => $tagClean,
-                'technology' => $tagClean,
-            ],
-        ])->withViewData([
-            'meta' => [
-                'title' => "{$title} | MuSoftwares Marketplace",
-                'description' => "Find best freelancers and services specialized in {$tagClean} on MuSoftwares Marketplace.",
-                'url' => $canonicalUrl,
-                'schemaJson' => $schemaJson,
-            ],
-        ]);
+        $filters = [
+            'tag' => $tagClean,
+            'technology' => $tagClean,
+        ];
+
+        $meta = [
+            'title' => "{$title} | MuSoftwares Marketplace",
+            'description' => "Find best freelancers and services specialized in {$tagClean} on MuSoftwares Marketplace.",
+            'url' => $canonicalUrl,
+            'canonical_url' => $canonicalUrl,
+            'en_url' => $canonicalUrl.'?lang=en',
+            'ar_url' => $canonicalUrl.'?lang=ar',
+            'type' => 'website',
+            'schema_json' => $schemaJson,
+        ];
+
+        $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
+
+        return view('marketplace::public.index', compact('services', 'categories', 'filters', 'meta', 'viewerCurrency'));
     }
 
     /**
@@ -982,22 +1015,25 @@ class ServiceController extends Controller
             ['name' => "Integration: {$tagClean}", 'url' => $canonicalUrl],
         ]);
 
-        return Inertia::render('Marketplace/Browse', [
-            'services' => $services,
-            'categories' => $categories,
-            'schemaJson' => $schemaJson,
-            'filters' => [
-                'tag' => $tagClean,
-                'integration' => $tagClean,
-            ],
-        ])->withViewData([
-            'meta' => [
-                'title' => "{$title} | MuSoftwares Marketplace",
-                'description' => "Explore {$tagClean} integrations, tools, and automated services on MuSoftwares Marketplace.",
-                'url' => $canonicalUrl,
-                'schemaJson' => $schemaJson,
-            ],
-        ]);
+        $filters = [
+            'tag' => $tagClean,
+            'integration' => $tagClean,
+        ];
+
+        $meta = [
+            'title' => "{$title} | MuSoftwares Marketplace",
+            'description' => "Explore {$tagClean} integrations, tools, and automated services on MuSoftwares Marketplace.",
+            'url' => $canonicalUrl,
+            'canonical_url' => $canonicalUrl,
+            'en_url' => $canonicalUrl.'?lang=en',
+            'ar_url' => $canonicalUrl.'?lang=ar',
+            'type' => 'website',
+            'schema_json' => $schemaJson,
+        ];
+
+        $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
+
+        return view('marketplace::public.index', compact('services', 'categories', 'filters', 'meta', 'viewerCurrency'));
     }
 }
 
