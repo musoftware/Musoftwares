@@ -15,7 +15,7 @@ import {
   SidebarFooter
 } from '@/Components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/Components/ui/collapsible';
-import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
@@ -38,8 +38,6 @@ const items: MenuItem[] = [
         { title: "Projects", url: "/admin/projects" },
         { title: "Plans", url: "/admin/plans" },
         { title: "Blog Articles", url: "/admin/blog-articles" },
-        { title: "Digital Books", url: "/admin/digital-products" },
-        { title: "Book Categories", url: "/admin/digital-products/categories" },
     ]
   },
   {
@@ -111,6 +109,9 @@ const items: MenuItem[] = [
     url: "/admin/marketplace", 
     icon: Building2,
     subItems: [
+        { title: "Digital Books", url: "/admin/digital-products" },
+        { title: "Upload Book (PDF)", url: "/admin/digital-products/create" },
+        { title: "Book Categories", url: "/admin/digital-products/categories" },
         { title: "Quotations", url: "/admin/marketplace/quotations" },
         { title: "Service Playbooks", url: "/admin/marketplace/service-playbooks" },
         { title: "All Services", url: "/admin/marketplace/all-services" },
