@@ -8,6 +8,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $digital_product_id
+ * @property float|string $amount_paid
+ * @property int|null $currency_id
+ * @property string $payment_method
+ * @property string|null $transaction_id
+ * @property string $status
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @property-read \Modules\DigitalProducts\Models\DigitalProduct|null $product
+ * @property-read \App\Models\Currency|null $currency
+ */
 class DigitalProductPurchase extends Model
 {
     use HasFactory;

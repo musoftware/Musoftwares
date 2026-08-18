@@ -26,17 +26,33 @@ class FreeDownloadController extends Controller
     {
         $product = DigitalProduct::where('slug', $slug)
             ->where('is_published', true)
-            ->where('is_free', true)
             ->firstOrFail();
 
         $validated = $request->validate([
             'email' => 'required|email|max:255',
+            'edition_type' => 'nullable|string|in:full,playbook',
         ]);
+
+        $editionType = $validated['edition_type'] ?? ($product->is_free ? 'full' : 'playbook');
+
+        if ($editionType === 'full' && !$product->is_free) {
+            return response()->json([
+                'success' => false,
+                'message' => 'النسخة الكاملة من هذا الكتاب مدفوعة. يمكنك تحميل نسخة الـ Playbook مجاناً.',
+            ], 422);
+        }
+
+        if ($editionType === 'playbook' && !$product->has_free_edition) {
+            return response()->json([
+                'success' => false,
+                'message' => 'نسخة الـ Playbook غير متوفرة لهذا الكتاب.',
+            ], 422);
+        }
 
         $email = strtolower(trim($validated['email']));
         $user = auth()->user();
 
-        $downloadRecord = $this->downloadTokenService->generateTokenForFreeBook($product, $email, $user);
+        $downloadRecord = $this->downloadTokenService->generateTokenForFreeBook($product, $email, $user, $editionType);
 
         // Attempt sending email with download link
         try {

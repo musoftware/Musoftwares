@@ -315,14 +315,14 @@ export default function Index({ categories }: Props) {
             {/* Confirm Delete Modal */}
             <ConfirmModal
                 isOpen={Boolean(pendingDeleteCategory)}
-                onClose={() => setPendingDeleteCategory(null)}
+                onCancel={() => setPendingDeleteCategory(null)}
                 onConfirm={confirmDelete}
                 title={__('general.confirm_delete_category') || 'Delete Category'}
-                message={
+                description={
                     __('general.confirm_delete_category_message') ||
                     `Are you sure you want to delete category "${pendingDeleteCategory?.name}"? Any books under this category will become uncategorized.`
                 }
-                confirmText={__('general.delete') || 'Delete'}
+                confirmLabel={__('general.delete') || 'Delete'}
                 variant="danger"
             />
         </AdminSidebarLayout>

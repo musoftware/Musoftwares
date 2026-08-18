@@ -520,10 +520,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         </div>
                     </div>
 
-                    {/* Secondary Filters Row: Date Range, Amount Range, Search & Actions */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end pt-1">
+                    {/* Secondary Filters Row: Date Range & Amount Range */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end pt-1">
                         {/* Date Range: From */}
-                        <div className="lg:col-span-2">
+                        <div>
                             <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_from') || 'Date From'}</Label>
                             <Input
                                 type="date"
@@ -535,7 +535,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         </div>
 
                         {/* Date Range: To */}
-                        <div className="lg:col-span-2">
+                        <div>
                             <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_to') || 'Date To'}</Label>
                             <Input
                                 type="date"
@@ -547,7 +547,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         </div>
 
                         {/* Amount Range: Min & Max */}
-                        <div className="lg:col-span-3">
+                        <div className="lg:col-span-2">
                             <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.amount') || 'Amount Range'}</Label>
                             <div className="flex items-center gap-2">
                                 <Input
@@ -571,12 +571,15 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 />
                             </div>
                         </div>
+                    </div>
 
+                    {/* Third Filters Row: Search & Actions */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3 pt-1">
                         {/* Filter by field + Search */}
-                        <div className="lg:col-span-3">
+                        <div className="flex-1 max-w-xl">
                             <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.search') || 'Search'}</Label>
                             <div className="flex items-center gap-2">
-                                <div className="w-28 flex-shrink-0">
+                                <div className="w-36 sm:w-44 flex-shrink-0">
                                     <PremiumCombobox
                                         value={filterBy}
                                         onChange={(val) => { setFilterBy(String(val)); setTimeout(() => handleFilter({ filter_by: String(val) }), 50); }}
@@ -610,8 +613,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             </div>
                         </div>
 
-                        {/* Actions: Filter, Reset & Create */}
-                        <div className="lg:col-span-2 flex items-center gap-2 justify-end">
+                        {/* Actions: Per Page, Filter, Reset & Create */}
+                        <div className="flex flex-wrap items-center gap-2 justify-end sm:self-end">
                             <div className="w-20">
                                 <PremiumCombobox
                                     value={perPage}
@@ -621,7 +624,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 />
                             </div>
 
-                            <Button size="sm" className="h-9 px-3" onClick={() => handleFilter()} title={__('general.filter') || 'Filter'}>
+                            <Button size="sm" className="h-9 px-3.5" onClick={() => handleFilter()} title={__('general.filter') || 'Filter'}>
                                 <Filter className="h-4 w-4 me-1.5" />
                                 {__('general.filter') || 'Filter'}
                             </Button>
@@ -633,7 +636,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             )}
 
                             <Link href={`/admin/invoices/create${clientId ? `?client_id=${clientId}${projectId ? `&project_id=${projectId}` : ''}` : ''}`}>
-                                <Button size="sm" variant="secondary" className="h-9 px-3 whitespace-nowrap" title={__('general.add_invoice')}>
+                                <Button size="sm" variant="secondary" className="h-9 px-3.5 whitespace-nowrap" title={__('general.add_invoice')}>
                                     <Plus className="h-4 w-4 me-1" />
                                     {__('general.add_invoice') || 'Add Invoice'}
                                 </Button>

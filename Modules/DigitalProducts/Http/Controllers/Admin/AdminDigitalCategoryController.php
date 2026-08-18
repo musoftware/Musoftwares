@@ -6,18 +6,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Modules\DigitalProducts\Models\DigitalCategory;
 
 class AdminDigitalCategoryController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $categories = DigitalCategory::withCount('products')
             ->orderBy('sort_order')
             ->get();
 
-        return view('digitalproducts::admin.categories.index', compact('categories'));
+        return Inertia::render('Admin/DigitalProducts/Categories/Index', [
+            'categories' => $categories,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

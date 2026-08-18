@@ -163,84 +163,181 @@
                     @endif
                 </div>
 
-                <!-- Action Card (Purchase or Free Download) -->
-                <div class="rounded-2xl glass-card p-6 border border-zinc-800 mb-8">
-                    @if($isPurchased)
-                        <!-- User Already Purchased -->
-                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div>
-                                <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1 mb-1">
-                                    <i class="ri-checkbox-circle-fill"></i> تمتلك هذا الكتاب في مكتبتك
-                                </span>
-                                <h4 class="text-sm font-bold text-white">يمكنك تحميل الكتاب في أي وقت مدى الحياة</h4>
-                            </div>
-                            <a href="{{ route('library.my_library.download', $product->slug) }}" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all">
-                                <i class="ri-download-2-fill text-lg"></i>
-                                <span>تحميل ملف الـ PDF</span>
-                            </a>
+                <!-- Action Cards Area -->
+                @if($product->has_free_edition && !$product->is_free)
+                    <!-- Dual Editions Comparison Section -->
+                    <div class="mb-8 space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+                            <span class="text-xs font-bold text-brand-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="ri-stack-line"></i> هذا الكتاب متوفر في نسختين (ملخص مجاني + إصدار كامل)
+                            </span>
                         </div>
-                    @elseif($product->is_free)
-                        <!-- Free Download with Email Verification -->
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider block">تحميل مجاني 100%</span>
-                                    <h4 class="text-lg font-bold text-white">احصل على نسختك المجانية الآن</h4>
-                                </div>
-                                <span class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
-                                    Free Ebook
-                                </span>
-                            </div>
 
-                            <form action="{{ route('library.free_download', $product->slug) }}" method="POST" class="space-y-3">
-                                @csrf
-                                <div class="relative">
-                                    <i class="ri-mail-line absolute right-4 top-3.5 text-zinc-400 text-base"></i>
-                                    <input type="email" name="email" value="{{ auth()->user()?->email ?? '' }}" required placeholder="أدخل بريدك الإلكتروني لاستلام رابط التحميل..." class="w-full h-12 pr-11 pl-4 rounded-xl bg-zinc-900 border border-zinc-700/80 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all">
-                                </div>
-                                <button type="submit" class="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2">
-                                    <i class="ri-download-cloud-line text-lg"></i>
-                                    <span>تحميل الكتاب مجاناً</span>
-                                </button>
-                                <p class="text-[11px] text-zinc-500 text-center">
-                                    🔒 نلتزم بحماية خصوصيتك ولن يتم إرسال أي رسائل غير مرغوب فيها.
-                                </p>
-                            </form>
-                        </div>
-                    @else
-                        <!-- Paid Book Flow -->
-                        <div>
-                            <div class="flex items-center justify-between mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            
+                            <!-- Card 1: Free Playbook Edition -->
+                            <div class="rounded-2xl bg-gradient-to-b from-emerald-950/40 via-dark-800 to-dark-900 border border-emerald-500/30 p-5 flex flex-col justify-between shadow-lg relative overflow-hidden">
+                                <div class="absolute -top-12 -left-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
                                 <div>
-                                    <span class="text-xs text-zinc-400 block mb-1">سعر النسخة الرقمية</span>
-                                    <div class="flex items-baseline gap-2">
-                                        <span class="text-3xl font-extrabold text-white">{{ number_format($product->price, 2) }}</span>
-                                        <span class="text-sm font-semibold text-brand-400">{{ $product->currency?->code ?? 'USD' }}</span>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1">
+                                            <i class="ri-gift-line"></i> نسخة مجانية (Playbook)
+                                        </span>
+                                        <span class="text-xs font-bold text-emerald-400 font-mono">0.00 $</span>
+                                    </div>
+
+                                    <h4 class="text-base font-bold text-white mb-2 leading-snug">
+                                        {{ $product->free_edition_title ?: 'الملخص التطبيقي (Playbook)' }}
+                                    </h4>
+
+                                    <div class="flex items-center gap-3 text-xs text-zinc-400 mb-4 pb-3 border-b border-emerald-950/60">
+                                        <span class="flex items-center gap-1"><i class="ri-pages-line text-emerald-400"></i> {{ $product->free_edition_page_count ?? 20 }} صفحة</span>
+                                        <span>•</span>
+                                        <span>{{ $product->formatted_free_edition_file_size }}</span>
                                     </div>
                                 </div>
-                                <div class="text-left text-xs text-zinc-400">
-                                    <span class="px-2.5 py-1 rounded-md bg-zinc-800 text-zinc-300 font-semibold inline-block mb-1">وصول دائم</span>
-                                    <div>تحديثات مجانية للكتاب</div>
-                                </div>
-                            </div>
 
-                            @auth
-                                <form action="{{ route('library.buy.wallet', $product->slug) }}" method="POST">
+                                <form action="{{ route('library.free_download', $product->slug) }}" method="POST" class="space-y-2 mt-auto">
                                     @csrf
-                                    <button type="submit" onclick="return confirm('هل تريد تأكيد شراء الكتاب وخصم {{ number_format($product->price, 2) }} من رصيدك؟')" class="w-full h-13 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-500/30 transition-all flex items-center justify-center gap-2">
-                                        <i class="ri-wallet-3-line text-lg"></i>
-                                        <span>شراء الآن من رصيد المحفظة ({{ number_format($product->price, 2) }} {{ $product->currency?->code ?? 'USD' }})</span>
+                                    <input type="hidden" name="edition_type" value="playbook">
+                                    <input type="email" name="email" value="{{ auth()->user()?->email ?? '' }}" required placeholder="أدخل بريدك لتحميل الـ Playbook..." class="w-full h-10 px-3 rounded-xl bg-zinc-900/90 border border-emerald-800/60 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-500">
+                                    <button type="submit" class="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-1.5">
+                                        <i class="ri-download-cloud-2-line text-sm"></i>
+                                        <span>تحميل الـ Playbook مجاناً</span>
                                     </button>
                                 </form>
-                            @else
-                                <a href="{{ route('login') }}" class="w-full h-12 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-2">
-                                    <i class="ri-user-shared-line text-lg"></i>
-                                    <span>تسجيل الدخول لشراء الكتاب</span>
-                                </a>
-                            @endauth
+                            </div>
+
+                            <!-- Card 2: Full Master Book Edition -->
+                            <div class="rounded-2xl bg-gradient-to-b from-brand-950/40 via-dark-800 to-dark-900 border border-brand-500/40 p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
+                                <div class="absolute -top-12 -right-12 w-28 h-28 bg-brand-500/15 rounded-full blur-2xl pointer-events-none"></div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="px-2.5 py-1 rounded-lg bg-brand-500/20 text-brand-400 border border-brand-500/30 text-[11px] font-bold flex items-center gap-1">
+                                            <i class="ri-vip-crown-line"></i> الإصدار الكامل المعتمد
+                                        </span>
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-lg font-black text-white">{{ number_format($product->price, 2) }}</span>
+                                            <span class="text-xs font-semibold text-brand-400">{{ $product->currency?->code ?? 'USD' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="text-base font-bold text-white mb-2 leading-snug">
+                                        الكتاب الكامل الشامل
+                                    </h4>
+
+                                    <div class="flex items-center gap-3 text-xs text-zinc-400 mb-4 pb-3 border-b border-brand-950/60">
+                                        <span class="flex items-center gap-1"><i class="ri-pages-line text-brand-400"></i> {{ $product->page_count ?? 120 }} صفحة</span>
+                                        <span>•</span>
+                                        <span>{{ $product->formatted_file_size }}</span>
+                                        <span>•</span>
+                                        <span class="text-amber-400 font-medium">وصول دائم</span>
+                                    </div>
+                                </div>
+
+                                @if($isPurchased)
+                                    <a href="{{ route('library.my_library.download', $product->slug) }}" class="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-1.5 mt-auto">
+                                        <i class="ri-download-2-fill text-base"></i>
+                                        <span>تحميل النسخة الكاملة PDF</span>
+                                    </a>
+                                @elseif(auth()->check())
+                                    <form action="{{ route('library.buy.wallet', $product->slug) }}" method="POST" class="mt-auto">
+                                        @csrf
+                                        <button type="submit" onclick="return confirm('هل تريد تأكيد شراء النسخة الكاملة بـ {{ number_format($product->price, 2) }}؟')" class="w-full h-11 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-1.5">
+                                            <i class="ri-wallet-3-line text-base"></i>
+                                            <span>شراء النسخة الكاملة ({{ number_format($product->price, 2) }} {{ $product->currency?->code ?? 'USD' }})</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <a href="{{ route('login') }}" class="w-full h-11 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-1.5 mt-auto">
+                                        <i class="ri-user-shared-line text-base"></i>
+                                        <span>تسجيل الدخول لشراء النسخة الكاملة</span>
+                                    </a>
+                                @endif
+                            </div>
+
                         </div>
-                    @endif
-                </div>
+                    </div>
+                @else
+                    <div class="rounded-2xl glass-card p-6 border border-zinc-800 mb-8">
+                        @if($isPurchased)
+                            <!-- User Already Purchased -->
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1 mb-1">
+                                        <i class="ri-checkbox-circle-fill"></i> تمتلك هذا الكتاب في مكتبتك
+                                    </span>
+                                    <h4 class="text-sm font-bold text-white">يمكنك تحميل الكتاب في أي وقت مدى الحياة</h4>
+                                </div>
+                                <a href="{{ route('library.my_library.download', $product->slug) }}" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all">
+                                    <i class="ri-download-2-fill text-lg"></i>
+                                    <span>تحميل ملف الـ PDF</span>
+                                </a>
+                            </div>
+                        @elseif($product->is_free)
+                            <!-- Free Download with Email Verification -->
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider block">تحميل مجاني 100%</span>
+                                        <h4 class="text-lg font-bold text-white">احصل على نسختك المجانية الآن</h4>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
+                                        Free Ebook
+                                    </span>
+                                </div>
+
+                                <form action="{{ route('library.free_download', $product->slug) }}" method="POST" class="space-y-3">
+                                    @csrf
+                                    <input type="hidden" name="edition_type" value="full">
+                                    <div class="relative">
+                                        <i class="ri-mail-line absolute right-4 top-3.5 text-zinc-400 text-base"></i>
+                                        <input type="email" name="email" value="{{ auth()->user()?->email ?? '' }}" required placeholder="أدخل بريدك الإلكتروني لاستلام رابط التحميل..." class="w-full h-12 pr-11 pl-4 rounded-xl bg-zinc-900 border border-zinc-700/80 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                    </div>
+                                    <button type="submit" class="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2">
+                                        <i class="ri-download-cloud-line text-lg"></i>
+                                        <span>تحميل الكتاب مجاناً</span>
+                                    </button>
+                                    <p class="text-[11px] text-zinc-500 text-center">
+                                        🔒 نلتزم بحماية خصوصيتك ولن يتم إرسال أي رسائل غير مرغوب فيها.
+                                    </p>
+                                </form>
+                            </div>
+                        @else
+                            <!-- Paid Book Flow -->
+                            <div>
+                                <div class="flex items-center justify-between mb-6">
+                                    <div>
+                                        <span class="text-xs text-zinc-400 block mb-1">سعر النسخة الرقمية</span>
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-3xl font-extrabold text-white">{{ number_format($product->price, 2) }}</span>
+                                            <span class="text-sm font-semibold text-brand-400">{{ $product->currency?->code ?? 'USD' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-left text-xs text-zinc-400">
+                                        <span class="px-2.5 py-1 rounded-md bg-zinc-800 text-zinc-300 font-semibold inline-block mb-1">وصول دائم</span>
+                                        <div>تحديثات مجانية للكتاب</div>
+                                    </div>
+                                </div>
+
+                                @auth
+                                    <form action="{{ route('library.buy.wallet', $product->slug) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" onclick="return confirm('هل تريد تأكيد شراء الكتاب وخصم {{ number_format($product->price, 2) }} من رصيدك؟')" class="w-full h-13 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-500/30 transition-all flex items-center justify-center gap-2">
+                                            <i class="ri-wallet-3-line text-lg"></i>
+                                            <span>شراء الآن من رصيد المحفظة ({{ number_format($product->price, 2) }} {{ $product->currency?->code ?? 'USD' }})</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <a href="{{ route('login') }}" class="w-full h-12 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-2">
+                                        <i class="ri-user-shared-line text-lg"></i>
+                                        <span>تسجيل الدخول لشراء الكتاب</span>
+                                    </a>
+                                @endauth
+                            </div>
+                        @endif
+                    </div>
+                @endif
 
                 <!-- Description / Book Content -->
                 <div class="prose prose-invert max-w-none">

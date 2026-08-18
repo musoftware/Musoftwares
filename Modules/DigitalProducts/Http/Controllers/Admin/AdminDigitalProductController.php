@@ -8,7 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Modules\DigitalProducts\Models\DigitalCategory;
 use Modules\DigitalProducts\Models\DigitalProduct;
 use Modules\DigitalProducts\Services\PdfProcessingService;
@@ -19,7 +20,7 @@ class AdminDigitalProductController extends Controller
         protected PdfProcessingService $pdfService
     ) {}
 
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = DigitalProduct::with(['category', 'purchases']);
 
@@ -48,18 +49,25 @@ class AdminDigitalProductController extends Controller
 
         $stats = [
             'total_books' => DigitalProduct::count(),
-            'total_downloads' => DigitalProduct::sum('download_count'),
+            'total_downloads' => (int) DigitalProduct::sum('download_count'),
             'total_free' => DigitalProduct::where('is_free', true)->count(),
             'total_paid' => DigitalProduct::where('is_free', false)->count(),
         ];
 
-        return view('digitalproducts::admin.index', compact('products', 'categories', 'stats'));
+        return Inertia::render('Admin/DigitalProducts/Index', [
+            'products' => $products,
+            'categories' => $categories,
+            'stats' => $stats,
+            'filters' => $request->only(['search', 'category_id', 'status']),
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
         $categories = DigitalCategory::where('is_active', true)->orderBy('name')->get();
-        return view('digitalproducts::admin.create', compact('categories'));
+        return Inertia::render('Admin/DigitalProducts/Create', [
+            'categories' => $categories,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse|JsonResponse
@@ -70,6 +78,12 @@ class AdminDigitalProductController extends Controller
             'pdf_file' => 'required|file|mimes:pdf|max:153600', // max 150MB
             'cover_data' => 'nullable|string', // Base64 data from PDF.js
             'cover_image' => 'nullable|image|max:10240',
+            'has_free_edition' => 'nullable|boolean',
+            'free_edition_title' => 'nullable|string|max:255',
+            'free_edition_pdf_file' => 'nullable|file|mimes:pdf|max:153600',
+            'free_edition_cover_data' => 'nullable|string',
+            'free_edition_cover_image' => 'nullable|image|max:10240',
+            'free_edition_page_count' => 'nullable|integer|min:1',
             'category_id' => 'nullable|exists:digital_categories,id',
             'price' => 'nullable|numeric|min:0',
             'is_free' => 'nullable|boolean',
@@ -86,15 +100,35 @@ class AdminDigitalProductController extends Controller
             'meta_description' => 'nullable|string',
         ]);
 
-        // 1. Process and store PDF file
+        // 1. Process and store Main PDF file
         $pdfResult = $this->pdfService->storePdf($request->file('pdf_file'));
 
-        // 2. Process and store Cover Image (from client-side PDF.js canvas or manual upload)
+        // 2. Process and store Main Cover Image
         $coverPath = null;
         if ($request->filled('cover_data')) {
             $coverPath = $this->pdfService->storeCoverImage($request->cover_data);
         } elseif ($request->hasFile('cover_image')) {
             $coverPath = $this->pdfService->storeCoverImage($request->file('cover_image'));
+        }
+
+        // 3. Process Free Playbook Edition if enabled
+        $hasFreeEdition = $request->boolean('has_free_edition');
+        $freeEditionFilePath = null;
+        $freeEditionCoverPath = null;
+        $freeEditionPageCount = null;
+        $freeEditionFileSize = null;
+
+        if ($hasFreeEdition && $request->hasFile('free_edition_pdf_file')) {
+            $playbookResult = $this->pdfService->storePdf($request->file('free_edition_pdf_file'));
+            $freeEditionFilePath = $playbookResult['file_path'];
+            $freeEditionFileSize = $playbookResult['file_size'];
+            $freeEditionPageCount = $validated['free_edition_page_count'] ?? $playbookResult['page_count'] ?? 1;
+
+            if ($request->filled('free_edition_cover_data')) {
+                $freeEditionCoverPath = $this->pdfService->storeCoverImage($request->free_edition_cover_data);
+            } elseif ($request->hasFile('free_edition_cover_image')) {
+                $freeEditionCoverPath = $this->pdfService->storeCoverImage($request->file('free_edition_cover_image'));
+            }
         }
 
         $price = (float) ($request->price ?? 0);
@@ -106,6 +140,12 @@ class AdminDigitalProductController extends Controller
             'category_id' => $validated['category_id'] ?? null,
             'price' => $isFree ? 0 : $price,
             'is_free' => $isFree,
+            'has_free_edition' => $hasFreeEdition && !empty($freeEditionFilePath),
+            'free_edition_title' => $validated['free_edition_title'] ?? 'Playbook Edition (ملخص مجاني)',
+            'free_edition_file_path' => $freeEditionFilePath,
+            'free_edition_cover_path' => $freeEditionCoverPath,
+            'free_edition_page_count' => $freeEditionPageCount,
+            'free_edition_file_size' => $freeEditionFileSize,
             'file_path' => $pdfResult['file_path'],
             'cover_image_path' => $coverPath,
             'file_size' => $pdfResult['file_size'],
@@ -125,21 +165,24 @@ class AdminDigitalProductController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'تم رفع وإضافة الكتاب بنجاح!',
+                'message' => 'تم رفع وإضافة الكتاب والنسخ بنجاح!',
                 'redirect_url' => route('admin.digitalproducts.index'),
             ]);
         }
 
         return redirect()->route('admin.digitalproducts.index')
-            ->with('success', 'تم رفع وإضافة الكتاب واستخراج البيانات بنجاح!');
+            ->with('success', 'تم رفع وإضافة الكتاب والنسخ واستخراج البيانات بنجاح!');
     }
 
-    public function edit(int $id): View
+    public function edit(int $id): Response
     {
         $product = DigitalProduct::findOrFail($id);
         $categories = DigitalCategory::where('is_active', true)->orderBy('name')->get();
 
-        return view('digitalproducts::admin.edit', compact('product', 'categories'));
+        return Inertia::render('Admin/DigitalProducts/Edit', [
+            'product' => $product,
+            'categories' => $categories,
+        ]);
     }
 
     public function update(Request $request, int $id): RedirectResponse
@@ -152,6 +195,11 @@ class AdminDigitalProductController extends Controller
             'category_id' => 'nullable|exists:digital_categories,id',
             'price' => 'nullable|numeric|min:0',
             'is_free' => 'nullable|boolean',
+            'has_free_edition' => 'nullable|boolean',
+            'free_edition_title' => 'nullable|string|max:255',
+            'free_edition_pdf_file' => 'nullable|file|mimes:pdf|max:153600',
+            'free_edition_cover_image' => 'nullable|image|max:10240',
+            'free_edition_page_count' => 'nullable|integer|min:1',
             'author_name' => 'nullable|string|max:255',
             'publisher' => 'nullable|string|max:255',
             'publication_year' => 'nullable|string|max:10',
@@ -167,7 +215,7 @@ class AdminDigitalProductController extends Controller
             'cover_image' => 'nullable|image|max:10240',
         ]);
 
-        // If new PDF uploaded
+        // If new Main PDF uploaded
         if ($request->hasFile('pdf_file')) {
             if ($product->file_path && Storage::disk('local')->exists($product->file_path)) {
                 Storage::disk('local')->delete($product->file_path);
@@ -180,10 +228,36 @@ class AdminDigitalProductController extends Controller
             }
         }
 
-        // If new cover uploaded
+        // If new Main cover uploaded
         if ($request->hasFile('cover_image')) {
             $coverPath = $this->pdfService->storeCoverImage($request->file('cover_image'));
             $product->cover_image_path = $coverPath;
+        }
+
+        // Free Playbook updates
+        $hasFreeEdition = $request->boolean('has_free_edition');
+        if ($hasFreeEdition) {
+            if ($request->hasFile('free_edition_pdf_file')) {
+                if ($product->free_edition_file_path && Storage::disk('local')->exists($product->free_edition_file_path)) {
+                    Storage::disk('local')->delete($product->free_edition_file_path);
+                }
+                $playbookResult = $this->pdfService->storePdf($request->file('free_edition_pdf_file'));
+                $product->free_edition_file_path = $playbookResult['file_path'];
+                $product->free_edition_file_size = $playbookResult['file_size'];
+                if (!$request->filled('free_edition_page_count') && $playbookResult['page_count']) {
+                    $product->free_edition_page_count = $playbookResult['page_count'];
+                }
+            }
+            if ($request->hasFile('free_edition_cover_image')) {
+                $product->free_edition_cover_path = $this->pdfService->storeCoverImage($request->file('free_edition_cover_image'));
+            }
+            $product->has_free_edition = true;
+            $product->free_edition_title = $validated['free_edition_title'] ?? $product->free_edition_title ?? 'Playbook Edition (ملخص مجاني)';
+            if ($request->filled('free_edition_page_count')) {
+                $product->free_edition_page_count = (int)$validated['free_edition_page_count'];
+            }
+        } else {
+            $product->has_free_edition = false;
         }
 
         $price = (float) ($request->price ?? 0);
@@ -212,17 +286,21 @@ class AdminDigitalProductController extends Controller
             ->with('success', 'تم تحديث بيانات الكتاب بنجاح!');
     }
 
-    public function togglePublish(int $id): JsonResponse
+    public function togglePublish(int $id): RedirectResponse|JsonResponse
     {
         $product = DigitalProduct::findOrFail($id);
         $product->is_published = !$product->is_published;
         $product->save();
 
-        return response()->json([
-            'success' => true,
-            'is_published' => $product->is_published,
-            'message' => $product->is_published ? 'تم نشر الكتاب في المعرض.' : 'تم إخفاء الكتاب.',
-        ]);
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'is_published' => $product->is_published,
+                'message' => $product->is_published ? 'تم نشر الكتاب في المعرض.' : 'تم إخفاء الكتاب.',
+            ]);
+        }
+
+        return back()->with('success', $product->is_published ? 'تم نشر الكتاب في المعرض.' : 'تم إخفاء الكتاب.');
     }
 
     public function destroy(int $id): RedirectResponse

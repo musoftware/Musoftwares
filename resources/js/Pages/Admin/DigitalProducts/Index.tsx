@@ -519,14 +519,14 @@ export default function Index({ products, categories, stats, filters = {} }: Pro
             {/* Confirm Delete Modal */}
             <ConfirmModal
                 isOpen={Boolean(pendingDeleteProduct)}
-                onClose={() => setPendingDeleteProduct(null)}
+                onCancel={() => setPendingDeleteProduct(null)}
                 onConfirm={confirmDelete}
                 title={__('general.confirm_delete_book') || 'Delete Digital Book'}
-                message={
+                description={
                     __('general.confirm_delete_book_message') ||
                     `Are you sure you want to delete "${pendingDeleteProduct?.title}"? This action cannot be undone.`
                 }
-                confirmText={__('general.delete') || 'Delete'}
+                confirmLabel={__('general.delete') || 'Delete'}
                 variant="danger"
             />
         </AdminSidebarLayout>

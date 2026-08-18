@@ -9,5 +9,6 @@
     "Shortlink": true,
     "WhatsappSender": true,
     "Listing": true,
-    "Series": true
+    "Series": true,
+    "DigitalProducts": true
 }

@@ -35,10 +35,11 @@ const items: MenuItem[] = [
     icon: Users,
     subItems: [
         { title: "Users", url: "/admin/users" },
-
         { title: "Projects", url: "/admin/projects" },
         { title: "Plans", url: "/admin/plans" },
         { title: "Blog Articles", url: "/admin/blog-articles" },
+        { title: "Digital Books", url: "/admin/digital-products" },
+        { title: "Book Categories", url: "/admin/digital-products/categories" },
     ]
   },
   {

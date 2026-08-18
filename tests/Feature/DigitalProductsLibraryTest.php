@@ -96,6 +96,63 @@ class DigitalProductsLibraryTest extends TestCase
         $this->assertEquals('attachment; filename=free-download-book.pdf', $downloadRes->headers->get('content-disposition'));
     }
 
+    public function test_dual_edition_book_allows_free_playbook_download_and_paid_full_book(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('books/files/full-ai-book.pdf', '%PDF-1.4 Full 120 Pages Master Book');
+        Storage::disk('local')->put('books/files/playbook-ai.pdf', '%PDF-1.4 Free 20 Pages Playbook');
+
+        $book = DigitalProduct::create([
+            'title' => 'AI Business Master Book',
+            'slug' => 'ai-business-master-book',
+            'price' => 49.00,
+            'is_free' => false,
+            'file_path' => 'books/files/full-ai-book.pdf',
+            'page_count' => 120,
+            'has_free_edition' => true,
+            'free_edition_title' => 'AI Business Fast Playbook',
+            'free_edition_file_path' => 'books/files/playbook-ai.pdf',
+            'free_edition_page_count' => 20,
+            'is_published' => true,
+        ]);
+
+        // 1. Check show page displays both options
+        $showRes = $this->get(route('library.show', $book->slug));
+        $showRes->assertStatus(200);
+        $showRes->assertSee('نسخة مجانية (Playbook)');
+        $showRes->assertSee('AI Business Fast Playbook');
+        $showRes->assertSee('الإصدار الكامل المعتمد');
+
+        // 2. Request Free Playbook Download
+        $freePlaybookRes = $this->post(route('library.free_download', $book->slug), [
+            'email' => 'playbook.reader@example.com',
+            'edition_type' => 'playbook',
+        ]);
+        $freePlaybookRes->assertStatus(302);
+
+        $downloadRecord = $book->downloads()->where('email', 'playbook.reader@example.com')->first();
+        $this->assertNotNull($downloadRecord);
+        $this->assertEquals('playbook', $downloadRecord->edition_type);
+
+        // 3. Download Playbook by token
+        $playbookFileRes = $this->get(route('library.download.token', $downloadRecord->download_token));
+        $playbookFileRes->assertStatus(200);
+        $this->assertEquals('attachment; filename=playbook-ai-business-master-book.pdf', $playbookFileRes->headers->get('content-disposition'));
+
+        $this->assertEquals(1, $book->fresh()->free_edition_download_count);
+
+        // 4. Buy Full Book with Wallet
+        $this->clientUser->add_balance(100.00, 'Test Deposit', 'deposit', 1);
+        $buyResponse = $this->actingAs($this->clientUser)->post(route('library.buy.wallet', $book->slug));
+        $buyResponse->assertStatus(302);
+        $buyResponse->assertRedirect(route('library.my_library'));
+
+        // 5. Permanent Full Download
+        $fullDownloadRes = $this->actingAs($this->clientUser)->get(route('library.my_library.download', $book->slug));
+        $fullDownloadRes->assertStatus(200);
+        $this->assertEquals('attachment; filename=ai-business-master-book.pdf', $fullDownloadRes->headers->get('content-disposition'));
+    }
+
     public function test_paid_book_wallet_purchase_and_permanent_download(): void
     {
         Storage::fake('local');
@@ -135,23 +192,30 @@ class DigitalProductsLibraryTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.digitalproducts.index'));
         $response->assertStatus(200);
-        $response->assertSee('معرض الكتب والمطبوعات الرقمية');
+        $response->assertInertia(fn ($page) => $page->component('Admin/DigitalProducts/Index'));
     }
 
-    public function test_admin_can_upload_new_book(): void
+    public function test_admin_can_upload_new_book_with_dual_editions(): void
     {
         Storage::fake('local');
 
-        $pdfContent = "%PDF-1.4\n1 0 obj\n<< /Count 42 /Type /Pages >>\nendobj\n";
-        $pdfFile = UploadedFile::fake()->createWithContent('ai-handbook.pdf', $pdfContent);
+        $fullPdfContent = "%PDF-1.4\n1 0 obj\n<< /Count 120 /Type /Pages >>\nendobj\n";
+        $fullPdfFile = UploadedFile::fake()->createWithContent('full-book.pdf', $fullPdfContent);
+
+        $playbookPdfContent = "%PDF-1.4\n1 0 obj\n<< /Count 20 /Type /Pages >>\nendobj\n";
+        $playbookPdfFile = UploadedFile::fake()->createWithContent('playbook-summary.pdf', $playbookPdfContent);
 
         $response = $this->actingAs($this->admin)
             ->post(route('admin.digitalproducts.store'), [
-                'title' => 'كتيب الذكاء الاصطناعي الشامل',
-                'price' => 0.00,
-                'is_free' => 1,
-                'page_count' => 42,
-                'pdf_file' => $pdfFile,
+                'title' => 'كتاب نماذج الأعمال والذكاء الاصطناعي',
+                'price' => 35.00,
+                'is_free' => 0,
+                'page_count' => 120,
+                'pdf_file' => $fullPdfFile,
+                'has_free_edition' => 1,
+                'free_edition_title' => 'ملخص الـ Playbook المجاني',
+                'free_edition_pdf_file' => $playbookPdfFile,
+                'free_edition_page_count' => 20,
                 'is_published' => 1,
             ]);
 
@@ -159,9 +223,11 @@ class DigitalProductsLibraryTest extends TestCase
         $response->assertRedirect(route('admin.digitalproducts.index'));
 
         $this->assertDatabaseHas('digital_products', [
-            'title' => 'كتيب الذكاء الاصطناعي الشامل',
-            'page_count' => 42,
-            'is_free' => 1,
+            'title' => 'كتاب نماذج الأعمال والذكاء الاصطناعي',
+            'price' => 35.00,
+            'page_count' => 120,
+            'has_free_edition' => 1,
+            'free_edition_page_count' => 20,
         ]);
     }
 }

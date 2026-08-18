@@ -15,12 +15,13 @@ class DownloadTokenService
     /**
      * Create a download record with unique secure token for free or email-verified access.
      */
-    public function generateTokenForFreeBook(DigitalProduct $product, string $email, ?User $user = null): DigitalProductDownload
+    public function generateTokenForFreeBook(DigitalProduct $product, string $email, ?User $user = null, string $editionType = 'full'): DigitalProductDownload
     {
         $hours = config('digitalproducts.download_token_lifetime_hours', 48);
 
         return DigitalProductDownload::create([
             'digital_product_id' => $product->id,
+            'edition_type' => $editionType,
             'user_id' => $user?->id,
             'email' => strtolower(trim($email)),
             'download_token' => Str::random(64),
@@ -44,7 +45,12 @@ class DownloadTokenService
         }
 
         $product = $download->product;
-        if (!$product || !Storage::disk('local')->exists($product->file_path)) {
+        $isPlaybook = ($download->edition_type === 'playbook');
+        $filePath = ($isPlaybook && $product->free_edition_file_path)
+            ? $product->free_edition_file_path
+            : $product->file_path;
+
+        if (!$product || empty($filePath) || !Storage::disk('local')->exists($filePath)) {
             throw new Exception(__('digitalproducts.file_not_found'));
         }
 
@@ -55,10 +61,15 @@ class DownloadTokenService
             'ip_address' => request()->ip(),
         ]);
 
-        $product->increment('download_count');
+        if ($isPlaybook) {
+            $product->increment('free_edition_download_count');
+        } else {
+            $product->increment('download_count');
+        }
 
-        $fullPath = Storage::disk('local')->path($product->file_path);
-        $cleanFileName = Str::slug($product->title) . '.pdf';
+        $fullPath = Storage::disk('local')->path($filePath);
+        $prefix = $isPlaybook ? 'playbook-' : '';
+        $cleanFileName = $prefix . (Str::slug($product->title) ?: 'book') . '.pdf';
 
         return response()->download($fullPath, $cleanFileName, [
             'Content-Type' => 'application/pdf',
