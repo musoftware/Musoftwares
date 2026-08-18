@@ -142,6 +142,11 @@ class HomeController extends Controller
         ]);
     }
 
+    public function services(Request $request)
+    {
+        return redirect()->route('marketplace.services.index', $request->query());
+    }
+
     public function websiteServiceShow($slug)
     {
         $service = WebsiteService::where('slug', $slug)->firstOrFail();

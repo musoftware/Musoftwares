@@ -130,11 +130,39 @@ class ProcessWebhookJob implements ShouldQueue
         }
 
         $source = $metaData['source'] ?? null;
+        $merchantOrderId = $data['merchantOrderId'] ?? '';
+
+        // Fallback source & ID deduction from merchantOrderId if metaData was omitted by gateway
+        if (! $source && $merchantOrderId) {
+            if (str_starts_with($merchantOrderId, 'plnk_')) {
+                $source = 'payment-link';
+                if (! isset($metaData['payment_link_id']) && preg_match('/^plnk_(\d+)_/', $merchantOrderId, $matches)) {
+                    $metaData['payment_link_id'] = (int) $matches[1];
+                }
+            } elseif (str_starts_with($merchantOrderId, 'u_inv_')) {
+                $source = 'user-invoice-payment';
+                if (! isset($metaData['invoice_id']) && preg_match('/^u_inv_(\d+)_/', $merchantOrderId, $matches)) {
+                    $metaData['invoice_id'] = (int) $matches[1];
+                }
+            } elseif (str_starts_with($merchantOrderId, 'inv_')) {
+                $source = 'guest-invoice-payment';
+                if (! isset($metaData['invoice_id']) && preg_match('/^inv_(\d+)_/', $merchantOrderId, $matches)) {
+                    $metaData['invoice_id'] = (int) $matches[1];
+                }
+            }
+        }
+
         $userId = $metaData['user_id'] ?? null;
+        if (! $userId && $merchantOrderId) {
+            if (preg_match('/-(\d+)$/', $merchantOrderId, $uMatches)) {
+                $userId = (int) $uMatches[1];
+            }
+        }
+
         $trxId = $data['transactionId'] ?? null;
 
         $amountPaid = floatval($metaData['original_amount'] ?? $data['amount'] ?? 0);
-        $currencyCode = $metaData['original_currency'] ?? 'EGP';
+        $currencyCode = $metaData['original_currency'] ?? ($data['currency'] ?? 'EGP');
 
         $currencyId = null;
         if ($currencyCode) {

@@ -220,19 +220,25 @@ class InvoiceController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 400);
         }
 
-        $payload = json_decode($request->getContent(), true);
+        $payload = json_decode($request->getContent(), true) ?: $request->all();
         if (! $payload || ! isset($payload['data'])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid payload format'], 400);
         }
 
         $data = $payload['data'];
-        $metaData = json_decode($data['metaData'] ?? '{}', true);
-
-        if (($metaData['source'] ?? '') !== 'user-invoice-payment') {
-            return response()->json(['status' => 'ignored', 'message' => 'Not a user invoice payment']);
+        $metaData = $data['metaData'] ?? [];
+        if (is_string($metaData)) {
+            $metaData = json_decode($metaData, true) ?: [];
         }
 
+        // Try extracting invoice ID from metadata or fallback to merchantOrderId (e.g. u_inv_4277_...)
         $invoiceId = $metaData['invoice_id'] ?? null;
+        if (! $invoiceId && ! empty($data['merchantOrderId'])) {
+            if (preg_match('/^(?:u_)?inv_(\d+)_/', $data['merchantOrderId'], $matches)) {
+                $invoiceId = (int) $matches[1];
+            }
+        }
+
         if (! $invoiceId) {
             return response()->json(['status' => 'error', 'message' => 'Missing invoice ID'], 400);
         }
@@ -242,7 +248,7 @@ class InvoiceController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Invoice not found'], 404);
         }
 
-        if ($data['status'] === 'SUCCESS') {
+        if (($data['status'] ?? '') === 'SUCCESS') {
             if ($invoice->status !== 'paid') {
                 try {
                     $invoice->mark_as_paid();
@@ -254,7 +260,7 @@ class InvoiceController extends Controller
                 }
             }
         } else {
-            Log::info("User Invoice payment failed for invoice #{$invoice->id}, Status: ".$data['status']);
+            Log::info("User Invoice payment failed for invoice #{$invoice->id}, Status: ".($data['status'] ?? 'unknown'));
         }
 
         return response()->json(['status' => 'success']);

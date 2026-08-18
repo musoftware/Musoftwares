@@ -121,19 +121,25 @@ class GuestInvoiceController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 400);
         }
 
-        $payload = json_decode($request->getContent(), true);
+        $payload = json_decode($request->getContent(), true) ?: $request->all();
         if (! $payload || ! isset($payload['data'])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid payload format'], 400);
         }
 
         $data = $payload['data'];
-        $metaData = json_decode($data['metaData'] ?? '{}', true);
-
-        if (($metaData['source'] ?? '') !== 'guest-invoice-payment') {
-            return response()->json(['status' => 'ignored', 'message' => 'Not a guest invoice payment']);
+        $metaData = $data['metaData'] ?? [];
+        if (is_string($metaData)) {
+            $metaData = json_decode($metaData, true) ?: [];
         }
 
+        // Try extracting invoice ID from metadata or fallback to merchantOrderId (e.g. inv_4277_6a809d141e9c9-778)
         $invoiceId = $metaData['invoice_id'] ?? null;
+        if (! $invoiceId && ! empty($data['merchantOrderId'])) {
+            if (preg_match('/^inv_(\d+)_/', $data['merchantOrderId'], $matches)) {
+                $invoiceId = (int) $matches[1];
+            }
+        }
+
         if (! $invoiceId) {
             return response()->json(['status' => 'error', 'message' => 'Missing invoice ID'], 400);
         }
@@ -143,7 +149,7 @@ class GuestInvoiceController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Invoice not found'], 404);
         }
 
-        if ($data['status'] === 'SUCCESS') {
+        if (($data['status'] ?? '') === 'SUCCESS') {
             if ($invoice->status !== 'paid') {
                 try {
                     $invoice->mark_as_paid();
@@ -155,7 +161,7 @@ class GuestInvoiceController extends Controller
                 }
             }
         } else {
-            Log::info("Guest Invoice payment failed for invoice #{$invoice->id}, Status: ".$data['status']);
+            Log::info("Guest Invoice payment failed for invoice #{$invoice->id}, Status: ".($data['status'] ?? 'unknown'));
         }
 
         return response()->json(['status' => 'success']);

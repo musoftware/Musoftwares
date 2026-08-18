@@ -80,6 +80,12 @@ class PublicRoutesTest extends TestCase
         $this->get('/blog/test-article')->assertStatus(200);
     }
 
+    public function test_services_redirects_to_marketplace()
+    {
+        $response = $this->get('/services');
+        $response->assertRedirect(route('marketplace.services.index'));
+    }
+
     public function test_website_service_show_returns_successful_response()
     {
         $service = new WebsiteService;

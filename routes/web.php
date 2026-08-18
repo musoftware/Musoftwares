@@ -119,6 +119,7 @@ use Modules\Marketplace\Http\Controllers\ServiceReviewController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio');
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
+Route::get('/services', [HomeController::class, 'services'])->name('services.index');
 Route::get('/services/{slug}', [HomeController::class, 'websiteServiceShow'])->name('website-services.show');
 
 // Public Contract Links

@@ -91,20 +91,33 @@ class GuestPaymentLinkController extends Controller
 
     public function paymentWebhook(Request $request)
     {
-        $payload = json_decode($request->getContent(), true);
+        $payload = json_decode($request->getContent(), true) ?: $request->all();
         if (! $payload || ! isset($payload['data'])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid payload format'], 400);
         }
 
-        $metaData = json_decode($payload['data']['metaData'] ?? '{}', true);
-        if (($metaData['source'] ?? '') !== 'payment-link') {
+        $data = $payload['data'];
+        $metaData = $data['metaData'] ?? [];
+        if (is_string($metaData)) {
+            $metaData = json_decode($metaData, true) ?: [];
+        }
+
+        $source = $metaData['source'] ?? null;
+        $merchantOrderId = $data['merchantOrderId'] ?? '';
+        if (! $source && $merchantOrderId) {
+            if (str_starts_with($merchantOrderId, 'plnk_')) {
+                $source = 'payment-link';
+            }
+        }
+
+        if ($source && $source !== 'payment-link') {
             return response()->json(['status' => 'ignored', 'message' => 'Not a payment link payment']);
         }
 
         try {
             $webhook = IncomingWebhook::create([
                 'source' => 'kashier',
-                'event_type' => $payload['data']['status'] ?? 'unknown',
+                'event_type' => $data['status'] ?? 'unknown',
                 'payload' => $payload,
                 'headers' => $request->headers->all(),
                 'status' => 'pending',

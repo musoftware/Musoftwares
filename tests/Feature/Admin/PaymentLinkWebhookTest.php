@@ -129,13 +129,83 @@ class PaymentLinkWebhookTest extends TestCase
             'headers' => [],
         ]));
 
-        $reflection = new \ReflectionMethod($job, 'handlePaymentLink');
-        $reflection->setAccessible(true);
-
         $this->expectException(\Exception::class);
         $reflection->invoke($job, 'trx_1', 99, ['payment_link_id' => $link->id]);
 
         $link->refresh();
         $this->assertSame(PaymentLink::STATUS_PENDING, $link->status);
+    }
+
+    public function test_webhook_controller_handles_kashier_payload_without_metadata(): void
+    {
+        \Illuminate\Support\Facades\Queue::fake();
+
+        $user = User::factory()->create();
+        $link = PaymentLink::factory()->create(['user_id' => $user->id, 'amount' => 2299.92]);
+
+        $payload = [
+            'platform' => 'kashier',
+            'event' => 'pay',
+            'data' => [
+                'merchantOrderId' => "plnk_{$link->id}_6a6fbbffcf25f-69",
+                'kashierOrderId' => '5170fd8e-16fd-4588-a470-6d51891b1457',
+                'orderReference' => 'ORD-29811024',
+                'transactionId' => 'TX-24073468588',
+                'status' => 'SUCCESS',
+                'method' => 'card',
+                'amount' => 2299.92,
+                'currency' => 'EGP',
+            ],
+        ];
+
+        $response = $this->call(
+            'POST',
+            route('guest.payment-links.webhook'),
+            [],
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($payload)
+        );
+
+        $response->assertStatus(202);
+        \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\ProcessWebhookJob::class);
+    }
+
+    public function test_process_kashier_handles_merchant_order_id_fallback(): void
+    {
+        $user = User::factory()->create();
+        $link = PaymentLink::factory()->create(['user_id' => $user->id, 'amount' => 2299.92]);
+
+        $payload = [
+            'platform' => 'kashier',
+            'event' => 'pay',
+            'data' => [
+                'merchantOrderId' => "plnk_{$link->id}_6a6fbbffcf25f-69",
+                'kashierOrderId' => '5170fd8e-16fd-4588-a470-6d51891b1457',
+                'orderReference' => 'ORD-29811024',
+                'transactionId' => 'TX-24073468588',
+                'status' => 'SUCCESS',
+                'method' => 'card',
+                'amount' => 2299.92,
+                'currency' => 'EGP',
+            ],
+        ];
+
+        $webhook = new \App\Models\IncomingWebhook([
+            'source' => 'kashier',
+            'payload' => $payload,
+            'headers' => [],
+        ]);
+
+        $job = new \App\Jobs\ProcessWebhookJob($webhook);
+        $reflection = new \ReflectionMethod($job, 'processKashier');
+        $reflection->setAccessible(true);
+        $reflection->invoke($job, $payload);
+
+        $link->refresh();
+        $this->assertSame(PaymentLink::STATUS_PAID, $link->status);
+        $this->assertSame(PaymentLink::METHOD_KASHIER, $link->paid_method);
+        $this->assertSame('TX-24073468588', $link->paid_transaction_id);
     }
 }

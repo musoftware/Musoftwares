@@ -59,6 +59,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'financial/add-balance/webhook',
             'subscriptions/kashier/webhook',
             'points/kashier/webhook',
+            'billing/invoices/payment/webhook',
+            'guest/invoices/payment/webhook',
+            'guest/quotations/payment/webhook',
+            'pay/webhook',
             'api/serial/device',   // Serial license check-in — called by client software, no browser session
             'crm/whatsapp/webhook/*', // WhatsApp provider webhooks — external POST requests
             'sms-pay/*/verify', // Hosted checkout embedded via iframe across domains
