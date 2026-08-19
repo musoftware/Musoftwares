@@ -119,8 +119,11 @@
                                     <p class="font-semibold text-slate-900 dark:text-white">
                                         {{ $order->snapshot['package_name'] ?? $order->package?->name ?? 'Standard Package' }}
                                     </p>
+                                    @php
+                                        $oCurrency = $order->currency->symbol ?? $order->currency->currency ?? '$';
+                                    @endphp
                                     <div class="flex items-baseline gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
-                                        <span>${{ number_format($order->amount, 2) }}</span>
+                                        <span>{{ $oCurrency }} {{ number_format($order->amount, 2) }}</span>
                                         <span class="text-[10px] text-slate-500 dark:text-zinc-400 font-normal">({{ app()->getLocale() === 'ar' ? 'محفوظ بالضمان' : 'Escrow Protected' }})</span>
                                     </div>
                                 </td>

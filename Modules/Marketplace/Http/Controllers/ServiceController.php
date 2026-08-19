@@ -413,16 +413,9 @@ class ServiceController extends Controller
     public function create()
     {
         $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
-        $user = auth()->user();
+        $seller = auth()->user();
 
-        return Inertia::render('Marketplace/Services/Create', [
-            'categories' => $categories,
-            'seller' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'avatar' => $user->avatar ?? null,
-            ],
-        ]);
+        return view('marketplace::services.create', compact('categories', 'seller'));
     }
 
     public function store(StoreServiceRequest $request)
@@ -579,10 +572,7 @@ class ServiceController extends Controller
         $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
         $service->load(['packages', 'extras']);
 
-        return Inertia::render('Marketplace/Services/Edit', [
-            'categories' => $categories,
-            'service' => $service,
-        ]);
+        return view('marketplace::services.edit', compact('categories', 'service'));
     }
 
     public function update(UpdateServiceRequest $request, Service $service)

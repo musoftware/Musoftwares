@@ -1,9 +1,32 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="scroll-smooth">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="scroll-smooth dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Theme Initialization Script (Prevents FOUC) -->
+    <script>
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('musoftware_theme') || localStorage.getItem('theme');
+                if (storedTheme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                } else if (storedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (prefersDark) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            } catch (e) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
 
     <!-- SEO Meta Tags -->
     <title>{{ $meta['title'] ?? __('marketplace.meta_title') ?? 'Software & Digital Services Marketplace | MuSoftwares' }}</title>
@@ -39,10 +62,10 @@
 
     <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Plus Jakarta Sans (English) + Alexandria & IBM Plex Sans Arabic (Arabic) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Remix Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
@@ -69,15 +92,19 @@
                             950: '#1e1b4b',
                         },
                         dark: {
+                            950: '#060608',
                             900: '#09090b',
                             850: '#0f0f13',
-                            800: '#121215',
-                            700: '#18181b',
+                            800: '#121217',
+                            750: '#15151c',
+                            700: '#18181f',
                             600: '#27272a',
                         }
                     },
                     fontFamily: {
-                        sans: ['Cairo', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Alexandria', 'IBM Plex Sans Arabic', 'Inter', 'system-ui', 'sans-serif'],
+                        arabic: ['Alexandria', 'IBM Plex Sans Arabic', 'system-ui', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Alexandria', 'sans-serif'],
                     }
                 }
             }
@@ -85,25 +112,149 @@
     </script>
 
     <style>
+        :root {
+            --bg-body: #f8f9fc;
+            --text-body: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(226, 232, 240, 0.9);
+            --card-surface: #ffffff;
+            --card-border: #e2e8f0;
+            --card-sub-bg: #f8fafc;
+            --pill-active-bg: #0f172a;
+            --pill-active-text: #ffffff;
+            --pill-inactive-bg: #ffffff;
+            --pill-inactive-border: #e2e8f0;
+            --pill-inactive-text: #334155;
+            --accent-brand: #6366f1;
+        }
+        html.dark {
+            --bg-body: #09090b;
+            --text-body: #f3f4f6;
+            --glass-bg: rgba(15, 15, 19, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --card-surface: #111116;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-sub-bg: #16161d;
+            --pill-active-bg: #4f46e5;
+            --pill-active-text: #ffffff;
+            --pill-inactive-bg: #15151c;
+            --pill-inactive-border: rgba(255, 255, 255, 0.1);
+            --pill-inactive-text: #d4d4d8;
+            --accent-brand: #6366f1;
+        }
         body {
-            font-family: 'Cairo', 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #0b0c10;
-            color: #f3f4f6;
+            font-family: 'Cairo', 'Outfit', 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
         .glass {
-            background: rgba(18, 18, 24, 0.85);
+            background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid var(--glass-border);
         }
-        .card-surface {
-            background: rgba(22, 22, 30, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+        .explore-card {
+            background: var(--card-surface);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .card-surface:hover {
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 12px 30px -10px rgba(79, 70, 229, 0.2);
+        .explore-card:hover {
+            border-color: rgba(99, 102, 241, 0.45);
+            box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(99, 102, 241, 0.15);
+            transform: translateY(-3px);
+        }
+        html.dark .explore-card:hover {
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.3);
+        }
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .filter-pill.active {
+            background-color: var(--pill-active-bg);
+            color: var(--pill-active-text);
+            border: 1px solid var(--pill-active-bg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        .filter-pill.inactive {
+            background-color: var(--pill-inactive-bg);
+            color: var(--pill-inactive-text);
+            border: 1px solid var(--pill-inactive-border);
+        }
+        .filter-pill.inactive:hover {
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+        /* Custom Dual Range Slider Styling */
+        .range-slider-wrapper {
+            position: relative;
+            height: 24px;
+            display: flex;
+            align-items: center;
+        }
+        .range-slider-track {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            z-index: 1;
+        }
+        html.dark .range-slider-track {
+            background-color: #27272a;
+        }
+        .range-slider-progress {
+            position: absolute;
+            height: 4px;
+            background-color: #0f172a;
+            border-radius: 9999px;
+            z-index: 2;
+        }
+        html.dark .range-slider-progress {
+            background-color: #ffffff;
+        }
+        .range-slider-input {
+            position: absolute;
+            width: 100%;
+            pointer-events: none;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent !important;
+            height: 4px;
+            z-index: 3;
+            outline: none;
+            margin: 0;
+        }
+        .range-slider-input::-webkit-slider-thumb {
+            pointer-events: auto;
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #0f172a;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+        html.dark .range-slider-input::-webkit-slider-thumb {
+            background: #ffffff;
+            border: 2.5px solid #09090b;
+        }
+        .range-slider-input::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
         }
         .scrollbar-none::-webkit-scrollbar {
             display: none;
@@ -123,135 +274,92 @@
     @stack('schema')
     @stack('head')
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white bg-dark-900 text-zinc-100">
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white bg-[#f8f9fa] dark:bg-dark-900 text-slate-900 dark:text-zinc-100">
 
-    <!-- Top Announcement / Escrow Banner -->
-    <div class="bg-gradient-to-r from-brand-900/60 via-brand-800/40 to-dark-800 border-b border-brand-500/20 py-1.5 px-4 text-center text-xs text-brand-200">
-        <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-            <span class="inline-flex items-center gap-1 font-semibold text-brand-400">
-                <i class="ri-shield-check-fill text-sm text-emerald-400"></i>
-                {{ app()->getLocale() === 'ar' ? 'حماية وضمان المشترين:' : '100% Escrow Buyer Protection:' }}
-            </span>
-            <span>
-                {{ app()->getLocale() === 'ar' ? 'أموالك محفوظة في أمان تام ولا تُحول للبائع إلا بعد استلام الخدمة وموافقتك.' : 'Funds are held securely in escrow and only released upon your final approval.' }}
-            </span>
-        </div>
-    </div>
-
-    <!-- Marketplace Header -->
-    <header class="sticky top-0 z-50 glass">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4 py-3">
+    <!-- Minimalist Marketplace Header -->
+    <header class="sticky top-0 z-50 glass transition-colors border-b border-slate-200/60 dark:border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
             
             <!-- Left: Brand Logo & Title -->
-            <div class="flex items-center gap-4 sm:gap-6 flex-shrink-0">
-                <a href="{{ route('marketplace.services.index') }}" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-indigo-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/25 group-hover:scale-105 transition-all">
-                        <i class="ri-store-2-fill text-xl"></i>
+            <div class="flex items-center gap-4 flex-shrink-0">
+                <a href="{{ route('marketplace.services.index') }}" class="flex items-center gap-2.5 group">
+                    <div class="w-9 h-9 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 flex items-center justify-center font-black text-lg shadow-sm transition-transform group-hover:scale-105">
+                        <i class="ri-store-2-line"></i>
                     </div>
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-xl font-black tracking-tight text-white">
-                                musoftware
-                            </span>
-                            <span class="inline-flex items-center rounded-full bg-brand-500/20 border border-brand-500/30 px-2 py-0.5 text-[10px] font-bold text-brand-300 uppercase">
-                                Marketplace
-                            </span>
-                        </div>
-                        <span class="text-[10px] font-medium text-zinc-400 hidden sm:block">
-                            {{ app()->getLocale() === 'ar' ? 'سوق الخدمات البرمجية والحلول الرقمية' : 'Software Services & Digital Store' }}
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg font-black tracking-tight text-slate-900 dark:text-white font-sans">
+                            musoftware
+                        </span>
+                        <span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-dark-800 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:text-zinc-300">
+                            Marketplace
                         </span>
                     </div>
                 </a>
             </div>
 
-            <!-- Middle: Search Bar (Desktop) -->
-            <div class="hidden md:flex flex-1 max-w-xl mx-4">
-                <form action="{{ route('marketplace.services.index') }}" method="GET" class="w-full relative flex items-center">
-                    @if(request('category'))
-                        <input type="hidden" name="category" value="{{ request('category') }}">
-                    @endif
-                    <div class="relative w-full">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            value="{{ request('search') ?? request('q') }}" 
-                            placeholder="{{ app()->getLocale() === 'ar' ? 'ابحث عن خدمة، برمجة، ذكاء اصطناعي، تصميم...' : 'Search services, scripts, AI bots, web apps...' }}"
-                            class="w-full h-11 ps-4 pe-24 rounded-xl bg-zinc-900/90 border border-zinc-700/80 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all shadow-inner"
-                        >
-                        <button type="submit" class="absolute {{ app()->getLocale() === 'ar' ? 'left-1.5' : 'right-1.5' }} top-1.5 bottom-1.5 px-4 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center gap-1 transition-all shadow-sm">
-                            <i class="ri-search-2-line"></i>
-                            <span>{{ app()->getLocale() === 'ar' ? 'بحث' : 'Search' }}</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
             <!-- Right: Actions & User Navigation -->
             <div class="flex items-center gap-2 sm:gap-3">
                 
+                <!-- Dark / Light Mode Toggle Button -->
+                <button 
+                    type="button" 
+                    id="theme-toggle-btn"
+                    onclick="toggleDarkMode()" 
+                    class="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:bg-slate-200/70 dark:hover:bg-dark-800 transition-colors"
+                    title="تبديل المظهر (داكن / فاتح)"
+                    aria-label="Toggle dark mode"
+                >
+                    <i id="theme-toggle-icon" class="ri-moon-line text-base dark:hidden"></i>
+                    <i id="theme-toggle-icon-dark" class="ri-sun-line text-base hidden dark:inline-block text-amber-400"></i>
+                </button>
+
                 <!-- Language Switcher -->
                 @php
                     $isArabic = app()->getLocale() === 'ar';
                     $switchUrl = $isArabic ? (Str::contains(url()->full(), '?') ? url()->full().'&lang=en' : url()->full().'?lang=en') : (Str::contains(url()->full(), '?') ? url()->full().'&lang=ar' : url()->full().'?lang=ar');
                 @endphp
-                <a href="{{ $switchUrl }}" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700/80 border border-zinc-700/60 transition-colors flex items-center gap-1.5" title="Switch Language">
-                    <i class="ri-global-line text-sm text-brand-400"></i>
+                <a href="{{ $switchUrl }}" class="px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 dark:text-zinc-300 hover:bg-slate-200/70 dark:hover:bg-dark-800 transition-colors" title="Switch Language">
                     <span>{{ $isArabic ? 'English' : 'العربية' }}</span>
                 </a>
 
                 <!-- Add / Publish Service Button -->
-                <a href="{{ route('marketplace.services.create') }}" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white shadow-md shadow-brand-600/20 transition-all">
-                    <i class="ri-add-line text-sm"></i>
+                <a href="{{ route('marketplace.services.create') }}" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-slate-950 transition-all shadow-sm">
+                    <i class="ri-add-line text-sm font-bold"></i>
                     <span>{{ app()->getLocale() === 'ar' ? 'أضف خدمتك' : 'Sell a Service' }}</span>
                 </a>
 
                 <!-- Auth Navigation -->
                 @auth
                     <div class="relative group">
-                        <button type="button" class="flex items-center gap-2 p-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 border border-zinc-700/60 transition-all">
-                            <div class="w-8 h-8 rounded-lg bg-brand-600/30 border border-brand-500/40 text-brand-300 flex items-center justify-center font-bold text-xs">
+                        <button type="button" class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-200/60 dark:hover:bg-dark-800 transition-all">
+                            <div class="w-8 h-8 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center font-bold text-xs">
                                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
                             </div>
-                            <span class="text-xs font-medium text-zinc-200 hidden lg:inline max-w-[100px] truncate">
-                                {{ auth()->user()->name }}
-                            </span>
-                            <i class="ri-arrow-down-s-line text-zinc-400 text-sm"></i>
+                            <i class="ri-arrow-down-s-line text-slate-500 dark:text-zinc-400 text-sm pe-1"></i>
                         </button>
-
+                        
                         <!-- Dropdown Menu -->
-                        <div class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} top-full mt-2 w-56 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl py-2 hidden group-hover:block z-50">
-                            <div class="px-4 py-2 border-b border-zinc-800">
-                                <p class="text-xs font-semibold text-white truncate">{{ auth()->user()->name }}</p>
-                                <p class="text-[11px] text-zinc-400 truncate">{{ auth()->user()->email }}</p>
-                                @if(isset(auth()->user()->user_balance))
-                                    <div class="mt-1 flex items-center justify-between text-xs">
-                                        <span class="text-zinc-400">{{ app()->getLocale() === 'ar' ? 'الرصيد:' : 'Balance:' }}</span>
-                                        <span class="font-bold text-emerald-400">${{ number_format(auth()->user()->user_balance, 2) }}</span>
-                                    </div>
-                                @endif
+                        <div class="absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} top-full mt-2 w-56 rounded-2xl bg-white dark:bg-dark-850 border border-slate-200 dark:border-white/10 shadow-xl py-2 hidden group-hover:block z-50">
+                            <div class="px-4 py-2 border-b border-slate-100 dark:border-white/5">
+                                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">{{ auth()->user()->name }}</p>
+                                <p class="text-[11px] text-slate-500 dark:text-zinc-400 truncate">{{ auth()->user()->email }}</p>
                             </div>
-
-                            <a href="{{ route('marketplace.orders.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
-                                <i class="ri-shopping-bag-3-line text-brand-400"></i>
-                                <span>{{ app()->getLocale() === 'ar' ? 'طلباتي ومشترياتي' : 'My Orders & Purchases' }}</span>
+                            <a href="{{ route('marketplace.orders.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-dark-800 transition-colors">
+                                <i class="ri-shopping-bag-3-line text-brand-500"></i>
+                                <span>{{ app()->getLocale() === 'ar' ? 'طلباتي ومشترياتي' : 'My Orders' }}</span>
                             </a>
-                            <a href="{{ route('marketplace.favorites.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
-                                <i class="ri-heart-line text-rose-400"></i>
-                                <span>{{ app()->getLocale() === 'ar' ? 'المفضلة' : 'Saved Favorites' }}</span>
+                            <a href="{{ route('marketplace.favorites.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-dark-800 transition-colors">
+                                <i class="ri-bookmark-line text-rose-500"></i>
+                                <span>{{ app()->getLocale() === 'ar' ? 'المفضلة' : 'Saved' }}</span>
                             </a>
-                            <a href="{{ route('marketplace.home') }}" class="flex items-center gap-2 px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
-                                <i class="ri-dashboard-3-line text-indigo-400"></i>
-                                <span>{{ app()->getLocale() === 'ar' ? 'لوحة تحكم السوق' : 'Marketplace Dashboard' }}</span>
+                            <a href="{{ route('marketplace.home') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-dark-800 transition-colors">
+                                <i class="ri-dashboard-3-line text-indigo-500"></i>
+                                <span>{{ app()->getLocale() === 'ar' ? 'لوحة التحكم' : 'Dashboard' }}</span>
                             </a>
-                            <a href="{{ url('/dashboard') }}" class="flex items-center gap-2 px-4 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
-                                <i class="ri-apps-2-line text-amber-400"></i>
-                                <span>{{ app()->getLocale() === 'ar' ? 'لوحة التحكم الرئيسية' : 'Main Workspace' }}</span>
-                            </a>
-
-                            <div class="border-t border-zinc-800 my-1"></div>
+                            <div class="border-t border-slate-100 dark:border-white/5 my-1"></div>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/30 transition-colors text-start">
+                                <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-start">
                                     <i class="ri-logout-box-r-line"></i>
                                     <span>{{ app()->getLocale() === 'ar' ? 'تسجيل الخروج' : 'Log Out' }}</span>
                                 </button>
@@ -259,33 +367,14 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-xl text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                    <a href="{{ route('login') }}" class="px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-700 hover:text-slate-900 dark:text-zinc-300 dark:hover:text-white transition-colors">
                         {{ app()->getLocale() === 'ar' ? 'تسجيل الدخول' : 'Sign In' }}
                     </a>
-                    <a href="{{ route('register') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700/80 transition-all">
+                    <a href="{{ route('register') }}" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-slate-950 shadow-sm transition-all">
                         {{ app()->getLocale() === 'ar' ? 'حساب جديد' : 'Join' }}
                     </a>
                 @endauth
             </div>
-        </div>
-
-        <!-- Mobile Search Bar -->
-        <div class="md:hidden px-4 pb-3">
-            <form action="{{ route('marketplace.services.index') }}" method="GET" class="relative flex items-center">
-                @if(request('category'))
-                    <input type="hidden" name="category" value="{{ request('category') }}">
-                @endif
-                <input 
-                    type="text" 
-                    name="search" 
-                    value="{{ request('search') ?? request('q') }}" 
-                    placeholder="{{ app()->getLocale() === 'ar' ? 'ابحث في الخدمات البرمجية...' : 'Search software services...' }}"
-                    class="w-full h-10 ps-3 pe-20 rounded-xl bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-brand-500"
-                >
-                <button type="submit" class="absolute {{ app()->getLocale() === 'ar' ? 'left-1' : 'right-1' }} top-1 bottom-1 px-3 rounded-lg bg-brand-600 text-white text-xs font-medium">
-                    {{ app()->getLocale() === 'ar' ? 'بحث' : 'Search' }}
-                </button>
-            </form>
         </div>
     </header>
 
@@ -433,9 +522,7 @@
                         {{ app()->getLocale() === 'ar' ? 'نظام دفع آمن 100% مع ضمان فحص الكود وجودة التنفيذ.' : 'All transactions are strictly protected through cryptographic escrow verification.' }}
                     </p>
                     <div class="flex items-center gap-3 text-lg text-zinc-400">
-                        <a href="https://facebook.com/musoftwares" target="_blank" rel="noopener" class="hover:text-brand-400"><i class="ri-facebook-circle-fill"></i></a>
-                        <a href="https://twitter.com/musoftwares" target="_blank" rel="noopener" class="hover:text-brand-400"><i class="ri-twitter-x-fill"></i></a>
-                        <a href="https://linkedin.com/company/musoftwares" target="_blank" rel="noopener" class="hover:text-brand-400"><i class="ri-linkedin-box-fill"></i></a>
+                        <a href="https://facebook.com/musoftwares.com.page" target="_blank" rel="noopener" class="hover:text-brand-400"><i class="ri-facebook-circle-fill"></i></a>
                         <a href="https://github.com/musoftwares" target="_blank" rel="noopener" class="hover:text-brand-400"><i class="ri-github-fill"></i></a>
                     </div>
                 </div>
@@ -452,6 +539,14 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('musoftware_theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+    </script>
 
     @stack('scripts')
 </body>

@@ -256,20 +256,23 @@
                     </span>
                 </div>
 
+                @php
+                    $orderCurrency = $order->currency->symbol ?? $order->currency->currency ?? '$';
+                @endphp
                 <div class="space-y-3 text-xs">
                     <div class="flex items-center justify-between">
                         <span class="text-slate-600 dark:text-zinc-400">{{ app()->getLocale() === 'ar' ? 'مبلغ الطلب:' : 'Order Total:' }}</span>
-                        <span class="text-base font-extrabold text-slate-900 dark:text-white font-mono">${{ number_format($order->amount, 2) }}</span>
+                        <span class="text-base font-extrabold text-slate-900 dark:text-white font-mono">{{ $orderCurrency }} {{ number_format($order->amount, 2) }}</span>
                     </div>
 
                     @if($isSeller)
                         <div class="flex items-center justify-between text-slate-500 dark:text-zinc-400">
                             <span>{{ app()->getLocale() === 'ar' ? 'عمولة المنصة:' : 'Platform Fee:' }}</span>
-                            <span class="font-mono">-${{ number_format($order->commission_amount, 2) }}</span>
+                            <span class="font-mono">-{{ $orderCurrency }} {{ number_format($order->commission_amount, 2) }}</span>
                         </div>
                         <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-zinc-800 font-bold text-emerald-600 dark:text-emerald-400">
                             <span>{{ app()->getLocale() === 'ar' ? 'صافي أرباحك عند الإكمال:' : 'Net Earnings:' }}</span>
-                            <span class="text-base font-mono">${{ number_format($order->amount - $order->commission_amount, 2) }}</span>
+                            <span class="text-base font-mono">{{ $orderCurrency }} {{ number_format($order->amount - $order->commission_amount, 2) }}</span>
                         </div>
                     @endif
                 </div>

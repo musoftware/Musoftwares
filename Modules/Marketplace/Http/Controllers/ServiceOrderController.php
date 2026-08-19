@@ -28,10 +28,7 @@ class ServiceOrderController extends Controller
             $orders = ServiceOrder::with(['seller', 'package.service'])->where('buyer_id', $user->id)->latest()->paginate(15);
         }
 
-        return Inertia::render('Marketplace/Orders/Index', [
-            'orders' => $orders,
-            'tab' => $tab
-        ]);
+        return view('marketplace::orders.index', compact('orders', 'tab'));
     }
 
     public function show(ServiceOrder $order)
@@ -63,10 +60,7 @@ class ServiceOrderController extends Controller
 
         $conversation->load(['messages.sender', 'participants.user']);
 
-        return Inertia::render('Marketplace/Orders/Show', [
-            'order' => $order,
-            'conversation' => $conversation
-        ]);
+        return view('marketplace::orders.show', compact('order', 'conversation'));
     }
 
     public function store(Request $request, FinancialTransactionService $financialService, EscrowService $escrowService, \Modules\Marketplace\Services\SoftwareLicenseService $digitalKeyService)

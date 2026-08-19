@@ -214,16 +214,15 @@ class DashboardController extends Controller
             'completionRate' => $completionRate,
         ];
 
-        return Inertia::render('Marketplace/Dashboard', [
-            'needsActionPurchases' => $needsActionPurchases,
-            'activePurchases' => $activePurchases,
-            'buyerActivity' => $buyerActivity,
-            'buyerStats' => $buyerStats,
-            
-            'needsActionSales' => $needsActionSales,
-            'activeSales' => $activeSales,
-            'listedGigs' => $listedGigs,
-            'sellerStats' => $sellerStats,
-        ]);
+        return view('marketplace::dashboard.index', compact(
+            'needsActionPurchases',
+            'activePurchases',
+            'buyerActivity',
+            'buyerStats',
+            'needsActionSales',
+            'activeSales',
+            'listedGigs',
+            'sellerStats'
+        ));
     }
 }

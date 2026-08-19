@@ -16,7 +16,7 @@ class WishlistController extends Controller
 {
     public function __construct(protected WishlistService $wishlistService) {}
 
-    public function index(Request $request): Response|JsonResponse
+    public function index(Request $request)
     {
         $favorites = Favorite::where('user_id', $request->user()?->id)
             ->where('favoritable_type', Service::class)
@@ -28,9 +28,7 @@ class WishlistController extends Controller
             return response()->json(['favorites' => $favorites]);
         }
 
-        return Inertia::render('Marketplace/Favorites/Index', [
-            'favorites' => $favorites,
-        ]);
+        return view('marketplace::favorites.index', compact('favorites'));
     }
 
     public function toggle(Request $request, Service $service): RedirectResponse|JsonResponse
