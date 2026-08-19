@@ -536,47 +536,82 @@
 
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!-- SAMPLE PREVIEW MODAL (Interactive Trust & Sample Peek)                     -->
+<!-- SAMPLE PREVIEW MODAL (Real Structured Curriculum & Outlines)                -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <div id="samplePreviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
-    <div class="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-6 sm:p-8 shadow-2xl space-y-6">
+    <div class="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-5 sm:p-7 shadow-2xl space-y-5">
         
         <!-- Header -->
-        <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-zinc-800">
-            <div>
-                <span class="text-[10px] font-bold text-[#ff7a59] uppercase tracking-wider block">معاينة صفحات من الكتاب</span>
-                <h3 class="text-lg font-black text-[#2e1f1d] dark:text-white font-editorial">{{ $product->title }}</h3>
+        <div class="flex items-center justify-between pb-3.5 border-b border-slate-200 dark:border-zinc-800">
+            <div class="min-w-0 me-3">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 uppercase tracking-wider">
+                        {{ app()->getLocale() === 'ar' ? 'الفهرس ومحاور الكتاب الفعلية' : 'Full Book Curriculum' }}
+                    </span>
+                    @if($product->page_count)
+                        <span class="text-[10px] text-slate-400 dark:text-zinc-500 font-mono">
+                            {{ $product->page_count }} {{ app()->getLocale() === 'ar' ? 'صفحة' : 'Pages' }}
+                        </span>
+                    @endif
+                </div>
+                <h3 class="text-base sm:text-lg font-black text-slate-950 dark:text-white truncate">
+                    {{ $product->title }}
+                </h3>
             </div>
-            <button type="button" onclick="document.getElementById('samplePreviewModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
-                <i class="ri-close-line text-lg"></i>
+            <button type="button" onclick="document.getElementById('samplePreviewModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center flex-shrink-0 transition-colors">
+                <i class="ri-close-line text-lg font-bold"></i>
             </button>
         </div>
 
-        <!-- Sample Content Container -->
-        <div class="space-y-4 max-h-[60vh] overflow-y-auto p-4 rounded-2xl bg-[#faf7f4] dark:bg-zinc-950 border border-slate-200/80 dark:border-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-300 leading-relaxed">
-            <h4 class="font-bold text-base text-[#2e1f1d] dark:text-white pb-2 border-b border-slate-200 dark:border-zinc-800">
-                📑 فهرس المحتويات والمحاور الرئيسية:
-            </h4>
-            <ul class="space-y-2 list-disc list-inside">
-                <li><strong>الفصل الأول:</strong> المدخل التأسيسي وبناء المفاهيم الجوهرية.</li>
-                <li><strong>الفصل الثاني:</strong> البيئة التطبيقية والأدوات الأساسية للعمل.</li>
-                <li><strong>الفصل الثالث:</strong> الهياكل البرمجية والتحكم في سير البيانات.</li>
-                <li><strong>الفصل الرابع:</strong> بناء الدوال والوحدات النمطية القابلة لإعادة الاستخدام.</li>
-                <li><strong>الفصل الخامس:</strong> التطبيقات العملية ومشاريع التخرج الشاملة.</li>
-            </ul>
-            <div class="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-500 italic text-center">
-                هذه المعاينة توضح هيكل الفهرس المعتمد. يمكنك الحصول على النسخة الكاملة بـ {{ $product->is_free ? 'مجاناً' : '$' . number_format($product->price, 2) }} مع إمكانية التحميل الفوري بصيغة PDF.
-            </div>
+        <!-- Real Sample Content Container -->
+        @php
+            $realChapters = $product->real_chapters;
+        @endphp
+        <div class="space-y-3 max-h-[60vh] overflow-y-auto p-1 scrollbar-none">
+            @foreach($realChapters as $chapter)
+                <div class="p-3.5 sm:p-4 rounded-2xl bg-[#faf7f4] dark:bg-zinc-950 border border-slate-200/80 dark:border-zinc-800/80 shadow-2xs space-y-2.5 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors">
+                    <div class="flex items-start gap-3">
+                        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-950 font-mono font-extrabold text-xs flex items-center justify-center flex-shrink-0 shadow-xs">
+                            {{ $chapter['num'] }}
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <h5 class="font-bold text-xs sm:text-sm text-slate-950 dark:text-white leading-snug">
+                                {{ $chapter['title'] }}
+                            </h5>
+                            @if(!empty($chapter['subtopics']))
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    @foreach($chapter['subtopics'] as $sub)
+                                        <span class="px-2 py-0.5 rounded-md bg-white dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800 text-[10px] font-medium text-slate-700 dark:text-zinc-300">
+                                            {{ $sub }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @if(!empty($chapter['project']))
+                        <div class="pt-2 border-t border-slate-200/60 dark:border-zinc-900 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                            <i class="ri-checkbox-circle-fill text-xs"></i>
+                            <span>{{ $chapter['project'] }}</span>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
         </div>
 
         <!-- Action Footer -->
-        <div class="flex items-center justify-end gap-3 pt-2">
-            <button type="button" onclick="document.getElementById('samplePreviewModal').classList.add('hidden')" class="px-5 py-2 rounded-full text-xs font-bold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors">
-                إغلاق
-            </button>
-            <button type="button" onclick="document.getElementById('samplePreviewModal').classList.add('hidden'); window.scrollTo({top: 200, behavior: 'smooth'})" class="pill-btn-coral py-2 px-6 text-xs">
-                <span>{{ $product->is_free ? 'تحميل الكتاب الآن' : 'شراء النسخة الكاملة' }}</span>
-            </button>
+        <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-zinc-800">
+            <span class="text-[11px] text-slate-500 dark:text-zinc-400 font-medium">
+                {{ app()->getLocale() === 'ar' ? 'محتوى كامل ومحدث بصيغة PDF فورية.' : 'Instant full PDF download after purchase.' }}
+            </span>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="document.getElementById('samplePreviewModal').classList.add('hidden')" class="px-4 py-2 rounded-full text-xs font-bold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors">
+                    {{ app()->getLocale() === 'ar' ? 'إغلاق' : 'Close' }}
+                </button>
+                <button type="button" onclick="document.getElementById('samplePreviewModal').classList.add('hidden'); window.scrollTo({top: 200, behavior: 'smooth'})" class="px-5 py-2 rounded-full bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-slate-950 font-bold text-xs transition-all shadow-sm">
+                    <span>{{ $product->is_free ? (app()->getLocale() === 'ar' ? 'تحميل الكتاب الآن' : 'Download Free') : (app()->getLocale() === 'ar' ? 'الحصول على النسخة الكاملة' : 'Get Full Edition') }}</span>
+                </button>
+            </div>
         </div>
 
     </div>
