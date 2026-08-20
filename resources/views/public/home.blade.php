@@ -584,87 +584,168 @@
 
 
         <!-- ============================================================ -->
-        <!-- 5. PROVEN SYSTEMS IN PRODUCTION (Carousel) -->
+        <!-- 5. INTERACTIVE GALLERY CAROUSEL (Web, Mobile, Desktop) -->
         <!-- ============================================================ -->
-        <section class="rounded-[18px] bg-[#f5f5f7] py-14 px-6 overflow-hidden">
-            <div class="max-w-[1280px] mx-auto mb-8 text-center sm:text-start rtl:sm:text-right flex flex-col sm:flex-row items-center justify-between gap-4">
+        <section id="portfolio-showcase" class="rounded-[18px] bg-[#f5f5f7] py-12 md:py-16 px-6 md:px-10 overflow-hidden">
+            
+            <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                 <div>
-                    <h3 class="text-[32px] sm:text-[44px] font-semibold text-[#1d1d1f] tracking-tight">
-                        Proven Systems In Production.
+                    <h3 class="text-[32px] sm:text-[44px] font-semibold text-[#1d1d1f] tracking-[-0.02em] leading-tight">
+                        {{ $locale === 'ar' ? 'معرض المشاريع والأنظمة الحية' : 'Proven Systems In Production.' }}
                     </h3>
+                    <p class="mt-2 text-[17px] text-[#1d1d1f]/70">
+                        {{ $locale === 'ar' ? 'أنظمة حقيقية تعمل في بيئات الإنتاج بكفاءة واستقرار تام.' : 'Real-world platforms deployed and engineered to perfection.' }}
+                    </p>
                 </div>
-                <div class="flex gap-2">
-                    <button class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:bg-black/10">‹</button>
-                    <button class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:bg-black/10">›</button>
+
+                <!-- Navigation Arrow Controls -->
+                <div class="flex items-center gap-2 self-start md:self-end">
+                    <button id="gallery-prev" aria-label="Previous" class="w-10 h-10 rounded-full bg-white border border-black/5 shadow-sm flex items-center justify-center text-[#1d1d1f] hover:bg-black hover:text-white transition duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button id="gallery-next" aria-label="Next" class="w-10 h-10 rounded-full bg-white border border-black/5 shadow-sm flex items-center justify-center text-[#1d1d1f] hover:bg-black hover:text-white transition duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- Horizontal Scrollable Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 max-w-[1400px] mx-auto">
+            <!-- Top Filter Buttons (Web Apps, Mobile Apps, Desktop Apps) -->
+            <div class="max-w-[1280px] mx-auto mb-8 flex flex-wrap items-center gap-2.5">
+                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition shadow-sm bg-[#1d1d1f] text-white" data-filter="all">
+                    {{ $locale === 'ar' ? 'جميع الأنظمة' : 'All Systems' }}
+                </button>
+                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition bg-white border border-black/5 text-[#1d1d1f] hover:bg-[#eaeaea]" data-filter="web">
+                    {{ $locale === 'ar' ? 'تطبيقات الويب (Web Apps)' : 'Web Apps' }}
+                </button>
+                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition bg-white border border-black/5 text-[#1d1d1f] hover:bg-[#eaeaea]" data-filter="mobile">
+                    {{ $locale === 'ar' ? 'تطبيقات الموبايل (Mobile Apps)' : 'Mobile Apps' }}
+                </button>
+                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition bg-white border border-black/5 text-[#1d1d1f] hover:bg-[#eaeaea]" data-filter="desktop">
+                    {{ $locale === 'ar' ? 'برامج الديسك توب (Desktop Apps)' : 'Desktop Apps' }}
+                </button>
+            </div>
+
+            <!-- Scrollable Carousel Track -->
+            <div id="gallery-track" class="flex gap-4 overflow-x-auto no-scrollbar pb-4 max-w-[1400px] mx-auto scroll-smooth">
                 
-                <div class="bg-white rounded-2xl border border-black/5 p-4 space-y-3 shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold">W</div>
-                    <div>
-                        <h4 class="text-base font-bold text-[#1d1d1f]">Trenz CRM</h4>
-                        <p class="text-xs text-[#86868b]">Meta Cloud WhatsApp</p>
+                <!-- Card 1: Trenz whatsCRM (Web) -->
+                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="web">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 rounded-full bg-[#e8f0fb] text-[#0071e3] text-[11px] font-semibold uppercase tracking-wider">Web Platform</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
+                        </div>
+                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Trenz whatsCRM</h4>
+                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
+                            Official Meta Graph API WhatsApp team inbox with multi-agent queue and appointment automation.
+                        </p>
                     </div>
-                    <div class="h-1 bg-black/5 rounded-full overflow-hidden">
-                        <div class="h-full w-4/5 bg-black rounded-full"></div>
+                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
+                        <span class="text-[12px] font-semibold text-[#1d1d1f]">1.2M+ Messages</span>
+                        <a href="/portfolio/trenz-whatscrm" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                            Case study &gt;
+                        </a>
                     </div>
-                    <div class="text-[11px] text-[#86868b]">1.2M chats sent</div>
-                    <a href="/portfolio/trenz-whatscrm" class="text-xs text-[#0071e3] font-medium block">Case study &gt;</a>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-black/5 p-4 space-y-3 shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">$</div>
-                    <div>
-                        <h4 class="text-base font-bold text-[#1d1d1f]">ChartCash</h4>
-                        <p class="text-xs text-[#86868b]">Financial &amp; POS Engine</p>
+                <!-- Card 2: Kbdny Multi-Vendor Hub (Web & Mobile) -->
+                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="web mobile">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 rounded-full bg-[#fcf6f4] text-[#ff9500] text-[11px] font-semibold uppercase tracking-wider">Web &amp; Mobile</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
+                        </div>
+                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Kbdny Platform</h4>
+                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
+                            Multi-vendor dropshipping engine syncing catalogs, affiliate commission wallets, and Bosta manifests.
+                        </p>
                     </div>
-                    <div class="h-1 bg-black/5 rounded-full overflow-hidden">
-                        <div class="h-full w-full bg-[#0071e3] rounded-full"></div>
+                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
+                        <span class="text-[12px] font-semibold text-[#1d1d1f]">5,000+ Affiliates</span>
+                        <a href="/portfolio/kbdny" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                            Case study &gt;
+                        </a>
                     </div>
-                    <div class="text-[11px] text-[#86868b]">10ms latency</div>
-                    <a href="/portfolio/chartcash" class="text-xs text-[#0071e3] font-medium block">Case study &gt;</a>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-black/5 p-4 space-y-3 shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">K</div>
-                    <div>
-                        <h4 class="text-base font-bold text-[#1d1d1f]">Kbdny</h4>
-                        <p class="text-xs text-[#86868b]">Multi-Vendor Dropshipping</p>
+                <!-- Card 3: StockManager Terminal (Desktop) -->
+                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="desktop">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 rounded-full bg-[#f5f5f7] text-[#1d1d1f] text-[11px] font-semibold uppercase tracking-wider">Desktop App</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
+                        </div>
+                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">StockManager Terminal</h4>
+                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
+                            Offline-first cashier and inventory software with ESC/POS thermal printing and USB barcode scanning.
+                        </p>
                     </div>
-                    <div class="h-1 bg-black/5 rounded-full overflow-hidden">
-                        <div class="h-full w-3/4 bg-amber-500 rounded-full"></div>
+                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
+                        <span class="text-[12px] font-semibold text-[#1d1d1f]">12 Retail Stores</span>
+                        <a href="/portfolio/stock-manager" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                            Case study &gt;
+                        </a>
                     </div>
-                    <div class="text-[11px] text-[#86868b]">5k+ affiliates</div>
-                    <a href="/portfolio/kbdny" class="text-xs text-[#0071e3] font-medium block">Case study &gt;</a>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-black/5 p-4 space-y-3 shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">S</div>
-                    <div>
-                        <h4 class="text-base font-bold text-[#1d1d1f]">StockManager</h4>
-                        <p class="text-xs text-[#86868b]">Retail POS &amp; Inventory</p>
+                <!-- Card 4: ChartCash Ledger (Desktop & Web) -->
+                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="desktop web">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 rounded-full bg-[#e8f0fb] text-[#0071e3] text-[11px] font-semibold uppercase tracking-wider">Desktop &amp; Cloud</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
+                        </div>
+                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">ChartCash Financials</h4>
+                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
+                            Double-entry financial accounting ledger with sub-10ms operational queries and cashflow telemetry.
+                        </p>
                     </div>
-                    <div class="h-1 bg-black/5 rounded-full overflow-hidden">
-                        <div class="h-full w-2/3 bg-purple-500 rounded-full"></div>
+                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
+                        <span class="text-[12px] font-semibold text-[#1d1d1f]">10ms Latency</span>
+                        <a href="/portfolio/chartcash" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                            Case study &gt;
+                        </a>
                     </div>
-                    <div class="text-[11px] text-[#86868b]">12 stores</div>
-                    <a href="/portfolio/stock-manager" class="text-xs text-[#0071e3] font-medium block">Case study &gt;</a>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-black/5 p-4 space-y-3 shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">F</div>
-                    <div>
-                        <h4 class="text-base font-bold text-[#1d1d1f]">Mini Fatora</h4>
-                        <p class="text-xs text-[#86868b]">Invoicing &amp; Receipts</p>
+                <!-- Card 5: AM SMS Gateway (Mobile & Desktop) -->
+                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="mobile desktop">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 rounded-full bg-[#f5f5f7] text-[#30d158] text-[11px] font-semibold uppercase tracking-wider">Mobile &amp; Hardware</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
+                        </div>
+                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">AM SMS Gateway</h4>
+                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
+                            Android native SIM background driver transforming cellular phones into automated local SMS gateways.
+                        </p>
                     </div>
-                    <div class="h-1 bg-black/5 rounded-full overflow-hidden">
-                        <div class="h-full w-4/5 bg-emerald-500 rounded-full"></div>
+                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
+                        <span class="text-[12px] font-semibold text-[#1d1d1f]">Zero SMS Cost</span>
+                        <a href="/portfolio/am-sms-gateway" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                            Case study &gt;
+                        </a>
                     </div>
-                    <div class="text-[11px] text-[#86868b]">50k invoices</div>
-                    <a href="/portfolio/mini-fatora" class="text-xs text-[#0071e3] font-medium block">Case study &gt;</a>
+                </div>
+
+                <!-- Card 6: AMC Academy (Web) -->
+                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="web">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 rounded-full bg-[#f5f5f7] text-[#af52de] text-[11px] font-semibold uppercase tracking-wider">Web &amp; DRM</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
+                        </div>
+                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">AMC Academy LMS</h4>
+                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
+                            High-security online learning management system with dynamic moving watermarks and anti-screen recording DRM.
+                        </p>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
+                        <span class="text-[12px] font-semibold text-[#1d1d1f]">100% Protected</span>
+                        <a href="/portfolio/amc-academy" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                            Case study &gt;
+                        </a>
+                    </div>
                 </div>
 
             </div>
@@ -673,4 +754,65 @@
     </div>
 
 </div>
+
+<!-- Gallery Carousel Auto-Scroll & Filter Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const track = document.getElementById('gallery-track');
+        const prevBtn = document.getElementById('gallery-prev');
+        const nextBtn = document.getElementById('gallery-next');
+        const filterBtns = document.querySelectorAll('.gallery-filter-btn');
+        const cards = document.querySelectorAll('.gallery-card');
+
+        let isPaused = false;
+        let scrollSpeed = 1;
+
+        // Auto-scrolling
+        const autoScroll = () => {
+            if (!isPaused && track) {
+                if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 5) {
+                    track.scrollLeft = 0;
+                } else {
+                    track.scrollLeft += scrollSpeed;
+                }
+            }
+        };
+
+        let interval = setInterval(autoScroll, 30);
+
+        // Pause on mouse enter
+        track?.addEventListener('mouseenter', () => isPaused = true);
+        track?.addEventListener('mouseleave', () => isPaused = false);
+
+        // Manual controls
+        prevBtn?.addEventListener('click', () => {
+            track.scrollBy({ left: -360, behavior: 'smooth' });
+        });
+        nextBtn?.addEventListener('click', () => {
+            track.scrollBy({ left: 360, behavior: 'smooth' });
+        });
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-[#1d1d1f]', 'text-white');
+                    b.classList.add('bg-white', 'text-[#1d1d1f]');
+                });
+                btn.classList.remove('bg-white', 'text-[#1d1d1f]');
+                btn.classList.add('bg-[#1d1d1f]', 'text-white');
+
+                const filter = btn.getAttribute('data-filter');
+                cards.forEach(card => {
+                    const category = card.getAttribute('data-category') || '';
+                    if (filter === 'all' || category.includes(filter)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection
