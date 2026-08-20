@@ -13,17 +13,16 @@ Base URL: http://localhost
 - OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
 
 ## Service Categories
-- **Web Development**: http://localhost/marketplace/categories/web-development
 
 ## Full Services Catalog
 
-### Custom Laravel Web Application Development
-- **ID**: 1
-- **Category**: Web Development
-- **URL**: http://localhost/marketplace/services/1/custom-laravel-web-application-development
-- **Starting Price**: $0
-- **Tagline**: High-performance bespoke Laravel applications built for scale.
-- **Description**: We design and develop production-ready web applications using Laravel, MySQL, and Tailwind CSS with full responsiveness.
-
 ## Full Blog Articles Catalog
+
+### Test Article
+- **Slug**: test-article
+- **URL**: http://localhost/blog/test-article
+- **Published At**: 2026-08-20T22:30:56+00:00
+- **Excerpt**: 
+- **Content**:
+This is a test article.
 

@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-08-18T17:44:45+00:00",
+    "updated_at": "2026-08-20T22:30:56+00:00",
     "platform": "Musoftwares Marketplace Engine",
     "version": "1.0.0",
     "capabilities": [
@@ -26,13 +26,6 @@
                 "package_id",
                 "requirements_data"
             ]
-        },
-        {
-            "capability_id": "service_1",
-            "name": "Custom Laravel Web Application Development",
-            "description": "High-performance bespoke Laravel applications built for scale.",
-            "endpoint": "http://localhost/marketplace/api/v1/services/1",
-            "method": "GET"
         }
     ]
 }

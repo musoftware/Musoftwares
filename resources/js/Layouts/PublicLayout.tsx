@@ -198,7 +198,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
 
                     {/* Left: Stark Brand Monogram */}
                     <div className="flex items-center gap-8">
-                        <Link href="/" className="flex items-center space-x-3 group focus:outline-none">
+                        <SafeLink href="/" className="flex items-center space-x-3 group focus:outline-none">
                             <span className="text-2xl sm:text-3xl font-black tracking-tighter text-white font-sans">
                                 MUSOFT
                             </span>
@@ -206,20 +206,20 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             <span className="text-[11px] font-mono tracking-widest rtl:tracking-normal uppercase text-zinc-400 hidden sm:inline-block">
                                 STUDIO
                             </span>
-                        </Link>
+                        </SafeLink>
 
                         {/* Desktop Navigation (Uppercase tracking-[0.2em]) */}
                         <nav className="hidden lg:flex items-center space-x-8 text-[11px] font-bold tracking-[0.2em] rtl:tracking-normal rtl:space-x-reverse uppercase text-zinc-300">
                             {navItems.map((item) => (
                                 <div key={item.id} className="relative">
-                                    <Link
+                                    <SafeLink
                                         href={item.href}
                                         onMouseEnter={() => item.items.length > 0 && setActiveDropdown(item.id)}
                                         className="flex items-center gap-1 hover:text-white transition-colors"
                                     >
                                         {item.label}
                                         {item.items.length > 0 && <ChevronDown className="h-3 w-3 opacity-60" />}
-                                    </Link>
+                                    </SafeLink>
 
                                     {/* Dropdown Menu */}
                                     {item.items.length > 0 && activeDropdown === item.id && (
@@ -229,7 +229,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                             className="absolute left-0 rtl:left-auto rtl:right-0 top-full mt-3 w-80 bg-[#161616] border border-[#2B2B2B] p-2 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 z-50"
                                         >
                                             {item.items.map((subItem) => (
-                                                <Link
+                                                <SafeLink
                                                     key={subItem.href}
                                                     href={subItem.href}
                                                     className="flex flex-col p-3 hover:bg-[#222222] transition-colors group"
@@ -240,7 +240,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                                     <span className="text-[11px] text-zinc-400 mt-0.5 font-sans">
                                                         {subItem.desc}
                                                     </span>
-                                                </Link>
+                                                </SafeLink>
                                             ))}
                                         </div>
                                     )}
@@ -259,17 +259,17 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </SafeLink>
                         ) : (
                             <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                                <Link
+                                <SafeLink
                                     href={route('login')}
                                     className="text-[11px] font-bold tracking-widest rtl:tracking-normal uppercase text-zinc-400 hover:text-white transition-colors"
                                 >
                                     {__('general.sign_in') || 'SIGN IN'}
-                                </Link>
-                                <Link href="/start-project">
+                                </SafeLink>
+                                <SafeLink href="/start-project">
                                     <button className="px-5 py-2 rounded-none bg-white text-black hover:bg-zinc-200 font-bold text-[11px] tracking-widest rtl:tracking-normal uppercase transition-all">
                                         {__('general.start_a_project') || 'START A PROJECT'} ➔
                                     </button>
-                                </Link>
+                                </SafeLink>
                             </div>
                         )}
 
@@ -288,22 +288,22 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     <div className="lg:hidden border-b border-[#222222] bg-[#111111] px-6 py-6 space-y-4">
                         <div className="flex flex-col space-y-3 font-mono text-xs uppercase tracking-wider rtl:tracking-normal text-zinc-300">
                             {navItems.map((item) => (
-                                <Link
+                                <SafeLink
                                     key={item.id}
                                     href={item.href}
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="py-2 hover:text-white border-b border-[#1E1E1E]"
                                 >
                                     {item.label}
-                                </Link>
+                                </SafeLink>
                             ))}
-                            <Link
+                            <SafeLink
                                 href="/start-project"
                                 onClick={() => setMobileMenuOpen(false)}
                                 className="py-2 text-[#748660] font-bold border-b border-[#1E1E1E]"
                             >
                                 START SYSTEM WIZARD ➔
-                            </Link>
+                            </SafeLink>
                         </div>
                     </div>
                 )}
@@ -325,35 +325,35 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             <ul className="space-y-2.5 font-sans text-xs">
                                 <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{__('general.whatsapp_direct') || 'WhatsApp Direct'}</a></li>
                                 <li><a href="mailto:admin@musoftwares.com" className="hover:text-white transition-colors">{__('general.email_studio') || 'Email Studio'}</a></li>
-                                <li><Link href="/start-project" className="hover:text-white transition-colors text-[#748660] font-bold">{__('general.start_project_wizard') || 'System Scoping Wizard ➔'}</Link></li>
+                                <li><SafeLink href="/start-project" className="hover:text-white transition-colors text-[#748660] font-bold">{__('general.start_project_wizard') || 'System Scoping Wizard ➔'}</SafeLink></li>
                             </ul>
                         </div>
 
                         <div className="space-y-4">
                             <div className="text-white font-bold tracking-wider rtl:tracking-normal font-sans">{__('general.solutions') || 'Solutions'}</div>
                             <ul className="space-y-2.5 font-sans text-xs">
-                                <li><Link href="/platforms/erp" className="hover:text-white transition-colors">Enterprise ERP</Link></li>
-                                <li><Link href="/platforms/crm" className="hover:text-white transition-colors">WhatsApp Cloud API</Link></li>
-                                <li><Link href="/platforms/cloud" className="hover:text-white transition-colors">Meta Graph Suite</Link></li>
-                                <li><Link href="/start-project" className="hover:text-white transition-colors">System Architecture Wizard</Link></li>
+                                <li><SafeLink href="/platforms/erp" className="hover:text-white transition-colors">Enterprise ERP</SafeLink></li>
+                                <li><SafeLink href="/platforms/crm" className="hover:text-white transition-colors">WhatsApp Cloud API</SafeLink></li>
+                                <li><SafeLink href="/platforms/cloud" className="hover:text-white transition-colors">Meta Graph Suite</SafeLink></li>
+                                <li><SafeLink href="/start-project" className="hover:text-white transition-colors">System Architecture Wizard</SafeLink></li>
                             </ul>
                         </div>
 
                         <div className="space-y-4">
                             <div className="text-white font-bold tracking-wider rtl:tracking-normal font-sans">{__('general.press_center') || 'Press Center'}</div>
                             <ul className="space-y-2.5 font-sans text-xs">
-                                <li><Link href="/estimator" className="hover:text-white transition-colors">{__('general.estimator') || 'Architecture Estimator'}</Link></li>
-                                <li><Link href="/portfolio" className="hover:text-white transition-colors">{__('general.portfolio') || 'Case Studies Archive'}</Link></li>
-                                <li><Link href="/about/mahmoud-amin" className="hover:text-white transition-colors">{__('general.leadership_bio') || 'Leadership Bio (Mahmoud Amin)'}</Link></li>
-                                <li><Link href="/compare/laravel-vs-nodejs" className="hover:text-white transition-colors">Tech Benchmarks (Laravel vs Node.js)</Link></li>
+                                <li><SafeLink href="/estimator" className="hover:text-white transition-colors">{__('general.estimator') || 'Architecture Estimator'}</SafeLink></li>
+                                <li><SafeLink href="/portfolio" className="hover:text-white transition-colors">{__('general.portfolio') || 'Case Studies Archive'}</SafeLink></li>
+                                <li><SafeLink href="/about/mahmoud-amin" className="hover:text-white transition-colors">{__('general.leadership_bio') || 'Leadership Bio (Mahmoud Amin)'}</SafeLink></li>
+                                <li><SafeLink href="/compare/laravel-vs-nodejs" className="hover:text-white transition-colors">Tech Benchmarks (Laravel vs Node.js)</SafeLink></li>
                             </ul>
                         </div>
 
                         <div className="space-y-4">
                             <div className="text-white font-bold tracking-wider rtl:tracking-normal font-sans">{__('general.legal') || 'Legal & Privacy'}</div>
                             <ul className="space-y-2.5 font-sans text-xs">
-                                <li><Link href="/privacy-policy" className="hover:text-white transition-colors">{__('general.privacy_policy') || 'Privacy Policy'}</Link></li>
-                                <li><Link href="/terms-of-service" className="hover:text-white transition-colors">{__('general.terms_of_service') || 'Terms & SLA'}</Link></li>
+                                <li><SafeLink href="/privacy-policy" className="hover:text-white transition-colors">{__('general.privacy_policy') || 'Privacy Policy'}</SafeLink></li>
+                                <li><SafeLink href="/terms-of-service" className="hover:text-white transition-colors">{__('general.terms_of_service') || 'Terms & SLA'}</SafeLink></li>
                                 <li><span className="text-zinc-500">Security Architecture</span></li>
                                 <li><span className="text-zinc-500">GDPR Compliance</span></li>
                             </ul>

@@ -20,7 +20,6 @@ use App\Http\Controllers\Admin\AdminTransactionController;
 use App\Http\Controllers\Admin\AdminUserLoanController;
 use App\Http\Controllers\Admin\AdminVoucherController;
 use App\Http\Controllers\Admin\AdminWithdrawRequestController;
-use App\Http\Controllers\Admin\AiEstimatorController;
 use App\Http\Controllers\Admin\BroadcastNotificationController;
 use App\Http\Controllers\Admin\BusinessController;
 use App\Http\Controllers\Admin\CharityCounterController;
@@ -595,10 +594,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // Website Services
     Route::resource('website-services', WebsiteServiceController::class)->except(['show']);
-
-    // AI Estimator
-    Route::get('/tools/ai-estimator', [AiEstimatorController::class, 'index'])->name('tools.ai-estimator');
-    Route::post('/tools/ai-estimator/estimate', [AiEstimatorController::class, 'estimate'])->name('tools.ai-estimator.estimate');
 
     // Broadcast Notifications
     Route::get('/notifications/broadcast', [BroadcastNotificationController::class, 'index'])->name('notifications.broadcast');

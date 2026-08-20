@@ -319,7 +319,9 @@
                     </div>
                 </div>
                 <div class="p-6 space-y-3">
-                    <h3 class="text-lg font-bold text-white font-sans">RevFlow Double-Entry Kernel</h3>
+                    <h3 class="text-lg font-bold text-white font-sans group-hover:text-[#748660] transition-colors">
+                        <a href="/portfolio/revflow">RevFlow Double-Entry Kernel</a>
+                    </h3>
                     <p class="text-xs text-zinc-400 leading-relaxed font-sans">
                         محرك حسابات مؤسسي معتمد بالقيود المزدوجة، يربط الفواتير والمخازن وتوزيع الأرباح لحظياً.
                     </p>
@@ -327,10 +329,12 @@
             </div>
             <div class="p-6 pt-0">
                 <div class="pt-4 border-t border-[#222222] flex justify-between items-center text-xs font-mono">
-                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20an%20ERP%20system%20similar%20to%20RevFlow." target="_blank" rel="noopener noreferrer" class="text-[#748660] hover:text-white font-bold flex items-center gap-1">
-                        <span>{{ __('general.whatsapp_direct') }}</span> ➔
+                    <a href="/portfolio/revflow" class="text-white hover:text-[#748660] font-bold flex items-center gap-1">
+                        <span>Case Study</span> ➔
                     </a>
-                    <a href="/portfolio" class="text-zinc-500 hover:text-white">Archive ↗</a>
+                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20an%20ERP%20system%20similar%20to%20RevFlow." target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-white">
+                        Inquire ↗
+                    </a>
                 </div>
             </div>
         </div>
@@ -345,7 +349,9 @@
                     </div>
                 </div>
                 <div class="p-6 space-y-3">
-                    <h3 class="text-lg font-bold text-white font-sans">ChartCash Financial Terminal</h3>
+                    <h3 class="text-lg font-bold text-white font-sans group-hover:text-[#748660] transition-colors">
+                        <a href="/portfolio/chartcash">ChartCash Financial Terminal</a>
+                    </h3>
                     <p class="text-xs text-zinc-400 leading-relaxed font-sans">
                         محطة نقاط بيع وحسابات تدفقات نقدية فورية، مربوطة بالـ WebSockets وطابعات الباركود.
                     </p>
@@ -353,10 +359,12 @@
             </div>
             <div class="p-6 pt-0">
                 <div class="pt-4 border-t border-[#222222] flex justify-between items-center text-xs font-mono">
-                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20a%20POS/FinTech%20system%20similar%20to%20ChartCash." target="_blank" rel="noopener noreferrer" class="text-[#748660] hover:text-white font-bold flex items-center gap-1">
-                        <span>{{ __('general.whatsapp_direct') }}</span> ➔
+                    <a href="/portfolio/chartcash" class="text-white hover:text-[#748660] font-bold flex items-center gap-1">
+                        <span>Case Study</span> ➔
                     </a>
-                    <a href="/portfolio" class="text-zinc-500 hover:text-white">Archive ↗</a>
+                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20a%20POS/FinTech%20system%20similar%20to%20ChartCash." target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-white">
+                        Inquire ↗
+                    </a>
                 </div>
             </div>
         </div>
@@ -371,7 +379,9 @@
                     </div>
                 </div>
                 <div class="p-6 space-y-3">
-                    <h3 class="text-lg font-bold text-white font-sans">Trenz Multi-Agent CRM</h3>
+                    <h3 class="text-lg font-bold text-white font-sans group-hover:text-[#748660] transition-colors">
+                        <a href="/portfolio/trenz-whatscrm">Trenz Multi-Agent CRM</a>
+                    </h3>
                     <p class="text-xs text-zinc-400 leading-relaxed font-sans">
                         محرك معالجة ملايين الرسائل مع شات موحد للوكلاء وربط WhatsApp Cloud API رسمي.
                     </p>
@@ -379,10 +389,12 @@
             </div>
             <div class="p-6 pt-0">
                 <div class="pt-4 border-t border-[#222222] flex justify-between items-center text-xs font-mono">
-                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20a%20WhatsApp%20CRM%20system%20similar%20to%20Trenz." target="_blank" rel="noopener noreferrer" class="text-[#748660] hover:text-white font-bold flex items-center gap-1">
-                        <span>{{ __('general.whatsapp_direct') }}</span> ➔
+                    <a href="/portfolio/trenz-whatscrm" class="text-white hover:text-[#748660] font-bold flex items-center gap-1">
+                        <span>Case Study</span> ➔
                     </a>
-                    <a href="/portfolio" class="text-zinc-500 hover:text-white">Archive ↗</a>
+                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20a%20WhatsApp%20CRM%20system%20similar%20to%20Trenz." target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-white">
+                        Inquire ↗
+                    </a>
                 </div>
             </div>
         </div>

@@ -370,200 +370,200 @@ function AuthenticatedContent({
                                         <DropdownMenu>
                                             <div className="relative inline-block">
                                                 <DropdownMenuTrigger className={cn(
-                                                    "inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none transition-colors duration-150 outline-none select-none",
+                                                    "inline-flex items-center gap-1.5 h-8 px-3 rounded-none text-xs font-mono uppercase tracking-wider leading-none transition-colors duration-150 outline-none select-none",
                                                     isWorkspaceActive 
-                                                        ? "bg-slate-100/80 text-slate-900" 
-                                                        : "text-slate-500 hover:bg-slate-100/60 hover:text-slate-800"
+                                                        ? "bg-[#1E1E1E] text-white border border-[#2B2B2B]" 
+                                                        : "text-zinc-400 hover:bg-[#1E1E1E] hover:text-white"
                                                 )}>
-                                                    {__('general.workspace')}<ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
+                                                    {__('general.workspace')}<ChevronDown className="ms-1 h-3 w-3 opacity-60" />
                                                 </DropdownMenuTrigger>
                                                 {isTourOpen && (tourStep === 2 || tourStep === 5) && (
-                                                    <span className="absolute top-1 end-1 flex h-3 w-3">
-                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
-                                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
+                                                    <span className="absolute top-1 end-1 flex h-2.5 w-2.5">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#748660] opacity-75" />
+                                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#748660]" />
                                                     </span>
                                                 )}
                                             </div>
-                                            <DropdownMenuContent align="start" className="w-[820px] p-5 grid grid-cols-3 gap-6 rounded-2xl border border-slate-200 bg-white isolate z-50" style={{ boxShadow: 'var(--shadow-menu-soft)' }}>
+                                            <DropdownMenuContent align="start" className="w-[820px] p-5 grid grid-cols-3 gap-6 rounded-none border border-[#2B2B2B] bg-[#141414] text-zinc-300 isolate z-50 shadow-2xl">
                                                 {/* Column 1: Projects & Collaboration */}
-                                                <div className="flex flex-col gap-1 divide-y divide-slate-100">
-                                                    <div className="px-2 py-2 mb-1 border-b border-blue-200">
-                                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.projects_and_collaboration')}</p>
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="px-2 py-2 mb-1 border-b border-[#222222]">
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#748660]">{__('general.projects_and_collaboration')}</p>
                                                     </div>
                                                     
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isProjectsMenuActive
-                                                                ? "bg-blue-50/60 border-blue-100" 
-                                                                : "hover:bg-blue-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('client.projects.index')} aria-current={isProjectsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300" />}
+                                                        render={<SafeLink href={safeRoute('client.projects.index')} aria-current={isProjectsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
-                                                            <FolderKanban className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <FolderKanban className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.projects')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.projects_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.projects')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.projects_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isAllTasksMenuActive
-                                                                ? "bg-blue-50/60 border-blue-100" 
-                                                                : "hover:bg-blue-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('client.projects.all-tasks')} aria-current={isAllTasksMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300" />}
+                                                        render={<SafeLink href={safeRoute('client.projects.all-tasks')} aria-current={isAllTasksMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
-                                                            <ListTodo className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <ListTodo className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.all_tasks')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.all_tasks_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.all_tasks')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.all_tasks_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isMessagesMenuActive
-                                                                ? "bg-blue-50/60 border-blue-100" 
-                                                                : "hover:bg-blue-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('messages.index')} aria-current={isMessagesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300" />}
+                                                        render={<SafeLink href={safeRoute('messages.index')} aria-current={isMessagesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
-                                                            <MessageSquare className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <MessageSquare className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.messages')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.messages_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.messages')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.messages_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
                                                 </div>
 
                                                 {/* Column 2: Financials */}
-                                                <div className="flex flex-col gap-1 divide-y divide-slate-100">
-                                                    <div className="px-2 py-2 mb-1 border-b border-emerald-200">
-                                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.financials')}</p>
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="px-2 py-2 mb-1 border-b border-[#222222]">
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#748660]">{__('general.financials')}</p>
                                                     </div>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isInvoicesMenuActive
-                                                                ? "bg-emerald-50/60 border-emerald-100" 
-                                                                : "hover:bg-emerald-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('billing.invoices.index')} aria-current={isInvoicesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
+                                                        render={<SafeLink href={safeRoute('billing.invoices.index')} aria-current={isInvoicesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
-                                                            <FileText className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <FileText className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.my_invoices')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.my_invoices_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.my_invoices')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.my_invoices_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isTransactionsMenuActive
-                                                                ? "bg-emerald-50/60 border-emerald-100" 
-                                                                : "hover:bg-emerald-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('financial.transactions')} aria-current={isTransactionsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
+                                                        render={<SafeLink href={safeRoute('financial.transactions')} aria-current={isTransactionsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
-                                                            <ArrowRightLeft className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <ArrowRightLeft className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.transactions')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.transactions_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.transactions')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.transactions_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isWithdrawalsMenuActive
-                                                                ? "bg-emerald-50/60 border-emerald-100" 
-                                                                : "hover:bg-emerald-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('financial.withdrawals')} aria-current={isWithdrawalsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
+                                                        render={<SafeLink href={safeRoute('financial.withdrawals')} aria-current={isWithdrawalsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
-                                                            <ArrowUpRight className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <ArrowUpRight className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.request_withdrawal')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.request_withdrawal_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.request_withdrawal')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.request_withdrawal_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isPayoutMethodsMenuActive
-                                                                ? "bg-emerald-50/60 border-emerald-100" 
-                                                                : "hover:bg-emerald-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('financial.payout-methods.index')} aria-current={isPayoutMethodsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
+                                                        render={<SafeLink href={safeRoute('financial.payout-methods.index')} aria-current={isPayoutMethodsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
-                                                            <CreditCard className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <CreditCard className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.payout_methods')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.payout_methods_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.payout_methods')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.payout_methods_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg mt-1",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isReferralsMenuActive
-                                                                ? "bg-emerald-50/60 border-emerald-100" 
-                                                                : "hover:bg-emerald-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('referrals.index')} aria-current={isReferralsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-300" />}
+                                                        render={<SafeLink href={safeRoute('referrals.index')} aria-current={isReferralsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-600">
-                                                            <Users className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <Users className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.referrals')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.referrals_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.referrals')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.referrals_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
                                                 </div>
 
                                                 {/* Column 3: Support */}
-                                                <div className="flex flex-col gap-1 divide-y divide-slate-100">
-                                                    <div className="px-2 py-2 mb-1 border-b border-orange-200">
-                                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.support')}</p>
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="px-2 py-2 mb-1 border-b border-[#222222]">
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#748660]">{__('general.support')}</p>
                                                     </div>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
-                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-lg",
+                                                            "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
                                                             isTicketsMenuActive
-                                                                ? "bg-orange-50/60 border-orange-100" 
-                                                                : "hover:bg-orange-50/60 border-transparent"
+                                                                ? "bg-[#1E1E1E] border-[#333333]" 
+                                                                : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                         )}
-                                                        render={<Link href={safeRoute('tickets.index')} aria-current={isTicketsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2 rounded-lg w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-300" />}
+                                                        render={<SafeLink href={safeRoute('tickets.index')} aria-current={isTicketsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-md bg-orange-50 flex items-center justify-center shrink-0 text-orange-600">
-                                                            <LifeBuoy className="icon-md" />
+                                                        <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                            <LifeBuoy className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-slate-900">{__('general.support_tickets')}</p>
-                                                            <p className="text-xs text-slate-500 leading-normal">{__('general.support_tickets_desc')}</p>
+                                                            <p className="text-xs font-bold text-white font-sans">{__('general.support_tickets')}</p>
+                                                            <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5">{__('general.support_tickets_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
                                                 </div>
@@ -571,58 +571,55 @@ function AuthenticatedContent({
                                         </DropdownMenu>
 
                                 {/* SERVICES LINK */}
-                                <Link
+                                <SafeLink
                                     href={safeRoute('marketplace.services.index')}
                                     className={cn(
-                                        "inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none transition-colors duration-150 outline-none select-none",
+                                        "inline-flex items-center gap-1.5 h-8 px-3 rounded-none text-xs font-mono uppercase tracking-wider leading-none transition-colors duration-150 outline-none select-none",
                                         isRouteActive('marketplace.services')
-                                            ? "bg-emerald-50 text-emerald-700 font-semibold"
-                                            : "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                                            ? "bg-[#1E1E1E] text-[#748660] font-bold border border-[#2B2B2B]"
+                                            : "text-zinc-400 hover:bg-[#1E1E1E] hover:text-white"
                                     )}
                                 >
-                                    <Briefcase className="me-1.5 h-3.5 w-3.5" /> {__('general.services')}
-                                </Link>
+                                    <Briefcase className="me-1.5 h-3.5 w-3.5 text-[#748660]" /> {__('general.services')}
+                                </SafeLink>
 
                                 {/* iSAAS MEGA MENU */}
                                 <DropdownMenu>
                                     <div className="relative inline-block">
-                                        <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-150 outline-none select-none">
-                                            <Sparkles className="me-1.5 h-3.5 w-3.5" /> iSAAS <ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
+                                        <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-none text-xs font-mono uppercase tracking-wider leading-none text-zinc-400 hover:bg-[#1E1E1E] hover:text-white transition-colors duration-150 outline-none select-none">
+                                            <Sparkles className="me-1.5 h-3.5 w-3.5 text-[#748660]" /> iSAAS <ChevronDown className="ms-1 h-3 w-3 opacity-60" />
                                         </DropdownMenuTrigger>
                                         {isTourOpen && tourStep === 4 && (
-                                            <span className="absolute top-1 end-1 flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
+                                            <span className="absolute top-1 end-1 flex h-2.5 w-2.5">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#748660] opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#748660]" />
                                             </span>
                                         )}
                                     </div>
-                                    <DropdownMenuContent align="start" className="w-[640px] p-4 grid grid-cols-2 gap-4 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
+                                    <DropdownMenuContent align="start" className="w-[640px] p-5 grid grid-cols-2 gap-6 rounded-none border border-[#2B2B2B] bg-[#141414] text-zinc-300 isolate z-50 shadow-2xl">
                                         {/* Column 1: Core Systems */}
-                                        <div className="flex flex-col gap-1">
-                                            <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.core_systems')}</p>
+                                        <div className="flex flex-col gap-1.5">
+                                            <div className="px-2 py-2 mb-1 border-b border-[#222222]">
+                                                <p className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#748660]">{__('general.core_systems')}</p>
                                             </div>
                                             
                                             <DropdownMenuItem 
                                                 className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isErpActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
+                                                    isErpActive ? "bg-[#1E1E1E] border-[#333333]" : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                 )}
-                                                render={<SafeLink href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 w-full" />}
                                             >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isErpActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
-                                                )}>
-                                                    <Building2 className={cn("w-4 h-4", isErpActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
+                                                <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                    <Building2 className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isErpActive ? "text-indigo-900" : "text-slate-900")}>ERP</p>
-                                                        {isErpActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">{__('general.active')}</span>}
-                                                        {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                        <p className="text-xs font-bold text-white font-sans">ERP</p>
+                                                        {isErpActive && <span className="text-[10px] font-mono px-1.5 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#748660]">{__('general.active')}</span>}
+                                                        {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-zinc-500" />}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isErpActive ? "text-indigo-700/70" : "text-slate-500")}>
+                                                    <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5 truncate">
                                                         {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
                                                     </p>
                                                 </div>
@@ -630,49 +627,43 @@ function AuthenticatedContent({
 
                                             <DropdownMenuItem 
                                                 className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
+                                                    isCrmActive ? "bg-[#1E1E1E] border-[#333333]" : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                 )}
-                                                render={<SafeLink href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 w-full" />}
                                             >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isCrmActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
-                                                )}>
-                                                    <Megaphone className={cn("w-4 h-4", isCrmActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
+                                                <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                    <Megaphone className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>{__('general.lead_gen_crm')}</p>
-                                                        {isCrmActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">{__('general.active')}</span>}
-                                                        {!activeModules.crm && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                        <p className="text-xs font-bold text-white font-sans">{__('general.lead_gen_crm')}</p>
+                                                        {isCrmActive && <span className="text-[10px] font-mono px-1.5 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#748660]">{__('general.active')}</span>}
+                                                        {!activeModules.crm && <Lock className="w-3.5 h-3.5 text-zinc-500" />}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isCrmActive ? "text-indigo-700/70" : "text-slate-500")}>
-                                                        {!activeModules.crm ? 'Subscribe to access' : 'Capture leads and manage campaigns'}
+                                                    <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5 truncate">
+                                                        {!activeModules.crm ? 'Subscribe to access' : 'Capture leads & campaigns'}
                                                     </p>
                                                 </div>
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem 
                                                 className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isBookingActive ? "bg-amber-50/80 border-amber-100" : "hover:bg-slate-50 border-transparent"
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
+                                                    isBookingActive ? "bg-[#1E1E1E] border-[#333333]" : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                 )}
-                                                render={<SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 w-full" />}
                                             >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isBookingActive ? "bg-amber-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-amber-50"
-                                                )}>
-                                                    <Calendar className={cn("w-4 h-4", isBookingActive ? "text-amber-700" : "text-slate-500 group-hover/dropdown-menu-item:text-amber-600")} />
+                                                <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                    <Calendar className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isBookingActive ? "text-amber-900" : "text-slate-900")}>{__('general.booking')}</p>
-                                                        {isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">{__('general.active')}</span>}
-                                                        {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                        <p className="text-xs font-bold text-white font-sans">{__('general.booking')}</p>
+                                                        {isBookingActive && <span className="text-[10px] font-mono px-1.5 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#748660]">{__('general.active')}</span>}
+                                                        {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-zinc-500" />}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isBookingActive ? "text-amber-700/70" : "text-slate-500")}>
+                                                    <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5 truncate">
                                                         {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
                                                     </p>
                                                 </div>
@@ -680,131 +671,96 @@ function AuthenticatedContent({
                                         </div>
 
                                         {/* Column 2: Tools */}
-                                        <div className="flex flex-col gap-1">
-                                            <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.tools')}</p>
+                                        <div className="flex flex-col gap-1.5">
+                                            <div className="px-2 py-2 mb-1 border-b border-[#222222]">
+                                                <p className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#748660]">{__('general.tools')}</p>
                                             </div>
 
                                             <DropdownMenuItem 
                                                 className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isRouteActive('fbmb.index') ? "bg-teal-50/80 border-teal-100" : "hover:bg-slate-50 border-transparent"
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
+                                                    isRouteActive('fbmb.index') ? "bg-[#1E1E1E] border-[#333333]" : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                 )}
-                                                render={<Link href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 w-full" />}
                                             >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isRouteActive('fbmb.index') ? "bg-teal-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-teal-50"
-                                                )}>
-                                                    <Activity className={cn("w-4 h-4", isRouteActive('fbmb.index') ? "text-teal-700" : "text-slate-500 group-hover/dropdown-menu-item:text-teal-600")} />
+                                                <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                    <Activity className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('fbmb.index') ? "text-teal-900" : "text-slate-900")}>{__('general.isaas_fb_lookup')}</p>
-                                                        {isRouteActive('fbmb.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">{__('general.active')}</span>}
+                                                        <p className="text-xs font-bold text-white font-sans">{__('general.isaas_fb_lookup')}</p>
+                                                        {isRouteActive('fbmb.index') && <span className="text-[10px] font-mono px-1.5 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#748660]">{__('general.active')}</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>{__('general.search_mobile_by_fbid')}</p>
+                                                    <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5 truncate">{__('general.search_mobile_by_fbid')}</p>
                                                 </div>
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem 
                                                 className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isRouteActive('whatsapp.index') ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
+                                                    isRouteActive('whatsapp.index') ? "bg-[#1E1E1E] border-[#333333]" : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                 )}
-                                                render={<Link href={safeRoute('whatsapp.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={safeRoute('whatsapp.index')} className="flex items-start gap-3 p-2.5 w-full" />}
                                             >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isRouteActive('whatsapp.index') ? "bg-emerald-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-emerald-50"
-                                                )}>
-                                                    <MessageSquare className={cn("w-4 h-4", isRouteActive('whatsapp.index') ? "text-emerald-700" : "text-slate-500 group-hover/dropdown-menu-item:text-emerald-600")} />
+                                                <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                    <MessageSquare className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('whatsapp.index') ? "text-emerald-900" : "text-slate-900")}>WhatsApp Sender API</p>
-                                                        {isRouteActive('whatsapp.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">{__('general.active')}</span>}
+                                                        <p className="text-xs font-bold text-white font-sans">WhatsApp API</p>
+                                                        {isRouteActive('whatsapp.index') && <span className="text-[10px] font-mono px-1.5 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#748660]">{__('general.active')}</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('whatsapp.index') ? "text-emerald-700/70" : "text-slate-500")}>Meta Cloud API & FB Login</p>
+                                                    <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5 truncate">Meta Cloud API &amp; Webhooks</p>
                                                 </div>
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem 
                                                 className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isRouteActive('sms-payment-gateway.index') ? "bg-rose-50/80 border-rose-100" : "hover:bg-slate-50 border-transparent"
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
+                                                    isRouteActive('sms-payment-gateway.index') ? "bg-[#1E1E1E] border-[#333333]" : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                 )}
-                                                render={<Link href={safeRoute('sms-payment-gateway.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={safeRoute('sms-payment-gateway.index')} className="flex items-start gap-3 p-2.5 w-full" />}
                                             >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isRouteActive('sms-payment-gateway.index') ? "bg-rose-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-rose-50"
-                                                )}>
-                                                    <MessageSquare className={cn("w-4 h-4", isRouteActive('sms-payment-gateway.index') ? "text-rose-700" : "text-slate-500 group-hover/dropdown-menu-item:text-rose-600")} />
+                                                <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                    <MessageSquare className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('sms-payment-gateway.index') ? "text-rose-900" : "text-slate-900")}>{__('general.payment_gateway')}</p>
-                                                        {isRouteActive('sms-payment-gateway.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">{__('general.active')}</span>}
+                                                        <p className="text-xs font-bold text-white font-sans">{__('general.payment_gateway')}</p>
+                                                        {isRouteActive('sms-payment-gateway.index') && <span className="text-[10px] font-mono px-1.5 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#748660]">{__('general.active')}</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('sms-payment-gateway.index') ? "text-rose-700/70" : "text-slate-500")}>{__('general.android_automated_sms')}</p>
+                                                    <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5 truncate">{__('general.android_automated_sms')}</p>
                                                 </div>
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem 
                                                 className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isRouteActive('isaas.gold-savers.index') ? "bg-yellow-50/80 border-yellow-100" : "hover:bg-slate-50 border-transparent"
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer rounded-none group",
+                                                    isToolsActive ? "bg-[#1E1E1E] border-[#333333]" : "hover:bg-[#1C1C1C] border-transparent hover:border-[#2B2B2B]"
                                                 )}
-                                                render={<SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} className="flex items-start gap-3 p-2.5 w-full" />}
                                             >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isRouteActive('isaas.gold-savers.index') ? "bg-yellow-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-yellow-50"
-                                                )}>
-                                                    <Coins className={cn("w-4 h-4", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700" : "text-slate-500 group-hover/dropdown-menu-item:text-yellow-600")} />
+                                                <div className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-[#748660] group-hover:border-[#748660]/40 transition-colors">
+                                                    <Wrench className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('isaas.gold-savers.index') ? "text-yellow-900" : "text-slate-900")}>{__('general.gold_savers')}</p>
-                                                        {isRouteActive('isaas.gold-savers.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700">{__('general.active')}</span>}
+                                                        <p className="text-xs font-bold text-white font-sans">{__('general.tools_amp_plugins')}</p>
+                                                        {isToolsActive && <span className="text-[10px] font-mono px-1.5 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#748660]">{__('general.active')}</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700/70" : "text-slate-500")}>{__('general.track_your_gold_value')}</p>
-                                                </div>
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
-                                                )}
-                                                render={<SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                            >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isToolsActive ? "bg-fuchsia-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-fuchsia-50"
-                                                )}>
-                                                    <Wrench className={cn("w-4 h-4", isToolsActive ? "text-fuchsia-700" : "text-slate-500 group-hover/dropdown-menu-item:text-fuchsia-600")} />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isToolsActive ? "text-fuchsia-900" : "text-slate-900")}>{__('general.tools_amp_plugins')}</p>
-                                                        {isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-700">{__('general.active')}</span>}
-                                                        {!isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">{__('general.free_browse')}</span>}
-                                                    </div>
-                                                    <p className={cn("text-xs truncate", isToolsActive ? "text-fuchsia-700/70" : "text-slate-500")}>{__('general.extensions_amp_licensing')}</p>
+                                                    <p className="text-[11px] text-zinc-400 font-sans leading-tight mt-0.5 truncate">{__('general.extensions_amp_licensing')}</p>
                                                 </div>
                                             </DropdownMenuItem>
                                         </div>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
-                                <NavLink href={safeRoute('estimator', undefined, '/estimator')} active={isRouteActive('estimator')}>
-                                    <Calculator className="h-3.5 w-3.5 text-blue-500" /> {__('general.estimator') || 'Estimator'}
+                                <NavLink href={safeRoute('estimator', undefined, '/estimator')} active={isRouteActive('estimator')} className="text-xs font-mono uppercase tracking-wider text-zinc-400 hover:text-white">
+                                    <Calculator className="h-3.5 w-3.5 text-[#748660]" /> {__('general.estimator') || 'Estimator'}
                                 </NavLink>
 
-                                <NavLink href={safeRoute('subscriptions.plans')} active={isRouteActive('subscriptions')}>
-                                    <CreditCard className="h-3.5 w-3.5 text-amber-500" /> {__('general.subscription')}</NavLink>
+                                <NavLink href={safeRoute('subscriptions.plans')} active={isRouteActive('subscriptions')} className="text-xs font-mono uppercase tracking-wider text-zinc-400 hover:text-white">
+                                    <CreditCard className="h-3.5 w-3.5 text-[#748660]" /> {__('general.subscription')}</NavLink>
                                     </>
                                 )}
                             </nav>
@@ -818,107 +774,107 @@ function AuthenticatedContent({
                                 </div>
                             )}
                             {!auth?.team_member && (
-                                <div className="hidden md:flex items-center gap-2 me-2">
-                                    {/* Add Balance pill — locked geometry */}
-                                    <Link
+                                <div className="hidden md:flex items-center gap-2 me-2 font-mono text-xs">
+                                    {/* Add Balance pill — unified studio geometry */}
+                                    <SafeLink
                                         href={safeRoute('financial.add-balance')}
-                                        className="inline-flex items-center gap-1 h-8 min-w-[105px] justify-center px-3 text-xs font-medium border border-slate-200 rounded-full text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors duration-150"
+                                        className="inline-flex items-center gap-1 h-8 min-w-[105px] justify-center px-3 text-xs font-bold border border-[#2B2B2B] bg-black text-zinc-300 hover:border-white hover:text-white rounded-none uppercase tracking-wider transition-colors duration-150"
                                     >
-                                        <Plus className="w-3.5 h-3.5 shrink-0" />
+                                        <Plus className="w-3.5 h-3.5 shrink-0 text-[#748660]" />
                                         <span>{__('general.add_balance')}</span>
-                                    </Link>
+                                    </SafeLink>
 
-                                    {/* Wallet pill — locked geometry */}
+                                    {/* Wallet pill — unified studio geometry */}
                                     <div className="relative">
-                                        <Link
+                                        <SafeLink
                                             href={safeRoute('financial.transactions')}
-                                            className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors duration-150 text-xs font-medium text-slate-900"
+                                            className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-[#1C1C1C] hover:bg-[#252525] border border-[#2B2B2B] rounded-none transition-colors duration-150 text-xs font-bold text-white tracking-wider"
                                             title={__('general.wallet_balance')}
                                         >
-                                            <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                            <Wallet className="w-3.5 h-3.5 text-[#748660] shrink-0" />
                                             <span>{wallet ? formatMoney(wallet.balance, wallet.currency) : formatMoney(0, (auth?.user as any)?.currency)}</span>
-                                        </Link>
+                                        </SafeLink>
                                         {isTourOpen && tourStep === 3 && (
-                                            <span className="absolute -top-1 -end-1 flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                                            <span className="absolute -top-1 -end-1 flex h-2.5 w-2.5">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#748660] opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#748660]" />
                                             </span>
                                         )}
                                     </div>
 
-                                    {/* Points pill — locked geometry */}
-                                    <Link
+                                    {/* Points pill — unified studio geometry */}
+                                    <SafeLink
                                         href={safeRoute('points.index', undefined, '/points')}
-                                        className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
+                                        className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-[#1E2619] border border-[#748660]/40 rounded-none transition-colors duration-150 text-xs font-bold text-[#748660] tracking-wider"
                                         title={__('general.points_connects_balance')}
                                     >
-                                        <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                        <Coins className="w-3.5 h-3.5 text-[#748660] shrink-0" />
                                         <span>{user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}</span>
-                                    </Link>
+                                    </SafeLink>
                                 </div>
                             )}
 
                             {/* Notifications */}
                             <DropdownMenu>
                                 <div className="relative inline-block">
-                                    <DropdownMenuTrigger className="w-9 h-9 rounded-full inline-flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors duration-150 relative outline-none shrink-0">
-                                        <Bell className="w-5 h-5" />
+                                    <DropdownMenuTrigger className="w-8 h-8 rounded-none bg-black border border-[#2B2B2B] inline-flex items-center justify-center text-zinc-400 hover:text-white hover:border-[#748660] transition-colors duration-150 relative outline-none shrink-0">
+                                        <Bell className="w-4 h-4" />
                                         {notifications?.unread_count > 0 && (
-                                            <span className="absolute top-2 end-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
+                                            <span className="absolute top-1 end-1 w-2 h-2 bg-[#748660] rounded-full" />
                                         )}
                                     </DropdownMenuTrigger>
                                     {isTourOpen && tourStep === 6 && (
-                                        <span className="absolute top-0 end-0 flex h-3 w-3">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
+                                        <span className="absolute top-0 end-0 flex h-2.5 w-2.5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#748660] opacity-75" />
+                                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#748660]" />
                                         </span>
                                     )}
                                 </div>
-                                <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
-                                    <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
-                                        <span className="font-semibold text-slate-900 text-sm">{__('general.notifications')}</span>
+                                <DropdownMenuContent align="end" className="w-80 p-0 rounded-none border border-[#2B2B2B] bg-[#141414] text-zinc-300 isolate z-50 shadow-2xl">
+                                    <div className="px-4 py-3 border-b border-[#222222] flex justify-between items-center">
+                                        <span className="font-mono font-bold text-white text-xs uppercase tracking-wider">{__('general.notifications')}</span>
                                         {notifications?.unread_count > 0 && (
-                                            <Link 
+                                            <SafeLink 
                                                 href={safeRoute('notifications.mark-all-read')} 
                                                 method="post" 
                                                 as="button" 
-                                                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium bg-transparent border-0 cursor-pointer p-0"
-                                            >{__('general.mark_all_read')}</Link>
+                                                className="text-[11px] font-mono text-[#748660] hover:text-white font-bold bg-transparent border-0 cursor-pointer p-0"
+                                            >{__('general.mark_all_read')}</SafeLink>
                                         )}
                                     </div>
-                                    <div className="max-h-[300px] overflow-y-auto p-2">
+                                    <div className="max-h-[300px] overflow-y-auto p-2 space-y-1">
                                         {notifications?.recent && notifications.recent.length > 0 ? (
                                             notifications.recent.map((n: any) => (
-                                                <div key={n.id} className="p-1 hover:bg-slate-50 rounded-lg text-xs flex justify-between items-start gap-1 border-b border-slate-50 last:border-0 relative group">
-                                                    <Link 
+                                                <div key={n.id} className="p-2 hover:bg-[#1E1E1E] border border-transparent hover:border-[#2B2B2B] text-xs flex justify-between items-start gap-1 relative group transition-colors">
+                                                    <SafeLink 
                                                         href={safeRoute('notifications.mark-read', { id: n.id })} 
                                                         method="post" 
                                                         as="button" 
-                                                        className="flex-1 text-start p-1.5 rounded-md outline-none hover:bg-slate-100/50 transition-colors"
+                                                        className="flex-1 text-start p-0 outline-none"
                                                     >
-                                                        <p className="text-slate-800 font-medium leading-tight">{n.data?.title || n.data?.message || __('general.new_notification')}</p>
+                                                        <p className="text-white font-bold leading-tight font-sans text-xs">{n.data?.title || n.data?.message || __('general.new_notification')}</p>
                                                         {(n.data?.body || (n.data?.title && n.data?.message)) && (
-                                                            <p className="text-slate-500 text-[10px] mt-0.5 line-clamp-2">{n.data?.body || n.data?.message}</p>
+                                                            <p className="text-zinc-400 text-[11px] mt-0.5 line-clamp-2 font-sans">{n.data?.body || n.data?.message}</p>
                                                         )}
-                                                        <span className="text-[10px] text-slate-400 block mt-1">{n.created_at ? new Date(n.created_at).toLocaleDateString() : ''}</span>
-                                                    </Link>
-                                                    <Link 
+                                                        <span className="text-[10px] font-mono text-zinc-500 block mt-1">{n.created_at ? new Date(n.created_at).toLocaleDateString() : ''}</span>
+                                                    </SafeLink>
+                                                    <SafeLink 
                                                         href={safeRoute('notifications.mark-read', { id: n.id, no_redirect: 1 })} 
                                                         method="post" 
                                                         as="button" 
-                                                        className="text-[10px] text-indigo-600 hover:underline shrink-0 bg-transparent border-0 cursor-pointer p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    >{__('general.mark_read')}</Link>
+                                                        className="text-[10px] font-mono text-[#748660] hover:text-white shrink-0 bg-transparent border-0 cursor-pointer p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >{__('general.mark_read')}</SafeLink>
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="px-2 py-6 text-center text-sm text-slate-500 font-light">{__('general.no_new_notifications')}</div>
+                                            <div className="px-2 py-6 text-center text-xs font-mono text-zinc-500 uppercase tracking-wider">{__('general.no_new_notifications')}</div>
                                         )}
                                     </div>
-                                    <div className="p-2 border-t border-slate-100">
-                                        <Link 
+                                    <div className="p-2 border-t border-[#222222]">
+                                        <SafeLink 
                                             href={safeRoute('notifications.index')} 
-                                            className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), "w-full text-xs text-slate-600 justify-center")}
-                                        >{__('general.view_all')}</Link>
+                                            className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), "w-full text-xs font-mono uppercase tracking-wider text-zinc-400 hover:text-white justify-center rounded-none hover:bg-[#1E1E1E]")}
+                                        >{__('general.view_all')}</SafeLink>
                                     </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -926,93 +882,93 @@ function AuthenticatedContent({
                             {/* Profile */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="outline-none relative shrink-0">
-                                    <Avatar className="h-9 w-9 border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity duration-150">
-                                        <AvatarFallback className="bg-slate-900 text-white font-medium text-xs">
+                                    <Avatar className="h-8 w-8 rounded-none border border-[#2B2B2B] cursor-pointer hover:border-white transition-colors duration-150">
+                                        <AvatarFallback className="bg-black text-white font-mono font-bold text-xs rounded-none">
                                             {displayName.substring(0, 2).toUpperCase() || 'US'}
                                         </AvatarFallback>
                                     </Avatar>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
-                                    <div className="px-2 py-2 mb-2 border-b border-slate-50">
-                                        <p className="text-sm font-medium text-slate-900 truncate">{displayName}</p>
-                                        <p className="text-xs text-slate-500 truncate">{displayEmail}</p>
+                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-none border border-[#2B2B2B] bg-[#141414] text-zinc-300 isolate z-50 shadow-2xl">
+                                    <div className="px-2 py-2 mb-2 border-b border-[#222222]">
+                                        <p className="text-xs font-bold text-white font-mono uppercase tracking-wider truncate">{displayName}</p>
+                                        <p className="text-[11px] text-zinc-400 truncate mt-0.5">{displayEmail}</p>
                                     </div>
                                     
                                     {!auth?.team_member ? (
                                         <>
-                                            <DropdownMenuGroup>
+                                            <DropdownMenuGroup className="space-y-0.5">
                                                 {user?.role === 'admin' && (
                                                     <DropdownMenuItem 
-                                                        className="cursor-pointer rounded-lg text-sm bg-indigo-50 text-indigo-700 focus:bg-indigo-100 focus:text-indigo-800 mb-1"
-                                                        render={<Link href={safeRoute('admin.dashboard')} className="flex items-center w-full font-medium" />}
+                                                        className="cursor-pointer rounded-none text-xs font-mono uppercase tracking-wider bg-[#1E2619] border border-[#748660]/40 text-[#748660] hover:bg-[#25321F] mb-1 p-2"
+                                                        render={<SafeLink href={safeRoute('admin.dashboard')} className="flex items-center w-full font-bold" />}
                                                     >
-                                                        <Shield className="me-2 h-4 w-4 text-indigo-600" />{__('general.admin_dashboard')}</DropdownMenuItem>
+                                                        <Shield className="me-2 h-3.5 w-3.5 text-[#748660]" />{__('general.admin_dashboard')}</DropdownMenuItem>
                                                 )}
                                                 {user?.roles?.includes('seller') && (
                                                     <DropdownMenuItem 
-                                                        className="cursor-pointer rounded-lg text-sm bg-amber-50 text-amber-700 focus:bg-amber-100 focus:text-amber-800 mb-1"
-                                                        render={<Link href={safeRoute('seller.dashboard')} className="flex items-center w-full font-medium" />}
+                                                        className="cursor-pointer rounded-none text-xs font-mono uppercase tracking-wider bg-[#1E2619] border border-[#748660]/40 text-[#748660] hover:bg-[#25321F] mb-1 p-2"
+                                                        render={<SafeLink href={safeRoute('seller.dashboard')} className="flex items-center w-full font-bold" />}
                                                     >
-                                                        <Building2 className="me-2 h-4 w-4 text-amber-600" />Seller Portal</DropdownMenuItem>
+                                                        <Building2 className="me-2 h-3.5 w-3.5 text-[#748660]" />Seller Portal</DropdownMenuItem>
                                                 )}
                                                 {(user?.roles?.includes('moderator') || user?.roles?.includes('support_agent')) && (
                                                     <DropdownMenuItem 
-                                                        className="cursor-pointer rounded-lg text-sm bg-blue-50 text-blue-700 focus:bg-blue-100 focus:text-blue-800 mb-1"
-                                                        render={<Link href={safeRoute('admin.tickets.index')} className="flex items-center w-full font-medium" />}
+                                                        className="cursor-pointer rounded-none text-xs font-mono uppercase tracking-wider bg-[#1E2619] border border-[#748660]/40 text-[#748660] hover:bg-[#25321F] mb-1 p-2"
+                                                        render={<SafeLink href={safeRoute('admin.tickets.index')} className="flex items-center w-full font-bold" />}
                                                     >
-                                                        <LifeBuoy className="me-2 h-4 w-4 text-blue-600" />{__('general.manage_tickets')}</DropdownMenuItem>
+                                                        <LifeBuoy className="me-2 h-3.5 w-3.5 text-[#748660]" />{__('general.manage_tickets')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
+                                                    render={<SafeLink href={safeRoute('profile.edit')} className="flex items-center w-full" />}
                                                 >
-                                                    <User className="me-2 h-4 w-4 text-slate-400" />{__('general.my_profile')}</DropdownMenuItem>
+                                                    <User className="me-2 h-3.5 w-3.5 text-zinc-500" />{__('general.my_profile')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('kyc.index')} className="flex items-center w-full" />}
+                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
+                                                    render={<SafeLink href={safeRoute('kyc.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Shield className="me-2 h-4 w-4 text-slate-400" />{__('general.identity_verification')}</DropdownMenuItem>
+                                                    <Shield className="me-2 h-3.5 w-3.5 text-zinc-500" />{__('general.identity_verification')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
+                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
+                                                    render={<SafeLink href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
                                                 >
-                                                    <History className="me-2 h-4 w-4 text-slate-400" />{__('general.balance_history')}</DropdownMenuItem>
+                                                    <History className="me-2 h-3.5 w-3.5 text-zinc-500" />{__('general.balance_history')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
+                                                    render={<SafeLink href={safeRoute('profile.edit')} className="flex items-center w-full" />}
                                                 >
-                                                    <Shield className="me-2 h-4 w-4 text-slate-400" />{__('general.security_settings')}</DropdownMenuItem>
+                                                    <Shield className="me-2 h-3.5 w-3.5 text-zinc-500" />{__('general.security_settings')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('settings.backup.index')} className="flex items-center w-full" />}
+                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
+                                                    render={<SafeLink href={safeRoute('settings.backup.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Download className="me-2 h-4 w-4 text-slate-400" />{__('general.backup_restore')}</DropdownMenuItem>
+                                                    <Download className="me-2 h-3.5 w-3.5 text-zinc-500" />{__('general.backup_restore')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('settings.automations.index')} className="flex items-center w-full" />}
+                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
+                                                    render={<SafeLink href={safeRoute('settings.automations.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Settings className="me-2 h-4 w-4 text-slate-400" />{__('general.automations')}</DropdownMenuItem>
+                                                    <Settings className="me-2 h-3.5 w-3.5 text-zinc-500" />{__('general.automations')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
+                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
+                                                    render={<SafeLink href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
                                                 >
-                                                    <Box className="me-2 h-4 w-4 text-slate-400" /> {__('general.subscriptions')}</DropdownMenuItem>
+                                                    <Box className="me-2 h-3.5 w-3.5 text-zinc-500" /> {__('general.subscriptions')}</DropdownMenuItem>
                                             </DropdownMenuGroup>
                                             
-                                            <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                                            <DropdownMenuSeparator className="my-1.5 bg-[#222222]" />
                                             
                                             <DropdownMenuItem 
-                                                className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
-                                                render={<Link href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
+                                                className="cursor-pointer rounded-none text-xs font-mono uppercase tracking-wider text-rose-400 hover:text-rose-300 hover:bg-[#201111] p-2 transition-colors"
+                                                render={<SafeLink href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-bold" />}
                                             >
-                                                <LogOut className="me-2 h-4 w-4" /> {__('general.logout')}</DropdownMenuItem>
+                                                <LogOut className="me-2 h-3.5 w-3.5" /> {__('general.logout')}</DropdownMenuItem>
                                         </>
                                     ) : (
                                         <DropdownMenuItem 
-                                            className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
-                                            render={<Link href={route('erp.team.logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
+                                            className="cursor-pointer rounded-none text-xs font-mono uppercase tracking-wider text-rose-400 hover:text-rose-300 hover:bg-[#201111] p-2 transition-colors"
+                                            render={<SafeLink href={route('erp.team.logout')} method="post" as="button" className="flex items-center w-full font-bold" />}
                                         >
-                                            <LogOut className="me-2 h-4 w-4" />{__('general.logout_team_member')}</DropdownMenuItem>
+                                            <LogOut className="me-2 h-3.5 w-3.5" />{__('general.logout_team_member')}</DropdownMenuItem>
                                     )}
                                 </DropdownMenuContent>
                             </DropdownMenu>

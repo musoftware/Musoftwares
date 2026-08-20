@@ -10,6 +10,7 @@ use App\Services\PricingService;
 use App\Services\ProjectEstimatorDataService;
 use App\Traits\ConvertsCurrency;
 use App\Models\Project;
+use App\Services\PortfolioData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -61,25 +62,10 @@ class HomeController extends Controller
 
     public function portfolio()
     {
-        $dbProjects = Project::landingPortfolio()->get()->map(function($project) {
-            return [
-                'slug' => Str::slug($project->portfolio_title ?? $project->project_name),
-                'img' => $project->portfolio_image ? asset($project->portfolio_image) : null,
-                'img_original' => is_array($project->portfolio_gallery) && count($project->portfolio_gallery) > 0 
-                    ? asset($project->portfolio_gallery[0]) 
-                    : ($project->portfolio_image ? asset($project->portfolio_image) : null),
-                'title' => $project->portfolio_title ?? $project->project_name,
-                'desc' => $project->portfolio_description ?? $project->description,
-                'cat' => $project->portfolio_category ?? 'Platform',
-                'live_url' => $project->portfolio_live_url,
-                'github_url' => $project->portfolio_github_url,
-                'techs' => $project->portfolio_tech ?? [],
-                'is_db' => true,
-            ];
-        })->toArray();
+        $projects = PortfolioData::all();
 
         return view('public.portfolio', [
-            'dbProjects' => $dbProjects,
+            'projects' => $projects,
             'title' => 'Case Studies & Production Platforms | Musoftwares',
             'description' => 'Explore our portfolio of over 30 production platforms, enterprise ERP engines, and custom SaaS systems.',
         ]);
@@ -87,44 +73,60 @@ class HomeController extends Controller
 
     public function portfolioShow($slug)
     {
-        $project = Project::where('show_on_landing_portfolio', true)
-            ->where(function($q) use ($slug) {
-                $q->where('portfolio_title', $slug)
-                  ->orWhere('project_name', $slug)
-                  ->orWhere(DB::raw('LOWER(REPLACE(portfolio_title, " ", "-"))'), $slug)
-                  ->orWhere(DB::raw('LOWER(REPLACE(project_name, " ", "-"))'), $slug);
-            })->first();
+        $project = PortfolioData::find($slug);
 
-        $dbProject = null;
-        if ($project) {
-            $dbProject = [
+        if (!$project) {
+            // Also check by slugified title if needed
+            $all = PortfolioData::all();
+            foreach ($all as $item) {
+                if (Str::slug($item['title_en']) === $slug || Str::slug($item['slug']) === $slug) {
+                    $project = $item;
+                    break;
+                }
+            }
+        }
+
+        if (!$project) {
+            $project = [
                 'slug' => $slug,
-                'img' => $project->portfolio_image ? asset($project->portfolio_image) : null,
-                'img_original' => is_array($project->portfolio_gallery) && count($project->portfolio_gallery) > 0 
-                    ? asset($project->portfolio_gallery[0]) 
-                    : ($project->portfolio_image ? asset($project->portfolio_image) : null),
-                'title' => $project->portfolio_title ?? $project->project_name,
-                'desc' => $project->portfolio_description ?? $project->description,
-                'cat' => $project->portfolio_category ?? 'Platform',
-                'live_url' => $project->portfolio_live_url,
-                'github_url' => $project->portfolio_github_url,
-                'techs' => $project->portfolio_tech ?? [],
-                'is_db' => true,
+                'title_en' => ucwords(str_replace('-', ' ', $slug)) . ' System',
+                'title_ar' => 'نظام ' . ucwords(str_replace('-', ' ', $slug)),
+                'category' => 'SaaS & Cloud',
+                'category_ar' => 'منصات سحابية SaaS',
+                'desc_en' => 'Custom enterprise software engineered and deployed by Musoftwares.',
+                'desc_ar' => 'نظام برمجي مخصص تم تصميمه وتطويره بواسطة استوديو Musoftwares.',
+                'img' => '/images/portfolio/musoftwares.png',
+                'techs' => ['Laravel', 'PostgreSQL', 'TailwindCSS'],
+                'live_url' => null,
+                'metrics' => [
+                    'Architecture' => 'Custom Production Platform',
+                    'Latency' => '< 10ms',
+                    'Ownership' => '100% Full Source Code',
+                ],
+                'highlights_en' => [
+                    'Bespoke software architecture tailored to operational workflows.',
+                    'Zero lock-in with direct client source code deployment.',
+                ],
+                'highlights_ar' => [
+                    'بنية برمجية مخصصة بالكامل لمتطلبات ودورة عمل العميل.',
+                    'ملكية كاملة للكود المصدري دون أي قيود.',
+                ],
             ];
         }
 
-        return Inertia::render('Public/PortfolioShow', [
+        $locale = app()->getLocale();
+        $title = ($project['title_' . $locale] ?? $project['title_en']) . ' | Musoftwares';
+        $description = $project['desc_' . $locale] ?? $project['desc_en'];
+
+        $viewName = view()->exists("public.portfolio.{$slug}") 
+            ? "public.portfolio.{$slug}" 
+            : 'public.portfolio.layout';
+
+        return view($viewName, [
+            'project' => $project,
             'slug' => $slug,
-            'dbProject' => $dbProject,
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => ucfirst(str_replace('-', ' ', $slug)).' - Portfolio | Musoftware',
-                'description' => 'Discover the details and success story of '.ucfirst(str_replace('-', ' ', $slug)).' developed by Musoftware.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+            'title' => $title,
+            'description' => $description,
         ]);
     }
 

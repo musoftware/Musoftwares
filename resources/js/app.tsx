@@ -19,6 +19,20 @@ router.on('navigate', (event) => {
     }
 });
 
+// Global DRY fix: Intercept any non-Inertia (Blade) responses and perform clean full-page navigation
+// This completely prevents Inertia from opening an iframe modal for Blade pages
+router.on('invalid', (event: any) => {
+    event.preventDefault();
+    const targetUrl = 
+        event.detail?.response?.request?.responseURL || 
+        event.detail?.response?.config?.url || 
+        event.detail?.visit?.url?.href || 
+        window.location.href;
+    if (targetUrl) {
+        window.location.href = targetUrl;
+    }
+});
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 // Global Scroll Animation Observer

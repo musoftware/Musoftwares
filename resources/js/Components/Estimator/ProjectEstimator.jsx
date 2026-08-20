@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import AiEstimatorModal from '@/Components/Estimator/AiEstimatorModal';
 import { useToast } from '@/Components/ui/use-toast';
 import { 
     Globe, 
@@ -43,7 +42,6 @@ import axios from 'axios';
 
 export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = true, title = "Calculate Your Project Investment", subtitle = "Combine platforms and in-demand modules to calculate your transparent development estimate." }) {
     const { auth } = usePage().props || {};
-    const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
     const phoneNumber = "201015218548";
     const { toast } = useToast();
@@ -1110,32 +1108,6 @@ Please let me know when we can review the technical specification!`;
                 </div>
 
             </div>
-
-            {/* AI Scope Modal */}
-            <AiEstimatorModal
-                isOpen={isAiModalOpen}
-                onClose={() => setIsAiModalOpen(false)}
-                onApplyRecommendations={(recs) => {
-                    if (recs?.platforms && Array.isArray(recs.platforms)) {
-                        setSelectedPlatforms(recs.platforms);
-                    }
-                    if (recs?.screens) {
-                        setPlatformScreens(prev => ({ ...prev, ...recs.screens }));
-                    }
-                    if (recs?.options) {
-                        const newOpts = {};
-                        recs.options.forEach(optId => {
-                            newOpts[optId] = 1;
-                        });
-                        setSelectedOptions(newOpts);
-                    }
-                    setIsAiModalOpen(false);
-                    toast({
-                        title: 'AI Recommendations Applied',
-                        description: 'Your project architecture has been updated based on the AI analysis.',
-                    });
-                }}
-            />
         </div>
     );
 }

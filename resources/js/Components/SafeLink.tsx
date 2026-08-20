@@ -1,30 +1,86 @@
 import React from 'react';
-import { Link, InertiaLinkProps, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 /**
- * List of non-Inertia (Blade) routes in the application that require full page loads.
+ * Prefixes and paths of Blade (Server-Rendered HTML) routes that require full browser page loads.
  */
-const BLADE_ROUTES = ['/', '/dashboard', '/dashboard/directory'];
+const BLADE_PREFIXES = [
+    '/',
+    '/about',
+    '/portfolio',
+    '/blog',
+    '/compare',
+    '/platforms',
+    '/solutions',
+    '/start-project',
+    '/legal',
+    '/contact',
+    '/pricing',
+    '/cost',
+    '/tools/cost',
+    '/tools/website-cost',
+    '/dashboard',
+    '/sso',
+];
+
+/**
+ * Specific paths that are known Inertia SPA routes (exempted from Blade full-page redirects).
+ */
+const INERTIA_PREFIXES = [
+    '/estimator',
+    '/admin',
+    '/workspace',
+    '/app',
+    '/login',
+    '/register',
+];
 
 /**
  * Determines whether a given URL is a Blade (non-Inertia) or external route.
  */
 export function isExternalRoute(href?: string): boolean {
     if (!href) return false;
+
+    // External protocols
     if (
         href.startsWith('http://') ||
         href.startsWith('https://') ||
         href.startsWith('//') ||
         href.startsWith('mailto:') ||
         href.startsWith('tel:') ||
+        href.startsWith('#') ||
         href.includes('/sso/redirect') ||
         href.includes('/sso/')
     ) {
         return true;
     }
-    return BLADE_ROUTES.some(
-        (route) => href === route || href.startsWith(route + '?') || href.startsWith(route + '#')
-    );
+
+    // Normalize path by stripping origin and query/hash
+    let path = href;
+    try {
+        if (href.startsWith('/')) {
+            path = href.split('?')[0].split('#')[0];
+        } else {
+            const parsed = new URL(href, window.location.origin);
+            if (parsed.origin !== window.location.origin) {
+                return true;
+            }
+            path = parsed.pathname;
+        }
+    } catch {
+        path = href;
+    }
+
+    // Check if path is an explicit Inertia route
+    const isInertia = INERTIA_PREFIXES.some(prefix => path === prefix || path.startsWith(prefix + '/'));
+    if (isInertia) {
+        return false;
+    }
+
+    // Check exact root or Blade prefixes
+    if (path === '/') return true;
+
+    return BLADE_PREFIXES.some(prefix => prefix !== '/' && (path === prefix || path.startsWith(prefix + '/')));
 }
 
 /**
