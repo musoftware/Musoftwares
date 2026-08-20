@@ -7,7 +7,6 @@ import {
     UsersRound, FileText, Bot, PieChart, Send, Activity, UserPlus
 } from 'lucide-react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
-import { CrmCommandPalette } from '@/Components/CRM/CrmCommandPalette';
 import { __ } from '@/lib/i18n';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 
@@ -21,7 +20,6 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
     useInertiaNotifications();
     const workspaceName = "CRM Workspace";
     const tenantId = 'DRAFT';
-    const [cmdOpen, setCmdOpen] = React.useState(false);
 
     const teamMember = auth?.crm_team_member;
     const memberRole = teamMember?.role;
@@ -230,7 +228,6 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                 </div>
             </div>
 
-            <CrmCommandPalette open={cmdOpen} setOpen={setCmdOpen} onOpenLead={() => { }} />
             <FloatingWhatsAppButton />
         </div>
     );

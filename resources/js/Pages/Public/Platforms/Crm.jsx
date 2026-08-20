@@ -1,145 +1,143 @@
 import { useRef } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { Users, BarChart3, Workflow, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Users, MessageSquare, Target, ArrowUpRight } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
-import { Button } from '@/Components/ui/button';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import StudioHeader from '@/Components/Studio/StudioHeader';
+import { openWhatsAppChat, STUDIO_PHONE } from '@/lib/whatsapp';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Crm({ auth }) {
     const mainRef = useRef(null);
-    const phoneNumber = "201015218548";
 
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
         sections.forEach((section) => {
             const elements = section.querySelectorAll('.gsap-fade-up');
-            gsap.fromTo(elements, 
-                { opacity: 0, y: 30 },
-                {
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 0.8,
-                    stagger: 0.1,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse"
+            if (elements && elements.length > 0) {
+                gsap.fromTo(elements, 
+                    { opacity: 0, y: 20 },
+                    {
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.6,
+                        stagger: 0.08,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        }
                     }
-                }
-            );
+                );
+            }
         });
     }, { scope: mainRef });
 
-    const openWhatsApp = (msg) => {
-        const encodedMessage = encodeURIComponent(msg);
-        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-    };
-
     const features = [
         {
-            title: "Centralized Data",
+            title: "Automated Lead Pipeline & Stages",
+            icon: Target,
+            desc: "Capture inquiries instantly from landing pages, Facebook Ads, and WhatsApp into structured conversion stages.",
+            bullets: ["Custom sales funnel stages", "Lead scoring & assignment rules", "Interaction timeline tracking"]
+        },
+        {
+            title: "Omnichannel Communications & WhatsApp",
+            icon: MessageSquare,
+            desc: "Unified messaging hub integrating Official Meta WhatsApp Cloud API with multi-agent inbox support.",
+            bullets: ["Official WhatsApp Business API", "Multi-agent concurrent chat", "Automated message templates"]
+        },
+        {
+            title: "Client 360 & Lifetime Value",
             icon: Users,
-            desc: "Single source of truth for all client interactions. Stop digging through email threads to find what you need.",
-            bullets: ["360-degree customer view", "Interaction history", "Document management"]
-        },
-        {
-            title: "Pipeline Management",
-            icon: BarChart3,
-            desc: "Clear visibility into sales cycles, conversion rates, and operational bottlenecks. Know exactly where deals stall.",
-            bullets: ["Kanban drag-and-drop", "Conversion analytics", "Forecasting reports"]
-        },
-        {
-            title: "Automated Workflows",
-            icon: Workflow,
-            desc: "Reduce manual entry with automated lead assignment, task creation, and email follow-up triggers.",
-            bullets: ["Lead assignment rules", "Automated sequences", "Task reminders"]
+            desc: "Comprehensive customer intelligence with historical purchase orders, support tickets, and total lifetime spend.",
+            bullets: ["Customer transaction ledger", "Lifetime value (LTV) analytics", "Contract & file repository"]
         }
     ];
 
     return (
-        <PublicLayout auth={auth}>
+        <PublicLayout>
             <Head>
-                <title>CRM Platform | Musoftware</title>
-                <meta name="description" content="A centralized infrastructure for managing customer data and accelerating sales." />
+                <title>Custom CRM Platform Architecture | Musoftwares</title>
+                <meta name="description" content="Custom Customer Relationship Management systems built for seamless lead conversion and communication." />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss a CRM Platform." />
+            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I want to discuss building a custom CRM system." />
 
-            <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
+            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white overflow-x-hidden pt-16 sm:pt-24 pb-24 sm:pb-36">
                 
-                {/* Hero Section */}
-                <section className="pt-32 pb-24 lg:pt-48 lg:pb-32 px-6 lg:px-8 max-w-7xl mx-auto reveal-section border-b border-[#e5e5e5]">
-                    <div className="max-w-4xl">
-                        <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
-                            <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            Platform
-                        </div>
-                        <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                            Customer Operations.
-                        </h1>
-                        <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
-                            A centralized infrastructure for managing customer data, tracking interactions, and accelerating sales cycles. Built for scale and operational clarity.
-                        </p>
-                        <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I want to discuss a CRM Platform.")}
-                            className="gsap-fade-up bg-[#111111] text-white hover:bg-[#333333] rounded-xl px-8 py-6 text-sm font-bold uppercase tracking-wide transition-all"
+                {/* Hero Header */}
+                <div className="reveal-section">
+                    <StudioHeader
+                        badge="Pipeline & Conversions"
+                        title={
+                            <>
+                                Bespoke CRM Architecture. <br className="hidden sm:inline" />
+                                <span className="text-[#748660]">Full Lead-to-Cash Visibility.</span>
+                            </>
+                        }
+                        subtitle="Never lose a qualified lead. We build unified CRM systems with deep WhatsApp integration and real-time interaction continuity."
+                    />
+
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 -mt-8">
+                        <button
+                            onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a custom CRM system.")}
+                            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
                         >
-                            Discuss Your Needs
-                        </Button>
+                            DISCUSS CRM SCOPE ➔
+                        </button>
+                        <Link
+                            href="/estimator"
+                            className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                        >
+                            {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
+                        </Link>
                     </div>
-                </section>
+                </div>
 
-                {/* Features Grid */}
-                <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
-                    <div className="text-center mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">CRM Capabilities</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">Everything you need to close more deals.</p>
-                    </div>
-
+                {/* CRM Pillars Grid */}
+                <section className="px-6 max-w-[1400px] mx-auto reveal-section mb-24">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {features.map((feature, idx) => (
-                            <div key={idx} className="gsap-fade-up bg-white p-8 lg:p-10 border border-[#e5e5e5] rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:border-[#111111] transition-all flex flex-col h-full group">
-                                <div className="w-14 h-14 bg-[#f4f4f5] group-hover:bg-[#111111] transition-colors rounded-xl flex items-center justify-center mb-8">
-                                    <feature.icon className="w-6 h-6 text-[#111111] group-hover:text-white transition-colors" />
+                        {features.map((item, idx) => {
+                            const Icon = item.icon;
+                            return (
+                                <div
+                                    key={idx}
+                                    className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors"
+                                >
+                                    <div className="space-y-4">
+                                        <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                            <Icon className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white font-sans">
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                            {item.desc}
+                                        </p>
+                                        <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                            {item.bullets.map((b, bIdx) => (
+                                                <li key={bIdx} className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>
+                                                    <span>{b}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <button
+                                        onClick={() => openWhatsAppChat(`Hello Mahmoud, I want to discuss ${item.title}.`)}
+                                        className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                                    >
+                                        <span>INITIATE MODULE BRIEF</span>
+                                        <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                                    </button>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
-                                <p className="text-[#666666] leading-relaxed text-[15px] mb-8 flex-grow">
-                                    {feature.desc}
-                                </p>
-                                <ul className="space-y-3 pt-6 border-t border-[#f4f4f5]">
-                                    {feature.bullets.map((bullet, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-[#444444]">
-                                            <CheckCircle2 className="w-4 h-4 text-[#111111]" />
-                                            <span className="text-sm font-medium">{bullet}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* CTA Section */}
-                <section className="py-32 bg-[#111111] text-white text-center reveal-section px-6">
-                    <div className="max-w-3xl mx-auto">
-                        <h2 className="gsap-fade-up text-4xl md:text-5xl font-extrabold mb-6">
-                            Ready to organize your sales?
-                        </h2>
-                        <p className="gsap-fade-up text-xl text-[#a3a3a3] mb-12 leading-relaxed">
-                            Stop losing leads to disorganized spreadsheets. Build a CRM that fits your workflow.
-                        </p>
-                        <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I need to organize my sales with a custom CRM.")}
-                            className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-all flex items-center justify-center gap-3 mx-auto"
-                        >
-                            Book a Consultation <ArrowRight className="w-4 h-4" />
-                        </Button>
+                            );
+                        })}
                     </div>
                 </section>
 

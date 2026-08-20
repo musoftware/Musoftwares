@@ -224,17 +224,8 @@
                 </div>
             </div>
 
-            <!-- ▶ RIGHT: Command Bar, Notifications, Lang & User Capsule -->
+            <!-- ▶ RIGHT: Notifications, Lang & User Capsule -->
             <div class="d-flex align-items-center">
-
-                <!-- Search (Ctrl + K) Trigger -->
-                <div class="command-bar-trigger mr-2 d-flex align-items-center pointer px-2 py-1 rounded-pill" 
-                     data-toggle="modal" data-target="#commandBarModal" title="Universal Search & Actions (Ctrl + K)"
-                     style="background: rgba(35, 16, 70, 0.6); border: 1px solid rgba(168, 85, 247, 0.4); backdrop-filter: blur(8px); transition: all 0.3s ease;">
-                    <i class="icon-search mr-1" style="font-size: 12px; color: #00f0ff;"></i>
-                    <span class="mr-2 d-none d-sm-inline" style="color: #f3e8ff; font-size: 11px; font-weight: 600;">{{ __('dashboard.search') }}</span>
-                    <kbd class="command-bar-kbd" style="background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4); font-size: 9px; padding: 1px 5px; border-radius: 4px;">Ctrl K</kbd>
-                </div>
 
                 <!-- Notifications Dropdown -->
                 <div class="dropdown mr-2">
@@ -1658,60 +1649,6 @@
 </div>
 </div>
 
-<!-- UX FEATURE 1: Universal Command Bar (Ctrl + K) Modal -->
-<div class="modal fade modal-command-bar" id="commandBarModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 920px;">
-        <div class="modal-content">
-            <div class="modal-body p-4 text-left">
-                <div class="d-flex align-items-center mb-3">
-                    <input type="text" id="commandSearchInput" class="command-search-input" placeholder="Search systems, tools, invoices, actions... (e.g. ERP, CRM, Gold, Wallet)" autocomplete="off">
-                </div>
-                <div id="commandResultsList" class="command-results-container" style="max-height: 360px; overflow-y: auto; overflow-x: hidden; padding-right: 6px;">
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/erp') }}">
-                        <div><i class="icon-calendar text-cyan mr-2"></i><strong>ERP Enterprise System</strong> <span class="text-muted small ml-2">- Financial & Accounting Operations</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/crm') }}">
-                        <div><i class="icon-users text-cyan mr-2"></i><strong>CRM Customer Management</strong> <span class="text-muted small ml-2">- Leads & Client Interactions</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/goldsaversys') }}">
-                        <div><i class="icon-star text-amber mr-2"></i><strong>Gold Saver System</strong> <span class="text-muted small ml-2">- Precious Metal Investment</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/affsys') }}">
-                        <div><i class="icon-chart-bar text-cyan mr-2"></i><strong>Affiliate POS System</strong> <span class="text-muted small ml-2">- Partner Sales & Commissions</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/bookingsys') }}">
-                        <div><i class="icon-clock text-cyan mr-2"></i><strong>Booking System</strong> <span class="text-muted small ml-2">- Reservations & Appointments</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/sso/toolsys') }}">
-                        <div><i class="icon-cog text-cyan mr-2"></i><strong>Runtime Agent Tools</strong> <span class="text-muted small ml-2">- AI & Automation Engines</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/marketplace/services') }}">
-                        <div><i class="icon-social text-cyan mr-2"></i><strong>Marketplace Services</strong> <span class="text-muted small ml-2">- Addons & Plugins Catalog</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-href="{{ url('/billing/invoices') }}">
-                        <div><i class="icon-credit-card text-cyan mr-2"></i><strong>Billing & Invoices</strong> <span class="text-muted small ml-2">- Manage Payments</span></div>
-                        <span class="badge badge-outline-info">Open</span>
-                    </div>
-                    <div class="command-result-item d-flex align-items-center justify-content-between" data-target="#payDueModal" data-toggle="modal" data-dismiss="modal">
-                        <div><i class="icon-basket text-amber mr-2"></i><strong>{{ __('dashboard.pay_due_amount') }}</strong></div>
-                        <span class="badge badge-outline-warning">Action</span>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center justify-content-between text-muted small mt-3 pt-2 border-top border-secondary">
-                    <span>Navigation: <kbd class="command-bar-kbd">â†‘</kbd> <kbd class="command-bar-kbd">â†“</kbd> to select, <kbd class="command-bar-kbd">Enter</kbd> to open</span>
-                    <span>Close: <kbd class="command-bar-kbd">Esc</kbd></span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/SVGLoader.js"></script>
 <script src="{{ asset('v8main/js/jquery-3.4.1.min.js') }}"></script>
@@ -1733,38 +1670,6 @@
         if (href && href !== '#') {
             location.assign(href);
         }
-    });
-
-    /* ==========================================================================
-       UX FEATURE 1: UNIVERSAL COMMAND BAR (CTRL + K) SPOTLIGHT ENGINE
-       ========================================================================== */
-    $(document).on('keydown', function (e) {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-            e.preventDefault();
-            $('#commandBarModal').modal('show');
-        }
-    });
-
-    $(document).on('click', '.command-bar-trigger', function (e) {
-        e.preventDefault();
-        $('#commandBarModal').modal('show');
-    });
-
-    $('#commandBarModal').on('shown.bs.modal', function () {
-        $('#commandSearchInput').focus().val('');
-        $('.command-result-item').show();
-    });
-
-    $('#commandSearchInput').on('input', function () {
-        var query = $(this).val().toLowerCase().trim();
-        $('.command-result-item').each(function () {
-            var text = $(this).text().toLowerCase();
-            if (text.indexOf(query) !== -1) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
     });
 
     $('#notificationSearchInput').on('input', function () {

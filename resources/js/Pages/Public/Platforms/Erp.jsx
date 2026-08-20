@@ -1,145 +1,143 @@
 import { useRef } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { Building2, Database, Briefcase, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Building2, Database, Briefcase, ArrowUpRight } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
-import { Button } from '@/Components/ui/button';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import StudioHeader from '@/Components/Studio/StudioHeader';
+import { openWhatsAppChat, STUDIO_PHONE } from '@/lib/whatsapp';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Erp({ auth }) {
     const mainRef = useRef(null);
-    const phoneNumber = "201015218548";
 
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
         sections.forEach((section) => {
             const elements = section.querySelectorAll('.gsap-fade-up');
-            gsap.fromTo(elements, 
-                { opacity: 0, y: 30 },
-                {
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 0.8,
-                    stagger: 0.1,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse"
+            if (elements && elements.length > 0) {
+                gsap.fromTo(elements, 
+                    { opacity: 0, y: 20 },
+                    {
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.6,
+                        stagger: 0.08,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        }
                     }
-                }
-            );
+                );
+            }
         });
     }, { scope: mainRef });
 
-    const openWhatsApp = (msg) => {
-        const encodedMessage = encodeURIComponent(msg);
-        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-    };
-
     const features = [
         {
-            title: "Financial Ledger",
+            title: "Financial Ledgers & Double Entry",
             icon: Database,
-            desc: "Accurate, real-time tracking of income, expenses, and ledger history. Stop guessing about your cash flow.",
-            bullets: ["Multi-currency support", "Expense tracking", "Invoice generation"]
+            desc: "Accurate, real-time tracking of income, expenses, and transaction logs. Dual currency BC-math precision.",
+            bullets: ["Multi-currency dual ledger", "Automated expense categorization", "Instant invoice & PDF generation"]
         },
         {
-            title: "Inventory Control",
+            title: "Multi-Warehouse Inventory Control",
             icon: Building2,
-            desc: "Monitor stock levels, predict shortages, and automate procurement cycles across multiple warehouses.",
-            bullets: ["Multi-branch stock", "Low stock alerts", "Supplier management"]
+            desc: "Monitor stock levels, track transfer batches across branches, and automate low-stock reorder thresholds.",
+            bullets: ["Multi-branch stock isolation", "Automated reorder triggers", "Supplier & vendor logs"]
         },
         {
-            title: "HR & Payroll",
+            title: "HR, Attendance & Automated Payroll",
             icon: Briefcase,
-            desc: "Manage employee records, time tracking, and complex payroll calculations natively within the system.",
-            bullets: ["Attendance tracking", "Automated payslips", "Leave management"]
+            desc: "Manage employee contracts, track daily attendance shifts, and calculate salary deductions natively.",
+            bullets: ["Shift schedules & overtime", "Automated monthly payroll runs", "Role permissions & audit trails"]
         }
     ];
 
     return (
-        <PublicLayout auth={auth}>
+        <PublicLayout>
             <Head>
-                <title>ERP Platform | Musoftware</title>
-                <meta name="description" content="A complete suite to manage financials, operations, and supply chains." />
+                <title>Custom ERP Software Architecture | Musoftwares</title>
+                <meta name="description" content="Custom Enterprise Resource Planning software tailored to your company's exact operational logic." />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss an ERP Platform." />
+            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I want to discuss building a custom ERP system." />
 
-            <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
+            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white overflow-x-hidden pt-16 sm:pt-24 pb-24 sm:pb-36">
                 
-                {/* Hero Section */}
-                <section className="pt-32 pb-24 lg:pt-48 lg:pb-32 px-6 lg:px-8 max-w-7xl mx-auto reveal-section border-b border-[#e5e5e5]">
-                    <div className="max-w-4xl">
-                        <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
-                            <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            Platform
-                        </div>
-                        <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                            Enterprise Resource Planning.
-                        </h1>
-                        <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
-                            A complete suite to manage financials, operations, and supply chains. Gain total visibility and control over your core business functions.
-                        </p>
-                        <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I want to discuss an ERP Platform.")}
-                            className="gsap-fade-up bg-[#111111] text-white hover:bg-[#333333] rounded-xl px-8 py-6 text-sm font-bold uppercase tracking-wide transition-all"
+                {/* Hero Header */}
+                <div className="reveal-section">
+                    <StudioHeader
+                        badge="Enterprise Core"
+                        title={
+                            <>
+                                Bespoke ERP Architecture. <br className="hidden sm:inline" />
+                                <span className="text-[#748660]">One Unified Business Backbone.</span>
+                            </>
+                        }
+                        subtitle="Eliminate messy spreadsheets and disconnected tools. We engineer custom enterprise systems tailored to your specific commercial workflows."
+                    />
+
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 -mt-8">
+                        <button
+                            onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a custom ERP platform.")}
+                            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
                         >
-                            Discuss Your Needs
-                        </Button>
+                            DISCUSS ERP SCOPE ➔
+                        </button>
+                        <Link
+                            href="/estimator"
+                            className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                        >
+                            {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
+                        </Link>
                     </div>
-                </section>
+                </div>
 
-                {/* Features Grid */}
-                <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
-                    <div className="text-center mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">ERP Modules</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">A unified operating system for your enterprise.</p>
-                    </div>
-
+                {/* ERP Pillars Grid */}
+                <section className="px-6 max-w-[1400px] mx-auto reveal-section mb-24">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {features.map((feature, idx) => (
-                            <div key={idx} className="gsap-fade-up bg-white p-8 lg:p-10 border border-[#e5e5e5] rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:border-[#111111] transition-all flex flex-col h-full group">
-                                <div className="w-14 h-14 bg-[#f4f4f5] group-hover:bg-[#111111] transition-colors rounded-xl flex items-center justify-center mb-8">
-                                    <feature.icon className="w-6 h-6 text-[#111111] group-hover:text-white transition-colors" />
+                        {features.map((item, idx) => {
+                            const Icon = item.icon;
+                            return (
+                                <div
+                                    key={idx}
+                                    className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors"
+                                >
+                                    <div className="space-y-4">
+                                        <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                            <Icon className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white font-sans">
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                            {item.desc}
+                                        </p>
+                                        <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                            {item.bullets.map((b, bIdx) => (
+                                                <li key={bIdx} className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>
+                                                    <span>{b}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <button
+                                        onClick={() => openWhatsAppChat(`Hello Mahmoud, I want to discuss ${item.title}.`)}
+                                        className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                                    >
+                                        <span>INITIATE MODULE BRIEF</span>
+                                        <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                                    </button>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
-                                <p className="text-[#666666] leading-relaxed text-[15px] mb-8 flex-grow">
-                                    {feature.desc}
-                                </p>
-                                <ul className="space-y-3 pt-6 border-t border-[#f4f4f5]">
-                                    {feature.bullets.map((bullet, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-[#444444]">
-                                            <CheckCircle2 className="w-4 h-4 text-[#111111]" />
-                                            <span className="text-sm font-medium">{bullet}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* CTA Section */}
-                <section className="py-32 bg-[#111111] text-white text-center reveal-section px-6">
-                    <div className="max-w-3xl mx-auto">
-                        <h2 className="gsap-fade-up text-4xl md:text-5xl font-extrabold mb-6">
-                            Ready to unify your operations?
-                        </h2>
-                        <p className="gsap-fade-up text-xl text-[#a3a3a3] mb-12 leading-relaxed">
-                            Stop using disjointed software that slows you down. Bring everything into one dashboard.
-                        </p>
-                        <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I need a unified ERP system.")}
-                            className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-all flex items-center justify-center gap-3 mx-auto"
-                        >
-                            Book a Consultation <ArrowRight className="w-4 h-4" />
-                        </Button>
+                            );
+                        })}
                     </div>
                 </section>
 

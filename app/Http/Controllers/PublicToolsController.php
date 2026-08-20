@@ -15,14 +15,10 @@ class PublicToolsController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Public/Tools/Index')
-            ->withViewData([
-                'meta' => [
-                    'title' => __('tools.tools_directory') . ' | Musoftwares',
-                    'description' => __('tools.tools_directory_desc'),
-                    'url' => route('public.tools.index'),
-                ],
-            ]);
+        return view('public.tools.index', [
+            'title' => 'Developer & Business Tools Directory | Musoftwares',
+            'description' => 'Explore our collection of free developer, business, and architecture estimation tools.',
+        ]);
     }
 
     /**

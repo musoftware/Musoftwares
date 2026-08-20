@@ -232,3 +232,9 @@ vendor_*.zip
 *.tar.gz
 
 app/Services/AI.zip
+resources/js/tra3BDD.tmp
+resources/js/tra3C4C.tmp
+resources/js/tra3D29.tmp
+resources/js/tra3CBA.tmp
+resources/js/tra3D97.tmp
+resources/js/*.tmp

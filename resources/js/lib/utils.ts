@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 const CURRENCY_FORMATS: Record<string, string> = {
     'USD': '$%v',
-    'EGP': 'e£%v',
+    'EGP': 'E£%v',
     'EUR': '€%v',
     'GBP': '£%v',
     'AED': '%v د.إ',

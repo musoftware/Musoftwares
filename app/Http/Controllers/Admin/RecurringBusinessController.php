@@ -25,9 +25,10 @@ class RecurringBusinessController extends Controller
 
     public function recurring_costs(Request $request)
     {
-        $costs = RecurringCost::latest()->paginate(50);
+        $costs = RecurringCost::withCount('transactions')->latest()->paginate(50);
         $costs->getCollection()->transform(function ($cost) {
             $cost->currency = CurrencyHelper::getFrontendCurrency($cost->currency_id);
+            $cost->next_date = $cost->getNextExecutionDate()?->toDateString();
 
             return $cost;
         });
@@ -214,8 +215,8 @@ class RecurringBusinessController extends Controller
         // Compute 15 upcoming schedule dates
         $upcomingSchedule = [];
         $count = 0;
-        $baseDate = Carbon::parse($rCost->current_date);
-        for ($i = 0; $i <= 365 && $count < 15; $i++) {
+        $baseDate = Carbon::today(config('app.timezone', 'Africa/Cairo'));
+        for ($i = 0; $i <= 1826 && $count < 15; $i++) {
             $checkDate = $baseDate->copy()->addDays($i);
             if ($rCost->isToday($checkDate)) {
                 $count++;
@@ -256,6 +257,7 @@ class RecurringBusinessController extends Controller
                 'reason' => $rCost->reason,
                 'start_date' => $rCost->start_date,
                 'current_date' => $rCost->current_date,
+                'next_date' => $rCost->getNextExecutionDate()?->toDateString(),
                 'recurring' => $rCost->recurring,
                 'recurring_times' => $rCost->recurring_times,
                 'details' => $rCost->details(),
@@ -294,15 +296,28 @@ class RecurringBusinessController extends Controller
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }
 
+    public function recurring_costs_generate_missing($id)
+    {
+        $rCost = RecurringCost::findOrFail($id);
+        $count = $rCost->generateMissingRuns();
+
+        if ($count > 0) {
+            return redirect()->back()->with('success', __('general.generated_missing_transactions_count', ['count' => $count]));
+        }
+
+        return redirect()->back()->with('info', __('general.all_transactions_already_up_to_date'));
+    }
+
     // ==========================================
     // RECURRING INCOME ACTIONS
     // ==========================================
 
     public function recurring_income(Request $request)
     {
-        $incomes = RecurringIncome::latest()->paginate(50);
+        $incomes = RecurringIncome::withCount('transactions')->latest()->paginate(50);
         $incomes->getCollection()->transform(function ($income) {
             $income->currency = CurrencyHelper::getFrontendCurrency($income->currency_id);
+            $income->next_date = $income->getNextExecutionDate()?->toDateString();
 
             return $income;
         });
@@ -466,8 +481,8 @@ class RecurringBusinessController extends Controller
         // Compute 15 upcoming schedule dates
         $upcomingSchedule = [];
         $count = 0;
-        $baseDate = Carbon::parse($rIncome->current_date);
-        for ($i = 0; $i <= 365 && $count < 15; $i++) {
+        $baseDate = Carbon::today(config('app.timezone', 'Africa/Cairo'));
+        for ($i = 0; $i <= 1826 && $count < 15; $i++) {
             $checkDate = $baseDate->copy()->addDays($i);
             if ($rIncome->isToday($checkDate)) {
                 $count++;
@@ -508,6 +523,7 @@ class RecurringBusinessController extends Controller
                 'reason' => $rIncome->reason,
                 'start_date' => $rIncome->start_date,
                 'current_date' => $rIncome->current_date,
+                'next_date' => $rIncome->getNextExecutionDate()?->toDateString(),
                 'recurring' => $rIncome->recurring,
                 'recurring_times' => $rIncome->recurring_times,
                 'details' => $rIncome->details(),
@@ -546,15 +562,28 @@ class RecurringBusinessController extends Controller
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }
 
+    public function recurring_income_generate_missing($id)
+    {
+        $rIncome = RecurringIncome::findOrFail($id);
+        $count = $rIncome->generateMissingRuns();
+
+        if ($count > 0) {
+            return redirect()->back()->with('success', __('general.generated_missing_transactions_count', ['count' => $count]));
+        }
+
+        return redirect()->back()->with('info', __('general.all_transactions_already_up_to_date'));
+    }
+
     // ==========================================
     // RECURRING SALARIES ACTIONS
     // ==========================================
 
     public function recurring_salaries(Request $request)
     {
-        $salaries = RecurringSalary::with('user')->latest()->paginate(50);
+        $salaries = RecurringSalary::with('user')->withCount('transactions')->latest()->paginate(50);
         $salaries->getCollection()->transform(function ($salary) {
             $salary->currency = CurrencyHelper::getFrontendCurrency($salary->currency_id);
+            $salary->next_date = $salary->getNextExecutionDate()?->toDateString();
 
             return $salary;
         });
@@ -697,8 +726,8 @@ class RecurringBusinessController extends Controller
         // Compute 15 upcoming schedule dates
         $upcomingSchedule = [];
         $count = 0;
-        $baseDate = Carbon::parse($salary->current_date);
-        for ($i = 0; $i <= 365 && $count < 15; $i++) {
+        $baseDate = Carbon::today(config('app.timezone', 'Africa/Cairo'));
+        for ($i = 0; $i <= 1826 && $count < 15; $i++) {
             $checkDate = $baseDate->copy()->addDays($i);
             if ($salary->isToday($checkDate)) {
                 $count++;
@@ -744,6 +773,7 @@ class RecurringBusinessController extends Controller
                 'reason' => $salary->reason ?? '',
                 'start_date' => $salary->start_date,
                 'current_date' => $salary->current_date,
+                'next_date' => $salary->getNextExecutionDate()?->toDateString(),
                 'recurring' => $salary->recurring,
                 'recurring_times' => $salary->recurring_times,
                 'details' => $salary->details(),
@@ -772,5 +802,17 @@ class RecurringBusinessController extends Controller
         $salary->save();
 
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
+    }
+
+    public function recurring_salaries_generate_missing($id)
+    {
+        $salary = RecurringSalary::findOrFail($id);
+        $count = $salary->generateMissingRuns();
+
+        if ($count > 0) {
+            return redirect()->back()->with('success', __('general.generated_missing_transactions_count', ['count' => $count]));
+        }
+
+        return redirect()->back()->with('info', __('general.all_transactions_already_up_to_date'));
     }
 }

@@ -418,9 +418,8 @@
                     </div>
                 </div>
                 <div class="company-info">
-                    Musoftware Solutions LLC &bull; Suez / Cairo, Egypt<br>
-                    Commercial Registration: CR-481920 &bull; info@musoftwares.com<br>
-                    Direct Engineering Hotline / WhatsApp: +20 101 521 8548
+                    musoftware &bull; Suez, Egypt<br>
+                    WhatsApp: +201015218548
                 </div>
             </div>
 

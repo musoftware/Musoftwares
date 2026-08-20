@@ -22,18 +22,13 @@ class HomeController extends Controller
 {
     use ConvertsCurrency;
 
-    public function index(Request $request)
+    public function index(Request $request, \App\Services\NewsAggregatorService $newsService)
     {
         if (Auth::check()) {
-            $user = Auth::user();
-            if (! ($user->enable_3d_dashboard ?? true)) {
-                return redirect()->route('client.projects.index');
-            }
-            $dashboardService = app(\App\Services\DashboardService::class);
-            $data = $dashboardService->getClientDashboardData($user);
-
-            return view('dashboard.v8_main', $data);
+            return redirect()->route('dashboard');
         }
+
+        $newsFeed = $newsService->getFeaturedNewsFeed();
 
         $dbProjects = Project::landingPortfolio()->get()->map(function($project) {
             return [
@@ -52,17 +47,15 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        return Inertia::render('Public/Home', [
+        return view('public.home', [
             'dbProjects' => $dbProjects,
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Home | Musoftware',
-                'description' => 'Comprehensive ERP and CRM solutions, business management tools, and technical consulting to scale your operations.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+            'newsFeed' => $newsFeed,
+            'title' => app()->getLocale() === 'ar' 
+                ? 'ميوسوفت ويرز | أنظمة سحابية وبرمجة برامج الشركات ERP ومواقع سريعة' 
+                : 'Musoftwares | Enterprise Cloud Systems, ERP & Web Platforms',
+            'description' => app()->getLocale() === 'ar'
+                ? 'استوديو برمجيات متخصص في بناء أنظمة الـ ERP والحسابات، المتاجر والمواقع السريعة، وأتمتة الواتساب. مقرنا بالسويس ونشحن لعملائنا عالمياً.'
+                : 'Boutique software engineering studio crafting enterprise ERP engines, high-speed web platforms, and WhatsApp Cloud APIs in Suez, Egypt.',
         ]);
     }
 
@@ -85,17 +78,10 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        return Inertia::render('Public/Portfolio', [
+        return view('public.portfolio', [
             'dbProjects' => $dbProjects,
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Portfolio | Musoftware',
-                'description' => 'Explore our successful projects, case studies, and the robust applications we have built for businesses worldwide.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+            'title' => 'Case Studies & Production Platforms | Musoftwares',
+            'description' => 'Explore our portfolio of over 30 production platforms, enterprise ERP engines, and custom SaaS systems.',
         ]);
     }
 
@@ -179,178 +165,111 @@ class HomeController extends Controller
 
     public function platforms()
     {
-        return Inertia::render('Public/Platforms', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Platforms | Musoftware',
-                'description' => 'Discover our suite of business platforms including CRM, ERP, and Cloud solutions tailored for your business needs.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.platforms', [
+            'title' => 'Digital Architecture & Business Platforms | Musoftwares',
+            'description' => 'Scalable digital platforms engineered for longevity, mission-critical ERP engines, and high-performance business infrastructure in Suez, Egypt.',
         ]);
     }
 
     public function platformCrm()
     {
-        return Inertia::render('Public/Platforms/Crm', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'CRM Platform | Musoftware',
-                'description' => 'Manage your customer relationships efficiently with our powerful CRM platform.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.platforms.crm', [
+            'title' => 'WhatsApp Cloud API & CRM Platform | Musoftwares',
+            'description' => 'Direct Meta WhatsApp Cloud API integration, transactional OTP notifications, multi-agent unified inbox, and automated bots.',
         ]);
     }
 
     public function platformErp()
     {
-        return Inertia::render('Public/Platforms/Erp', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'ERP Platform | Musoftware',
-                'description' => 'Streamline your enterprise resources and operations with our integrated ERP platform.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.platforms.erp', [
+            'title' => 'Enterprise ERP & Double-Entry Accounting | Musoftwares',
+            'description' => 'Custom double-entry accounting ledgers, multi-warehouse stock management, and ETA / ZATCA e-invoicing compliance.',
         ]);
     }
 
     public function platformCloud()
     {
-        return Inertia::render('Public/Platforms/Cloud', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Cloud Solutions | Musoftware',
-                'description' => 'Secure, scalable, and reliable cloud solutions to host and manage your applications.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
-        ]);
+        return redirect()->route('platforms');
     }
 
     public function solutions()
     {
-        return Inertia::render('Public/Solutions', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Industry Solutions | Musoftware',
-                'description' => 'Tailored software solutions for Healthcare, Education, E-commerce, Real Estate, and Finance sectors.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.solutions', [
+            'title' => 'Tailored Software Solutions | Musoftwares',
+            'description' => 'Bespoke software engines tailored for healthcare, e-commerce, real estate, and finance workflows.',
         ]);
     }
 
     public function solutionHealthcare()
     {
-        return Inertia::render('Public/Solutions/Healthcare', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Healthcare Solutions | Musoftware',
-                'description' => 'Advanced digital health and clinic management software solutions.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.solutions', [
+            'title' => 'Healthcare & Clinic Solutions | Musoftwares',
+            'description' => 'Advanced digital health and clinic management software solutions.',
         ]);
     }
 
     public function solutionEducation()
     {
-        return Inertia::render('Public/Solutions/Education', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Education Solutions | Musoftware',
-                'description' => 'Innovative e-learning platforms and school management systems.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.solutions', [
+            'title' => 'Education & Academy Platforms | Musoftwares',
+            'description' => 'Innovative e-learning platforms and academy management systems.',
         ]);
     }
 
     public function solutionEcommerce()
     {
-        return Inertia::render('Public/Solutions/Ecommerce', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'E-commerce Solutions | Musoftware',
-                'description' => 'Scalable online stores and multi-vendor marketplace solutions.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.solutions', [
+            'title' => 'E-commerce & Multi-Vendor Platforms | Musoftwares',
+            'description' => 'Scalable online stores and multi-vendor marketplace solutions.',
         ]);
     }
 
     public function solutionRealEstate()
     {
-        return Inertia::render('Public/Solutions/RealEstate', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Real Estate Solutions | Musoftware',
-                'description' => 'Property management and real estate listing platforms.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.solutions', [
+            'title' => 'Real Estate Platforms | Musoftwares',
+            'description' => 'Property management and real estate listing platforms.',
         ]);
     }
 
     public function solutionFinance()
     {
-        return Inertia::render('Public/Solutions/Finance', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Finance Solutions | Musoftware',
-                'description' => 'Secure financial software, accounting tools, and fintech solutions.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.solutions', [
+            'title' => 'Financial Software & Ledgers | Musoftwares',
+            'description' => 'Secure financial software, accounting tools, and fintech solutions.',
         ]);
     }
 
     public function company()
     {
-        return Inertia::render('Public/Company', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Company | Musoftware',
-                'description' => 'Learn more about Musoftware, our mission, vision, and the team driving innovation.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
-        ]);
+        return redirect()->route('company.about');
     }
 
     public function companyAbout()
     {
-        return Inertia::render('Public/Company/About', [
+        return view('public.about', [
+            'title' => 'About Us — Boutique Software Engineering Studio | Musoftwares',
+            'description' => 'Musoftwares is an elite software engineering studio crafting bespoke Enterprise ERP systems, Meta API cloud integrations, and business platforms in Suez, Egypt.',
+        ]);
+    }
+
+    public function leadershipBio()
+    {
+        return view('public.bio', [
+            'title' => 'Mahmoud Amin — Founder & Chief Software Architect | Musoftwares',
+            'description' => 'Biography and engineering profile of Mahmoud Amin, Founder and Chief Software Architect at Musoftwares in Suez, Egypt.',
+        ]);
+    }
+
+    public function startProject()
+    {
+        return Inertia::render('Public/Wizard/SystemBuilder', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
         ])->withViewData([
             'meta' => [
-                'title' => 'About Us | Musoftware',
-                'description' => 'Discover our story, values, and what makes Musoftware a leader in digital solutions.',
+                'title' => 'Start a Project — System Architecture Wizard | Musoftwares',
+                'description' => 'Configure your custom enterprise system, ERP, WhatsApp automation, or SaaS application step-by-step with transparent modules and instant quotation.',
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
             ],
@@ -359,163 +278,69 @@ class HomeController extends Controller
 
     public function companyCareers()
     {
-        return Inertia::render('Public/Company/Careers', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Careers | Musoftware',
-                'description' => 'Join our dynamic team. Explore open positions and career opportunities at Musoftware.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.careers', [
+            'title' => 'Careers — Join Our Engineering Studio | Musoftwares',
+            'description' => 'Explore engineering and systems architecture roles at Musoftwares Studio in Suez, Egypt.',
         ]);
     }
 
     public function companyContact()
     {
-        return Inertia::render('Public/Company/Contact', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Contact Us | Musoftware',
-                'description' => 'Get in touch with our team for inquiries, support, or to discuss your next big project.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.contact', [
+            'title' => 'Contact Us — Talk Directly with Chief Software Architect | Musoftwares',
+            'description' => 'Direct technical communication with Mahmoud Amin. No middle management. Rapid responses and transparent project scoping.',
         ]);
     }
 
     public function privacyPolicy()
     {
-        return Inertia::render('Public/Legal/Privacy', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Privacy Policy | Musoftware',
-                'description' => 'Read our privacy policy to understand how we collect, use, and protect your data.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.legal.privacy', [
+            'title' => 'Privacy Policy | Data Protection & Security | Musoftwares',
+            'description' => 'Learn how Musoftwares protects your personal data and maintains strict privacy and security standards.',
         ]);
     }
 
     public function termsOfService()
     {
-        return Inertia::render('Public/Legal/Terms', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Terms of Service | Musoftware',
-                'description' => 'Review the terms and conditions governing the use of Musoftware services.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.legal.terms', [
+            'title' => 'Terms of Service | Enterprise Agreement | Musoftwares',
+            'description' => 'Read our Terms of Service governing the use of Musoftwares software and infrastructure.',
         ]);
     }
 
     public function cookiePolicy()
     {
-        return Inertia::render('Public/Legal/Cookies', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Cookie Policy | Musoftware',
-                'description' => 'Information about how we use cookies to improve your browsing experience.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.legal.cookies', [
+            'title' => 'Cookie Policy | Tracking & Analytics | Musoftwares',
+            'description' => 'Information about how cookies and session storage are used on Musoftwares platforms.',
         ]);
     }
 
-    public function pricing(Request $request, IpGeolocationService $geoService)
+    public function compare($slug = 'laravel-vs-nodejs')
     {
-        $user = Auth::user();
-
-        $usdCurrency = Currency::where('currency', 'USD')->first();
-        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-
-        $egpCurrency = Currency::where('currency', 'EGP')->first();
-        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-
-        $userCurrencyId = null;
-        if ($user && $user->currency_id) {
-            $userCurrencyId = $user->currency_id;
-        } else {
-            // Use IP Geolocation for guest users
-            $ipCurrencyCode = $geoService->getCurrencyCodeForIp($request->ip());
-            if ($ipCurrencyCode) {
-                $ipCurrency = Currency::where('currency', $ipCurrencyCode)->first();
-                if ($ipCurrency) {
-                    $userCurrencyId = $ipCurrency->id;
-                }
-            }
-            // Fallback to USD if no IP currency match
-            if (! $userCurrencyId) {
-                $userCurrencyId = $usdCurrencyId;
-            }
-        }
-
-        $userCurrency = Currency::find($userCurrencyId);
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
-
-        $rate = 1.0;
-        if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
-            $rate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
-        }
-
-        $egpRate = 50; // Fallback
-        if ($usdCurrency && $egpCurrencyId) {
-            $egpRate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
-        }
-
-        $basePricesEGP = config('saas.modules', []);
-        $convertPrice = function ($egpPrice) use ($egpRate, $rate, $currencyCode) {
-            if ($currencyCode === 'EGP') {
-                return round($egpPrice);
-            }
-            $usdPrice = $egpPrice / $egpRate;
-            $converted = $usdPrice * $rate;
-
-            return psychological_price($converted);
-        };
-
-        $pricingService = new PricingService;
-        $serviceItems = $pricingService->getServiceItems($convertPrice);
-
-        return Inertia::render('Public/Pricing', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'serviceItems' => $serviceItems,
-            'currency' => $currencyCode,
-            'targetModule' => $request->query('module'),
-            'targetTool' => $request->query('tool'),
-            'targetPlan' => $request->query('plan'),
-        ])->withViewData([
-            'meta' => [
-                'title' => 'Pricing | Musoftware',
-                'description' => 'Transparent and flexible pricing plans for our CRM, ERP, and specialized software services.',
-                'image' => asset('images/default-meta.png'),
-                'url' => url()->current(),
-            ],
+        return view('public.compare', [
+            'title' => 'Laravel vs Node.js: 2026 Enterprise Architecture Benchmark | Musoftwares',
+            'description' => 'Technical comparison and performance benchmark: Laravel 12 vs Node.js for Enterprise ERP, SaaS platforms, and real-time APIs.',
         ]);
+    }
+
+    public function pricing()
+    {
+        return redirect()->route('estimator', [], 301);
     }
 
     public function estimator(Request $request)
     {
-        $usd = Currency::where('currency', 'USD')->first();
-        $egp = Currency::where('currency', 'EGP')->first();
         $rate = 50.0;
-        if ($usd && $egp) {
-            try {
-                $rate = CurrenciesExchange::RateToday(1.0, $usd->id, $egp->id);
-            } catch (\Throwable $e) {
-                // Keep default 50.0 fallback on failure
+        try {
+            $usd = Currency::where('currency', 'USD')->first();
+            $egp = Currency::where('currency', 'EGP')->first();
+            if ($usd && $egp) {
+                $rate = CurrenciesExchange::RateToday(1.0, $usd->id, $egp->id) ?: 50.0;
             }
+        } catch (\Throwable $e) {
+            // Keep default 50.0 fallback on connection/lookup failure
+            $rate = 50.0;
         }
 
         $estimatorData = (new ProjectEstimatorDataService())->getEstimatorData((float)$rate);

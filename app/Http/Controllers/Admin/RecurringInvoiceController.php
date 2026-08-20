@@ -19,9 +19,10 @@ class RecurringInvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = RecurringInvoice::with('user')->latest()->paginate(50);
+        $invoices = RecurringInvoice::with('user')->withCount('records')->latest()->paginate(50);
         $invoices->getCollection()->transform(function ($invoice) {
             $invoice->currency = CurrencyHelper::getFrontendCurrency($invoice->currency_id);
+            $invoice->next_date = $invoice->getNextExecutionDate()?->toDateString();
 
             return $invoice;
         });
@@ -176,8 +177,8 @@ class RecurringInvoiceController extends Controller
         // Compute 15 upcoming schedule dates
         $upcomingSchedule = [];
         $count = 0;
-        $baseDate = Carbon::parse($invoice->current_date);
-        for ($i = 0; $i <= 365 && $count < 15; $i++) {
+        $baseDate = Carbon::today(config('app.timezone', 'Africa/Cairo'));
+        for ($i = 0; $i <= 1826 && $count < 15; $i++) {
             $checkDate = $baseDate->copy()->addDays($i);
             if ($invoice->isToday($checkDate)) {
                 $count++;
@@ -218,6 +219,7 @@ class RecurringInvoiceController extends Controller
                 'currency' => $currencyModel,
                 'start_date' => $invoice->start_date,
                 'current_date' => $invoice->current_date,
+                'next_date' => $invoice->getNextExecutionDate()?->toDateString(),
                 'recurring' => $invoice->recurring,
                 'recurring_times' => $invoice->recurring_times,
                 'details' => $invoice->details(),
@@ -245,6 +247,18 @@ class RecurringInvoiceController extends Controller
         $invoice->save();
 
         return redirect()->back()->with('success', __('general.status_updated_successfully'));
+    }
+
+    public function generateMissing($id)
+    {
+        $invoice = RecurringInvoice::findOrFail($id);
+        $count = $invoice->generateMissingRuns();
+
+        if ($count > 0) {
+            return redirect()->back()->with('success', __('general.generated_missing_transactions_count', ['count' => $count]));
+        }
+
+        return redirect()->back()->with('info', __('general.all_transactions_already_up_to_date'));
     }
 
     public function deleteRecord(Request $request, RecurringInvoice $invoice, RecurringInvoiceRecord $record)

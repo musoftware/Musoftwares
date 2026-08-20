@@ -39,18 +39,19 @@
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
+      "@@context": "https://schema.org",
+      "@@type": "SoftwareApplication",
       "name": "Musoftwares",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, Windows, Cloud",
       "url": "https://musoftwares.com",
       "author": {
-        "@type": "Organization",
-        "name": "Musoftwares Inc.",
-        "url": "https://musoftwares.com",
+        "@@type": "Person",
+        "name": "Mahmoud Amin",
+        "jobTitle": "Founder & Chief Software Architect",
+        "url": "https://musoftwares.com/about/mahmoud-amin",
         "address": {
-          "@type": "PostalAddress",
+          "@@type": "PostalAddress",
           "addressLocality": "Suez",
           "addressCountry": "EG"
         }
@@ -58,20 +59,67 @@
     }
     </script>
 
-    @vite(['resources/css/app.css'])
+    @vite(['resources/js/app.tsx'])
+
+    <script>
+        if (localStorage.theme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <style>
         body {
             font-family: 'Inter', 'Cairo', sans-serif;
-            background-color: #111111;
-            color: #E5E5E5;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
         }
+        html.dark body {
+            background-color: #111111;
+            color: #E5E5E5;
+        }
+        html:not(.dark) body {
+            background-color: #F8F9FA;
+            color: #111827;
+        }
+        html:not(.dark) .bg-[#111111],
+        html:not(.dark) .bg-[#0E0E0E],
+        html:not(.dark) .bg-[#0A0A0A] {
+            background-color: #FFFFFF !important;
+            color: #111827 !important;
+        }
+        html:not(.dark) .bg-[#161616],
+        html:not(.dark) .bg-[#141414],
+        html:not(.dark) .bg-[#181818],
+        html:not(.dark) .bg-[#1C1C1C],
+        html:not(.dark) .bg-[#1F1F1F] {
+            background-color: #F3F4F6 !important;
+            color: #111827 !important;
+        }
+        html:not(.dark) .border-[#222222],
+        html:not(.dark) .border-[#262626],
+        html:not(.dark) .border-[#2B2B2B],
+        html:not(.dark) .border-[#333333],
+        html:not(.dark) .border-[#1C1C1C],
+        html:not(.dark) .border-[#1E1E1E] {
+            border-color: #E5E7EB !important;
+        }
+        html:not(.dark) .text-white {
+            color: #111827 !important;
+        }
+        html:not(.dark) .text-zinc-400,
+        html:not(.dark) .text-zinc-300 {
+            color: #4B5563 !important;
+        }
+        html:not(.dark) .text-zinc-500 {
+            color: #6B7280 !important;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-[#748660] selection:text-white bg-[#111111] text-[#E5E5E5]">
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#748660] selection:text-white">
 
     <!-- Minimalist Sticky Header -->
     <header class="sticky top-0 z-50 w-full border-b border-[#222222] bg-[#111111]/95 backdrop-blur-md">
@@ -94,39 +142,47 @@
 
             <!-- Desktop Nav Links -->
             <nav class="hidden lg:flex items-center space-x-8 rtl:space-x-reverse text-xs font-mono tracking-wider uppercase text-zinc-400">
-                <a href="/#services" class="hover:text-white transition-colors">{{ __('general.solutions') ?? 'Solutions' }}</a>
-                <a href="/#estimator" class="hover:text-white transition-colors">{{ __('general.estimator') ?? 'Estimator' }}</a>
-                <a href="/portfolio" class="hover:text-white transition-colors">{{ __('general.portfolio') ?? 'Work' }}</a>
-                <a href="/about/mahmoud-amin" class="hover:text-white transition-colors">{{ __('general.leadership_bio') ?? 'Chief Architect' }}</a>
-                <a href="/company/contact" class="hover:text-white transition-colors">{{ __('general.contact_us') ?? 'Contact' }}</a>
+                <a href="/#services" class="hover:text-white transition-colors">{{ __('general.solutions') }}</a>
+                <a href="/estimator" class="hover:text-white transition-colors">{{ __('general.estimator') }}</a>
+                <a href="/portfolio" class="hover:text-white transition-colors">{{ __('general.portfolio') }}</a>
+                <a href="/about/mahmoud-amin" class="hover:text-white transition-colors">{{ __('general.leadership_bio') }}</a>
+                <a href="/company/contact" class="hover:text-white transition-colors">{{ __('general.contact_us') }}</a>
             </nav>
 
-            <!-- Language & Action CTA -->
+            <!-- Theme Toggle & Action CTA -->
             <div class="flex items-center space-x-4 rtl:space-x-reverse">
                 
-                <!-- Language Toggle -->
-                @if(app()->getLocale() === 'ar')
-                    <a href="/language/en" class="px-2 py-1 text-[11px] font-mono border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-400 transition-colors">
-                        English
-                    </a>
-                @else
-                    <a href="/language/ar" class="px-2 py-1 text-[11px] font-mono border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-400 transition-colors">
-                        عربي
-                    </a>
-                @endif
+                <!-- Dark Mode Toggle Button -->
+                <button 
+                    id="theme-toggle-btn"
+                    type="button"
+                    onclick="toggleTheme()"
+                    title="Toggle Dark / Light Mode"
+                    aria-label="Toggle theme"
+                    class="p-2 border border-zinc-700 hover:border-zinc-400 text-zinc-400 hover:text-white transition-colors flex items-center justify-center"
+                >
+                    <!-- Sun Icon (visible in dark mode to switch to light) -->
+                    <svg id="theme-sun-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <!-- Moon Icon (visible in light mode to switch to dark) -->
+                    <svg id="theme-moon-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
 
-                @auth
+                @if(auth()->check())
                     <a href="/dashboard" class="px-5 py-2 bg-[#748660] text-[#0F140A] font-bold text-[11px] tracking-widest font-mono uppercase hover:bg-[#60704E] transition-all">
-                        {{ __('general.console') ?? 'DASHBOARD' }} ➔
+                        {{ __('general.console') }} ➔
                     </a>
                 @else
                     <a href="/login" class="hidden sm:inline-block text-[11px] font-bold font-mono tracking-widest uppercase text-zinc-400 hover:text-white transition-colors">
-                        {{ __('general.sign_in') ?? 'SIGN IN' }}
+                        {{ __('general.sign_in') }}
                     </a>
                     <a href="/start-project" class="px-5 py-2 bg-white text-black hover:bg-zinc-200 font-bold text-[11px] tracking-widest font-mono uppercase transition-all">
-                        {{ __('general.start_a_project') ?? 'START A PROJECT' }} ➔
+                        {{ __('general.start_a_project') }} ➔
                     </a>
-                @endauth
+                @endif
 
                 <!-- Mobile Menu Button -->
                 <button onclick="document.getElementById('mobile-drawer').classList.toggle('hidden')" class="lg:hidden p-2 text-zinc-400 hover:text-white">
@@ -138,12 +194,12 @@
         <!-- Mobile Drawer -->
         <div id="mobile-drawer" class="hidden lg:hidden border-b border-[#222222] bg-[#111111] px-6 py-6 space-y-4">
             <div class="flex flex-col space-y-3 font-mono text-xs uppercase tracking-wider text-zinc-300">
-                <a href="/#services" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.solutions') ?? 'Solutions' }}</a>
-                <a href="/#estimator" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.estimator') ?? 'Estimator' }}</a>
-                <a href="/portfolio" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.portfolio') ?? 'Work' }}</a>
-                <a href="/about/mahmoud-amin" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.leadership_bio') ?? 'Chief Architect' }}</a>
-                <a href="/company/contact" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.contact_us') ?? 'Contact' }}</a>
-                <a href="/start-project" class="py-2 text-[#748660] font-bold border-b border-[#1E1E1E]">START A PROJECT ➔</a>
+                <a href="/#services" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.solutions') }}</a>
+                <a href="/estimator" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.estimator') }}</a>
+                <a href="/portfolio" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.portfolio') }}</a>
+                <a href="/about/mahmoud-amin" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.leadership_bio') }}</a>
+                <a href="/company/contact" class="py-2 hover:text-white border-b border-[#1E1E1E]">{{ __('general.contact_us') }}</a>
+                <a href="/start-project" class="py-2 text-[#748660] font-bold border-b border-[#1E1E1E]">{{ __('general.start_a_project') }} ➔</a>
             </div>
         </div>
     </header>
@@ -159,36 +215,36 @@
             
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-10 lg:gap-16 flex-1">
                 <div class="space-y-4">
-                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.contact_us') ?? 'Contact Us' }}</div>
+                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.contact_us') }}</div>
                     <ul class="space-y-2.5 font-sans text-xs">
-                        <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors text-[#748660] font-bold">{{ __('general.whatsapp_direct') ?? 'WhatsApp Direct' }}</a></li>
-                        <li><a href="mailto:info@musoftwares.com" class="hover:text-white transition-colors">info@musoftwares.com</a></li>
-                        <li><a href="/start-project" class="hover:text-white transition-colors">{{ __('general.start_project_wizard') ?? 'System Scoping Wizard ➔' }}</a></li>
+                        <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors text-[#748660] font-bold">{{ __('general.whatsapp_direct') }}</a></li>
+                        <li><a href="mailto:admin@musoftwares.com" class="hover:text-white transition-colors">admin@musoftwares.com</a></li>
+                        <li><a href="/start-project" class="hover:text-white transition-colors">{{ __('general.start_project_wizard') }} ➔</a></li>
                     </ul>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.solutions') ?? 'Solutions' }}</div>
+                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.solutions') }}</div>
                     <ul class="space-y-2.5 font-sans text-xs">
                         <li><a href="/platforms/erp" class="hover:text-white transition-colors">Enterprise ERP</a></li>
                         <li><a href="/platforms/crm" class="hover:text-white transition-colors">WhatsApp Cloud API</a></li>
-                        <li><a href="/platforms/cloud" class="hover:text-white transition-colors">Meta Graph Suite</a></li>
+                        <li><a href="/platforms" class="hover:text-white transition-colors">Digital Platforms</a></li>
                         <li><a href="/start-project" class="hover:text-white transition-colors">Custom System Builder</a></li>
                     </ul>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.press_center') ?? 'Press Center' }}</div>
+                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.press_center') }}</div>
                     <ul class="space-y-2.5 font-sans text-xs">
-                        <li><a href="/estimator" class="hover:text-white transition-colors">{{ __('general.estimator') ?? 'Project Estimator' }}</a></li>
-                        <li><a href="/portfolio" class="hover:text-white transition-colors">{{ __('general.portfolio') ?? 'Case Studies' }}</a></li>
-                        <li><a href="/about/mahmoud-amin" class="hover:text-white transition-colors">Mahmoud Amin (Chief Architect)</a></li>
+                        <li><a href="/estimator" class="hover:text-white transition-colors">{{ __('general.estimator') }}</a></li>
+                        <li><a href="/portfolio" class="hover:text-white transition-colors">{{ __('general.portfolio') }}</a></li>
+                        <li><a href="/about/mahmoud-amin" class="hover:text-white transition-colors">{{ __('landing_bio.title') }}</a></li>
                         <li><a href="/compare/laravel-vs-nodejs" class="hover:text-white transition-colors">Laravel vs Node.js Benchmarks</a></li>
                     </ul>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.legal') ?? 'Legal & Privacy' }}</div>
+                    <div class="text-white font-bold tracking-wider font-sans">{{ __('general.legal') }}</div>
                     <ul class="space-y-2.5 font-sans text-xs">
                         <li><a href="/privacy-policy" class="hover:text-white transition-colors">Privacy Policy</a></li>
                         <li><a href="/terms-of-service" class="hover:text-white transition-colors">Terms & SLA</a></li>
@@ -217,10 +273,40 @@
         </div>
 
         <div class="max-w-[1400px] mx-auto mt-16 pt-8 border-t border-[#1C1C1C] flex flex-col sm:flex-row items-center justify-between text-zinc-400 font-mono text-[11px]">
-            <div>&copy; {{ date('Y') }} Musoftwares Inc. {{ __('general.all_rights_reserved') ?? 'All rights reserved.' }}</div>
-            <div class="mt-2 sm:mt-0">Suez, Egypt &bull; {{ __('general.worldwide_delivery') ?? 'Worldwide Delivery' }}</div>
+            <div>&copy; {{ date('Y') }} Musoftwares &bull; Mahmoud Amin. {{ __('general.all_rights_reserved') }}</div>
+            <div class="mt-2 sm:mt-0">Suez, Egypt &bull; {{ __('general.worldwide_delivery') }}</div>
         </div>
     </footer>
+
+    <script>
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const sunIcon = document.getElementById('theme-sun-icon');
+            const moonIcon = document.getElementById('theme-moon-icon');
+            if (sunIcon && moonIcon) {
+                if (isDark) {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                } else {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                }
+            }
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+            updateThemeIcons();
+        }
+
+        document.addEventListener('DOMContentLoaded', updateThemeIcons);
+    </script>
 
 </body>
 </html>

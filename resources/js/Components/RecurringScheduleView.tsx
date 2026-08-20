@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Card, CardContent } from '@/Components/ui/card';
-import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2, X, Play } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import {
@@ -54,6 +54,18 @@ export function RecurringScheduleView({
     const historyItems: any[] = records ?? transactions ?? [];
     const scheduleItems: any[] = Array.isArray(upcomingSchedule) ? upcomingSchedule : [];
     const [pendingDelete, setPendingDelete] = useState<number | null>(null);
+    const [generating, setGenerating] = useState(false);
+
+    const handleGenerateMissing = () => {
+        const genRoute = kind === 'salary' ? 'admin.recurring_salaries.generate_missing' : 'admin.recurring_invoices.generate_missing';
+        if (confirm(__('general.confirm_generate_missing') || 'Are you sure you want to generate all missing past transactions up to today for this schedule?')) {
+            setGenerating(true);
+            router.post(route(genRoute, item.id), {}, {
+                preserveScroll: true,
+                onFinish: () => setGenerating(false),
+            });
+        }
+    };
 
     const handleDelete = () => {
         router.delete(route(deleteRoute, item.id), {
@@ -97,7 +109,11 @@ export function RecurringScheduleView({
                 <Link href={backHref} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
                     <ArrowLeft className="w-4 h-4" />{__(backLabelKey)}
                 </Link>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                    <Button variant="default" size="sm" className="bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm" onClick={handleGenerateMissing} disabled={generating}>
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                        {generating ? (__('general.loading') || 'Generating...') : (__('general.generate_missing_transactions') || 'Generate Missing')}
+                    </Button>
                     <Link href={route(editRoute, item.id)}>
                         <Button variant="outline" size="sm" className="flex items-center gap-1.5">
                             <Edit className="w-4 h-4" /> {__('general.edit')}
@@ -150,7 +166,7 @@ export function RecurringScheduleView({
                         <div className="mt-2">
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">{__('general.next_execution_date')}</span>
                             <span className="text-sm font-medium text-slate-800 flex items-center gap-1 mt-1">
-                                <Clock className="w-4 h-4 text-slate-500" /> {item.current_date ? new Date(item.current_date).toLocaleDateString() : '—'}
+                                <Clock className="w-4 h-4 text-slate-500" /> {item.next_date ? new Date(item.next_date).toLocaleDateString() : (item.current_date ? new Date(item.current_date).toLocaleDateString() : '—')}
                             </span>
                         </div>
                     </div>

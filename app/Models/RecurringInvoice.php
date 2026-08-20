@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\InvoiceCreated;
 use App\Helpers\FinanceHelper;
+use App\Traits\HasRecurringSchedule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,7 @@ use Illuminate\Support\Str;
 
 class RecurringInvoice extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasRecurringSchedule;
 
     protected $guarded = [];
 
@@ -155,6 +156,76 @@ class RecurringInvoice extends Model
                 });
             }
         }
+    }
+
+    public function generateMissingRuns(?Carbon $until = null): int
+    {
+        $timezone = config('app.timezone', 'Africa/Cairo');
+        $until = $until ? $until->copy()->setTimezone($timezone)->endOfDay() : Carbon::today($timezone)->endOfDay();
+        $startDate = Carbon::parse($this->start_date)->setTimezone($timezone)->startOfDay();
+
+        if ($startDate->gt($until)) {
+            return 0;
+        }
+
+        $user = $this->user;
+        if (! $user) {
+            return 0;
+        }
+
+        $userCurrencyId = $user->currency_id ?? $user->currency;
+        if (! $userCurrencyId) {
+            return 0;
+        }
+
+        $convertedAmount = CurrenciesExchange::RateToday($this->amount, $this->currency_id, $userCurrencyId);
+
+        $generatedCount = 0;
+        $diffDays = $startDate->diffInDays($until);
+
+        for ($i = 0; $i <= $diffDays; $i++) {
+            $checkDate = $startDate->copy()->addDays($i);
+            if ($this->isToday($checkDate) && ! $this->createdBefore($checkDate)) {
+                $targetTime = $checkDate->copy()->setTime(3, 0, 0);
+
+                DB::transaction(function () use ($user, $userCurrencyId, $convertedAmount, $checkDate, $targetTime) {
+                    $invoice = new Invoice;
+                    $invoice->uuid = (string) Str::uuid();
+                    $invoice->user_id = $user->id;
+                    $invoice->currency_id = $userCurrencyId;
+                    $invoice->status = 'unpaid';
+                    $invoice->job_status = 'pending';
+                    $invoice->created_at = $targetTime;
+                    $invoice->updated_at = $targetTime;
+                    $invoice->save();
+
+                    $item = new InvoiceItem;
+                    $item->invoice_id = $invoice->id;
+                    $item->item_title = $this->title;
+                    $item->item_type = 'simple';
+                    $item->qty = 1;
+                    $item->amount = $convertedAmount;
+                    $item->created_at = $targetTime;
+                    $item->updated_at = $targetTime;
+                    $item->save();
+
+                    $invoice->unpaid = $invoice->total();
+                    $invoice->save();
+
+                    DB::table('recurring_invoice_records')->insert([
+                        'recurring_invoice_id' => $this->id,
+                        'invoice_id' => $invoice->id,
+                        'unique_id' => $this->unique_id($checkDate),
+                        'created_at' => $targetTime,
+                        'updated_at' => $targetTime,
+                    ]);
+                });
+
+                $generatedCount++;
+            }
+        }
+
+        return $generatedCount;
     }
 
     private function unique_id($date)

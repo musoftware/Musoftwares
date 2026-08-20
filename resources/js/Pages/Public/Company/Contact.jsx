@@ -1,124 +1,108 @@
 import React from 'react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
-import { MapPin, Mail, Phone, MessageSquare, Sparkles, Clock, Globe, ChevronRight } from 'lucide-react';
+import { Mail, MessageSquare, Globe, ArrowUpRight } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { openWhatsAppChat } from '@/lib/whatsapp';
+import StudioHeader from '@/Components/Studio/StudioHeader';
 
 export default function Contact({ canLogin, canRegister }) {
-    const phoneNumber = "201015218548";
-
-    const openWhatsApp = (msg) => {
-        const encodedMessage = encodeURIComponent(msg);
-        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-    };
-
     return (
-        <PublicLayout auth={{ user: null }}>
-            <Head title={`${__('landing_company.contact_meta_title') || 'Contact Us'} | Musoftware`} />
+        <PublicLayout>
+            <Head title={`${__('landing_company.contact_meta_title') || 'Contact Studio'} | Musoftwares`} />
 
-            <div className="w-full bg-white text-[#1d1d1f] font-sans selection:bg-[#1d1d1f] selection:text-white pt-12 sm:pt-20 pb-20 sm:pb-32">
-                
-                {/* Hero Section */}
-                <section className="px-6 max-w-5xl mx-auto flex flex-col items-center text-center mb-20 sm:mb-28">
-                    <p className="text-base sm:text-xl text-[#86868b] font-medium mb-3 sm:mb-4 tracking-tight">
-                        Direct Technical Communication
-                    </p>
+            <div className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
 
-                    <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[86px] leading-[1.05] font-bold text-[#1d1d1f] max-w-5xl mb-6 tracking-tight">
-                        {__('landing_company.contact_title') || 'Talk directly with'} <br className="hidden sm:inline" />
-                        <span className="bg-gradient-to-r from-[#0066cc] to-[#3399ff] bg-clip-text text-transparent">
-                            the software architect.
-                        </span>
-                    </h1>
+                {/* Reusable Hero Header */}
+                <StudioHeader
+                    badge="Direct Technical Communication"
+                    title={
+                        <>
+                            Talk Directly with <br className="hidden sm:inline" />
+                            <span className="text-[#748660]">The Software Architect.</span>
+                        </>
+                    }
+                    subtitle={__('landing_company.contact_subtitle') || 'No layers of middle management. Direct technical communication, rapid responses, and transparent scoping.'}
+                />
 
-                    <p className="text-lg sm:text-2xl md:text-[26px] text-[#86868b] max-w-3xl mb-10 sm:mb-12 font-medium leading-snug tracking-tight">
-                        {__('landing_company.contact_subtitle') || 'No layers of middle management. Direct technical communication, rapid responses, and transparent scoping.'}
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto items-center justify-center">
-                        <button
-                            onClick={() => openWhatsApp("Hello Mahmoud, I'd like to discuss a project with Musoftware.")}
-                            className="bg-[#1d1d1f] hover:bg-[#333336] text-white px-8 py-3.5 rounded-full text-[17px] font-semibold w-full sm:w-auto transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-95"
-                        >
-                            {__('landing_company.contact_support_whatsapp') || 'WhatsApp Direct Chat'}
-                        </button>
-                        <a
-                            href="mailto:admin@musoftwares.com"
-                            className="text-[#0066cc] hover:text-[#0077ed] text-[17px] font-semibold flex items-center gap-1 group transition-colors cursor-pointer"
-                        >
-                            <span>admin@musoftwares.com</span>
-                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
-                        </a>
-                    </div>
-                </section>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20">
+                    <button
+                        onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to discuss a project with Musoftware.")}
+                        className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                    >
+                        {__('general.whatsapp_direct') || 'WHATSAPP DIRECT CHAT'} ➔
+                    </button>
+                    <a
+                        href="mailto:admin@musoftwares.com"
+                        className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                    >
+                        admin@musoftwares.com
+                    </a>
+                </div>
 
                 {/* 3 Contact Channels Cards */}
-                <section className="px-6 max-w-6xl mx-auto">
+                <section className="px-6 max-w-[1400px] mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        
-                        {/* Channel 1: WhatsApp & Technical Leadership */}
-                        <div className="bg-[#f5f5f7] rounded-[28px] p-8 sm:p-10 flex flex-col justify-between h-full border border-[#0066cc]/20 shadow-xs">
-                            <div>
-                                <div className="w-12 h-12 rounded-2xl bg-white border border-[#d2d2d7]/60 flex items-center justify-center mb-6 text-emerald-600">
+
+                        {/* Channel 1: WhatsApp */}
+                        <div className="bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
                                     <MessageSquare className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold text-[#1d1d1f] tracking-tight mb-2">
-                                    {__('landing_company.contact_support_title') || 'Instant WhatsApp Channel'}
+                                <h3 className="text-lg font-bold text-white tracking-tight font-sans">
+                                    Instant Direct WhatsApp
                                 </h3>
-                                <p className="text-[15px] text-[#86868b] leading-relaxed font-medium mb-6">
-                                    {__('landing_company.contact_support_desc') || 'Fastest response for project scoping, technical consultations, and urgent production support.'}
+                                <p className="text-sm text-zinc-400 font-sans leading-relaxed">
+                                    Fastest way to get in touch. Technical consultations, urgent scope reviews, and architecture briefs.
                                 </p>
                             </div>
-                            <div className="space-y-3 pt-6 border-t border-[#d2d2d7]/40">
-                                <button
-                                    onClick={() => openWhatsApp("Hello Mahmoud, I'm reaching out from the website.")}
-                                    className="w-full h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 transition"
-                                >
-                                    <span>+20 101 521 8548</span>
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => openWhatsAppChat("Hello Mahmoud, I want to initiate a scope.")}
+                                className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                            >
+                                <span>OPEN WHATSAPP CHAT</span>
+                                <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                            </button>
                         </div>
 
-                        {/* Channel 2: Sales & Formal Inquiries */}
-                        <div className="bg-[#f5f5f7] rounded-[28px] p-8 sm:p-10 flex flex-col justify-between h-full border border-[#d2d2d7]/50 shadow-xs">
-                            <div>
-                                <div className="w-12 h-12 rounded-2xl bg-white border border-[#d2d2d7]/60 flex items-center justify-center mb-6 text-[#1d1d1f]">
+                        {/* Channel 2: Email Studio */}
+                        <div className="bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
                                     <Mail className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold text-[#1d1d1f] tracking-tight mb-2">
-                                    {__('landing_company.contact_sales_title') || 'Official Email'}
+                                <h3 className="text-lg font-bold text-white tracking-tight font-sans">
+                                    Formal Proposal Inbox
                                 </h3>
-                                <p className="text-[15px] text-[#86868b] leading-relaxed font-medium mb-6">
-                                    {__('landing_company.contact_sales_desc') || 'Send RFPs, enterprise scopes, legal inquiries, and custom architecture documentation.'}
+                                <p className="text-sm text-zinc-400 font-sans leading-relaxed">
+                                    Send RFP documents, NDA agreements, and multi-platform specification files for detailed review.
                                 </p>
                             </div>
-                            <div className="pt-6 border-t border-[#d2d2d7]/40">
-                                <a
-                                    href="mailto:admin@musoftwares.com"
-                                    className="w-full h-11 rounded-full bg-white hover:bg-zinc-100 border border-[#d2d2d7] text-zinc-900 font-bold text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center transition"
-                                >
-                                    <span>admin@musoftwares.com</span>
-                                </a>
-                            </div>
+                            <a
+                                href="mailto:admin@musoftwares.com"
+                                className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                            >
+                                <span>SEND EMAIL BRIEF</span>
+                                <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                            </a>
                         </div>
 
-                        {/* Channel 3: Headquarters & Operations */}
-                        <div className="bg-[#f5f5f7] rounded-[28px] p-8 sm:p-10 flex flex-col justify-between h-full border border-[#d2d2d7]/50 shadow-xs">
-                            <div>
-                                <div className="w-12 h-12 rounded-2xl bg-white border border-[#d2d2d7]/60 flex items-center justify-center mb-6 text-[#1d1d1f]">
-                                    <MapPin className="w-6 h-6" />
+                        {/* Channel 3: Global Delivery */}
+                        <div className="bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                    <Globe className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold text-[#1d1d1f] tracking-tight mb-2">
-                                    {__('landing_company.contact_hq_title') || 'Headquarters'}
+                                <h3 className="text-lg font-bold text-white tracking-tight font-sans">
+                                    Worldwide Delivery
                                 </h3>
-                                <p className="text-[15px] text-[#86868b] leading-relaxed font-medium mb-6">
-                                    {__('landing_company.contact_hq_desc') || 'Operating from Suez, Egypt with enterprise clients and software deployments across the globe.'}
+                                <p className="text-sm text-zinc-400 font-sans leading-relaxed">
+                                    Headquartered in Suez, Egypt. Deploying mission-critical platforms to clients worldwide.
                                 </p>
                             </div>
-                            <div className="pt-6 border-t border-[#d2d2d7]/40 flex items-center justify-center text-xs font-semibold text-zinc-700 gap-1.5">
-                                <Globe className="w-4 h-4 text-[#86868b]" />
-                                <span>{__('landing_company.contact_hq_address') || 'Suez, Egypt — Serving Worldwide'}</span>
+                            <div className="mt-8 text-xs font-mono text-zinc-400">
+                                Suez, Egypt (Cairo Timezone UTC+2 / UTC+3)
                             </div>
                         </div>
 

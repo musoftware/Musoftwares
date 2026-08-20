@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\FinanceHelper;
+use App\Traits\HasRecurringSchedule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,9 +11,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $title
+ * @property float $amount
+ * @property int $currency_id
+ * @property string|null $reason
+ * @property string $start_date
+ * @property string $current_date
+ * @property string $recurring
+ * @property int|null $recurring_times
+ * @property mixed $recurring_times_day
+ * @property mixed $recurring_times_month
+ * @property mixed $recurring_times_year
+ * @property bool $is_active
+ */
 class RecurringSalary extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasRecurringSchedule;
 
     protected $guarded = [];
 
@@ -82,6 +99,64 @@ class RecurringSalary extends Model
                 'updated_at' => $now,
             ]);
         }
+    }
+
+    public function generateMissingRuns(?Carbon $until = null): int
+    {
+        $timezone = config('app.timezone', 'Africa/Cairo');
+        $until = $until ? $until->copy()->setTimezone($timezone)->endOfDay() : Carbon::today($timezone)->endOfDay();
+        $startDate = Carbon::parse($this->start_date)->setTimezone($timezone)->startOfDay();
+
+        if ($startDate->gt($until)) {
+            return 0;
+        }
+
+        $user = User::find($this->user_id);
+        if (! $user) {
+            return 0;
+        }
+
+        $reason = trim((string) ($this->reason ?? $this->title));
+        if ($reason === '') {
+            $reason = 'Recurring salary #'.$this->id;
+        }
+
+        $generatedCount = 0;
+        $diffDays = $startDate->diffInDays($until);
+
+        for ($i = 0; $i <= $diffDays; $i++) {
+            $checkDate = $startDate->copy()->addDays($i);
+            if ($this->isToday($checkDate) && ! $this->createdBefore($checkDate)) {
+                $targetTime = $checkDate->copy()->setTime(3, 0, 0);
+
+                $tid = $user->add_balance(
+                    (float) $this->amount,
+                    $reason,
+                    'earned',
+                    (int) $this->currency_id,
+                    null
+                );
+
+                if ($tid) {
+                    Transaction::where('id', $tid)->update([
+                        'created_at' => $targetTime,
+                        'updated_at' => $targetTime,
+                    ]);
+
+                    DB::table('recurring_salary_transactions')->insert([
+                        'recurring_salary_id' => $this->id,
+                        'transaction_id' => $tid,
+                        'unique_id' => $this->unique_id($checkDate),
+                        'created_at' => $targetTime,
+                        'updated_at' => $targetTime,
+                    ]);
+
+                    $generatedCount++;
+                }
+            }
+        }
+
+        return $generatedCount;
     }
 
     private function unique_id($date): string

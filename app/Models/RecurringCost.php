@@ -3,15 +3,31 @@
 namespace App\Models;
 
 use App\Helpers\FinanceHelper;
+use App\Traits\HasRecurringSchedule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property float $amount
+ * @property int $currency_id
+ * @property string $reason
+ * @property string $start_date
+ * @property string $current_date
+ * @property string $recurring
+ * @property int|null $recurring_times
+ * @property mixed $recurring_times_day
+ * @property mixed $recurring_times_month
+ * @property mixed $recurring_times_year
+ * @property bool $is_active
+ */
 class RecurringCost extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasRecurringSchedule;
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -59,6 +75,43 @@ class RecurringCost extends Model
                 ]);
             }
         }
+    }
+
+    public function generateMissingRuns(?Carbon $until = null): int
+    {
+        $timezone = config('app.timezone', 'Africa/Cairo');
+        $until = $until ? $until->copy()->setTimezone($timezone)->endOfDay() : Carbon::today($timezone)->endOfDay();
+        $startDate = Carbon::parse($this->start_date)->setTimezone($timezone)->startOfDay();
+
+        if ($startDate->gt($until)) {
+            return 0;
+        }
+
+        $generatedCount = 0;
+        $diffDays = $startDate->diffInDays($until);
+
+        for ($i = 0; $i <= $diffDays; $i++) {
+            $checkDate = $startDate->copy()->addDays($i);
+            if ($this->isToday($checkDate) && ! $this->createdBefore($checkDate)) {
+                $targetTime = $checkDate->copy()->setTime(3, 0, 0);
+
+                $costTx = new CostTransaction;
+                $costTx->amount = $this->amount;
+                $costTx->reason = $this->reason;
+                $costTx->currency_id = $this->currency_id;
+                $costTx->created_at = $targetTime;
+                $costTx->updated_at = $targetTime;
+                $costTx->save();
+
+                $this->transactions()->attach($costTx->id, [
+                    'unique_id' => $this->unique_id($checkDate),
+                ]);
+
+                $generatedCount++;
+            }
+        }
+
+        return $generatedCount;
     }
 
     private function unique_id($date)

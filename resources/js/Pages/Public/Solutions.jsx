@@ -1,158 +1,150 @@
 import { useRef } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { Briefcase, Building2, Server, GraduationCap, Code2, ShieldCheck, ArrowRight, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Briefcase, Building2, GraduationCap, Code2, ArrowUpRight } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
-import { Button } from '@/Components/ui/button';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { __ } from '@/lib/i18n';
+import StudioHeader from '@/Components/Studio/StudioHeader';
+import { openWhatsAppChat, STUDIO_PHONE } from '@/lib/whatsapp';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Solutions() {
     const mainRef = useRef(null);
-    const phoneNumber = "201015218548";
 
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
         sections.forEach((section) => {
             const elements = section.querySelectorAll('.gsap-fade-up');
-            gsap.fromTo(elements, 
-                { opacity: 0, y: 30 },
-                {
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 0.8,
-                    stagger: 0.1,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse"
+            if (elements && elements.length > 0) {
+                gsap.fromTo(elements, 
+                    { opacity: 0, y: 20 },
+                    {
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.6,
+                        stagger: 0.08,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        }
                     }
-                }
-            );
+                );
+            }
         });
     }, { scope: mainRef });
 
-    const openWhatsApp = (msg) => {
-        const encodedMessage = encodeURIComponent(msg);
-        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-    };
-
     const solutions = [
         {
-            title: "ERP & Business Systems",
+            title: "ERP & Business Backbones",
             icon: Building2,
-            desc: "Stop relying on chaotic spreadsheets. We build custom Enterprise Resource Planning systems tailored to your unique workflows, managing inventory, sales, and HR.",
-            features: ["Custom workflows", "Role-based access", "Automated reporting"]
+            desc: "Custom Enterprise Resource Planning systems tailored to your unique operational workflows, double-entry finance, inventory, and multi-branch sales.",
+            features: ["Custom business workflows", "Strict role-based access", "Real-time ledger analytics"]
         },
         {
             title: "SaaS & Subscription Platforms",
             icon: Briefcase,
-            desc: "Turn your idea into a scalable business. We architect SaaS applications that handle multi-tenant data isolation, recurring billing, and user management.",
-            features: ["Multi-tenant architecture", "Stripe/Paymob integration", "User dashboards"]
+            desc: "Turn your software idea into a scalable business with tenant data isolation, recurring billing engines, and unified client workspaces.",
+            features: ["Zero-leak multi-tenant schema", "Instant payment integrations", "White-label customer dashboards"]
         },
         {
-            title: "E-Learning Academies",
+            title: "E-Learning & Academy Systems",
             icon: GraduationCap,
-            desc: "Launch your own digital academy. We create secure, video-centric platforms for selling courses with progress tracking and interactive exams.",
-            features: ["Video protection", "Interactive quizzes", "Certificates generation"]
+            desc: "Custom platforms for video streaming protection, student grade management, and interactive exam pipelines.",
+            features: ["DRM video protection", "Automated student grading", "Certificates & quiz engines"]
         },
         {
-            title: "Process Automation",
+            title: "Bespoke APIs & Background Microservices",
             icon: Code2,
-            desc: "Automate the boring stuff. We develop custom scripts and background workers to connect different APIs, sync data, and run scheduled tasks.",
-            features: ["API integrations", "Scheduled cron jobs", "Data syncing"]
-        },
-        {
-            title: "E-Commerce Engines",
-            icon: Server,
-            desc: "Sell products seamlessly. High-performance, SEO-optimized e-commerce platforms designed to handle massive traffic and complex product variations.",
-            features: ["High concurrency", "Cart management", "Payment gateways"]
-        },
-        {
-            title: "Security & Audits",
-            icon: ShieldCheck,
-            desc: "Protect your data and reputation. We review existing codebases, patch vulnerabilities, and restructure applications to withstand heavy attacks.",
-            features: ["Code reviews", "Vulnerability patching", "Performance optimization"]
+            desc: "High-throughput webhook consumers, message queues, and API gateways that process millions of events reliably.",
+            features: ["High-speed Redis pipelines", "Guaranteed webhook deliveries", "Sub-100ms response targets"]
         }
     ];
 
     return (
         <PublicLayout>
             <Head>
-                <title>Solutions | Musoftware</title>
-                <meta name="description" content="Custom software solutions, ERP systems, SaaS platforms, and business automation engineered for scale." />
+                <title>{__('general.solutions') || 'Solutions'} | Musoftwares</title>
+                <meta name="description" content="Custom software engineering solutions tailored to solve specific business problems." />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss a software solution." />
+            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I'd like to discuss a software solution." />
 
-            <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white">
+            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white overflow-x-hidden pt-16 sm:pt-24 pb-24 sm:pb-36">
                 
-                {/* Hero Section */}
-                <section className="pt-32 pb-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section border-b border-[#e5e5e5]">
-                    <div className="max-w-4xl">
-                        <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
-                            <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            {__('general.custom_solutions')}</div>
-                        <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                            {__('general.software_built_for_your_business')}</h1>
-                        <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
-                            {__('general.we_dont_sell_templates_we_engineer_robus')}</p>
-                        <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I need a custom software solution.")}
-                            className="gsap-fade-up bg-[#111111] text-white hover:bg-[#333333] rounded-xl px-8 py-6 text-sm font-bold uppercase tracking-wide transition-all"
+                {/* Hero Header */}
+                <div className="reveal-section">
+                    <StudioHeader
+                        badge={__('general.solutions') || 'Engineered Solutions'}
+                        title={
+                            <>
+                                Tailored Software Solutions. <br className="hidden sm:inline" />
+                                <span className="text-[#748660]">Built for Your Exact Workflow.</span>
+                            </>
+                        }
+                        subtitle="Every industry has unique operational challenges. We build specialized software engines designed around your exact business requirements."
+                    />
+
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 -mt-8">
+                        <button
+                            onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a tailored solution for my business.")}
+                            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
                         >
-                            {__('general.discuss_your_project')}</Button>
+                            DISCUSS SOLUTION ➔
+                        </button>
+                        <Link
+                            href="/estimator"
+                            className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                        >
+                            {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
+                        </Link>
                     </div>
-                </section>
+                </div>
 
                 {/* Solutions Grid */}
-                <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
-                    <div className="text-center mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('general.core_competencies')}</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">{__('general.what_we_excel_at_building')}</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {solutions.map((sol, idx) => (
-                            <div key={idx} className="gsap-fade-up bg-white p-8 lg:p-10 border border-[#e5e5e5] rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:border-[#111111] transition-all flex flex-col h-full group">
-                                <div className="w-14 h-14 bg-[#f4f4f5] group-hover:bg-[#111111] transition-colors rounded-xl flex items-center justify-center mb-8">
-                                    <sol.icon className="w-6 h-6 text-[#111111] group-hover:text-white transition-colors" />
+                <section className="px-6 max-w-[1400px] mx-auto reveal-section mb-24">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {solutions.map((item, idx) => {
+                            const Icon = item.icon;
+                            return (
+                                <div
+                                    key={idx}
+                                    className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors"
+                                >
+                                    <div className="space-y-4">
+                                        <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                            <Icon className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white font-sans">
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                            {item.desc}
+                                        </p>
+                                        <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                            {item.features.map((feat, fIdx) => (
+                                                <li key={fIdx} className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>
+                                                    <span>{feat}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <button
+                                        onClick={() => openWhatsAppChat(`Hello Mahmoud, I want to discuss ${item.title}.`)}
+                                        className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                                    >
+                                        <span>INITIATE ARCHITECTURE BRIEF</span>
+                                        <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                                    </button>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-4">{sol.title}</h3>
-                                <p className="text-[#666666] leading-relaxed text-[15px] mb-8 flex-grow">
-                                    {sol.desc}
-                                </p>
-                                <ul className="space-y-3 pt-6 border-t border-[#f4f4f5]">
-                                    {sol.features.map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-[#444444]">
-                                            <CheckCircle2 className="w-4 h-4 text-[#111111]" />
-                                            <span className="text-sm font-medium">{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* CTA Section */}
-                <section className="py-32 bg-[#111111] text-white text-center reveal-section px-6">
-                    <div className="max-w-3xl mx-auto">
-                        <h2 className="gsap-fade-up text-4xl md:text-5xl font-extrabold mb-6">
-                            {__('general.have_a_complex_problem')}</h2>
-                        <p className="gsap-fade-up text-xl text-[#a3a3a3] mb-12 leading-relaxed">
-                            {__('general.lets_map_out_the_architecture_the_consul')}</p>
-                        <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I have a complex problem and need a technical consultation.")}
-                            className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-all flex items-center justify-center gap-3 mx-auto"
-                        >
-                            {__('general.book_a_consultation')}<ArrowRight className="w-4 h-4" />
-                        </Button>
+                            );
+                        })}
                     </div>
                 </section>
 

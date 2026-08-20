@@ -223,63 +223,63 @@ export default function PricingBuilder({
                 key={item.id}
                 onClick={() => toggleItem(item.id)}
                 className={cn(
-                    'relative flex items-start gap-4 rounded-2xl border transition-all duration-300 cursor-pointer group text-start',
-                    isAddon ? 'p-4 bg-white/50 hover:bg-white' : 'p-5 bg-white hover:shadow-sm',
+                    'relative flex items-start gap-4 border transition-all duration-200 cursor-pointer group text-start font-mono',
+                    isAddon ? 'p-3.5 bg-black hover:border-zinc-500' : 'p-5 bg-[#161616] hover:border-zinc-500',
                     isSelected
-                        ? (isAddon ? 'border-indigo-400 bg-indigo-50/50' : 'border-indigo-600 bg-indigo-50/50 shadow-md shadow-indigo-100/50')
-                        : 'border-slate-200 hover:border-indigo-300'
+                        ? (isAddon ? 'border-[#748660] bg-[#1A2215]' : 'border-[#748660] bg-[#1A2215] shadow-sm')
+                        : 'border-[#2B2B2B]'
                 )}
             >
                 <div className={cn(
-                    'flex items-center justify-center rounded-md border mt-0.5 shrink-0 transition-colors',
-                    isAddon ? 'w-5 h-5' : 'w-6 h-6',
-                    isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-50 border-slate-300 text-transparent group-hover:border-indigo-400'
+                    'flex items-center justify-center border mt-0.5 shrink-0 transition-colors',
+                    isAddon ? 'w-5 h-5' : 'w-5 h-5',
+                    isSelected ? 'bg-[#748660] border-[#748660] text-black' : 'bg-black border-[#333333] text-transparent group-hover:border-zinc-500'
                 )}>
-                    <Check className={isAddon ? "w-3 h-3" : "w-4 h-4"} />
+                    <Check className={isAddon ? "w-3 h-3" : "w-3.5 h-3.5"} strokeWidth={3} />
                 </div>
                 
                 <div className="flex-1">
                     <div className="flex justify-between items-start">
                         <div>
                             <div className="flex items-center gap-2">
-                                <Icon className={cn("w-4 h-4", isSelected ? 'text-indigo-600' : 'text-slate-400')} />
-                                <h3 className={cn("font-semibold", isSelected ? 'text-indigo-900' : 'text-slate-900')}>
+                                <Icon className={cn("w-4 h-4", isSelected ? 'text-[#748660]' : 'text-zinc-400')} />
+                                <h3 className={cn("font-bold text-sm", isSelected ? 'text-white' : 'text-zinc-200')}>
                                     {item.name}
                                 </h3>
                                 {ownedFeature && (
                                     <span className={cn(
-                                        "ms-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full",
+                                        "ms-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
                                         ownedFeature.status === 'active' 
-                                            ? "bg-emerald-100 text-emerald-700" 
-                                            : "bg-red-100 text-red-700"
+                                            ? "bg-[#1E2619] text-[#748660] border border-[#748660]/40" 
+                                            : "bg-red-950 text-red-400 border border-red-800"
                                     )}>
                                         {ownedFeature.status === 'active' ? 'Active' : 'Expired'}
                                     </span>
                                 )}
                             </div>
                             {item.description && (
-                                <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+                                <p className="text-xs text-zinc-400 mt-1 leading-relaxed font-mono">
                                     {item.description}
                                 </p>
                             )}
                             {ownedFeature && (
                                 <p className={cn(
                                     "text-xs mt-1.5 font-medium",
-                                    ownedFeature.status === 'active' ? "text-emerald-600" : "text-red-500"
-                                )}>
+                                    ownedFeature.status === 'active' ? "text-[#748660]" : "text-red-400"
+                                    )}>
                                     {ownedFeature.status === 'active' ? 'Renews / Expires on' : 'Expired on'} {ownedFeature.expires_at}
                                     {ownedFeature.status === 'expired' && " - Select to Renew"}
                                 </p>
                             )}
                         </div>
-                        <div className="text-end shrink-0 ms-2">
+                        <div className="text-end shrink-0 ms-2 font-mono">
                             {item.type === 'module' && (
-                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5 text-end">{__('general.starts_from')}</div>
+                                <div className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider mb-0.5 text-end">{__('general.starts_from')}</div>
                             )}
-                            <span className="text-lg font-bold text-slate-900">
+                            <span className="text-base font-bold text-white">
                                 {calculateItemPrice(item).toFixed(2)}
                             </span>
-                            <span className="text-xs text-slate-500 ms-1">{currency}</span>
+                            <span className="text-xs text-zinc-400 ms-1">{currency}</span>
                         </div>
                     </div>
                 </div>
@@ -288,15 +288,18 @@ export default function PricingBuilder({
     };
 
     return (
-        <div className="flex flex-col lg:flex-row gap-8 items-start w-full">
+        <div className="flex flex-col lg:flex-row gap-8 items-start w-full font-mono">
             {/* ── Products List (Left) ── */}
             <div className="flex-1 w-full space-y-10 text-start">
                 <section>
                     <div className="mb-4">
-                        <h2 className="text-xl font-semibold text-slate-900">{__('general.core_modules')}</h2>
-                        <p className="text-sm text-slate-500">{__('general.the_foundation_for_your_business_operations')}</p>
+                        <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
+                            Architecture Core
+                        </span>
+                        <h2 className="text-xl font-bold text-white mt-1">{__('general.core_modules')}</h2>
+                        <p className="text-xs text-zinc-400 font-mono">{__('general.the_foundation_for_your_business_operations')}</p>
                     </div>
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 gap-4">
                         {modules.map(module => {
                             const moduleAddons = addons.filter(a => a.parent_id === module.id);
                             const isModuleSelected = selectedItems.includes(module.id);
@@ -306,16 +309,16 @@ export default function PricingBuilder({
                                     
                                     {/* Add-ons Section */}
                                     {moduleAddons.length > 0 && (isModuleSelected || (isNewSystem ? false : activeSubscription?.owned_features?.find(f => f.id === module.id)?.status === 'active')) && (
-                                        <div className="mt-4 ps-4 md:ps-8 border-s-[3px] border-indigo-100 ms-4 md:ms-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-300">
-                                            <div className="flex items-center justify-between mb-3">
-                                                <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 tracking-tight">
-                                                    <Sparkles className="w-4 h-4 text-indigo-500" /> 
+                                        <div className="mt-3 ps-4 md:ps-6 border-s-2 border-[#748660]/40 ms-4 md:ms-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-200">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h4 className="text-xs font-bold text-zinc-300 flex items-center gap-2 tracking-tight">
+                                                    <Sparkles className="w-3.5 h-3.5 text-[#748660]" /> 
                                                     Power up {module.name}
                                                 </h4>
                                                 <Button 
                                                     variant="ghost" 
                                                     size="sm" 
-                                                    className="h-7 text-xs px-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                                                    className="h-6 text-[11px] px-2 text-[#748660] hover:text-white hover:bg-black rounded-none"
                                                     onClick={(e) => { e.stopPropagation(); handleSelectAllAddons(module.id); }}
                                                 >
                                                     {moduleAddons.every(a => selectedItems.includes(a.id)) ? __('general.deselect_all') : __('general.select_all_addons')}
@@ -332,19 +335,23 @@ export default function PricingBuilder({
                     </div>
                 </section>
 
-                <div className="border-t border-slate-100" />
+                <div className="border-t border-[#222222]" />
 
                 <section>
                     <div className="mb-4 flex items-center justify-between">
                         <div>
-                            <h2 className="text-xl font-semibold text-slate-900">{__('general.automation_tools')}</h2>
-                            <p className="text-sm text-slate-500">{__('general.standalone_tools_to_boost_your_productivity')}</p>
+                            <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
+                                Automation Layer
+                            </span>
+                            <h2 className="text-xl font-bold text-white mt-1">{__('general.automation_tools')}</h2>
+                            <p className="text-xs text-zinc-400 font-mono">{__('general.standalone_tools_to_boost_your_productivity')}</p>
                         </div>
                         {tools.length > 0 && (
                             <Button 
                                 variant="outline" 
                                 size="sm" 
                                 onClick={handleSelectAllTools}
+                                className="border-[#333333] bg-black text-xs text-zinc-300 hover:bg-[#222222] hover:text-white rounded-none"
                             >
                                 {tools.every(t => selectedItems.includes(t.id)) ? 'Deselect All' : 'Select All Tools'}
                             </Button>
@@ -357,28 +364,28 @@ export default function PricingBuilder({
             </div>
 
             {/* ── Sticky Summary Cart (Right) ── */}
-            <div className="w-full lg:w-[380px] shrink-0 sticky top-24 text-start">
-                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-                    <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex flex-col gap-3">
+            <div className="w-full lg:w-[380px] shrink-0 sticky top-24 text-start font-mono">
+                <div className="bg-[#161616] border border-[#2B2B2B] overflow-hidden">
+                    <div className="p-6 bg-black border-b border-[#2B2B2B] flex flex-col gap-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-900">{__('general.workspace_summary')}</h3>
-                            <p className="text-sm text-slate-500">{__('general.select_your_preferred_billing_cycle')}</p>
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-white">{__('general.workspace_summary')}</h3>
+                            <p className="text-xs text-zinc-400">{__('general.select_your_preferred_billing_cycle')}</p>
                         </div>
                         
-                        <div className="flex bg-slate-200/50 p-1 rounded-xl text-sm text-slate-500">
+                        <div className="flex border border-[#333333] bg-black p-0.5 text-xs">
                             {[
                                 { id: '1_month', label: '1M' },
                                 { id: '6_months', label: '6M' },
-                                { id: '1_year', label: '1Y (Save 16%)' },
+                                { id: '1_year', label: '1Y (-16%)' },
                             ].map(option => (
                                 <button
                                     key={option.id}
                                     onClick={() => setBilling(option.id as any)}
                                     className={cn(
-                                        'flex-1 py-2 px-1 text-center rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm',
+                                        'flex-1 py-1.5 px-1 text-center font-bold transition-all text-xs',
                                         billing === option.id
-                                            ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-900/5'
-                                            : 'hover:text-slate-700 hover:bg-slate-200'
+                                            ? 'bg-white text-black'
+                                            : 'text-zinc-400 hover:text-white'
                                     )}
                                 >
                                     {option.label}
@@ -391,13 +398,13 @@ export default function PricingBuilder({
                     <div className="p-6">
                         {selectedItems.length === 0 ? (
                             <div className="text-center py-8">
-                                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <Layers className="w-6 h-6 text-slate-300" />
+                                <div className="w-10 h-10 bg-black border border-[#2B2B2B] flex items-center justify-center mx-auto mb-3 text-zinc-500">
+                                    <Layers className="w-5 h-5" />
                                 </div>
-                                <p className="text-slate-500 text-sm">{__('general.select_modules_to_build_your_workspace')}</p>
+                                <p className="text-zinc-500 text-xs">{__('general.select_modules_to_build_your_workspace')}</p>
                             </div>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {selectedItems.slice(0, isCartExpanded ? undefined : 5).map(id => {
                                     const item = serviceItems.find(i => i.id === id);
                                     if (!item) return null;
@@ -405,12 +412,12 @@ export default function PricingBuilder({
                                     const isAddon = item.type === 'addon';
                                     
                                     return (
-                                        <div key={id} className={cn("flex justify-between text-sm", isAddon ? "ps-4 text-slate-500" : "text-slate-700 font-medium")}>
+                                        <div key={id} className={cn("flex justify-between text-xs", isAddon ? "ps-3 text-zinc-400" : "text-zinc-200")}>
                                             <span className="flex items-center gap-1.5">
-                                                {isAddon && <span className="text-slate-300">↳</span>}
+                                                {isAddon && <span className="text-zinc-600">↳</span>}
                                                 {item.name}
                                             </span>
-                                            <span className={cn(isAddon ? "text-slate-500" : "text-slate-900")}>
+                                            <span className={cn(isAddon ? "text-zinc-400" : "text-white font-bold")}>
                                                 {calculateItemPrice(item).toFixed(2)}
                                             </span>
                                         </div>
@@ -420,42 +427,42 @@ export default function PricingBuilder({
                                 {selectedItems.length > 5 && (
                                     <button
                                         onClick={() => setIsCartExpanded(!isCartExpanded)}
-                                        className="text-xs text-indigo-600 hover:text-indigo-700 font-medium w-full text-start py-1"
+                                        className="text-xs text-[#748660] hover:underline font-bold w-full text-start py-1"
                                     >
                                         {isCartExpanded ? __('general.show_less') : `+${selectedItems.length - 5} ${__('general.more_items')}`}
                                     </button>
                                 )}
                                 
-                                <div className="border-t border-slate-100 pt-4 mt-4" />
+                                <div className="border-t border-[#2B2B2B] pt-3 mt-3" />
                                 
                                 {toolsDiscount > 0 && (
-                                    <div className="flex justify-between text-sm text-indigo-600 font-medium">
+                                    <div className="flex justify-between text-xs text-[#748660] font-bold">
                                         <span>{__('general.tools_volume_discount')}</span>
                                         <span>-{toolsDiscount.toFixed(2)}</span>
                                     </div>
                                 )}
 
                                 {discount > 0 && (
-                                    <div className="flex justify-between text-sm text-emerald-600 font-medium">
+                                    <div className="flex justify-between text-xs text-[#748660] font-bold">
                                         <span>Discount (Annual)</span>
                                         <span>-{discount.toFixed(2)}</span>
                                     </div>
                                 )}
 
                                 {!isNewSystem && proratedRefund > 0 && (
-                                    <div className="flex justify-between text-sm text-amber-600 font-medium">
-                                        <span>Prorated Refund (Current Plan)</span>
+                                    <div className="flex justify-between text-xs text-amber-400 font-bold">
+                                        <span>Prorated Refund</span>
                                         <span>-{proratedRefund.toFixed(2)}</span>
                                     </div>
                                 )}
 
-                                <div className="flex justify-between items-end">
-                                    <span className="text-base font-medium text-slate-900">{__('general.total_to_pay')}</span>
+                                <div className="flex justify-between items-end pt-2">
+                                    <span className="text-xs uppercase font-bold text-zinc-400">{__('general.total_to_pay')}</span>
                                     <div className={cn("text-end", isCalculating && "opacity-50 transition-opacity")}>
-                                        <span className="text-3xl font-bold tracking-tight text-indigo-600">
+                                        <span className="text-2xl sm:text-3xl font-bold font-mono text-white">
                                             {Math.max(0, total - (!isNewSystem ? proratedRefund : 0)).toFixed(2)}
                                         </span>
-                                        <span className="text-sm text-slate-400 ms-1">{currency}</span>
+                                        <span className="text-xs text-zinc-400 ms-1">{currency}</span>
                                     </div>
                                 </div>
                             </div>
@@ -468,16 +475,16 @@ export default function PricingBuilder({
                                 <Button
                                     disabled={selectedItems.length === 0}
                                     className={cn(
-                                        'w-full h-12 rounded-xl text-sm font-medium gap-2 transition-all',
+                                        'w-full h-11 rounded-none text-xs font-bold uppercase tracking-wider transition-all',
                                         selectedItems.length > 0
-                                            ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-sm'
-                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                            ? 'bg-white hover:bg-zinc-200 text-black'
+                                            : 'bg-[#2B2B2B] text-zinc-600 cursor-not-allowed'
                                     )}
                                 >{__('general.start_building_your_workspace')}</Button>
                             </Link>
                         )}
                         {!renderActions && (
-                            <p className="text-xs text-center text-slate-500 pt-2">{__('general.no_credit_card_required_for_14_day_trial_on_erp_modules_not_applicable_for_tools')}</p>
+                            <p className="text-[11px] text-center text-zinc-500 pt-1 font-mono">{__('general.no_credit_card_required_for_14_day_trial_on_erp_modules_not_applicable_for_tools')}</p>
                         )}
                     </div>
                 </div>

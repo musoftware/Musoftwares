@@ -40,6 +40,7 @@ export interface RecurringScheduleRow {
     recurring_times_year?: string[] | null;
     start_date: string;
     current_date?: string;
+    next_date?: string;
     user?: { id: number; name?: string; email?: string };
     details?: string;
 }
@@ -215,8 +216,8 @@ export function RecurringSchedulesIndex({
                                         </TableCell>
                                         <TableCell className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm text-gray-900">{new Date(row.start_date).toLocaleDateString()}</div>
-                                            {row.current_date && (
-                                                <div className="text-xs text-gray-500 mt-0.5">Next: {row.current_date}</div>
+                                            {(row.next_date || row.current_date) && (
+                                                <div className="text-xs text-gray-500 mt-0.5">Next: {new Date(row.next_date || row.current_date!).toLocaleDateString()}</div>
                                             )}
                                         </TableCell>
                                         <TableCell className="px-6 py-4 whitespace-nowrap text-center">

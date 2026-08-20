@@ -174,4 +174,60 @@ class AdminRecurringBusinessTest extends TestCase
         $this->assertArrayHasKey('id', $transactions[0], 'Each transaction must include id.');
         $this->assertSame($cost->id, $transactions[0]['id']);
     }
+
+    public function test_recurring_cost_computes_accurate_next_execution_date(): void
+    {
+        $rc = new RecurringCost;
+        $rc->title = 'WE Internet';
+        $rc->amount = 1054;
+        $rc->currency_id = $this->currency->id;
+        $rc->start_date = '2023-01-01';
+        $rc->current_date = '2023-01-01';
+        $rc->recurring = 'month';
+        $rc->recurring_times = 1;
+        $rc->recurring_times_month = '19';
+        $rc->reason = 'internet';
+        $rc->is_active = true;
+        $rc->save();
+
+        $nextDate = $rc->getNextExecutionDate();
+        $this->assertNotNull($nextDate);
+        $this->assertSame('19', $nextDate->format('d'));
+        $this->assertTrue($nextDate->greaterThanOrEqualTo(now()->startOfDay()));
+
+        $response = $this->actingAs($this->admin)->get(route('admin.recurring_costs.index'));
+        $response->assertStatus(200);
+
+        $props = $response->original->getData()['page']['props'];
+        $costs = $props['costs']['data'] ?? [];
+        $this->assertNotEmpty($costs);
+        $costItem = collect($costs)->firstWhere('id', $rc->id);
+        $this->assertNotNull($costItem);
+        $this->assertArrayHasKey('next_date', $costItem);
+        $this->assertSame($nextDate->toDateString(), $costItem['next_date']);
+    }
+
+    public function test_admin_can_generate_missing_recurring_cost_runs(): void
+    {
+        $rc = new RecurringCost;
+        $rc->title = 'Server Infra';
+        $rc->amount = 100;
+        $rc->currency_id = $this->currency->id;
+        $rc->start_date = now()->subMonths(3)->startOfMonth()->toDateString();
+        $rc->current_date = $rc->start_date;
+        $rc->recurring = 'month';
+        $rc->recurring_times = 1;
+        $rc->recurring_times_month = '1';
+        $rc->reason = 'server';
+        $rc->is_active = true;
+        $rc->save();
+
+        $response = $this->actingAs($this->admin)->post(route('admin.recurring_costs.generate_missing', $rc->id));
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertGreaterThanOrEqual(3, $rc->transactions()->count());
+    }
 }
+
+

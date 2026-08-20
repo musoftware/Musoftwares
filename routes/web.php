@@ -181,11 +181,28 @@ Route::post('/estimator/generate-quotation', [HomeController::class, 'generateQu
 Route::get('/quotation/{code}', [HomeController::class, 'showQuotation'])->name('public.quotation.show');
 Route::get('/custom-solutions', [HomeController::class, 'customSolutions'])->name('custom-solutions');
 
+// Tech Comparisons & Benchmarks
+Route::get('/compare/laravel-vs-nodejs', [HomeController::class, 'compare'])->name('compare.laravel-vs-nodejs');
+Route::get('/compare/{slug}', [HomeController::class, 'compare'])->name('compare.show');
 
-// Short Alias Redirects (301) to prevent 404
+// System Architecture Wizard & Onboarding
+Route::get('/start-project', [HomeController::class, 'startProject'])->name('start-project');
+Route::get('/build', [HomeController::class, 'startProject'])->name('build');
+Route::get('/wizard', [HomeController::class, 'startProject'])->name('wizard');
+Route::get('/system-builder', [HomeController::class, 'startProject'])->name('system-builder');
+
+// Leadership Bio
+Route::get('/about/mahmoud-amin', [HomeController::class, 'leadershipBio'])->name('about.mahmoud-amin');
+Route::get('/leadership', [HomeController::class, 'leadershipBio'])->name('leadership');
+
+Route::redirect('/pricing', '/estimator', 301);
 Route::redirect('/cost', '/estimator', 301);
 Route::redirect('/tools/cost', '/estimator', 301);
 Route::redirect('/tools/website-cost', '/estimator', 301);
+Route::redirect('/docs', '/portfolio', 301);
+Route::redirect('/about', '/company/about', 301);
+Route::redirect('/about/mahmoud-sakr', '/about/mahmoud-amin', 301);
+Route::redirect('/mahmoud-amin', '/about/mahmoud-amin', 301);
 Route::redirect('/privacy', '/privacy-policy', 301);
 Route::redirect('/terms', '/terms-of-service', 301);
 Route::redirect('/cookies', '/cookie-policy', 301);
@@ -193,7 +210,7 @@ Route::redirect('/legal/privacy', '/privacy-policy', 301);
 Route::redirect('/legal/terms', '/terms-of-service', 301);
 Route::redirect('/legal/cookies', '/cookie-policy', 301);
 
-// Pricing
+// Pricing Route (Fallback alias)
 Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 
 // Sitemap
@@ -205,10 +222,6 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 // Public Free Tools
 Route::get('/tools', [PublicToolsController::class, 'index'])->name('public.tools.index');
 Route::get('/tools/image-cropper', [PublicToolsController::class, 'imageCropper'])->name('public.tools.image-cropper');
-
-Route::get('/cost', [PublicToolsController::class, 'websiteCostCalculator'])->name('public.tools.cost');
-Route::get('/tools/cost', [PublicToolsController::class, 'websiteCostCalculator']);
-Route::redirect('/tools/website-cost', '/cost', 301);
 Route::get('/tools/facebook-page-cost', [PublicToolsController::class, 'facebookCostCalculator'])->name('public.tools.facebook-cost');
 Route::get('/tools/invoice-generator', [PublicToolsController::class, 'invoiceGenerator'])->name('public.tools.invoice-generator');
 Route::get('/tools/website-checker', [PublicToolsController::class, 'websiteChecker'])->name('public.tools.website-checker');
@@ -1198,6 +1211,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::delete('costs/{id}/delete', [RecurringBusinessController::class, 'recurring_costs_delete'])->name('recurring_costs.delete');
         Route::delete('costs/{id}/delete-with-transaction', [RecurringBusinessController::class, 'recurring_costs_delete_with_transaction'])->name('recurring_costs.delete_with_transaction');
         Route::post('costs/{id}/toggle-status', [RecurringBusinessController::class, 'toggle_recurring_costs'])->name('recurring_costs.toggle');
+        Route::post('costs/{id}/generate-missing', [RecurringBusinessController::class, 'recurring_costs_generate_missing'])->name('recurring_costs.generate_missing');
 
         // Income
         Route::get('income', [RecurringBusinessController::class, 'recurring_income'])->name('recurring_income.index');
@@ -1208,6 +1222,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::delete('income/{id}/delete', [RecurringBusinessController::class, 'recurring_income_delete'])->name('recurring_income.delete');
         Route::delete('income/{id}/delete-with-transaction', [RecurringBusinessController::class, 'recurring_income_delete_with_transaction'])->name('recurring_income.delete_with_transaction');
         Route::post('income/{id}/toggle-status', [RecurringBusinessController::class, 'toggle_recurring_income'])->name('recurring_income.toggle');
+        Route::post('income/{id}/generate-missing', [RecurringBusinessController::class, 'recurring_income_generate_missing'])->name('recurring_income.generate_missing');
 
         // Salaries
         Route::get('salaries', [RecurringBusinessController::class, 'recurring_salaries'])->name('recurring_salaries.index');
@@ -1217,6 +1232,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::get('salaries/{id}', [RecurringBusinessController::class, 'recurring_salaries_view'])->name('recurring_salaries.view');
         Route::delete('salaries/{id}/delete', [RecurringBusinessController::class, 'recurring_salaries_delete'])->name('recurring_salaries.delete');
         Route::post('salaries/{id}/toggle-status', [RecurringBusinessController::class, 'toggle_recurring_salaries'])->name('recurring_salaries.toggle');
+        Route::post('salaries/{id}/generate-missing', [RecurringBusinessController::class, 'recurring_salaries_generate_missing'])->name('recurring_salaries.generate_missing');
 
         // Invoices
         Route::get('invoices', [RecurringInvoiceController::class, 'index'])->name('recurring_invoices.index');
@@ -1227,6 +1243,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::get('invoices/{id}', [RecurringInvoiceController::class, 'view'])->name('recurring_invoices.view');
         Route::delete('invoices/{id}/delete', [RecurringInvoiceController::class, 'delete'])->name('recurring_invoices.delete');
         Route::post('invoices/{id}/toggle-status', [RecurringInvoiceController::class, 'toggle'])->name('recurring_invoices.toggle');
+        Route::post('invoices/{id}/generate-missing', [RecurringInvoiceController::class, 'generateMissing'])->name('recurring_invoices.generate_missing');
         Route::delete('invoices/{invoice}/records/{record}', [RecurringInvoiceController::class, 'deleteRecord'])->name('recurring_invoices.records.delete');
 
         // Notices — managed inline from the Board page (no admin CRUD pages).

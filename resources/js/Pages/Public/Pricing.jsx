@@ -1,19 +1,19 @@
 import { useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { Check, ChevronRight, MessageSquare, Sparkles, Calculator, ShieldCheck } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
+import { Check } from 'lucide-react';
 import PricingBuilder from '@/Components/PricingBuilder';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { __ } from '@/lib/i18n';
+import StudioHeader from '@/Components/Studio/StudioHeader';
+import { openWhatsAppChat } from '@/lib/whatsapp';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Pricing({ currency = 'USD', serviceItems = [], targetModule = null, targetTool = null, targetPlan = null }) {
     const mainRef = useRef(null);
-    const phoneNumber = "201015218548";
 
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
@@ -46,197 +46,175 @@ export default function Pricing({ currency = 'USD', serviceItems = [], targetMod
 
     return (
         <PublicLayout>
-            <Head title={`${__('general.pricing') || 'Pricing'} | Musoftware`}>
+            <Head title={`${__('general.pricing') || 'Pricing'} | Musoftwares Studio`}>
                 <meta name="description" content="Transparent pricing for SaaS subscriptions and dedicated engineering blocks." />
             </Head>
 
-            <div ref={mainRef} className="w-full bg-white text-[#1d1d1f] font-sans selection:bg-[#1d1d1f] selection:text-white pt-12 sm:pt-20 pb-20 sm:pb-32">
+            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
                 
-                {/* Hero Section */}
-                <section className="px-6 max-w-5xl mx-auto flex flex-col items-center text-center mb-20 sm:mb-28 reveal-section">
-                    <p className="text-base sm:text-xl text-[#86868b] font-medium mb-3 sm:mb-4 tracking-tight">
-                        {__('general.pricing') || 'Transparent Pricing'}
-                    </p>
+                {/* Reusable Studio Hero Section */}
+                <div className="reveal-section">
+                    <StudioHeader
+                        badge={__('general.pricing') || 'Transparent Pricing'}
+                        title={
+                            <>
+                                Transparent Investment. <br className="hidden sm:inline" />
+                                <span className="text-[#748660]">Zero Hidden Surprises.</span>
+                            </>
+                        }
+                        subtitle={__('general.no_hidden_fees_choose_a_prebuilt_saas_su') || 'Choose from our cloud-ready platforms or book dedicated engineering blocks for bespoke development.'}
+                    />
 
-                    <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[86px] leading-[1.05] font-bold text-[#1d1d1f] max-w-5xl mb-6 tracking-tight">
-                        {__('general.transparent_engineering_costs') || 'Transparent Investment.'} <br className="hidden sm:inline" />
-                        <span className="bg-gradient-to-r from-[#0066cc] to-[#3399ff] bg-clip-text text-transparent">
-                            Zero Hidden Costs.
-                        </span>
-                    </h1>
-
-                    <p className="text-lg sm:text-2xl md:text-[26px] text-[#86868b] max-w-3xl mb-10 sm:mb-12 font-medium leading-snug tracking-tight">
-                        {__('general.no_hidden_fees_choose_a_prebuilt_saas_su') || 'Choose from our cloud-ready platforms or book dedicated engineering blocks for custom development.'}
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto items-center justify-center">
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center -mt-8 mb-24">
                         <button
-                            onClick={() => openWhatsApp("Hello Mahmoud, I'd like to discuss pricing options.")}
-                            className="bg-[#1d1d1f] hover:bg-[#333336] text-white px-8 py-3.5 rounded-full text-[17px] font-semibold w-full sm:w-auto transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-95"
+                            onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to discuss pricing options.")}
+                            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 text-xs font-bold font-mono tracking-widest rtl:tracking-normal uppercase transition-all"
                         >
-                            Talk with Architect
+                            {__('general.talk_with_architect') || 'TALK WITH ARCHITECT'}
                         </button>
                         <Link
                             href="/estimator"
-                            className="text-[#0066cc] hover:text-[#0077ed] text-[17px] font-semibold flex items-center gap-1 group transition-colors cursor-pointer"
+                            className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 text-xs font-bold font-mono tracking-widest rtl:tracking-normal uppercase transition-all"
                         >
-                            <span>Calculate Your Estimate</span>
-                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
+                            {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'} ➔
                         </Link>
                     </div>
-                </section>
+                </div>
 
-                {/* 1. ENGINEERING BLOCKS & HOURLY MODELS (Apple Card Grid) */}
-                <section className="px-6 max-w-7xl mx-auto mb-24 sm:mb-32 reveal-section">
-                    <div className="text-center mb-16 sm:mb-20">
-                        <h2 className="text-3xl sm:text-5xl font-bold text-[#1d1d1f] mb-4 tracking-tight leading-tight">
-                            {__('general.engineering_blocks') || 'Engineering Sprints & Blocks'}
+                {/* 1. ENGINEERING BLOCKS & HOURLY MODELS */}
+                <section className="px-6 max-w-[1400px] mx-auto mb-24 sm:mb-32 reveal-section">
+                    <div className="text-center mb-16">
+                        <h2 className="text-2xl sm:text-4xl font-bold text-white mb-3 tracking-tight font-sans">
+                            {__('general.engineering_blocks') || 'Engineering Sprints & Retainers'}
                         </h2>
-                        <p className="text-base sm:text-xl text-[#86868b] max-w-2xl mx-auto font-medium tracking-tight">
+                        <p className="text-sm font-sans text-zinc-400 max-w-2xl mx-auto leading-relaxed">
                             {__('general.for_businesses_that_need_custom_developm') || 'Direct engineering hours with dedicated architecture, code reviews, and rapid delivery.'}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Fix & Improve */}
-                        <div className="bg-[#f5f5f7] rounded-[28px] p-8 sm:p-10 flex flex-col justify-between h-full">
+                        <div className="bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between h-full">
                             <div>
-                                <div className="text-[13px] font-semibold text-[#86868b] mb-6 uppercase tracking-wider">
+                                <div className="text-xs font-mono font-bold text-zinc-400 mb-6 uppercase tracking-widest rtl:tracking-normal">
                                     {__('general.maintenance_retainer') || 'Fix & Improve'}
                                 </div>
                                 <div className="mb-4 flex items-baseline gap-2">
-                                    <span className="text-[44px] sm:text-[48px] font-bold text-[#1d1d1f] tracking-tight">$45</span>
-                                    <span className="text-[17px] text-[#86868b] font-medium">/ 5h block</span>
+                                    <span className="text-4xl sm:text-5xl font-bold font-mono text-white">$45</span>
+                                    <span className="text-xs font-mono text-zinc-400">/ 5h block</span>
                                 </div>
-                                <p className="text-[15px] text-[#1d1d1f] mb-8 leading-relaxed font-medium">
+                                <p className="text-sm text-zinc-300 mb-8 leading-relaxed font-sans">
                                     {__('general.ideal_for_existing_projects_that_need_bu') || 'Ideal for urgent bug fixes, server maintenance, or minor system updates.'}
                                 </p>
-                                <ul className="space-y-3.5 mb-10">
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">{__('general.bug_fixes_and_patches') || 'Codebase debugging & patches'}</span>
+                                <ul className="space-y-3.5 mb-10 text-xs font-sans">
+                                    <li className="flex items-start gap-3 text-zinc-300">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>{__('general.bug_fixes_and_patches') || 'Codebase debugging & patches'}</span>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">{__('general.server_monitoring') || 'Server monitoring & health check'}</span>
+                                    <li className="flex items-start gap-3 text-zinc-300">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>{__('general.server_monitoring') || 'Server monitoring & health check'}</span>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">{__('general.security_updates') || 'Security & package updates'}</span>
+                                    <li className="flex items-start gap-3 text-zinc-300">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>{__('general.security_updates') || 'Security & package updates'}</span>
                                     </li>
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openWhatsApp("Hello Mahmoud, I want to book a 5h Fix & Improve block.")}
-                                className="text-[#0066cc] hover:text-[#0077ed] text-[17px] font-semibold flex items-center gap-1 group transition-colors cursor-pointer justify-center"
+                                onClick={() => openWhatsAppChat("Hello Mahmoud, I want to book a 5h Fix & Improve block.")}
+                                className="w-full py-3 border border-white text-white hover:bg-white hover:text-black text-xs font-mono font-bold tracking-widest rtl:tracking-normal uppercase transition-colors text-center"
                             >
-                                <span>Book 5h Block</span>
-                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" strokeWidth={2.5} />
+                                BOOK 5H BLOCK ➔
                             </button>
                         </div>
 
-                        {/* Build New (Most Popular) */}
-                        <div className="bg-[#f5f5f7] rounded-[28px] p-8 sm:p-10 flex flex-col justify-between h-full relative border border-[#0066cc]/20 shadow-xs">
-                            <div className="absolute top-8 end-8 text-[11px] sm:text-[12px] font-bold text-[#0066cc] uppercase tracking-wider bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/60">
-                                {__('general.most_popular') || 'Most Popular'}
+                        {/* Build New (Signature Sage Green Block) */}
+                        <div className="bg-[#1A2215] border-2 border-[#748660] p-8 sm:p-10 flex flex-col justify-between h-full relative">
+                            <div className="absolute top-6 end-6 text-[10px] font-mono font-bold uppercase tracking-widest rtl:tracking-normal bg-[#748660] text-black px-2.5 py-0.5">
+                                {__('general.most_popular') || 'Recommended'}
                             </div>
                             <div>
-                                <div className="text-[13px] font-semibold text-[#1d1d1f] mb-6 uppercase tracking-wider">
-                                    {__('general.custom_build') || 'Build New Feature'}
+                                <div className="text-xs font-mono font-bold text-[#748660] mb-6 uppercase tracking-widest rtl:tracking-normal">
+                                    {__('general.custom_build') || 'Feature Sprint'}
                                 </div>
                                 <div className="mb-4 flex items-baseline gap-2">
-                                    <span className="text-[44px] sm:text-[48px] font-bold text-[#1d1d1f] tracking-tight">$110</span>
-                                    <span className="text-[17px] text-[#86868b] font-medium">/ 12h block</span>
+                                    <span className="text-4xl sm:text-5xl font-bold font-mono text-white">$110</span>
+                                    <span className="text-xs font-mono text-zinc-400">/ 12h sprint</span>
                                 </div>
-                                <p className="text-[15px] text-[#1d1d1f] mb-8 leading-relaxed font-medium">
+                                <p className="text-sm text-zinc-300 mb-8 leading-relaxed font-sans">
                                     {__('general.for_building_new_mvps_saas_platforms_or') || 'Perfect for developing specific new modules or integrating third-party APIs.'}
                                 </p>
-                                <ul className="space-y-3.5 mb-10">
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">{__('general.fullstack_development') || 'Full-stack feature engineering'}</span>
+                                <ul className="space-y-3.5 mb-10 text-xs font-sans">
+                                    <li className="flex items-start gap-3 text-zinc-200">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>{__('general.fullstack_development') || 'Full-stack feature engineering'}</span>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">{__('general.database_architecture') || 'Database & API integrations'}</span>
+                                    <li className="flex items-start gap-3 text-zinc-200">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>{__('general.database_architecture') || 'Database & API integrations'}</span>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">Priority engineering queue</span>
+                                    <li className="flex items-start gap-3 text-zinc-200">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>Priority architect queue</span>
                                     </li>
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openWhatsApp("Hello Mahmoud, I want to book a 12h Build New sprint.")}
-                                className="text-[#0066cc] hover:text-[#0077ed] text-[17px] font-semibold flex items-center gap-1 group transition-colors cursor-pointer justify-center"
+                                onClick={() => openWhatsAppChat("Hello Mahmoud, I want to book a 12h Build New sprint.")}
+                                className="w-full py-3 bg-[#748660] text-black hover:bg-[#869970] text-xs font-mono font-bold tracking-widest rtl:tracking-normal uppercase transition-colors text-center"
                             >
-                                <span>Book 12h Sprint</span>
-                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" strokeWidth={2.5} />
+                                BOOK 12H SPRINT ➔
                             </button>
                         </div>
 
-                        {/* Growth Partner / Custom Scope */}
-                        <div className="bg-[#f5f5f7] rounded-[28px] p-8 sm:p-10 flex flex-col justify-between h-full">
+                        {/* Dedicated Retainer */}
+                        <div className="bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between h-full">
                             <div>
-                                <div className="text-[13px] font-semibold text-[#86868b] mb-6 uppercase tracking-wider">
-                                    {__('general.growth_partner') || 'Full Platform'}
+                                <div className="text-xs font-mono font-bold text-zinc-400 mb-6 uppercase tracking-widest rtl:tracking-normal">
+                                    Full Architecture Retainer
                                 </div>
-                                <div className="mb-4 h-[56px] flex items-end">
-                                    <span className="text-[28px] sm:text-[32px] font-bold text-[#1d1d1f] tracking-tight leading-none pb-1">Custom Scope</span>
+                                <div className="mb-4 flex items-baseline gap-2">
+                                    <span className="text-4xl sm:text-5xl font-bold font-mono text-white">$450</span>
+                                    <span className="text-xs font-mono text-zinc-400">/ 50h retainer</span>
                                 </div>
-                                <p className="text-[15px] text-[#1d1d1f] mb-8 leading-relaxed font-medium">
-                                    {__('general.for_scaling_companies_that_need_an_exter') || 'Complete architecture, end-to-end MVP execution, or dedicated team partnership.'}
+                                <p className="text-sm text-zinc-300 mb-8 leading-relaxed font-sans">
+                                    Full-cycle dedicated engineering team supporting ongoing scale, features, and security.
                                 </p>
-                                <ul className="space-y-3.5 mb-10">
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">{__('general.technical_leadership') || 'Direct software architect leadership'}</span>
+                                <ul className="space-y-3.5 mb-10 text-xs font-sans">
+                                    <li className="flex items-start gap-3 text-zinc-300">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>Continuous deployment & CI/CD</span>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">{__('general.code_reviews_audits') || 'Full architecture & system design'}</span>
+                                    <li className="flex items-start gap-3 text-zinc-300">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>Direct Slack / WhatsApp channel</span>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <Check className="w-4 h-4 text-[#86868b] shrink-0 mt-1" strokeWidth={2.5} />
-                                        <span className="text-[15px] text-[#86868b] font-medium">Long-term SLA and deployment support</span>
+                                    <li className="flex items-start gap-3 text-zinc-300">
+                                        <Check className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                        <span>24/7 emergency incident coverage</span>
                                     </li>
                                 </ul>
                             </div>
-                            <Link
-                                href="/estimator"
-                                className="text-[#0066cc] hover:text-[#0077ed] text-[17px] font-semibold flex items-center gap-1 group transition-colors cursor-pointer justify-center"
+                            <button
+                                onClick={() => openWhatsAppChat("Hello Mahmoud, I want to book a 50h Dedicated Retainer.")}
+                                className="w-full py-3 border border-white text-white hover:bg-white hover:text-black text-xs font-mono font-bold tracking-widest rtl:tracking-normal uppercase transition-colors text-center"
                             >
-                                <span>Get Custom Quote</span>
-                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" strokeWidth={2.5} />
-                            </Link>
+                                BOOK 50H RETAINER ➔
+                            </button>
                         </div>
                     </div>
                 </section>
 
-                {/* 2. SAAS SUBSCRIPTIONS & PLATFORMS BUILDER */}
-                <section className="px-6 max-w-7xl mx-auto pt-16 border-t border-[#d2d2d7]/50 reveal-section">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f5f7] border border-[#d2d2d7]/60 text-[#86868b] text-xs font-semibold mb-3 uppercase tracking-wider">
-                            <span>SaaS &amp; Cloud Modules</span>
-                        </div>
-                        <h2 className="text-3xl sm:text-5xl font-bold text-[#1d1d1f] mb-4 tracking-tight leading-tight">
-                            Ready Cloud Subscriptions
-                        </h2>
-                        <p className="text-[#86868b] text-base sm:text-lg">
-                            {__('general.readytouse_platforms_built_by_us_subscri') || 'Deploy and run your business operations with our dedicated cloud-ready platforms.'}
-                        </p>
-                    </div>
-
-                    <div className="max-w-7xl mx-auto">
-                        <PricingBuilder 
-                            serviceItems={serviceItems} 
-                            currency={currency} 
-                            isNewSystem={true} 
-                            targetModule={targetModule}
-                            targetTool={targetTool}
-                            targetPlan={targetPlan}
-                        />
-                    </div>
+                {/* 2. DYNAMIC PRICING CALCULATOR */}
+                <section className="px-6 max-w-[1400px] mx-auto reveal-section border-t border-[#222222] pt-20">
+                    <PricingBuilder 
+                        currency={currency} 
+                        serviceItems={serviceItems} 
+                        targetModule={targetModule} 
+                        targetTool={targetTool} 
+                        targetPlan={targetPlan} 
+                    />
                 </section>
 
             </div>

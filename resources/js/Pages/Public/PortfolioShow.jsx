@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Globe, Layers } from 'lucide-react';
 import { portfolioItems } from '@/lib/portfolioData';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -24,7 +24,7 @@ export default function PortfolioShow({ slug, dbProject = null }) {
             return {
                 slug: staticItem.slug,
                 img: staticItem.img,
-                img_original: staticItem.img, // fallback to standard
+                img_original: staticItem.img,
                 title: (rawTitle && !rawTitle.startsWith('general.')) ? rawTitle : staticItem.slug,
                 desc: (rawDesc && !rawDesc.startsWith('general.')) ? rawDesc : '',
                 content: (rawContent && !rawContent.startsWith('general.')) ? rawContent : `<p>${rawDesc || ''}</p>`,
@@ -64,11 +64,11 @@ export default function PortfolioShow({ slug, dbProject = null }) {
     if (!item) {
         return (
             <PublicLayout>
-                <div className="min-h-[60vh] flex items-center justify-center bg-[#fafafa]">
-                    <div className="text-center">
-                        <h2 className="text-3xl font-bold text-[#111111] mb-4">{__('general.not_found') || 'Not Found'}</h2>
-                        <Link href={route('portfolio')} className="text-[#666666] font-semibold hover:text-[#111111] underline transition-colors">
-                            {__('general.back_to_portfolio') || 'Back to Portfolio'}
+                <div className="min-h-[60vh] flex items-center justify-center bg-[#111111] text-white font-mono">
+                    <div className="text-center space-y-4">
+                        <h2 className="text-2xl font-bold text-white uppercase tracking-widest">{__('general.not_found') || 'Case Study Not Found'}</h2>
+                        <Link href="/portfolio" className="text-xs text-[#748660] hover:underline uppercase tracking-wider block">
+                            ➔ {__('general.back_to_portfolio') || 'Back to Studio Archive'}
                         </Link>
                     </div>
                 </div>
@@ -78,87 +78,108 @@ export default function PortfolioShow({ slug, dbProject = null }) {
 
     return (
         <PublicLayout>
-            <Head title={`${item.title} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}>
+            <Head title={`${item.title} | ${__('general.musoftware_unified_workspace') || 'Musoftwares'}`}>
                 <meta name="description" content={item.desc} />
             </Head>
 
-            <div ref={mainRef} className="w-full bg-[#fafafa] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
+            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white overflow-x-hidden pt-12 pb-28">
+                
                 {/* HERO SECTION */}
-                <section className="pt-32 pb-16 lg:pt-40 lg:pb-24 bg-[#fafafa] border-b border-[#e5e5e5] reveal-section">
-                    <div className="max-w-[80rem] mx-auto px-6 lg:px-8">
-                        <Link 
-                            href={route('portfolio')} 
-                            className="gsap-fade-up inline-flex items-center text-xs font-bold uppercase tracking-widest text-[#888888] hover:text-[#111111] transition-colors mb-12"
-                        >
-                            <ArrowLeft className="w-4 h-4 me-2 rtl:ms-2 rtl:me-0 rtl:rotate-180" />
-                            {__('general.back_to_portfolio') || 'Back to Portfolio'}
-                        </Link>
+                <section className="max-w-[1400px] mx-auto px-6 lg:px-8 mb-20 reveal-section">
+                    <Link 
+                        href="/portfolio" 
+                        className="gsap-fade-up inline-flex items-center text-xs font-mono font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors mb-10"
+                    >
+                        <ArrowLeft className="w-3.5 h-3.5 me-2 rtl:ms-2 rtl:me-0 rtl:rotate-180" />
+                        {__('general.back_to_portfolio') || 'STUDIO ARCHIVE'}
+                    </Link>
 
-                        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-                            <div>
-                                <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-6 bg-white">
-                                    <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                                    {item.cat}
+                    <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+                        
+                        {/* Meta & Project Brief (5 cols) */}
+                        <div className="lg:col-span-5 space-y-6 font-mono">
+                            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-[#748660] bg-[#1E2619] border border-[#748660]/40 px-3 py-1">
+                                {item.cat}
+                            </span>
+                            <h1 className="gsap-fade-up text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-sans">
+                                {item.title}
+                            </h1>
+                            <p className="gsap-fade-up text-xs sm:text-sm text-zinc-400 leading-relaxed font-mono">
+                                {item.desc}
+                            </p>
+                            
+                            {item.techs && item.techs.length > 0 && (
+                                <div className="pt-4 border-t border-[#262626] space-y-2">
+                                    <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                                        Engineered With:
+                                    </span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {item.techs.map((tech, idx) => (
+                                            <span key={idx} className="text-[11px] font-mono bg-black border border-[#2B2B2B] text-zinc-300 px-2.5 py-1">
+                                                {tech}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
-                                <h1 className="gsap-fade-up text-4xl lg:text-6xl font-bold tracking-tight text-[#111111] leading-[1.05] mb-6">
-                                    {item.title}
-                                </h1>
-                                <p className="gsap-fade-up text-xl text-[#666666] leading-relaxed font-normal mb-8">
-                                    {item.desc}
-                                </p>
-                                
-                                {item.live_url && (
+                            )}
+
+                            {item.live_url && (
+                                <div className="pt-4">
                                     <a 
                                         href={item.live_url} 
                                         target="_blank" 
                                         rel="noopener noreferrer" 
-                                        className="gsap-fade-up inline-flex items-center gap-2 px-6 py-3.5 bg-[#111111] hover:bg-[#333333] text-white rounded-lg text-sm font-bold uppercase tracking-wider transition-colors duration-300 shadow-sm"
+                                        className="gsap-fade-up inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black hover:bg-zinc-200 text-xs font-bold font-mono uppercase tracking-widest transition-colors shadow-sm"
                                     >
-                                        {__('general.visit_live_website') || 'Visit Live Website'}
+                                        <Globe className="w-4 h-4" />
+                                        <span>{__('general.visit_live_website') || 'LAUNCH PLATFORM'} ➔</span>
                                     </a>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Browser Showcase Screen (7 cols) */}
+                        <div className="lg:col-span-7 gsap-fade-up bg-[#161616] border border-[#2B2B2B] overflow-hidden flex flex-col h-[520px]">
+                            {/* Browser Mockup Bar */}
+                            <div className="bg-black border-b border-[#2B2B2B] px-4 py-3 flex items-center gap-2 shrink-0">
+                                <div className="flex gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-zinc-700"></span>
+                                    <span className="w-2.5 h-2.5 rounded-full bg-zinc-700"></span>
+                                    <span className="w-2.5 h-2.5 rounded-full bg-zinc-700"></span>
+                                </div>
+                                <div className="flex-1 bg-[#141414] border border-[#262626] px-3 py-1 text-[11px] text-zinc-400 truncate text-center font-mono">
+                                    {item.live_url || 'https://www.musoftwares.com'}
+                                </div>
+                            </div>
+                            {/* Image Showcase */}
+                            <div className="flex-1 overflow-y-auto bg-black flex items-center justify-center p-4">
+                                {item.img_original || item.img ? (
+                                    <img 
+                                        src={item.img_original || item.img} 
+                                        alt={item.title} 
+                                        className="w-full h-auto object-contain transition-all" 
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-zinc-600 font-mono text-xs">
+                                        [PREVIEW UNAVAILABLE]
+                                    </div>
                                 )}
                             </div>
-                            
-                            <div className="gsap-fade-up bg-white border border-[#e5e5e5] rounded-xl overflow-hidden shadow-lg flex flex-col h-[500px]">
-                                {/* Browser Mockup Header */}
-                                <div className="bg-[#f4f4f5] border-b border-[#e5e5e5] px-4 py-3 flex items-center gap-2 shrink-0">
-                                    <div className="flex gap-1.5">
-                                        <span className="w-3 h-3 rounded-full bg-[#ef4444]"></span>
-                                        <span className="w-3 h-3 rounded-full bg-[#eab308]"></span>
-                                        <span className="w-3 h-3 rounded-full bg-[#22c55e]"></span>
-                                    </div>
-                                    <div className="flex-1 bg-white border border-[#e5e5e5] rounded px-3 py-0.5 text-xs text-[#888888] truncate select-all text-center font-mono">
-                                        {item.live_url || 'https://www.musoftwares.com'}
-                                    </div>
-                                </div>
-                                {/* Scrollable Image Container */}
-                                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
-                                    {item.img_original || item.img ? (
-                                        <img 
-                                            src={item.img_original || item.img} 
-                                            alt={item.title} 
-                                            className="w-full h-auto object-contain transition-all duration-500" 
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-medium">
-                                            No Image
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
                         </div>
+
                     </div>
                 </section>
 
                 {/* DETAILED CONTENT SECTION */}
-                <section className="py-24 lg:py-32 bg-white reveal-section">
+                <section className="py-16 border-t border-[#222222] reveal-section">
                     <div className="max-w-4xl mx-auto px-6 lg:px-8">
                         <div 
-                            className="gsap-fade-up prose prose-lg max-w-none text-[#666666] prose-headings:text-[#111111] prose-headings:font-bold prose-headings:tracking-tight prose-a:text-[#111111] prose-a:font-semibold hover:prose-a:text-[#666666] prose-img:border prose-img:border-[#e5e5e5] prose-img:rounded-none rtl:prose-p:text-end rtl:prose-headings:text-end rtl:prose-ul:text-end rtl:prose-li:text-end rtl:prose-blockquote:text-end rtl:prose-blockquote:border-e-4 rtl:prose-blockquote:border-s-0 rtl:prose-blockquote:pe-4 rtl:prose-blockquote:ps-0"
+                            className="gsap-fade-up prose prose-invert prose-p:text-zinc-400 prose-p:font-mono prose-p:text-xs sm:prose-p:text-sm prose-headings:text-white prose-headings:font-sans prose-a:text-[#748660] max-w-none rtl:prose-p:text-end rtl:prose-headings:text-end rtl:prose-ul:text-end"
                             dangerouslySetInnerHTML={{ __html: item.content }}
                         />
                     </div>
                 </section>
+
             </div>
         </PublicLayout>
     );

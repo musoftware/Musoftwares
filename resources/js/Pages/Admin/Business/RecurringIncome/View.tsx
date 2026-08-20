@@ -2,12 +2,23 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { ArrowLeft, Calendar, Clock, DollarSign, List, History, AlertCircle, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, DollarSign, List, History, AlertCircle, Edit, Trash2, Play } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
 export default function View({ income, transactions, upcomingSchedule, total_stat }) {
     const [activeTab, setActiveTab] = useState<'history' | 'schedule'>('history');
+    const [generating, setGenerating] = useState(false);
+
+    const handleGenerateMissing = () => {
+        if (confirm(__('general.confirm_generate_missing') || 'Are you sure you want to generate all missing past transactions up to today for this schedule?')) {
+            setGenerating(true);
+            router.post(route('admin.recurring_income.generate_missing', income.id), {}, {
+                preserveScroll: true,
+                onFinish: () => setGenerating(false),
+            });
+        }
+    };
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this recurring income?')) {
@@ -28,7 +39,11 @@ export default function View({ income, transactions, upcomingSchedule, total_sta
             <div className="mb-4 flex justify-between items-center">
                 <Link href={route('admin.recurring_income.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
                     <ArrowLeft className="w-4 h-4" />{__('general.back_to_recurring_income')}</Link>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                    <Button variant="default" size="sm" className="bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm" onClick={handleGenerateMissing} disabled={generating}>
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                        {generating ? (__('general.loading') || 'Generating...') : (__('general.generate_missing_transactions') || 'Generate Missing')}
+                    </Button>
                     <Link href={route('admin.recurring_income.edit', income.id)}>
                         <Button variant="outline" size="sm" className="flex items-center gap-1.5">
                             <Edit className="w-4 h-4" /> {__('general.edit')}</Button>
@@ -69,7 +84,7 @@ export default function View({ income, transactions, upcomingSchedule, total_sta
                         <div className="mt-2">
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">{__('general.next_execution_date')}</span>
                             <span className="text-sm font-medium text-slate-800 flex items-center gap-1 mt-0.5">
-                                <Clock className="w-4 h-4 text-slate-500" /> {new Date(income.current_date).toLocaleDateString()}
+                                <Clock className="w-4 h-4 text-slate-500" /> {income.next_date ? new Date(income.next_date).toLocaleDateString() : (income.current_date ? new Date(income.current_date).toLocaleDateString() : '—')}
                             </span>
                         </div>
                     </div>

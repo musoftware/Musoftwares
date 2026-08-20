@@ -183,7 +183,9 @@ export default function Index({ costs, currencies, categories, stats }) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900">{new Date(cost.start_date).toLocaleDateString()}</div>
-                                    <div className="text-xs text-gray-500 mt-0.5">Next: {cost.current_date}</div>
+                                    {(cost.next_date || cost.current_date) && (
+                                        <div className="text-xs text-gray-500 mt-0.5">Next: {new Date(cost.next_date || cost.current_date).toLocaleDateString()}</div>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="bg-slate-100 border text-slate-800 text-xs px-2 py-0.5 rounded font-medium">{cost.reason}</span>
@@ -202,7 +204,9 @@ export default function Index({ costs, currencies, categories, stats }) {
                                     <div className="text-[10px] text-gray-500 mt-1">{cost.is_active ? __('general.active') : __('general.inactive')}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">{__('general.active_log')}</span>
+                                    <span className="text-xs font-medium text-slate-700 bg-slate-100 border px-2.5 py-1 rounded-full">
+                                        {cost.transactions_count ?? 0} {__('general.transactions')}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                     <Link href={route('admin.recurring_costs.view', cost.id)}>

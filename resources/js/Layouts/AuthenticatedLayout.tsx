@@ -28,7 +28,6 @@ import {
     ListTodo,
     Calculator
 } from 'lucide-react';
-import CommandPalette from '@/Components/CommandPalette';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import ProductTourModal from '@/Components/ProductTourModal';
 import BackgroundTaskStatus from '@/Components/Tools/BackgroundTaskStatus';
@@ -150,13 +149,10 @@ function AuthenticatedContent({
         <Link
             href={href}
             className={cn(
-                // Fixed geometry — never changes on hover/active
-                'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none',
-                // Color-only transition
-                'transition-colors duration-150',
+                'inline-flex items-center gap-1.5 h-8 px-3.5 rounded-none text-xs font-mono tracking-wider uppercase leading-none transition-colors duration-150',
                 active
-                    ? 'bg-slate-100 text-slate-900'
-                    : 'text-slate-500 hover:bg-slate-100/60 hover:text-slate-800'
+                    ? 'bg-white text-black font-bold'
+                    : 'text-zinc-400 hover:bg-[#222222] hover:text-white'
             )}
         >
             {children}
@@ -164,12 +160,11 @@ function AuthenticatedContent({
     );
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
+        <div className="min-h-screen bg-[#111111] font-sans text-[#E5E5E5] flex flex-col selection:bg-[#748660] selection:text-white">
             {isImpersonating && (
                 <div
-                    className="bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0"
+                    className="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-700 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0"
                     style={{
-                        /* Push content below iOS status bar on PWA standalone mode */
                         paddingTop: 'env(safe-area-inset-top, 0px)',
                         height: 'calc(36px + env(safe-area-inset-top, 0px))'
                     }}
@@ -185,39 +180,40 @@ function AuthenticatedContent({
                     </div>
                     <Link
                         href={route('admin.stop-impersonate')}
-                        className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0 ms-2"
+                        className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-none border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0 ms-2"
                     >{__('general.stop_impersonation')}</Link>
                 </div>
             )}
 
             {/* Top Navigation */}
             <header
-                className={cn("sticky z-40 w-full bg-white border-b border-slate-200", isImpersonating ? "top-[36px]" : "top-0")}
+                className={cn("sticky z-40 w-full bg-[#111111] border-b border-[#222222]", isImpersonating ? "top-[36px]" : "top-0")}
                 style={{
-                    /* Shift content below iOS notch/dynamic island when running as installed PWA */
                     paddingTop: 'env(safe-area-inset-top, 0px)',
                     height: 'calc(68px + env(safe-area-inset-top, 0px))'
                 }}
             >
-                <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 h-full">
                     <div className="flex h-full items-center justify-between">
                         {/* LEFT: Logo & Nav */}
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-8">
                             {/* Mobile Menu Trigger */}
                             <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                                 <SheetTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="md:hidden -ms-2 text-slate-500">
+                                    <Button variant="ghost" size="icon" className="md:hidden -ms-2 text-zinc-400 hover:text-white">
                                         <Menu className="h-5 w-5" />
                                     </Button>
                                 </SheetTrigger>
-                                <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 bg-white">
+                                <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 bg-[#161616] border-[#2B2B2B] text-white">
                                     <div className="flex flex-col h-full">
-                                        <div className="p-4 border-b border-slate-100">
+                                        <div className="p-5 border-b border-[#222222]">
                                             <SafeLink href="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
-                                                <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
-                                                    <ApplicationLogo className="w-5 h-5 text-white" />
-                                                </div>
-                                                <span className="font-semibold text-lg">musoftware</span>
+                                                <span className="text-xl font-black tracking-tighter text-white font-sans">
+                                                    MUSOFT
+                                                </span>
+                                                <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">
+                                                    STUDIO
+                                                </span>
                                             </SafeLink>
                                         </div>
                                         <div className="flex-1 overflow-y-auto p-4 space-y-6">
@@ -1087,8 +1083,6 @@ function AuthenticatedContent({
                 currentStep={tourStep}
                 onStepChange={setTourStep}
             />
-
-            <CommandPalette />
 
             <Toaster />
             <FloatingWhatsAppButton />

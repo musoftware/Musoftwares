@@ -3,18 +3,16 @@
 @section('content')
 <div class="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
     
-    <!-- Hero Header -->
-    <div class="max-w-4xl mx-auto px-6 text-center space-y-4 mb-16">
+    <!-- Header -->
+    <div class="max-w-4xl mx-auto px-6 text-center space-y-4 mb-20">
         <span class="inline-block px-3 py-1 bg-[#1E2619] border border-[#748660]/40 text-[#748660] text-xs font-mono font-bold uppercase tracking-wider">
-            {{ app()->getLocale() === 'ar' ? 'سجل الإنجازات والأنظمة الحية' : 'Case Studies Archive' }}
+            {{ __('landing_home.portfolio_badge') }}
         </span>
         <h1 class="text-3xl sm:text-5xl font-bold text-white font-sans tracking-tight">
-            {{ app()->getLocale() === 'ar' ? 'سابقة الأعمال والأنظمة المشحونة' : 'Shipped Systems & Enterprise Solutions' }}
+            {{ __('landing_home.portfolio_title') }}
         </h1>
         <p class="text-sm sm:text-base text-zinc-400 font-sans leading-relaxed max-w-2xl mx-auto">
-            {{ app()->getLocale() === 'ar'
-                ? 'أكثر من 30 نظام ومنصة سحابية تعمل في السوق الفعلي، تعالج ملايين المعاملات والبيانات الحساسة يومياً.'
-                : 'Over 30 production platforms operating in live markets, processing high-throughput financial transactions and data streams.' }}
+            {{ __('landing_home.hero_subtitle_1') }}
         </p>
     </div>
 
@@ -22,7 +20,7 @@
     <div class="max-w-[1400px] mx-auto px-6 sm:px-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
-            @forelse($dbProjects as $proj)
+            @forelse($dbProjects ?? [] as $proj)
                 <div class="bg-[#161616] border border-[#262626] overflow-hidden group hover:border-[#748660] transition-colors flex flex-col justify-between">
                     <div>
                         <div class="h-60 bg-zinc-900 overflow-hidden relative">
@@ -120,14 +118,14 @@
         <!-- Bottom CTA -->
         <div class="mt-20 p-12 bg-[#161616] border border-[#262626] text-center space-y-6">
             <h3 class="text-2xl font-bold text-white font-sans">
-                {{ app()->getLocale() === 'ar' ? 'هل تريد نظاماً مصمماً خصيصاً لاحتياجات مؤسستك؟' : 'Need a custom platform engineered for your business?' }}
+                {{ __('landing_home.cta_title') }}
             </h3>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 font-mono text-xs">
                 <a href="/start-project" class="px-8 py-3.5 bg-[#748660] text-[#0F140A] font-bold uppercase tracking-widest hover:bg-[#60704E] transition-all">
-                    {{ app()->getLocale() === 'ar' ? 'ابدأ معالج تصميم النظام ➔' : 'START SCOPING WIZARD ➔' }}
+                    {{ __('landing_home.cta_start_wizard') }}
                 </a>
                 <a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="px-8 py-3.5 border border-[#333333] text-zinc-300 hover:text-white font-bold uppercase tracking-widest hover:border-white transition-all">
-                    {{ app()->getLocale() === 'ar' ? 'استشارة واتساب مباشرة' : 'WHATSAPP DIRECT' }}
+                    {{ __('landing_home.cta_whatsapp') }}
                 </a>
             </div>
         </div>

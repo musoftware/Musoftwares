@@ -12,10 +12,6 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        if (! ($user->enable_3d_dashboard ?? true)) {
-            return redirect()->route('client.projects.index');
-        }
-
         return $this->clientDashboard($user);
     }
 

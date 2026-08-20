@@ -1,149 +1,199 @@
 import { useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { LayoutDashboard, Workflow, Globe, Monitor, ArrowRight } from 'lucide-react';
+import { LayoutDashboard, Workflow, Globe, Monitor, ArrowUpRight } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
-import { Button } from '@/Components/ui/button';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { __ } from '@/lib/i18n';
+import StudioHeader from '@/Components/Studio/StudioHeader';
+import { openWhatsAppChat, STUDIO_PHONE } from '@/lib/whatsapp';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Platforms() {
     const mainRef = useRef(null);
-    const phoneNumber = "201015218548";
 
     useGSAP(() => {
         const sections = gsap.utils.toArray('.reveal-section');
         sections.forEach((section) => {
             const elements = section.querySelectorAll('.gsap-fade-up');
-            gsap.fromTo(elements, 
-                { opacity: 0, y: 30 },
-                {
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 0.8,
-                    stagger: 0.1,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse"
+            if (elements && elements.length > 0) {
+                gsap.fromTo(elements, 
+                    { opacity: 0, y: 20 },
+                    {
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.6,
+                        stagger: 0.08,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        }
                     }
-                }
-            );
+                );
+            }
         });
     }, { scope: mainRef });
-
-    const openWhatsApp = (msg) => {
-        const encodedMessage = encodeURIComponent(msg);
-        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-    };
 
     return (
         <PublicLayout>
             <Head>
-                <title>Platforms | Musoftware</title>
+                <title>{__('general.platforms') || 'Platforms'} | Musoftwares</title>
                 <meta name="description" content="Explore the platforms we build, from internal dashboards to high-performance enterprise systems." />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss building a platform." />
+            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I want to discuss building a platform." />
 
-            <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
+            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white overflow-x-hidden pt-16 sm:pt-24 pb-24 sm:pb-36">
                 
-                <section className="pt-20 pb-16 sm:pt-32 sm:pb-24 lg:pt-40 lg:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto reveal-section border-b border-[#e5e5e5]">
-                    <div className="max-w-4xl mb-12 sm:mb-20">
-                        <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-6 sm:mb-8 bg-white rounded-full">
-                            <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            {__('general.platforms')}</div>
-                        <h1 className="gsap-fade-up text-3xl sm:text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.1] mb-4 sm:mb-6">
-                            {__('general.scalable_digital_platforms')}</h1>
-                        <p className="gsap-fade-up text-base sm:text-xl text-[#666666] font-normal leading-relaxed max-w-2xl">
-                            {__('general.we_dont_just_write_code') || "We don't just write code; we build robust platforms that serve as the operational backbone of your business."}
-                        </p>
-                    </div>
+                {/* Hero Header */}
+                <div className="reveal-section">
+                    <StudioHeader
+                        badge={__('general.platforms') || 'Digital Architecture'}
+                        title={
+                            <>
+                                Scalable Digital Platforms. <br className="hidden sm:inline" />
+                                <span className="text-[#748660]">Engineered For Longevity.</span>
+                            </>
+                        }
+                        subtitle={__('general.we_dont_just_write_code') || "We don't just write code; we build robust platforms that serve as the operational backbone of your business."}
+                    />
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-                        <div className="gsap-fade-up p-6 sm:p-10 bg-white border border-[#e5e5e5] rounded-2xl shadow-sm transition-colors group hover:border-[#111111]">
-                            <LayoutDashboard className="w-8 h-8 sm:w-10 sm:h-10 text-[#111111] mb-6" strokeWidth={1.5} />
-                            <h3 className="text-xl sm:text-2xl font-bold text-[#111111] mb-3">{__('general.internal_admin_dashboards')}</h3>
-                            <p className="text-xs sm:text-sm text-[#666666] leading-relaxed mb-6">
-                                {__('general.give_your_team_a_central_hub_to_manage_d')}</p>
-                            <ul className="space-y-3 mb-8">
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.data_visualizations_charts')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.rolebased_permissions')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.realtime_data_updates')}</li>
-                            </ul>
-                            <button onClick={() => openWhatsApp("I'm interested in an Internal Dashboard.")} className="inline-flex items-center gap-2 text-xs font-bold text-[#111111] uppercase tracking-widest hover:text-[#666666] transition-colors cursor-pointer">
-                                {__('general.discuss_this_platform')}<ArrowRight className="w-4 h-4 rtl:rotate-180" />
-                            </button>
-                        </div>
-                        
-                        <div className="gsap-fade-up p-6 sm:p-10 bg-white border border-[#e5e5e5] rounded-2xl shadow-sm transition-colors group hover:border-[#111111]">
-                            <Workflow className="w-8 h-8 sm:w-10 sm:h-10 text-[#111111] mb-6" strokeWidth={1.5} />
-                            <h3 className="text-xl sm:text-2xl font-bold text-[#111111] mb-3">{__('general.workflow_automation')}</h3>
-                            <p className="text-xs sm:text-sm text-[#666666] leading-relaxed mb-6">
-                                {__('general.replace_manual_data_entry_with_automated')}</p>
-                            <ul className="space-y-3 mb-8">
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.thirdparty_api_integrations')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.scheduled_background_tasks')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.automated_sms_email_triggers')}</li>
-                            </ul>
-                            <button onClick={() => openWhatsApp("I'm interested in Workflow Automation.")} className="inline-flex items-center gap-2 text-xs font-bold text-[#111111] uppercase tracking-widest hover:text-[#666666] transition-colors cursor-pointer">
-                                {__('general.discuss_this_platform')}<ArrowRight className="w-4 h-4 rtl:rotate-180" />
-                            </button>
-                        </div>
-
-                        <div className="gsap-fade-up p-6 sm:p-10 bg-white border border-[#e5e5e5] rounded-2xl shadow-sm transition-colors group hover:border-[#111111]">
-                            <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-[#111111] mb-6" strokeWidth={1.5} />
-                            <h3 className="text-xl sm:text-2xl font-bold text-[#111111] mb-3">{__('general.saas_applications')}</h3>
-                            <p className="text-xs sm:text-sm text-[#666666] leading-relaxed mb-6">
-                                {__('general.launch_your_own_subscriptionbased_softwa')}</p>
-                            <ul className="space-y-3 mb-8">
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.subscription_billing_logic')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.tenant_data_isolation')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.custom_user_portals')}</li>
-                            </ul>
-                            <button onClick={() => openWhatsApp("I'm interested in building a SaaS Application.")} className="inline-flex items-center gap-2 text-xs font-bold text-[#111111] uppercase tracking-widest hover:text-[#666666] transition-colors cursor-pointer">
-                                {__('general.discuss_this_platform')}<ArrowRight className="w-4 h-4 rtl:rotate-180" />
-                            </button>
-                        </div>
-
-                        <div className="gsap-fade-up p-6 sm:p-10 bg-white border border-[#e5e5e5] rounded-2xl shadow-sm transition-colors group hover:border-[#111111]">
-                            <Monitor className="w-8 h-8 sm:w-10 sm:h-10 text-[#111111] mb-6" strokeWidth={1.5} />
-                            <h3 className="text-xl sm:text-2xl font-bold text-[#111111] mb-3">{__('general.customer_portals')}</h3>
-                            <p className="text-xs sm:text-sm text-[#666666] leading-relaxed mb-6">
-                                {__('general.give_your_clients_a_professional_interfa')}</p>
-                            <ul className="space-y-3 mb-8">
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.secure_client_authentication')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.invoice_document_sharing')}</li>
-                                <li className="flex items-center text-[#111111] text-xs sm:text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-3"></div>{__('general.support_ticket_systems')}</li>
-                            </ul>
-                            <button onClick={() => openWhatsApp("I'm interested in building a Customer Portal.")} className="inline-flex items-center gap-2 text-xs font-bold text-[#111111] uppercase tracking-widest hover:text-[#666666] transition-colors cursor-pointer">
-                                {__('general.discuss_this_platform')}<ArrowRight className="w-4 h-4 rtl:rotate-180" />
-                            </button>
-                        </div>
-                    </div>
-                </section>
-                
-                {/* CTA Section */}
-                <section className="py-20 sm:py-28 bg-[#111111] text-white text-center reveal-section px-4 sm:px-6">
-                    <div className="max-w-3xl mx-auto">
-                        <h2 className="gsap-fade-up text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6">
-                            {__('general.ready_to_build_your_platform')}</h2>
-                        <p className="gsap-fade-up text-sm sm:text-lg text-[#a3a3a3] mb-8 sm:mb-12 leading-relaxed">
-                            {__('general.stop_using_fragmented_tools_lets_build_a')}</p>
-                        <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I want to discuss building a platform for my business.")}
-                            className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-8 h-12 text-xs font-bold tracking-wider uppercase transition-all inline-flex items-center justify-center gap-2 mx-auto cursor-pointer"
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 -mt-8">
+                        <button
+                            onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a custom platform architecture.")}
+                            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
                         >
-                            <span>{__('general.start_your_project')}</span>
-                            <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-                        </Button>
+                            DISCUSS PLATFORM ➔
+                        </button>
+                        <Link
+                            href="/estimator"
+                            className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                        >
+                            {__('general.calculate_estimate') || 'ESTIMATE SCOPE'}
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Platforms Grid */}
+                <section className="px-6 max-w-[1400px] mx-auto reveal-section mb-24">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        {/* 1. Internal Dashboards */}
+                        <div className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                    <LayoutDashboard className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white font-sans">
+                                    {__('general.internal_admin_dashboards') || 'Internal Admin Dashboards'}
+                                </h3>
+                                <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    {__('general.give_your_team_a_central_hub_to_manage_d') || 'Give your team a central hub to manage daily workflows, financial ledgers, and analytics.'}
+                                </p>
+                                <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.data_visualizations_charts') || 'Realtime Data Visualizations & Metrics'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.rolebased_permissions') || 'Granular Role-Based Permissions'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.realtime_data_updates') || 'Zero-Lag Operational Feeds'}</li>
+                                </ul>
+                            </div>
+                            <button
+                                onClick={() => openWhatsAppChat("I'm interested in an Internal Dashboard.")}
+                                className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                            >
+                                <span>DISCUSS THIS PLATFORM</span>
+                                <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                            </button>
+                        </div>
+
+                        {/* 2. Workflow Automation */}
+                        <div className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                    <Workflow className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white font-sans">
+                                    {__('general.workflow_automation') || 'Workflow Automation'}
+                                </h3>
+                                <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    {__('general.replace_manual_data_entry_with_automated') || 'Replace manual repetitive data entry with automated background pipelines.'}
+                                </p>
+                                <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.thirdparty_api_integrations') || 'Third-party API & Graph Integrations'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.scheduled_background_tasks') || 'Scheduled Daemon Queue Workers'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.automated_sms_email_triggers') || 'Automated Webhook & WhatsApp Triggers'}</li>
+                                </ul>
+                            </div>
+                            <button
+                                onClick={() => openWhatsAppChat("I'm interested in Workflow Automation.")}
+                                className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                            >
+                                <span>DISCUSS THIS PLATFORM</span>
+                                <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                            </button>
+                        </div>
+
+                        {/* 3. SaaS Platforms */}
+                        <div className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                    <Globe className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white font-sans">
+                                    {__('general.saas_applications') || 'SaaS Applications'}
+                                </h3>
+                                <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    {__('general.launch_your_own_subscriptionbased_softwa') || 'Launch your own subscription-based software with automated multi-tenant isolation.'}
+                                </p>
+                                <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.subscription_billing_logic') || 'Billing & Automated Wallet Deductions'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.tenant_data_isolation') || 'Zero-Leak Schema Tenant Isolation'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.custom_user_portals') || 'White-Label Customer Workspaces'}</li>
+                                </ul>
+                            </div>
+                            <button
+                                onClick={() => openWhatsAppChat("I'm interested in building a SaaS Application.")}
+                                className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                            >
+                                <span>DISCUSS THIS PLATFORM</span>
+                                <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                            </button>
+                        </div>
+
+                        {/* 4. Customer Portals */}
+                        <div className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                    <Monitor className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white font-sans">
+                                    {__('general.customer_portals') || 'Client Workspaces & Portals'}
+                                </h3>
+                                <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    {__('general.give_your_clients_a_professional_interfa') || 'Give your clients a high-fidelity interface to track invoices, deliverables, and projects.'}
+                                </p>
+                                <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.secure_client_authentication') || 'Secure Single-Sign-On Auth'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.invoice_document_sharing') || 'PDF Quotations & Instant Invoicing'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>{__('general.support_ticket_systems') || 'Direct Real-Time Chat & Tickets'}</li>
+                                </ul>
+                            </div>
+                            <button
+                                onClick={() => openWhatsAppChat("I'm interested in building a Customer Portal.")}
+                                className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                            >
+                                <span>DISCUSS THIS PLATFORM</span>
+                                <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
+                            </button>
+                        </div>
+
                     </div>
                 </section>
+
             </div>
         </PublicLayout>
     );

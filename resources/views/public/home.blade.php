@@ -11,19 +11,19 @@
             
             <!-- Slide 1: Programs & ERP -->
             <div class="hero-slide absolute inset-0 transition-opacity duration-700 opacity-100" data-index="0">
-                <img src="/images/hero/hero_erp.jpg" alt="Enterprise ERP Systems" class="w-full h-full object-cover brightness-[0.85] contrast-[1.1]">
+                <img src="/images/banners/hero_erp.jpg" alt="Enterprise ERP Systems Architecture" class="w-full h-full object-cover brightness-[0.9] contrast-[1.05]">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
             </div>
 
             <!-- Slide 2: Websites & Apps -->
             <div class="hero-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none" data-index="1">
-                <img src="/images/hero/hero_fintech.jpg" alt="Websites & Apps" class="w-full h-full object-cover brightness-[0.85] contrast-[1.1]">
+                <img src="/images/banners/hero_web.jpg" alt="High-Scale Web & E-Commerce" class="w-full h-full object-cover brightness-[0.9] contrast-[1.05]">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
             </div>
 
             <!-- Slide 3: WhatsApp Automation -->
             <div class="hero-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none" data-index="2">
-                <img src="/images/hero/hero_meta.jpg" alt="WhatsApp Automation" class="w-full h-full object-cover brightness-[0.85] contrast-[1.1]">
+                <img src="/images/banners/hero_whatsapp.jpg" alt="Meta WhatsApp Cloud API Automation" class="w-full h-full object-cover brightness-[0.9] contrast-[1.05]">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
             </div>
 
@@ -40,30 +40,30 @@
                 <!-- Banner 1 -->
                 <div class="banner-text-item" data-index="0">
                     <div class="text-xs font-mono uppercase tracking-[0.2em] text-[#28321E] font-bold">
-                        {{ app()->getLocale() === 'ar' ? 'أنظمة وبرامج الشركات • ERP' : 'Enterprise Systems • Cloud ERP' }}
+                        {{ __('landing_home.hero_badge_1') }}
                     </div>
                     <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0F140A] font-sans">
-                        {{ app()->getLocale() === 'ar' ? 'عايز تعمل برنامج يدير شركتك أو مصنعك بالكامل؟' : 'Need a custom system to run your entire enterprise?' }}
+                        {{ __('landing_home.hero_title_1') }}
                     </h1>
                 </div>
 
                 <!-- Banner 2 -->
                 <div class="banner-text-item hidden" data-index="1">
                     <div class="text-xs font-mono uppercase tracking-[0.2em] text-[#28321E] font-bold">
-                        {{ app()->getLocale() === 'ar' ? 'مواقع ومتاجر وتطبيقات • Web & Mobile' : 'High-Scale Web & Mobile Apps' }}
+                        {{ __('landing_home.hero_badge_2') }}
                     </div>
                     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0F140A] font-sans">
-                        {{ app()->getLocale() === 'ar' ? 'عايز موقع أو متجر إلكتروني يشيل آلاف الطلبات والزوار؟' : 'Need a lightning-fast store or web platform?' }}
+                        {{ __('landing_home.hero_title_2') }}
                     </h2>
                 </div>
 
                 <!-- Banner 3 -->
                 <div class="banner-text-item hidden" data-index="2">
                     <div class="text-xs font-mono uppercase tracking-[0.2em] text-[#28321E] font-bold">
-                        {{ app()->getLocale() === 'ar' ? 'أتمتة وربط واتساب • WhatsApp Cloud API' : 'WhatsApp Automation & Cloud APIs' }}
+                        {{ __('landing_home.hero_badge_3') }}
                     </div>
                     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0F140A] font-sans">
-                        {{ app()->getLocale() === 'ar' ? 'عايز خدمة عملاء وفواتير وإشعارات واتساب أوتوماتيك؟' : 'Automate notifications, OTPs & customer chats 24/7' }}
+                        {{ __('landing_home.hero_title_3') }}
                     </h2>
                 </div>
 
@@ -72,7 +72,7 @@
             <!-- Actions & Pagination -->
             <div class="flex items-center space-x-6 rtl:space-x-reverse shrink-0">
                 <a href="/start-project" class="px-6 py-2.5 bg-[#0F140A] text-[#748660] hover:bg-black text-xs font-bold font-mono tracking-widest uppercase transition-colors">
-                    {{ app()->getLocale() === 'ar' ? 'ابدأ مشروعك ➔' : 'START PROJECT ➔' }}
+                    {{ __('general.start_a_project') }} ➔
                 </a>
 
                 <!-- Pagination Arrows (< 1 / 3 >) -->
@@ -87,6 +87,27 @@
                 </div>
             </div>
 
+    </div>
+
+    <!-- Studio Architectural Metrics Strip -->
+    <div class="w-full bg-[#141414] border-b border-[#222222] py-6 px-6 sm:px-12">
+        <div class="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 font-mono text-center sm:text-left rtl:sm:text-right">
+            <div class="space-y-1">
+                <div class="text-xl sm:text-2xl font-bold text-white">30+ Systems</div>
+                <div class="text-[11px] text-[#748660] font-bold uppercase tracking-wider">Shipped in Production</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-xl sm:text-2xl font-bold text-white">100% Ownership</div>
+                <div class="text-[11px] text-[#748660] font-bold uppercase tracking-wider">Source Code & Database</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-xl sm:text-2xl font-bold text-white">Direct 1-on-1</div>
+                <div class="text-[11px] text-[#748660] font-bold uppercase tracking-wider">With Chief Architect</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-xl sm:text-2xl font-bold text-white">&lt; 10ms Latency</div>
+                <div class="text-[11px] text-[#748660] font-bold uppercase tracking-wider">High-Speed Architecture</div>
+            </div>
         </div>
     </div>
 </section>
@@ -96,92 +117,104 @@
 <section id="services" class="py-24 px-6 sm:px-12 max-w-[1400px] mx-auto">
     <div class="mb-16 space-y-3">
         <span class="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
-            {{ app()->getLocale() === 'ar' ? 'خدماتنا الهندسية' : 'What We Build' }}
+            {{ __('landing_home.services_badge') }}
         </span>
         <h2 class="text-3xl sm:text-4xl font-bold text-white font-sans tracking-tight">
-            {{ app()->getLocale() === 'ar' ? 'بنعمل إيه لمشروعك؟ برمجيات حقيقية بتدخل فلوس' : 'Engineered for Performance. Built for Real Business.' }}
+            {{ __('landing_home.services_title') }}
         </h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Card 1: ERP -->
-        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between">
+        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between group">
             <div class="space-y-4">
                 <div class="w-10 h-10 bg-black border border-[#2B2B2B] text-[#748660] font-mono font-bold flex items-center justify-center text-sm">
                     01
                 </div>
                 <h3 class="text-xl font-bold text-white font-sans">
-                    {{ app()->getLocale() === 'ar' ? 'برامج ERP وحسابات ومخازن' : 'Enterprise ERP & Ledgers' }}
+                    {{ __('landing_home.service_erp_title') }}
                 </h3>
                 <p class="text-sm text-zinc-400 font-sans leading-relaxed">
-                    {{ app()->getLocale() === 'ar' 
-                        ? 'حسابات قيود مزدوجة، إدارة مخازن متعددة، وربط مع الفاتورة الإلكترونية المصرية (ETA) وهيئة الزكاة (ZATCA).' 
-                        : 'Double-entry ledgers, multi-warehouse stock control, and official tax compliance.' }}
+                    {{ __('landing_home.service_erp_desc') }}
                 </p>
+                <div class="flex flex-wrap gap-1.5 pt-2">
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">Laravel 12</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">PostgreSQL</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-[#748660]">ETA / ZATCA</span>
+                </div>
             </div>
-            <a href="/start-project" class="mt-8 text-xs font-mono text-[#748660] hover:text-white font-bold flex items-center gap-1">
-                {{ app()->getLocale() === 'ar' ? 'اطلب نظام شركتك ➔' : 'Scope ERP System ➔' }}
+            <a href="/platforms/erp" class="mt-8 text-xs font-mono text-[#748660] hover:text-white font-bold flex items-center gap-1">
+                {{ __('landing_home.service_erp_action') }}
             </a>
         </div>
 
         <!-- Card 2: Websites & Stores -->
-        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between">
+        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between group">
             <div class="space-y-4">
                 <div class="w-10 h-10 bg-black border border-[#2B2B2B] text-[#748660] font-mono font-bold flex items-center justify-center text-sm">
                     02
                 </div>
                 <h3 class="text-xl font-bold text-white font-sans">
-                    {{ app()->getLocale() === 'ar' ? 'مواقع ومتاجر إلكترونية فائقة السرعة' : 'Web & E-Commerce' }}
+                    {{ __('landing_home.service_web_title') }}
                 </h3>
                 <p class="text-sm text-zinc-400 font-sans leading-relaxed">
-                    {{ app()->getLocale() === 'ar' 
-                        ? 'متاجر سريعة تتحمل آلاف الطلبات المتزامنة، مربوطة ببوابات الدفع (Visa, Mastercard, Fawry, Vodafone Cash).' 
-                        : 'Ultra-fast storefronts handling massive traffic surges with local payment gateway integrations.' }}
+                    {{ __('landing_home.service_web_desc') }}
                 </p>
+                <div class="flex flex-wrap gap-1.5 pt-2">
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">React &bull; Inertia</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">Redis &bull; Octane</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-[#748660]">Visa / Fawry</span>
+                </div>
             </div>
             <a href="/start-project" class="mt-8 text-xs font-mono text-[#748660] hover:text-white font-bold flex items-center gap-1">
-                {{ app()->getLocale() === 'ar' ? 'اطلب متجرك أو موقعك ➔' : 'Build Web Platform ➔' }}
+                {{ __('landing_home.service_web_action') }}
             </a>
         </div>
 
         <!-- Card 3: WhatsApp Automation -->
-        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between">
+        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between group">
             <div class="space-y-4">
                 <div class="w-10 h-10 bg-black border border-[#2B2B2B] text-[#748660] font-mono font-bold flex items-center justify-center text-sm">
                     03
                 </div>
                 <h3 class="text-xl font-bold text-white font-sans">
-                    {{ app()->getLocale() === 'ar' ? 'أتمتة الواتساب وخدمة العملاء' : 'WhatsApp Cloud Engine' }}
+                    {{ __('landing_home.service_wa_title') }}
                 </h3>
                 <p class="text-sm text-zinc-400 font-sans leading-relaxed">
-                    {{ app()->getLocale() === 'ar' 
-                        ? 'ربط رسمي WhatsApp Cloud API بدون حظر، إرسال إشعارات الفواتير، وتوزيع الشات بين فريق المبيعات.' 
-                        : 'Official WhatsApp API integration, transactional OTP alerts, and multi-agent customer routing.' }}
+                    {{ __('landing_home.service_wa_desc') }}
                 </p>
+                <div class="flex flex-wrap gap-1.5 pt-2">
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">Meta Graph API</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">Webhook Queue</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-[#748660]">OTP & Multi-Agent</span>
+                </div>
             </div>
             <a href="/platforms/crm" class="mt-8 text-xs font-mono text-[#748660] hover:text-white font-bold flex items-center gap-1">
-                {{ app()->getLocale() === 'ar' ? 'استكشف ربط الواتساب ➔' : 'Explore Engine ➔' }}
+                {{ __('landing_home.service_wa_action') }}
             </a>
         </div>
 
         <!-- Card 4: POS & Desktop .NET -->
-        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between">
+        <div class="bg-[#161616] border border-[#262626] p-8 hover:border-[#748660] transition-colors flex flex-col justify-between group">
             <div class="space-y-4">
                 <div class="w-10 h-10 bg-black border border-[#2B2B2B] text-[#748660] font-mono font-bold flex items-center justify-center text-sm">
                     04
                 </div>
                 <h3 class="text-xl font-bold text-white font-sans">
-                    {{ app()->getLocale() === 'ar' ? 'برامج كاشير POS وسطح مكتب' : 'POS & Desktop Apps (.NET)' }}
+                    {{ __('landing_home.service_pos_title') }}
                 </h3>
                 <p class="text-sm text-zinc-400 font-sans leading-relaxed">
-                    {{ app()->getLocale() === 'ar' 
-                        ? 'برامج أوفلاين سريعة بلغة C#، ربط مباشر مع طابعات الباركود والإيصالات، وشاشات لمس للمحلات والمطاعم.' 
-                        : 'Offline-first high-speed desktop tools in .NET, receipt printers, and multi-lane retail registers.' }}
+                    {{ __('landing_home.service_pos_desc') }}
                 </p>
+                <div class="flex flex-wrap gap-1.5 pt-2">
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">.NET 9 / WPF</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-zinc-300">Offline SQLite</span>
+                    <span class="px-2 py-0.5 bg-black/60 border border-[#333333] text-[10px] font-mono text-[#748660]">Hardware ESC/POS</span>
+                </div>
             </div>
             <a href="/start-project" class="mt-8 text-xs font-mono text-[#748660] hover:text-white font-bold flex items-center gap-1">
-                {{ app()->getLocale() === 'ar' ? 'اطلب نظام نقاط البيع ➔' : 'Deploy POS System ➔' }}
+                {{ __('landing_home.service_pos_action') }}
             </a>
         </div>
 
@@ -189,71 +222,66 @@
 </section>
 
 
-<!-- 3. INSTANT PRICING ESTIMATOR -->
+<!-- 3. TRANSPARENT PRICING & ARCHITECTURE ESTIMATOR -->
 <section id="estimator" class="py-24 px-6 sm:px-12 bg-[#0E0E0E] border-y border-[#222222]">
     <div class="max-w-[1200px] mx-auto">
         <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span class="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
-                {{ app()->getLocale() === 'ar' ? 'حاسبة التكلفة الفورية' : 'Instant Architecture Estimator' }}
+            <span class="inline-block px-3 py-1 bg-[#1E2619] border border-[#748660]/40 text-[#748660] text-xs font-mono font-bold uppercase tracking-wider">
+                {{ __('landing_home.estimator_badge') }}
             </span>
-            <h2 class="text-3xl sm:text-4xl font-bold text-white font-sans">
-                {{ app()->getLocale() === 'ar' ? 'احسب تكلفة مشروعك بنفسك في دقيقة' : 'Calculate Your Project Estimate Transparently' }}
+            <h2 class="text-3xl sm:text-5xl font-bold text-white font-sans tracking-tight">
+                {{ __('landing_home.estimator_title') }}
             </h2>
-            <p class="text-sm text-zinc-400 font-sans">
-                {{ app()->getLocale() === 'ar' ? 'شفافية هندسية كاملة، بدون رسوم مخفية، مع مخرجات وتسعير فوري بالجنيه المصري والدولار.' : 'Zero hidden fees, transparent modular breakdown, and instant quotation dispatch.' }}
+            <p class="text-sm sm:text-base text-zinc-400 font-sans leading-relaxed">
+                {{ __('landing_home.estimator_desc') }}
             </p>
         </div>
 
-        <!-- Calculator Box -->
+        <!-- Official Pricing Framework Box -->
         <div class="bg-[#141414] border border-[#2B2B2B] p-8 sm:p-12 space-y-10">
             
-            <!-- Step A: Platform -->
-            <div class="space-y-4">
-                <label class="text-xs font-mono text-zinc-400 uppercase tracking-wider font-bold block">
-                    {{ app()->getLocale() === 'ar' ? '1. اختر نوع وبيئة تشغيل النظام:' : '1. Select Deployment Platform:' }}
-                </label>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
-                    <button type="button" onclick="selectPlatform('web', 800)" class="platform-btn p-4 border border-[#748660] bg-[#1E2619] text-white font-bold text-center transition-colors">
-                        🌐 Web Platform
-                    </button>
-                    <button type="button" onclick="selectPlatform('mobile', 1200)" class="platform-btn p-4 border border-[#2B2B2B] bg-black text-zinc-400 hover:text-white font-bold text-center transition-colors">
-                        📱 Mobile App (iOS/Android)
-                    </button>
-                    <button type="button" onclick="selectPlatform('desktop', 1000)" class="platform-btn p-4 border border-[#2B2B2B] bg-black text-zinc-400 hover:text-white font-bold text-center transition-colors">
-                        💻 Desktop (.NET)
-                    </button>
-                    <button type="button" onclick="selectPlatform('suite', 2200)" class="platform-btn p-4 border border-[#2B2B2B] bg-black text-zinc-400 hover:text-white font-bold text-center transition-colors">
-                        🚀 Full Multi-Platform Suite
-                    </button>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+                <!-- Unit Rate 1: Web -->
+                <div class="bg-[#181818] border border-[#262626] p-6 space-y-3">
+                    <div class="text-[#748660] font-bold text-sm">🌐 WEB APPLICATIONS</div>
+                    <div class="text-2xl font-bold text-white">$10 <span class="text-xs font-normal text-zinc-400">/ page</span></div>
+                    <p class="text-zinc-400 text-xs font-sans leading-relaxed">
+                        {{ __('landing_home.estimator_unit_web') }}
+                    </p>
+                </div>
+
+                <!-- Unit Rate 2: Mobile -->
+                <div class="bg-[#181818] border border-[#262626] p-6 space-y-3">
+                    <div class="text-[#748660] font-bold text-sm">📱 MOBILE APPS (iOS/Android)</div>
+                    <div class="text-2xl font-bold text-white">$15 <span class="text-xs font-normal text-zinc-400">/ screen</span></div>
+                    <p class="text-zinc-400 text-xs font-sans leading-relaxed">
+                        {{ __('landing_home.estimator_unit_mobile') }}
+                    </p>
+                </div>
+
+                <!-- Unit Rate 3: Desktop & POS -->
+                <div class="bg-[#181818] border border-[#262626] p-6 space-y-3">
+                    <div class="text-[#748660] font-bold text-sm">💻 DESKTOP & POS (.NET)</div>
+                    <div class="text-2xl font-bold text-white">$25 <span class="text-xs font-normal text-zinc-400">/ screen</span></div>
+                    <p class="text-zinc-400 text-xs font-sans leading-relaxed">
+                        {{ __('landing_home.estimator_unit_desktop') }}
+                    </p>
                 </div>
             </div>
 
-            <!-- Step B: Number of Screens -->
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <label class="text-xs font-mono text-zinc-400 uppercase tracking-wider font-bold">
-                        {{ app()->getLocale() === 'ar' ? '2. حجم وشاشات النظام التقديرية:' : '2. Estimated Custom Screens:' }}
-                    </label>
-                    <span id="screen-count-label" class="text-[#748660] font-mono font-bold text-base">8 Screens</span>
-                </div>
-                <input type="range" id="screen-slider" min="3" max="30" value="8" oninput="updateEstimate()" class="w-full accent-[#748660] bg-zinc-800 h-2 cursor-pointer">
-            </div>
-
-            <!-- Price Output Box -->
-            <div class="pt-8 border-t border-[#222222] flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div>
-                    <span class="text-xs font-mono text-zinc-400 block uppercase tracking-wider">
-                        {{ app()->getLocale() === 'ar' ? 'التكلفة التقديرية للاستثمار البرمجي:' : 'Estimated Investment:' }}
-                    </span>
-                    <div class="flex items-baseline gap-3 mt-1">
-                        <span id="estimated-price-egp" class="text-3xl sm:text-4xl font-bold text-white font-mono">35,000 EGP</span>
-                        <span id="estimated-price-usd" class="text-sm text-zinc-400 font-mono">($720 USD)</span>
+            <div class="pt-6 border-t border-[#222222] flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="space-y-1 text-center sm:text-left rtl:sm:text-right">
+                    <div class="text-sm font-bold text-white font-sans">
+                        Instant Breakdown • Live Currency Exchange (USD &bull; EGP) • Official PDF Quotations
                     </div>
+                    <p class="text-xs text-zinc-400 font-sans">
+                        Combine platforms, select add-on modules, and calculate transparent investment estimates in real-time.
+                    </p>
                 </div>
 
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <a id="estimator-wa-btn" href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I%20calculated%20an%20estimate%20for%20my%20system." target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto text-center px-8 py-3.5 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold font-mono text-xs uppercase tracking-wider transition-colors">
-                        {{ app()->getLocale() === 'ar' ? 'ناقش التقدير على واتساب ➔' : 'DISCUSS ESTIMATE ON WHATSAPP ➔' }}
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto font-mono text-xs">
+                    <a href="/estimator" class="w-full sm:w-auto text-center px-8 py-4 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold uppercase tracking-widest transition-all">
+                        {{ __('landing_home.estimator_open_button') }}
                     </a>
                 </div>
             </div>
@@ -268,75 +296,93 @@
     <div class="mb-16 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div class="space-y-3">
             <span class="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
-                {{ app()->getLocale() === 'ar' ? 'سابقة الأعمال الحية' : 'Case Studies Archive' }}
+                {{ __('landing_home.portfolio_badge') }}
             </span>
             <h2 class="text-3xl sm:text-4xl font-bold text-white font-sans tracking-tight">
-                {{ app()->getLocale() === 'ar' ? 'أنظمة حقيقية تعمل الآن في السوق' : 'Production Systems Driving Millions in Revenue' }}
+                {{ __('landing_home.portfolio_title') }}
             </h2>
         </div>
         <a href="/portfolio" class="text-xs font-mono text-zinc-400 hover:text-white uppercase tracking-wider">
-            {{ app()->getLocale() === 'ar' ? 'عرض كافة الأعمال (30+) ➔' : 'View Full Archive (30+) ➔' }}
+            {{ __('landing_home.portfolio_view_all') }}
         </a>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         
         <!-- System 1: RevFlow -->
-        <div class="bg-[#161616] border border-[#262626] overflow-hidden group hover:border-[#748660] transition-colors">
-            <div class="h-56 bg-zinc-900 overflow-hidden relative">
-                <img src="/images/portfolio/revflow.jpg" alt="RevFlow ERP" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div class="absolute top-4 right-4 bg-black/80 px-2.5 py-1 text-[10px] font-mono text-[#748660] font-bold border border-zinc-800">
-                    ENTERPRISE ERP
+        <div class="bg-[#161616] border border-[#262626] overflow-hidden group hover:border-[#748660] transition-colors flex flex-col justify-between">
+            <div>
+                <div class="h-56 bg-zinc-900 overflow-hidden relative">
+                    <img src="/images/portfolio/revFlow.png" alt="RevFlow ERP System" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute top-4 right-4 bg-black/80 px-2.5 py-1 text-[10px] font-mono text-[#748660] font-bold border border-zinc-800">
+                        ENTERPRISE ERP
+                    </div>
+                </div>
+                <div class="p-6 space-y-3">
+                    <h3 class="text-lg font-bold text-white font-sans">RevFlow Double-Entry Kernel</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed font-sans">
+                        محرك حسابات مؤسسي معتمد بالقيود المزدوجة، يربط الفواتير والمخازن وتوزيع الأرباح لحظياً.
+                    </p>
                 </div>
             </div>
-            <div class="p-6 space-y-3">
-                <h3 class="text-lg font-bold text-white font-sans">RevFlow Double-Entry Kernel</h3>
-                <p class="text-xs text-zinc-400 leading-relaxed font-sans">
-                    محرك حسابات مؤسسي معتمد بالقيود المزدوجة، يربط الفواتير والمخازن وتوزيع الأرباح لحظياً.
-                </p>
+            <div class="p-6 pt-0">
                 <div class="pt-4 border-t border-[#222222] flex justify-between items-center text-xs font-mono">
-                    <span class="text-zinc-500">Laravel &bull; PostgreSQL</span>
-                    <a href="/portfolio/revflow" class="text-[#748660] hover:text-white font-bold">Details ↗</a>
+                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20an%20ERP%20system%20similar%20to%20RevFlow." target="_blank" rel="noopener noreferrer" class="text-[#748660] hover:text-white font-bold flex items-center gap-1">
+                        <span>{{ __('general.whatsapp_direct') }}</span> ➔
+                    </a>
+                    <a href="/portfolio" class="text-zinc-500 hover:text-white">Archive ↗</a>
                 </div>
             </div>
         </div>
 
-        <!-- System 2: WeBill POS -->
-        <div class="bg-[#161616] border border-[#262626] overflow-hidden group hover:border-[#748660] transition-colors">
-            <div class="h-56 bg-zinc-900 overflow-hidden relative">
-                <img src="/images/portfolio/gold-pos.jpg" alt="WeBill FinTech POS" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div class="absolute top-4 right-4 bg-black/80 px-2.5 py-1 text-[10px] font-mono text-[#748660] font-bold border border-zinc-800">
-                    FINTECH POS
+        <!-- System 2: ChartCash POS -->
+        <div class="bg-[#161616] border border-[#262626] overflow-hidden group hover:border-[#748660] transition-colors flex flex-col justify-between">
+            <div>
+                <div class="h-56 bg-zinc-900 overflow-hidden relative">
+                    <img src="/images/portfolio/chartcash.png" alt="ChartCash FinTech & POS" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute top-4 right-4 bg-black/80 px-2.5 py-1 text-[10px] font-mono text-[#748660] font-bold border border-zinc-800">
+                        FINTECH POS
+                    </div>
+                </div>
+                <div class="p-6 space-y-3">
+                    <h3 class="text-lg font-bold text-white font-sans">ChartCash Financial Terminal</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed font-sans">
+                        محطة نقاط بيع وحسابات تدفقات نقدية فورية، مربوطة بالـ WebSockets وطابعات الباركود.
+                    </p>
                 </div>
             </div>
-            <div class="p-6 space-y-3">
-                <h3 class="text-lg font-bold text-white font-sans">Real-Time Gold & POS Terminal</h3>
-                <p class="text-xs text-zinc-400 leading-relaxed font-sans">
-                    محطة نقاط بيع وتداول لأسعار الذهب والعملات، مربوطة بالـ WebSockets وطابعات الباركود.
-                </p>
+            <div class="p-6 pt-0">
                 <div class="pt-4 border-t border-[#222222] flex justify-between items-center text-xs font-mono">
-                    <span class="text-zinc-500">WebSocket &bull; .NET &bull; React</span>
-                    <a href="/portfolio/gold-pos" class="text-[#748660] hover:text-white font-bold">Details ↗</a>
+                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20a%20POS/FinTech%20system%20similar%20to%20ChartCash." target="_blank" rel="noopener noreferrer" class="text-[#748660] hover:text-white font-bold flex items-center gap-1">
+                        <span>{{ __('general.whatsapp_direct') }}</span> ➔
+                    </a>
+                    <a href="/portfolio" class="text-zinc-500 hover:text-white">Archive ↗</a>
                 </div>
             </div>
         </div>
 
-        <!-- System 3: WhatsApp Cloud Suite -->
-        <div class="bg-[#161616] border border-[#262626] overflow-hidden group hover:border-[#748660] transition-colors">
-            <div class="h-56 bg-zinc-900 overflow-hidden relative">
-                <img src="/images/portfolio/whatsapp-suite.jpg" alt="WhatsApp Cloud Engine" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div class="absolute top-4 right-4 bg-black/80 px-2.5 py-1 text-[10px] font-mono text-[#748660] font-bold border border-zinc-800">
-                    META GRAPH API
+        <!-- System 3: Trenz WhatsApp CRM -->
+        <div class="bg-[#161616] border border-[#262626] overflow-hidden group hover:border-[#748660] transition-colors flex flex-col justify-between">
+            <div>
+                <div class="h-56 bg-zinc-900 overflow-hidden relative">
+                    <img src="/images/portfolio/trenz-whatscrm.png" alt="Trenz WhatsApp CRM Engine" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute top-4 right-4 bg-black/80 px-2.5 py-1 text-[10px] font-mono text-[#748660] font-bold border border-zinc-800">
+                        META GRAPH API
+                    </div>
+                </div>
+                <div class="p-6 space-y-3">
+                    <h3 class="text-lg font-bold text-white font-sans">Trenz Multi-Agent CRM</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed font-sans">
+                        محرك معالجة ملايين الرسائل مع شات موحد للوكلاء وربط WhatsApp Cloud API رسمي.
+                    </p>
                 </div>
             </div>
-            <div class="p-6 space-y-3">
-                <h3 class="text-lg font-bold text-white font-sans">Meta Cloud & Multi-Agent CRM</h3>
-                <p class="text-xs text-zinc-400 leading-relaxed font-sans">
-                    محرك معالجة 1M+ رسالة وإشعار يومياً، مع نظام رد آلي وربط فوري بأنظمة الشركات.
-                </p>
+            <div class="p-6 pt-0">
                 <div class="pt-4 border-t border-[#222222] flex justify-between items-center text-xs font-mono">
-                    <span class="text-zinc-500">Meta API &bull; Redis &bull; Queue</span>
-                    <a href="/platforms/crm" class="text-[#748660] hover:text-white font-bold">Details ↗</a>
+                    <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'm%20interested%20in%20a%20WhatsApp%20CRM%20system%20similar%20to%20Trenz." target="_blank" rel="noopener noreferrer" class="text-[#748660] hover:text-white font-bold flex items-center gap-1">
+                        <span>{{ __('general.whatsapp_direct') }}</span> ➔
+                    </a>
+                    <a href="/portfolio" class="text-zinc-500 hover:text-white">Archive ↗</a>
                 </div>
             </div>
         </div>
@@ -345,27 +391,79 @@
 </section>
 
 
-<!-- 5. FINAL CALL TO ACTION (START PROJECT OR CHAT) -->
+<!-- 5. WHY MUSOFTWARES (COMPARISON MATRIX & DATA SOVEREIGNTY) -->
+<section class="py-24 px-6 sm:px-12 bg-[#0E0E0E] border-t border-[#222222]">
+    <div class="max-w-[1200px] mx-auto space-y-16">
+        
+        <div class="text-center max-w-3xl mx-auto space-y-4">
+            <span class="inline-block px-3 py-1 bg-[#1E2619] border border-[#748660]/40 text-[#748660] text-xs font-mono font-bold uppercase tracking-wider">
+                {{ __('landing_home.comparison_badge') }}
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-bold text-white font-sans tracking-tight">
+                {{ __('landing_home.comparison_title') }}
+            </h2>
+            <p class="text-sm sm:text-base text-zinc-400 font-sans leading-relaxed">
+                {{ __('landing_home.comparison_desc') }}
+            </p>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="bg-[#141414] border border-[#2B2B2B] overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-4 bg-[#1C1C1C] p-5 font-mono text-xs text-white font-bold border-b border-[#2B2B2B] gap-4">
+                <div class="text-zinc-400">{{ __('landing_home.comp_col_metric') }}</div>
+                <div class="text-[#748660]">{{ __('landing_home.comp_col_musoftware') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_col_agency') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_col_freelance') }}</div>
+            </div>
+
+            <!-- Row 1: Communication -->
+            <div class="grid grid-cols-1 md:grid-cols-4 p-5 font-mono text-xs border-b border-[#222222] gap-4 items-center">
+                <div class="text-white font-bold">{{ __('landing_home.comp_row_comm_title') }}</div>
+                <div class="text-[#748660] font-bold">{{ __('landing_home.comp_row_comm_musoftware') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_row_comm_agency') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_row_comm_freelance') }}</div>
+            </div>
+
+            <!-- Row 2: Code Ownership -->
+            <div class="grid grid-cols-1 md:grid-cols-4 p-5 font-mono text-xs border-b border-[#222222] gap-4 items-center bg-black/30">
+                <div class="text-white font-bold">{{ __('landing_home.comp_row_code_title') }}</div>
+                <div class="text-[#748660] font-bold">{{ __('landing_home.comp_row_code_musoftware') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_row_code_agency') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_row_code_freelance') }}</div>
+            </div>
+
+            <!-- Row 3: Architecture -->
+            <div class="grid grid-cols-1 md:grid-cols-4 p-5 font-mono text-xs gap-4 items-center">
+                <div class="text-white font-bold">{{ __('landing_home.comp_row_quality_title') }}</div>
+                <div class="text-[#748660] font-bold">{{ __('landing_home.comp_row_quality_musoftware') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_row_quality_agency') }}</div>
+                <div class="text-zinc-400">{{ __('landing_home.comp_row_quality_freelance') }}</div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- 6. FINAL CALL TO ACTION (START PROJECT OR CHAT) -->
 <section class="py-24 px-6 sm:px-12 bg-gradient-to-b from-[#111111] to-[#0A0A0A] border-t border-[#222222]">
     <div class="max-w-4xl mx-auto text-center space-y-8">
         <span class="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
-            {{ app()->getLocale() === 'ar' ? 'خطوة واحدة للبدء' : 'Direct Engagement' }}
+            {{ __('landing_home.cta_badge') }}
         </span>
         <h2 class="text-3xl sm:text-5xl font-bold text-white font-sans tracking-tight">
-            {{ app()->getLocale() === 'ar' ? 'جاهز تبني نظام شركتك أو تبدأ مشروعك الجديد؟' : 'Ready to Engineer Your Next Enterprise System?' }}
+            {{ __('landing_home.cta_title') }}
         </h2>
         <p class="text-base text-zinc-400 font-sans leading-relaxed max-w-2xl mx-auto">
-            {{ app()->getLocale() === 'ar' 
-                ? 'تواصل مباشرة مع المهندس محمود أمين أو استخدم معالج تصميم النظام لتحديد المواصفات والحصول على كود المشروع.' 
-                : 'Direct communication with Chief Software Architect Mahmoud Amin. Zero middle management layers.' }}
+            {{ __('landing_home.cta_desc') }}
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 font-mono text-xs">
             <a href="/start-project" class="w-full sm:w-auto px-8 py-4 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold uppercase tracking-widest transition-all">
-                {{ app()->getLocale() === 'ar' ? 'ابدأ معالج تصميم النظام ➔' : 'START SCOPING WIZARD ➔' }}
+                {{ __('landing_home.cta_start_wizard') }}
             </a>
             <a href="https://wa.me/201015218548?text=Hello%20Mahmoud,%20I'd%20like%20to%20discuss%20a%20new%20system." target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 border border-[#333333] hover:border-white text-zinc-300 hover:text-white font-bold uppercase tracking-widest transition-all">
-                {{ app()->getLocale() === 'ar' ? 'محادثة واتساب مباشرة' : 'WHATSAPP DIRECT' }}
+                {{ __('landing_home.cta_whatsapp') }}
             </a>
         </div>
     </div>
@@ -407,39 +505,6 @@
 
     // Auto-advance hero banner every 6 seconds
     setInterval(nextSlide, 6000);
-
-    // Estimator Logic
-    let basePlatformCost = 800;
-    let selectedPlatformName = 'Web Platform';
-
-    function selectPlatform(type, baseCost) {
-        basePlatformCost = baseCost;
-        selectedPlatformName = type;
-        
-        document.querySelectorAll('.platform-btn').forEach(btn => {
-            btn.classList.remove('border-[#748660]', 'bg-[#1E2619]', 'text-white');
-            btn.classList.add('border-[#2B2B2B]', 'bg-black', 'text-zinc-400');
-        });
-
-        event.currentTarget.classList.remove('border-[#2B2B2B]', 'bg-black', 'text-zinc-400');
-        event.currentTarget.classList.add('border-[#748660]', 'bg-[#1E2619]', 'text-white');
-
-        updateEstimate();
-    }
-
-    function updateEstimate() {
-        const screens = parseInt(document.getElementById('screen-slider').value);
-        document.getElementById('screen-count-label').innerText = `${screens} Screens`;
-
-        const totalUsd = Math.round(basePlatformCost + (screens * 45));
-        const totalEgp = Math.round(totalUsd * 49.5);
-
-        document.getElementById('estimated-price-egp').innerText = `${totalEgp.toLocaleString('en-US')} EGP`;
-        document.getElementById('estimated-price-usd').innerText = `($${totalUsd.toLocaleString('en-US')} USD)`;
-
-        const waText = encodeURIComponent(`Hello Mahmoud, I estimated a ${selectedPlatformName} with ${screens} screens on Musoftware. Estimated budget: ${totalEgp.toLocaleString('en-US')} EGP ($${totalUsd} USD). Can we discuss?`);
-        document.getElementById('estimator-wa-btn').href = `https://wa.me/201015218548?text=${waText}`;
-    }
 </script>
 
 @endsection
