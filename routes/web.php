@@ -261,6 +261,7 @@ Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
 // per-day visual workflow board. Ownership is enforced per-route via ProjectPolicy.
 Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')->group(function () {
     Route::get('/projects', [ClientProjectController::class, 'index'])->name('index');
+    Route::get('/client/projects', [ClientProjectController::class, 'index'])->name('client-index');
     Route::get('/projects/tasks', [ClientTasksAggregatorController::class, 'index'])->name('all-tasks');
     Route::get('/projects/board', [ClientProjectCalendarController::class, 'allProjectsBoardIndex'])->name('all-projects-board.index');
     Route::get('/projects/board/{date}', [ClientProjectCalendarController::class, 'allProjectsBoardDate'])->name('all-projects-board.date');
@@ -268,6 +269,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::post('/projects/store-new', [ClientProjectController::class, 'store'])->name('store-new');
     Route::post('/projects/{project}/ai/activate', [ClientProjectController::class, 'activateAi'])->name('ai.activate');
     Route::get('/projects/{project}', [ClientProjectController::class, 'show'])->name('show');
+    Route::get('/client/projects/{project}', [ClientProjectController::class, 'show'])->name('client-show');
     Route::get('/projects/{project}/tasks', [ClientProjectTaskController::class, 'tasksIndex'])->name('tasks.index');
     Route::get('/projects/{project}/reports/{report}', [ClientProjectReportController::class, 'show'])->name('reports.show');
 

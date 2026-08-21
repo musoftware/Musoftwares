@@ -202,9 +202,9 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                 <meta name="description" content="Musoftwares is an elite software engineering studio crafting bespoke Enterprise ERP systems, Meta API cloud integrations, and high-performance business platforms." />
             </Head>
 
-            <div className="w-full bg-[#111111] text-[#E5E5E5] font-sans antialiased selection:bg-[#748660] selection:text-white">
+            <div className="w-full bg-[#fbfbfd] text-[#1d1d1f] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
                 
-                {/* 1. HERO SHOWCASE SECTION (PANORAMIC ARTWORK + SAGE GREEN LOWER BAR - DYNAMIC NEWS ENGINE) */}
+                {/* 1. HERO SHOWCASE SECTION (PANORAMIC ARTWORK + STUDIO LOWER BAR - DYNAMIC NEWS ENGINE) */}
                 <section id="hero" className="w-full">
                     {/* Top Panoramic Visual Artwork Container */}
                     <div className="w-full h-[380px] sm:h-[480px] lg:h-[540px] bg-black overflow-hidden relative">
@@ -220,30 +220,30 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                                 <img 
                                     src={slide.image} 
                                     alt={slide.title} 
-                                    className="w-full h-full object-cover object-center filter brightness-[0.9] contrast-[1.05]"
+                                    className="w-full h-full object-cover object-center filter brightness-[0.95] contrast-[1.02]"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />
                             </motion.div>
                         </AnimatePresence>
                     </div>
 
-                    {/* Exact Sage / Moss Olive Green Accent Bar (#748660) */}
-                    <div className="w-full bg-[#748660] text-[#111111] py-6 sm:py-8 px-6 sm:px-12 border-b border-[#5E6D4E]">
+                    {/* Clean Apple Light Accent Bar */}
+                    <div className="w-full bg-white text-[#1d1d1f] py-6 sm:py-8 px-6 sm:px-12 border-b border-black/5 shadow-sm">
                         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
                             
                             {/* Title and Category */}
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs font-mono uppercase tracking-[0.2em] rtl:tracking-normal text-[#28321E] font-bold">
+                                    <span className="text-xs font-semibold uppercase tracking-wider text-[#0071e3]">
                                         {slide.category || 'News & Architecture'}
                                     </span>
                                     {slide.badge && (
-                                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#28321E]/15 border border-[#28321E]/30 uppercase text-[#141A0E]">
+                                        <span className="text-[10px] font-semibold px-2 py-0.5 bg-[#0071e3]/10 border border-[#0071e3]/20 uppercase rounded-full text-[#0071e3]">
                                             {slide.badge}
                                         </span>
                                     )}
                                 </div>
-                                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0F140A] font-sans">
+                                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#1d1d1f] font-sans">
                                     {slide.title}
                                 </h2>
                             </div>
@@ -251,13 +251,13 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                             {/* Actions Right: Read Article Button + < 1/3 > Arrows */}
                             <div className="flex items-center space-x-6 rtl:space-x-reverse shrink-0">
                                 <Link href={slide.link}>
-                                    <button className="px-6 py-2.5 bg-transparent border border-[#0F140A] text-[#0F140A] hover:bg-[#0F140A] hover:text-[#748660] text-xs font-bold font-mono tracking-widest rtl:tracking-normal uppercase transition-colors">
+                                    <button className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] shadow-sm transition-all cursor-pointer">
                                         {slide.linkText || 'Read More ➔'}
                                     </button>
                                 </Link>
 
                                 {/* Pagination Arrows (< 1 / N >) */}
-                                <div className="flex items-center space-x-3 rtl:space-x-reverse text-[#0F140A] font-mono text-sm font-bold">
+                                <div className="flex items-center space-x-3 rtl:space-x-reverse text-[#1d1d1f] font-mono text-sm font-semibold">
                                     <button 
                                         onClick={prevSlide}
                                         aria-label="Previous Release"
@@ -286,16 +286,16 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                 {/* 2. EDITORIAL MANIFESTO INTRO */}
                 <section className="py-28 sm:py-36 px-6 max-w-4xl mx-auto text-center">
                     <div className="space-y-8">
-                        <p className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight text-[#EDEDED] leading-[1.4] text-center max-w-3xl mx-auto font-sans">
-                            Combining <span className="text-white font-bold">creative heart</span> with <span className="text-white font-bold">technical scale</span> and <span className="text-white font-bold">human intelligence</span>, we build meaningful software connections that resonate with users and help global businesses thrive.
+                        <p className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight text-[#1d1d1f] leading-[1.4] text-center max-w-3xl mx-auto font-sans">
+                            Combining <span className="text-black font-bold">creative heart</span> with <span className="text-black font-bold">technical scale</span> and <span className="text-black font-bold">human intelligence</span>, we build meaningful software connections that resonate with users and help global businesses thrive.
                         </p>
                         
-                        <p className="text-base sm:text-lg text-zinc-400 font-sans font-normal">
-                            <a href="#expertise" className="underline font-bold text-white decoration-zinc-500 underline-offset-4 hover:decoration-white transition-all">
+                        <p className="text-base sm:text-lg text-[#1d1d1f]/60 font-sans font-normal">
+                            <a href="#expertise" className="underline font-bold text-[#0071e3] decoration-[#0071e3]/30 underline-offset-4 hover:decoration-[#0071e3] transition-all">
                                 Discover more
                             </a>
                             {' '}or{' '}
-                            <a href="#contact" className="underline font-bold text-white decoration-zinc-500 underline-offset-4 hover:decoration-white transition-all">
+                            <a href="#contact" className="underline font-bold text-[#0071e3] decoration-[#0071e3]/30 underline-offset-4 hover:decoration-[#0071e3] transition-all">
                                 connect with us
                             </a>
                             {' '}to explore what’s possible.
@@ -304,7 +304,7 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                         {/* Reference Signature Wave Line Motif */}
                         <div className="pt-6 flex justify-center items-center">
                             <svg width="240" height="28" viewBox="0 0 240 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 14C35 14 45 4 70 14C95 24 115 4 140 14C165 24 185 14 238 14" stroke="#888888" strokeWidth="1.5" strokeLinecap="round" />
+                                <path d="M2 14C35 14 45 4 70 14C95 24 115 4 140 14C165 24 185 14 238 14" stroke="#0071e3" strokeWidth="1.5" strokeLinecap="round" />
                             </svg>
                         </div>
                     </div>
@@ -312,26 +312,18 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
 
 
                 {/* 3. OUR CORE EXPERTISE (4-PILLAR ARCHITECTURAL SHOWCASE) */}
-                <section id="expertise" className="py-24 sm:py-32 px-6 relative border-y border-[#222222]">
-                    <div 
-                        className="absolute inset-0 opacity-[0.08] pointer-events-none" 
-                        style={{
-                            backgroundImage: `radial-gradient(#FFFFFF 1px, transparent 1px)`,
-                            backgroundSize: '16px 16px'
-                        }} 
-                    />
-
+                <section id="expertise" className="py-24 sm:py-32 px-6 relative bg-white border-y border-black/5">
                     <div className="max-w-[1400px] mx-auto relative z-10">
                         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
                             <div>
-                                <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#748660] font-semibold block mb-2">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-[#0071e3] block mb-2">
                                     Engineering Capabilities
                                 </span>
-                                <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white font-sans">
+                                <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1d1d1f] font-sans">
                                     Our Core Expertise
                                 </h3>
                             </div>
-                            <p className="text-sm text-zinc-400 font-sans max-w-lg leading-relaxed">
+                            <p className="text-sm text-[#1d1d1f]/60 font-sans max-w-lg leading-relaxed">
                                 Proven production systems engineered from the ground up: from mission-critical ERP ledgers and official Meta Cloud pipelines to high-speed Windows desktop automation and real-time FinTech engines.
                             </p>
                         </div>
@@ -339,22 +331,22 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             
                             {/* Pillar 1: Enterprise ERP & Accounting */}
-                            <div className="bg-[#161616] border border-[#262626] p-8 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="bg-[#f5f5f7] border border-black/5 rounded-[24px] p-8 flex flex-col justify-between group hover:bg-white hover:border-black/10 hover:shadow-xl transition-all duration-300">
                                 <div className="space-y-5">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-mono text-[#748660] font-bold">01 / BACKBONE</span>
-                                        <div className="w-2 h-2 rounded-full bg-[#748660]/40 group-hover:bg-[#748660] transition-colors" />
+                                        <span className="text-xs font-semibold text-[#0071e3]">01 / BACKBONE</span>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-[#0071e3]/40 group-hover:bg-[#0071e3] transition-colors" />
                                     </div>
-                                    <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight font-sans">
+                                    <h4 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight font-sans">
                                         Enterprise ERP &amp; Financial Ledgers
                                     </h4>
-                                    <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    <p className="text-sm text-[#1d1d1f]/70 leading-relaxed font-sans">
                                         Bespoke double-entry ledger engines, multi-tenant databases, multi-branch inventory with barcode sync, compliant electronic invoicing (Fatora), and zero-loss financial auditing.
                                     </p>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-[#262626] flex flex-wrap gap-2">
+                                <div className="mt-8 pt-6 border-t border-black/5 flex flex-wrap gap-2">
                                     {['Double-Entry Ledgers', 'Multi-Branch POS', 'E-Invoicing & Tax QR', 'Multi-Tenant SaaS'].map((tag, idx) => (
-                                        <span key={idx} className="text-[10px] font-mono uppercase px-2 py-1 bg-black text-zinc-300 border border-[#333333]">
+                                        <span key={idx} className="text-[11px] font-medium px-2.5 py-1 bg-white text-[#1d1d1f]/80 border border-black/5 rounded-full">
                                             {tag}
                                         </span>
                                     ))}
@@ -362,22 +354,22 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                             </div>
 
                             {/* Pillar 2: Meta API, WhatsApp & CRM */}
-                            <div className="bg-[#161616] border border-[#262626] p-8 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="bg-[#f5f5f7] border border-black/5 rounded-[24px] p-8 flex flex-col justify-between group hover:bg-white hover:border-black/10 hover:shadow-xl transition-all duration-300">
                                 <div className="space-y-5">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-mono text-[#748660] font-bold">02 / INTEGRATION</span>
-                                        <div className="w-2 h-2 rounded-full bg-[#748660]/40 group-hover:bg-[#748660] transition-colors" />
+                                        <span className="text-xs font-semibold text-emerald-600">02 / INTEGRATION</span>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/40 group-hover:bg-emerald-500 transition-colors" />
                                     </div>
-                                    <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight font-sans">
+                                    <h4 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight font-sans">
                                         Meta Cloud &amp; WhatsApp Automation
                                     </h4>
-                                    <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    <p className="text-sm text-[#1d1d1f]/70 leading-relaxed font-sans">
                                         Verified Meta Graph and WhatsApp Cloud API pipelines, multi-agent live support desks, high-throughput webhook queues, automated campaign triggers, and custom CRM systems.
                                     </p>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-[#262626] flex flex-wrap gap-2">
+                                <div className="mt-8 pt-6 border-t border-black/5 flex flex-wrap gap-2">
                                     {['WhatsApp Cloud API', 'Multi-Agent CRM', 'Webhook Queues', 'Omnichannel Broadcast'].map((tag, idx) => (
-                                        <span key={idx} className="text-[10px] font-mono uppercase px-2 py-1 bg-black text-zinc-300 border border-[#333333]">
+                                        <span key={idx} className="text-[11px] font-medium px-2.5 py-1 bg-white text-[#1d1d1f]/80 border border-black/5 rounded-full">
                                             {tag}
                                         </span>
                                     ))}
@@ -385,22 +377,22 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                             </div>
 
                             {/* Pillar 3: Desktop RPA, Scrapers & Daemons */}
-                            <div className="bg-[#161616] border border-[#262626] p-8 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="bg-[#f5f5f7] border border-black/5 rounded-[24px] p-8 flex flex-col justify-between group hover:bg-white hover:border-black/10 hover:shadow-xl transition-all duration-300">
                                 <div className="space-y-5">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-mono text-[#748660] font-bold">03 / AUTOMATION</span>
-                                        <div className="w-2 h-2 rounded-full bg-[#748660]/40 group-hover:bg-[#748660] transition-colors" />
+                                        <span className="text-xs font-semibold text-purple-600">03 / AUTOMATION</span>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-purple-500/40 group-hover:bg-purple-500 transition-colors" />
                                     </div>
-                                    <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight font-sans">
+                                    <h4 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight font-sans">
                                         Desktop Apps, RPA &amp; Web Scrapers
                                     </h4>
-                                    <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    <p className="text-sm text-[#1d1d1f]/70 leading-relaxed font-sans">
                                         High-performance C# / .NET Windows utilities, background worker services, automated lead &amp; map extractors, bulk messaging engines (Telegram/WhatsApp/Email), and computer vision RPA.
                                     </p>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-[#262626] flex flex-wrap gap-2">
+                                <div className="mt-8 pt-6 border-t border-black/5 flex flex-wrap gap-2">
                                     {['C# / .NET Windows Tools', 'B2B Lead Scrapers', 'Bulk Dispatchers', 'Background Workers'].map((tag, idx) => (
-                                        <span key={idx} className="text-[10px] font-mono uppercase px-2 py-1 bg-black text-zinc-300 border border-[#333333]">
+                                        <span key={idx} className="text-[11px] font-medium px-2.5 py-1 bg-white text-[#1d1d1f]/80 border border-black/5 rounded-full">
                                             {tag}
                                         </span>
                                     ))}
@@ -408,22 +400,22 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                             </div>
 
                             {/* Pillar 4: FinTech, Trading & Custom Platforms */}
-                            <div className="bg-[#161616] border border-[#262626] p-8 flex flex-col justify-between group hover:border-[#748660] transition-colors">
+                            <div className="bg-[#f5f5f7] border border-black/5 rounded-[24px] p-8 flex flex-col justify-between group hover:bg-white hover:border-black/10 hover:shadow-xl transition-all duration-300">
                                 <div className="space-y-5">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-mono text-[#748660] font-bold">04 / REAL-TIME</span>
-                                        <div className="w-2 h-2 rounded-full bg-[#748660]/40 group-hover:bg-[#748660] transition-colors" />
+                                        <span className="text-xs font-semibold text-amber-600">04 / REAL-TIME</span>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-amber-500/40 group-hover:bg-amber-500 transition-colors" />
                                     </div>
-                                    <h4 className="text-lg sm:text-xl font-bold text-white tracking-tight font-sans">
+                                    <h4 className="text-lg sm:text-xl font-bold text-[#1d1d1f] tracking-tight font-sans">
                                         Real-Time FinTech &amp; Custom SaaS
                                     </h4>
-                                    <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                    <p className="text-sm text-[#1d1d1f]/70 leading-relaxed font-sans">
                                         Sub-second Gold &amp; Commodity POS exchange terminals with live price streaming, automated Forex trading bots, DRM-protected video academies, and high-concurrency custom platforms.
                                     </p>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-[#262626] flex flex-wrap gap-2">
+                                <div className="mt-8 pt-6 border-t border-black/5 flex flex-wrap gap-2">
                                     {['Gold & Commodity POS', 'Live Price Tickers', 'Forex Trading Bots', 'DRM Academies'].map((tag, idx) => (
-                                        <span key={idx} className="text-[10px] font-mono uppercase px-2 py-1 bg-black text-zinc-300 border border-[#333333]">
+                                        <span key={idx} className="text-[11px] font-medium px-2.5 py-1 bg-white text-[#1d1d1f]/80 border border-black/5 rounded-full">
                                             {tag}
                                         </span>
                                     ))}
@@ -432,11 +424,11 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
 
                         </div>
 
-                        <div className="mt-14 pt-8 border-t border-[#222222] flex items-center justify-between">
-                            <a href="#work" className="text-xs font-bold font-mono tracking-widest rtl:tracking-normal uppercase text-zinc-300 hover:text-white underline underline-offset-4">
+                        <div className="mt-14 pt-8 border-t border-black/5 flex items-center justify-between">
+                            <a href="#work" className="text-xs font-bold uppercase text-[#0071e3] hover:underline underline-offset-4">
                                 Explore Production Case Studies ➔
                             </a>
-                            <span className="text-xs font-mono text-zinc-500 uppercase">
+                            <span className="text-xs font-medium text-[#1d1d1f]/40 uppercase tracking-wider">
                                 30+ Shipped Solutions
                             </span>
                         </div>
@@ -448,20 +440,20 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                 <section id="work" className="py-24 sm:py-32 px-6 max-w-[1400px] mx-auto">
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                         <div>
-                            <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#748660] font-semibold block mb-2">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-[#0071e3] block mb-2">
                                 Curated Production Archive
                             </span>
-                            <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white font-sans">
+                            <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#1d1d1f] font-sans">
                                 Our Work, News &amp; Insights
                             </h3>
                         </div>
-                        <p className="text-sm text-zinc-400 font-sans max-w-md leading-relaxed">
+                        <p className="text-sm text-[#1d1d1f]/60 font-sans max-w-md leading-relaxed">
                             Filter our real-world engineered platforms by domain to explore architecture blueprints, live systems, and technical case studies.
                         </p>
                     </div>
 
                     {/* Tab Navigation Filter Bar */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 border-b border-[#222222] scrollbar-none">
+                    <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 border-b border-black/5 scrollbar-none">
                         {GALLERY_TABS.map((tab) => {
                             const isActive = activeGalleryTab === tab.id;
                             const count = tab.id === 'all' 
@@ -472,15 +464,15 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveGalleryTab(tab.id)}
-                                    className={`px-4 sm:px-5 py-2.5 text-xs font-mono font-bold tracking-wider uppercase whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 ${
+                                    className={`px-4 sm:px-5 py-2 text-xs font-semibold rounded-[980px] whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 ${
                                         isActive
-                                            ? 'bg-[#748660] text-[#0F140A] shadow-lg shadow-[#748660]/20'
-                                            : 'bg-[#161616] text-zinc-400 hover:text-white hover:bg-[#222222] border border-[#2B2B2B]'
+                                            ? 'bg-[#0071e3] text-white shadow-sm'
+                                            : 'bg-[#f5f5f7] text-[#1d1d1f]/75 hover:bg-black/5 hover:text-[#1d1d1f]'
                                     }`}
                                 >
                                     <span>{tab.label}</span>
-                                    <span className={`text-[10px] px-1.5 py-0.5 rounded-sm ${
-                                        isActive ? 'bg-[#0F140A] text-[#748660]' : 'bg-[#111111] text-zinc-500'
+                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                                        isActive ? 'bg-white/20 text-white' : 'bg-black/5 text-[#1d1d1f]/60'
                                     }`}>
                                         {count}
                                     </span>
@@ -493,8 +485,6 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                     <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         <AnimatePresence mode="popLayout">
                             {filteredGalleryItems.map((item) => {
-                                const isSage = item.cardType === 'sage';
-                                
                                 return (
                                     <motion.div
                                         key={item.id}
@@ -503,65 +493,43 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.94 }}
                                         transition={{ duration: 0.35, ease: 'easeOut' }}
-                                        className={`overflow-hidden flex flex-col justify-between group transition-all duration-300 ${
-                                            isSage
-                                                ? 'bg-[#748660] text-[#111111] border border-[#5E6D4E] p-6 sm:p-8'
-                                                : 'bg-[#161616] text-[#E5E5E5] border border-[#262626] hover:border-[#748660]'
-                                        }`}
+                                        className="overflow-hidden flex flex-col justify-between group transition-all duration-300 rounded-[24px] bg-white border border-black/5 shadow-sm hover:shadow-xl hover:border-black/10"
                                     >
                                         <div>
                                             {/* Media Container */}
-                                            <div className={`relative w-full overflow-hidden bg-black ${
-                                                isSage 
-                                                    ? 'h-56 sm:h-64 rounded-sm mb-6 bg-[#657652]/40' 
-                                                    : 'h-64 sm:h-72 border-b border-[#222222]'
-                                            }`}>
+                                            <div className="relative w-full overflow-hidden bg-black h-64 sm:h-72 border-b border-black/5">
                                                 <img 
                                                     src={item.image} 
                                                     alt={item.title} 
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 contrast-[1.05]"
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-95"
                                                     loading="lazy"
                                                 />
                                                 <div className="absolute top-3 end-3">
-                                                    <span className={`text-[10px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 backdrop-blur-md border ${
-                                                        isSage 
-                                                            ? 'bg-[#0F140A]/90 text-[#748660] border-[#0F140A]' 
-                                                            : 'bg-black/85 text-white border-[#333333]'
-                                                    }`}>
+                                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[#1d1d1f] shadow-sm">
                                                         {item.badge}
                                                     </span>
                                                 </div>
                                             </div>
 
                                             {/* Content Header & Body */}
-                                            <div className={isSage ? 'space-y-2' : 'p-6 sm:p-8 space-y-2.5'}>
-                                                <span className={`text-[11px] font-mono uppercase tracking-widest block font-semibold ${
-                                                    isSage ? 'text-[#242E1B]' : 'text-[#748660]'
-                                                }`}>
+                                            <div className="p-6 sm:p-8 space-y-2.5">
+                                                <span className="text-[11px] font-semibold uppercase tracking-wider block text-[#0071e3]">
                                                     {item.category}
                                                 </span>
-                                                <h4 className={`text-lg sm:text-xl font-bold tracking-tight font-sans transition-colors ${
-                                                    isSage ? 'text-[#0F140A]' : 'text-white group-hover:text-[#748660]'
-                                                }`}>
+                                                <h4 className="text-lg sm:text-xl font-bold tracking-tight font-sans transition-colors text-[#1d1d1f] group-hover:text-[#0071e3]">
                                                     {item.title}
                                                 </h4>
-                                                <p className={`text-sm font-sans leading-relaxed line-clamp-2 ${
-                                                    isSage ? 'text-[#242E1B]' : 'text-zinc-400'
-                                                }`}>
+                                                <p className="text-sm font-sans leading-relaxed line-clamp-2 text-[#1d1d1f]/60">
                                                     {item.description}
                                                 </p>
                                             </div>
                                         </div>
 
                                         {/* Action Link Footer */}
-                                        <div className={`mt-6 pt-4 border-t flex items-center justify-between text-xs font-mono font-bold transition-colors ${
-                                            isSage 
-                                                ? 'border-[#5E6D4E] text-[#0F140A]' 
-                                                : 'px-6 sm:px-8 pb-6 pt-4 border-[#222222] text-zinc-400 group-hover:text-white'
-                                        }`}>
+                                        <div className="px-6 sm:px-8 pb-6 pt-4 border-t border-black/5 flex items-center justify-between text-xs font-semibold text-[#0071e3] group-hover:underline">
                                             <Link 
                                                 href={item.link}
-                                                className="flex items-center justify-between w-full hover:underline underline-offset-4"
+                                                className="flex items-center justify-between w-full"
                                             >
                                                 <span className="tracking-wider uppercase">EXPLORE CASE STUDY</span>
                                                 <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -576,7 +544,7 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                     {/* Footer Explore Link */}
                     <div className="mt-16 flex flex-col items-center space-y-4">
                         <Link href="/portfolio">
-                            <button className="px-8 py-3.5 border border-white text-white hover:bg-[#748660] hover:text-[#0F140A] hover:border-[#748660] text-xs font-bold font-mono tracking-widest rtl:tracking-normal uppercase transition-all cursor-pointer">
+                            <button className="px-8 py-3.5 bg-black hover:bg-zinc-800 text-white rounded-[980px] text-xs font-semibold tracking-wider uppercase transition-all shadow-md cursor-pointer">
                                 EXPLORE ALL PORTFOLIO ARCHIVES ➔
                             </button>
                         </Link>
@@ -585,34 +553,34 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
 
 
                 {/* 5. GLOBAL INFRASTRUCTURE PERSPECTIVE (3D DOT GLOBE ARC) */}
-                <section id="network" className="py-28 sm:py-36 px-6 bg-black border-t border-[#222222] relative overflow-hidden text-center">
+                <section id="network" className="py-28 sm:py-36 px-6 bg-[#f5f5f7] border-t border-black/5 relative overflow-hidden text-center">
                     <div className="max-w-4xl mx-auto relative mb-12">
                         <div className="relative w-full h-48 sm:h-64 flex items-center justify-center">
-                            <svg viewBox="0 0 800 300" className="w-full h-full opacity-60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <ellipse cx="400" cy="300" rx="380" ry="180" stroke="#333333" strokeWidth="1" strokeDasharray="3 3" />
-                                <ellipse cx="400" cy="300" rx="320" ry="140" stroke="#444444" strokeWidth="1" />
-                                <ellipse cx="400" cy="300" rx="240" ry="100" stroke="#333333" strokeWidth="1" strokeDasharray="2 2" />
-                                <ellipse cx="400" cy="300" rx="140" ry="60" stroke="#555555" strokeWidth="1" />
+                            <svg viewBox="0 0 800 300" className="w-full h-full opacity-40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <ellipse cx="400" cy="300" rx="380" ry="180" stroke="#0071e3" strokeWidth="1" strokeDasharray="3 3" />
+                                <ellipse cx="400" cy="300" rx="320" ry="140" stroke="#0071e3" strokeWidth="1" />
+                                <ellipse cx="400" cy="300" rx="240" ry="100" stroke="#0071e3" strokeWidth="1" strokeDasharray="2 2" />
+                                <ellipse cx="400" cy="300" rx="140" ry="60" stroke="#0071e3" strokeWidth="1" />
                                 
                                 <circle cx="210" cy="220" r="4" fill="#FF5722" className="animate-pulse" />
-                                <circle cx="320" cy="180" r="4" fill="#748660" className="animate-pulse" />
-                                <circle cx="400" cy="160" r="5" fill="#FFFFFF" className="animate-pulse" />
+                                <circle cx="320" cy="180" r="4" fill="#0071e3" className="animate-pulse" />
+                                <circle cx="400" cy="160" r="5" fill="#000000" className="animate-pulse" />
                                 <circle cx="480" cy="185" r="4" fill="#B2831B" className="animate-pulse" />
-                                <circle cx="590" cy="225" r="4" fill="#00E5FF" className="animate-pulse" />
+                                <circle cx="590" cy="225" r="4" fill="#10B981" className="animate-pulse" />
                             </svg>
                         </div>
                     </div>
 
                     <div className="max-w-4xl mx-auto space-y-8 relative z-10">
-                        <h2 className="text-2xl sm:text-4xl md:text-5xl font-medium tracking-tight text-[#EDEDED] leading-[1.35] font-sans">
+                        <h2 className="text-2xl sm:text-4xl md:text-5xl font-medium tracking-tight text-[#1d1d1f] leading-[1.35] font-sans">
                             Global perspective, local heartbeat. 120+ enterprise deployments, 14 cloud nodes connected worldwide.
                         </h2>
 
-                        <div className="flex items-center justify-center space-x-10 rtl:space-x-reverse text-xs font-mono uppercase tracking-[0.2em] rtl:tracking-normal text-zinc-400 pt-4">
-                            <a href="#expertise" className="hover:text-white underline underline-offset-4">
+                        <div className="flex items-center justify-center space-x-10 rtl:space-x-reverse text-xs font-semibold uppercase tracking-wider text-[#0071e3] pt-4">
+                            <a href="#expertise" className="hover:underline underline-offset-4">
                                 Our Stack
                             </a>
-                            <Link href="/about/mahmoud-amin" className="hover:text-white underline underline-offset-4">
+                            <Link href="/about/mahmoud-amin" className="hover:underline underline-offset-4">
                                 About Us
                             </Link>
                         </div>
@@ -621,7 +589,7 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
 
 
                 {/* 6. DISCOVERY BUDGET & ARCHITECTURE ESTIMATOR */}
-                <section id="contact" className="py-24 sm:py-32 px-6 border-t border-[#222222] bg-[#141414]">
+                <section id="contact" className="py-24 sm:py-32 px-6 border-t border-black/5 bg-white">
                     <ProjectEstimator />
                 </section>
 

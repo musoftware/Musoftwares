@@ -34,18 +34,18 @@ export default function ToolsPublicLayout({
         <PublicLayout>
             <Head title={`${title} — Musoftwares Tools`} />
 
-            <div className="w-full bg-[#111111] text-[#E5E5E5] min-h-screen">
+            <div className="w-full bg-[#fbfbfd] text-[#1d1d1f] min-h-screen">
                 {/* Runtime status banner */}
                 {isAuthed && (
-                    <div className="border-b border-[#222222] bg-[#161616]">
+                    <div className="border-b border-black/5 bg-white">
                         <RuntimeStatusBanner toolSlug={toolSlug} />
                     </div>
                 )}
 
                 {/* Sub-Navigation Bar */}
-                <div className="border-b border-[#222222] bg-[#141414] py-3 px-6 sm:px-10">
+                <div className="border-b border-black/5 bg-white/80 backdrop-blur-md py-3 px-6 sm:px-10 sticky top-14 z-30">
                     <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-                        <div className="flex items-center space-x-2 sm:space-x-4 overflow-x-auto">
+                        <div className="flex items-center space-x-2 sm:space-x-3 overflow-x-auto">
                             {visibleItems.map((item) => {
                                 const Icon = item.icon;
                                 const isActive = activeNav === item.id;
@@ -53,10 +53,10 @@ export default function ToolsPublicLayout({
                                     <Link
                                         key={item.id}
                                         href={item.href}
-                                        className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono tracking-wider rtl:tracking-normal uppercase transition-colors ${
+                                        className={`flex items-center gap-2 px-4 py-2 text-xs rounded-full font-medium transition-all ${
                                             isActive
-                                                ? 'bg-white text-black font-bold'
-                                                : 'text-zinc-400 hover:text-white hover:bg-[#222222]'
+                                                ? 'bg-[#0071e3] text-white shadow-sm font-semibold'
+                                                : 'text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#f5f5f7]'
                                         }`}
                                     >
                                         <Icon className="h-3.5 w-3.5" />

@@ -41,6 +41,34 @@ class ClientProjectViewsTest extends TestCase
         ], $attrs));
     }
 
+    public function test_client_can_view_projects_index()
+    {
+        $client = $this->makeClient();
+        $this->makeProject($client);
+
+        $response = $this->actingAs($client)->get(route('client.projects.index'));
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Client/Projects/Index')
+            ->has('projects.data', 1)
+        );
+    }
+
+    public function test_client_can_access_client_projects_alias()
+    {
+        $client = $this->makeClient();
+        $this->makeProject($client);
+
+        $response = $this->actingAs($client)->get('/client/projects');
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Client/Projects/Index')
+            ->has('projects.data', 1)
+        );
+    }
+
     public function test_client_can_view_aggregated_tasks()
     {
         $client = $this->makeClient();

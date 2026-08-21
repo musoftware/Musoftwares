@@ -10,7 +10,7 @@ export default function MarketplaceLayout({
 
     return (
         <PublicLayout>
-            <div className="w-full bg-[#111111] text-[#E5E5E5] min-h-screen">
+            <div className="w-full bg-[#fbfbfd] text-[#1d1d1f] min-h-screen">
                 <MarketplaceCategoryNav />
                 {/* Main content area */}
                 <main className="w-full">

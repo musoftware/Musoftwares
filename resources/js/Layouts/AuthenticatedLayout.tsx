@@ -144,15 +144,15 @@ function AuthenticatedContent({
     };
 
 
-    // Stable NavItem: Apple pill geometry with high-contrast active state
+    // Stable NavItem: Apple pill geometry with sleek, harmonious active state
     const NavLink = ({ href, active, children }: any) => (
         <Link
             href={href}
             className={cn(
-                'inline-flex items-center gap-1.5 h-8 px-3.5 rounded-[980px] text-xs font-semibold tracking-wide transition-all duration-150',
+                'inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium tracking-normal transition-all duration-150',
                 active
-                    ? 'bg-[#0071e3] text-white shadow-sm font-semibold'
-                    : 'text-[#1d1d1f]/75 hover:bg-black/5 hover:text-[#1d1d1f]'
+                    ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold'
+                    : 'text-[#1d1d1f]/70 hover:bg-black/5 hover:text-[#1d1d1f]'
             )}
         >
             {children}
@@ -359,13 +359,15 @@ function AuthenticatedContent({
                                 </span>
                             </SafeLink>
 
-                            <nav className="hidden md:flex items-center gap-1.5">
+                            <nav className="hidden md:flex items-center gap-1">
                                 <div className="relative">
                                     <NavLink 
                                         href={auth?.team_member ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('dashboard')} 
                                         active={auth?.team_member ? isRouteActive('erp') : isRouteActive('dashboard')}
                                     >
-                                        {__('general.dashboard')}</NavLink>
+                                        <LayoutDashboard className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                        <span>{__('general.dashboard')}</span>
+                                    </NavLink>
                                     {(!auth?.team_member && isTourOpen && tourStep === 2) && (
                                         <span className="absolute -top-1 end-0 flex h-3 w-3">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0071e3]/40 opacity-75" />
@@ -379,12 +381,14 @@ function AuthenticatedContent({
                                         <DropdownMenu>
                                             <div className="relative inline-block">
                                                 <DropdownMenuTrigger className={cn(
-                                                    "inline-flex items-center gap-1.5 h-8 px-3.5 rounded-[980px] text-xs font-semibold tracking-wide transition-all duration-150 outline-none select-none",
+                                                    "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium tracking-normal transition-all duration-150 outline-none select-none cursor-pointer",
                                                     isWorkspaceActive 
-                                                        ? "bg-[#0071e3] text-white shadow-sm font-semibold" 
-                                                        : "text-[#1d1d1f]/75 hover:bg-black/5 hover:text-[#1d1d1f]"
+                                                        ? "bg-[#0071e3]/10 text-[#0071e3] font-semibold" 
+                                                        : "text-[#1d1d1f]/70 hover:bg-black/5 hover:text-[#1d1d1f]"
                                                 )}>
-                                                    {__('general.workspace')}<ChevronDown className="ms-1 h-3 w-3 opacity-60" />
+                                                    <FolderKanban className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                                    <span>{__('general.workspace')}</span>
+                                                    <ChevronDown className="ms-0.5 h-3 w-3 opacity-50 shrink-0" />
                                                 </DropdownMenuTrigger>
                                                 {isTourOpen && (tourStep === 2 || tourStep === 5) && (
                                                     <span className="absolute top-1 end-1 flex h-2.5 w-2.5">
@@ -580,28 +584,26 @@ function AuthenticatedContent({
                                         </DropdownMenu>
 
                                 {/* SERVICES LINK */}
-                                <SafeLink
+                                <NavLink
                                     href={safeRoute('marketplace.services.index')}
-                                    className={cn(
-                                        "inline-flex items-center gap-1.5 h-8 px-3.5 rounded-[980px] text-xs font-semibold tracking-wide transition-all duration-150 outline-none select-none",
-                                        isRouteActive('marketplace.services')
-                                            ? "bg-[#0071e3] text-white shadow-sm font-semibold"
-                                            : "text-[#1d1d1f]/75 hover:bg-black/5 hover:text-[#1d1d1f]"
-                                    )}
+                                    active={isRouteActive('marketplace.services')}
                                 >
-                                    <Briefcase className="me-1 h-3.5 w-3.5" /> {__('general.services')}
-                                </SafeLink>
+                                    <Briefcase className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                    <span>{__('general.services')}</span>
+                                </NavLink>
 
                                 {/* iSAAS MEGA MENU */}
                                 <DropdownMenu>
                                     <div className="relative inline-block">
                                         <DropdownMenuTrigger className={cn(
-                                            "inline-flex items-center gap-1.5 h-8 px-3.5 rounded-[980px] text-xs font-semibold tracking-wide transition-all duration-150 outline-none select-none",
+                                            "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium tracking-normal transition-all duration-150 outline-none select-none cursor-pointer",
                                             isErpActive || isCrmActive || isBookingActive || isToolsActive || isIntelligenceActive
-                                                ? "bg-[#0071e3] text-white shadow-sm font-semibold"
-                                                : "text-[#1d1d1f]/75 hover:bg-black/5 hover:text-[#1d1d1f]"
+                                                ? "bg-[#0071e3]/10 text-[#0071e3] font-semibold"
+                                                : "text-[#1d1d1f]/70 hover:bg-black/5 hover:text-[#1d1d1f]"
                                         )}>
-                                            <Sparkles className="me-1 h-3.5 w-3.5 text-[#0071e3]" /> iSAAS <ChevronDown className="ms-1 h-3 w-3 opacity-60" />
+                                            <Sparkles className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                            <span>iSAAS</span>
+                                            <ChevronDown className="ms-0.5 h-3 w-3 opacity-50 shrink-0" />
                                         </DropdownMenuTrigger>
                                         {isTourOpen && tourStep === 4 && (
                                             <span className="absolute top-1 end-1 flex h-2.5 w-2.5">
@@ -770,39 +772,42 @@ function AuthenticatedContent({
                                 </DropdownMenu>
 
                                 <NavLink href={safeRoute('estimator', undefined, '/estimator')} active={isRouteActive('estimator')}>
-                                    <Calculator className="h-3.5 w-3.5 text-[#0071e3]" /> {__('general.estimator') || 'Estimator'}
+                                    <Calculator className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                    <span>{__('general.estimator') || 'Estimator'}</span>
                                 </NavLink>
 
                                 <NavLink href={safeRoute('subscriptions.plans')} active={isRouteActive('subscriptions')}>
-                                    <CreditCard className="h-3.5 w-3.5 text-[#0071e3]" /> {__('general.subscription')}</NavLink>
+                                    <CreditCard className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                    <span>{__('general.subscription')}</span>
+                                </NavLink>
                                     </>
                                 )}
                             </nav>
                         </div>
 
                         {/* RIGHT: Financials, Tour Button & Profile */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-2.5">
                             {isMarketplaceActive && (
-                                <div className="me-1 sm:me-2">
+                                <div className="me-1">
                                     <MarketplaceModeToggle />
                                 </div>
                             )}
                             {!auth?.team_member && (
-                                <div className="hidden md:flex items-center gap-2 me-1 font-sans text-xs">
-                                    {/* Add Balance pill — unified studio geometry */}
+                                <div className="hidden md:flex items-center gap-2 font-sans text-xs">
+                                    {/* Add Balance pill */}
                                     <SafeLink
                                         href={safeRoute('financial.add-balance')}
-                                        className="inline-flex items-center gap-1.5 h-8 min-w-[100px] justify-center px-3.5 text-xs font-semibold border border-black/10 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-[980px] shadow-sm transition-all"
+                                        className="inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium border border-black/10 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full shadow-2xs transition-all shrink-0"
                                     >
                                         <Plus className="w-3.5 h-3.5 shrink-0 text-[#0071e3]" />
                                         <span>{__('general.add_balance')}</span>
                                     </SafeLink>
 
-                                    {/* Wallet pill — unified studio geometry */}
+                                    {/* Wallet pill */}
                                     <div className="relative">
                                         <SafeLink
                                             href={safeRoute('financial.transactions')}
-                                            className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3.5 bg-[#f5f5f7] hover:bg-[#ebebed] border border-black/5 rounded-[980px] transition-all text-xs font-semibold text-[#1d1d1f]"
+                                            className="inline-flex items-center gap-1.5 h-8 px-3 bg-[#f5f5f7] hover:bg-[#ebebed] border border-black/5 rounded-full transition-all text-xs font-semibold text-[#1d1d1f] shrink-0"
                                             title={__('general.wallet_balance')}
                                         >
                                             <Wallet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -816,10 +821,10 @@ function AuthenticatedContent({
                                         )}
                                     </div>
 
-                                    {/* Points pill — unified studio geometry */}
+                                    {/* Points pill */}
                                     <SafeLink
                                         href={safeRoute('points.index', undefined, '/points')}
-                                        className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 border border-amber-200/60 rounded-[980px] transition-all text-xs font-semibold text-amber-800"
+                                        className="inline-flex items-center gap-1.5 h-8 px-2.5 bg-amber-50 hover:bg-amber-100/60 border border-amber-200/60 rounded-full transition-all text-xs font-semibold text-amber-800 shrink-0"
                                         title={__('general.points_connects_balance')}
                                     >
                                         <Coins className="w-3.5 h-3.5 text-amber-600 shrink-0" />
@@ -831,10 +836,10 @@ function AuthenticatedContent({
                             {/* Notifications */}
                             <DropdownMenu>
                                 <div className="relative inline-block">
-                                    <DropdownMenuTrigger className="w-8 h-8 rounded-full bg-white border border-black/10 inline-flex items-center justify-center text-[#1d1d1f]/75 hover:text-[#1d1d1f] hover:bg-[#f5f5f7] transition-all relative outline-none shrink-0 cursor-pointer">
-                                        <Bell className="w-4 h-4" />
+                                    <DropdownMenuTrigger className="w-8 h-8 rounded-full bg-white hover:bg-[#f5f5f7] border border-black/10 inline-flex items-center justify-center text-[#1d1d1f]/75 hover:text-[#1d1d1f] transition-all relative outline-none shrink-0 cursor-pointer shadow-2xs">
+                                        <Bell className="w-3.5 h-3.5" />
                                         {notifications?.unread_count > 0 && (
-                                            <span className="absolute top-1 end-1 w-2 h-2 bg-[#0071e3] rounded-full" />
+                                            <span className="absolute top-1.5 end-1.5 w-2 h-2 bg-[#0071e3] rounded-full" />
                                         )}
                                     </DropdownMenuTrigger>
                                     {isTourOpen && tourStep === 6 && (
@@ -980,34 +985,6 @@ function AuthenticatedContent({
                                     ) : (
                                         <DropdownMenuItem 
                                             className="cursor-pointer rounded-[12px] text-xs font-semibold text-rose-600 hover:bg-rose-50 p-2 transition-colors"
-                                            render={<SafeLink href={route('erp.team.logout')} method="post" as="button" className="flex items-center w-full font-bold" />}
-                                        >
-                                            <LogOut className="me-2 h-3.5 w-3.5" />{__('general.logout_team_member')}</DropdownMenuItem>
-                                    )}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                </div>
-            </header>
-                                                <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-none text-xs text-zinc-300 hover:bg-[#1E1E1E] hover:text-white p-2 transition-colors"
-                                                    render={<SafeLink href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
-                                                >
-                                                    <Box className="me-2 h-3.5 w-3.5 text-zinc-500" /> {__('general.subscriptions')}</DropdownMenuItem>
-                                            </DropdownMenuGroup>
-                                            
-                                            <DropdownMenuSeparator className="my-1.5 bg-[#222222]" />
-                                            
-                                            <DropdownMenuItem 
-                                                className="cursor-pointer rounded-none text-xs font-mono uppercase tracking-wider text-rose-400 hover:text-rose-300 hover:bg-[#201111] p-2 transition-colors"
-                                                render={<SafeLink href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-bold" />}
-                                            >
-                                                <LogOut className="me-2 h-3.5 w-3.5" /> {__('general.logout')}</DropdownMenuItem>
-                                        </>
-                                    ) : (
-                                        <DropdownMenuItem 
-                                            className="cursor-pointer rounded-none text-xs font-mono uppercase tracking-wider text-rose-400 hover:text-rose-300 hover:bg-[#201111] p-2 transition-colors"
                                             render={<SafeLink href={route('erp.team.logout')} method="post" as="button" className="flex items-center w-full font-bold" />}
                                         >
                                             <LogOut className="me-2 h-3.5 w-3.5" />{__('general.logout_team_member')}</DropdownMenuItem>

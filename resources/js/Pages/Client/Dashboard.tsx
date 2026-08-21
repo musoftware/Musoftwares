@@ -48,12 +48,12 @@ export default function Dashboard({
         ? userProjects 
         : [
             {
-                id: 1,
+                id: 0,
                 name: 'Enterprise Cloud ERP Deployment',
                 status: 'In Progress',
                 progress: 68,
                 phase: 'Sprint 3: Ledger Reconciliation & VAT Automation',
-                link: '/client/projects'
+                link: '/projects'
             }
         ];
 
@@ -88,7 +88,7 @@ export default function Dashboard({
                         </div>
 
                         <div className="flex items-center space-x-4 shrink-0">
-                            <Link href="/client/projects">
+                            <Link href={currentProject?.id ? `/projects/${currentProject.id}` : '/projects'}>
                                 <button className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer">
                                     <span>LAUNCH WORKSPACE</span>
                                     <ArrowRight className="w-4 h-4" />
@@ -122,7 +122,7 @@ export default function Dashboard({
                                 </div>
                                 <p className="text-xs text-[#1d1d1f]/60">Sprint deliveries, kanban boards &amp; files</p>
                             </div>
-                            <Link href="/client/projects" className="text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1">
+                            <Link href="/projects" className="text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1">
                                 <span>VIEW PROJECT BOARD</span>
                                 <ArrowUpRight className="h-3.5 w-3.5" />
                             </Link>
