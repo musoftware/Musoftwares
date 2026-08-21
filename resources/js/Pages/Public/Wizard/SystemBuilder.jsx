@@ -318,7 +318,7 @@ Looking forward to reviewing the technical proposal!`;
                 <meta name="description" content="Configure your custom enterprise system, ERP, WhatsApp automation, or SaaS application step-by-step with transparent modules and instant quotation." />
             </Head>
 
-            <div className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
+            <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-8 sm:pt-14 pb-24 sm:pb-36">
                 
                 {/* Header */}
                 <StudioHeader
@@ -326,7 +326,7 @@ Looking forward to reviewing the technical proposal!`;
                     title={
                         <>
                             Architect Your Custom System. <br className="hidden sm:inline" />
-                            <span className="text-[#748660]">Step-by-Step Production Blueprint.</span>
+                            <span className="text-[#0071e3]">Step-by-Step Production Blueprint.</span>
                         </>
                     }
                     subtitle="Configure your operational archetype, required modules, integrations, and target timeline to receive an engineered proposal."
@@ -335,12 +335,12 @@ Looking forward to reviewing the technical proposal!`;
                 <div className="max-w-[1200px] mx-auto px-6 sm:px-10">
                     
                     {/* Multi-Step Progress Tracker */}
-                    <div className="mb-14">
-                        <div className="flex items-center justify-between relative font-mono text-xs max-w-3xl mx-auto">
+                    <div className="mb-12">
+                        <div className="flex items-center justify-between relative text-xs max-w-3xl mx-auto">
                             {/* Track Line */}
-                            <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-[#222222] -translate-y-1/2 z-0" />
+                            <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-[#e5e5ea] -translate-y-1/2 z-0" />
                             <div 
-                                className="absolute top-1/2 left-0 h-[2px] bg-[#748660] -translate-y-1/2 z-0 transition-all duration-500" 
+                                className="absolute top-1/2 left-0 h-[2px] bg-[#0071e3] -translate-y-1/2 z-0 transition-all duration-500" 
                                 style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
                             />
 
@@ -355,18 +355,18 @@ Looking forward to reviewing the technical proposal!`;
                                     <button
                                         type="button"
                                         onClick={() => s.step < currentStep && setCurrentStep(s.step)}
-                                        className={`w-9 h-9 flex items-center justify-center border font-bold transition-all ${
+                                        className={`w-9 h-9 rounded-full flex items-center justify-center font-semibold text-xs transition-all ${
                                             currentStep === s.step
-                                                ? 'bg-[#748660] border-[#748660] text-[#0F140A] scale-110 shadow-lg shadow-[#748660]/25'
+                                                ? 'bg-[#0071e3] text-white scale-110 shadow-md shadow-[#0071e3]/30'
                                                 : currentStep > s.step
-                                                ? 'bg-black border-[#748660] text-[#748660]'
-                                                : 'bg-black border-[#333333] text-zinc-500'
+                                                ? 'bg-white border-2 border-[#0071e3] text-[#0071e3]'
+                                                : 'bg-[#f5f5f7] border border-black/10 text-[#1d1d1f]/40'
                                         }`}
                                     >
                                         {currentStep > s.step ? <Check className="w-4 h-4" strokeWidth={3} /> : s.step}
                                     </button>
-                                    <span className={`text-[11px] mt-2 hidden sm:block font-mono uppercase tracking-wider ${
-                                        currentStep === s.step ? 'text-white font-bold' : 'text-zinc-500'
+                                    <span className={`text-[11px] mt-2 hidden sm:block font-medium ${
+                                        currentStep === s.step ? 'text-[#1d1d1f] font-semibold' : 'text-[#1d1d1f]/40'
                                     }`}>
                                         {s.label}
                                     </span>
@@ -376,7 +376,7 @@ Looking forward to reviewing the technical proposal!`;
                     </div>
 
                     {/* Step Card Container */}
-                    <div className="bg-[#161616] border border-[#2B2B2B] p-6 sm:p-12 relative overflow-hidden shadow-2xl">
+                    <div className="bg-white border border-black/5 rounded-[28px] p-6 sm:p-12 relative overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)]">
                         
                         <AnimatePresence mode="wait">
                             
@@ -388,14 +388,14 @@ Looking forward to reviewing the technical proposal!`;
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.3 }}
-                                    className="space-y-10"
+                                    className="space-y-8"
                                 >
-                                    <div className="space-y-2">
-                                        <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">Step 01 / 05</span>
-                                        <h3 className="text-2xl sm:text-3xl font-bold text-white font-sans">
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 01 / 05</span>
+                                        <h3 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                             Select Your Core System Archetype
                                         </h3>
-                                        <p className="text-sm text-zinc-400 font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 font-sans">
                                             Choose the primary operational architecture that best represents your system foundation.
                                         </p>
                                     </div>
@@ -409,33 +409,33 @@ Looking forward to reviewing the technical proposal!`;
                                                 <div
                                                     key={arch.id}
                                                     onClick={() => setFormData(prev => ({ ...prev, archetype: arch.id }))}
-                                                    className={`p-6 border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
+                                                    className={`p-6 rounded-[20px] border transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
                                                         isSelected
-                                                            ? 'border-[#748660] bg-[#1A2215] ring-1 ring-[#748660]'
-                                                            : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                                            ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 shadow-[0_8px_24px_rgba(0,113,227,0.12)] ring-4 ring-[#0071e3]/10'
+                                                            : 'border-black/10 bg-white hover:border-black/30 hover:shadow-md'
                                                     }`}
                                                 >
                                                     <div className="space-y-3">
                                                         <div className="flex items-center justify-between">
-                                                            <div className={`p-2.5 ${isSelected ? 'bg-[#748660] text-[#0F140A]' : 'bg-[#1C1C1C] text-zinc-400'}`}>
+                                                            <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-[#0071e3] text-white shadow-sm' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`}>
                                                                 <IconComp className="h-5 w-5" />
                                                             </div>
-                                                            <span className="text-[10px] font-mono uppercase px-2 py-0.5 border border-[#333333] text-zinc-400">
+                                                            <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-[#f5f5f7] border border-black/5 text-[#1d1d1f]/70">
                                                                 {arch.badge}
                                                             </span>
                                                         </div>
 
                                                         <div>
-                                                            <h4 className="font-bold text-base text-white font-sans">{arch.title}</h4>
-                                                            <p className="text-xs text-zinc-400 mt-1 font-sans leading-relaxed">
+                                                            <h4 className="font-semibold text-base text-[#1d1d1f] font-sans">{arch.title}</h4>
+                                                            <p className="text-xs text-[#1d1d1f]/60 mt-1 font-sans leading-relaxed">
                                                                 {arch.desc}
                                                             </p>
                                                         </div>
                                                     </div>
 
-                                                    <div className="pt-3 border-t border-[#222222] text-[11px] font-mono text-zinc-400 flex items-center justify-between">
-                                                        <span className="truncate">{arch.recommendedFor}</span>
-                                                        <div className={`w-4 h-4 border flex items-center justify-center ${isSelected ? 'border-[#748660] bg-[#748660] text-black' : 'border-[#444]'}`}>
+                                                    <div className="pt-3 border-t border-black/5 text-[11px] text-[#1d1d1f]/60 flex items-center justify-between">
+                                                        <span className="truncate max-w-[180px]">{arch.recommendedFor}</span>
+                                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isSelected ? 'border-[#0071e3] bg-[#0071e3] text-white' : 'border-black/20 bg-white'}`}>
                                                             {isSelected && <Check className="w-3 h-3" strokeWidth={3} />}
                                                         </div>
                                                     </div>
@@ -445,15 +445,15 @@ Looking forward to reviewing the technical proposal!`;
                                     </div>
 
                                     {/* Deployment Platforms */}
-                                    <div className="pt-6 border-t border-[#262626] space-y-4">
-                                        <div className="space-y-1">
-                                            <h4 className="font-bold text-sm text-white font-sans">
+                                    <div className="pt-6 border-t border-black/5 space-y-4">
+                                        <div className="space-y-0.5">
+                                            <h4 className="font-semibold text-sm text-[#1d1d1f] font-sans">
                                                 Target Client Environments (Select All That Apply)
                                             </h4>
-                                            <p className="text-xs text-zinc-400 font-sans">Where will your users interact with this system?</p>
+                                            <p className="text-xs text-[#1d1d1f]/60 font-sans">Where will your users interact with this system?</p>
                                         </div>
 
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                                             {deploymentPlatformOptions.map((plat) => {
                                                 const IconC = plat.icon;
                                                 const active = formData.deploymentPlatforms.includes(plat.id);
@@ -462,14 +462,14 @@ Looking forward to reviewing the technical proposal!`;
                                                         key={plat.id}
                                                         type="button"
                                                         onClick={() => togglePlatform(plat.id)}
-                                                        className={`p-4 border transition-all cursor-pointer flex items-center gap-3 text-start ${
+                                                        className={`p-4 rounded-[16px] border transition-all cursor-pointer flex items-center gap-3 text-start ${
                                                             active
-                                                                ? 'border-[#748660] bg-[#1A2215] text-white'
-                                                                : 'border-[#2B2B2B] bg-black text-zinc-400 hover:border-zinc-500 hover:text-white'
+                                                                ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 text-[#1d1d1f] shadow-sm font-semibold'
+                                                                : 'border-black/10 bg-white text-[#1d1d1f]/70 hover:border-black/30 hover:text-[#1d1d1f]'
                                                         }`}
                                                     >
-                                                        <IconC className={`w-4 h-4 ${active ? 'text-[#748660]' : 'text-zinc-500'}`} />
-                                                        <span className="font-bold">{plat.title}</span>
+                                                        <IconC className={`w-4 h-4 ${active ? 'text-[#0071e3]' : 'text-[#1d1d1f]/50'}`} />
+                                                        <span>{plat.title}</span>
                                                     </button>
                                                 );
                                             })}
@@ -486,45 +486,45 @@ Looking forward to reviewing the technical proposal!`;
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.3 }}
-                                    className="space-y-10"
+                                    className="space-y-8"
                                 >
-                                    <div className="space-y-2">
-                                        <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">Step 02 / 05</span>
-                                        <h3 className="text-2xl sm:text-3xl font-bold text-white font-sans">
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 02 / 05</span>
+                                        <h3 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                             Architectural Modules &amp; Capabilities
                                         </h3>
-                                        <p className="text-sm text-zinc-400 font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 font-sans">
                                             Select the building blocks and integrations required for your workflow.
                                         </p>
                                     </div>
 
-                                    <div className="space-y-8">
+                                    <div className="space-y-6">
                                         {moduleCategories.map((group, gIdx) => (
-                                            <div key={gIdx} className="space-y-4">
-                                                <h4 className="text-xs font-mono uppercase tracking-wider text-[#748660] font-bold">
+                                            <div key={gIdx} className="space-y-3">
+                                                <h4 className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
                                                     {group.category}
                                                 </h4>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                                                     {group.items.map((item) => {
                                                         const isChecked = formData.modules.includes(item.id);
                                                         return (
                                                             <div
                                                                 key={item.id}
                                                                 onClick={() => toggleModule(item.id)}
-                                                                className={`p-4 border transition-all cursor-pointer flex items-start gap-3.5 ${
+                                                                className={`p-4 rounded-[18px] border transition-all cursor-pointer flex items-start gap-3.5 ${
                                                                     isChecked
-                                                                        ? 'border-[#748660] bg-[#1A2215]'
-                                                                        : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                                                        ? 'border-[#0071e3] bg-[#0071e3]/5 shadow-sm ring-1 ring-[#0071e3]'
+                                                                        : 'border-black/5 bg-white hover:border-black/20 hover:shadow-sm'
                                                                 }`}
                                                             >
-                                                                <div className={`mt-0.5 w-4 h-4 shrink-0 border flex items-center justify-center ${
-                                                                    isChecked ? 'bg-[#748660] border-[#748660] text-black' : 'border-[#444] bg-[#161616]'
+                                                                <div className={`mt-0.5 w-4 h-4 rounded-md shrink-0 border flex items-center justify-center transition-all ${
+                                                                    isChecked ? 'bg-[#0071e3] border-[#0071e3] text-white' : 'border-black/20 bg-white'
                                                                 }`}>
                                                                     {isChecked && <Check className="w-3 h-3" strokeWidth={3} />}
                                                                 </div>
-                                                                <div className="space-y-1">
-                                                                    <div className="font-bold text-xs text-white font-mono">{item.title}</div>
-                                                                    <p className="text-[11px] text-zinc-400 font-sans leading-relaxed">{item.desc}</p>
+                                                                <div className="space-y-0.5">
+                                                                    <div className="font-semibold text-xs text-[#1d1d1f]">{item.title}</div>
+                                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-relaxed">{item.desc}</p>
                                                                 </div>
                                                             </div>
                                                         );
@@ -535,8 +535,8 @@ Looking forward to reviewing the technical proposal!`;
                                     </div>
 
                                     {/* Custom Modules Text */}
-                                    <div className="pt-4 border-t border-[#262626] space-y-2">
-                                        <label className="text-xs font-mono uppercase text-zinc-300 block">
+                                    <div className="pt-4 border-t border-black/5 space-y-2">
+                                        <label className="text-xs font-semibold text-[#1d1d1f] block">
                                             Any Specific Custom Features or External APIs?
                                         </label>
                                         <textarea
@@ -544,7 +544,7 @@ Looking forward to reviewing the technical proposal!`;
                                             value={formData.customFeaturesText}
                                             onChange={(e) => setFormData(prev => ({ ...prev, customFeaturesText: e.target.value }))}
                                             placeholder="Example: We need direct integration with Aramex courier API, or specialized loyalty points system..."
-                                            className="w-full p-3 bg-black border border-[#2B2B2B] text-white text-xs font-mono focus:border-[#748660] focus:outline-none"
+                                            className="w-full p-3.5 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] text-xs focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                         />
                                     </div>
                                 </motion.div>
@@ -558,39 +558,39 @@ Looking forward to reviewing the technical proposal!`;
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.3 }}
-                                    className="space-y-10"
+                                    className="space-y-8"
                                 >
-                                    <div className="space-y-2">
-                                        <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">Step 03 / 05</span>
-                                        <h3 className="text-2xl sm:text-3xl font-bold text-white font-sans">
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 03 / 05</span>
+                                        <h3 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                             Target Timeline &amp; Investment Tier
                                         </h3>
-                                        <p className="text-sm text-zinc-400 font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 font-sans">
                                             Helps our engineering leads plan team capacity and milestones.
                                         </p>
                                     </div>
 
                                     {/* Timeline */}
-                                    <div className="space-y-4">
-                                        <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
+                                    <div className="space-y-3">
+                                        <h4 className="text-xs uppercase tracking-wider text-[#1d1d1f]/70 font-semibold">
                                             Target Launch Window
                                         </h4>
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                                             {timelineOptions.map((t) => {
                                                 const isSel = formData.timeline === t.id;
                                                 return (
                                                     <div
                                                         key={t.id}
                                                         onClick={() => setFormData(prev => ({ ...prev, timeline: t.id }))}
-                                                        className={`p-5 border transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
-                                                            isSel ? 'border-[#748660] bg-[#1A2215]' : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                                        className={`p-5 rounded-[18px] border transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                                                            isSel ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 shadow-sm' : 'border-black/10 bg-white hover:border-black/30 hover:shadow-md'
                                                         }`}
                                                     >
                                                         <div className="flex items-center justify-between">
-                                                            <span className="text-sm font-bold text-white">{t.title}</span>
-                                                            <span className="text-xs text-[#748660] font-bold">{t.time}</span>
+                                                            <span className="text-sm font-semibold text-[#1d1d1f]">{t.title}</span>
+                                                            <span className="text-xs text-[#0071e3] font-semibold">{t.time}</span>
                                                         </div>
-                                                        <p className="text-[11px] text-zinc-400 font-sans">{t.desc}</p>
+                                                        <p className="text-[11px] text-[#1d1d1f]/60 font-sans">{t.desc}</p>
                                                     </div>
                                                 );
                                             })}
@@ -598,49 +598,49 @@ Looking forward to reviewing the technical proposal!`;
                                     </div>
 
                                     {/* Budget Tier */}
-                                    <div className="pt-6 border-t border-[#262626] space-y-4">
+                                    <div className="pt-6 border-t border-black/5 space-y-4">
                                         <div className="flex items-center justify-between">
-                                            <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
+                                            <h4 className="text-xs uppercase tracking-wider text-[#1d1d1f]/70 font-semibold">
                                                 Estimated Investment Budget Range
                                             </h4>
                                             
                                             {/* Currency Switcher */}
-                                            <div className="flex items-center border border-[#333333] bg-black font-mono text-xs">
+                                            <div className="flex items-center rounded-full bg-[#f5f5f7] p-1 border border-black/5 text-xs">
                                                 <button
                                                     type="button"
                                                     onClick={() => setFormData(prev => ({ ...prev, currency: 'EGP' }))}
-                                                    className={`px-2.5 py-1 ${formData.currency === 'EGP' ? 'bg-white text-black font-bold' : 'text-zinc-400'}`}
+                                                    className={`px-3 py-0.5 rounded-full transition-all cursor-pointer font-semibold ${formData.currency === 'EGP' ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#1d1d1f]/60 hover:text-[#1d1d1f]'}`}
                                                 >
                                                     EGP
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => setFormData(prev => ({ ...prev, currency: 'USD' }))}
-                                                    className={`px-2.5 py-1 ${formData.currency === 'USD' ? 'bg-white text-black font-bold' : 'text-zinc-400'}`}
+                                                    className={`px-3 py-0.5 rounded-full transition-all cursor-pointer font-semibold ${formData.currency === 'USD' ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#1d1d1f]/60 hover:text-[#1d1d1f]'}`}
                                                 >
                                                     USD
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                                             {budgetOptions.map((b) => {
                                                 const isSel = formData.budgetTier === b.id;
                                                 return (
                                                     <div
                                                         key={b.id}
                                                         onClick={() => setFormData(prev => ({ ...prev, budgetTier: b.id }))}
-                                                        className={`p-5 border transition-all cursor-pointer flex items-center justify-between ${
-                                                            isSel ? 'border-[#748660] bg-[#1A2215]' : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                                        className={`p-5 rounded-[18px] border transition-all cursor-pointer flex items-center justify-between ${
+                                                            isSel ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 shadow-sm' : 'border-black/10 bg-white hover:border-black/30 hover:shadow-md'
                                                         }`}
                                                     >
                                                         <div>
-                                                            <div className="font-bold text-white">{b.title}</div>
-                                                            <div className="text-xs text-[#748660] font-bold mt-1">
+                                                            <div className="font-semibold text-[#1d1d1f]">{b.title}</div>
+                                                            <div className="text-xs text-[#0071e3] font-semibold mt-1">
                                                                 {formData.currency === 'USD' ? b.usd : b.egp}
                                                             </div>
                                                         </div>
-                                                        <div className={`w-4 h-4 border flex items-center justify-center ${isSel ? 'border-[#748660] bg-[#748660] text-black' : 'border-[#444]'}`}>
+                                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isSel ? 'border-[#0071e3] bg-[#0071e3] text-white' : 'border-black/20 bg-white'}`}>
                                                             {isSel && <Check className="w-3 h-3" strokeWidth={3} />}
                                                         </div>
                                                     </div>
@@ -661,35 +661,35 @@ Looking forward to reviewing the technical proposal!`;
                                     transition={{ duration: 0.3 }}
                                     className="space-y-8"
                                 >
-                                    <div className="space-y-2">
-                                        <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">Step 04 / 05</span>
-                                        <h3 className="text-2xl sm:text-3xl font-bold text-white font-sans">
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 04 / 05</span>
+                                        <h3 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                             Company &amp; Stakeholder Details
                                         </h3>
-                                        <p className="text-sm text-zinc-400 font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 font-sans">
                                             Who should our lead architect connect with for technical clarifications?
                                         </p>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 font-mono text-xs">
-                                        <div className="space-y-2">
-                                            <label className="text-zinc-300 font-bold block">Company / Project Name *</label>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[#1d1d1f] font-semibold block">Company / Project Name *</label>
                                             <input
                                                 type="text"
                                                 required
                                                 placeholder="e.g. Al-Rowad Gold Exchange"
                                                 value={formData.companyName}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
-                                                className="w-full p-3 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                                className="w-full p-3 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <label className="text-zinc-300 font-bold block">Industry Sector *</label>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[#1d1d1f] font-semibold block">Industry Sector *</label>
                                             <select
                                                 value={formData.industry}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
-                                                className="w-full p-3 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                                className="w-full p-3 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                             >
                                                 {industryOptions.map((ind) => (
                                                     <option key={ind} value={ind}>{ind}</option>
@@ -697,60 +697,60 @@ Looking forward to reviewing the technical proposal!`;
                                             </select>
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <label className="text-zinc-300 font-bold block">Decision Maker / Contact Name *</label>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[#1d1d1f] font-semibold block">Decision Maker / Contact Name *</label>
                                             <input
                                                 type="text"
                                                 required
                                                 placeholder="e.g. Eng. Ahmed Hassan"
                                                 value={formData.contactName}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, contactName: e.target.value }))}
-                                                className="w-full p-3 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                                className="w-full p-3 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <label className="text-zinc-300 font-bold block">Phone / WhatsApp Number *</label>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[#1d1d1f] font-semibold block">Phone / WhatsApp Number *</label>
                                             <input
                                                 type="tel"
                                                 required
                                                 placeholder="+20 10X XXX XXXX"
                                                 value={formData.contactPhone}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
-                                                className="w-full p-3 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                                className="w-full p-3 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                             />
                                         </div>
 
-                                        <div className="space-y-2 sm:col-span-2">
-                                            <label className="text-zinc-300 font-bold block">Work Email (Optional for formal RFP)</label>
+                                        <div className="space-y-1.5 sm:col-span-2">
+                                            <label className="text-[#1d1d1f] font-semibold block">Work Email (Optional for formal RFP)</label>
                                             <input
                                                 type="email"
                                                 placeholder="contact@company.com"
                                                 value={formData.contactEmail}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
-                                                className="w-full p-3 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                                className="w-full p-3 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                             />
                                         </div>
 
-                                        <div className="space-y-2 sm:col-span-2">
-                                            <label className="text-zinc-300 font-bold block">Link to Figma, PRD, or Specifications (Optional)</label>
+                                        <div className="space-y-1.5 sm:col-span-2">
+                                            <label className="text-[#1d1d1f] font-semibold block">Link to Figma, PRD, or Specifications (Optional)</label>
                                             <input
                                                 type="url"
                                                 placeholder="https://figma.com/... or https://docs.google.com/..."
                                                 value={formData.figmaOrDocUrl}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, figmaOrDocUrl: e.target.value }))}
-                                                className="w-full p-3 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                                className="w-full p-3 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                             />
                                         </div>
 
-                                        <div className="space-y-2 sm:col-span-2">
-                                            <label className="text-zinc-300 font-bold block">Project Overview / Current Bottlenecks</label>
+                                        <div className="space-y-1.5 sm:col-span-2">
+                                            <label className="text-[#1d1d1f] font-semibold block">Project Overview / Current Bottlenecks</label>
                                             <textarea
                                                 rows={4}
                                                 placeholder="Describe what you want the system to solve, current software issues, or special requirements..."
                                                 value={formData.projectNotes}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, projectNotes: e.target.value }))}
-                                                className="w-full p-3 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                                className="w-full p-3 bg-[#f5f5f7] border border-black/10 rounded-xl text-[#1d1d1f] focus:bg-white focus:ring-2 focus:ring-[#0071e3] focus:outline-none transition-colors"
                                             />
                                         </div>
                                     </div>
@@ -767,30 +767,30 @@ Looking forward to reviewing the technical proposal!`;
                                     transition={{ duration: 0.3 }}
                                     className="space-y-8"
                                 >
-                                    <div className="space-y-2">
-                                        <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">Step 05 / 05</span>
-                                        <h3 className="text-2xl sm:text-3xl font-bold text-white font-sans">
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 05 / 05</span>
+                                        <h3 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                             System Blueprint Summary
                                         </h3>
-                                        <p className="text-sm text-zinc-400 font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 font-sans">
                                             Review your architectural specification before final dispatch.
                                         </p>
                                     </div>
 
                                     {/* Structured Blueprint Card */}
-                                    <div className="bg-black border border-[#2B2B2B] p-6 sm:p-8 space-y-6 font-mono text-xs">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#222222] pb-6">
+                                    <div className="bg-[#f5f5f7] border border-black/5 rounded-[24px] p-6 sm:p-8 space-y-6 text-xs text-[#1d1d1f]">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-6">
                                             <div>
-                                                <span className="text-[10px] text-zinc-500 uppercase tracking-widest block">Project Specification</span>
-                                                <h4 className="text-lg font-bold text-white mt-1">
+                                                <span className="text-[10px] text-[#1d1d1f]/50 uppercase tracking-widest block font-semibold">Project Specification</span>
+                                                <h4 className="text-lg font-semibold text-[#1d1d1f] mt-0.5">
                                                     {formData.companyName || 'Custom Engineering Project'}
                                                 </h4>
-                                                <span className="text-zinc-400 text-xs">{formData.industry}</span>
+                                                <span className="text-[#1d1d1f]/60 text-xs">{formData.industry}</span>
                                             </div>
                                             
                                             <div className="text-start sm:text-end">
-                                                <span className="text-[10px] text-zinc-500 uppercase tracking-widest block">Archetype</span>
-                                                <span className="text-[#748660] font-bold text-sm">
+                                                <span className="text-[10px] text-[#1d1d1f]/50 uppercase tracking-widest block font-semibold">Archetype</span>
+                                                <span className="text-[#0071e3] font-semibold text-sm">
                                                     {archetypes.find(a => a.id === formData.archetype)?.title}
                                                 </span>
                                             </div>
@@ -798,10 +798,10 @@ Looking forward to reviewing the technical proposal!`;
 
                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
                                             <div>
-                                                <span className="text-zinc-500 block mb-1">Target Environments:</span>
+                                                <span className="text-[#1d1d1f]/50 block mb-1 font-medium">Target Environments:</span>
                                                 <div className="flex flex-wrap gap-1.5">
                                                     {formData.deploymentPlatforms.map(p => (
-                                                        <span key={p} className="px-2 py-0.5 bg-[#1C1C1C] border border-[#333] text-zinc-300 uppercase text-[10px]">
+                                                        <span key={p} className="px-2.5 py-0.5 bg-white border border-black/5 rounded-full text-[#1d1d1f] uppercase text-[10px] font-semibold shadow-2xs">
                                                             {p}
                                                         </span>
                                                     ))}
@@ -809,27 +809,27 @@ Looking forward to reviewing the technical proposal!`;
                                             </div>
 
                                             <div>
-                                                <span className="text-zinc-500 block mb-1">Timeline Target:</span>
-                                                <span className="text-white font-bold">
+                                                <span className="text-[#1d1d1f]/50 block mb-1 font-medium">Timeline Target:</span>
+                                                <span className="text-[#1d1d1f] font-semibold">
                                                     {timelineOptions.find(t => t.id === formData.timeline)?.title} ({timelineOptions.find(t => t.id === formData.timeline)?.time})
                                                 </span>
                                             </div>
 
                                             <div>
-                                                <span className="text-zinc-500 block mb-1">Budget Allocation:</span>
-                                                <span className="text-[#748660] font-bold">
+                                                <span className="text-[#1d1d1f]/50 block mb-1 font-medium">Budget Allocation:</span>
+                                                <span className="text-[#0071e3] font-semibold">
                                                     {budgetOptions.find(b => b.id === formData.budgetTier)?.[formData.currency === 'USD' ? 'usd' : 'egp']}
                                                 </span>
                                             </div>
                                         </div>
 
                                         {/* Modules List */}
-                                        <div className="pt-4 border-t border-[#222222] space-y-2">
-                                            <span className="text-zinc-500 block">Selected Architectural Modules ({formData.modules.length}):</span>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-zinc-300">
+                                        <div className="pt-4 border-t border-black/5 space-y-2">
+                                            <span className="text-[#1d1d1f]/50 block font-medium">Selected Architectural Modules ({formData.modules.length}):</span>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[#1d1d1f]/80">
                                                 {formData.modules.map(m => (
                                                     <div key={m} className="flex items-center gap-2">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 text-[#748660] shrink-0" />
+                                                        <CheckCircle2 className="w-3.5 h-3.5 text-[#0071e3] shrink-0" />
                                                         <span className="capitalize">{m.replace(/_/g, ' ')}</span>
                                                     </div>
                                                 ))}
@@ -837,15 +837,15 @@ Looking forward to reviewing the technical proposal!`;
                                         </div>
 
                                         {/* Contact & Notes */}
-                                        <div className="pt-4 border-t border-[#222222] grid grid-cols-1 sm:grid-cols-2 gap-4 text-zinc-400">
+                                        <div className="pt-4 border-t border-black/5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-[#1d1d1f]/70">
                                             <div>
-                                                <span className="text-zinc-500 block">Primary Contact:</span>
-                                                <span className="text-white font-bold">{formData.contactName}</span> ({formData.contactPhone})
+                                                <span className="text-[#1d1d1f]/50 block font-medium">Primary Contact:</span>
+                                                <span className="text-[#1d1d1f] font-semibold">{formData.contactName}</span> ({formData.contactPhone})
                                             </div>
                                             {formData.contactEmail && (
                                                 <div>
-                                                    <span className="text-zinc-500 block">Email:</span>
-                                                    <span className="text-white">{formData.contactEmail}</span>
+                                                    <span className="text-[#1d1d1f]/50 block font-medium">Email:</span>
+                                                    <span className="text-[#1d1d1f]">{formData.contactEmail}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -853,21 +853,21 @@ Looking forward to reviewing the technical proposal!`;
 
                                     {/* Action Buttons on Step 5 */}
                                     {isSubmitted ? (
-                                        <div className="p-8 bg-[#1A2215] border border-[#748660] text-center space-y-4 font-mono">
-                                            <div className="w-12 h-12 bg-[#748660] text-[#0F140A] rounded-none mx-auto flex items-center justify-center">
+                                        <div className="p-8 rounded-[24px] bg-white border border-green-500/30 text-center space-y-4 shadow-sm">
+                                            <div className="w-12 h-12 rounded-full bg-green-50 text-green-600 mx-auto flex items-center justify-center">
                                                 <Check className="w-6 h-6" strokeWidth={3} />
                                             </div>
-                                            <h4 className="text-xl font-bold text-white">System Brief Registered!</h4>
-                                            <p className="text-xs text-zinc-300 max-w-lg mx-auto font-sans">
-                                                Reference Code: <strong className="text-[#748660]">{briefId}</strong>. Our lead architect Mahmoud Amin has received your technical brief.
+                                            <h4 className="text-xl font-semibold text-[#1d1d1f]">System Brief Registered!</h4>
+                                            <p className="text-xs text-[#1d1d1f]/70 max-w-lg mx-auto font-sans">
+                                                Reference Code: <strong className="text-[#0071e3]">{briefId}</strong>. Our lead architect Mahmoud Amin has received your technical brief.
                                             </p>
 
-                                            <div className="pt-4 flex items-center justify-center gap-4 flex-wrap text-xs">
+                                            <div className="pt-4 flex items-center justify-center gap-3 flex-wrap text-xs">
                                                 <a
                                                     href={generatedWhatsAppUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="px-6 py-3 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold uppercase tracking-wider transition-all flex items-center gap-2"
+                                                    className="px-6 py-3 rounded-[980px] bg-[#25D366] hover:bg-[#20ba59] text-white font-medium shadow-md shadow-green-500/20 transition-all flex items-center gap-2"
                                                 >
                                                     <MessageSquare className="w-4 h-4" />
                                                     <span>Open in WhatsApp Directly</span>
@@ -876,21 +876,21 @@ Looking forward to reviewing the technical proposal!`;
                                                 <button
                                                     type="button"
                                                     onClick={copyBriefSummary}
-                                                    className="px-6 py-3 bg-black hover:bg-[#222] text-white border border-[#333] font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
+                                                    className="px-6 py-3 rounded-[980px] bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-black/10 font-medium transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                                                 >
-                                                    {copied ? <CheckCheck className="w-4 h-4 text-[#748660]" /> : <Copy className="w-4 h-4" />}
+                                                    {copied ? <CheckCheck className="w-4 h-4 text-[#0071e3]" /> : <Copy className="w-4 h-4" />}
                                                     <span>{copied ? 'Copied' : 'Copy Brief'}</span>
                                                 </button>
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                                                 <button
                                                     type="button"
                                                     disabled={isSubmitting}
                                                     onClick={handleSubmitBrief}
-                                                    className="w-full py-4 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-[#748660]/20"
+                                                    className="w-full py-4 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md shadow-blue-500/20"
                                                 >
                                                     <Send className="w-4 h-4" />
                                                     <span>{isSubmitting ? 'Registering Brief...' : 'Submit System Brief'}</span>
@@ -900,9 +900,9 @@ Looking forward to reviewing the technical proposal!`;
                                                     href={generatedWhatsAppUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="w-full py-4 bg-white hover:bg-zinc-200 text-black font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                                                    className="w-full py-4 rounded-[980px] bg-[#25D366] hover:bg-[#20ba59] text-white font-medium transition-all flex items-center justify-center gap-2 shadow-md shadow-green-500/20"
                                                 >
-                                                    <MessageSquare className="w-4 h-4 text-[#748660]" />
+                                                    <MessageSquare className="w-4 h-4" />
                                                     <span>Send to WhatsApp Now ➔</span>
                                                 </a>
                                             </div>
@@ -915,12 +915,12 @@ Looking forward to reviewing the technical proposal!`;
 
                         {/* Navigation Prev / Next Footer (Visible on steps 1-4, or step 5 if not submitted) */}
                         {!isSubmitted && (
-                            <div className="mt-12 pt-8 border-t border-[#262626] flex items-center justify-between font-mono text-xs">
+                            <div className="mt-12 pt-8 border-t border-black/5 flex items-center justify-between text-xs">
                                 {currentStep > 1 ? (
                                     <button
                                         type="button"
                                         onClick={handleBack}
-                                        className="px-6 py-3 border border-[#333333] hover:border-white text-zinc-300 hover:text-white uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2"
+                                        className="px-6 py-2.5 rounded-[980px] border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] transition-all cursor-pointer flex items-center gap-2 font-medium shadow-sm"
                                     >
                                         <ArrowLeft className="w-4 h-4" />
                                         <span>Back</span>
@@ -931,7 +931,7 @@ Looking forward to reviewing the technical proposal!`;
                                     <button
                                         type="button"
                                         onClick={handleNext}
-                                        className="px-8 py-3 bg-white text-black hover:bg-zinc-200 font-bold uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2"
+                                        className="px-8 py-2.5 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                                     >
                                         <span>Continue</span>
                                         <ArrowRight className="w-4 h-4" />

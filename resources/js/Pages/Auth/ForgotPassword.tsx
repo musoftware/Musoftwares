@@ -24,19 +24,19 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.reset_your_password')}</h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.enter_your_email_address_and_we_will_send_you_a_link_to_reset_your_password')}</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] font-sans">{__('general.reset_your_password')}</h1>
+                    <p className="text-xs text-[#1d1d1f]/60 font-sans">{__('general.enter_your_email_address_and_we_will_send_you_a_link_to_reset_your_password')}</p>
                 </div>
 
                 {status && (
-                    <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                    <div className="rounded-xl bg-[#34c759]/10 border border-[#34c759]/20 p-3 text-xs font-semibold text-[#28a745]">
                         {status}
                     </div>
                 )}
 
                 <form onSubmit={submit} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.email_address_1')}</Label>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="email" className="text-xs font-semibold text-[#1d1d1f]/80">{__('general.email_address_1')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -45,21 +45,21 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             autoFocus
                             onChange={(e) => setData('email', e.target.value)}
                             required
-                            className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                            className="h-10 px-3 py-2 text-sm rounded-xl border-black/10 bg-[#f5f5f7]/50 focus:bg-white focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                         />
                         {errors.email && (
-                            <p className="text-xs text-red-500 font-medium mt-1">{errors.email}</p>
+                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.email}</p>
                         )}
                     </div>
 
                     <div className="pt-2">
                         <Button
-                            className="w-full h-10 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 font-medium text-sm rounded-lg shadow-xs transition-all flex items-center justify-center space-x-2"
+                            className="w-full h-11 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-sm rounded-[980px] shadow-md shadow-blue-500/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                             disabled={processing}
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
+                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                                     <span>{__('general.sending_reset_link')}</span>
                                 </>
                             ) : (
@@ -69,10 +69,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     </div>
                 </form>
 
-                <div className="text-center pt-4 border-t border-zinc-100 dark:border-zinc-800/80 mt-6">
+                <div className="text-center pt-4 border-t border-black/5 mt-6">
                     <Link
                         href={route('login')}
-                        className="inline-flex items-center space-x-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+                        className="inline-flex items-center space-x-2 text-xs font-semibold text-[#0071e3] hover:underline transition-colors"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" />
                         <span>{__('general.back_to_log_in')}</span>

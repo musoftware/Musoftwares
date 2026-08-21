@@ -666,19 +666,20 @@ Please let me know when we can review the technical specification!`;
     };
 
     return (
-        <div className="w-full text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white">
-            <div className="mx-auto max-w-[1400px] space-y-12">
+        <div className="w-full text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+            <div className="mx-auto max-w-[1280px] space-y-10">
                 
                 {/* Optional Header */}
                 {showHeader && (
-                    <div className="text-center max-w-3xl mx-auto space-y-4 pt-4">
-                        <span className="text-xs font-mono uppercase tracking-[0.2em] rtl:tracking-normal text-[#748660] font-bold">
+                    <div className="text-center max-w-3xl mx-auto space-y-3 pt-2">
+                        <span className="text-[12px] font-medium tracking-normal text-[#1d1d1f]/80 bg-[#f5f5f7] border border-black/5 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#0071e3]"></span>
                             Architecture Cost Engine
                         </span>
-                        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white font-sans">
+                        <h2 className="text-[32px] sm:text-[46px] font-semibold tracking-[-0.02em] text-[#1d1d1f] font-sans leading-[1.08]">
                             {title}
                         </h2>
-                        <p className="text-sm text-zinc-400 font-sans leading-relaxed">
+                        <p className="text-[15px] sm:text-[17px] text-[#1d1d1f]/70 font-sans leading-[1.4] max-w-2xl mx-auto">
                             {subtitle}
                         </p>
                     </div>
@@ -688,29 +689,21 @@ Please let me know when we can review the technical specification!`;
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
                     {/* Left Configuration Panel (8 Cols) */}
-                    <div className="lg:col-span-8 space-y-8">
+                    <div className="lg:col-span-8 space-y-6">
                         
                         {/* Step 1: Select Platform / Project Types (Multi-Select) */}
-                        <div className="bg-[#161616] p-6 sm:p-8 border border-[#2B2B2B] space-y-6">
+                        <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div className="space-y-1">
-                                    <span className="text-xs font-mono font-bold uppercase tracking-wider rtl:tracking-normal text-[#748660]">Step 1</span>
-                                    <h3 className="text-lg font-bold text-white font-sans">Select Project Platform(s)</h3>
-                                    <p className="text-xs text-zinc-400 font-sans">
+                                <div className="space-y-0.5">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 1</span>
+                                    <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#1d1d1f] font-sans">Select Project Platform(s)</h3>
+                                    <p className="text-[13px] text-[#1d1d1f]/60 font-sans">
                                         Choose one or combine multiple platforms for an integrated system.
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsAiModalOpen(true)}
-                                        className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-black hover:bg-[#222222] text-white text-xs font-mono border border-[#333333] transition-all cursor-pointer"
-                                    >
-                                        <Sparkles className="w-3.5 h-3.5 text-[#748660]" />
-                                        <span>AI Scope Estimator</span>
-                                    </button>
                                     {selectedPlatforms.length >= 2 && (
-                                        <span className="text-xs font-mono font-bold text-[#748660] bg-[#1E2619] border border-[#748660]/40 px-3 py-1 flex items-center gap-1.5 rtl:tracking-normal">
+                                        <span className="text-[11px] font-semibold text-[#0071e3] bg-[#0071e3]/10 border border-[#0071e3]/20 px-3 py-1 rounded-full flex items-center gap-1.5">
                                             <Tag className="h-3.5 w-3.5" />
                                             10% Multi-Platform Discount
                                         </span>
@@ -718,32 +711,32 @@ Please let me know when we can review the technical specification!`;
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                                 {/* Web Project */}
                                 <button
                                     type="button"
                                     onClick={() => togglePlatform('web')}
-                                    className={`p-5 border text-start transition-all cursor-pointer flex flex-col justify-between h-40 ${
+                                    className={`p-5 rounded-[20px] border text-start transition-all cursor-pointer flex flex-col justify-between h-44 ${
                                         selectedPlatforms.includes('web')
-                                            ? 'border-[#748660] bg-[#1A2215]'
-                                            : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                            ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 shadow-[0_8px_24px_rgba(0,113,227,0.12)] ring-4 ring-[#0071e3]/10'
+                                            : 'border-black/10 bg-white hover:border-black/30 hover:shadow-md'
                                     }`}
                                 >
                                     <div className="flex items-center justify-between w-full">
-                                        <div className={`p-2.5 ${selectedPlatforms.includes('web') ? 'bg-[#748660] text-black' : 'bg-[#1E1E1E] text-zinc-400'}`}>
+                                        <div className={`p-2.5 rounded-xl ${selectedPlatforms.includes('web') ? 'bg-[#0071e3] text-white shadow-sm' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`}>
                                             <Globe className="h-5 w-5" />
                                         </div>
-                                        <div className={`h-5 w-5 flex items-center justify-center border ${
+                                        <div className={`h-5 w-5 rounded-full flex items-center justify-center border transition-all ${
                                             selectedPlatforms.includes('web')
-                                                ? 'bg-[#748660] border-[#748660] text-black'
-                                                : 'border-[#333333] bg-black'
+                                                ? 'bg-[#0071e3] border-[#0071e3] text-white'
+                                                : 'border-black/20 bg-white'
                                         }`}>
                                             {selectedPlatforms.includes('web') && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white text-sm">Website / Web App</h4>
-                                        <p className="text-xs text-zinc-400 mt-0.5">$10 per page</p>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Website / Web App</h4>
+                                        <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$10 per page</p>
                                     </div>
                                 </button>
 
@@ -751,27 +744,27 @@ Please let me know when we can review the technical specification!`;
                                 <button
                                     type="button"
                                     onClick={() => togglePlatform('mobile')}
-                                    className={`p-5 border text-start transition-all cursor-pointer flex flex-col justify-between h-40 ${
+                                    className={`p-5 rounded-[20px] border text-start transition-all cursor-pointer flex flex-col justify-between h-44 ${
                                         selectedPlatforms.includes('mobile')
-                                            ? 'border-[#748660] bg-[#1A2215]'
-                                            : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                            ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 shadow-[0_8px_24px_rgba(0,113,227,0.12)] ring-4 ring-[#0071e3]/10'
+                                            : 'border-black/10 bg-white hover:border-black/30 hover:shadow-md'
                                     }`}
                                 >
                                     <div className="flex items-center justify-between w-full">
-                                        <div className={`p-2.5 ${selectedPlatforms.includes('mobile') ? 'bg-[#748660] text-black' : 'bg-[#1E1E1E] text-zinc-400'}`}>
+                                        <div className={`p-2.5 rounded-xl ${selectedPlatforms.includes('mobile') ? 'bg-[#0071e3] text-white shadow-sm' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`}>
                                             <Smartphone className="h-5 w-5" />
                                         </div>
-                                        <div className={`h-5 w-5 flex items-center justify-center border ${
+                                        <div className={`h-5 w-5 rounded-full flex items-center justify-center border transition-all ${
                                             selectedPlatforms.includes('mobile')
-                                                ? 'bg-[#748660] border-[#748660] text-black'
-                                                : 'border-[#333333] bg-black'
+                                                ? 'bg-[#0071e3] border-[#0071e3] text-white'
+                                                : 'border-black/20 bg-white'
                                         }`}>
                                             {selectedPlatforms.includes('mobile') && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white text-sm">Mobile App</h4>
-                                        <p className="text-xs text-zinc-400 mt-0.5">$15 per screen (iOS &amp; Android)</p>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Mobile App</h4>
+                                        <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$15 per screen (iOS &amp; Android)</p>
                                     </div>
                                 </button>
 
@@ -779,47 +772,47 @@ Please let me know when we can review the technical specification!`;
                                 <button
                                     type="button"
                                     onClick={() => togglePlatform('desktop')}
-                                    className={`p-5 border text-start transition-all cursor-pointer flex flex-col justify-between h-40 ${
+                                    className={`p-5 rounded-[20px] border text-start transition-all cursor-pointer flex flex-col justify-between h-44 ${
                                         selectedPlatforms.includes('desktop')
-                                            ? 'border-[#748660] bg-[#1A2215]'
-                                            : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                            ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 shadow-[0_8px_24px_rgba(0,113,227,0.12)] ring-4 ring-[#0071e3]/10'
+                                            : 'border-black/10 bg-white hover:border-black/30 hover:shadow-md'
                                     }`}
                                 >
                                     <div className="flex items-center justify-between w-full">
-                                        <div className={`p-2.5 ${selectedPlatforms.includes('desktop') ? 'bg-[#748660] text-black' : 'bg-[#1E1E1E] text-zinc-400'}`}>
+                                        <div className={`p-2.5 rounded-xl ${selectedPlatforms.includes('desktop') ? 'bg-[#0071e3] text-white shadow-sm' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`}>
                                             <Monitor className="h-5 w-5" />
                                         </div>
-                                        <div className={`h-5 w-5 flex items-center justify-center border ${
+                                        <div className={`h-5 w-5 rounded-full flex items-center justify-center border transition-all ${
                                             selectedPlatforms.includes('desktop')
-                                                ? 'bg-[#748660] border-[#748660] text-black'
-                                                : 'border-[#333333] bg-black'
+                                                ? 'bg-[#0071e3] border-[#0071e3] text-white'
+                                                : 'border-black/20 bg-white'
                                         }`}>
                                             {selectedPlatforms.includes('desktop') && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white text-sm">Desktop Software</h4>
-                                        <p className="text-xs text-zinc-400 mt-0.5">$25 per screen (.NET / Native)</p>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Desktop Software</h4>
+                                        <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$25 per screen (.NET / Native)</p>
                                     </div>
                                 </button>
                             </div>
                         </div>
 
                         {/* Step 2: Dedicated Screen / Page Sliders */}
-                        <div className="bg-[#161616] p-6 sm:p-8 border border-[#2B2B2B] space-y-8">
+                        <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-6">
                             <div className="flex items-center justify-between">
-                                <div className="space-y-1">
-                                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#748660]">Step 2</span>
-                                    <h3 className="text-lg font-bold text-white">
+                                <div className="space-y-0.5">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 2</span>
+                                    <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#1d1d1f]">
                                         Screen / Page Counters
                                     </h3>
                                 </div>
-                                <span className="text-xs font-mono text-zinc-400 bg-black border border-[#2B2B2B] px-3 py-1">
+                                <span className="text-xs text-[#1d1d1f]/70 bg-[#f5f5f7] border border-black/5 px-3 py-1 rounded-full font-medium">
                                     {selectedPlatforms.length} Platform{selectedPlatforms.length > 1 ? 's' : ''} Selected
                                 </span>
                             </div>
 
-                            <div className="space-y-6 divide-y divide-[#222222]">
+                            <div className="space-y-6 divide-y divide-black/5">
                                 {selectedPlatforms.map(pKey => {
                                     const pRate = rates[pKey];
                                     const currentCount = platformScreens[pKey] || 1;
@@ -830,26 +823,26 @@ Please let me know when we can review the technical specification!`;
                                         <div key={pKey} className="pt-6 first:pt-0 space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-black border border-[#2B2B2B] text-zinc-300">
+                                                    <div className="p-2.5 bg-[#f5f5f7] rounded-xl border border-black/5 text-[#1d1d1f]">
                                                         <IconComp className="h-5 w-5" />
                                                     </div>
                                                     <div>
-                                                        <h4 className="font-bold text-sm text-white">{pRate.title}</h4>
-                                                        <span className="text-xs font-mono text-zinc-400">${pRate.rate} per {pRate.unit.toLowerCase()}</span>
+                                                        <h4 className="font-semibold text-sm text-[#1d1d1f]">{pRate.title}</h4>
+                                                        <span className="text-xs text-[#1d1d1f]/60">${pRate.rate} per {pRate.unit.toLowerCase()}</span>
                                                     </div>
                                                 </div>
 
-                                                <div className="text-end font-mono">
-                                                    <span className="text-xl sm:text-2xl font-bold text-[#748660]">
+                                                <div className="text-end">
+                                                    <span className="text-xl sm:text-2xl font-semibold text-[#0071e3]">
                                                         {currentCount}
                                                     </span>
-                                                    <span className="text-xs text-zinc-400 ms-1">
+                                                    <span className="text-xs text-[#1d1d1f]/60 ms-1 font-medium">
                                                         {pRate.unit}s ({formatPrice(subCost)})
                                                     </span>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-3">
+                                            <div className="space-y-2">
                                                 <input
                                                     type="range"
                                                     min="1"
@@ -857,20 +850,20 @@ Please let me know when we can review the technical specification!`;
                                                     step="1"
                                                     value={currentCount}
                                                     onChange={(e) => updateScreens(pKey, e.target.value)}
-                                                    className="w-full h-2 bg-black border border-[#2B2B2B] appearance-none cursor-pointer accent-[#748660]"
+                                                    className="w-full h-2 bg-[#e5e5ea] rounded-full appearance-none cursor-pointer accent-[#0071e3]"
                                                 />
                                             </div>
 
-                                            <div className="flex items-center justify-center gap-2 pt-1 font-mono text-xs">
+                                            <div className="flex items-center justify-center gap-2 pt-1 text-xs">
                                                 {[3, 5, 8, 12, 20].map((preset) => (
                                                     <button
                                                         key={preset}
                                                         type="button"
                                                         onClick={() => updateScreens(pKey, preset)}
-                                                        className={`px-3 py-1 border transition-all cursor-pointer ${
+                                                        className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                                                             currentCount === preset
-                                                                ? 'bg-white text-black border-white font-bold'
-                                                                : 'bg-black text-zinc-400 border-[#2B2B2B] hover:border-zinc-500 hover:text-white'
+                                                                ? 'bg-[#1d1d1f] text-white font-medium shadow-sm'
+                                                                : 'bg-[#f5f5f7] text-[#1d1d1f]/70 border border-black/5 hover:bg-[#e8e8ed]'
                                                         }`}
                                                     >
                                                         {preset} {pRate.unit}s
@@ -884,11 +877,11 @@ Please let me know when we can review the technical specification!`;
                         </div>
 
                         {/* Step 3: Modules & Addons */}
-                        <div className="bg-[#161616] p-6 sm:p-8 border border-[#2B2B2B] space-y-6">
+                        <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div className="space-y-1">
-                                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#748660]">Step 3</span>
-                                    <h3 className="text-lg font-bold text-white">
+                                <div className="space-y-0.5">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 3</span>
+                                    <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#1d1d1f]">
                                         Modules &amp; Engineering Services
                                     </h3>
                                 </div>
@@ -896,7 +889,7 @@ Please let me know when we can review the technical specification!`;
                                     <button
                                         type="button"
                                         onClick={() => setSelectedOptions({})}
-                                        className="text-xs font-mono text-zinc-400 hover:text-white underline cursor-pointer"
+                                        className="text-xs text-[#1d1d1f]/60 hover:text-[#0071e3] underline cursor-pointer font-medium"
                                     >
                                         ✕ Clear All ({costBreakdown.itemizedAddons.length})
                                     </button>
@@ -904,16 +897,16 @@ Please let me know when we can review the technical specification!`;
                             </div>
 
                             {/* Category Filter Tabs */}
-                            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 font-mono text-xs scrollbar-none">
+                            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none bg-[#f5f5f7] p-1.5 rounded-full border border-black/5">
                                 {categories.map(cat => (
                                     <button
                                         key={cat.id}
                                         type="button"
                                         onClick={() => setActiveCategory(cat.id)}
-                                        className={`px-3.5 py-1.5 border whitespace-nowrap transition-all cursor-pointer ${
+                                        className={`px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer text-xs ${
                                             activeCategory === cat.id
-                                                ? 'bg-white text-black border-white font-bold'
-                                                : 'bg-black text-zinc-400 border-[#2B2B2B] hover:border-zinc-500 hover:text-white'
+                                                ? 'bg-white text-[#1d1d1f] font-semibold shadow-sm'
+                                                : 'text-[#1d1d1f]/70 hover:text-[#1d1d1f]'
                                         }`}
                                     >
                                         {cat.title}
@@ -922,7 +915,7 @@ Please let me know when we can review the technical specification!`;
                             </div>
 
                             {/* Modules Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                                 {filteredOptions.map((option) => {
                                     const IconComponent = option.icon;
                                     const isSelected = !!selectedOptions[option.id];
@@ -930,23 +923,23 @@ Please let me know when we can review the technical specification!`;
                                         <div
                                             key={option.id}
                                             onClick={() => toggleOption(option.id)}
-                                            className={`p-4 border transition-all cursor-pointer flex items-start gap-3.5 ${
+                                            className={`p-4 rounded-[18px] border transition-all cursor-pointer flex items-start gap-3.5 ${
                                                 isSelected
-                                                    ? 'border-[#748660] bg-[#1A2215]'
-                                                    : 'border-[#2B2B2B] bg-black hover:border-zinc-500'
+                                                    ? 'border-[#0071e3] bg-[#0071e3]/5 shadow-sm ring-1 ring-[#0071e3]'
+                                                    : 'border-black/5 bg-white hover:border-black/20 hover:shadow-sm'
                                             }`}
                                         >
-                                            <div className={`p-2 shrink-0 mt-0.5 ${isSelected ? 'bg-[#748660] text-black' : 'bg-[#1A1A1A] text-zinc-400'}`}>
+                                            <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${isSelected ? 'bg-[#0071e3] text-white shadow-sm' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`}>
                                                 <IconComponent className="h-4 w-4" />
                                             </div>
-                                            <div className="flex-1 font-mono">
+                                            <div className="flex-1">
                                                 <div className="flex items-center justify-between">
-                                                    <h4 className="font-bold text-xs text-white">{option.title}</h4>
-                                                    <span className="text-xs font-bold text-[#748660]">
+                                                    <h4 className="font-semibold text-xs text-[#1d1d1f]">{option.title}</h4>
+                                                    <span className="text-xs font-semibold text-[#0071e3]">
                                                         {option.price > 0 ? `+${formatPrice(option.price)}` : 'Included'}
                                                     </span>
                                                 </div>
-                                                <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+                                                <p className="text-[11px] text-[#1d1d1f]/60 mt-1 leading-relaxed">
                                                     {option.desc}
                                                 </p>
                                             </div>
@@ -958,23 +951,23 @@ Please let me know when we can review the technical specification!`;
                     </div>
 
                     {/* Right Sticky Summary & Action Card (4 Cols) */}
-                    <div className="lg:col-span-4 sticky top-24 space-y-6 font-mono">
+                    <div className="lg:col-span-4 sticky top-24 space-y-6">
                         
                         {/* Summary Card */}
-                        <div className="bg-[#161616] text-white p-6 sm:p-8 border border-[#2B2B2B] space-y-6">
-                            <div className="flex items-center justify-between border-b border-[#2B2B2B] pb-4">
+                        <div className="bg-white text-[#1d1d1f] p-6 sm:p-8 rounded-[28px] border border-black/5 shadow-[0_20px_60px_rgba(0,0,0,0.06)] space-y-6">
+                            <div className="flex items-center justify-between border-b border-black/5 pb-4">
                                 <div className="flex items-center gap-2">
-                                    <Calculator className="h-4 w-4 text-[#748660]" />
-                                    <h3 className="font-bold text-sm uppercase tracking-wider text-white">Estimated Budget</h3>
+                                    <Calculator className="h-4 w-4 text-[#0071e3]" />
+                                    <h3 className="font-semibold text-sm tracking-tight text-[#1d1d1f]">Estimated Budget</h3>
                                 </div>
                                 
                                 {/* Currency Switcher */}
-                                <div className="flex items-center border border-[#333333] bg-black">
+                                <div className="flex items-center rounded-full bg-[#f5f5f7] p-1 border border-black/5">
                                     <button
                                         type="button"
                                         onClick={() => setIsUsd(true)}
-                                        className={`px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
-                                            isUsd ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+                                        className={`px-3 py-0.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                                            isUsd ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#1d1d1f]/60 hover:text-[#1d1d1f]'
                                         }`}
                                     >
                                         USD
@@ -982,8 +975,8 @@ Please let me know when we can review the technical specification!`;
                                     <button
                                         type="button"
                                         onClick={() => setIsUsd(false)}
-                                        className={`px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
-                                            !isUsd ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+                                        className={`px-3 py-0.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                                            !isUsd ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#1d1d1f]/60 hover:text-[#1d1d1f]'
                                         }`}
                                     >
                                         EGP
@@ -993,36 +986,36 @@ Please let me know when we can review the technical specification!`;
 
                             {/* Total Display */}
                             <div className="space-y-1">
-                                <span className="text-xs text-zinc-400 block uppercase tracking-wider">Estimated Total</span>
-                                <div className="text-3xl sm:text-4xl font-black text-white">
+                                <span className="text-xs text-[#1d1d1f]/60 block font-medium">Estimated Total</span>
+                                <div className="text-[34px] sm:text-[40px] font-semibold text-[#1d1d1f] tracking-tight leading-none">
                                     {isUsd ? `$${costBreakdown.finalTotalUsd.toLocaleString()}` : `${costBreakdown.finalTotalEgp.toLocaleString()} EGP`}
                                 </div>
-                                <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-[#222222] mt-3">
+                                <div className="flex items-center justify-between text-xs text-[#1d1d1f]/70 pt-2 border-t border-black/5 mt-3">
                                     <span>Estimated Timeline</span>
-                                    <span className="text-[#748660] font-bold">~{costBreakdown.estimatedDays} business days</span>
+                                    <span className="text-[#0071e3] font-semibold">~{costBreakdown.estimatedDays} business days</span>
                                 </div>
                             </div>
 
                             {/* Line Items Breakdown */}
-                            <div className="space-y-3 pt-4 border-t border-[#2B2B2B] text-xs">
-                                <div className="text-zinc-400 font-bold uppercase tracking-wider">Architecture Scope</div>
+                            <div className="space-y-2.5 pt-3 border-t border-black/5 text-xs">
+                                <div className="text-[#1d1d1f] font-semibold">Architecture Scope</div>
                                 
                                 {costBreakdown.itemizedPlatforms.map(item => (
-                                    <div key={item.key} className="flex justify-between text-zinc-300">
+                                    <div key={item.key} className="flex justify-between text-[#1d1d1f]/80">
                                         <span>{item.title} ({item.count} {item.unit}s)</span>
-                                        <span>{formatPrice(item.total)}</span>
+                                        <span className="font-medium">{formatPrice(item.total)}</span>
                                     </div>
                                 ))}
 
                                 {costBreakdown.itemizedAddons.map(item => (
-                                    <div key={item.id} className="flex justify-between text-zinc-400 text-[11px]">
+                                    <div key={item.id} className="flex justify-between text-[#1d1d1f]/60 text-[11px]">
                                         <span className="truncate max-w-[200px]">{item.title}</span>
-                                        <span>+{formatPrice(item.subtotal)}</span>
+                                        <span className="font-medium">+{formatPrice(item.subtotal)}</span>
                                     </div>
                                 ))}
 
                                 {costBreakdown.multiPlatformDiscount > 0 && (
-                                    <div className="flex justify-between text-[#748660] font-bold pt-2 border-t border-[#222222]">
+                                    <div className="flex justify-between text-[#0071e3] font-semibold pt-2 border-t border-black/5">
                                         <span>Multi-Platform Discount (10%)</span>
                                         <span>-{formatPrice(costBreakdown.multiPlatformDiscount)}</span>
                                     </div>
@@ -1030,12 +1023,12 @@ Please let me know when we can review the technical specification!`;
                             </div>
 
                             {/* CTAs */}
-                            <div className="space-y-3 pt-4">
+                            <div className="space-y-2.5 pt-3">
                                 <a
                                     href={whatsappLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold text-xs uppercase tracking-wider transition-colors shadow-lg shadow-[#748660]/20"
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-[980px] bg-[#25D366] hover:bg-[#20ba59] text-white font-medium text-xs tracking-tight transition-all shadow-md shadow-green-500/20"
                                 >
                                     <MessageSquare className="w-4 h-4" />
                                     <span>Discuss Scope on WhatsApp</span>
@@ -1043,7 +1036,7 @@ Please let me know when we can review the technical specification!`;
 
                                 <Link
                                     href="/estimator"
-                                    className="w-full flex items-center justify-center gap-2 py-3 bg-black hover:bg-[#222222] text-zinc-300 hover:text-white border border-[#333333] text-xs font-bold uppercase tracking-wider transition-colors"
+                                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-[980px] bg-[#f5f5f7] hover:bg-[#e8e8ed] text-[#1d1d1f] text-xs font-medium transition-colors"
                                 >
                                     <span>Open Dedicated Estimator Page</span>
                                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -1052,30 +1045,30 @@ Please let me know when we can review the technical specification!`;
                         </div>
 
                         {/* Direct Lead Capture Proposal Form */}
-                        <div className="bg-[#161616] p-6 border border-[#2B2B2B] space-y-4">
-                            <div className="space-y-1">
-                                <h4 className="font-bold text-xs uppercase tracking-wider text-white">
+                        <div className="bg-[#f5f5f7] p-6 rounded-[24px] border border-black/5 space-y-4">
+                            <div className="space-y-0.5">
+                                <h4 className="font-semibold text-xs text-[#1d1d1f]">
                                     Request Official Engineering Proposal
                                 </h4>
-                                <p className="text-[11px] text-zinc-400">
+                                <p className="text-[11px] text-[#1d1d1f]/60">
                                     Submit your scope and our lead architect will prepare a formal timeline &amp; NDA.
                                 </p>
                             </div>
 
                             {leadSaved ? (
-                                <div className="p-4 bg-[#1E2619] border border-[#748660]/40 text-[#748660] text-xs flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                                <div className="p-3.5 rounded-xl bg-white border border-green-500/30 text-green-700 text-xs flex items-center gap-2">
+                                    <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
                                     <span>Proposal requested! We will reach out within 24 hours.</span>
                                 </div>
                             ) : (
-                                <form onSubmit={handleLeadSubmit} className="space-y-3 text-xs">
+                                <form onSubmit={handleLeadSubmit} className="space-y-2.5 text-xs">
                                     <input
                                         type="text"
                                         placeholder="Your Full Name *"
                                         required
                                         value={leadName}
                                         onChange={(e) => setLeadName(e.target.value)}
-                                        className="w-full px-3 py-2 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                        className="w-full px-3 py-2 bg-white rounded-xl border border-black/10 text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:outline-none"
                                     />
                                     <input
                                         type="tel"
@@ -1083,19 +1076,19 @@ Please let me know when we can review the technical specification!`;
                                         required
                                         value={leadMobile}
                                         onChange={(e) => setLeadMobile(e.target.value)}
-                                        className="w-full px-3 py-2 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                        className="w-full px-3 py-2 bg-white rounded-xl border border-black/10 text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:outline-none"
                                     />
                                     <input
                                         type="email"
                                         placeholder="Work Email (Optional)"
                                         value={leadEmail}
                                         onChange={(e) => setLeadEmail(e.target.value)}
-                                        className="w-full px-3 py-2 bg-black border border-[#2B2B2B] text-white focus:border-[#748660] focus:outline-none"
+                                        className="w-full px-3 py-2 bg-white rounded-xl border border-black/10 text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:outline-none"
                                     />
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="w-full py-2.5 bg-white hover:bg-zinc-200 text-black font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50"
+                                        className="w-full py-2.5 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition-all cursor-pointer disabled:opacity-50 shadow-sm"
                                     >
                                         {submitting ? 'Submitting Scope...' : 'Submit Engineering Scope ➔'}
                                     </button>
@@ -1111,3 +1104,4 @@ Please let me know when we can review the technical specification!`;
         </div>
     );
 }
+

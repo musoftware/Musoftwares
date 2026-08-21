@@ -68,7 +68,7 @@ export default function Cloud({ auth }) {
 
             <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I want to discuss cloud hosting and infrastructure." />
 
-            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white overflow-x-hidden pt-16 sm:pt-24 pb-24 sm:pb-36">
+            <div ref={mainRef} className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] overflow-x-hidden pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <div className="reveal-section">
@@ -77,22 +77,22 @@ export default function Cloud({ auth }) {
                         title={
                             <>
                                 Mission-Critical Cloud. <br className="hidden sm:inline" />
-                                <span className="text-[#748660]">Zero Downtime Architecture.</span>
+                                <span className="text-[#0071e3]">Zero Downtime Architecture.</span>
                             </>
                         }
                         subtitle="We engineer dedicated cloud servers, auto-recovering background queues, and bulletproof deployment pipelines for enterprise workloads."
                     />
 
-                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 -mt-8">
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 -mt-8">
                         <button
                             onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss cloud infrastructure and DevOps.")}
-                            className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                            className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
                             DISCUSS INFRASTRUCTURE ➔
                         </button>
                         <Link
                             href="/estimator"
-                            className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                            className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm"
                         >
                             {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
                         </Link>
@@ -107,22 +107,22 @@ export default function Cloud({ auth }) {
                             return (
                                 <div
                                     key={idx}
-                                    className="gsap-fade-up bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors"
+                                    className="gsap-fade-up bg-white border border-black/5 rounded-[24px] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#0071e3]/40 hover:shadow-md transition-all shadow-sm"
                                 >
                                     <div className="space-y-4">
-                                        <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                        <div className="w-12 h-12 rounded-2xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
                                             <Icon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-white font-sans">
+                                        <h3 className="text-xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                             {item.title}
                                         </h3>
-                                        <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 leading-relaxed font-sans">
                                             {item.desc}
                                         </p>
-                                        <ul className="space-y-2.5 pt-2 text-xs font-sans text-zinc-300">
+                                        <ul className="space-y-2.5 pt-2 text-xs font-sans text-[#1d1d1f]/80">
                                             {item.bullets.map((bullet, bIdx) => (
                                                 <li key={bIdx} className="flex items-center gap-2">
-                                                    <span className="w-1.5 h-1.5 bg-[#748660] shrink-0"></span>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>
                                                     <span>{bullet}</span>
                                                 </li>
                                             ))}
@@ -130,7 +130,7 @@ export default function Cloud({ auth }) {
                                     </div>
                                     <button
                                         onClick={() => openWhatsAppChat(`Hello Mahmoud, I want to discuss ${item.title}.`)}
-                                        className="mt-8 text-xs font-mono font-bold text-white hover:text-[#748660] flex items-center gap-1 rtl:gap-reverse"
+                                        className="mt-8 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1 rtl:gap-reverse cursor-pointer"
                                     >
                                         <span>CONSULT ARCHITECT</span>
                                         <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />

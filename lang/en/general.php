@@ -6037,6 +6037,7 @@ return array (
   'save_landing_page' => 'Save Landing Page',
   'save_notes' => 'Save notes',
   'save_pin' => 'Save Pin',
+  'save_password' => 'Save Password',
   'save_product' => 'Save Product',
   'save_record' => 'Save Record',
   'save_rule' => 'Save Rule',
@@ -8185,4 +8186,8 @@ return array (
   'generated_missing_transactions_count' => 'Successfully generated :count missing transaction(s).',
   'all_transactions_already_up_to_date' => 'All transactions are already up to date.',
   'confirm_generate_missing' => 'Are you sure you want to generate all missing past transactions up to today for this schedule?',
+  'desktop_apps' => 'Desktop Apps',
+  'founder' => 'Founder',
+  'mobile_apps' => 'Mobile Apps',
+  'web_apps' => 'Web Apps',
 );

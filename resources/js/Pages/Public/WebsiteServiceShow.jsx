@@ -42,10 +42,10 @@ export default function WebsiteServiceShow({ service }) {
     if (!service) {
         return (
             <PublicLayout>
-                <div className="min-h-[60vh] flex items-center justify-center bg-[#111111] text-white font-mono">
+                <div className="min-h-[60vh] flex items-center justify-center bg-white text-[#1d1d1f] font-sans">
                     <div className="text-center space-y-4">
-                        <h2 className="text-2xl font-bold text-white uppercase tracking-widest">{__('general.not_found') || 'Service Not Found'}</h2>
-                        <Link href="/" className="text-xs text-[#748660] hover:underline uppercase tracking-wider block">
+                        <h2 className="text-2xl font-semibold text-[#1d1d1f]">{__('general.not_found') || 'Service Not Found'}</h2>
+                        <Link href="/" className="text-xs font-semibold text-[#0071e3] hover:underline block">
                             ➔ {__('general.back_to_home') || 'Back to Studio Home'}
                         </Link>
                     </div>
@@ -70,13 +70,13 @@ export default function WebsiteServiceShow({ service }) {
                 <meta name="description" content={finalDescription} />
             </Head>
 
-            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white overflow-x-hidden pt-12 pb-28">
+            <div ref={mainRef} className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] overflow-x-hidden pt-8 pb-28">
                 
                 {/* HERO SECTION */}
-                <section className="max-w-[1400px] mx-auto px-6 lg:px-8 mb-20 reveal-section">
+                <section className="max-w-[1400px] mx-auto px-6 lg:px-8 mb-16 reveal-section">
                     <Link 
                         href="/" 
-                        className="gsap-fade-up inline-flex items-center text-xs font-mono font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors mb-10"
+                        className="gsap-fade-up inline-flex items-center text-xs font-semibold uppercase tracking-wider text-[#1d1d1f]/60 hover:text-[#0071e3] transition-colors mb-8"
                     >
                         <ArrowLeft className="w-3.5 h-3.5 me-2 rtl:ms-2 rtl:me-0 rtl:rotate-180" />
                         {__('general.back_to_home') || 'STUDIO HOME'}
@@ -85,27 +85,27 @@ export default function WebsiteServiceShow({ service }) {
                     <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
                         
                         {/* Meta & Info (6 cols) */}
-                        <div className="lg:col-span-6 space-y-6 font-mono">
-                            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-[#748660] bg-[#1E2619] border border-[#748660]/40 px-3 py-1">
+                        <div className="lg:col-span-6 space-y-6">
+                            <span className="inline-block text-[11px] font-semibold uppercase tracking-wider text-[#0071e3] bg-[#0071e3]/10 border border-[#0071e3]/20 px-3.5 py-1 rounded-full shadow-2xs">
                                 {__('general.services') || 'Engineering Service'}
                             </span>
-                            <h1 className="gsap-fade-up text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-sans">
+                            <h1 className="gsap-fade-up text-3xl sm:text-5xl font-semibold tracking-tight text-[#1d1d1f] leading-tight font-sans">
                                 {finalTitle}
                             </h1>
-                            <p className="gsap-fade-up text-sm sm:text-base text-zinc-400 leading-relaxed font-mono">
+                            <p className="gsap-fade-up text-sm sm:text-base text-[#1d1d1f]/70 leading-relaxed font-sans">
                                 {finalDescription}
                             </p>
                             
                             <div className="pt-4 flex flex-col sm:flex-row gap-4">
                                 <button 
                                     onClick={() => openWhatsAppChat(`Hello Mahmoud, I'm inquiring about ${finalTitle}`)}
-                                    className="gsap-fade-up px-8 py-3.5 bg-white text-black hover:bg-zinc-200 text-xs font-bold font-mono uppercase tracking-widest transition-colors shadow-sm text-center"
+                                    className="gsap-fade-up px-8 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-colors shadow-md shadow-blue-500/20 text-center cursor-pointer"
                                 >
                                     <span>INITIATE SERVICE SCOPE ➔</span>
                                 </button>
                                 <Link
                                     href="/estimator"
-                                    className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 text-xs font-bold font-mono tracking-widest uppercase transition-all text-center"
+                                    className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 text-xs font-semibold rounded-[980px] tracking-wide transition-all text-center shadow-sm"
                                 >
                                     ESTIMATE COST
                                 </Link>
@@ -113,16 +113,16 @@ export default function WebsiteServiceShow({ service }) {
                         </div>
                         
                         {/* Image Showcase (6 cols) */}
-                        <div className="lg:col-span-6 gsap-fade-up bg-[#161616] border border-[#2B2B2B] overflow-hidden flex items-center justify-center p-6 min-h-[380px]">
+                        <div className="lg:col-span-6 gsap-fade-up bg-white border border-black/5 rounded-[24px] shadow-xl overflow-hidden flex items-center justify-center p-6 min-h-[380px]">
                             {imageUrl ? (
                                 <img 
                                     src={`/${imageUrl}`} 
                                     alt={finalTitle} 
-                                    className="w-full h-auto object-contain max-h-[500px]" 
+                                    className="w-full h-auto object-contain max-h-[500px] rounded-lg" 
                                 />
                             ) : (
-                                <div className="text-zinc-600 font-mono text-xs flex flex-col items-center gap-3">
-                                    <Box className="w-12 h-12 text-zinc-700" strokeWidth={1} />
+                                <div className="text-[#1d1d1f]/40 text-xs flex flex-col items-center gap-3">
+                                    <Box className="w-12 h-12 text-[#1d1d1f]/30" strokeWidth={1} />
                                     <span>[ENGINEERING SPECIFICATION DIAGRAM]</span>
                                 </div>
                             )}
@@ -133,13 +133,13 @@ export default function WebsiteServiceShow({ service }) {
 
                 {/* DETAILED CONTENT SECTION */}
                 {description && (
-                    <section className="py-16 border-t border-[#222222] reveal-section">
+                    <section className="py-16 border-t border-black/5 reveal-section">
                         <div className="max-w-4xl mx-auto px-6 lg:px-8">
-                            <h2 className="text-xs font-mono font-bold text-[#748660] uppercase tracking-widest mb-6">
+                            <h2 className="text-xs font-semibold text-[#0071e3] uppercase tracking-wider mb-6">
                                 Technical Specifications &amp; Architecture
                             </h2>
                             <div 
-                                className="gsap-fade-up prose prose-invert prose-p:text-zinc-400 prose-p:font-mono prose-p:text-xs sm:prose-p:text-sm prose-headings:text-white prose-headings:font-sans prose-a:text-[#748660] max-w-none rtl:prose-p:text-end rtl:prose-headings:text-end rtl:prose-ul:text-end"
+                                className="gsap-fade-up prose prose-neutral prose-p:text-[#1d1d1f]/70 prose-headings:text-[#1d1d1f] prose-a:text-[#0071e3] max-w-none rtl:prose-p:text-end rtl:prose-headings:text-end rtl:prose-ul:text-end"
                                 dangerouslySetInnerHTML={{ __html: description }}
                             />
                         </div>

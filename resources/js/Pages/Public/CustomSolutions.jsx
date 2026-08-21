@@ -68,7 +68,7 @@ export default function CustomSolutions() {
                 <meta name="description" content="Bespoke software architecture, database engineering, and scalable enterprise systems built to your exact specifications." />
             </Head>
 
-            <div className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
+            <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <StudioHeader
@@ -76,22 +76,22 @@ export default function CustomSolutions() {
                     title={
                         <>
                             Custom Software Architecture. <br className="hidden sm:inline" />
-                            <span className="text-[#748660]">Tailored To Your Scale.</span>
+                            <span className="text-[#0071e3]">Tailored To Your Scale.</span>
                         </>
                     }
                     subtitle="We build high-performance systems from the database schema up. No disposable templates, no fragile shortcuts — pure engineering."
                 />
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 -mt-8">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 -mt-8">
                     <button
                         onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a custom engineering solution.")}
-                        className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                        className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                     >
                         INITIATE TECHNICAL SCOPE ➔
                     </button>
                     <Link
                         href="/estimator"
-                        className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                        className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm"
                     >
                         {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
                     </Link>
@@ -105,16 +105,16 @@ export default function CustomSolutions() {
                             return (
                                 <div
                                     key={idx}
-                                    className="bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors"
+                                    className="bg-white border border-black/5 rounded-[24px] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#0071e3]/40 hover:shadow-md transition-all shadow-sm"
                                 >
                                     <div className="space-y-4">
-                                        <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                        <div className="w-12 h-12 rounded-2xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
                                             <Icon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-white font-sans">
+                                        <h3 className="text-xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                             {cap.title}
                                         </h3>
-                                        <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 leading-relaxed font-sans">
                                             {cap.desc}
                                         </p>
                                     </div>
@@ -125,25 +125,25 @@ export default function CustomSolutions() {
                 </section>
 
                 {/* Tech Stack Matrix */}
-                <section className="px-6 max-w-[1400px] mx-auto border-t border-[#222222] pt-20">
+                <section className="px-6 max-w-[1400px] mx-auto border-t border-black/5 pt-16">
                     <div className="text-center mb-12">
-                        <span className="text-xs font-mono uppercase tracking-[0.2em] rtl:tracking-normal text-[#748660] font-bold">
+                        <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
                             Production Technology Stack
                         </span>
-                        <h2 className="text-2xl sm:text-4xl font-bold text-white font-sans mt-2">
+                        <h2 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] font-sans tracking-tight mt-2">
                             Engineered with Modern Standards
                         </h2>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {techCategories.map((cat, idx) => (
-                            <div key={idx} className="bg-[#161616] border border-[#262626] p-6 space-y-4">
-                                <h4 className="text-xs font-mono font-bold uppercase tracking-widest rtl:tracking-normal text-[#748660]">
+                            <div key={idx} className="bg-white border border-black/5 rounded-[20px] p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
+                                <h4 className="text-xs font-semibold uppercase tracking-wider text-[#0071e3]">
                                     {cat.title}
                                 </h4>
-                                <div className="flex flex-wrap gap-1.5 font-mono text-xs">
+                                <div className="flex flex-wrap gap-2 text-xs">
                                     {cat.techs.map((tech, tIdx) => (
-                                        <span key={tIdx} className="bg-black border border-[#2B2B2B] text-zinc-300 px-2.5 py-1">
+                                        <span key={tIdx} className="bg-[#f5f5f7] border border-black/5 text-[#1d1d1f]/80 px-3 py-1 rounded-full font-medium">
                                             {tech}
                                         </span>
                                     ))}

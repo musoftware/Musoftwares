@@ -100,6 +100,12 @@ export interface SafeLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElem
     href: string;
     external?: boolean;
     children?: React.ReactNode;
+    method?: string;
+    as?: string;
+    data?: any;
+    preserveState?: boolean;
+    preserveScroll?: boolean;
+    only?: string[];
 }
 
 /**
@@ -107,7 +113,7 @@ export interface SafeLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElem
  * Automatically renders a standard HTML <a> tag for Blade and external routes,
  * ensuring full page browser navigation and preventing Inertia srcdoc iframe issues.
  */
-export default function SafeLink({ href, external, children, className, ...props }: SafeLinkProps) {
+export default function SafeLink({ href, external, children, className, method, as, data, preserveState, preserveScroll, only, ...props }: SafeLinkProps) {
     if (external || isExternalRoute(href)) {
         return (
             <a href={href} className={className} {...props}>
@@ -117,7 +123,17 @@ export default function SafeLink({ href, external, children, className, ...props
     }
 
     return (
-        <Link href={href} className={className} {...(props as any)}>
+        <Link
+            href={href}
+            className={className}
+            method={method as any}
+            as={as as any}
+            data={data}
+            preserveState={preserveState}
+            preserveScroll={preserveScroll}
+            only={only}
+            {...(props as any)}
+        >
             {children}
         </Link>
     );

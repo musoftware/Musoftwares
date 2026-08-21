@@ -103,7 +103,7 @@ export default function LaravelVsNodejs() {
                 'Business-Critical SaaS with strict RBAC and billing flows',
                 'Fast execution speed with full React UI fidelity (Inertia.js)',
             ],
-            color: 'border-[#748660] bg-[#1A2215]',
+            color: 'border-[#0071e3]/30 bg-[#0071e3]/5',
         },
         {
             title: 'When to Choose Node.js / Fastify',
@@ -113,7 +113,7 @@ export default function LaravelVsNodejs() {
                 'Lightweight micro-gateways routing raw binary packets',
                 'Pure GraphQL streaming proxy layers',
             ],
-            color: 'border-[#2B2B2B] bg-black',
+            color: 'border-black/10 bg-[#f5f5f7]',
         },
     ];
 
@@ -124,7 +124,7 @@ export default function LaravelVsNodejs() {
                 <meta name="description" content="Technical comparison and performance benchmark: Laravel 12 + Inertia vs Node.js for Enterprise ERP, SaaS platforms, and real-time APIs." />
             </Head>
 
-            <div className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
+            <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <StudioHeader
@@ -132,24 +132,24 @@ export default function LaravelVsNodejs() {
                     title={
                         <>
                             Laravel vs Node.js <br className="hidden sm:inline" />
-                            <span className="text-[#748660]">Enterprise Architecture Benchmark</span>
+                            <span className="text-[#0071e3]">Enterprise Architecture Benchmark</span>
                         </>
                     }
                     subtitle="A data-driven engineering comparison between monolithic Laravel 12 + Inertia vs Node.js microservices for mission-critical business platforms."
                 />
 
                 {/* Quick Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 px-6">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 px-6">
                     <Link href="/estimator">
-                        <button className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all cursor-pointer">
+                        <button className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer">
                             Calculate Project Scope ➔
                         </button>
                     </Link>
                     <button 
                         onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to consult on selecting the right tech stack for my enterprise project (Laravel vs Node.js).")}
-                        className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all cursor-pointer flex items-center gap-2"
+                        className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm cursor-pointer flex items-center gap-2"
                     >
-                        <MessageSquare className="w-4 h-4 text-[#748660]" />
+                        <MessageSquare className="w-4 h-4 text-[#0071e3]" />
                         <span>Consult Lead Architect</span>
                     </button>
                 </div>
@@ -157,17 +157,17 @@ export default function LaravelVsNodejs() {
                 <div className="max-w-[1400px] mx-auto px-6 sm:px-12 space-y-20">
                     
                     {/* Executive Summary Card */}
-                    <div className="p-8 sm:p-12 bg-[#161616] border border-[#2B2B2B] relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-[#748660]/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="p-8 sm:p-12 bg-white border border-black/5 rounded-[24px] shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-[#0071e3]/5 rounded-full blur-3xl pointer-events-none" />
                         <div className="relative z-10 space-y-4 max-w-4xl">
-                            <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
+                            <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
                                 Executive Summary
                             </span>
-                            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                            <h2 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
                                 The Modern "Majestic Monolith" Outperforms Fragmented Microservices
                             </h2>
-                            <p className="text-sm text-zinc-300 leading-relaxed font-sans">
-                                In 2026, building enterprise SaaS with a modern <strong className="text-white">Laravel 12 + Inertia.js + PostgreSQL</strong> stack delivers up to <strong className="text-[#748660]">60% faster development cycles</strong> and zero schema-drift bugs compared to disjointed Node.js microservices. Node.js excels at raw async network streaming, but Laravel dominates in business logic, financial ledgers, and operational durability.
+                            <p className="text-sm sm:text-base text-[#1d1d1f]/70 leading-relaxed font-sans">
+                                In 2026, building enterprise SaaS with a modern <strong className="text-[#1d1d1f]">Laravel 12 + Inertia.js + PostgreSQL</strong> stack delivers up to <strong className="text-[#0071e3]">60% faster development cycles</strong> and zero schema-drift bugs compared to disjointed Node.js microservices. Node.js excels at raw async network streaming, but Laravel dominates in business logic, financial ledgers, and operational durability.
                             </p>
                         </div>
                     </div>
@@ -175,10 +175,10 @@ export default function LaravelVsNodejs() {
                     {/* Detailed Comparison Matrix */}
                     <div className="space-y-8">
                         <div className="text-center max-w-3xl mx-auto space-y-2">
-                            <span className="text-xs font-mono uppercase tracking-widest text-[#748660] font-bold">
+                            <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
                                 Architectural Showdown
                             </span>
-                            <h3 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
+                            <h3 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
                                 Head-to-Head Technical Matrix
                             </h3>
                         </div>
@@ -187,47 +187,47 @@ export default function LaravelVsNodejs() {
                             {comparisonMetrics.map((metric, idx) => {
                                 const IconComp = metric.icon;
                                 return (
-                                    <div key={idx} className="bg-[#161616] border border-[#2B2B2B] p-6 sm:p-8 space-y-6">
-                                        <div className="flex items-center gap-3 border-b border-[#222222] pb-4">
-                                            <div className="p-2.5 bg-black border border-[#2B2B2B] text-[#748660]">
+                                    <div key={idx} className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 space-y-6 shadow-sm">
+                                        <div className="flex items-center gap-3 border-b border-black/5 pb-4">
+                                            <div className="p-2.5 rounded-xl bg-[#0071e3]/10 text-[#0071e3]">
                                                 <IconComp className="h-5 w-5" />
                                             </div>
-                                            <h4 className="font-bold text-lg text-white font-sans">
+                                            <h4 className="font-semibold text-lg text-[#1d1d1f] font-sans">
                                                 {metric.category}
                                             </h4>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             {/* Laravel Column */}
-                                            <div className="p-5 bg-black/60 border border-[#748660]/30 space-y-2 font-mono text-xs">
-                                                <div className="flex items-center justify-between text-white font-bold text-sm">
-                                                    <span className="text-[#748660] flex items-center gap-1.5">
+                                            <div className="p-5 rounded-[20px] bg-[#0071e3]/5 border border-[#0071e3]/20 space-y-2 text-xs">
+                                                <div className="flex items-center justify-between text-[#1d1d1f] font-semibold text-sm">
+                                                    <span className="text-[#0071e3] flex items-center gap-1.5">
                                                         <CheckCircle2 className="h-4 w-4" />
                                                         Laravel 12 Architecture
                                                     </span>
-                                                    <span className="text-[10px] uppercase px-2 py-0.5 bg-[#1E2619] text-[#748660] border border-[#748660]/40">
+                                                    <span className="text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-[#0071e3]/10 text-[#0071e3] font-semibold">
                                                         Recommended
                                                     </span>
                                                 </div>
-                                                <div className="font-bold text-zinc-200">{metric.laravel.title}</div>
-                                                <p className="text-zinc-400 font-sans text-xs leading-relaxed">
+                                                <div className="font-semibold text-[#1d1d1f]">{metric.laravel.title}</div>
+                                                <p className="text-[#1d1d1f]/70 font-sans text-xs leading-relaxed">
                                                     {metric.laravel.desc}
                                                 </p>
                                             </div>
 
                                             {/* Node.js Column */}
-                                            <div className="p-5 bg-black/60 border border-[#2B2B2B] space-y-2 font-mono text-xs">
-                                                <div className="flex items-center justify-between text-zinc-300 font-bold text-sm">
-                                                    <span className="text-zinc-400 flex items-center gap-1.5">
+                                            <div className="p-5 rounded-[20px] bg-[#f5f5f7] border border-black/5 space-y-2 text-xs">
+                                                <div className="flex items-center justify-between text-[#1d1d1f] font-semibold text-sm">
+                                                    <span className="text-[#1d1d1f]/70 flex items-center gap-1.5">
                                                         <Server className="h-4 w-4" />
                                                         Node.js / Express Stack
                                                     </span>
-                                                    <span className="text-[10px] uppercase px-2 py-0.5 bg-[#1C1C1C] text-zinc-400 border border-[#333333]">
+                                                    <span className="text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-black/5 text-[#1d1d1f]/60 font-semibold">
                                                         Specialized
                                                     </span>
                                                 </div>
-                                                <div className="font-bold text-zinc-300">{metric.nodejs.title}</div>
-                                                <p className="text-zinc-400 font-sans text-xs leading-relaxed">
+                                                <div className="font-semibold text-[#1d1d1f]/80">{metric.nodejs.title}</div>
+                                                <p className="text-[#1d1d1f]/60 font-sans text-xs leading-relaxed">
                                                     {metric.nodejs.desc}
                                                 </p>
                                             </div>
@@ -241,15 +241,15 @@ export default function LaravelVsNodejs() {
                     {/* Verdict Columns */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {verdictHighlights.map((verdict, i) => (
-                            <div key={i} className={`p-8 border ${verdict.color} space-y-6`}>
-                                <h4 className="text-xl font-bold text-white font-sans flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5 text-[#748660]" />
+                            <div key={i} className={`p-8 rounded-[24px] border ${verdict.color} space-y-6 shadow-sm`}>
+                                <h4 className="text-xl font-semibold text-[#1d1d1f] font-sans flex items-center gap-2">
+                                    <Sparkles className="w-5 h-5 text-[#0071e3]" />
                                     {verdict.title}
                                 </h4>
-                                <ul className="space-y-3 font-sans text-sm text-zinc-300">
+                                <ul className="space-y-3 font-sans text-sm text-[#1d1d1f]/80">
                                     {verdict.points.map((pt, idx) => (
                                         <li key={idx} className="flex items-start gap-2.5">
-                                            <CheckCircle2 className="w-4 h-4 text-[#748660] shrink-0 mt-0.5" />
+                                            <CheckCircle2 className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
                                             <span>{pt}</span>
                                         </li>
                                     ))}
@@ -259,24 +259,24 @@ export default function LaravelVsNodejs() {
                     </div>
 
                     {/* Studio Call To Action */}
-                    <div className="bg-[#161616] p-8 sm:p-12 border border-[#2B2B2B] text-center space-y-6">
-                        <span className="text-xs font-mono uppercase tracking-widest text-[#748660] font-bold block">
+                    <div className="bg-[#f5f5f7] p-8 sm:p-12 border border-black/5 rounded-[28px] text-center space-y-6">
+                        <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold block">
                             Our Studio Advantage
                         </span>
-                        <h3 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
+                        <h3 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
                             We Engineer Both Stacks with Production Mastery
                         </h3>
-                        <p className="text-sm text-zinc-400 max-w-2xl mx-auto font-sans leading-relaxed">
+                        <p className="text-sm text-[#1d1d1f]/60 max-w-2xl mx-auto font-sans leading-relaxed">
                             Musoftwares engineers multi-tenant SaaS platforms, real-time Meta bots, and high-performance desktop tools tailored precisely to your operational requirements.
                         </p>
-                        <div className="pt-2 flex items-center justify-center gap-4 flex-wrap font-mono text-xs">
+                        <div className="pt-2 flex items-center justify-center gap-4 flex-wrap text-xs">
                             <Link href="/estimator">
-                                <button className="px-8 py-3.5 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold uppercase tracking-wider transition-colors cursor-pointer">
+                                <button className="px-8 py-3.5 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold tracking-wide transition-colors cursor-pointer shadow-md shadow-blue-500/20">
                                     Launch Architecture Estimator
                                 </button>
                             </Link>
                             <Link href="/portfolio">
-                                <button className="px-8 py-3.5 bg-black hover:bg-[#222222] text-zinc-300 hover:text-white border border-[#333333] font-bold uppercase tracking-wider transition-colors cursor-pointer">
+                                <button className="px-8 py-3.5 rounded-[980px] bg-white hover:bg-[#e5e5ea] text-[#1d1d1f] border border-black/10 font-semibold tracking-wide transition-colors cursor-pointer shadow-sm">
                                     Explore Studio Case Studies
                                 </button>
                             </Link>

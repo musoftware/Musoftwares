@@ -88,7 +88,7 @@ export default function LeadershipBio() {
                 <meta name="description" content="Biography and engineering profile of Mahmoud Amin, Founder and Chief Software Architect at Musoftwares." />
             </Head>
 
-            <div className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
+            <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <StudioHeader
@@ -96,23 +96,23 @@ export default function LeadershipBio() {
                     title={
                         <>
                             Mahmoud Amin <br className="hidden sm:inline" />
-                            <span className="text-[#748660]">Founder &amp; Chief Software Architect</span>
+                            <span className="text-[#0071e3]">Founder &amp; Chief Software Architect</span>
                         </>
                     }
                     subtitle="10+ years architecting mission-critical ERP platforms, real-time financial systems, and high-throughput Meta API integrations."
                 />
 
                 {/* Direct Action Bar */}
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20 px-6">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 px-6">
                     <button 
                         onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to book an executive architectural consultation regarding my project.")}
-                        className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all cursor-pointer flex items-center gap-2"
+                        className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer flex items-center gap-2"
                     >
-                        <MessageSquare className="w-4 h-4 text-[#748660]" />
+                        <MessageSquare className="w-4 h-4 text-white" />
                         <span>Consult Mahmoud Directly</span>
                     </button>
                     <Link href="/portfolio">
-                        <button className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all cursor-pointer">
+                        <button className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm cursor-pointer">
                             View Shipped Case Studies ➔
                         </button>
                     </Link>
@@ -124,61 +124,61 @@ export default function LeadershipBio() {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                         
                         {/* Profile Summary Card (4 cols) */}
-                        <div className="lg:col-span-4 bg-[#161616] border border-[#2B2B2B] p-8 space-y-6">
-                            <div className="w-24 h-24 bg-[#1E2619] border-2 border-[#748660] flex items-center justify-center font-mono text-3xl font-black text-[#748660]">
+                        <div className="lg:col-span-4 bg-white border border-black/5 rounded-[24px] p-8 space-y-6 shadow-sm">
+                            <div className="w-24 h-24 rounded-2xl bg-[#0071e3]/10 border border-[#0071e3]/20 flex items-center justify-center text-3xl font-bold text-[#0071e3]">
                                 MA
                             </div>
                             
                             <div className="space-y-1">
-                                <h3 className="text-xl font-bold text-white font-sans">Mahmoud Amin</h3>
-                                <p className="text-xs font-mono text-[#748660] uppercase tracking-wider">Chief Software Architect</p>
-                                <p className="text-xs text-zinc-400 font-sans">Suez, Egypt • Worldwide Delivery</p>
+                                <h3 className="text-xl font-semibold text-[#1d1d1f] font-sans tracking-tight">Mahmoud Amin</h3>
+                                <p className="text-xs text-[#0071e3] font-semibold uppercase tracking-wider">Chief Software Architect</p>
+                                <p className="text-xs text-[#1d1d1f]/60 font-sans">Suez, Egypt • Worldwide Delivery</p>
                             </div>
 
-                            <div className="pt-4 border-t border-[#222222] space-y-3 text-xs font-mono text-zinc-300">
+                            <div className="pt-4 border-t border-black/5 space-y-3 text-xs text-[#1d1d1f]/80">
                                 <div className="flex justify-between">
-                                    <span className="text-zinc-500">Experience:</span>
-                                    <span>10+ Years</span>
+                                    <span className="text-[#1d1d1f]/50 font-medium">Experience:</span>
+                                    <span className="font-semibold">10+ Years</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-zinc-500">Platforms Shipped:</span>
-                                    <span>30+ Production Systems</span>
+                                    <span className="text-[#1d1d1f]/50 font-medium">Platforms Shipped:</span>
+                                    <span className="font-semibold">30+ Production Systems</span>
                                 </div>
                                 <div className="space-y-1.5 pt-1">
-                                    <span className="text-zinc-500 block">Core Architectural Domains:</span>
-                                    <div className="flex flex-wrap gap-1.5 pt-1 text-[10px]">
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">Cloud SaaS Platforms</span>
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">Desktop Applications (.NET)</span>
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">WhatsApp Business Solutions</span>
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">Meta Graph Cloud APIs</span>
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">Enterprise ERP & Accounting</span>
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">Point of Sale (POS) Systems</span>
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">FinTech & Exchange Engines</span>
-                                        <span className="px-2 py-0.5 bg-[#1E2619] border border-[#748660]/40 text-[#A2B889] font-bold">RPA & Data Automation</span>
+                                    <span className="text-[#1d1d1f]/50 block font-medium">Core Architectural Domains:</span>
+                                    <div className="flex flex-wrap gap-1.5 pt-1 text-[11px]">
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">Cloud SaaS Platforms</span>
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">Desktop Applications (.NET)</span>
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">WhatsApp Business Solutions</span>
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">Meta Graph Cloud APIs</span>
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">Enterprise ERP & Accounting</span>
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">Point of Sale (POS) Systems</span>
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">FinTech & Exchange Engines</span>
+                                        <span className="px-2.5 py-1 bg-[#f5f5f7] border border-black/5 rounded-full text-[#1d1d1f]/80 font-medium">RPA & Data Automation</span>
                                     </div>
                                 </div>
-                                <div className="flex justify-between pt-1 border-t border-[#1C1C1C]">
-                                    <span className="text-zinc-500">Studio:</span>
-                                    <span className="text-[#748660] font-bold">Musoftwares</span>
+                                <div className="flex justify-between pt-2 border-t border-black/5">
+                                    <span className="text-[#1d1d1f]/50 font-medium">Studio:</span>
+                                    <span className="text-[#0071e3] font-semibold">Musoftwares</span>
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-[#222222] space-y-2">
+                            <div className="pt-4 border-t border-black/5 space-y-2">
                                 <a 
                                     href="https://wa.me/201015218548" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="w-full flex items-center justify-center gap-2 py-3 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold text-xs font-mono uppercase tracking-wider transition-colors"
+                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-[980px] bg-[#25D366] hover:bg-[#20ba59] text-white font-semibold text-xs transition-colors shadow-md shadow-green-500/20"
                                 >
                                     <span>Message on WhatsApp</span>
                                 </a>
 
-                                <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] font-mono text-center">
+                                <div className="grid grid-cols-2 gap-2 pt-2 text-xs text-center">
                                     <a 
                                         href="https://www.linkedin.com/in/musoftwareuno/?locale=ar" 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="p-2 border border-[#2B2B2B] bg-black hover:border-zinc-500 text-zinc-300 hover:text-white transition-colors"
+                                        className="p-2 border border-black/10 bg-[#f5f5f7] hover:bg-white rounded-xl text-[#1d1d1f]/80 hover:text-[#1d1d1f] font-medium transition-colors"
                                     >
                                         LinkedIn ↗
                                     </a>
@@ -186,7 +186,7 @@ export default function LeadershipBio() {
                                         href="https://github.com/musoftware" 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="p-2 border border-[#2B2B2B] bg-black hover:border-zinc-500 text-zinc-300 hover:text-white transition-colors"
+                                        className="p-2 border border-black/10 bg-[#f5f5f7] hover:bg-white rounded-xl text-[#1d1d1f]/80 hover:text-[#1d1d1f] font-medium transition-colors"
                                     >
                                         GitHub ↗
                                     </a>
@@ -194,7 +194,7 @@ export default function LeadershipBio() {
                                         href="https://x.com/MusoftwareUno" 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="p-2 border border-[#2B2B2B] bg-black hover:border-zinc-500 text-zinc-300 hover:text-white transition-colors"
+                                        className="p-2 border border-black/10 bg-[#f5f5f7] hover:bg-white rounded-xl text-[#1d1d1f]/80 hover:text-[#1d1d1f] font-medium transition-colors"
                                     >
                                         X (Twitter) ↗
                                     </a>
@@ -202,7 +202,7 @@ export default function LeadershipBio() {
                                         href="https://www.facebook.com/musoftwares.com.page/" 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="p-2 border border-[#2B2B2B] bg-black hover:border-zinc-500 text-zinc-300 hover:text-white transition-colors"
+                                        className="p-2 border border-black/10 bg-[#f5f5f7] hover:bg-white rounded-xl text-[#1d1d1f]/80 hover:text-[#1d1d1f] font-medium transition-colors"
                                     >
                                         Facebook ↗
                                     </a>
@@ -212,15 +212,15 @@ export default function LeadershipBio() {
 
                         {/* Bio Narrative (8 cols) */}
                         <div className="lg:col-span-8 space-y-8">
-                            <div className="bg-[#161616] border border-[#2B2B2B] p-8 sm:p-10 space-y-6">
-                                <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#748660] font-bold">
+                            <div className="bg-white border border-black/5 rounded-[24px] p-8 sm:p-10 space-y-6 shadow-sm">
+                                <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
                                     Architectural Statement
                                 </span>
-                                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                                <h3 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
                                     "We engineer software as durable infrastructure, not disposable consumer prototypes."
                                 </h3>
                                 
-                                <div className="space-y-4 text-sm text-zinc-300 font-sans leading-relaxed">
+                                <div className="space-y-4 text-sm sm:text-base text-[#1d1d1f]/70 font-sans leading-relaxed">
                                     <p>
                                         Mahmoud Amin is the founder and lead architect behind Musoftwares. Over the past decade, he has engineered and delivered enterprise-grade applications ranging from multi-branch ERP ledgers and automated commodity exchanges to verified Meta Graph API engines.
                                     </p>
@@ -232,21 +232,21 @@ export default function LeadershipBio() {
 
                             {/* Core Competencies Grid */}
                             <div className="space-y-4">
-                                <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
+                                <h4 className="text-xs uppercase tracking-wider text-[#1d1d1f]/60 font-semibold">
                                     Technical Domains of Authority
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {coreCompetencies.map((comp, idx) => {
                                         const IconComp = comp.icon;
                                         return (
-                                            <div key={idx} className="bg-[#161616] border border-[#2B2B2B] p-5 space-y-2 font-mono">
+                                            <div key={idx} className="bg-white border border-black/5 rounded-[20px] p-5 space-y-2 shadow-sm hover:shadow-md transition-all">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-black border border-[#2B2B2B] text-[#748660]">
+                                                    <div className="p-2 rounded-xl bg-[#0071e3]/10 text-[#0071e3]">
                                                         <IconComp className="h-4 w-4" />
                                                     </div>
-                                                    <h5 className="font-bold text-white text-xs">{comp.title}</h5>
+                                                    <h5 className="font-semibold text-[#1d1d1f] text-sm">{comp.title}</h5>
                                                 </div>
-                                                <p className="text-[11px] text-zinc-400 font-sans leading-relaxed">
+                                                <p className="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed">
                                                     {comp.desc}
                                                 </p>
                                             </div>
@@ -261,24 +261,24 @@ export default function LeadershipBio() {
                     {/* Timeline Milestones */}
                     <div className="space-y-8">
                         <div className="text-center max-w-3xl mx-auto space-y-2">
-                            <span className="text-xs font-mono uppercase tracking-widest text-[#748660] font-bold">
+                            <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
                                 Proven Track Record
                             </span>
-                            <h3 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
+                            <h3 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
                                 Engineering Journey &amp; Milestones
                             </h3>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4 font-mono">
+                        <div className="grid grid-cols-1 gap-4">
                             {milestones.map((m, idx) => (
-                                <div key={idx} className="bg-[#161616] border border-[#2B2B2B] p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-6">
+                                <div key={idx} className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-6 shadow-sm">
                                     <div className="sm:w-32 shrink-0">
-                                        <span className="text-lg font-bold text-[#748660]">{m.year}</span>
+                                        <span className="text-xl font-bold text-[#0071e3]">{m.year}</span>
                                     </div>
                                     <div className="space-y-1 flex-1">
-                                        <h4 className="text-base font-bold text-white">{m.role}</h4>
-                                        <div className="text-xs text-zinc-400">{m.organization}</div>
-                                        <p className="text-xs text-zinc-300 font-sans leading-relaxed pt-2">
+                                        <h4 className="text-base font-semibold text-[#1d1d1f]">{m.role}</h4>
+                                        <div className="text-xs text-[#1d1d1f]/50 font-medium">{m.organization}</div>
+                                        <p className="text-xs sm:text-sm text-[#1d1d1f]/70 font-sans leading-relaxed pt-2">
                                             {m.desc}
                                         </p>
                                     </div>
@@ -288,25 +288,25 @@ export default function LeadershipBio() {
                     </div>
 
                     {/* Bottom Consultation Banner */}
-                    <div className="bg-[#161616] p-8 sm:p-12 border border-[#2B2B2B] text-center space-y-6">
-                        <span className="text-xs font-mono uppercase tracking-widest text-[#748660] font-bold block">
+                    <div className="bg-[#f5f5f7] p-8 sm:p-12 border border-black/5 rounded-[28px] text-center space-y-6">
+                        <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold block">
                             Direct Architecture Engagement
                         </span>
-                        <h3 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
+                        <h3 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
                             Have a Complex System That Demands Senior Architecture?
                         </h3>
-                        <p className="text-sm text-zinc-400 max-w-2xl mx-auto font-sans leading-relaxed">
+                        <p className="text-sm text-[#1d1d1f]/60 max-w-2xl mx-auto font-sans leading-relaxed">
                             Connect directly with Mahmoud Amin to review your system schema, API contracts, or high-throughput requirements.
                         </p>
-                        <div className="pt-2 flex items-center justify-center gap-4 flex-wrap font-mono text-xs">
+                        <div className="pt-2 flex items-center justify-center gap-4 flex-wrap text-xs">
                             <button 
                                 onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to book an architecture review for my enterprise system.")}
-                                className="px-8 py-3.5 bg-[#748660] hover:bg-[#60704E] text-[#0F140A] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                                className="px-8 py-3.5 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold tracking-wide transition-colors cursor-pointer shadow-md shadow-blue-500/20"
                             >
                                 Discuss on WhatsApp Directly
                             </button>
                             <Link href="/company/contact">
-                                <button className="px-8 py-3.5 bg-black hover:bg-[#222222] text-zinc-300 hover:text-white border border-[#333333] font-bold uppercase tracking-wider transition-colors cursor-pointer">
+                                <button className="px-8 py-3.5 rounded-[980px] bg-white hover:bg-[#e5e5ea] text-[#1d1d1f] border border-black/10 font-semibold tracking-wide transition-colors cursor-pointer shadow-sm">
                                     Submit Engineering Brief
                                 </button>
                             </Link>

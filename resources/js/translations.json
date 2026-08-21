@@ -8187,6 +8187,7 @@
             "save_landing_page": "حفظ Landing Page",
             "save_notes": "حفظ ملاحظات",
             "save_pin": "حفظ Pin",
+            "save_password": "حفظ كلمة المرور",
             "save_product": "حفظ Product",
             "save_record": "حفظ Record",
             "save_rule": "حفظ Rule",
@@ -10333,7 +10334,11 @@
             "generate_missing_transactions": "إنشاء المعاملات الناقصة",
             "generated_missing_transactions_count": "تم إنشاء :count معاملة ناقصة بنجاح.",
             "all_transactions_already_up_to_date": "جميع المعاملات محدثة ولا توجد أي معاملات ناقصة.",
-            "confirm_generate_missing": "هل أنت متأكد من رغبتك في إنشاء وتوليد جميع المعاملات الفائتة السابقة حتى اليوم لهذا الجدول؟"
+            "confirm_generate_missing": "هل أنت متأكد من رغبتك في إنشاء وتوليد جميع المعاملات الفائتة السابقة حتى اليوم لهذا الجدول؟",
+            "desktop_apps": "برامج الديسك توب",
+            "founder": "محمود أمين",
+            "mobile_apps": "تطبيقات الموبايل",
+            "web_apps": "تطبيقات الويب"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -20986,6 +20991,7 @@
             "save_landing_page": "Save Landing Page",
             "save_notes": "Save notes",
             "save_pin": "Save Pin",
+            "save_password": "Save Password",
             "save_product": "Save Product",
             "save_record": "Save Record",
             "save_rule": "Save Rule",
@@ -23132,7 +23138,11 @@
             "generate_missing_transactions": "Generate Missing Runs",
             "generated_missing_transactions_count": "Successfully generated :count missing transaction(s).",
             "all_transactions_already_up_to_date": "All transactions are already up to date.",
-            "confirm_generate_missing": "Are you sure you want to generate all missing past transactions up to today for this schedule?"
+            "confirm_generate_missing": "Are you sure you want to generate all missing past transactions up to today for this schedule?",
+            "desktop_apps": "Desktop Apps",
+            "founder": "Founder",
+            "mobile_apps": "Mobile Apps",
+            "web_apps": "Web Apps"
         },
         "gold_saver": {
             "achieved": "Achieved",

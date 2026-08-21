@@ -88,7 +88,7 @@ export default function Finance({ auth }) {
                         </p>
                         <Button 
                             onClick={() => openWhatsApp("Hello Mahmoud, I want to discuss a FinTech Solution.")}
-                            className="gsap-fade-up bg-[#111111] text-white hover:bg-[#333333] rounded-xl px-8 py-6 text-sm font-bold uppercase tracking-wide transition-all"
+                            className="gsap-fade-up bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-[980px] px-8 py-4 text-sm font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
                             Discuss Your Needs
                         </Button>
@@ -104,9 +104,9 @@ export default function Finance({ auth }) {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {features.map((feature, idx) => (
-                            <div key={idx} className="gsap-fade-up bg-white p-8 lg:p-10 border border-[#e5e5e5] rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:border-[#111111] transition-all flex flex-col h-full group">
-                                <div className="w-14 h-14 bg-[#f4f4f5] group-hover:bg-[#111111] transition-colors rounded-xl flex items-center justify-center mb-8">
-                                    <feature.icon className="w-6 h-6 text-[#111111] group-hover:text-white transition-colors" />
+                            <div key={idx} className="gsap-fade-up bg-white p-8 lg:p-10 border border-black/5 rounded-[24px] shadow-sm hover:shadow-md hover:border-[#0071e3]/40 transition-all flex flex-col h-full group">
+                                <div className="w-14 h-14 bg-[#0071e3]/10 text-[#0071e3] transition-colors rounded-2xl flex items-center justify-center mb-8">
+                                    <feature.icon className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
                                 <p className="text-[#666666] leading-relaxed text-[15px] mb-8 flex-grow">
@@ -115,7 +115,7 @@ export default function Finance({ auth }) {
                                 <ul className="space-y-3 pt-6 border-t border-[#f4f4f5]">
                                     {feature.bullets.map((bullet, i) => (
                                         <li key={i} className="flex items-center gap-3 text-[#444444]">
-                                            <CheckCircle2 className="w-4 h-4 text-[#111111]" />
+                                            <CheckCircle2 className="w-4 h-4 text-[#0071e3]" />
                                             <span className="text-sm font-medium">{bullet}</span>
                                         </li>
                                     ))}
@@ -126,17 +126,17 @@ export default function Finance({ auth }) {
                 </section>
 
                 {/* CTA Section */}
-                <section className="py-32 bg-[#111111] text-white text-center reveal-section px-6">
+                <section className="py-24 bg-[#f5f5f7] text-[#1d1d1f] border-t border-black/5 text-center reveal-section px-6">
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="gsap-fade-up text-4xl md:text-5xl font-extrabold mb-6">
+                        <h2 className="gsap-fade-up text-3xl md:text-5xl font-bold tracking-tight mb-6">
                             Ready to innovate in finance?
                         </h2>
-                        <p className="gsap-fade-up text-xl text-[#a3a3a3] mb-12 leading-relaxed">
+                        <p className="gsap-fade-up text-lg text-[#1d1d1f]/70 mb-10 leading-relaxed">
                             Don't risk your reputation on poor architecture. Let's build a rock-solid financial platform.
                         </p>
                         <Button 
                             onClick={() => openWhatsApp("Hello Mahmoud, I need to build a FinTech application.")}
-                            className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-all flex items-center justify-center gap-3 mx-auto"
+                            className="gsap-fade-up bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-[980px] px-10 py-4 text-sm font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-3 mx-auto cursor-pointer"
                         >
                             Book a Consultation <ArrowRight className="w-4 h-4" />
                         </Button>

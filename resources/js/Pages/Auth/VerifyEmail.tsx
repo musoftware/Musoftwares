@@ -20,30 +20,30 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
             <div className="space-y-6">
                 <div className="flex justify-center">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20 shadow-sm">
-                        <MailCheck className="w-8 h-8 text-primary" />
+                    <div className="w-16 h-16 bg-[#0071e3]/10 rounded-2xl flex items-center justify-center border border-[#0071e3]/20 shadow-xs">
+                        <MailCheck className="w-8 h-8 text-[#0071e3]" />
                     </div>
                 </div>
                 
                 <div className="space-y-1.5 text-center">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.check_your_email')}</h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.we_sent_a_verification_link_to_your_inbox')}</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] font-sans">{__('general.check_your_email')}</h1>
+                    <p className="text-xs text-[#1d1d1f]/60 font-sans">{__('general.we_sent_a_verification_link_to_your_inbox')}</p>
                 </div>
 
-                <p className="text-xs text-center text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">{__('general.please_verify_your_email_address_to_unlock_full_workspace_access_if_you_didn_t_receive_the_email_we_will_gladly_send_you_another')}</p>
+                <p className="text-xs text-center text-[#1d1d1f]/70 leading-relaxed font-sans">{__('general.please_verify_your_email_address_to_unlock_full_workspace_access_if_you_didn_t_receive_the_email_we_will_gladly_send_you_another')}</p>
 
                 {status === 'verification-link-sent' && (
-                    <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">{__('general.a_new_verification_link_has_been_sent_to_your_email_address')}</div>
+                    <div className="rounded-xl bg-[#34c759]/10 border border-[#34c759]/20 p-3 text-xs font-semibold text-[#28a745] text-center">{__('general.a_new_verification_link_has_been_sent_to_your_email_address')}</div>
                 )}
 
                 <form onSubmit={submit} className="space-y-4 pt-2">
                     <Button
-                        className="w-full h-10 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 font-medium text-sm rounded-lg shadow-xs transition-all flex items-center justify-center space-x-2"
+                        className="w-full h-11 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-sm rounded-[980px] shadow-md shadow-blue-500/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                         disabled={processing}
                     >
                         {processing ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
+                                <Loader2 className="w-4 h-4 animate-spin text-white" />
                                 <span>{__('general.sending_verification_link')}</span>
                             </>
                         ) : (
@@ -51,12 +51,12 @@ export default function VerifyEmail({ status }: { status?: string }) {
                         )}
                     </Button>
 
-                    <div className="text-center pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
+                    <div className="text-center pt-4 border-t border-black/5">
                         <Link
                             href={route('logout')}
                             method="post"
                             as="button"
-                            className="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors underline underline-offset-4 font-normal"
+                            className="text-xs font-semibold text-[#1d1d1f]/60 hover:text-[#1d1d1f] transition-colors cursor-pointer"
                         >{__('general.log_out')}</Link>
                     </div>
                 </form>

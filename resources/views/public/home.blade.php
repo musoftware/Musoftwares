@@ -677,7 +677,7 @@
                 {
                     title_en: "Kbdny Affiliate",
                     title_ar: "منصة كبدني للتجارة والتسويق بالعمولة",
-                    badge: "Web & E-Commerce",
+                    badge: "Web Platform",
                     desc_en: "Multi-vendor affiliate platform with real-time commission tracking and payouts.",
                     desc_ar: "نظام متكامل واحترافي للتجارة الإلكترونية والدروبشيبينغ مع تتبع العمولات اللحظي.",
                     img: "/images/portfolio/kbdny.png",
@@ -685,19 +685,9 @@
                     metric: "5,000+ Affiliates"
                 },
                 {
-                    title_en: "Stock Manager",
-                    title_ar: "نظام Stock Manager لإدارة المخزون ونقاط البيع",
-                    badge: "Web & POS",
-                    desc_en: "Inventory and POS system with multi-location support and KPI reporting.",
-                    desc_ar: "نظام متكامل لإدارة المخازن ونقاط البيع للمحلات وسلاسل التوزيع.",
-                    img: "/images/portfolio/stockmanager.png",
-                    slug: "stock-manager",
-                    metric: "Multi-Location Support"
-                },
-                {
                     title_en: "Mini Fatora",
                     title_ar: "منصة Mini Fatora للفوترة السريعة وإدارة الفواتير",
-                    badge: "SaaS Billing",
+                    badge: "Web SaaS",
                     desc_en: "Online invoicing and billing SaaS for freelancers and small businesses.",
                     desc_ar: "منصة فوترة سحابية خفيفة وسريعة للمستقلين والشركات الناشئة.",
                     img: "/images/portfolio/minifatora.png",
@@ -705,19 +695,19 @@
                     metric: "Instant PDF Invoicing"
                 },
                 {
-                    title_en: "Vodafone CRM",
-                    title_ar: "نظام إدارة الموزعين والعمليات الميدانية لـ Vodafone",
-                    badge: "Enterprise CRM",
-                    desc_en: "Custom CRM and operations management system for Vodafone Egypt distributor.",
-                    desc_ar: "نظام مؤسسي متقدم لإدارة شبكة الموزعين والمناديب الميدانيين لخدمات الاتصالات.",
-                    img: "/images/portfolio/vodafone-crm.jpg",
-                    slug: "vodafone-crm",
-                    metric: "50k+ SIM Serial Records"
+                    title_en: "Trenz whatsCRM",
+                    title_ar: "منصة Trenz whatsCRM لإدارة المحادثات والحجوزات",
+                    badge: "Web Platform",
+                    desc_en: "WhatsApp CRM and appointment scheduling platform designed for agencies.",
+                    desc_ar: "منصة سحابية متكاملة لخدمة العملاء عبر واتساب وجدولة المواعيد.",
+                    img: "/images/portfolio/trenz-whatscrm.png",
+                    slug: "trenz-whatscrm",
+                    metric: "Official Meta Cloud API"
                 },
                 {
                     title_en: "AMC Academy",
                     title_ar: "منصة AMC Academy للتعليم والتدريب الرقمي المشفر",
-                    badge: "E-Learning & DRM",
+                    badge: "Web E-Learning",
                     desc_en: "Full e-learning platform with student portals, scheduling, and assessments.",
                     desc_ar: "منصة تعليمية متكاملة تدعم حماية الفيديو من التسجيل والعلامات المائية.",
                     img: "/images/portfolio/amcacademy.jpg",
@@ -725,9 +715,19 @@
                     metric: "DRM Video Protection"
                 },
                 {
+                    title_en: "Vodafone CRM",
+                    title_ar: "نظام إدارة الموزعين والعمليات الميدانية لـ Vodafone",
+                    badge: "Web Operations",
+                    desc_en: "Custom CRM and operations management system for Vodafone Egypt distributor.",
+                    desc_ar: "نظام مؤسسي متقدم لإدارة شبكة الموزعين والمناديب الميدانيين لخدمات الاتصالات.",
+                    img: "/images/portfolio/vodafone-crm.jpg",
+                    slug: "vodafone-crm",
+                    metric: "50k+ SIM Records"
+                },
+                {
                     title_en: "Telecom System",
                     title_ar: "بوابة شحن وإدارة خدمات الاتصالات والإنترنت B2B",
-                    badge: "B2B Telecom",
+                    badge: "Web Gateway",
                     desc_en: "B2B recharge and ISP management platform with automated billing.",
                     desc_ar: "منصة خدمات الاتصالات والشحن الفوري للشركات وإدارة الاشتراكات.",
                     img: "/images/portfolio/telecom-system.png",
@@ -737,7 +737,7 @@
                 {
                     title_en: "Altayaraa",
                     title_ar: "منصة التجارة الإلكترونية السريعة الطيارة (Altayaraa)",
-                    badge: "E-Commerce",
+                    badge: "Web E-Commerce",
                     desc_en: "Arabic e-commerce and product listing platform with vendor management.",
                     desc_ar: "متجر إلكتروني فائق السرعة مصمم للشراء الفوري ومزامنة المخازن.",
                     img: "/images/portfolio/altayaraa.png",
@@ -745,31 +745,31 @@
                     metric: "Single-Page Checkout"
                 },
                 {
-                    title_en: "Trenz whatsCRM",
-                    title_ar: "منصة Trenz whatsCRM لإدارة المحادثات والحجوزات",
-                    badge: "WhatsApp CRM",
-                    desc_en: "WhatsApp CRM and appointment scheduling platform designed for agencies.",
-                    desc_ar: "منصة سحابية متكاملة لخدمة العملاء عبر واتساب وجدولة المواعيد.",
-                    img: "/images/portfolio/trenz-whatscrm.png",
-                    slug: "trenz-whatscrm",
-                    metric: "Meta Cloud API"
+                    title_en: "Project Manager",
+                    title_ar: "منصة إدارة المشاريع والمهام الهندسية Project Manager",
+                    badge: "Web Platform",
+                    desc_en: "Internal project and team management tool with task boards and timelines.",
+                    desc_ar: "بيئة عمل متكاملة لإدارة المشاريع البرمجية والهندسية ولوحات كانبان.",
+                    img: "/images/portfolio/projectmanager.png",
+                    slug: "project-manager",
+                    metric: "Sub-Second Timers"
                 }
             ],
             mobile: [
                 {
                     title_en: "Nokhpa",
                     title_ar: "تطبيق النخبة للتجارة الإلكترونية والتسوق الفاخر",
-                    badge: "Mobile App",
+                    badge: "Mobile App (iOS / Android)",
                     desc_en: "E-commerce mobile app with native checkout, order tracking, and product filtering.",
                     desc_ar: "تطبيق تسوق إلكتروني متطور للمنتجات الفاخرة يدعم تتبع مسار المندوب بالـ GPS.",
                     img: "/images/portfolio/nokhpa.png",
                     slug: "nokhpa",
-                    metric: "Native Checkout & GPS"
+                    metric: "Native iOS / Android"
                 },
                 {
                     title_en: "Forex App",
                     title_ar: "تطبيق إشارات التداول وتحليل أسواق العملات Forex App",
-                    badge: "Fintech Mobile",
+                    badge: "Mobile App (Flutter)",
                     desc_en: "Mobile companion for algorithmic trading with market signals and alerts.",
                     desc_ar: "تطبيق موبايل مالي متخصص في إرسال إشارات التداول اللحظية وتنبيهات السوق.",
                     img: "/images/portfolio/forex-app.png",
@@ -777,21 +777,11 @@
                     metric: "< 150ms Push Alerts"
                 },
                 {
-                    title_en: "AMC Social",
-                    title_ar: "منصة النشر والتواصل الاجتماعي AMC Social",
-                    badge: "Social Network",
-                    desc_en: "Internal social platform for AMC Academy students with posts and events.",
-                    desc_ar: "منصة سحابية لإدارة وجدولة المنشورات والتفاعل على شبكات التواصل الاجتماعي.",
-                    img: "/images/portfolio/amcsocial.png",
-                    slug: "amc-social",
-                    metric: "Cross-Network Sync"
-                },
-                {
                     title_en: "Wallet App",
                     title_ar: "تطبيق المحفظة الرقمية وتحويل الأموال Wallet App",
-                    badge: "Digital Wallet",
+                    badge: "Mobile App",
                     desc_en: "Digital currency wallet with real-time exchange, recharge, and transfer capabilities.",
-                    desc_ar: "محفظة مالية رقمية مع أسعار صرف فورية وتحويلات وإعادة شحن.",
+                    desc_ar: "محفظة مالية رقمية على الهواتف الذكية مع أسعار صرف فورية وتحويلات وإعادة شحن.",
                     img: "/images/portfolio/wallet-app.png",
                     slug: "portfolio",
                     metric: "Real-Time Exchange"
@@ -799,19 +789,39 @@
                 {
                     title_en: "QCoin App",
                     title_ar: "تطبيق QCoin لمتابعة وإدارة الاستثمارات الرقمية",
-                    badge: "Crypto Tracking",
+                    badge: "Mobile App",
                     desc_en: "Crypto investment and tracking mobile app with portfolio management.",
-                    desc_ar: "تطبيق جوال لمتابعة الأصول الرقمية وإدارة المحافظ الاستثمارية.",
+                    desc_ar: "تطبيق جوال لمتابعة الأصول الرقمية وإدارة المحافظ الاستثمارية للمستخدمين.",
                     img: "/images/portfolio/qcoin-app.jpg",
                     slug: "portfolio",
                     metric: "Portfolio Tracker"
+                },
+                {
+                    title_en: "AMC Social",
+                    title_ar: "منصة النشر والتواصل الاجتماعي AMC Social",
+                    badge: "Mobile App",
+                    desc_en: "Internal social platform for AMC Academy students with posts and events.",
+                    desc_ar: "تطبيق التواصل والتفاعل الاجتماعي للطلاب لمتابعة الأخبار والفعاليات.",
+                    img: "/images/portfolio/amcsocial.png",
+                    slug: "amc-social",
+                    metric: "Student Community"
                 }
             ],
             desktop: [
                 {
+                    title_en: "Stock Manager",
+                    title_ar: "نظام Stock Manager لكاشير ونقاط البيع السريعة",
+                    badge: "Desktop Application",
+                    desc_en: "Inventory and POS system with multi-location support and KPI reporting.",
+                    desc_ar: "برنامج كاشير ومخازن يعمل أوفلاين مع دعم طابعات الإيصالات الحرارية وقارئ الباركود.",
+                    img: "/images/portfolio/stockmanager.png",
+                    slug: "stock-manager",
+                    metric: "< 50ms Barcode Scanning"
+                },
+                {
                     title_en: "WhatsApp Sender",
                     title_ar: "برنامج إرسال رسائل الواتساب المخصصة WhatsApp Sender",
-                    badge: "Desktop Automation",
+                    badge: "Desktop Software",
                     desc_en: "Bulk WhatsApp messaging tool with scheduling, templates, and contact lists.",
                     desc_ar: "برنامج سطح مكتب لأتمتة إرسال رسائل الفواتير والتنبيهات المخصصة عبر واتساب.",
                     img: "/images/portfolio/whatsapp-sender.png",
@@ -821,27 +831,37 @@
                 {
                     title_en: "Telegram Sender",
                     title_ar: "برنامج البث والنشر الفوري على تيليجرام Telegram Sender",
-                    badge: "MTProto Broadcaster",
+                    badge: "Desktop Software",
                     desc_en: "Automated Telegram broadcast tool with group/channel targeting and scheduling.",
                     desc_ar: "برنامج بث ونشر فوري عبر بروتوكول MTProto لآلاف القنوات والمجموعات.",
                     img: "/images/portfolio/telegram-sender.png",
                     slug: "telegram-sender",
-                    metric: "Multi-Account Session"
+                    metric: "MTProto Protocol"
                 },
                 {
                     title_en: "Inbox Sender",
                     title_ar: "برنامج إرسال البريد الإلكتروني وتدوير الـ SMTP",
-                    badge: "Email Delivery",
+                    badge: "Desktop Software",
                     desc_en: "Email bulk sending system with SMTP rotation and delivery rate optimization.",
-                    desc_ar: "منصة إرسال رسائل بريدية مع تدوير ذكي لعناوين الـ IP وخوادم الـ SMTP.",
+                    desc_ar: "منظومة إرسال رسائل بريدية مع تدوير ذكي لعناوين الـ IP وخوادم الـ SMTP.",
                     img: "/images/portfolio/inbox-sender.png",
                     slug: "email-sender",
                     metric: "SMTP Pool Rotation"
                 },
                 {
+                    title_en: "ChartCash",
+                    title_ar: "منصة التحليلات المالية ولوحات القيادة ChartCash",
+                    badge: "Desktop & Analytics",
+                    desc_en: "Financial analytics dashboard with real-time charts, KPIs, and P&L tracking.",
+                    desc_ar: "منصة ذكاء أعمال وتحليلات مالية متقدمة توفر مؤشرات التدفق النقدي وهوامش الربحية.",
+                    img: "/images/portfolio/chartcash.png",
+                    slug: "chartcash",
+                    metric: "Real-Time Telemetry"
+                },
+                {
                     title_en: "StockTalk AI",
                     title_ar: "محرك الذكاء الاصطناعي وخدمة العملاء StockTalk AI",
-                    badge: "AI Assistant",
+                    badge: "Desktop / Server AI",
                     desc_en: "WhatsApp-based AI customer support agent for automated stock and order queries.",
                     desc_ar: "ربط الذكاء الاصطناعي بقاعدة بيانات المخازن الحية للرد الفوري على العملاء.",
                     img: "/images/portfolio/stocktalk.png",
@@ -849,19 +869,9 @@
                     metric: "ERP RAG Grounding"
                 },
                 {
-                    title_en: "ChartCash",
-                    title_ar: "منصة التحليلات المالية ولوحات القيادة ChartCash",
-                    badge: "Financial Analytics",
-                    desc_en: "Financial analytics dashboard with real-time charts, KPIs, and P&L tracking.",
-                    desc_ar: "منصة ذكاء أعمال وتحليلات مالية متقدمة توفر مؤشرات التدفق النقدي وهوامش الربحية.",
-                    img: "/images/portfolio/chartcash.png",
-                    slug: "chartcash",
-                    metric: "Real-Time Aggregations"
-                },
-                {
                     title_en: "Forex Bot",
                     title_ar: "روبوت التداول الخوارزمي الآلي Forex Bot",
-                    badge: "Algorithmic Trading",
+                    badge: "Desktop / VPS Bot",
                     desc_en: "Algorithmic trading bot with adaptive strategy, signal processing, and execution.",
                     desc_ar: "محرك تداول آلي خوارزمي متصل بمنصات التداول لتنفيذ الصفقات وإدارة المخاطر.",
                     img: "/images/portfolio/forex.png",
@@ -871,7 +881,7 @@
                 {
                     title_en: "Duplicate Finder",
                     title_ar: "برنامج البحث عن الملفات المكررة Duplicate Finder",
-                    badge: "Windows Utility",
+                    badge: "Windows Application",
                     desc_en: "File indexing and duplicate detection for Windows. Fast scan, SHA comparison.",
                     desc_ar: "فهرسة الملفات واكتشاف الملفات المكررة للويندوز مع فحص سريع ومقارنة SHA.",
                     img: "/images/portfolio/duplicate-finder.jpg",
@@ -881,7 +891,7 @@
                 {
                     title_en: "Map Extractor",
                     title_ar: "أداة استخراج بيانات الشركات والعملاء Map Extractor",
-                    badge: "Data Extraction",
+                    badge: "Windows Application",
                     desc_en: "Business leads extraction tool with filtering and export capabilities.",
                     desc_ar: "أداة استخراج العملاء المحتملين والشركات مع الفلترة والتصدير لإكسيل.",
                     img: "/images/portfolio/map-extractor.jpg",
@@ -891,7 +901,7 @@
                 {
                     title_en: "Instagram Manager",
                     title_ar: "برنامج إدارة وجدولة حسابات انستجرام Instagram Manager",
-                    badge: "Desktop Automation",
+                    badge: "Windows Application",
                     desc_en: "Desktop automation suite for account management and content scheduling.",
                     desc_ar: "أتمتة إدارة الحسابات وجدولة المحتوى ونشر المنشورات على انستجرام.",
                     img: "/images/portfolio/instagram-manager.png",
@@ -901,7 +911,7 @@
                 {
                     title_en: "HEIC Converter",
                     title_ar: "أداة تحويل صور HEIC لـ JPG/PNG للويندوز",
-                    badge: "Windows Utility",
+                    badge: "Windows Application",
                     desc_en: "Batch HEIC to JPG/PNG converter for Windows with drag-and-drop interface.",
                     desc_ar: "تحويل مجمع لصور الآيفون بصيغة HEIC إلى JPG/PNG بالسحب والإفلات.",
                     img: "/images/portfolio/heic-converter.png",

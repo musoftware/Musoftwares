@@ -66,7 +66,7 @@ export default function Portfolio({ dbProjects = [] }) {
                 <meta name="description" content={__('general.landing_portfolio_desc') || "Explore our engineered platforms, enterprise SaaS, and desktop utilities."} />
             </Head>
 
-            <div ref={mainRef} className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
+            <div ref={mainRef} className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Reusable Studio Hero Section */}
                 <div className="reveal-section">
@@ -75,7 +75,7 @@ export default function Portfolio({ dbProjects = [] }) {
                         title={
                             <>
                                 Engineered for Scale. <br className="hidden sm:inline" />
-                                <span className="text-[#748660]">Shipped to the World.</span>
+                                <span className="text-[#0071e3]">Shipped to the World.</span>
                             </>
                         }
                         subtitle={__('general.landing_portfolio_desc') || 'A curated archive of bespoke ERP architectures, high-throughput Meta Graph pipelines, and custom enterprise platforms.'}
@@ -89,19 +89,19 @@ export default function Portfolio({ dbProjects = [] }) {
                             <Link 
                                 key={index} 
                                 href={route('portfolio.show', item.slug)}
-                                className="group bg-[#161616] border border-[#262626] overflow-hidden flex flex-col justify-between hover:border-[#748660] transition-all duration-300"
+                                className="group bg-white border border-black/5 rounded-[24px] overflow-hidden flex flex-col justify-between hover:border-[#0071e3]/40 hover:shadow-xl transition-all duration-300 shadow-sm"
                             >
                                 <div>
                                     {/* Image Preview Container */}
-                                    <div className="h-56 sm:h-64 overflow-hidden bg-black relative border-b border-[#222222]">
+                                    <div className="h-56 sm:h-64 overflow-hidden bg-[#f5f5f7] relative border-b border-black/5">
                                         <img 
                                             src={item.img} 
                                             alt={item.title} 
-                                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-90 contrast-[1.05]" 
+                                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
                                             loading="lazy"
                                         />
                                         <div className="absolute top-3 end-3">
-                                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest rtl:tracking-normal px-2.5 py-1 bg-black/80 text-white border border-[#333333] backdrop-blur-md">
+                                            <span className="text-[10px] font-semibold uppercase tracking-wider px-3 py-1 bg-white/90 text-[#1d1d1f] border border-black/5 rounded-full backdrop-blur-md shadow-xs">
                                                 {item.cat}
                                             </span>
                                         </div>
@@ -109,17 +109,17 @@ export default function Portfolio({ dbProjects = [] }) {
 
                                     {/* Titles and descriptions */}
                                     <div className="p-6">
-                                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight mb-2 group-hover:text-[#748660] transition-colors font-sans">
+                                        <h3 className="text-base sm:text-lg font-semibold text-[#1d1d1f] tracking-tight mb-2 group-hover:text-[#0071e3] transition-colors font-sans">
                                             {item.title}
                                         </h3>
-                                        <p className="text-sm text-zinc-400 font-sans leading-relaxed line-clamp-2">
+                                        <p className="text-sm text-[#1d1d1f]/60 font-sans leading-relaxed line-clamp-2">
                                             {item.desc}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="p-6 pt-0 flex items-center justify-between text-xs font-mono font-bold text-zinc-400 group-hover:text-white transition-colors">
-                                    <span className="tracking-wider rtl:tracking-normal">EXPLORE CASE STUDY</span>
+                                <div className="p-6 pt-0 flex items-center justify-between text-xs font-semibold text-[#0071e3] group-hover:text-[#0077ed] transition-colors">
+                                    <span className="tracking-wide">EXPLORE CASE STUDY</span>
                                     <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                 </div>
                             </Link>

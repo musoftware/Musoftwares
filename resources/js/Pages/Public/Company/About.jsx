@@ -29,7 +29,7 @@ export default function About({ canLogin, canRegister }) {
         <PublicLayout>
             <Head title={`${__('landing_company.about_meta_title') || 'About Studio'} | Musoftwares`} />
 
-            <div className="w-full bg-[#111111] text-[#E5E5E5] font-sans selection:bg-[#748660] selection:text-white pt-16 sm:pt-24 pb-24 sm:pb-36">
+            <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Reusable Hero Header */}
                 <StudioHeader
@@ -37,21 +37,21 @@ export default function About({ canLogin, canRegister }) {
                     title={
                         <>
                             Engineering with Scale. <br className="hidden sm:inline" />
-                            <span className="text-[#748660]">Pure Architectural Clarity.</span>
+                            <span className="text-[#0071e3]">Pure Architectural Clarity.</span>
                         </>
                     }
                     subtitle={__('landing_company.about_subtitle') || 'One dedicated engineering studio, 10+ years of operational architecture, and 30+ production platforms shipped worldwide.'}
                 />
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center font-mono text-xs mb-20">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20">
                     <Link href="/company/contact">
-                        <button className="bg-white text-black hover:bg-zinc-200 px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all">
+                        <button className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer">
                             {__('general.initiate_brief') || 'INITIATE BRIEF'} ➔
                         </button>
                     </Link>
                     <button 
                         onClick={() => openWhatsAppChat("Hello Mahmoud, I want to learn more about the studio.")}
-                        className="border border-[#333333] hover:border-white text-zinc-300 hover:text-white px-8 py-3.5 font-bold uppercase tracking-widest rtl:tracking-normal transition-all"
+                        className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm cursor-pointer"
                     >
                         {__('general.talk_with_architect') || 'TALK WITH ARCHITECT'}
                     </button>
@@ -65,16 +65,16 @@ export default function About({ canLogin, canRegister }) {
                             return (
                                 <div 
                                     key={idx} 
-                                    className="bg-[#161616] border border-[#262626] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#748660] transition-colors"
+                                    className="bg-white border border-black/5 rounded-[24px] p-8 sm:p-10 flex flex-col justify-between group hover:border-[#0071e3]/40 hover:shadow-md transition-all shadow-sm"
                                 >
                                     <div className="space-y-4">
-                                        <div className="w-12 h-12 bg-black border border-[#2B2B2B] flex items-center justify-center text-[#748660]">
+                                        <div className="w-12 h-12 rounded-2xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
                                             <Icon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-white tracking-tight font-sans">
+                                        <h3 className="text-lg font-semibold text-[#1d1d1f] tracking-tight font-sans">
                                             {pillar.title}
                                         </h3>
-                                        <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+                                        <p className="text-sm text-[#1d1d1f]/60 leading-relaxed font-sans">
                                             {pillar.desc}
                                         </p>
                                     </div>
@@ -85,21 +85,21 @@ export default function About({ canLogin, canRegister }) {
                 </section>
 
                 {/* Chief Architect Profile Strip */}
-                <section className="px-6 max-w-[1400px] mx-auto border-t border-[#222222] pt-20">
-                    <div className="bg-[#161616] border border-[#262626] p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-10">
+                <section className="px-6 max-w-[1400px] mx-auto border-t border-black/5 pt-16">
+                    <div className="bg-white border border-black/5 rounded-[24px] p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-sm">
                         <div className="space-y-3 max-w-2xl">
-                            <span className="text-xs font-mono uppercase tracking-widest rtl:tracking-normal text-[#748660] font-bold">
+                            <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
                                 Leadership
                             </span>
-                            <h2 className="text-2xl sm:text-3xl font-bold text-white font-sans">
+                            <h2 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
                                 Mahmoud Amin — Chief Software Architect
                             </h2>
-                            <p className="text-sm text-zinc-400 font-sans leading-relaxed">
+                            <p className="text-sm text-[#1d1d1f]/60 font-sans leading-relaxed">
                                 Full-lifecycle software engineer specializing in Enterprise ERP backbones, high-frequency transactional data models, and verified Meta API automations.
                             </p>
                         </div>
                         <Link href="/about/mahmoud-amin">
-                            <button className="px-8 py-3.5 border border-white text-white hover:bg-white hover:text-black text-xs font-bold font-mono tracking-widest rtl:tracking-normal uppercase transition-all whitespace-nowrap">
+                            <button className="px-8 py-3 rounded-[980px] border border-black/10 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] text-xs font-semibold tracking-wide uppercase transition-all whitespace-nowrap shadow-sm cursor-pointer">
                                 READ LEADERSHIP BIO ➔
                             </button>
                         </Link>

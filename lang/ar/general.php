@@ -6037,6 +6037,7 @@ return array (
   'save_landing_page' => 'حفظ Landing Page',
   'save_notes' => 'حفظ ملاحظات',
   'save_pin' => 'حفظ Pin',
+  'save_password' => 'حفظ كلمة المرور',
   'save_product' => 'حفظ Product',
   'save_record' => 'حفظ Record',
   'save_rule' => 'حفظ Rule',
@@ -8185,4 +8186,8 @@ return array (
   'generated_missing_transactions_count' => 'تم إنشاء :count معاملة ناقصة بنجاح.',
   'all_transactions_already_up_to_date' => 'جميع المعاملات محدثة ولا توجد أي معاملات ناقصة.',
   'confirm_generate_missing' => 'هل أنت متأكد من رغبتك في إنشاء وتوليد جميع المعاملات الفائتة السابقة حتى اليوم لهذا الجدول؟',
+  'desktop_apps' => 'برامج الديسك توب',
+  'founder' => 'محمود أمين',
+  'mobile_apps' => 'تطبيقات الموبايل',
+  'web_apps' => 'تطبيقات الويب',
 );

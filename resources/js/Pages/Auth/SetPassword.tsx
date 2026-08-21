@@ -60,13 +60,13 @@ export default function SetPassword({
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                    <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] font-sans">
                         {__('general.set_your_password') || 'Set your password'}
                     </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
+                    <p className="text-xs text-[#1d1d1f]/60 font-sans">
                         {name} · {email}
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
+                    <p className="text-xs text-[#1d1d1f]/60 font-sans">
                         {__('general.choose_a_secure_key_to_protect_your_workspace') ||
                             'Choose a secure password to protect your account. This link is single-use.'}
                     </p>
@@ -75,8 +75,8 @@ export default function SetPassword({
                 <form onSubmit={submit} className="space-y-4">
                     <input type="hidden" name="token" value={data.token} />
 
-                    <div className="space-y-2">
-                        <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                    <div className="space-y-1.5">
+                        <Label htmlFor="password" className="text-xs font-semibold text-[#1d1d1f]/80">
                             {__('general.new_password') || 'New password'}
                         </Label>
                         <div className="relative">
@@ -93,12 +93,12 @@ export default function SetPassword({
                                     checkPasswordStrength(e.target.value);
                                 }}
                                 required
-                                className="h-10 px-3 py-2 pe-10 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                                className="h-10 px-3 py-2 pe-10 text-sm rounded-xl border-black/10 bg-[#f5f5f7]/50 focus:bg-white focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute end-3 top-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+                                className="absolute end-3 top-3 text-[#1d1d1f]/40 hover:text-[#1d1d1f] transition-colors"
                                 aria-label={showPassword ? __('general.hide_password') : __('general.show_password')}
                             >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -113,20 +113,20 @@ export default function SetPassword({
                                             className={`h-1 w-full rounded-full transition-all duration-300 ${
                                                 passwordStrength.score >= i
                                                     ? (passwordStrength.score <= 2
-                                                        ? 'bg-orange-500'
+                                                        ? 'bg-[#ff9500]'
                                                         : passwordStrength.score === 3
-                                                            ? 'bg-amber-500'
-                                                            : 'bg-emerald-500')
-                                                    : 'bg-zinc-200 dark:bg-zinc-800'
+                                                            ? 'bg-[#ffcc00]'
+                                                            : 'bg-[#34c759]')
+                                                    : 'bg-black/5'
                                             }`}
                                         />
                                     ))}
                                 </div>
                                 {passwordStrength.label && (
-                                    <p className={`text-[10px] font-medium mt-1.5 uppercase tracking-wider ${
-                                        passwordStrength.score <= 2 ? 'text-orange-600 dark:text-orange-400' :
-                                        passwordStrength.score === 3 ? 'text-amber-600 dark:text-amber-400' :
-                                        'text-emerald-600 dark:text-emerald-400'
+                                    <p className={`text-[10px] font-semibold mt-1.5 uppercase tracking-wider ${
+                                        passwordStrength.score <= 2 ? 'text-[#ff9500]' :
+                                        passwordStrength.score === 3 ? 'text-[#ff9500]' :
+                                        'text-[#34c759]'
                                     }`}>
                                         {passwordStrength.label}
                                     </p>
@@ -134,12 +134,12 @@ export default function SetPassword({
                             </div>
                         )}
                         {errors.password && (
-                            <p className="text-xs text-red-500 font-medium mt-1">{errors.password}</p>
+                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.password}</p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="password_confirmation" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                    <div className="space-y-1.5">
+                        <Label htmlFor="password_confirmation" className="text-xs font-semibold text-[#1d1d1f]/80">
                             {__('general.confirm_password') || 'Confirm password'}
                         </Label>
                         <div className="relative">
@@ -152,41 +152,41 @@ export default function SetPassword({
                                 autoComplete="new-password"
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 required
-                                className="h-10 px-3 py-2 pe-10 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                                className="h-10 px-3 py-2 pe-10 text-sm rounded-xl border-black/10 bg-[#f5f5f7]/50 focus:bg-white focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                             />
                         </div>
                         {data.password_confirmation.length > 0 && data.password !== data.password_confirmation && (
-                            <p className="text-xs text-red-500 font-medium mt-1">
+                            <p className="text-xs text-[#ff3b30] font-medium mt-1">
                                 {__('general.passwords_do_not_match') || 'Passwords do not match'}
                             </p>
                         )}
                         {data.password_confirmation.length > 0 && data.password === data.password_confirmation && (
-                            <p className="text-xs text-emerald-500 font-medium mt-1">
+                            <p className="text-xs text-[#34c759] font-medium mt-1">
                                 {__('general.passwords_match') || 'Passwords match'}
                             </p>
                         )}
                         {errors.password_confirmation && (
-                            <p className="text-xs text-red-500 font-medium mt-1">{errors.password_confirmation}</p>
+                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.password_confirmation}</p>
                         )}
                     </div>
 
                     {errors.token && (
-                        <p className="text-xs text-red-500 font-medium mt-1">{errors.token}</p>
+                        <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.token}</p>
                     )}
 
                     <div className="pt-2">
                         <Button
-                            className="w-full h-10 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 font-medium text-sm rounded-lg shadow-xs transition-all flex items-center justify-center space-x-2"
+                            className="w-full h-11 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-sm rounded-[980px] shadow-md shadow-blue-500/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                             type="submit"
                             disabled={processing}
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
-                                    <span>{__('general.setting_password') || 'Setting password…'}</span>
+                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                    <span>{__('general.setting_password') || 'Setting password...'}</span>
                                 </>
                             ) : (
-                                <span>{__('general.set_password') || 'Set password'}</span>
+                                <span>{__('general.save_password') || 'Save password & sign in'}</span>
                             )}
                         </Button>
                     </div>

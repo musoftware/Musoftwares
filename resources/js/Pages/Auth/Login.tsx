@@ -36,19 +36,19 @@ export default function Login({
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.log_in_to_your_account')}</h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.enter_your_email_and_password_to_open_your_workspace')}</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] font-sans">{__('general.log_in_to_your_account')}</h1>
+                    <p className="text-xs text-[#1d1d1f]/60 font-sans">{__('general.enter_your_email_and_password_to_open_your_workspace')}</p>
                 </div>
 
                 {status && (
-                    <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                    <div className="rounded-xl bg-[#34c759]/10 border border-[#34c759]/20 p-3 text-xs font-semibold text-[#28a745]">
                         {status}
                     </div>
                 )}
 
                 <div className="pt-1">
-                    <a href={route('social.google.redirect')} className="flex w-full items-center justify-center space-x-2 rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-colors">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <a href={route('social.google.redirect')} className="flex w-full items-center justify-center space-x-2 rounded-[980px] border border-black/10 bg-white px-4 py-2.5 text-xs font-semibold text-[#1d1d1f] shadow-xs hover:bg-[#f5f5f7] transition-all">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24">
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -61,18 +61,18 @@ export default function Login({
 
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-zinc-200 dark:border-zinc-800" />
+                        <span className="w-full border-t border-black/5" />
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-white px-2 text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400">
+                    <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-semibold">
+                        <span className="bg-white px-3 text-[#1d1d1f]/40">
                             {__('general.or_continue_with')}
                         </span>
                     </div>
                 </div>
 
                 <form onSubmit={submit} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.email_address_1')}</Label>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="email" className="text-xs font-semibold text-[#1d1d1f]/80">{__('general.email_address_1')}</Label>
                         <Input
                             id="email"
                             name="email"
@@ -82,22 +82,22 @@ export default function Login({
                             autoComplete="username"
                             autoFocus
                             onChange={(e) => setData('email', e.target.value)}
-                            className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                            className="h-10 px-3 py-2 text-sm rounded-xl border-black/10 bg-[#f5f5f7]/50 focus:bg-white focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                         />
                         {errors.email && (
-                            <p className="text-xs text-red-500 font-medium mt-1">{errors.email}</p>
+                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.email}</p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                            <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                            <Label htmlFor="password" className="text-xs font-semibold text-[#1d1d1f]/80">
                                 {__('general.password')}
                             </Label>
                             {canResetPassword && (
                                 <Link
                                     href={route('password.request')}
-                                    className="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+                                    className="text-xs font-semibold text-[#0071e3] hover:underline transition-colors"
                                 >{__('general.forgot_password_1')}</Link>
                             )}
                         </div>
@@ -110,19 +110,19 @@ export default function Login({
                                 value={data.password}
                                 autoComplete="current-password"
                                 onChange={(e) => setData('password', e.target.value)}
-                                className="h-10 px-3 py-2 pe-10 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                                className="h-10 px-3 py-2 pe-10 text-sm rounded-xl border-black/10 bg-[#f5f5f7]/50 focus:bg-white focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute end-3 top-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+                                className="absolute end-3 top-3 text-[#1d1d1f]/40 hover:text-[#1d1d1f] transition-colors"
                                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                             >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                         </div>
                         {errors.password && (
-                            <p className="text-xs text-red-500 font-medium mt-1">{errors.password}</p>
+                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.password}</p>
                         )}
                     </div>
 
@@ -132,23 +132,23 @@ export default function Login({
                             id="remember"
                             checked={data.remember}
                             onChange={(e) => setData('remember', e.target.checked)}
-                            className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:checked:bg-zinc-100 dark:checked:text-zinc-900 dark:focus:ring-zinc-100 transition-colors cursor-pointer"
+                            className="h-4 w-4 rounded border-black/20 text-[#0071e3] focus:ring-[#0071e3] transition-colors cursor-pointer"
                         />
                         <Label
                             htmlFor="remember"
-                            className="text-xs font-normal text-zinc-600 dark:text-zinc-400 cursor-pointer select-none"
+                            className="text-xs font-medium text-[#1d1d1f]/70 cursor-pointer select-none"
                         >{__('general.remember_me')}</Label>
                     </div>
 
                     <div className="pt-2">
                         <Button
-                            className="w-full h-10 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 font-medium text-sm rounded-lg shadow-xs transition-all flex items-center justify-center space-x-2"
+                            className="w-full h-11 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-sm rounded-[980px] shadow-md shadow-blue-500/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                             type="submit"
                             disabled={processing}
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
+                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                                     <span>{__('general.logging_in')}</span>
                                 </>
                             ) : (
@@ -158,12 +158,12 @@ export default function Login({
                     </div>
                 </form>
 
-                <div className="text-center pt-4 border-t border-zinc-100 dark:border-zinc-800/80 mt-6">
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
+                <div className="text-center pt-4 border-t border-black/5 mt-6">
+                    <p className="text-xs text-[#1d1d1f]/60 font-medium">
                         {__('general.dont_have_account')}{' '}
                         <Link
                             href={route('register')}
-                            className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+                            className="font-semibold text-[#0071e3] hover:underline"
                         >{__('general.sign_up')}</Link>
                     </p>
                 </div>
