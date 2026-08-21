@@ -63,9 +63,11 @@ class HomeController extends Controller
     public function portfolio()
     {
         $projects = PortfolioData::all();
+        $locale = app()->getLocale();
 
         return view('public.portfolio', [
             'projects' => $projects,
+            'locale' => $locale,
             'title' => 'Case Studies & Production Platforms | Musoftwares',
             'description' => 'Explore our portfolio of over 30 production platforms, enterprise ERP engines, and custom SaaS systems.',
         ]);
@@ -125,6 +127,7 @@ class HomeController extends Controller
         return view($viewName, [
             'project' => $project,
             'slug' => $slug,
+            'locale' => $locale,
             'title' => $title,
             'description' => $description,
         ]);

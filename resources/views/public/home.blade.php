@@ -584,235 +584,419 @@
 
 
         <!-- ============================================================ -->
-        <!-- 5. INTERACTIVE GALLERY CAROUSEL (Web, Mobile, Desktop) -->
+        <!-- 5. CENTERED SHOWCASE GALLERY (Manual Navigation) -->
         <!-- ============================================================ -->
-        <section id="portfolio-showcase" class="rounded-[18px] bg-[#f5f5f7] py-12 md:py-16 px-6 md:px-10 overflow-hidden">
+        <section id="portfolio-showcase" class="rounded-[28px] bg-[#f5f5f7] py-16 md:py-24 px-4 sm:px-6 md:px-12 overflow-hidden text-center">
             
-            <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-                <div>
-                    <h3 class="text-[32px] sm:text-[44px] font-semibold text-[#1d1d1f] tracking-[-0.02em] leading-tight">
-                        {{ $locale === 'ar' ? 'معرض المشاريع والأنظمة الحية' : 'Proven Systems In Production.' }}
-                    </h3>
-                    <p class="mt-2 text-[17px] text-[#1d1d1f]/70">
-                        {{ $locale === 'ar' ? 'أنظمة حقيقية تعمل في بيئات الإنتاج بكفاءة واستقرار تام.' : 'Real-world platforms deployed and engineered to perfection.' }}
-                    </p>
-                </div>
-
-                <!-- Navigation Arrow Controls -->
-                <div class="flex items-center gap-2 self-start md:self-end">
-                    <button id="gallery-prev" aria-label="Previous" class="w-10 h-10 rounded-full bg-white border border-black/5 shadow-sm flex items-center justify-center text-[#1d1d1f] hover:bg-black hover:text-white transition duration-200">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    </button>
-                    <button id="gallery-next" aria-label="Next" class="w-10 h-10 rounded-full bg-white border border-black/5 shadow-sm flex items-center justify-center text-[#1d1d1f] hover:bg-black hover:text-white transition duration-200">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
+            <!-- Gallery Title -->
+            <div class="max-w-[800px] mx-auto mb-6">
+                <h3 class="text-[36px] sm:text-[48px] font-bold text-[#1d1d1f] tracking-tight">
+                    {{ $locale === 'ar' ? 'معرض الأنظمة والمشاريع' : 'Gallery' }}
+                </h3>
+                <p class="mt-2 text-[16px] text-[#1d1d1f]/60 font-normal">
+                    {{ $locale === 'ar' ? 'استعراض المنصات والأنظمة البرمجية المنفذة في بيئات الإنتاج الحية.' : 'High-impact platforms engineered for web, mobile, and desktop.' }}
+                </p>
             </div>
 
-            <!-- Top Filter Buttons (Web Apps, Mobile Apps, Desktop Apps) -->
-            <div class="max-w-[1280px] mx-auto mb-8 flex flex-wrap items-center gap-2.5">
-                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition shadow-sm bg-[#1d1d1f] text-white" data-filter="all">
-                    {{ $locale === 'ar' ? 'جميع الأنظمة' : 'All Systems' }}
+            <!-- Top Filter Pill Container -->
+            <div class="inline-flex p-1.5 rounded-full bg-[#e8e8ed] border border-black/5 mb-10 shadow-inner">
+                <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 bg-white text-[#1d1d1f] shadow-sm" data-category="web">
+                    {{ $locale === 'ar' ? 'تطبيقات الويب' : 'Web Apps' }}
                 </button>
-                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition bg-white border border-black/5 text-[#1d1d1f] hover:bg-[#eaeaea]" data-filter="web">
-                    {{ $locale === 'ar' ? 'تطبيقات الويب (Web Apps)' : 'Web Apps' }}
+                <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 text-[#1d1d1f]/70 hover:text-[#1d1d1f]" data-category="mobile">
+                    {{ $locale === 'ar' ? 'تطبيقات الموبايل' : 'Mobile Apps' }}
                 </button>
-                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition bg-white border border-black/5 text-[#1d1d1f] hover:bg-[#eaeaea]" data-filter="mobile">
-                    {{ $locale === 'ar' ? 'تطبيقات الموبايل (Mobile Apps)' : 'Mobile Apps' }}
-                </button>
-                <button class="gallery-filter-btn px-5 py-2 rounded-full text-[13px] font-medium transition bg-white border border-black/5 text-[#1d1d1f] hover:bg-[#eaeaea]" data-filter="desktop">
-                    {{ $locale === 'ar' ? 'برامج الديسك توب (Desktop Apps)' : 'Desktop Apps' }}
+                <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 text-[#1d1d1f]/70 hover:text-[#1d1d1f]" data-category="desktop">
+                    {{ $locale === 'ar' ? 'برامج الديسك توب' : 'Desktop Apps' }}
                 </button>
             </div>
 
-            <!-- Scrollable Carousel Track -->
-            <div id="gallery-track" class="flex gap-4 overflow-x-auto no-scrollbar pb-4 max-w-[1400px] mx-auto scroll-smooth">
+            <!-- Featured Stage with Side Floating Buttons -->
+            <div class="max-w-[1024px] mx-auto relative flex items-center justify-center">
                 
-                <!-- Card 1: Trenz whatsCRM (Web) -->
-                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="web">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 rounded-full bg-[#e8f0fb] text-[#0071e3] text-[11px] font-semibold uppercase tracking-wider">Web Platform</span>
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
+                <!-- Left Nav Arrow Button -->
+                <button id="gallery-stage-prev" aria-label="Previous Project" class="absolute -left-2 sm:-left-6 md:-left-8 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] flex items-center justify-center text-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white transition duration-200">
+                    <svg class="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+
+                <!-- Center Showcase Card Container -->
+                <div class="w-full max-w-[880px] bg-white rounded-[24px] sm:rounded-[36px] border border-black/5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden transition-all duration-300 p-3 sm:p-5">
+                    <div class="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-[18px] sm:rounded-[28px] overflow-hidden bg-[#f0f0f2] flex items-center justify-center">
+                        <img id="gallery-stage-img" src="/images/portfolio/kbdny.png" alt="Kbdny Affiliate" class="w-full h-full object-cover object-top transition duration-500 transform hover:scale-[1.02]">
+                        
+                        <!-- Floating Category Badge -->
+                        <div class="absolute top-4 start-4 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md shadow-sm border border-black/5 text-[11px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#30d158]"></span>
+                            <span id="gallery-stage-badge">Web &amp; E-Commerce</span>
                         </div>
-                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Trenz whatsCRM</h4>
-                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
-                            Official Meta Graph API WhatsApp team inbox with multi-agent queue and appointment automation.
-                        </p>
-                    </div>
-                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
-                        <span class="text-[12px] font-semibold text-[#1d1d1f]">1.2M+ Messages</span>
-                        <a href="/portfolio/trenz-whatscrm" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
-                            Case study &gt;
-                        </a>
                     </div>
                 </div>
 
-                <!-- Card 2: Kbdny Multi-Vendor Hub (Web & Mobile) -->
-                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="web mobile">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 rounded-full bg-[#fcf6f4] text-[#ff9500] text-[11px] font-semibold uppercase tracking-wider">Web &amp; Mobile</span>
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
-                        </div>
-                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">Kbdny Platform</h4>
-                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
-                            Multi-vendor dropshipping engine syncing catalogs, affiliate commission wallets, and Bosta manifests.
-                        </p>
-                    </div>
-                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
-                        <span class="text-[12px] font-semibold text-[#1d1d1f]">5,000+ Affiliates</span>
-                        <a href="/portfolio/kbdny" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
-                            Case study &gt;
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Card 3: StockManager Terminal (Desktop) -->
-                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="desktop">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 rounded-full bg-[#f5f5f7] text-[#1d1d1f] text-[11px] font-semibold uppercase tracking-wider">Desktop App</span>
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
-                        </div>
-                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">StockManager Terminal</h4>
-                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
-                            Offline-first cashier and inventory software with ESC/POS thermal printing and USB barcode scanning.
-                        </p>
-                    </div>
-                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
-                        <span class="text-[12px] font-semibold text-[#1d1d1f]">12 Retail Stores</span>
-                        <a href="/portfolio/stock-manager" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
-                            Case study &gt;
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Card 4: ChartCash Ledger (Desktop & Web) -->
-                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="desktop web">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 rounded-full bg-[#e8f0fb] text-[#0071e3] text-[11px] font-semibold uppercase tracking-wider">Desktop &amp; Cloud</span>
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
-                        </div>
-                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">ChartCash Financials</h4>
-                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
-                            Double-entry financial accounting ledger with sub-10ms operational queries and cashflow telemetry.
-                        </p>
-                    </div>
-                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
-                        <span class="text-[12px] font-semibold text-[#1d1d1f]">10ms Latency</span>
-                        <a href="/portfolio/chartcash" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
-                            Case study &gt;
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Card 5: AM SMS Gateway (Mobile & Desktop) -->
-                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="mobile desktop">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 rounded-full bg-[#f5f5f7] text-[#30d158] text-[11px] font-semibold uppercase tracking-wider">Mobile &amp; Hardware</span>
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
-                        </div>
-                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">AM SMS Gateway</h4>
-                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
-                            Android native SIM background driver transforming cellular phones into automated local SMS gateways.
-                        </p>
-                    </div>
-                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
-                        <span class="text-[12px] font-semibold text-[#1d1d1f]">Zero SMS Cost</span>
-                        <a href="/portfolio/am-sms-gateway" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
-                            Case study &gt;
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Card 6: AMC Academy (Web) -->
-                <div class="gallery-card w-[320px] sm:w-[380px] shrink-0 bg-white rounded-[24px] border border-black/5 shadow-sm p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition duration-300" data-category="web">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 rounded-full bg-[#f5f5f7] text-[#af52de] text-[11px] font-semibold uppercase tracking-wider">Web &amp; DRM</span>
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#30d158]"></span>
-                        </div>
-                        <h4 class="text-[22px] font-semibold text-[#1d1d1f] tracking-tight">AMC Academy LMS</h4>
-                        <p class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
-                            High-security online learning management system with dynamic moving watermarks and anti-screen recording DRM.
-                        </p>
-                    </div>
-                    <div class="mt-8 pt-4 border-t border-black/5 flex items-center justify-between">
-                        <span class="text-[12px] font-semibold text-[#1d1d1f]">100% Protected</span>
-                        <a href="/portfolio/amc-academy" class="text-[13px] font-medium text-[#0071e3] hover:underline inline-flex items-center gap-1">
-                            Case study &gt;
-                        </a>
-                    </div>
-                </div>
+                <!-- Right Nav Arrow Button -->
+                <button id="gallery-stage-next" aria-label="Next Project" class="absolute -right-2 sm:-right-6 md:-right-8 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] flex items-center justify-center text-[#1d1d1f] hover:bg-[#1d1d1f] hover:text-white transition duration-200">
+                    <svg class="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
 
             </div>
+
+            <!-- Below Showcase Meta & Caption -->
+            <div class="max-w-[680px] mx-auto mt-6 space-y-2">
+                <h4 id="gallery-stage-title" class="text-[20px] sm:text-[24px] font-semibold text-[#1d1d1f] tracking-tight">
+                    {{ $locale === 'ar' ? 'منصة كبدني للتجارة والتسويق بالعمولة' : 'Kbdny Affiliate' }}
+                </h4>
+                <p id="gallery-stage-desc" class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
+                    {{ $locale === 'ar' ? 'نظام متكامل واحترافي للتجارة الإلكترونية والدروبشيبينغ مع تتبع العمولات اللحظي.' : 'Multi-vendor affiliate platform with real-time commission tracking and payouts.' }}
+                </p>
+                <div class="pt-1 flex items-center justify-center gap-4 text-[13px]">
+                    <span id="gallery-stage-metric" class="font-medium text-[#1d1d1f]/80">5,000+ Affiliates</span>
+                    <span class="text-black/20">•</span>
+                    <a id="gallery-stage-link" href="/portfolio/kbdny" class="font-semibold text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                        {{ $locale === 'ar' ? 'عرض تفاصيل النظام >' : 'View case study >' }}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pagination Dots / Active Bar -->
+            <div id="gallery-pagination" class="flex items-center justify-center gap-2 mt-6">
+                <!-- Injected via JavaScript -->
+            </div>
+
         </section>
 
     </div>
 
 </div>
 
-<!-- Gallery Carousel Auto-Scroll & Filter Logic -->
+<!-- Centered Gallery Navigation Logic (NO AUTO-MOVE - 100% REAL DATA) -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const track = document.getElementById('gallery-track');
-        const prevBtn = document.getElementById('gallery-prev');
-        const nextBtn = document.getElementById('gallery-next');
-        const filterBtns = document.querySelectorAll('.gallery-filter-btn');
-        const cards = document.querySelectorAll('.gallery-card');
+        const isArabic = '{{ $locale }}' === 'ar';
 
-        let isPaused = false;
-        let scrollSpeed = 1;
-
-        // Auto-scrolling
-        const autoScroll = () => {
-            if (!isPaused && track) {
-                if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 5) {
-                    track.scrollLeft = 0;
-                } else {
-                    track.scrollLeft += scrollSpeed;
+        const galleryData = {
+            web: [
+                {
+                    title_en: "Kbdny Affiliate",
+                    title_ar: "منصة كبدني للتجارة والتسويق بالعمولة",
+                    badge: "Web & E-Commerce",
+                    desc_en: "Multi-vendor affiliate platform with real-time commission tracking and payouts.",
+                    desc_ar: "نظام متكامل واحترافي للتجارة الإلكترونية والدروبشيبينغ مع تتبع العمولات اللحظي.",
+                    img: "/images/portfolio/kbdny.png",
+                    slug: "kbdny",
+                    metric: "5,000+ Affiliates"
+                },
+                {
+                    title_en: "Stock Manager",
+                    title_ar: "نظام Stock Manager لإدارة المخزون ونقاط البيع",
+                    badge: "Web & POS",
+                    desc_en: "Inventory and POS system with multi-location support and KPI reporting.",
+                    desc_ar: "نظام متكامل لإدارة المخازن ونقاط البيع للمحلات وسلاسل التوزيع.",
+                    img: "/images/portfolio/stockmanager.png",
+                    slug: "stock-manager",
+                    metric: "Multi-Location Support"
+                },
+                {
+                    title_en: "Mini Fatora",
+                    title_ar: "منصة Mini Fatora للفوترة السريعة وإدارة الفواتير",
+                    badge: "SaaS Billing",
+                    desc_en: "Online invoicing and billing SaaS for freelancers and small businesses.",
+                    desc_ar: "منصة فوترة سحابية خفيفة وسريعة للمستقلين والشركات الناشئة.",
+                    img: "/images/portfolio/minifatora.png",
+                    slug: "mini-fatora",
+                    metric: "Instant PDF Invoicing"
+                },
+                {
+                    title_en: "Vodafone CRM",
+                    title_ar: "نظام إدارة الموزعين والعمليات الميدانية لـ Vodafone",
+                    badge: "Enterprise CRM",
+                    desc_en: "Custom CRM and operations management system for Vodafone Egypt distributor.",
+                    desc_ar: "نظام مؤسسي متقدم لإدارة شبكة الموزعين والمناديب الميدانيين لخدمات الاتصالات.",
+                    img: "/images/portfolio/vodafone-crm.jpg",
+                    slug: "vodafone-crm",
+                    metric: "50k+ SIM Serial Records"
+                },
+                {
+                    title_en: "AMC Academy",
+                    title_ar: "منصة AMC Academy للتعليم والتدريب الرقمي المشفر",
+                    badge: "E-Learning & DRM",
+                    desc_en: "Full e-learning platform with student portals, scheduling, and assessments.",
+                    desc_ar: "منصة تعليمية متكاملة تدعم حماية الفيديو من التسجيل والعلامات المائية.",
+                    img: "/images/portfolio/amcacademy.jpg",
+                    slug: "amc-academy",
+                    metric: "DRM Video Protection"
+                },
+                {
+                    title_en: "Telecom System",
+                    title_ar: "بوابة شحن وإدارة خدمات الاتصالات والإنترنت B2B",
+                    badge: "B2B Telecom",
+                    desc_en: "B2B recharge and ISP management platform with automated billing.",
+                    desc_ar: "منصة خدمات الاتصالات والشحن الفوري للشركات وإدارة الاشتراكات.",
+                    img: "/images/portfolio/telecom-system.png",
+                    slug: "telecom-system",
+                    metric: "< 1.2s API Response"
+                },
+                {
+                    title_en: "Altayaraa",
+                    title_ar: "منصة التجارة الإلكترونية السريعة الطيارة (Altayaraa)",
+                    badge: "E-Commerce",
+                    desc_en: "Arabic e-commerce and product listing platform with vendor management.",
+                    desc_ar: "متجر إلكتروني فائق السرعة مصمم للشراء الفوري ومزامنة المخازن.",
+                    img: "/images/portfolio/altayaraa.png",
+                    slug: "altayaraa",
+                    metric: "Single-Page Checkout"
+                },
+                {
+                    title_en: "Trenz whatsCRM",
+                    title_ar: "منصة Trenz whatsCRM لإدارة المحادثات والحجوزات",
+                    badge: "WhatsApp CRM",
+                    desc_en: "WhatsApp CRM and appointment scheduling platform designed for agencies.",
+                    desc_ar: "منصة سحابية متكاملة لخدمة العملاء عبر واتساب وجدولة المواعيد.",
+                    img: "/images/portfolio/trenz-whatscrm.png",
+                    slug: "trenz-whatscrm",
+                    metric: "Meta Cloud API"
                 }
-            }
+            ],
+            mobile: [
+                {
+                    title_en: "Nokhpa",
+                    title_ar: "تطبيق النخبة للتجارة الإلكترونية والتسوق الفاخر",
+                    badge: "Mobile App",
+                    desc_en: "E-commerce mobile app with native checkout, order tracking, and product filtering.",
+                    desc_ar: "تطبيق تسوق إلكتروني متطور للمنتجات الفاخرة يدعم تتبع مسار المندوب بالـ GPS.",
+                    img: "/images/portfolio/nokhpa.png",
+                    slug: "nokhpa",
+                    metric: "Native Checkout & GPS"
+                },
+                {
+                    title_en: "Forex App",
+                    title_ar: "تطبيق إشارات التداول وتحليل أسواق العملات Forex App",
+                    badge: "Fintech Mobile",
+                    desc_en: "Mobile companion for algorithmic trading with market signals and alerts.",
+                    desc_ar: "تطبيق موبايل مالي متخصص في إرسال إشارات التداول اللحظية وتنبيهات السوق.",
+                    img: "/images/portfolio/forex-app.png",
+                    slug: "forex-app",
+                    metric: "< 150ms Push Alerts"
+                },
+                {
+                    title_en: "AMC Social",
+                    title_ar: "منصة النشر والتواصل الاجتماعي AMC Social",
+                    badge: "Social Network",
+                    desc_en: "Internal social platform for AMC Academy students with posts and events.",
+                    desc_ar: "منصة سحابية لإدارة وجدولة المنشورات والتفاعل على شبكات التواصل الاجتماعي.",
+                    img: "/images/portfolio/amcsocial.png",
+                    slug: "amc-social",
+                    metric: "Cross-Network Sync"
+                },
+                {
+                    title_en: "Wallet App",
+                    title_ar: "تطبيق المحفظة الرقمية وتحويل الأموال Wallet App",
+                    badge: "Digital Wallet",
+                    desc_en: "Digital currency wallet with real-time exchange, recharge, and transfer capabilities.",
+                    desc_ar: "محفظة مالية رقمية مع أسعار صرف فورية وتحويلات وإعادة شحن.",
+                    img: "/images/portfolio/wallet-app.png",
+                    slug: "portfolio",
+                    metric: "Real-Time Exchange"
+                },
+                {
+                    title_en: "QCoin App",
+                    title_ar: "تطبيق QCoin لمتابعة وإدارة الاستثمارات الرقمية",
+                    badge: "Crypto Tracking",
+                    desc_en: "Crypto investment and tracking mobile app with portfolio management.",
+                    desc_ar: "تطبيق جوال لمتابعة الأصول الرقمية وإدارة المحافظ الاستثمارية.",
+                    img: "/images/portfolio/qcoin-app.jpg",
+                    slug: "portfolio",
+                    metric: "Portfolio Tracker"
+                }
+            ],
+            desktop: [
+                {
+                    title_en: "WhatsApp Sender",
+                    title_ar: "برنامج إرسال رسائل الواتساب المخصصة WhatsApp Sender",
+                    badge: "Desktop Automation",
+                    desc_en: "Bulk WhatsApp messaging tool with scheduling, templates, and contact lists.",
+                    desc_ar: "برنامج سطح مكتب لأتمتة إرسال رسائل الفواتير والتنبيهات المخصصة عبر واتساب.",
+                    img: "/images/portfolio/whatsapp-sender.png",
+                    slug: "whatsapp-sender",
+                    metric: "Random Delay Engine"
+                },
+                {
+                    title_en: "Telegram Sender",
+                    title_ar: "برنامج البث والنشر الفوري على تيليجرام Telegram Sender",
+                    badge: "MTProto Broadcaster",
+                    desc_en: "Automated Telegram broadcast tool with group/channel targeting and scheduling.",
+                    desc_ar: "برنامج بث ونشر فوري عبر بروتوكول MTProto لآلاف القنوات والمجموعات.",
+                    img: "/images/portfolio/telegram-sender.png",
+                    slug: "telegram-sender",
+                    metric: "Multi-Account Session"
+                },
+                {
+                    title_en: "Inbox Sender",
+                    title_ar: "برنامج إرسال البريد الإلكتروني وتدوير الـ SMTP",
+                    badge: "Email Delivery",
+                    desc_en: "Email bulk sending system with SMTP rotation and delivery rate optimization.",
+                    desc_ar: "منصة إرسال رسائل بريدية مع تدوير ذكي لعناوين الـ IP وخوادم الـ SMTP.",
+                    img: "/images/portfolio/inbox-sender.png",
+                    slug: "email-sender",
+                    metric: "SMTP Pool Rotation"
+                },
+                {
+                    title_en: "StockTalk AI",
+                    title_ar: "محرك الذكاء الاصطناعي وخدمة العملاء StockTalk AI",
+                    badge: "AI Assistant",
+                    desc_en: "WhatsApp-based AI customer support agent for automated stock and order queries.",
+                    desc_ar: "ربط الذكاء الاصطناعي بقاعدة بيانات المخازن الحية للرد الفوري على العملاء.",
+                    img: "/images/portfolio/stocktalk.png",
+                    slug: "stocktalk-ai",
+                    metric: "ERP RAG Grounding"
+                },
+                {
+                    title_en: "ChartCash",
+                    title_ar: "منصة التحليلات المالية ولوحات القيادة ChartCash",
+                    badge: "Financial Analytics",
+                    desc_en: "Financial analytics dashboard with real-time charts, KPIs, and P&L tracking.",
+                    desc_ar: "منصة ذكاء أعمال وتحليلات مالية متقدمة توفر مؤشرات التدفق النقدي وهوامش الربحية.",
+                    img: "/images/portfolio/chartcash.png",
+                    slug: "chartcash",
+                    metric: "Real-Time Aggregations"
+                },
+                {
+                    title_en: "Forex Bot",
+                    title_ar: "روبوت التداول الخوارزمي الآلي Forex Bot",
+                    badge: "Algorithmic Trading",
+                    desc_en: "Algorithmic trading bot with adaptive strategy, signal processing, and execution.",
+                    desc_ar: "محرك تداول آلي خوارزمي متصل بمنصات التداول لتنفيذ الصفقات وإدارة المخاطر.",
+                    img: "/images/portfolio/forex.png",
+                    slug: "forex-bot",
+                    metric: "Adaptive Execution"
+                },
+                {
+                    title_en: "Duplicate Finder",
+                    title_ar: "برنامج البحث عن الملفات المكررة Duplicate Finder",
+                    badge: "Windows Utility",
+                    desc_en: "File indexing and duplicate detection for Windows. Fast scan, SHA comparison.",
+                    desc_ar: "فهرسة الملفات واكتشاف الملفات المكررة للويندوز مع فحص سريع ومقارنة SHA.",
+                    img: "/images/portfolio/duplicate-finder.jpg",
+                    slug: "portfolio",
+                    metric: "Fast SHA Scan"
+                },
+                {
+                    title_en: "Map Extractor",
+                    title_ar: "أداة استخراج بيانات الشركات والعملاء Map Extractor",
+                    badge: "Data Extraction",
+                    desc_en: "Business leads extraction tool with filtering and export capabilities.",
+                    desc_ar: "أداة استخراج العملاء المحتملين والشركات مع الفلترة والتصدير لإكسيل.",
+                    img: "/images/portfolio/map-extractor.jpg",
+                    slug: "portfolio",
+                    metric: "Direct Excel Export"
+                },
+                {
+                    title_en: "Instagram Manager",
+                    title_ar: "برنامج إدارة وجدولة حسابات انستجرام Instagram Manager",
+                    badge: "Desktop Automation",
+                    desc_en: "Desktop automation suite for account management and content scheduling.",
+                    desc_ar: "أتمتة إدارة الحسابات وجدولة المحتوى ونشر المنشورات على انستجرام.",
+                    img: "/images/portfolio/instagram-manager.png",
+                    slug: "portfolio",
+                    metric: "Automated Scheduling"
+                },
+                {
+                    title_en: "HEIC Converter",
+                    title_ar: "أداة تحويل صور HEIC لـ JPG/PNG للويندوز",
+                    badge: "Windows Utility",
+                    desc_en: "Batch HEIC to JPG/PNG converter for Windows with drag-and-drop interface.",
+                    desc_ar: "تحويل مجمع لصور الآيفون بصيغة HEIC إلى JPG/PNG بالسحب والإفلات.",
+                    img: "/images/portfolio/heic-converter.png",
+                    slug: "portfolio",
+                    metric: "Batch Conversion"
+                }
+            ]
         };
 
-        let interval = setInterval(autoScroll, 30);
+        let currentCategory = 'web';
+        let currentIndex = 0;
 
-        // Pause on mouse enter
-        track?.addEventListener('mouseenter', () => isPaused = true);
-        track?.addEventListener('mouseleave', () => isPaused = false);
+        const imgEl = document.getElementById('gallery-stage-img');
+        const badgeEl = document.getElementById('gallery-stage-badge');
+        const titleEl = document.getElementById('gallery-stage-title');
+        const descEl = document.getElementById('gallery-stage-desc');
+        const metricEl = document.getElementById('gallery-stage-metric');
+        const linkEl = document.getElementById('gallery-stage-link');
+        const paginationEl = document.getElementById('gallery-pagination');
+        const prevBtn = document.getElementById('gallery-stage-prev');
+        const nextBtn = document.getElementById('gallery-stage-next');
+        const categoryPills = document.querySelectorAll('.gallery-category-pill');
 
-        // Manual controls
+        function renderSlide(index) {
+            const list = galleryData[currentCategory];
+            if (!list || list.length === 0) return;
+
+            currentIndex = (index + list.length) % list.length;
+            const item = list[currentIndex];
+
+            // Smooth crossfade effect
+            imgEl.style.opacity = '0';
+            setTimeout(() => {
+                imgEl.src = item.img;
+                imgEl.alt = item.title_en;
+                imgEl.style.opacity = '1';
+            }, 150);
+
+            badgeEl.textContent = item.badge;
+            titleEl.textContent = isArabic ? item.title_ar : item.title_en;
+            descEl.textContent = isArabic ? item.desc_ar : item.desc_en;
+            metricEl.textContent = item.metric;
+            linkEl.href = item.slug === 'portfolio' ? '/portfolio' : '/portfolio/' + item.slug;
+
+            renderPagination(list.length, currentIndex);
+        }
+
+        function renderPagination(total, current) {
+            paginationEl.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('button');
+                dot.setAttribute('aria-label', `Slide ${i + 1}`);
+                if (i === current) {
+                    dot.className = 'h-2 w-8 rounded-full bg-[#1d1d1f] transition-all duration-300';
+                } else {
+                    dot.className = 'h-2 w-2 rounded-full bg-[#1d1d1f]/25 hover:bg-[#1d1d1f]/50 transition-all duration-200';
+                }
+                dot.addEventListener('click', () => {
+                    renderSlide(i);
+                });
+                paginationEl.appendChild(dot);
+            }
+        }
+
+        // Arrow Controls
         prevBtn?.addEventListener('click', () => {
-            track.scrollBy({ left: -360, behavior: 'smooth' });
+            renderSlide(currentIndex - 1);
         });
+
         nextBtn?.addEventListener('click', () => {
-            track.scrollBy({ left: 360, behavior: 'smooth' });
+            renderSlide(currentIndex + 1);
         });
 
-        // Filter buttons
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => {
-                    b.classList.remove('bg-[#1d1d1f]', 'text-white');
-                    b.classList.add('bg-white', 'text-[#1d1d1f]');
-                });
-                btn.classList.remove('bg-white', 'text-[#1d1d1f]');
-                btn.classList.add('bg-[#1d1d1f]', 'text-white');
+        // Category Switcher
+        categoryPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                const cat = pill.getAttribute('data-category');
+                if (cat === currentCategory) return;
 
-                const filter = btn.getAttribute('data-filter');
-                cards.forEach(card => {
-                    const category = card.getAttribute('data-category') || '';
-                    if (filter === 'all' || category.includes(filter)) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                categoryPills.forEach(p => {
+                    p.classList.remove('bg-white', 'text-[#1d1d1f]', 'shadow-sm');
+                    p.classList.add('text-[#1d1d1f]/70');
                 });
+
+                pill.classList.remove('text-[#1d1d1f]/70');
+                pill.classList.add('bg-white', 'text-[#1d1d1f]', 'shadow-sm');
+
+                currentCategory = cat;
+                currentIndex = 0;
+                renderSlide(0);
             });
         });
+
+        // Initial Render
+        renderSlide(0);
     });
 </script>
 @endsection

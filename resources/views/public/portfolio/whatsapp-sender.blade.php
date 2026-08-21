@@ -26,7 +26,7 @@
             <ul class="space-y-2.5 text-zinc-300">
                 <li class="flex items-start gap-2">
                     <span class="text-[#748660]">✓</span>
-                    <span>{{ $locale === 'ar' ? 'دمج تلقائي لبيانات الإكسيل (الاسم، المبلغ، رقم الفاتورة) داخل الرسالة' : 'Dynamic Excel placeholder tags ({{Name}}, {{Amount}}, {{Invoice}}).' }}</span>
+                    <span>{{ $locale === 'ar' ? 'دمج تلقائي لبيانات الإكسيل (الاسم، المبلغ، رقم الفاتورة) داخل الرسالة' : 'Dynamic Excel placeholder tags ({Name}, {Amount}, {Invoice}).' }}</span>
                 </li>
                 <li class="flex items-start gap-2">
                     <span class="text-[#748660]">✓</span>

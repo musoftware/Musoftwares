@@ -22,7 +22,7 @@ class PublicRoutesTest extends TestCase
         $this->get('/platforms')->assertStatus(200);
         $this->get('/platforms/crm')->assertStatus(200);
         $this->get('/platforms/erp')->assertStatus(200);
-        $this->get('/platforms/cloud')->assertStatus(200);
+        $this->get('/platforms/cloud')->assertRedirect(route('platforms'));
     }
 
     public function test_portfolio_page_returns_successful_response()
@@ -30,6 +30,12 @@ class PublicRoutesTest extends TestCase
         $this->get('/portfolio')->assertStatus(200);
         $this->get('/portfolio/test-slug')->assertStatus(200);
         $this->get('/portfolio/trenz-agency')->assertStatus(200);
+
+        // Verify all registered portfolio slugs in PortfolioData
+        $allPortfolio = \App\Services\PortfolioData::all();
+        foreach ($allPortfolio as $slug => $data) {
+            $this->get('/portfolio/' . $slug)->assertStatus(200);
+        }
     }
 
     public function test_solutions_pages_return_successful_response()
@@ -44,7 +50,7 @@ class PublicRoutesTest extends TestCase
 
     public function test_company_pages_return_successful_response()
     {
-        $this->get('/company')->assertStatus(200);
+        $this->get('/company')->assertRedirect(route('company.about'));
         $this->get('/company/about')->assertStatus(200);
         $this->get('/company/careers')->assertStatus(200);
         $this->get('/company/contact')->assertStatus(200);
@@ -59,7 +65,7 @@ class PublicRoutesTest extends TestCase
 
     public function test_pricing_page_returns_successful_response()
     {
-        $this->get('/pricing')->assertStatus(200);
+        $this->get('/pricing')->assertRedirect('/estimator');
     }
 
     public function test_blog_index_returns_successful_response()
