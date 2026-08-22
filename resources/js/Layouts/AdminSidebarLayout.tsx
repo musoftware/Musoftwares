@@ -35,8 +35,9 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                 <header
                     className="sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b bg-white px-4 shadow-sm"
                     style={{
-                        paddingTop: 'env(safe-area-inset-top, 0px)',
-                        height: 'calc(64px + env(safe-area-inset-top, 0px))'
+                        paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))',
+                        paddingBottom: '12px',
+                        minHeight: 'calc(64px + env(safe-area-inset-top, 0px))'
                     }}
                 >
                     <SidebarTrigger className="-ms-1" />

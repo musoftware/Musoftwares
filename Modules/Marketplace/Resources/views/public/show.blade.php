@@ -1,88 +1,92 @@
 @extends('marketplace::layouts.marketplace-master')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" id="service-app">
+<div class="max-w-[1280px] mx-auto px-6 sm:px-10 py-6 sm:py-10" id="service-app">
 
-    <!-- Breadcrumb Navigation -->
-    <nav class="flex items-center gap-2 text-xs text-slate-400 dark:text-zinc-400 mb-6 flex-wrap" aria-label="Breadcrumb">
-        <a href="{{ url('/') }}" class="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1">
-            <i class="ri-home-4-line"></i>
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- 1. BREADCRUMBS & TOP NAVIGATION                                         -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <nav class="flex items-center gap-2 text-xs text-[#86868b] mb-6 flex-wrap" aria-label="Breadcrumb">
+        <a href="{{ url('/') }}" class="hover:text-[#1d1d1f] transition-colors flex items-center gap-1">
             <span>{{ app()->getLocale() === 'ar' ? 'الرئيسية' : 'Home' }}</span>
         </a>
-        <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}-s-line text-slate-300 dark:text-zinc-600"></i>
-        <a href="{{ route('marketplace.services.index') }}" class="hover:text-slate-900 dark:hover:text-white transition-colors">
-            {{ app()->getLocale() === 'ar' ? 'سوق الخدمات' : 'Explore' }}
+        <span>›</span>
+        <a href="{{ route('marketplace.services.index') }}" class="hover:text-[#1d1d1f] transition-colors">
+            {{ app()->getLocale() === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}
         </a>
         @if($service->category)
-            <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}-s-line text-slate-300 dark:text-zinc-600"></i>
-            <a href="{{ route('marketplace.services.index', ['category' => $service->category->slug]) }}" class="hover:text-slate-900 dark:hover:text-white transition-colors">
+            <span>›</span>
+            <a href="{{ route('marketplace.services.index', ['category' => $service->category->slug]) }}" class="hover:text-[#1d1d1f] transition-colors">
                 {{ $service->category->name }}
             </a>
         @endif
-        <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}-s-line text-slate-300 dark:text-zinc-600"></i>
-        <span class="text-slate-800 dark:text-zinc-300 font-medium truncate max-w-xs">{{ $service->title }}</span>
+        <span>›</span>
+        <span class="text-[#1d1d1f] font-medium truncate max-w-xs">{{ $service->title }}</span>
     </nav>
 
-    <!-- Service Header: Category Tag, Title & Seller Bar -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- 2. SERVICE HEADER (Title, Category, Seller Bar)                         -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
     <div class="mb-8">
         <div class="flex items-center gap-2 mb-3">
             @if($service->category)
-                <a href="{{ route('marketplace.services.index', ['category' => $service->category->slug]) }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300 border border-brand-200 dark:border-brand-500/30 text-xs font-bold">
+                <a href="{{ route('marketplace.services.index', ['category' => $service->category->slug]) }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5f5f7] border border-black/5 text-[#0071e3] text-xs font-semibold hover:bg-[#e8e8ed] transition-colors">
                     <i class="ri-folder-2-line"></i>
-                    {{ $service->category->name }}
+                    <span>{{ $service->category->name }}</span>
                 </a>
             @endif
 
             @if($service->is_featured)
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40 text-xs font-bold uppercase tracking-wider">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200/80 text-xs font-semibold uppercase tracking-wider">
                     <i class="ri-vip-crown-fill text-amber-500"></i> Featured
                 </span>
             @endif
         </div>
 
-        <h1 class="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-4 leading-tight">
+        <h1 class="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-[-0.025em] mb-3 leading-tight">
             {{ $service->title }}
         </h1>
 
         @if($service->tagline)
-            <p class="text-sm sm:text-base text-slate-600 dark:text-zinc-400 mb-6 leading-relaxed">
+            <p class="text-sm sm:text-base text-[#86868b] mb-6 leading-relaxed max-w-3xl">
                 {{ $service->tagline }}
             </p>
         @endif
 
-        <!-- Seller Overview Bar (Modern Card) -->
-        <div class="flex flex-wrap items-center gap-4 sm:gap-6 py-3.5 px-5 rounded-2xl bg-white dark:bg-dark-850 border border-slate-200 dark:border-white/10 text-xs shadow-sm">
+        <!-- Seller Overview Bar (Apple Bento Card) -->
+        <div class="flex flex-wrap items-center gap-4 sm:gap-6 py-3.5 px-5 rounded-[18px] bg-[#f5f5f7] border border-black/5 text-xs shadow-2xs">
             <!-- Seller Profile -->
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-brand-600/20 to-indigo-500/20 dark:from-brand-500/30 dark:to-indigo-500/30 border border-brand-500/30 text-brand-600 dark:text-brand-300 flex items-center justify-center font-bold text-xs">
+                <div class="w-8 h-8 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center font-bold text-xs">
                     {{ strtoupper(substr($service->seller->name ?? 'S', 0, 2)) }}
                 </div>
                 <div>
-                    <span class="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                    <span class="font-semibold text-[#1d1d1f] flex items-center gap-1">
                         {{ $service->seller->name ?? 'Verified Seller' }}
-                        <i class="ri-verified-badge-fill text-brand-500 dark:text-brand-400 text-xs" title="Verified Expert"></i>
+                        <i class="ri-verified-badge-fill text-[#0071e3] text-xs" title="Verified Expert"></i>
                     </span>
-                    <span class="text-[10px] text-slate-400 dark:text-zinc-500 block">
-                        {{ app()->getLocale() === 'ar' ? 'مطور معتمد' : 'Verified Specialist' }}
+                    <span class="text-[10px] text-[#86868b] block">
+                        {{ app()->getLocale() === 'ar' ? 'مطور معتمد' : 'Verified Software Engineer' }}
                     </span>
                 </div>
             </div>
 
-            <div class="h-6 w-px bg-slate-200 dark:bg-white/10 hidden sm:block"></div>
+            <div class="h-5 w-px bg-black/10 hidden sm:block"></div>
 
             <!-- Rating Summary -->
-            <div class="flex items-center gap-1.5 text-amber-500 font-bold">
-                <i class="ri-star-fill text-sm"></i>
-                <span class="text-slate-900 dark:text-white">5.0</span>
-                <span class="text-slate-400 dark:text-zinc-500 font-normal">({{ $service->reviews ? $service->reviews->count() : 18 }} {{ app()->getLocale() === 'ar' ? 'تقييم' : 'reviews' }})</span>
+            <div class="flex items-center gap-1.5 font-semibold text-[#1d1d1f]">
+                <i class="ri-star-fill text-amber-500 text-sm"></i>
+                <span>5.0</span>
+                <span class="text-[#86868b] font-normal">({{ $service->reviews ? $service->reviews->count() : 18 }} {{ app()->getLocale() === 'ar' ? 'تقييم' : 'reviews' }})</span>
             </div>
 
-            <div class="h-6 w-px bg-slate-200 dark:bg-white/10 hidden sm:block"></div>
+            <div class="h-5 w-px bg-black/10 hidden sm:block"></div>
 
             <!-- Orders count -->
-            <div class="flex items-center gap-1.5 text-slate-600 dark:text-zinc-400">
-                <i class="ri-shopping-bag-3-line text-brand-500"></i>
-                <span>{{ $service->completed_orders_count ?? 12 }} {{ app()->getLocale() === 'ar' ? 'طلب مكتمل' : 'orders completed' }}</span>
+            <div class="flex items-center gap-1.5 text-[#86868b]">
+                <i class="ri-shopping-bag-3-line text-[#0071e3]"></i>
+                <span class="text-[#1d1d1f] font-medium">{{ $service->completed_orders_count ?? 12 }}</span>
+                <span>{{ app()->getLocale() === 'ar' ? 'طلب مكتمل' : 'orders completed' }}</span>
             </div>
 
             <!-- Favorite & Share Button -->
@@ -91,9 +95,9 @@
                     @csrf
                     <button 
                         type="submit" 
-                        class="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-dark-800 hover:bg-slate-200 dark:hover:bg-dark-750 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 transition-all flex items-center gap-1.5 text-xs font-semibold"
+                        class="px-3 py-1.5 rounded-full bg-white hover:bg-[#e8e8ed] text-[#1d1d1f] border border-black/10 transition-all flex items-center gap-1.5 text-xs font-medium shadow-2xs"
                     >
-                        <i class="{{ !empty($service->is_favorited) ? 'ri-bookmark-fill text-rose-500' : 'ri-bookmark-line' }}"></i>
+                        <i class="{{ !empty($service->is_favorited) ? 'ri-bookmark-fill text-rose-600' : 'ri-bookmark-line' }}"></i>
                         <span>{{ !empty($service->is_favorited) ? (app()->getLocale() === 'ar' ? 'محفوظ' : 'Saved') : (app()->getLocale() === 'ar' ? 'حفظ' : 'Bookmark') }}</span>
                     </button>
                 </form>
@@ -102,7 +106,7 @@
                     type="button" 
                     onclick="copyShareUrl()" 
                     id="copyBtn"
-                    class="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-dark-800 hover:bg-slate-200 dark:hover:bg-dark-750 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 transition-all flex items-center gap-1.5 text-xs font-semibold"
+                    class="px-3 py-1.5 rounded-full bg-white hover:bg-[#e8e8ed] text-[#1d1d1f] border border-black/10 transition-all flex items-center gap-1.5 text-xs font-medium shadow-2xs"
                 >
                     <i class="ri-share-forward-line"></i>
                     <span id="copyBtnText">{{ app()->getLocale() === 'ar' ? 'مشاركة' : 'Share' }}</span>
@@ -111,7 +115,9 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- 3. MAIN CONTENT GRID (Gallery + Details + Checkout Sidebar)             -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Left Column: Media Gallery, Description, FAQs, Reviews (8 cols) -->
@@ -152,9 +158,9 @@
             @endphp
 
             <!-- Media Gallery Box -->
-            <div class="rounded-3xl bg-white dark:bg-dark-850 overflow-hidden p-3 border border-slate-200 dark:border-white/10 shadow-sm">
+            <div class="rounded-[18px] bg-[#f5f5f7] p-3 border border-black/5 shadow-2xs">
                 <!-- Main Active Media Stage -->
-                <div class="relative aspect-video w-full bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center" id="mainMediaContainer">
+                <div class="relative aspect-video w-full bg-black rounded-[14px] overflow-hidden flex items-center justify-center" id="mainMediaContainer">
                     @if(!empty($mediaList))
                         @if($mediaList[0]['type'] === 'video')
                             <iframe 
@@ -174,25 +180,25 @@
                             >
                         @endif
                     @else
-                        <div class="w-full h-full bg-gradient-to-br from-slate-950 via-zinc-900 to-brand-950 flex flex-col items-center justify-center text-zinc-500">
-                            <i class="ri-code-s-slash-line text-6xl text-brand-400/50 mb-2"></i>
-                            <span class="text-sm font-semibold text-zinc-300">{{ $service->title }}</span>
+                        <div class="w-full h-full bg-[#1d1d1f] flex flex-col items-center justify-center text-[#86868b]">
+                            <i class="ri-code-s-slash-line text-5xl text-[#0071e3]/60 mb-2"></i>
+                            <span class="text-sm font-semibold text-white">{{ $service->title }}</span>
                         </div>
                     @endif
                 </div>
 
                 <!-- Thumbnail Carousel -->
                 @if(count($mediaList) > 1)
-                    <div class="flex items-center gap-3 overflow-x-auto p-3 scrollbar-none">
+                    <div class="flex items-center gap-2.5 overflow-x-auto p-2 scrollbar-none">
                         @foreach($mediaList as $index => $item)
                             <button 
                                 type="button" 
                                 onclick="switchMedia({{ $index }}, '{{ $item['type'] }}', '{{ $item['url'] }}')" 
-                                class="thumb-btn relative flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 {{ $index === 0 ? 'border-brand-500 shadow-md shadow-brand-500/30' : 'border-slate-200 dark:border-zinc-800 hover:border-brand-400' }} bg-slate-100 dark:bg-dark-800 transition-all"
+                                class="thumb-btn relative flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 {{ $index === 0 ? 'border-[#0071e3] shadow-sm' : 'border-black/10 hover:border-[#0071e3]' }} bg-white transition-all"
                                 id="thumb-{{ $index }}"
                             >
                                 @if($item['type'] === 'video')
-                                    <div class="w-full h-full flex items-center justify-center bg-zinc-900">
+                                    <div class="w-full h-full flex items-center justify-center bg-black">
                                         <i class="ri-play-circle-fill text-2xl text-rose-500"></i>
                                     </div>
                                 @else
@@ -205,34 +211,34 @@
             </div>
 
             <!-- Service Description & Details -->
-            <div class="rounded-3xl bg-white dark:bg-dark-850 p-6 sm:p-8 border border-slate-200 dark:border-white/10 shadow-sm">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                    <i class="ri-file-text-line text-brand-500"></i>
-                    {{ app()->getLocale() === 'ar' ? 'تفاصيل ومواصفات الخدمة' : 'Service Description & Deliverables' }}
+            <div class="rounded-[18px] bg-white p-6 sm:p-8 border border-black/5 shadow-2xs">
+                <h2 class="text-lg font-semibold text-[#1d1d1f] mb-4 flex items-center gap-2">
+                    <i class="ri-file-text-line text-[#0071e3]"></i>
+                    <span>{{ app()->getLocale() === 'ar' ? 'تفاصيل ومواصفات الخدمة' : 'Service Description & Deliverables' }}</span>
                 </h2>
 
-                <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-zinc-300 text-sm sm:text-base leading-relaxed space-y-4">
+                <div class="text-[#1d1d1f]/85 text-sm sm:text-base leading-relaxed space-y-4 font-normal">
                     {!! nl2br(e($service->description)) !!}
                 </div>
 
                 <!-- Requirements & Deliverable Highlights -->
                 @if(!empty($service->requirements))
-                    <div class="mt-8 pt-6 border-t border-slate-100 dark:border-white/5">
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <div class="mt-8 pt-6 border-t border-black/5">
+                        <h3 class="text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-3 flex items-center gap-1.5">
                             <i class="ri-clipboard-line text-amber-500"></i>
-                            {{ app()->getLocale() === 'ar' ? 'متطلبات البدء في المشروع:' : 'Buyer Requirements to Start:' }}
+                            <span>{{ app()->getLocale() === 'ar' ? 'متطلبات البدء في المشروع:' : 'Buyer Requirements to Start:' }}</span>
                         </h3>
                         @if(is_array($service->requirements))
-                            <ul class="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-zinc-400 bg-slate-50 dark:bg-dark-800 p-4 rounded-2xl border border-slate-200 dark:border-white/10">
+                            <ul class="space-y-2 text-xs sm:text-sm text-[#1d1d1f] bg-[#f5f5f7] p-4 rounded-2xl border border-black/5">
                                 @foreach($service->requirements as $req)
                                     <li class="flex items-start gap-2">
-                                        <i class="ri-check-line text-emerald-500 mt-0.5 flex-shrink-0"></i>
+                                        <i class="ri-check-line text-emerald-600 mt-0.5 flex-shrink-0"></i>
                                         <span>{{ is_array($req) ? ($req['text'] ?? $req['title'] ?? json_encode($req)) : $req }}</span>
                                     </li>
                                 @endforeach
                             </ul>
                         @else
-                            <p class="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 bg-slate-50 dark:bg-dark-800 p-4 rounded-2xl border border-slate-200 dark:border-white/10">
+                            <p class="text-xs sm:text-sm text-[#1d1d1f] bg-[#f5f5f7] p-4 rounded-2xl border border-black/5">
                                 {{ $service->requirements }}
                             </p>
                         @endif
@@ -241,10 +247,10 @@
 
                 <!-- Tags / Technologies -->
                 @if(!empty($service->tags) && is_array($service->tags))
-                    <div class="mt-8 pt-6 border-t border-slate-100 dark:border-white/5 flex items-center gap-2 flex-wrap">
-                        <span class="text-xs font-semibold text-slate-500 dark:text-zinc-400">{{ app()->getLocale() === 'ar' ? 'التقنيات المستخدمة:' : 'Technologies:' }}</span>
+                    <div class="mt-8 pt-6 border-t border-black/5 flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-semibold text-[#86868b]">{{ app()->getLocale() === 'ar' ? 'التقنيات المستخدمة:' : 'Technologies:' }}</span>
                         @foreach($service->tags as $tag)
-                            <a href="{{ route('marketplace.services.index', ['skill' => $tag]) }}" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-dark-800 text-xs font-semibold text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 hover:border-brand-500 hover:text-brand-500 transition-colors">
+                            <a href="{{ route('marketplace.services.index', ['skill' => $tag]) }}" class="px-3 py-1 rounded-full bg-[#f5f5f7] text-xs font-medium text-[#1d1d1f] border border-black/5 hover:border-[#0071e3] hover:text-[#0071e3] transition-colors">
                                 #{{ $tag }}
                             </a>
                         @endforeach
@@ -253,29 +259,29 @@
             </div>
 
             <!-- Trust FAQ Accordion -->
-            <div class="rounded-3xl bg-white dark:bg-dark-850 p-6 sm:p-8 border border-slate-200 dark:border-white/10 shadow-sm">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                    <i class="ri-questionnaire-line text-brand-500"></i>
-                    {{ app()->getLocale() === 'ar' ? 'الأسئلة الشائعة حول الخدمة والضمان' : 'Frequently Asked Questions' }}
+            <div class="rounded-[18px] bg-white p-6 sm:p-8 border border-black/5 shadow-2xs">
+                <h2 class="text-lg font-semibold text-[#1d1d1f] mb-4 flex items-center gap-2">
+                    <i class="ri-questionnaire-line text-[#0071e3]"></i>
+                    <span>{{ app()->getLocale() === 'ar' ? 'الأسئلة الشائعة حول الخدمة والضمان' : 'Frequently Asked Questions' }}</span>
                 </h2>
 
                 <div class="space-y-3">
-                    <div class="rounded-2xl bg-slate-50 dark:bg-dark-800 border border-slate-200 dark:border-white/10 p-4">
-                        <button type="button" onclick="toggleFaq(1)" class="w-full flex items-center justify-between text-start text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none">
+                    <div class="rounded-2xl bg-[#f5f5f7] border border-black/5 p-4">
+                        <button type="button" onclick="toggleFaq(1)" class="w-full flex items-center justify-between text-start text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:outline-none">
                             <span>{{ app()->getLocale() === 'ar' ? 'كيف يحميني نظام الضمان المالي (Escrow)؟' : 'How does Escrow Buyer Protection work?' }}</span>
-                            <i id="faq-icon-1" class="ri-arrow-down-s-line text-slate-400 text-lg transition-transform"></i>
+                            <i id="faq-icon-1" class="ri-arrow-down-s-line text-[#86868b] text-lg transition-transform"></i>
                         </button>
-                        <div id="faq-body-1" class="mt-3 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed hidden">
+                        <div id="faq-body-1" class="mt-2.5 text-xs text-[#86868b] leading-relaxed hidden">
                             {{ app()->getLocale() === 'ar' ? 'عند طلبك لهذه الخدمة يتم حجز المبلغ في رصيد وسيط آمن. لا يتسلم المطور مستحقاته إلا بعد أن تستلم العمل بالكامل وتوافق على جودته.' : 'Your payment is held safely in escrow. The seller only receives funds after you inspect, test, and approve the delivered solution.' }}
                         </div>
                     </div>
 
-                    <div class="rounded-2xl bg-slate-50 dark:bg-dark-800 border border-slate-200 dark:border-white/10 p-4">
-                        <button type="button" onclick="toggleFaq(2)" class="w-full flex items-center justify-between text-start text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none">
+                    <div class="rounded-2xl bg-[#f5f5f7] border border-black/5 p-4">
+                        <button type="button" onclick="toggleFaq(2)" class="w-full flex items-center justify-between text-start text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:outline-none">
                             <span>{{ app()->getLocale() === 'ar' ? 'هل تشمل الخدمة جولات مراجعة وتعديل؟' : 'Are revision rounds included?' }}</span>
-                            <i id="faq-icon-2" class="ri-arrow-down-s-line text-slate-400 text-lg transition-transform"></i>
+                            <i id="faq-icon-2" class="ri-arrow-down-s-line text-[#86868b] text-lg transition-transform"></i>
                         </button>
-                        <div id="faq-body-2" class="mt-3 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed hidden">
+                        <div id="faq-body-2" class="mt-2.5 text-xs text-[#86868b] leading-relaxed hidden">
                             {{ app()->getLocale() === 'ar' ? 'نعم، تتضمن باقات الخدمة جولات تعديل ومراجعة يمكنك طلبها مباشرة من غرفة الطلب مع المطور.' : 'Yes, each service package includes defined revision rounds. You can request revisions directly through your dedicated order room.' }}
                         </div>
                     </div>
@@ -306,12 +312,12 @@
                 $firstPkgSymbol = $firstPkg->currency->symbol ?? $firstPkg->currency->currency ?? $currencySymbol;
             @endphp
 
-            <!-- Package Selection Card -->
-            <div class="rounded-3xl bg-white dark:bg-dark-850 border border-slate-200/90 dark:border-white/10 p-5 sm:p-6 shadow-lg relative overflow-hidden">
+            <!-- Package Selection Bento Card -->
+            <div class="rounded-[18px] bg-white border border-black/10 p-6 shadow-sm relative overflow-hidden">
                 
                 <!-- Package Tabs if multiple -->
                 @if($packages->count() > 1)
-                    <div class="flex items-center gap-1 rounded-2xl bg-[#f4f5f8] dark:bg-dark-800 p-1 border border-slate-200/70 dark:border-white/5 mb-5 overflow-x-auto scrollbar-none">
+                    <div class="flex items-center gap-1 rounded-full bg-[#f5f5f7] p-1 border border-black/5 mb-5 overflow-x-auto scrollbar-none">
                         @foreach($packages as $pIdx => $pkg)
                             @php
                                 $pkgSymbol = $pkg->currency->symbol ?? $pkg->currency->currency ?? $currencySymbol;
@@ -319,7 +325,7 @@
                             <button 
                                 type="button" 
                                 onclick="selectPackage({{ $pkg->id }}, {{ $pkg->price }}, '{{ addslashes($pkg->name) }}', '{{ addslashes($pkg->description ?? '') }}', {{ $pkg->delivery_days ?? 3 }}, {{ $pkg->revisions ?? 1 }}, '{{ $pkgSymbol }}')" 
-                                class="pkg-tab-btn flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all truncate text-center {{ $pIdx === 0 ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm' : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white' }}"
+                                class="pkg-tab-btn flex-1 py-1.5 px-3 rounded-full text-xs font-semibold transition-all truncate text-center {{ $pIdx === 0 ? 'bg-[#1d1d1f] text-white shadow-xs' : 'text-[#86868b] hover:text-[#1d1d1f]' }}"
                                 id="pkg-tab-{{ $pkg->id }}"
                                 title="{{ $pkg->name }}"
                             >
@@ -332,40 +338,40 @@
                 <!-- Active Package Display -->
                 <div class="mb-5">
                     <div class="flex items-start justify-between gap-3 mb-2">
-                        <h3 class="text-sm sm:text-base font-extrabold text-slate-950 dark:text-white leading-snug line-clamp-2" id="pkgDisplayTitle">
+                        <h3 class="text-base font-semibold text-[#1d1d1f] leading-snug line-clamp-2" id="pkgDisplayTitle">
                             {{ $firstPkg->name }}
                         </h3>
-                        <div class="text-lg sm:text-xl font-extrabold text-slate-950 dark:text-white whitespace-nowrap flex-shrink-0 text-end" id="pkgDisplayPrice">
-                            <span class="text-xs text-slate-400 dark:text-zinc-500 font-semibold me-0.5">{{ $firstPkgSymbol }}</span>{{ number_format($firstPkg->price, 2) }}
+                        <div class="text-xl font-bold text-[#0071e3] font-mono whitespace-nowrap flex-shrink-0 text-end" id="pkgDisplayPrice">
+                            {{ $firstPkgSymbol }}{{ number_format($firstPkg->price, 2) }}
                         </div>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed min-h-[32px]" id="pkgDisplayDesc">
+                    <p class="text-xs text-[#86868b] leading-relaxed min-h-[32px]" id="pkgDisplayDesc">
                         {{ $firstPkg->description ?: 'Full package deliverables and source files.' }}
                     </p>
                 </div>
 
                 <!-- Package Highlights -->
-                <div class="space-y-3 py-4 border-y border-slate-100 dark:border-white/5 mb-6 text-xs text-slate-700 dark:text-zinc-300">
+                <div class="space-y-3 py-4 border-y border-black/5 mb-6 text-xs text-[#1d1d1f]">
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
-                            <i class="ri-time-line text-brand-500"></i>
-                            {{ app()->getLocale() === 'ar' ? 'مدة التسليم' : 'Delivery Time' }}
+                        <span class="text-[#86868b] flex items-center gap-1.5">
+                            <i class="ri-time-line text-[#0071e3]"></i>
+                            <span>{{ app()->getLocale() === 'ar' ? 'مدة التسليم' : 'Delivery Time' }}</span>
                         </span>
-                        <strong class="text-slate-900 dark:text-white" id="pkgDisplayDelivery">{{ $firstPkg->delivery_days ?? 3 }} {{ app()->getLocale() === 'ar' ? 'أيام' : 'Days' }}</strong>
+                        <strong class="text-[#1d1d1f]" id="pkgDisplayDelivery">{{ $firstPkg->delivery_days ?? 3 }} {{ app()->getLocale() === 'ar' ? 'أيام' : 'Days' }}</strong>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
-                            <i class="ri-loop-right-line text-emerald-500"></i>
-                            {{ app()->getLocale() === 'ar' ? 'جولات التعديل' : 'Revisions' }}
+                        <span class="text-[#86868b] flex items-center gap-1.5">
+                            <i class="ri-loop-right-line text-emerald-600"></i>
+                            <span>{{ app()->getLocale() === 'ar' ? 'جولات التعديل' : 'Revisions' }}</span>
                         </span>
-                        <strong class="text-slate-900 dark:text-white" id="pkgDisplayRevisions">{{ $firstPkg->revisions ?? 2 }} {{ app()->getLocale() === 'ar' ? 'تعديلات' : 'Rounds' }}</strong>
+                        <strong class="text-[#1d1d1f]" id="pkgDisplayRevisions">{{ $firstPkg->revisions ?? 2 }} {{ app()->getLocale() === 'ar' ? 'تعديلات' : 'Rounds' }}</strong>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
-                            <i class="ri-shield-check-line text-amber-500"></i>
-                            {{ app()->getLocale() === 'ar' ? 'الدفع بالضمان' : 'Escrow Protection' }}
+                        <span class="text-[#86868b] flex items-center gap-1.5">
+                            <i class="ri-shield-check-line text-emerald-600"></i>
+                            <span>{{ app()->getLocale() === 'ar' ? 'الدفع بالضمان' : 'Escrow Protection' }}</span>
                         </span>
-                        <strong class="text-emerald-600 dark:text-emerald-400">100% Guaranteed</strong>
+                        <strong class="text-emerald-700 font-semibold">100% Guaranteed</strong>
                     </div>
                 </div>
 
@@ -375,18 +381,39 @@
                     <input type="hidden" name="package_id" id="selectedPackageIdInput" value="{{ $firstPkg->id }}">
                     <input type="hidden" name="service_id" value="{{ $service->id }}">
 
-                    <button 
-                        type="submit" 
-                        class="w-full h-12 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-slate-950 font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2"
-                    >
-                        <i class="ri-shopping-cart-2-line text-base font-bold"></i>
-                        <span>{{ app()->getLocale() === 'ar' ? 'طلب الخدمة الآن' : 'Continue to Checkout' }}</span>
-                    </button>
+                    @auth
+                        @php
+                            $userAvail = (float) auth()->user()->available_balance();
+                        @endphp
+                        <div class="mb-4 p-3 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-between text-xs">
+                            <span class="text-[#86868b] flex items-center gap-1.5 font-medium">
+                                <i class="ri-wallet-3-line text-emerald-600"></i>
+                                <span>{{ app()->getLocale() === 'ar' ? 'رصيد محفظتك المتاح:' : 'Available Balance:' }}</span>
+                            </span>
+                            <span class="font-bold text-[#1d1d1f] font-mono">${{ number_format($userAvail, 2) }}</span>
+                        </div>
+
+                        <button 
+                            type="submit" 
+                            class="w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition-all shadow-xs flex items-center justify-center gap-1.5"
+                        >
+                            <i class="ri-flashlight-fill text-amber-300 text-sm"></i>
+                            <span>{{ app()->getLocale() === 'ar' ? 'شراء وتفعيل فوري بالرصيد' : 'Instant 1-Click Purchase' }}</span>
+                        </button>
+                    @else
+                        <a 
+                            href="{{ route('login') }}" 
+                            class="w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition-all shadow-xs flex items-center justify-center gap-1.5"
+                        >
+                            <i class="ri-login-box-line text-sm"></i>
+                            <span>{{ app()->getLocale() === 'ar' ? 'سجل دخول للمتابعة والشراء' : 'Sign In to Order' }}</span>
+                        </a>
+                    @endauth
                 </form>
 
-                <p class="text-[11px] text-center text-slate-400 dark:text-zinc-500 mt-3 flex items-center justify-center gap-1">
-                    <i class="ri-lock-line text-emerald-500"></i>
-                    <span>{{ app()->getLocale() === 'ar' ? 'دفع آمن بالضمان التام' : 'Secure & Escrow-Protected Checkout' }}</span>
+                <p class="text-[11px] text-center text-[#86868b] mt-3 flex items-center justify-center gap-1">
+                    <i class="ri-lock-line text-emerald-600"></i>
+                    <span>{{ app()->getLocale() === 'ar' ? 'دفع آمن بالضمان المالي الكامل (Escrow)' : '100% Escrow-Protected Transaction' }}</span>
                 </p>
 
             </div>
@@ -398,10 +425,10 @@
 </div>
 
 <!-- Fullscreen Image Modal (Simple Zoom) -->
-<div id="imageModal" class="fixed inset-0 z-50 bg-black/90 hidden items-center justify-center p-4 backdrop-blur-md" onclick="closeFullscreenImage()">
+<div id="imageModal" class="fixed inset-0 z-50 bg-black/85 hidden items-center justify-center p-4 backdrop-blur-md" onclick="closeFullscreenImage()">
     <div class="relative max-w-5xl max-h-[90vh] flex items-center justify-center">
         <img id="modalImg" src="" alt="preview" class="max-w-full max-h-[85vh] rounded-2xl object-contain shadow-2xl">
-        <button type="button" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-zinc-800 text-white flex items-center justify-center text-xl hover:bg-zinc-700">
+        <button type="button" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center text-xl hover:bg-white/30">
             <i class="ri-close-line"></i>
         </button>
     </div>
@@ -415,19 +442,19 @@
         const symbol = pkgSymbol || defaultCurrencySymbol;
         document.getElementById('selectedPackageIdInput').value = id;
         document.getElementById('pkgDisplayTitle').innerText = name;
-        document.getElementById('pkgDisplayPrice').innerHTML = '<span class="text-xs text-slate-400 dark:text-zinc-500 font-semibold me-0.5">' + symbol + '</span>' + Number(price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('pkgDisplayPrice').innerHTML = symbol + Number(price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('pkgDisplayDesc').innerText = desc || 'Full package deliverables and source files.';
         document.getElementById('pkgDisplayDelivery').innerText = delivery + ' ' + (document.documentElement.lang === 'ar' ? 'أيام' : 'Days');
         document.getElementById('pkgDisplayRevisions').innerText = revisions + ' ' + (document.documentElement.lang === 'ar' ? 'تعديلات' : 'Rounds');
 
         document.querySelectorAll('.pkg-tab-btn').forEach(btn => {
-            btn.classList.remove('bg-slate-950', 'text-white', 'dark:bg-white', 'dark:text-slate-950', 'shadow-sm');
-            btn.classList.add('text-slate-500', 'dark:text-zinc-400');
+            btn.classList.remove('bg-[#1d1d1f]', 'text-white', 'shadow-xs');
+            btn.classList.add('text-[#86868b]');
         });
         const activeBtn = document.getElementById('pkg-tab-' + id);
         if (activeBtn) {
-            activeBtn.classList.add('bg-slate-950', 'text-white', 'dark:bg-white', 'dark:text-slate-950', 'shadow-sm');
-            activeBtn.classList.remove('text-slate-500', 'dark:text-zinc-400');
+            activeBtn.classList.add('bg-[#1d1d1f]', 'text-white', 'shadow-xs');
+            activeBtn.classList.remove('text-[#86868b]');
         }
     }
 
@@ -440,13 +467,13 @@
         }
 
         document.querySelectorAll('.thumb-btn').forEach(btn => {
-            btn.classList.remove('border-brand-500', 'shadow-md', 'shadow-brand-500/30');
-            btn.classList.add('border-slate-200', 'dark:border-zinc-800');
+            btn.classList.remove('border-[#0071e3]', 'shadow-sm');
+            btn.classList.add('border-black/10');
         });
         const activeThumb = document.getElementById('thumb-' + index);
         if (activeThumb) {
-            activeThumb.classList.add('border-brand-500', 'shadow-md', 'shadow-brand-500/30');
-            activeThumb.classList.remove('border-slate-200', 'dark:border-zinc-800');
+            activeThumb.classList.add('border-[#0071e3]', 'shadow-sm');
+            activeThumb.classList.remove('border-black/10');
         }
     }
 

@@ -1,148 +1,155 @@
 @extends('marketplace::layouts.marketplace-master')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+<div class="max-w-[1280px] mx-auto px-6 sm:px-10 py-8 sm:py-12">
 
-    <!-- Top Section: Explore Header, Search Pill & Smooth Scroll Category Navigation -->
-    <div class="mb-7">
-        
-        <!-- Header Row: Title & Search Pill -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- 1. APPLE HERO SECTION (Storefront Header & Smart Search)                -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <section class="rounded-[22px] bg-[#f5f5f7] p-8 sm:p-12 mb-10 overflow-hidden relative border border-black/5">
+        <div class="max-w-[800px]">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-black/5 text-[#0071e3] text-xs font-semibold uppercase tracking-wider mb-4 shadow-2xs">
+                <i class="ri-store-2-line"></i>
+                <span>{{ app()->getLocale() === 'ar' ? 'سوق الخدمات والأدوات البرمجية' : 'Software Services & Tools Hub' }}</span>
+            </div>
             
-            <!-- Left: Menu Trigger & Explore Title -->
+            <h1 class="text-[32px] sm:text-[44px] lg:text-[50px] font-semibold tracking-[-0.03em] leading-[1.05] text-[#1d1d1f] mb-3">
+                {{ app()->getLocale() === 'ar' ? 'حلول برمجية فورية، جاهزة للإنتاج.' : 'Verified Software Services & Instant Tools.' }}
+            </h1>
+            
+            <p class="text-[16px] sm:text-[18px] text-[#86868b] leading-relaxed max-w-[640px] mb-8">
+                {{ app()->getLocale() === 'ar' 
+                    ? 'اكتشف واشترِ أدوات الذكاء الاصطناعي، تكاملات الواتساب، وتطوير الأنظمة المخصصة بضمان مالي Escrow بنسبة 100% ودفع فوري من المحفظة.' 
+                    : 'Deploy pre-built automation scripts, custom software architectures, and AI integrations with 100% cryptographic escrow guarantee.' }}
+            </p>
+
+            <!-- Apple Search Pill -->
+            <form action="{{ route('marketplace.services.index') }}" method="GET" id="mainSearchForm" class="relative max-w-[560px]">
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+                @if(request('sort'))
+                    <input type="hidden" name="sort" value="{{ request('sort') }}">
+                @endif
+                @if(request('delivery_time'))
+                    <input type="hidden" name="delivery_time" value="{{ request('delivery_time') }}">
+                @endif
+                @if(request('min_price'))
+                    <input type="hidden" name="min_price" value="{{ request('min_price') }}">
+                @endif
+                @if(request('max_price'))
+                    <input type="hidden" name="max_price" value="{{ request('max_price') }}">
+                @endif
+
+                <div class="relative flex items-center shadow-sm rounded-full bg-white border border-black/10 focus-within:border-[#0071e3] transition-all">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') ?? request('q') }}" 
+                        placeholder="{{ app()->getLocale() === 'ar' ? 'ابحث عن أداة، بوت، تكامل واتساب، أو خدمة برمجة...' : 'Search tools, WhatsApp APIs, AI integrations, or custom development...' }}"
+                        class="w-full h-12 {{ app()->getLocale() === 'ar' ? 'pr-5 pl-12' : 'pl-5 pr-12' }} rounded-full bg-transparent text-[#1d1d1f] placeholder-[#86868b] text-[14px] focus:outline-none"
+                    >
+                    <button type="submit" class="absolute {{ app()->getLocale() === 'ar' ? 'left-3' : 'right-3' }} w-8 h-8 rounded-full bg-[#0071e3] text-white hover:bg-[#0077ed] flex items-center justify-center transition-all shadow-xs" title="Search">
+                        <i class="ri-search-2-line text-sm"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- 2. CATEGORY TABS ROW (Apple Horizontal Pill Navigation)                -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between gap-4 mb-4">
             <div class="flex items-center gap-3">
-                <!-- Mobile Filters Drawer Toggle Button -->
+                <!-- Mobile Filter Toggle -->
                 <button 
                     type="button" 
                     onclick="toggleMobileFilters()" 
-                    class="lg:hidden w-9 h-9 rounded-2xl bg-white dark:bg-dark-800 border border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-zinc-200 flex items-center justify-center shadow-sm hover:bg-slate-100 dark:hover:bg-dark-750 transition-colors"
-                    title="{{ app()->getLocale() === 'ar' ? 'تصفية النتائج' : 'Open Filters' }}"
+                    class="lg:hidden h-9 px-3.5 rounded-full bg-[#f5f5f7] border border-black/5 text-[#1d1d1f] text-xs font-semibold flex items-center gap-1.5 hover:bg-[#e8e8ed] transition-colors"
                 >
-                    <i class="ri-menu-2-line text-base font-bold"></i>
+                    <i class="ri-equalizer-line"></i>
+                    <span>{{ app()->getLocale() === 'ar' ? 'الفلاتر' : 'Filters' }}</span>
                 </button>
 
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white tracking-tight">
-                    {{ app()->getLocale() === 'ar' ? 'استكشف' : 'Explore' }}
-                </h1>
+                <h2 class="text-[17px] font-semibold text-[#1d1d1f] tracking-[-0.01em]">
+                    {{ app()->getLocale() === 'ar' ? 'تصفح حسب القسم' : 'Browse by Category' }}
+                </h2>
             </div>
 
-            <!-- Right: Clean Search Pill -->
-            <div class="w-full sm:w-72 lg:w-80">
-                <form action="{{ route('marketplace.services.index') }}" method="GET" id="mainSearchForm" class="relative">
-                    @if(request('category'))
-                        <input type="hidden" name="category" value="{{ request('category') }}">
-                    @endif
-                    @if(request('sort'))
-                        <input type="hidden" name="sort" value="{{ request('sort') }}">
-                    @endif
-                    @if(request('delivery_time'))
-                        <input type="hidden" name="delivery_time" value="{{ request('delivery_time') }}">
-                    @endif
-                    @if(request('min_price'))
-                        <input type="hidden" name="min_price" value="{{ request('min_price') }}">
-                    @endif
-                    @if(request('max_price'))
-                        <input type="hidden" name="max_price" value="{{ request('max_price') }}">
-                    @endif
-
-                    <div class="relative flex items-center">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            value="{{ request('search') ?? request('q') }}" 
-                            placeholder="{{ app()->getLocale() === 'ar' ? 'بحث...' : 'Search' }}"
-                            class="w-full h-10 {{ app()->getLocale() === 'ar' ? 'pr-3.5 pl-10' : 'pl-3.5 pr-10' }} rounded-full bg-white dark:bg-dark-800 border border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-slate-400 dark:focus:border-white/30 transition-all shadow-sm"
-                        >
-                        <button type="submit" class="absolute {{ app()->getLocale() === 'ar' ? 'left-3' : 'right-3' }} text-slate-400 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors" title="{{ app()->getLocale() === 'ar' ? 'بحث' : 'Search' }}">
-                            <i class="ri-search-2-line text-base"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-
-        <!-- Category Tabs Container with Left & Right Arrow Buttons & Drag Scroll -->
-        <div class="relative group/tabs flex items-center">
-            
-            <!-- Left Scroll Arrow Button -->
-            <button 
-                type="button" 
-                onclick="scrollCatTabs(-240)" 
-                class="hidden sm:flex absolute -start-3 z-10 w-8 h-8 rounded-full bg-white dark:bg-dark-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-200 items-center justify-center shadow-md hover:bg-slate-50 dark:hover:bg-dark-750 transition-all opacity-80 hover:opacity-100 hover:scale-105"
-                title="Scroll Left"
-                aria-label="Scroll Categories Left"
-            >
-                <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}-s-line text-base"></i>
-            </button>
-
-            <!-- Scrollable Category Row -->
-            <div 
-                id="catScrollContainer"
-                class="flex items-center gap-6 sm:gap-7 overflow-x-auto pb-2 px-1 scrollbar-none scroll-smooth select-none cursor-grab active:cursor-grabbing w-full"
-            >
-                @php
-                    $isAllActive = !request('category') && !request('category_id') && !request('category_slug') && empty($filters['category']);
-                @endphp
-                <a 
-                    href="{{ route('marketplace.services.index', array_merge(request()->except(['category', 'category_id', 'category_slug', 'page']))) }}" 
-                    class="whitespace-nowrap text-sm sm:text-base transition-colors flex-shrink-0 {{ $isAllActive ? 'font-extrabold text-slate-950 dark:text-white' : 'font-semibold text-slate-400 hover:text-slate-800 dark:text-zinc-500 dark:hover:text-zinc-300' }}"
-                >
-                    {{ app()->getLocale() === 'ar' ? 'الكل' : 'All' }}
-                    <span class="text-xs font-normal text-slate-400 dark:text-zinc-500">({{ $services->total() }})</span>
-                </a>
-
-                @if(isset($categories) && $categories->count() > 0)
-                    @foreach($categories as $category)
-                        @php
-                            $isActive = (request('category') === $category->slug || request('category') === (string)$category->id || (isset($filters['category']) && $filters['category'] === $category->slug));
-                        @endphp
-                        <a 
-                            href="{{ route('marketplace.services.index', array_merge(request()->except(['page']), ['category' => $category->slug])) }}" 
-                            class="whitespace-nowrap text-sm sm:text-base transition-colors flex-shrink-0 {{ $isActive ? 'font-extrabold text-slate-950 dark:text-white' : 'font-semibold text-slate-400 hover:text-slate-800 dark:text-zinc-500 dark:hover:text-zinc-300' }}"
-                        >
-                            {{ $category->name }}
-                            @if(isset($category->services_count))
-                                <span class="text-xs font-normal text-slate-400 dark:text-zinc-500">({{ $category->services_count }})</span>
-                            @endif
-                        </a>
-                    @endforeach
+            <!-- Sort By Selector -->
+            <form action="{{ route('marketplace.services.index') }}" method="GET" id="topSortForm" class="flex items-center gap-2">
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
                 @endif
-            </div>
-
-            <!-- Right Scroll Arrow Button -->
-            <button 
-                type="button" 
-                onclick="scrollCatTabs(240)" 
-                class="hidden sm:flex absolute -end-3 z-10 w-8 h-8 rounded-full bg-white dark:bg-dark-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-200 items-center justify-center shadow-md hover:bg-slate-50 dark:hover:bg-dark-750 transition-all opacity-80 hover:opacity-100 hover:scale-105"
-                title="Scroll Right"
-                aria-label="Scroll Categories Right"
-            >
-                <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}-s-line text-base"></i>
-            </button>
-
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+                <span class="text-xs text-[#86868b] hidden sm:inline">{{ app()->getLocale() === 'ar' ? 'الترتيب:' : 'Sort:' }}</span>
+                <select 
+                    name="sort" 
+                    onchange="document.getElementById('topSortForm').submit()"
+                    class="bg-[#f5f5f7] border border-black/5 rounded-full px-3 py-1.5 text-xs font-medium text-[#1d1d1f] focus:outline-none cursor-pointer"
+                >
+                    <option value="popular" {{ request('sort') === 'popular' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'الأكثر طلباً' : 'Most Popular' }}</option>
+                    <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'الأحدث إضافتاً' : 'Newest' }}</option>
+                    <option value="rating" {{ request('sort') === 'rating' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'الأعلى تقييماً' : 'Highest Rated' }}</option>
+                    <option value="price_low" {{ request('sort') === 'price_low' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'السعر: من الأقل' : 'Price: Low to High' }}</option>
+                    <option value="price_high" {{ request('sort') === 'price_high' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'السعر: من الأعلى' : 'Price: High to Low' }}</option>
+                </select>
+            </form>
         </div>
 
+        <!-- Scrollable Category Row -->
+        <div class="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none select-none">
+            @php
+                $isAllActive = !request('category') && !request('category_id') && !request('category_slug') && empty($filters['category']);
+            @endphp
+            <a 
+                href="{{ route('marketplace.services.index', array_merge(request()->except(['category', 'category_id', 'category_slug', 'page']))) }}" 
+                class="px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 {{ $isAllActive ? 'bg-[#1d1d1f] text-white shadow-xs' : 'bg-[#f5f5f7] text-[#1d1d1f]/80 hover:bg-[#e8e8ed]' }}"
+            >
+                {{ app()->getLocale() === 'ar' ? 'جميع الخدمات' : 'All Services' }}
+                <span class="text-[11px] opacity-70 ms-1">({{ $services->total() }})</span>
+            </a>
+
+            @if(isset($categories) && $categories->count() > 0)
+                @foreach($categories as $category)
+                    @php
+                        $isActive = (request('category') === $category->slug || request('category') === (string)$category->id || (isset($filters['category']) && $filters['category'] === $category->slug));
+                    @endphp
+                    <a 
+                        href="{{ route('marketplace.services.index', array_merge(request()->except(['page']), ['category' => $category->slug])) }}" 
+                        class="px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 {{ $isActive ? 'bg-[#1d1d1f] text-white shadow-xs' : 'bg-[#f5f5f7] text-[#1d1d1f]/80 hover:bg-[#e8e8ed]' }}"
+                    >
+                        {{ $category->name }}
+                        @if(isset($category->services_count))
+                            <span class="text-[11px] opacity-70 ms-1">({{ $category->services_count }})</span>
+                        @endif
+                    </a>
+                @endforeach
+            @endif
+        </div>
     </div>
 
-    <!-- Main Content: Left Filters Sidebar & Right Cards Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- 3. MAIN CONTENT GRID (Bento Filters Sidebar + 2-Col Cards)             -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- ========================================== -->
-        <!-- LEFT COLUMN: FILTERS SIDEBAR               -->
-        <!-- ========================================== -->
-        <aside id="filtersSidebar" class="hidden lg:block lg:col-span-4 xl:col-span-3 sticky top-20">
-            <div class="rounded-3xl bg-white dark:bg-dark-850 border border-slate-200/60 dark:border-white/5 p-4 sm:p-5 shadow-sm space-y-4">
+        <!-- Left Column: Apple Bento Filter Sidebar (3 cols) -->
+        <aside id="filtersSidebar" class="hidden lg:block lg:col-span-4 xl:col-span-3 sticky top-24">
+            <div class="rounded-[18px] bg-[#f5f5f7] border border-black/5 p-5 space-y-5">
                 
-                <!-- Sidebar Header with Quick Reset -->
-                <div class="flex items-center justify-between pb-1 border-b border-slate-100 dark:border-white/5">
-                    <h2 class="text-sm sm:text-base font-extrabold text-slate-950 dark:text-white tracking-tight">
-                        {{ app()->getLocale() === 'ar' ? 'الفلاتر' : 'Filters' }}
-                    </h2>
+                <!-- Header with Quick Reset -->
+                <div class="flex items-center justify-between pb-3 border-b border-black/5">
+                    <h3 class="text-sm font-semibold text-[#1d1d1f]">
+                        {{ app()->getLocale() === 'ar' ? 'تخصيص النتائج' : 'Filter Results' }}
+                    </h3>
                     <a 
                         href="{{ route('marketplace.services.index') }}" 
-                        class="text-[11px] font-bold text-slate-400 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1 transition-colors"
-                        title="{{ app()->getLocale() === 'ar' ? 'إعادة ضبط الفلاتر' : 'Reset Filters' }}"
+                        class="text-[11px] font-medium text-[#0066cc] hover:underline flex items-center gap-1"
                     >
                         <i class="ri-refresh-line text-xs"></i>
                         <span>{{ app()->getLocale() === 'ar' ? 'إعادة ضبط' : 'Reset' }}</span>
@@ -150,7 +157,7 @@
                 </div>
 
                 <!-- Filters Form -->
-                <form action="{{ route('marketplace.services.index') }}" method="GET" id="sidebarFilterForm" class="space-y-3.5">
+                <form action="{{ route('marketplace.services.index') }}" method="GET" id="sidebarFilterForm" class="space-y-4">
                     @if(request('search'))
                         <input type="hidden" name="search" value="{{ request('search') }}">
                     @endif
@@ -158,16 +165,16 @@
                         <input type="hidden" name="sort" value="{{ request('sort') }}">
                     @endif
 
-                    <!-- Filter 1: Category Dropdown (Auto Submits on Change) -->
-                    <div class="rounded-2xl bg-[#f4f5f8] dark:bg-dark-800 px-3 py-2">
-                        <label class="block text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">
+                    <!-- Filter 1: Category Dropdown -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">
                             {{ app()->getLocale() === 'ar' ? 'القسم' : 'Category' }}
                         </label>
                         <div class="relative">
                             <select 
                                 name="category" 
                                 onchange="document.getElementById('sidebarFilterForm').submit()"
-                                class="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-zinc-100 focus:outline-none cursor-pointer appearance-none pe-5"
+                                class="w-full h-10 px-3 rounded-xl bg-white border border-black/10 text-xs font-medium text-[#1d1d1f] focus:outline-none focus:border-[#0071e3] appearance-none"
                             >
                                 <option value="">{{ app()->getLocale() === 'ar' ? 'جميع الأقسام' : 'All Categories' }}</option>
                                 @if(isset($categories))
@@ -178,51 +185,51 @@
                                     @endforeach
                                 @endif
                             </select>
-                            <i class="ri-arrow-down-s-line absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} top-0 text-slate-400 pointer-events-none text-sm"></i>
+                            <i class="ri-arrow-down-s-line absolute {{ app()->getLocale() === 'ar' ? 'left-3' : 'right-3' }} top-3 text-[#86868b] pointer-events-none text-sm"></i>
                         </div>
                     </div>
 
-                    <!-- Filter 2: Availability Dropdown (Auto Submits on Change) -->
-                    <div class="rounded-2xl bg-[#f4f5f8] dark:bg-dark-800 px-3 py-2">
-                        <label class="block text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">
-                            {{ app()->getLocale() === 'ar' ? 'نوع الخدمة والعمل' : 'Availability' }}
+                    <!-- Filter 2: Delivery Speed / Availability -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">
+                            {{ app()->getLocale() === 'ar' ? 'سرعة ونوع التسليم' : 'Delivery Model' }}
                         </label>
                         <div class="relative">
                             <select 
                                 name="availability" 
                                 onchange="document.getElementById('sidebarFilterForm').submit()"
-                                class="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-zinc-100 focus:outline-none cursor-pointer appearance-none pe-5"
+                                class="w-full h-10 px-3 rounded-xl bg-white border border-black/10 text-xs font-medium text-[#1d1d1f] focus:outline-none focus:border-[#0071e3] appearance-none"
                             >
-                                <option value="">{{ app()->getLocale() === 'ar' ? 'جميع أنواع العمل' : 'Full-time / Project work' }}</option>
-                                <option value="instant" {{ request('availability') === 'instant' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'تسليم فوري (أقل من 24 ساعة)' : 'Instant delivery' }}</option>
-                                <option value="project" {{ request('availability') === 'project' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'عمل بالمشروع (Project work)' : 'Project work' }}</option>
-                                <option value="hourly" {{ request('availability') === 'hourly' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'دعم مستمر وعقود' : 'Retainer / Support' }}</option>
+                                <option value="">{{ app()->getLocale() === 'ar' ? 'جميع النماذج' : 'All Models' }}</option>
+                                <option value="instant" {{ request('availability') === 'instant' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? '⚡ تسليم فوري (< 24 ساعة)' : '⚡ Instant (< 24h)' }}</option>
+                                <option value="project" {{ request('availability') === 'project' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? '📅 عمل بالمشروع' : '📅 Custom Project' }}</option>
+                                <option value="hourly" {{ request('availability') === 'hourly' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? '💼 عقود دعم مستمر' : '💼 Support Retainer' }}</option>
                             </select>
-                            <i class="ri-arrow-down-s-line absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} top-0 text-slate-400 pointer-events-none text-sm"></i>
+                            <i class="ri-arrow-down-s-line absolute {{ app()->getLocale() === 'ar' ? 'left-3' : 'right-3' }} top-3 text-[#86868b] pointer-events-none text-sm"></i>
                         </div>
                     </div>
 
-                    <!-- Filter 3: Price Range (Dual-Handle Slider) -->
+                    <!-- Filter 3: Price Range -->
                     @php
                         $currencySymbol = $viewerCurrency->symbol ?? $viewerCurrency->currency ?? '$';
-                        $curMinPrice = (int)(request('min_price') ?? 10);
+                        $curMinPrice = (int)(request('min_price') ?? 5);
                         $curMaxPrice = (int)(request('max_price') ?? 500);
                         if ($curMinPrice < 5) $curMinPrice = 5;
                         if ($curMaxPrice > 5000) $curMaxPrice = 5000;
                         if ($curMinPrice > $curMaxPrice) $curMinPrice = $curMaxPrice;
                     @endphp
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="text-xs font-bold text-slate-900 dark:text-zinc-200">
+                    <div class="pt-2">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider">
                                 {{ app()->getLocale() === 'ar' ? 'نطاق السعر' : 'Price Range' }}
                             </label>
-                            <span class="text-[11px] font-bold text-slate-800 dark:text-zinc-300 font-mono" id="priceDisplayRange">
-                                {{ $currencySymbol }} {{ $curMinPrice }} - {{ $currencySymbol }} {{ $curMaxPrice }}
+                            <span class="text-xs font-bold text-[#1d1d1f] font-mono" id="priceDisplayRange">
+                                {{ $currencySymbol }}{{ $curMinPrice }} - {{ $currencySymbol }}{{ $curMaxPrice }}
                             </span>
                         </div>
 
-                        <!-- Interactive Dual Range Slider Track -->
-                        <div class="range-slider-wrapper mb-2 px-1">
+                        <!-- Dual Range Slider Track -->
+                        <div class="range-slider-wrapper mb-3 px-1">
                             <div class="range-slider-track"></div>
                             <div class="range-slider-progress" id="sliderProgress"></div>
                             <input 
@@ -249,10 +256,9 @@
                             >
                         </div>
 
-                        <!-- From / To Direct Number Inputs -->
                         <div class="grid grid-cols-2 gap-2">
-                            <div class="rounded-xl bg-[#f4f5f8] dark:bg-dark-800 px-2.5 py-1.5">
-                                <span class="block text-[8px] text-slate-400 dark:text-zinc-500 font-semibold">{{ app()->getLocale() === 'ar' ? 'من ' . $currencySymbol : 'From, ' . $currencySymbol }}</span>
+                            <div class="rounded-xl bg-white border border-black/10 px-2.5 py-1.5">
+                                <span class="block text-[9px] text-[#86868b] font-medium">{{ app()->getLocale() === 'ar' ? 'من' : 'Min' }}</span>
                                 <input 
                                     type="number" 
                                     name="min_price" 
@@ -261,11 +267,11 @@
                                     placeholder="5" 
                                     oninput="onBoxPriceInput('min')"
                                     onchange="document.getElementById('sidebarFilterForm').submit()"
-                                    class="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white focus:outline-none p-0"
+                                    class="w-full bg-transparent text-xs font-bold text-[#1d1d1f] focus:outline-none p-0"
                                 >
                             </div>
-                            <div class="rounded-xl bg-[#f4f5f8] dark:bg-dark-800 px-2.5 py-1.5">
-                                <span class="block text-[8px] text-slate-400 dark:text-zinc-500 font-semibold">{{ app()->getLocale() === 'ar' ? 'إلى ' . $currencySymbol : 'To, ' . $currencySymbol }}</span>
+                            <div class="rounded-xl bg-white border border-black/10 px-2.5 py-1.5">
+                                <span class="block text-[9px] text-[#86868b] font-medium">{{ app()->getLocale() === 'ar' ? 'إلى' : 'Max' }}</span>
                                 <input 
                                     type="number" 
                                     name="max_price" 
@@ -274,74 +280,31 @@
                                     placeholder="500" 
                                     oninput="onBoxPriceInput('max')"
                                     onchange="document.getElementById('sidebarFilterForm').submit()"
-                                    class="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white focus:outline-none p-0"
+                                    class="w-full bg-transparent text-xs font-bold text-[#1d1d1f] focus:outline-none p-0"
                                 >
                             </div>
                         </div>
                     </div>
 
-                    <!-- Filter 4: Delivery Time -->
+                    <!-- Filter 4: Delivery Days -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-900 dark:text-zinc-200 mb-1.5">
-                            {{ app()->getLocale() === 'ar' ? 'مدة التسليم' : 'Delivery Time' }}
+                        <label class="block text-[11px] font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">
+                            {{ app()->getLocale() === 'ar' ? 'الحد الأقصى للتسليم' : 'Max Delivery Time' }}
                         </label>
-                        <div class="rounded-2xl bg-[#f4f5f8] dark:bg-dark-800 px-3 py-2">
-                            <div class="relative">
-                                <select 
-                                    name="delivery_time" 
-                                    onchange="document.getElementById('sidebarFilterForm').submit()"
-                                    class="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-zinc-100 focus:outline-none cursor-pointer appearance-none pe-5"
-                                >
-                                    <option value="">{{ app()->getLocale() === 'ar' ? 'أي مدة تسليم' : 'Any Delivery Time' }}</option>
-                                    <option value="1" {{ request('delivery_time') == '1' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'تسليم خلال 24 ساعة' : 'Up to 24 hours' }}</option>
-                                    <option value="3" {{ request('delivery_time') == '3' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'حتى 3 أيام' : 'Up to 3 days' }}</option>
-                                    <option value="7" {{ request('delivery_time') == '7' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'حتى 7 أيام' : 'Up to 7 days' }}</option>
-                                    <option value="14" {{ request('delivery_time') == '14' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'حتى 14 يوم' : 'Up to 14 days' }}</option>
-                                    <option value="30" {{ request('delivery_time') == '30' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'حتى شهر' : 'Up to 30 days' }}</option>
-                                </select>
-                                <i class="ri-arrow-down-s-line absolute {{ app()->getLocale() === 'ar' ? 'left-0' : 'right-0' }} top-0 text-slate-400 pointer-events-none text-sm"></i>
-                            </div>
+                        <div class="relative">
+                            <select 
+                                name="delivery_time" 
+                                onchange="document.getElementById('sidebarFilterForm').submit()"
+                                class="w-full h-10 px-3 rounded-xl bg-white border border-black/10 text-xs font-medium text-[#1d1d1f] focus:outline-none focus:border-[#0071e3] appearance-none"
+                            >
+                                <option value="">{{ app()->getLocale() === 'ar' ? 'أي مدة تسليم' : 'Any Timeline' }}</option>
+                                <option value="1" {{ request('delivery_time') == '1' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'أقل من 24 ساعة' : 'Within 24 hours' }}</option>
+                                <option value="3" {{ request('delivery_time') == '3' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'حتى 3 أيام' : 'Up to 3 days' }}</option>
+                                <option value="7" {{ request('delivery_time') == '7' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'حتى 7 أيام' : 'Up to 7 days' }}</option>
+                                <option value="14" {{ request('delivery_time') == '14' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? 'حتى 14 يوم' : 'Up to 14 days' }}</option>
+                            </select>
+                            <i class="ri-arrow-down-s-line absolute {{ app()->getLocale() === 'ar' ? 'left-3' : 'right-3' }} top-3 text-[#86868b] pointer-events-none text-sm"></i>
                         </div>
-                    </div>
-
-                    <!-- Filter 5: Skills / Tags (Pill Shape) -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-900 dark:text-zinc-200 mb-1.5">
-                            {{ app()->getLocale() === 'ar' ? 'المهارات والتقنيات' : 'Skills' }}
-                        </label>
-
-                        @php
-                            $popularSkills = [
-                                'Wireframes', 'Spline', 'Illustration', 'Figma',
-                                'Adobe Photoshop', 'Laravel', 'React', 'WhatsApp Bot',
-                                'Python', 'AI Automation', 'WordPress'
-                            ];
-                            $activeSkill = request('skill');
-                        @endphp
-
-                        <div class="flex flex-wrap gap-1.5">
-                            @foreach($popularSkills as $skill)
-                                @php
-                                    $isSelected = ($activeSkill === $skill);
-                                @endphp
-                                <a 
-                                    href="{{ $isSelected ? route('marketplace.services.index', request()->except(['skill', 'page'])) : route('marketplace.services.index', array_merge(request()->except(['page']), ['skill' => $skill])) }}"
-                                    class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-all {{ $isSelected ? 'bg-slate-950 text-white shadow-sm' : 'bg-white dark:bg-dark-800 text-slate-800 dark:text-zinc-200 border border-slate-300/80 dark:border-white/10 hover:border-slate-950 dark:hover:border-white' }}"
-                                >
-                                    {{ $skill }}
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Action Button: Show Results -->
-                    <div class="pt-1">
-                        <button 
-                            type="submit" 
-                            class="w-full h-10 rounded-full bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-slate-950 font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-1.5"
-                        >
-                            <span>{{ app()->getLocale() === 'ar' ? 'عرض النتائج (' . $services->total() . ')' : 'Show ' . $services->total() . ' results' }}</span>
-                        </button>
                     </div>
 
                 </form>
@@ -349,14 +312,11 @@
             </div>
         </aside>
 
-        <!-- ========================================== -->
-        <!-- RIGHT COLUMN: SERVICES CARDS GRID (2 Cols) -->
-        <!-- ========================================== -->
+        <!-- Right Column: Apple Bento Cards Grid (8/9 cols) -->
         <main class="lg:col-span-8 xl:col-span-9">
             
             @if($services->count() > 0)
-                <!-- 2-Column Spacious Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     @foreach($services as $index => $service)
                         @php
@@ -364,50 +324,50 @@
                             $minPrice = $service->packages->min('price') ?? $service->price ?? 5;
                             $firstPackage = $service->packages->first();
                             $currencyCode = $firstPackage && $firstPackage->currency ? ($firstPackage->currency->symbol ?? $firstPackage->currency->code ?? '$') : '$';
-                            $sellerName = $service->seller->name ?? 'Jason Holls';
+                            $sellerName = $service->seller->name ?? 'Verified Engineer';
                             $sellerInitials = strtoupper(substr($sellerName, 0, 2));
                             $deliveryDays = $firstPackage->delivery_days ?? 2;
                             $isFavorited = !empty($service->is_favorited);
                         @endphp
 
-                        <!-- Clean Card Component -->
-                        <article class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-dark-850 border border-slate-200/80 dark:border-white/5 flex flex-col justify-between group hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200 shadow-sm">
+                        <!-- Apple Bento Card Component -->
+                        <article class="apple-bento-card p-6 flex flex-col justify-between group">
                             
                             <div>
-                                <!-- Top Row: Creator Avatar + Name/Role + Rating Badge + Bookmark -->
+                                <!-- Top Row: Creator Profile + Rating + Favorite -->
                                 <div class="flex items-center justify-between gap-3 mb-4">
                                     
                                     <!-- Creator Info -->
                                     <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-300 to-rose-300 dark:from-zinc-700 dark:to-zinc-800 text-slate-900 dark:text-zinc-200 flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm">
+                                        <div class="w-8 h-8 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
                                             {{ $sellerInitials }}
                                         </div>
                                         <div class="min-w-0">
-                                            <h4 class="font-bold text-xs sm:text-sm text-slate-950 dark:text-white truncate">
-                                                {{ $sellerName }}
+                                            <h4 class="font-semibold text-xs sm:text-[13px] text-[#1d1d1f] truncate flex items-center gap-1">
+                                                <span>{{ $sellerName }}</span>
+                                                <i class="ri-verified-badge-fill text-[#0071e3] text-xs"></i>
                                             </h4>
-                                            <p class="text-[11px] text-slate-400 dark:text-zinc-500 truncate font-medium">
-                                                {{ $service->category->name ?? 'UX/UI Designer' }}
+                                            <p class="text-[11px] text-[#86868b] truncate">
+                                                {{ $service->category->name ?? (app()->getLocale() === 'ar' ? 'حلول برمجية' : 'Software Solutions') }}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <!-- Rating Pill & Bookmark -->
+                                    <!-- Rating Pill & Favorite Action -->
                                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                                        <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#f4f5f8] dark:bg-dark-800 text-[11px] font-bold text-slate-900 dark:text-zinc-200">
+                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[11px] font-semibold text-[#1d1d1f]">
                                             <i class="ri-star-fill text-amber-500 text-[11px]"></i>
                                             <span>4.9</span>
-                                            <span class="text-[10px] text-slate-400 dark:text-zinc-500 font-normal">({{ $service->reviews_count ?? ($index % 5 + 18) }})</span>
                                         </div>
 
                                         <form action="{{ route('marketplace.favorites.toggle', $service->id) }}" method="POST" class="inline">
                                             @csrf
                                             <button 
                                                 type="submit" 
-                                                class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:text-zinc-500 dark:hover:text-white transition-colors"
-                                                title="Bookmark"
+                                                class="w-7 h-7 rounded-full flex items-center justify-center text-[#86868b] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                                title="{{ app()->getLocale() === 'ar' ? 'حفظ في المفضلة' : 'Bookmark' }}"
                                             >
-                                                <i class="{{ $isFavorited ? 'ri-bookmark-fill text-slate-950 dark:text-white' : 'ri-bookmark-line' }} text-sm"></i>
+                                                <i class="{{ $isFavorited ? 'ri-bookmark-fill text-rose-600' : 'ri-bookmark-line' }} text-sm"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -415,61 +375,85 @@
                                 </div>
 
                                 <!-- Middle: Prominent Service Title & Price -->
-                                <div class="flex items-start justify-between gap-3 mb-3.5">
-                                    <h3 class="font-bold text-sm sm:text-base text-slate-950 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-300 transition-colors leading-snug line-clamp-2">
+                                <div class="flex items-start justify-between gap-3 mb-3">
+                                    <h3 class="font-semibold text-[15px] sm:text-[16px] text-[#1d1d1f] group-hover:text-[#0071e3] transition-colors leading-snug line-clamp-2 tracking-[-0.01em]">
                                         <a href="{{ $serviceUrl }}">
                                             {{ $service->title }}
                                         </a>
                                     </h3>
                                     <div class="text-end flex-shrink-0 whitespace-nowrap pt-0.5">
-                                        <span class="text-[11px] text-slate-400 dark:text-zinc-500 font-medium me-0.5">
-                                            {{ app()->getLocale() === 'ar' ? 'من' : 'from' }}
+                                        <span class="text-[10px] text-[#86868b] block font-medium">
+                                            {{ app()->getLocale() === 'ar' ? 'يبدأ من' : 'from' }}
                                         </span>
-                                        <span class="text-base sm:text-lg font-extrabold text-slate-950 dark:text-white">
+                                        <span class="text-[17px] sm:text-[19px] font-semibold text-[#0071e3] font-mono">
                                             {{ $currencyCode }}{{ number_format($minPrice, 0) }}
                                         </span>
                                     </div>
                                 </div>
 
-                                <!-- Metadata Badges Row (Outlined Pills with Icons) -->
+                                <!-- Metadata Badges Row (Delivery Model + Escrow) -->
                                 <div class="flex items-center gap-2 flex-wrap mb-3.5">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-300/80 dark:border-white/10 text-[11px] font-semibold text-slate-700 dark:text-zinc-300">
-                                        <i class="ri-briefcase-line text-[11px] text-slate-400"></i>
-                                        <span>{{ $deliveryDays }} {{ app()->getLocale() === 'ar' ? 'أيام تسليم' : 'days delivery' }}</span>
-                                    </span>
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-300/80 dark:border-white/10 text-[11px] font-semibold text-slate-700 dark:text-zinc-300">
-                                        <i class="ri-time-line text-[11px] text-slate-400"></i>
-                                        <span>{{ app()->getLocale() === 'ar' ? 'عمل بالمشروع' : 'Project work' }}</span>
+                                    @if($deliveryDays <= 1)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-medium">
+                                            <i class="ri-flashlight-fill text-emerald-600"></i>
+                                            <span>{{ app()->getLocale() === 'ar' ? 'تسليم فوري (< 24 ساعة)' : 'Instant Delivery (< 24h)' }}</span>
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#f5f5f7] border border-black/5 text-[11px] font-medium text-[#1d1d1f]/80">
+                                            <i class="ri-time-line text-[#86868b]"></i>
+                                            <span>{{ $deliveryDays }} {{ app()->getLocale() === 'ar' ? 'أيام تسليم' : 'days delivery' }}</span>
+                                        </span>
+                                    @endif
+
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-[#0066cc] text-[10px] font-medium border border-blue-200/60">
+                                        <i class="ri-shield-check-line"></i>
+                                        <span>{{ app()->getLocale() === 'ar' ? 'ضمان Escrow' : 'Escrow Protected' }}</span>
                                     </span>
                                 </div>
 
-                                <!-- Description Snippet (2-3 clean lines) -->
-                                <p class="text-xs text-slate-500 dark:text-zinc-400 line-clamp-3 leading-relaxed">
-                                    {{ $service->tagline ?? Str::limit(strip_tags($service->description ?? ''), 120) }}
+                                <!-- Description Snippet -->
+                                <p class="text-xs text-[#86868b] line-clamp-2 leading-relaxed mb-4">
+                                    {{ $service->tagline ?? Str::limit(strip_tags($service->description ?? ''), 110) }}
                                 </p>
+                            </div>
+
+                            <!-- Bottom Action Row -->
+                            <div class="pt-3 border-t border-black/5 flex items-center justify-between">
+                                <span class="text-[11px] text-[#86868b]">
+                                    {{ app()->getLocale() === 'ar' ? 'دفع آمن بالمحفظة' : '1-Click Wallet Checkout' }}
+                                </span>
+                                <a 
+                                    href="{{ $serviceUrl }}" 
+                                    class="inline-flex items-center gap-1 text-xs font-semibold text-[#0066cc] group-hover:underline transition-all"
+                                >
+                                    <span>{{ app()->getLocale() === 'ar' ? 'عرض المواصفات' : 'View Details' }}</span>
+                                    <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}-s-line font-bold"></i>
+                                </a>
                             </div>
 
                         </article>
 
-                        <!-- Interspersed Promotional Hero Card -->
+                        <!-- Interspersed Apple Bento Promotional Card -->
                         @if($index === 2)
-                            <article class="p-7 rounded-3xl bg-slate-950 text-white flex flex-col justify-between relative overflow-hidden shadow-md min-h-[230px]">
-                                <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-indigo-600/25 rounded-full blur-3xl pointer-events-none"></div>
+                            <article class="rounded-[18px] bg-[#1d1d1f] text-white p-7 flex flex-col justify-between relative overflow-hidden shadow-sm min-h-[220px]">
                                 <div class="relative z-10">
-                                    <h3 class="text-xl sm:text-2xl font-black tracking-tight leading-snug mb-2.5 text-white">
-                                        {{ app()->getLocale() === 'ar' ? 'ربطك بأفضل المطورين والفريلانسرز المعتمدين' : 'Connecting You with Trusted Freelancers & Developers' }}
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-medium tracking-wider uppercase mb-3">
+                                        {{ app()->getLocale() === 'ar' ? 'انضم للمنظومة' : 'DEVELOPER NETWORK' }}
+                                    </span>
+                                    <h3 class="text-xl font-semibold tracking-[-0.02em] leading-snug mb-2 text-white">
+                                        {{ app()->getLocale() === 'ar' ? 'اعرض خدماتك وأدواتك البرمجية للشركات' : 'Publish Your Custom Tools & Services' }}
                                     </h3>
-                                    <p class="text-xs text-zinc-300 leading-relaxed mb-5">
-                                        {{ app()->getLocale() === 'ar' ? 'خدمات برمجية مخصصة وحلول ذكاء اصطناعي مع ضمان حماية الدفع Escrow بنسبة 100%.' : 'Discover custom software development and AI tools with 100% escrow buyer protection.' }}
+                                    <p class="text-xs text-white/75 leading-relaxed mb-5">
+                                        {{ app()->getLocale() === 'ar' ? 'اربط حلولك بقاعدة عملاء Musoftwares واستقبل الدفعات الفورية بأمان الضمان المالي.' : 'Monetize scripts, automation bots, and bespoke software directly with escrow guaranteed payouts.' }}
                                     </p>
                                 </div>
 
                                 <div class="relative z-10">
                                     <a 
                                         href="{{ route('marketplace.services.create') }}" 
-                                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-zinc-100 text-slate-950 font-bold text-xs transition-all shadow-sm"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-[#1d1d1f] font-medium text-xs hover:bg-[#f5f5f7] transition-all shadow-xs"
                                     >
-                                        <span>{{ app()->getLocale() === 'ar' ? 'انضم كبائع الآن' : 'Become a Seller' }}</span>
+                                        <span>{{ app()->getLocale() === 'ar' ? 'ابدأ كبائع معتمد' : 'Become a Seller' }}</span>
                                         <i class="ri-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}-line font-bold"></i>
                                     </a>
                                 </div>
@@ -480,26 +464,25 @@
 
                 </div>
 
-                <!-- Pagination -->
+                <!-- Pagination (Apple Minimal Style) -->
                 <div class="mt-10">
                     {{ $services->links('pagination::tailwind') }}
                 </div>
 
             @else
-                <!-- Empty State -->
-                <div class="text-center py-20 rounded-3xl bg-white dark:bg-dark-850 border border-slate-200/60 dark:border-white/5 p-8 shadow-sm">
-                    <div class="w-14 h-14 rounded-full bg-slate-100 dark:bg-dark-800 text-slate-400 dark:text-zinc-500 flex items-center justify-center mx-auto text-xl mb-3">
+                <!-- Empty State (Apple Clean) -->
+                <div class="text-center py-16 rounded-[22px] bg-[#f5f5f7] border border-black/5 p-8">
+                    <div class="w-12 h-12 rounded-full bg-white text-[#86868b] flex items-center justify-center mx-auto text-xl mb-3 shadow-xs">
                         <i class="ri-inbox-line"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white mb-2">
+                    <h3 class="text-base font-semibold text-[#1d1d1f] mb-1">
                         {{ app()->getLocale() === 'ar' ? 'لم يتم العثور على خدمات مطابقة' : 'No matching services found' }}
                     </h3>
-                    <p class="text-xs text-slate-400 dark:text-zinc-500 max-w-md mx-auto mb-5 leading-relaxed">
-                        {{ app()->getLocale() === 'ar' ? 'جرب البحث بكلمات مختلفة أو إزالة الفلاتر المحددة للوصول لكافة الحلول البرمجية.' : 'Try adjusting your search criteria or resetting filters to browse all available services.' }}
+                    <p class="text-xs text-[#86868b] max-w-sm mx-auto mb-5 leading-relaxed">
+                        {{ app()->getLocale() === 'ar' ? 'جرب البحث بكلمات مختلفة أو إزالة الفلاتر المحددة لاستعراض كافة الحلول.' : 'Try adjusting your search criteria or resetting filters to browse all available software.' }}
                     </p>
-                    <a href="{{ route('marketplace.services.index') }}" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-slate-950 text-white dark:bg-white dark:text-slate-950 text-xs font-bold transition-all shadow-sm">
-                        <i class="ri-refresh-line"></i>
-                        <span>{{ app()->getLocale() === 'ar' ? 'عرض جميع الخدمات' : 'Browse All Services' }}</span>
+                    <a href="{{ route('marketplace.services.index') }}" class="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-[#0071e3] text-white text-xs font-medium hover:bg-[#0077ed] transition-all shadow-xs">
+                        <span>{{ app()->getLocale() === 'ar' ? 'عرض جميع الخدمات' : 'View All Services' }}</span>
                     </a>
                 </div>
             @endif
@@ -510,26 +493,27 @@
 
 </div>
 
-<!-- Mobile Filters Drawer / Sheet Modal -->
-<div id="mobileFiltersModal" class="fixed inset-0 z-50 hidden lg:hidden">
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="toggleMobileFilters()"></div>
-    <div class="fixed inset-y-0 start-0 max-w-xs w-full bg-white dark:bg-dark-900 p-6 overflow-y-auto shadow-2xl z-50">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5 mb-5">
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">
+<!-- Mobile Filters Drawer (Apple Frosted Sheet) -->
+<div id="mobileFiltersModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-lg bg-white rounded-t-[28px] sm:rounded-[22px] p-6 max-h-[85vh] overflow-y-auto space-y-5 shadow-2xl border border-black/10">
+        <div class="flex items-center justify-between pb-3 border-b border-black/5">
+            <h3 class="text-base font-semibold text-[#1d1d1f]">
                 {{ app()->getLocale() === 'ar' ? 'تصفية الخدمات' : 'Filter Services' }}
             </h3>
-            <button type="button" onclick="toggleMobileFilters()" class="w-7 h-7 rounded-full bg-slate-100 dark:bg-dark-800 text-slate-500 flex items-center justify-center">
-                <i class="ri-close-line text-base font-bold"></i>
+            <button type="button" onclick="toggleMobileFilters()" class="w-8 h-8 rounded-full bg-[#f5f5f7] text-[#1d1d1f] flex items-center justify-center text-base">
+                <i class="ri-close-line"></i>
             </button>
         </div>
-        
+
         <form action="{{ route('marketplace.services.index') }}" method="GET" class="space-y-4">
+            @if(request('search'))
+                <input type="hidden" name="search" value="{{ request('search') }}">
+            @endif
+            
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-zinc-400 mb-1">
-                    {{ app()->getLocale() === 'ar' ? 'القسم' : 'Category' }}
-                </label>
-                <select name="category" onchange="this.form.submit()" class="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-dark-800 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-800 dark:text-zinc-200">
-                    <option value="">{{ app()->getLocale() === 'ar' ? 'الكل' : 'All Categories' }}</option>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">{{ app()->getLocale() === 'ar' ? 'القسم' : 'Category' }}</label>
+                <select name="category" class="w-full h-11 px-3 rounded-xl bg-[#f5f5f7] border border-black/10 text-xs font-medium text-[#1d1d1f]">
+                    <option value="">{{ app()->getLocale() === 'ar' ? 'جميع الأقسام' : 'All Categories' }}</option>
                     @if(isset($categories))
                         @foreach($categories as $cat)
                             <option value="{{ $cat->slug }}" {{ request('category') === $cat->slug ? 'selected' : '' }}>{{ $cat->name }}</option>
@@ -539,155 +523,89 @@
             </div>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-zinc-400 mb-1">
-                    {{ app()->getLocale() === 'ar' ? 'الحد الأقصى للسعر ($)' : 'Max Price ($)' }}
-                </label>
-                <input type="number" name="max_price" value="{{ request('max_price') ?? 500 }}" class="w-full h-10 px-3 rounded-xl bg-slate-50 dark:bg-dark-800 border border-slate-200 dark:border-white/10 text-xs font-bold">
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">{{ app()->getLocale() === 'ar' ? 'نوع التسليم' : 'Delivery Model' }}</label>
+                <select name="availability" class="w-full h-11 px-3 rounded-xl bg-[#f5f5f7] border border-black/10 text-xs font-medium text-[#1d1d1f]">
+                    <option value="">{{ app()->getLocale() === 'ar' ? 'جميع النماذج' : 'All Models' }}</option>
+                    <option value="instant" {{ request('availability') === 'instant' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? '⚡ تسليم فوري (< 24 ساعة)' : '⚡ Instant (< 24h)' }}</option>
+                    <option value="project" {{ request('availability') === 'project' ? 'selected' : '' }}>{{ app()->getLocale() === 'ar' ? '📅 عمل بالمشروع' : '📅 Custom Project' }}</option>
+                </select>
             </div>
 
-            <button type="submit" class="w-full h-11 rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-bold text-xs mt-3">
+            <button type="submit" class="w-full h-11 rounded-full bg-[#0071e3] text-white text-xs font-medium hover:bg-[#0077ed] transition-all">
                 {{ app()->getLocale() === 'ar' ? 'تطبيق الفلاتر' : 'Apply Filters' }}
             </button>
         </form>
     </div>
 </div>
 
+@push('scripts')
 <script>
-    const dynamicCurrencySymbol = @json($currencySymbol);
-
-    // Dual Range Slider Logic
-    function updateSliderProgress() {
-        const minInput = document.getElementById('rangeMinInput');
-        const maxInput = document.getElementById('rangeMaxInput');
-        const progress = document.getElementById('sliderProgress');
-        const display = document.getElementById('priceDisplayRange');
-        if (!minInput || !maxInput || !progress) return;
-
-        const minVal = parseInt(minInput.value);
-        const maxVal = parseInt(maxInput.value);
-        const minLimit = parseInt(minInput.min);
-        const maxLimit = parseInt(minInput.max);
-
-        const leftPercent = ((minVal - minLimit) / (maxLimit - minLimit)) * 100;
-        const rightPercent = 100 - (((maxVal - minLimit) / (maxLimit - minLimit)) * 100);
-
-        progress.style.left = leftPercent + '%';
-        progress.style.right = rightPercent + '%';
-
-        if (display) {
-            display.innerText = dynamicCurrencySymbol + ' ' + minVal + ' - ' + dynamicCurrencySymbol + ' ' + maxVal;
-        }
-    }
-
-    function onDualSliderInput(changed) {
-        const minInput = document.getElementById('rangeMinInput');
-        const maxInput = document.getElementById('rangeMaxInput');
-        const fromBox = document.getElementById('fromPriceInput');
-        const toBox = document.getElementById('toPriceInput');
-        if (!minInput || !maxInput) return;
-
-        let minVal = parseInt(minInput.value);
-        let maxVal = parseInt(maxInput.value);
-
-        if (maxVal - minVal < 10) {
-            if (changed === 'min') {
-                minInput.value = maxVal - 10;
-                minVal = parseInt(minInput.value);
-            } else {
-                maxInput.value = minVal + 10;
-                maxVal = parseInt(maxInput.value);
-            }
-        }
-
-        if (fromBox) fromBox.value = minVal;
-        if (toBox) toBox.value = maxVal;
-        updateSliderProgress();
-    }
-
-    function onBoxPriceInput(changed) {
-        const minInput = document.getElementById('rangeMinInput');
-        const maxInput = document.getElementById('rangeMaxInput');
-        const fromBox = document.getElementById('fromPriceInput');
-        const toBox = document.getElementById('toPriceInput');
-        if (!minInput || !maxInput || !fromBox || !toBox) return;
-
-        let minVal = parseInt(fromBox.value) || 5;
-        let maxVal = parseInt(toBox.value) || 5000;
-
-        if (minVal < 5) minVal = 5;
-        if (maxVal > 5000) maxVal = 5000;
-        if (minVal > maxVal) minVal = maxVal - 10;
-
-        minInput.value = minVal;
-        maxInput.value = maxVal;
-        updateSliderProgress();
-    }
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        updateSliderProgress();
-    });
-
-    // Smooth Category Scroll using Arrow Buttons
-    function scrollCatTabs(offset) {
-        const container = document.getElementById('catScrollContainer');
-        if (container) {
-            const isRTL = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
-            container.scrollBy({
-                left: isRTL ? -offset : offset,
-                behavior: 'smooth'
-            });
-        }
-    }
-
-    // Mouse Drag-to-Scroll for Category Bar
-    (function() {
-        const slider = document.getElementById('catScrollContainer');
-        if (!slider) return;
-
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-
-        slider.addEventListener('mousedown', (e) => {
-            isDown = true;
-            slider.classList.add('cursor-grabbing');
-            startX = e.pageX - slider.offsetLeft;
-            scrollLeft = slider.scrollLeft;
-        });
-
-        slider.addEventListener('mouseleave', () => {
-            isDown = false;
-            slider.classList.remove('cursor-grabbing');
-        });
-
-        slider.addEventListener('mouseup', () => {
-            isDown = false;
-            slider.classList.remove('cursor-grabbing');
-        });
-
-        slider.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - slider.offsetLeft;
-            const walk = (x - startX) * 1.5;
-            slider.scrollLeft = scrollLeft - walk;
-        });
-
-        // Mouse Wheel Horizontal Scroll
-        slider.addEventListener('wheel', (e) => {
-            if (e.deltaY !== 0) {
-                e.preventDefault();
-                slider.scrollLeft += e.deltaY;
-            }
-        }, { passive: false });
-    })();
-
     function toggleMobileFilters() {
         const modal = document.getElementById('mobileFiltersModal');
-        if (modal) {
-            modal.classList.toggle('hidden');
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        } else {
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
         }
     }
+
+    const priceMin = 5;
+    const priceMax = 5000;
+
+    function updateSliderVisuals(minVal, maxVal) {
+        const progress = document.getElementById('sliderProgress');
+        const rangeText = document.getElementById('priceDisplayRange');
+        if (!progress) return;
+
+        const leftPercent = ((minVal - priceMin) / (priceMax - priceMin)) * 100;
+        const rightPercent = ((maxVal - priceMin) / (priceMax - priceMin)) * 100;
+
+        progress.style.left = leftPercent + '%';
+        progress.style.width = (rightPercent - leftPercent) + '%';
+
+        if (rangeText) {
+            rangeText.innerText = '{{ $currencySymbol }}' + minVal + ' - {{ $currencySymbol }}' + maxVal;
+        }
+    }
+
+    function onDualSliderInput(changedHandle) {
+        let minVal = parseInt(document.getElementById('rangeMinInput').value);
+        let maxVal = parseInt(document.getElementById('rangeMaxInput').value);
+
+        if (minVal > maxVal) {
+            if (changedHandle === 'min') {
+                document.getElementById('rangeMinInput').value = maxVal;
+                minVal = maxVal;
+            } else {
+                document.getElementById('rangeMaxInput').value = minVal;
+                maxVal = minVal;
+            }
+        }
+
+        document.getElementById('fromPriceInput').value = minVal;
+        document.getElementById('toPriceInput').value = maxVal;
+        updateSliderVisuals(minVal, maxVal);
+    }
+
+    function onBoxPriceInput(changedBox) {
+        let minVal = parseInt(document.getElementById('fromPriceInput').value) || priceMin;
+        let maxVal = parseInt(document.getElementById('toPriceInput').value) || priceMax;
+
+        if (minVal < priceMin) minVal = priceMin;
+        if (maxVal > priceMax) maxVal = priceMax;
+
+        document.getElementById('rangeMinInput').value = minVal;
+        document.getElementById('rangeMaxInput').value = maxVal;
+        updateSliderVisuals(minVal, maxVal);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const minVal = parseInt(document.getElementById('rangeMinInput')?.value || 5);
+        const maxVal = parseInt(document.getElementById('rangeMaxInput')?.value || 500);
+        updateSliderVisuals(minVal, maxVal);
+    });
 </script>
+@endpush
 @endsection

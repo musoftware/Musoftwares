@@ -187,13 +187,14 @@ function AuthenticatedContent({
 
             {/* Top Navigation */}
             <header
-                className={cn("sticky z-40 w-full bg-white/80 backdrop-blur-md border-b border-black/5 min-h-[56px] py-2", isImpersonating ? "top-[36px]" : "top-0")}
+                className={cn("sticky z-40 w-full bg-white/80 backdrop-blur-md border-b border-black/5 min-h-[64px] transition-all", isImpersonating ? "top-[36px]" : "top-0")}
                 style={{
-                    paddingTop: 'env(safe-area-inset-top, 0px)',
+                    paddingTop: 'calc(14px + env(safe-area-inset-top, 0px))',
+                    paddingBottom: '14px',
                 }}
             >
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 h-full">
-                    <div className="flex h-full items-center justify-between">
+                <div className="max-w-[1400px] mx-auto px-6 sm:px-10">
+                    <div className="flex items-center justify-between">
                         {/* LEFT: Logo & Nav */}
                         <div className="flex items-center gap-8">
                             {/* Mobile Menu Trigger */}

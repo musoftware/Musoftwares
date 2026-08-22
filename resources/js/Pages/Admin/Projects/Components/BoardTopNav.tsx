@@ -233,7 +233,8 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
         <header
             className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm"
             style={{
-                paddingTop: 'env(safe-area-inset-top, 0px)'
+                paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))',
+                paddingBottom: '4px'
             }}
             aria-label={__('general.board_layout_aria')}
         >

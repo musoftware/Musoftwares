@@ -20,6 +20,7 @@ Route::middleware('web')
     ->group(function () {
 
         // ── Public Pages & Semantic Routes ───────────────────────────────
+        Route::get('/', [ServiceController::class, 'index'])->name('index');
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
         Route::get('/categories/{slug}', [ServiceCategoryController::class, 'showCategory'])->name('categories.show');
         Route::get('/technologies/{tag}', [ServiceController::class, 'showTechnology'])->name('technologies.show');
@@ -52,8 +53,8 @@ Route::middleware('web')
         Route::middleware('auth')->group(function () {
 
             // Dashboard
-            Route::get('/',         [DashboardController::class, 'index'])->name('home');
-            Route::get('/dashboard',[DashboardController::class, 'index'])->name('dashboard.alias');
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('home');
+            Route::get('/dashboard/alias', [DashboardController::class, 'index'])->name('dashboard.alias');
 
             // Services CRUD
             Route::get('/services/create',        [ServiceController::class, 'create'])->name('services.create');

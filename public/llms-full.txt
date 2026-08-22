@@ -21,7 +21,7 @@ Base URL: http://localhost
 ### Test Article
 - **Slug**: test-article
 - **URL**: http://localhost/blog/test-article
-- **Published At**: 2026-08-21T01:12:53+00:00
+- **Published At**: 2026-08-21T15:09:00+00:00
 - **Excerpt**: 
 - **Content**:
 This is a test article.

@@ -1,64 +1,51 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="dark">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" class="light">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#ffffff">
 
-    <title>{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftware' }}</title>
-    <meta name="description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية والأدلة التطبيقية في التكنولوجيا والأعمال.' }}">
+    <title>{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftwares Studio' }}</title>
+    <meta name="description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية، الأدلة الهندسية، وقوالب النظم الجاهزة للتطبيق.' }}">
     <link rel="canonical" href="{{ $meta['url'] ?? url()->current() }}">
 
-    <!-- Theme Initialization Script (Prevents FOUC) -->
-    <script>
-        (function() {
-            try {
-                const storedTheme = localStorage.getItem('musoftware_theme') || localStorage.getItem('theme');
-                if (storedTheme === 'light') {
-                    document.documentElement.classList.remove('dark');
-                } else if (storedTheme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
-                    } else {
-                        document.documentElement.classList.remove('dark');
-                    }
-                }
-            } catch (e) {
-                document.documentElement.classList.add('dark');
-            }
-        })();
-    </script>
+    @php
+        $currentUrl = url()->current();
+        $locale = app()->getLocale();
+    @endphp
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="{{ $meta['type'] ?? 'website' }}">
-    <meta property="og:url" content="{{ $meta['url'] ?? url()->current() }}">
-    <meta property="og:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftware' }}">
-    <meta property="og:description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية والأدلة التطبيقية.' }}">
+    <meta property="og:site_name" content="Musoftwares Library">
+    <meta property="og:url" content="{{ $meta['url'] ?? $currentUrl }}">
+    <meta property="og:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftwares' }}">
+    <meta property="og:description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية والأدلة الهندسية.' }}">
     @if(!empty($meta['image']))
         <meta property="og:image" content="{{ $meta['image'] }}">
     @endif
+    <meta property="og:locale" content="{{ $locale === 'ar' ? 'ar_AR' : 'en_US' }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ $meta['url'] ?? url()->current() }}">
-    <meta property="twitter:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftware' }}">
-    <meta property="twitter:description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية والأدلة التطبيقية.' }}">
+    <meta property="twitter:url" content="{{ $meta['url'] ?? $currentUrl }}">
+    <meta property="twitter:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftwares' }}">
+    <meta property="twitter:description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية والأدلة الهندسية.' }}">
     @if(!empty($meta['image']))
         <meta property="twitter:image" content="{{ $meta['image'] }}">
     @endif
 
-    <!-- Fonts -->
+    <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Fonts: Apple SF Pro Fallbacks + Cairo & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
+    <!-- Remix Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
 
-    <!-- Tailwind CSS CDN for Blade views -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -66,45 +53,23 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
-                        },
-                        coral: {
-                            400: '#fb7185',
-                            500: '#f43f5e',
-                            600: '#e11d48',
-                        },
-                        peach: {
-                            400: '#fb923c',
-                            500: '#f97316',
-                            600: '#ea580c',
-                        },
-                        tealish: {
-                            400: '#2dd4bf',
-                            500: '#14b8a6',
-                            600: '#0d9488',
-                        },
-                        dark: {
-                            900: '#09090b',
-                            850: '#0f0f12',
-                            800: '#121215',
-                            700: '#18181b',
-                            600: '#27272a',
+                        apple: {
+                            bg: '#ffffff',
+                            section: '#f5f5f7',
+                            card: '#ffffff',
+                            text: '#1d1d1f',
+                            subtext: '#86868b',
+                            blue: '#0071e3',
+                            blueHover: '#0077ed',
+                            link: '#0066cc',
+                            border: '#d2d2d7',
+                            borderLight: 'rgba(0, 0, 0, 0.08)',
                         }
                     },
                     fontFamily: {
-                        sans: ['Cairo', 'Outfit', 'Inter', 'sans-serif'],
-                        display: ['Outfit', 'Cairo', 'Playfair Display', 'serif'],
-                        serif: ['Playfair Display', 'Cairo', 'serif'],
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'SF Pro Display', 'Inter', 'Cairo', 'system-ui', 'sans-serif'],
+                        display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Cairo', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
                     }
                 }
             }
@@ -113,94 +78,59 @@
 
     <style>
         :root {
-            --bg-body: #faeee4;
-            --text-body: #2d1810;
-            --canvas-bg: #ffffff;
-            --canvas-border: #f0dfd5;
-            --card-sub-bg: #fbf7f4;
-            --blob-coral: #ff7a59;
-            --blob-teal: #00dfc0;
-            --blob-amber: #fec84b;
-            --blob-yellow: #fde047;
-            --primary-orange: #ff7a59;
-            --primary-orange-hover: #f06443;
-        }
-        html.dark {
-            --bg-body: #09090c;
-            --text-body: #f4f4f6;
-            --canvas-bg: #121217;
-            --canvas-border: rgba(255, 255, 255, 0.08);
-            --card-sub-bg: #181820;
-            --blob-coral: rgba(255, 122, 89, 0.35);
-            --blob-teal: rgba(0, 223, 192, 0.3);
-            --blob-amber: rgba(254, 200, 75, 0.25);
-            --blob-yellow: rgba(253, 224, 71, 0.2);
-            --primary-orange: #ff7a59;
-            --primary-orange-hover: #f06443;
+            --apple-bg: #ffffff;
+            --apple-section-bg: #f5f5f7;
+            --apple-card-bg: #ffffff;
+            --apple-text: #1d1d1f;
+            --apple-subtext: #86868b;
+            --apple-blue: #0071e3;
+            --apple-blue-hover: #0077ed;
+            --apple-link: #0066cc;
+            --apple-border: #d2d2d7;
+            --apple-border-light: rgba(0, 0, 0, 0.08);
         }
         body {
-            font-family: 'Cairo', 'Outfit', 'Inter', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-body);
-            transition: background-color 0.25s ease, color 0.25s ease;
-            position: relative;
-            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Cairo", sans-serif;
+            background-color: var(--apple-bg);
+            color: var(--apple-text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .font-editorial {
-            font-family: 'Playfair Display', 'Outfit', 'Cairo', serif;
+        .apple-headline {
+            letter-spacing: -0.015em;
+            color: #1d1d1f;
         }
-        .bookhouse-canvas {
-            background-color: var(--canvas-bg);
-            border: 1px solid var(--canvas-border);
-            box-shadow: 0 25px 60px -15px rgba(45, 24, 16, 0.08), 0 10px 25px -5px rgba(0, 0, 0, 0.04);
-            border-radius: 36px;
+        .apple-subhead {
+            letter-spacing: -0.01em;
+            color: #86868b;
         }
-        html.dark .bookhouse-canvas {
-            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06);
+        .apple-frosted-light {
+            background-color: rgba(255, 255, 255, 0.82);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
         }
-        .book-shadow-3d {
-            box-shadow: 
-                -15px 20px 35px -8px rgba(35, 15, 10, 0.32),
-                0 4px 12px -2px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(0, 0, 0, 0.04);
-            transform: perspective(1000px) rotateY(-3deg);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .book-shadow-3d:hover {
-            transform: perspective(1000px) rotateY(0deg) translateY(-8px) scale(1.02);
-            box-shadow: 
-                0 30px 50px -12px rgba(35, 15, 10, 0.42),
-                0 12px 24px -6px rgba(255, 122, 89, 0.25);
-        }
-        html.dark .book-shadow-3d {
-            box-shadow: 
-                -15px 22px 40px -8px rgba(0, 0, 0, 0.85),
-                0 4px 18px -2px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
-        }
-        html.dark .book-shadow-3d:hover {
-            box-shadow: 
-                0 35px 55px -10px rgba(0, 0, 0, 0.95),
-                0 0 35px -5px rgba(255, 122, 89, 0.35);
-        }
-        .pill-btn-coral {
-            background-color: var(--primary-orange);
-            color: #ffffff;
-            border-radius: 9999px;
-            padding: 0.65rem 1.6rem;
-            font-weight: 800;
-            letter-spacing: 0.03em;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        .apple-pill-btn {
+            border-radius: 980px;
+            padding: 7px 16px;
+            font-size: 13px;
+            line-height: 1.4;
+            font-weight: 500;
+            letter-spacing: -0.01em;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            box-shadow: 0 8px 20px -4px rgba(255, 122, 89, 0.4);
+            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
-        .pill-btn-coral:hover {
-            background-color: var(--primary-orange-hover);
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 12px 25px -4px rgba(255, 122, 89, 0.55);
+        .apple-bento-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 18px;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+        }
+        .apple-bento-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 113, 227, 0.3);
+            box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.08);
         }
         .scrollbar-none::-webkit-scrollbar {
             display: none;
@@ -213,98 +143,142 @@
 
     @stack('head')
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-[#ff7a59] selection:text-white">
+<body class="min-h-screen flex flex-col antialiased bg-[#ffffff] text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white">
 
-    <!-- Ambient Corner Background Blobs (BookHouse Canvas DNA) -->
-    <div class="fixed -top-24 -left-24 w-96 sm:w-[32rem] h-96 sm:h-[32rem] bg-[#fed7aa] dark:bg-[#fed7aa]/10 rounded-full blur-3xl pointer-events-none -z-10 opacity-70"></div>
-    <div class="fixed -bottom-24 -right-24 w-96 sm:w-[36rem] h-96 sm:h-[36rem] bg-[#00dfc0] dark:bg-[#00dfc0]/10 rounded-full blur-3xl pointer-events-none -z-10 opacity-60"></div>
-    <div class="fixed top-1/3 -right-20 w-80 h-80 bg-[#ff7a59]/15 dark:bg-[#ff7a59]/5 rounded-full blur-3xl pointer-events-none -z-10 opacity-50"></div>
-
-    <!-- Header / Navbar (BookHouse DNA for Inner Pages) -->
-    @if(!request()->routeIs('library.index'))
-    <header class="sticky top-0 z-50 glass border-b transition-colors mb-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between py-3">
+    <!-- Apple Exact Global Navigation Bar (Unified with Homepage & Marketplace) -->
+    <header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-black/5 transition-all duration-200">
+        <div class="max-w-[1280px] mx-auto flex items-center justify-between px-6 sm:px-10 min-h-[56px] py-3">
             
-            <!-- Left Side: Menu Trigger & Quick Navigation -->
-            <div class="flex items-center gap-4 sm:gap-6">
-                <!-- Hamburger Pill / Icon Box -->
-                <a href="{{ route('library.index') }}" class="w-10 h-10 rounded-xl bg-[#ff7a59] hover:bg-[#f06443] text-white flex items-center justify-center shadow-md shadow-[#ff7a59]/25 transition-transform hover:scale-105" title="{{ app()->getLocale() === 'ar' ? 'القائمة الرئيسية' : 'Menu' }}">
-                    <i class="ri-menu-2-line text-lg font-bold"></i>
+            <!-- Left: Musoftwares Official Studio Monogram Logo & Brand -->
+            <div class="flex items-center gap-8">
+                <a href="{{ url('/') }}" class="flex items-center space-x-2.5 rtl:space-x-reverse group focus:outline-none shrink-0" title="Musoftwares Studio">
+                    <svg class="w-5 h-5 fill-[#1d1d1f] group-hover:text-[#000000] transition-colors" viewBox="0 0 307 307" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 48 54 L 48 223 L 51 226 L 52 226 L 54 228 L 55 228 L 57 230 L 58 230 L 60 232 L 61 232 L 63 234 L 64 234 L 66 236 L 67 236 L 69 238 L 70 238 L 72 240 L 73 240 L 75 242 L 76 242 L 78 244 L 79 244 L 81 246 L 82 246 L 84 248 L 91 252 L 94 255 L 97 256 L 99 258 L 100 258 L 102 260 L 103 260 L 105 262 L 106 262 L 108 264 L 109 264 L 132 280 L 135 281 L 141 286 L 144 287 L 146 289 L 153 293 L 155 291 L 158 290 L 161 287 L 162 287 L 164 285 L 165 285 L 167 283 L 168 283 L 170 281 L 171 281 L 173 279 L 174 279 L 176 277 L 177 277 L 179 275 L 180 275 L 182 273 L 183 273 L 185 271 L 186 271 L 188 269 L 189 269 L 191 267 L 192 267 L 194 265 L 195 265 L 197 263 L 198 263 L 200 261 L 201 261 L 203 259 L 204 259 L 206 257 L 207 257 L 209 255 L 210 255 L 212 253 L 213 253 L 215 251 L 216 251 L 218 249 L 219 249 L 221 247 L 222 247 L 224 245 L 225 245 L 227 243 L 228 243 L 230 241 L 231 241 L 233 239 L 234 239 L 236 237 L 237 237 L 239 235 L 240 235 L 242 233 L 243 233 L 245 231 L 246 231 L 256 224 L 256 220 L 257 219 L 257 216 L 256 215 L 256 54 L 254 56 L 250 58 L 247 61 L 246 61 L 243 64 L 236 68 L 226 76 L 225 76 L 223 78 L 219 80 L 216 83 L 215 83 L 213 85 L 206 89 L 203 92 L 196 96 L 193 99 L 186 103 L 183 106 L 182 106 L 180 108 L 173 112 L 170 115 L 169 115 L 164 119 L 164 120 L 166 122 L 167 122 L 174 128 L 176 128 L 180 125 L 181 125 L 184 122 L 188 120 L 191 117 L 198 113 L 201 110 L 202 110 L 204 108 L 211 104 L 214 101 L 215 101 L 217 99 L 224 95 L 227 92 L 231 90 L 237 85 L 239 84 L 241 85 L 241 216 L 238 219 L 237 219 L 232 223 L 229 224 L 227 226 L 223 228 L 220 231 L 217 232 L 215 234 L 211 236 L 208 239 L 202 242 L 200 244 L 199 244 L 197 246 L 196 246 L 194 248 L 193 248 L 191 250 L 190 250 L 188 252 L 187 252 L 185 254 L 184 254 L 182 256 L 181 256 L 179 258 L 178 258 L 176 260 L 175 260 L 173 262 L 172 262 L 170 264 L 163 268 L 160 271 L 159 271 L 154 275 L 151 275 L 149 273 L 148 273 L 146 271 L 145 271 L 143 269 L 142 269 L 140 267 L 139 267 L 137 265 L 136 265 L 134 263 L 133 263 L 131 261 L 130 261 L 128 259 L 127 259 L 125 257 L 124 257 L 122 255 L 121 255 L 119 253 L 118 253 L 116 251 L 115 251 L 92 235 L 86 232 L 80 227 L 77 226 L 75 224 L 68 220 L 64 216 L 64 85 L 66 84 L 68 86 L 69 86 L 72 89 L 73 89 L 75 91 L 82 95 L 85 98 L 86 98 L 92 103 L 93 103 L 95 105 L 102 109 L 105 112 L 106 112 L 112 117 L 113 117 L 115 119 L 122 123 L 125 126 L 126 126 L 128 128 L 129 128 L 131 130 L 138 134 L 145 140 L 152 144 L 159 150 L 163 152 L 166 155 L 167 155 L 175 161 L 177 161 L 180 158 L 181 158 L 183 156 L 184 156 L 186 154 L 187 154 L 189 152 L 190 152 L 192 150 L 199 146 L 202 143 L 203 143 L 210 138 L 211 139 L 211 204 L 201 211 L 200 211 L 198 213 L 197 213 L 195 215 L 194 215 L 192 217 L 191 217 L 189 219 L 188 219 L 186 221 L 185 221 L 183 223 L 182 223 L 180 225 L 179 225 L 177 227 L 176 227 L 174 229 L 173 229 L 171 231 L 170 231 L 168 233 L 167 233 L 165 235 L 164 235 L 162 237 L 161 237 L 159 239 L 158 239 L 156 241 L 155 241 L 153 243 L 152 243 L 150 241 L 149 241 L 147 239 L 146 239 L 144 237 L 143 237 L 141 235 L 140 235 L 138 233 L 137 233 L 135 231 L 134 231 L 132 229 L 131 229 L 108 213 L 105 212 L 102 209 L 99 208 L 94 204 L 94 141 L 93 140 L 94 139 L 98 140 L 104 145 L 105 145 L 128 161 L 130 161 L 140 153 L 141 153 L 137 149 L 134 148 L 131 145 L 130 145 L 127 142 L 120 138 L 117 135 L 116 135 L 114 133 L 113 133 L 111 131 L 110 131 L 108 129 L 101 125 L 98 122 L 97 122 L 95 120 L 88 116 L 85 113 L 78 109 L 78 211 L 88 218 L 89 218 L 91 220 L 92 220 L 94 222 L 95 222 L 97 224 L 98 224 L 100 226 L 101 226 L 103 228 L 104 228 L 106 230 L 107 230 L 109 232 L 110 232 L 112 234 L 113 234 L 115 236 L 116 236 L 118 238 L 119 238 L 121 240 L 122 240 L 124 242 L 125 242 L 127 244 L 128 244 L 130 246 L 131 246 L 133 248 L 134 248 L 136 250 L 137 250 L 139 252 L 140 252 L 142 254 L 143 254 L 145 256 L 146 256 L 148 258 L 149 258 L 151 260 L 155 259 L 157 257 L 158 257 L 160 255 L 161 255 L 163 253 L 164 253 L 166 251 L 167 251 L 169 249 L 170 249 L 172 247 L 173 247 L 175 245 L 176 245 L 178 243 L 179 243 L 181 241 L 182 241 L 184 239 L 185 239 L 187 237 L 188 237 L 211 221 L 214 220 L 217 217 L 223 214 L 227 210 L 227 109 L 224 110 L 222 112 L 218 114 L 215 117 L 214 117 L 212 119 L 208 121 L 205 124 L 204 124 L 202 126 L 201 126 L 199 128 L 192 132 L 189 135 L 186 136 L 183 139 L 182 139 L 177 143 L 174 143 L 168 138 L 167 138 L 161 133 L 160 133 L 157 130 L 153 128 L 150 125 L 143 121 L 133 113 L 132 113 L 130 111 L 126 109 L 123 106 L 122 106 L 120 104 L 113 100 L 110 97 L 109 97 L 107 95 L 100 91 L 97 88 L 90 84 L 87 81 L 83 79 L 80 76 L 73 72 L 70 69 L 63 65 L 56 59 L 55 59 L 49 54 Z"/>
+                    </svg>
+                    <span class="text-[19px] sm:text-[21px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
+                        Musoftware
+                    </span>
+                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#f5f5f7] border border-black/5 text-[#0071e3]">
+                        Library
+                    </span>
                 </a>
 
-                <!-- Nav Links -->
-                <nav class="hidden md:flex items-center gap-5 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-300">
-                    <a href="{{ route('library.index') }}" class="hover:text-[#ff7a59] transition-colors">
-                        {{ app()->getLocale() === 'ar' ? 'المجموعات' : 'Collection' }}
-                    </a>
-                    <a href="{{ route('library.index', ['sort' => 'popular']) }}" class="hover:text-[#ff7a59] transition-colors">
-                        {{ app()->getLocale() === 'ar' ? 'الأكثر مبيعاً' : 'Top Selling' }}
-                    </a>
-                    <a href="{{ route('library.index', ['type' => 'free']) }}" class="hover:text-[#00dfc0] transition-colors">
-                        {{ app()->getLocale() === 'ar' ? 'كتب مجانية' : 'Free Books' }}
-                    </a>
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden lg:flex items-center space-x-6 rtl:space-x-reverse text-[13px] font-normal text-[#1d1d1f]/75">
+                    <a href="{{ route('library.index') }}" class="font-medium text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Digital Library' }}</a>
+                    <a href="{{ route('marketplace.services.index') }}" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}</a>
+                    <a href="/platforms" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'المنصات' : 'Platforms' }}</a>
+                    <a href="/solutions" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'الحلول' : 'Solutions' }}</a>
+                    <a href="/portfolio" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'معرض الأعمال' : 'Portfolio' }}</a>
+                    <a href="/estimator" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'حاسبة التكلفة' : 'Estimator' }}</a>
                 </nav>
             </div>
 
-            <!-- Center Brand Logo: Musoftware -->
-            <div class="flex items-center justify-center">
-                <a href="{{ route('library.index') }}" class="flex items-center gap-1.5 group">
-                    <span class="text-xl sm:text-2xl font-black tracking-tight text-[#ff7a59] group-hover:scale-105 transition-transform font-editorial">
-                        Mu<span class="text-[#2e1f1d] dark:text-white">software</span>
-                    </span>
-                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#ff7a59]/10 text-[#ff7a59] border border-[#ff7a59]/20 uppercase tracking-widest hidden sm:inline-block">
-                        Digital
-                    </span>
-                </a>
-            </div>
-
-            <!-- Right Actions: User, Cart/Library, Theme Toggle -->
-            <div class="flex items-center gap-2.5 sm:gap-3.5">
+            <!-- Right: Actions & User Navigation -->
+            <div class="flex items-center space-x-3 sm:space-x-4 rtl:space-x-reverse shrink-0">
                 
-                <!-- Dark / Light Mode Toggle Button -->
-                <button 
-                    type="button" 
-                    id="theme-toggle-btn"
-                    onclick="toggleDarkMode()" 
-                    class="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 dark:text-zinc-300 bg-white/90 dark:bg-zinc-800/90 border border-slate-200 dark:border-zinc-700/70 shadow-2xs hover:bg-slate-100 dark:hover:bg-zinc-700 transition-all"
-                    title="تبديل المظهر"
-                    aria-label="Toggle dark mode"
-                >
-                    <i id="theme-toggle-icon" class="ri-moon-line text-base dark:hidden"></i>
-                    <i id="theme-toggle-icon-dark" class="ri-sun-line text-base hidden dark:inline-block text-amber-400"></i>
-                </button>
-
                 @auth
-                    <!-- My Library Pill Button -->
-                    <a href="{{ route('library.my_library') }}" class="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 shadow-2xs hover:border-[#ff7a59] transition-all">
-                        <i class="ri-book-mark-line text-[#ff7a59]"></i>
-                        <span class="hidden sm:inline">{{ app()->getLocale() === 'ar' ? 'مكتبتي' : 'My Library' }}</span>
+                    <!-- My Library Pill -->
+                    <a href="{{ route('library.my_library') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[980px] text-[12px] font-medium border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] transition-all shadow-xs">
+                        <i class="ri-book-open-line text-sm text-[#0071e3]"></i>
+                        <span>{{ $locale === 'ar' ? 'مكتبتي' : 'My Library' }}</span>
                     </a>
 
-                    <!-- Profile Avatar -->
-                    <div class="w-9 h-9 rounded-full bg-[#ff7a59]/10 border border-[#ff7a59]/30 text-[#ff7a59] flex items-center justify-center font-bold text-xs">
-                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                    <!-- Wallet Balance Pill -->
+                    <a href="{{ Route::has('billing.invoices.index') ? route('billing.invoices.index') : url('/dashboard') }}" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-[980px] bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[12px] font-medium transition-all shadow-2xs" title="{{ $locale === 'ar' ? 'رصيد المحفظة المتاح' : 'Available Balance' }}">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span class="font-mono font-semibold">${{ number_format(auth()->user()->available_balance(), 2) }}</span>
+                    </a>
+
+                    <div class="relative group">
+                        <button type="button" class="flex items-center gap-1.5 p-1 rounded-full hover:bg-[#f5f5f7] transition-all">
+                            <div class="w-7 h-7 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center font-bold text-[11px]">
+                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
+                            </div>
+                            <i class="ri-arrow-down-s-line text-[#86868b] text-xs"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute {{ $locale === 'ar' ? 'left-0' : 'right-0' }} top-full mt-2 w-56 rounded-2xl bg-white border border-black/10 shadow-xl py-2 hidden group-hover:block z-50">
+                            <div class="px-4 py-2 border-b border-black/5">
+                                <p class="text-xs font-bold text-[#1d1d1f] truncate">{{ auth()->user()->name }}</p>
+                                <p class="text-[11px] text-[#86868b] truncate">{{ auth()->user()->email }}</p>
+                            </div>
+                            <a href="{{ route('library.my_library') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
+                                <i class="ri-book-open-line text-[#0071e3]"></i>
+                                <span>{{ $locale === 'ar' ? 'كتبي ومكتبتي' : 'My Library' }}</span>
+                            </a>
+                            <a href="{{ route('marketplace.services.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
+                                <i class="ri-store-2-line text-indigo-500"></i>
+                                <span>{{ $locale === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}</span>
+                            </a>
+                            <a href="/dashboard" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
+                                <i class="ri-apps-2-line text-slate-700"></i>
+                                <span>{{ $locale === 'ar' ? 'لوحة التحكم الرئيسية' : 'Studio Portal' }}</span>
+                            </a>
+                            <div class="border-t border-black/5 my-1"></div>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-start">
+                                    <i class="ri-logout-box-r-line"></i>
+                                    <span>{{ $locale === 'ar' ? 'تسجيل الخروج' : 'Log Out' }}</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @else
-                    <!-- Create Account / Login Pill Button -->
-                    <a href="{{ route('login') }}" class="px-4 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-900 dark:text-zinc-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-all">
-                        {{ app()->getLocale() === 'ar' ? 'دخول' : 'Sign In' }}
+                    <a href="{{ route('login') }}" class="text-[12px] font-medium text-[#1d1d1f]/75 hover:text-[#1d1d1f] transition-colors px-2">
+                        {{ $locale === 'ar' ? 'دخول' : 'Sign in' }}
                     </a>
-                    <a href="{{ route('register') }}" class="hidden sm:inline-flex px-4 py-2 rounded-full text-xs font-bold bg-[#ff7a59] hover:bg-[#f06443] text-white shadow-md shadow-[#ff7a59]/20 transition-all">
-                        {{ app()->getLocale() === 'ar' ? 'حساب جديد' : 'Create Account' }}
+                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm">
+                        {{ $locale === 'ar' ? 'انضم للمنصة' : 'Join' }}
                     </a>
                 @endauth
+
+                <!-- Mobile Hamburger Toggle -->
+                <button onclick="document.getElementById('library-mobile-menu').classList.toggle('hidden')" class="lg:hidden p-2 text-[#1d1d1f]/70 hover:text-[#1d1d1f] transition-colors" aria-label="Toggle navigation">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7h16M4 17h16"/></svg>
+                </button>
             </div>
+
+        </div>
+
+        <!-- Apple Mobile Menu Dropdown -->
+        <div id="library-mobile-menu" class="hidden lg:hidden bg-white/95 backdrop-blur-xl border-b border-black/[0.08] px-6 py-6 space-y-3 text-[14px] font-medium text-[#1d1d1f]">
+            <a href="{{ route('library.index') }}" class="block py-1.5 text-[#0071e3] font-semibold border-b border-black/[0.05]">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Digital Library' }}</a>
+            <a href="{{ route('marketplace.services.index') }}" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'سوق الخدمات والأدوات' : 'Marketplace' }}</a>
+            <a href="/platforms" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'المنصات السحابية' : 'Platforms' }}</a>
+            <a href="/solutions" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'الحلول القطاعية' : 'Solutions' }}</a>
+            <a href="/portfolio" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'معرض الأعمال' : 'Portfolio' }}</a>
+            @auth
+                <a href="{{ route('library.my_library') }}" class="block py-1.5 text-[#0071e3] font-semibold">{{ $locale === 'ar' ? 'مكتبتي ➔' : 'My Library ➔' }}</a>
+            @else
+                <div class="pt-2 flex items-center gap-3">
+                    <a href="{{ route('login') }}" class="flex-1 text-center py-2 rounded-xl border border-black/10 text-sm font-medium">{{ $locale === 'ar' ? 'دخول' : 'Sign in' }}</a>
+                    <a href="{{ route('register') }}" class="flex-1 text-center py-2 rounded-xl bg-[#0071e3] text-white text-sm font-medium">{{ $locale === 'ar' ? 'انضمام' : 'Join' }}</a>
+                </div>
+            @endauth
         </div>
     </header>
-    @endif
 
-    <!-- Flash Alerts -->
+    <!-- Apple Announcement Ribbon Banner -->
+    <div class="w-full bg-[#fbfbfd] border-b border-black/[0.06] py-2.5 px-4 text-center text-[12px] text-[#1d1d1f] flex items-center justify-center gap-1.5">
+        <span class="flex items-center gap-1.5">
+            <i class="ri-book-3-line text-[#0071e3]"></i>
+            <span>
+                {{ $locale === 'ar' 
+                    ? 'المكتبة الهندسية والتطبيقية: أدلة برمجية، كتب معمارية النظم، وتنزيل فوري لجميع الإصدارات المجانية والمدفوعة.' 
+                    : 'Engineering Playbooks & Guides: 100% direct downloads, zero ads, and instant lifetime access.' }}
+            </span>
+        </span>
+    </div>
+
+    <!-- Flash Notifications -->
     @if(session('success'))
-        <div class="max-w-7xl mx-auto px-4 mt-4 w-full">
-            <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-between shadow-sm">
-                <div class="flex items-center gap-2.5">
-                    <i class="ri-checkbox-circle-fill text-emerald-600 dark:text-emerald-400 text-lg"></i>
+        <div class="max-w-[1280px] mx-auto px-6 mt-4 w-full">
+            <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between text-xs font-medium shadow-xs">
+                <div class="flex items-center gap-2">
+                    <i class="ri-checkbox-circle-fill text-emerald-600 text-base"></i>
                     <span>{{ session('success') }}</span>
                 </div>
             </div>
@@ -312,45 +286,103 @@
     @endif
 
     @if(session('error') || $errors->any())
-        <div class="max-w-7xl mx-auto px-4 mt-4 w-full">
-            <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/60 text-rose-800 dark:text-rose-300 flex items-center justify-between shadow-sm">
-                <div class="flex items-center gap-2.5">
-                    <i class="ri-error-warning-fill text-rose-600 dark:text-rose-400 text-lg"></i>
+        <div class="max-w-[1280px] mx-auto px-6 mt-4 w-full">
+            <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 flex items-center justify-between text-xs font-medium shadow-xs">
+                <div class="flex items-center gap-2">
+                    <i class="ri-error-warning-fill text-rose-600 text-base"></i>
                     <span>{{ session('error') ?? $errors->first() }}</span>
                 </div>
             </div>
         </div>
     @endif
 
-    <!-- Main Content -->
-    <main class="flex-1">
+    <!-- Main Content Stream -->
+    <main class="flex-1 w-full bg-[#ffffff]">
         @yield('content')
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-200 dark:border-zinc-800/80 bg-white dark:bg-dark-900 py-12 mt-16 text-slate-500 dark:text-zinc-400 text-sm transition-colors">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">
-                    M
+    <!-- Apple Exact 5-Column Global Directory Footer -->
+    <footer class="w-full bg-[#f5f5f7] border-t border-black/[0.08] pt-12 pb-12 px-6 sm:px-12 text-[#86868b] text-[12px] mt-16">
+        <div class="max-w-[1024px] mx-auto space-y-6">
+            
+            <!-- Footnote Disclosures -->
+            <div class="space-y-2 border-b border-[#d2d2d7]/60 pb-6 text-[11px] leading-relaxed text-[#86868b]">
+                <p>1. Instant Digital Deliveries: E-Books, PDF guides, and sample codes are accessible instantly upon free checkout or wallet deduction.</p>
+                <p>2. Complete DRM Freedom: Materials are provided with clean indexing, standard formats (PDF, EPUB, Markdown), and lifetime offline reading.</p>
+            </div>
+
+            <!-- Breadcrumb Navigation Trail -->
+            <div class="flex items-center space-x-2 rtl:space-x-reverse text-[12px] text-[#86868b]">
+                <a href="/" class="hover:text-[#1d1d1f]" title="Musoftwares">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 307 307" xmlns="http://www.w3.org/2000/svg"><path d="M 48 54 L 48 223 L 51 226 L 52 226 L 54 228 L 55 228 L 57 230 L 58 230 L 60 232 L 61 232 L 63 234 L 64 234 L 66 236 L 67 236 L 69 238 L 70 238 L 72 240 L 73 240 L 75 242 L 76 242 L 78 244 L 79 244 L 81 246 L 82 246 L 84 248 L 91 252 L 94 255 L 97 256 L 99 258 L 100 258 L 102 260 L 103 260 L 105 262 L 106 262 L 108 264 L 109 264 L 132 280 L 135 281 L 141 286 L 144 287 L 146 289 L 153 293 L 155 291 L 158 290 L 161 287 L 162 287 L 164 285 L 165 285 L 167 283 L 168 283 L 170 281 L 171 281 L 173 279 L 174 279 L 176 277 L 177 277 L 179 275 L 180 275 L 182 273 L 183 273 L 185 271 L 186 271 L 188 269 L 189 269 L 191 267 L 192 267 L 194 265 L 195 265 L 197 263 L 198 263 L 200 261 L 201 261 L 203 259 L 204 259 L 206 257 L 207 257 L 209 255 L 210 255 L 212 253 L 213 253 L 215 251 L 216 251 L 218 249 L 219 249 L 221 247 L 222 247 L 224 245 L 225 245 L 227 243 L 228 243 L 230 241 L 231 241 L 233 239 L 234 239 L 236 237 L 237 237 L 239 235 L 240 235 L 242 233 L 243 233 L 245 231 L 246 231 L 256 224 L 256 220 L 257 219 L 257 216 L 256 215 L 256 54 L 254 56 L 250 58 L 247 61 L 246 61 L 243 64 L 236 68 L 226 76 L 225 76 L 223 78 L 219 80 L 216 83 L 215 83 L 213 85 L 206 89 L 203 92 L 196 96 L 193 99 L 186 103 L 183 106 L 182 106 L 180 108 L 173 112 L 170 115 L 169 115 L 164 119 L 164 120 L 166 122 L 167 122 L 174 128 L 176 128 L 180 125 L 181 125 L 184 122 L 188 120 L 191 117 L 198 113 L 201 110 L 202 110 L 204 108 L 211 104 L 214 101 L 215 101 L 217 99 L 224 95 L 227 92 L 231 90 L 237 85 L 239 84 L 241 85 L 241 216 L 238 219 L 237 219 L 232 223 L 229 224 L 227 226 L 223 228 L 220 231 L 217 232 L 215 234 L 211 236 L 208 239 L 202 242 L 200 244 L 199 244 L 197 246 L 196 246 L 194 248 L 193 248 L 191 250 L 190 250 L 188 252 L 187 252 L 185 254 L 184 254 L 182 256 L 181 256 L 179 258 L 178 258 L 176 260 L 175 260 L 173 262 L 172 262 L 170 264 L 163 268 L 160 271 L 159 271 L 154 275 L 151 275 L 149 273 L 148 273 L 146 271 L 145 271 L 143 269 L 142 269 L 140 267 L 139 267 L 137 265 L 136 265 L 134 263 L 133 263 L 131 261 L 130 261 L 128 259 L 127 259 L 125 257 L 124 257 L 122 255 L 121 255 L 119 253 L 118 253 L 116 251 L 115 251 L 92 235 L 86 232 L 80 227 L 77 226 L 75 224 L 68 220 L 64 216 L 64 85 L 66 84 L 68 86 L 69 86 L 72 89 L 73 89 L 75 91 L 82 95 L 85 98 L 86 98 L 92 103 L 93 103 L 95 105 L 102 109 L 105 112 L 106 112 L 112 117 L 113 117 L 115 119 L 122 123 L 125 126 L 126 126 L 128 128 L 129 128 L 131 130 L 138 134 L 145 140 L 152 144 L 159 150 L 163 152 L 166 155 L 167 155 L 175 161 L 177 161 L 180 158 L 181 158 L 183 156 L 184 156 L 186 154 L 187 154 L 189 152 L 190 152 L 192 150 L 199 146 L 202 143 L 203 143 L 210 138 L 211 139 L 211 204 L 201 211 L 200 211 L 198 213 L 197 213 L 195 215 L 194 215 L 192 217 L 191 217 L 189 219 L 188 219 L 186 221 L 185 221 L 183 223 L 182 223 L 180 225 L 179 225 L 177 227 L 176 227 L 174 229 L 173 229 L 171 231 L 170 231 L 168 233 L 167 233 L 165 235 L 164 235 L 162 237 L 161 237 L 159 239 L 158 239 L 156 241 L 155 241 L 153 243 L 152 243 L 150 241 L 149 241 L 147 239 L 146 239 L 144 237 L 143 237 L 141 235 L 140 235 L 138 233 L 137 233 L 135 231 L 134 231 L 132 229 L 131 229 L 108 213 L 105 212 L 102 209 L 99 208 L 94 204 L 94 141 L 93 140 L 94 139 L 98 140 L 104 145 L 105 145 L 128 161 L 130 161 L 140 153 L 141 153 L 137 149 L 134 148 L 131 145 L 130 145 L 127 142 L 120 138 L 117 135 L 116 135 L 114 133 L 113 133 L 111 131 L 110 131 L 108 129 L 101 125 L 98 122 L 97 122 L 95 120 L 88 116 L 85 113 L 78 109 L 78 211 L 88 218 L 89 218 L 91 220 L 92 220 L 94 222 L 95 222 L 97 224 L 98 224 L 100 226 L 101 226 L 103 228 L 104 228 L 106 230 L 107 230 L 109 232 L 110 232 L 112 234 L 113 234 L 115 236 L 116 236 L 118 238 L 119 238 L 121 240 L 122 240 L 124 242 L 125 242 L 127 244 L 128 244 L 130 246 L 131 246 L 133 248 L 134 248 L 136 250 L 137 250 L 139 252 L 140 252 L 142 254 L 143 254 L 145 256 L 146 256 L 148 258 L 149 258 L 151 260 L 155 259 L 157 257 L 158 257 L 160 255 L 161 255 L 163 253 L 164 253 L 166 251 L 167 251 L 169 249 L 170 249 L 172 247 L 173 247 L 175 245 L 176 245 L 178 243 L 179 243 L 181 241 L 182 241 L 184 239 L 185 239 L 187 237 L 188 237 L 211 221 L 214 220 L 217 217 L 223 214 L 227 210 L 227 109 L 224 110 L 222 112 L 218 114 L 215 117 L 214 117 L 212 119 L 208 121 L 205 124 L 204 124 L 202 126 L 201 126 L 199 128 L 192 132 L 189 135 L 186 136 L 183 139 L 182 139 L 177 143 L 174 143 L 168 138 L 167 138 L 161 133 L 160 133 L 157 130 L 153 128 L 150 125 L 143 121 L 133 113 L 132 113 L 130 111 L 126 109 L 123 106 L 122 106 L 120 104 L 113 100 L 110 97 L 109 97 L 107 95 L 100 91 L 97 88 L 90 84 L 87 81 L 83 79 L 80 76 L 73 72 L 70 69 L 63 65 L 56 59 L 55 59 L 49 54 Z"/></svg>
+                </a>
+                <span>›</span>
+                <a href="{{ route('library.index') }}" class="hover:text-[#1d1d1f]">
+                    <span>{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Library' }}</span>
+                </a>
+                @if(isset($title) || isset($meta['title']))
+                    <span>›</span>
+                    <span class="text-[#1d1d1f] truncate max-w-[200px]">{{ $title ?? $meta['title'] }}</span>
+                @endif
+            </div>
+
+            <!-- 5-Column Apple Directory Links Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 pt-4 pb-8">
+                <div class="space-y-3">
+                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'أقسام المكتبة' : 'Library Catalog' }}</h3>
+                    <ul class="space-y-2 text-[12px]">
+                        <li><a href="{{ route('library.index', ['type' => 'free']) }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'الكتب والأدلة المجانية' : 'Free Engineering Books' }}</a></li>
+                        <li><a href="{{ route('library.index', ['type' => 'paid']) }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'الأدلة الاحترافية والمدفوعة' : 'Premium Playbooks' }}</a></li>
+                        <li><a href="{{ route('library.index', ['sort' => 'popular']) }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'الأكثر قراءة وتحميلاً' : 'Most Popular' }}</a></li>
+                    </ul>
                 </div>
-                <p>© {{ date('Y') }} Musoftware. جميع الحقوق محفوظة.</p>
+
+                <div class="space-y-3">
+                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'المنظومة' : 'Ecosystem' }}</h3>
+                    <ul class="space-y-2 text-[12px]">
+                        <li><a href="{{ route('marketplace.services.index') }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'سوق الخدمات والأدوات' : 'Marketplace' }}</a></li>
+                        <li><a href="/platforms" class="hover:text-[#0071e3] transition-colors">Enterprise Platforms</a></li>
+                        <li><a href="/solutions" class="hover:text-[#0071e3] transition-colors">Sector Solutions</a></li>
+                        <li><a href="/estimator" class="hover:text-[#0071e3] transition-colors">Project Scope Estimator</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'الاستشارات المباشرة' : 'Direct Access' }}</h3>
+                    <ul class="space-y-2 text-[12px]">
+                        <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] transition-colors text-[#0066cc] font-medium">WhatsApp Direct ➔</a></li>
+                        <li><a href="mailto:admin@musoftwares.com" class="hover:text-[#0071e3] transition-colors">admin@musoftwares.com</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'عن المهندس' : 'Founder' }}</h3>
+                    <ul class="space-y-2 text-[12px]">
+                        <li><a href="/about/mahmoud-amin" class="hover:text-[#0071e3] transition-colors">Mahmoud Amin (Profile)</a></li>
+                        <li><a href="https://github.com/musoftware" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'الأمان والترخيص' : 'Security & Terms' }}</h3>
+                    <ul class="space-y-2 text-[12px]">
+                        <li><a href="/privacy-policy" class="hover:text-[#0071e3] transition-colors">Privacy Policy</a></li>
+                        <li><a href="/terms-of-service" class="hover:text-[#0071e3] transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="flex items-center gap-6 text-xs text-slate-500 dark:text-zinc-400">
-                <a href="{{ route('library.index') }}" class="hover:text-brand-600 dark:hover:text-zinc-200 transition-colors">المكتبة الرقمية</a>
-                <a href="{{ url('/') }}" class="hover:text-brand-600 dark:hover:text-zinc-200 transition-colors">الرئيسية</a>
-                <a href="{{ route('library.index', ['type' => 'free']) }}" class="hover:text-brand-600 dark:hover:text-zinc-200 transition-colors">كتب مجانية</a>
+
+            <div class="border-t border-[#d2d2d7]/60 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#86868b]">
+                <p>© {{ date('Y') }} Musoftwares Inc. {{ $locale === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.' }}</p>
+                <div class="flex items-center gap-4">
+                    <a href="/privacy-policy" class="hover:text-[#1d1d1f]">Privacy</a>
+                    <a href="/terms-of-service" class="hover:text-[#1d1d1f]">Terms</a>
+                    <a href="{{ route('library.index') }}" class="text-[#0071e3]">Library</a>
+                </div>
             </div>
+
         </div>
     </footer>
-
-    <script>
-        function toggleDarkMode() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('musoftware_theme', isDark ? 'dark' : 'light');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
-    </script>
 
     @stack('scripts')
 </body>
