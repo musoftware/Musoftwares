@@ -828,7 +828,7 @@ class WhatsappSenderController extends Controller
     }
 
     /**
-     * Send direct chat message via CRM Chat UI.
+     * Send direct chat message via CRM Chat UI (Supports text, templates, images, documents, interactive buttons).
      */
     public function sendChatMessage(Request $request, int $id)
     {
@@ -842,19 +842,26 @@ class WhatsappSenderController extends Controller
         $validated = $request->validate([
             'whatsapp_account_id' => ['required', 'exists:whatsapp_accounts,id'],
             'recipient_phone' => ['required', 'string', 'max:50'],
-            'message_body' => ['nullable', 'required_unless:message_type,template', 'string', 'max:4096'],
-            'message_type' => ['nullable', 'string', 'in:text,template'],
+            'message_body' => ['nullable', 'string', 'max:4096'],
+            'message_type' => ['nullable', 'string', 'in:text,template,image,document,audio,video,interactive'],
             'template_name' => ['nullable', 'string'],
             'template_language' => ['nullable', 'string'],
             'template_components' => ['nullable', 'array'],
+            'media_file' => ['nullable', 'file', 'max:16384'], // Max 16MB media
+            'media_url' => ['nullable', 'string', 'max:1024'],
+            'caption' => ['nullable', 'string', 'max:1024'],
+            'buttons' => ['nullable', 'array', 'max:3'],
         ]);
 
         $account = WhatsappAccount::where('id', $validated['whatsapp_account_id'])
             ->where('whatsapp_business_id', $id)
             ->firstOrFail();
 
+        $messageType = $validated['message_type'] ?? 'text';
         $templateData = null;
-        if (($validated['message_type'] ?? 'text') === 'template') {
+        $extraData = [];
+
+        if ($messageType === 'template') {
             $templateData = [
                 'name' => $validated['template_name'] ?? 'hello_world',
                 'language' => $validated['template_language'] ?? 'en_US',
@@ -864,17 +871,40 @@ class WhatsappSenderController extends Controller
             }
         }
 
+        // Handle Media Upload if provided
+        if (in_array($messageType, ['image', 'document', 'audio', 'video'])) {
+            if ($request->hasFile('media_file')) {
+                $uploadRes = $this->whatsappService->uploadMedia($account, $request->file('media_file'), $messageType);
+                $extraData['link'] = $uploadRes['url'];
+                $extraData['filename'] = $uploadRes['filename'];
+            } elseif (!empty($validated['media_url'])) {
+                $extraData['link'] = $validated['media_url'];
+                $extraData['filename'] = basename(parse_url($validated['media_url'], PHP_URL_PATH)) ?: 'file';
+            }
+            if (!empty($validated['caption'])) {
+                $extraData['caption'] = $validated['caption'];
+            }
+        }
+
+        // Handle Interactive Buttons
+        if ($messageType === 'interactive' && !empty($validated['buttons'])) {
+            $extraData['buttons'] = $validated['buttons'];
+        }
+
         $messageBody = $validated['message_body'] ?? '';
-        if (($validated['message_type'] ?? 'text') === 'template' && empty($messageBody)) {
+        if ($messageType === 'template' && empty($messageBody)) {
             $messageBody = "Template: " . ($validated['template_name'] ?? 'Message');
+        } elseif (in_array($messageType, ['image', 'document', 'audio', 'video']) && empty($messageBody)) {
+            $messageBody = !empty($extraData['caption']) ? $extraData['caption'] : "Sent a " . $messageType;
         }
 
         $result = $this->whatsappService->sendMessage(
             $account,
             $validated['recipient_phone'],
             $messageBody,
-            $validated['message_type'] ?? 'text',
-            $templateData
+            $messageType,
+            $templateData,
+            $extraData
         );
 
         if ($result['success']) {
@@ -909,4 +939,352 @@ class WhatsappSenderController extends Controller
             'error' => $result['error'] ?? 'Message delivery failed.',
         ], 422);
     }
+
+    /**
+     * Get saved Canned Quick Replies for a business.
+     */
+    public function getQuickReplies(Request $request, int $id)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $defaultReplies = [
+            ['shortcut' => '/welcome', 'title' => 'Welcome Greeting', 'message' => 'Hello! Welcome to our official WhatsApp support. How can we help you today? 👋'],
+            ['shortcut' => '/hours', 'title' => 'Working Hours', 'message' => 'Our business hours are Sunday to Thursday, 9:00 AM - 6:00 PM (Cairo Time).'],
+            ['shortcut' => '/support', 'title' => 'Technical Support', 'message' => 'Our technical specialist is reviewing your inquiry and will reply shortly.'],
+            ['shortcut' => '/pricing', 'title' => 'Pricing & Plans', 'message' => 'You can view our complete service plans and pricing on our website: https://musoftwares.com'],
+            ['shortcut' => '/thanks', 'title' => 'Thank You', 'message' => 'Thank you for reaching out to us! Have a wonderful day.'],
+        ];
+
+        $metadata = $business->metadata ?? [];
+        $quickReplies = $metadata['quick_replies'] ?? $defaultReplies;
+
+        return response()->json([
+            'success' => true,
+            'quick_replies' => $quickReplies,
+        ]);
+    }
+
+    /**
+     * Store or update a Canned Quick Reply.
+     */
+    public function storeQuickReply(Request $request, int $id)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $validated = $request->validate([
+            'shortcut' => ['required', 'string', 'max:50'],
+            'title' => ['required', 'string', 'max:100'],
+            'message' => ['required', 'string', 'max:2048'],
+        ]);
+
+        $shortcut = str_starts_with($validated['shortcut'], '/') ? $validated['shortcut'] : '/' . $validated['shortcut'];
+
+        $metadata = $business->metadata ?? [];
+        $quickReplies = $metadata['quick_replies'] ?? [];
+
+        // Remove existing with same shortcut if updating
+        $quickReplies = array_values(array_filter($quickReplies, fn($q) => ($q['shortcut'] ?? '') !== $shortcut));
+        $quickReplies[] = [
+            'shortcut' => $shortcut,
+            'title' => $validated['title'],
+            'message' => $validated['message'],
+        ];
+
+        $metadata['quick_replies'] = $quickReplies;
+        $business->update(['metadata' => $metadata]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Quick reply saved successfully!',
+            'quick_replies' => $quickReplies,
+        ]);
+    }
+
+    /**
+     * Delete a Canned Quick Reply.
+     */
+    public function deleteQuickReply(Request $request, int $id, string $shortcut)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $cleanShortcut = urldecode($shortcut);
+        if (!str_starts_with($cleanShortcut, '/')) {
+            $cleanShortcut = '/' . $cleanShortcut;
+        }
+
+        $metadata = $business->metadata ?? [];
+        $quickReplies = $metadata['quick_replies'] ?? [];
+        $quickReplies = array_values(array_filter($quickReplies, fn($q) => ($q['shortcut'] ?? '') !== $cleanShortcut));
+
+        $metadata['quick_replies'] = $quickReplies;
+        $business->update(['metadata' => $metadata]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Quick reply removed.',
+            'quick_replies' => $quickReplies,
+        ]);
+    }
+
+    /**
+     * Update Contact CRM data (Name, Tags, Private Internal Notes).
+     */
+    public function updateContactCrm(Request $request, int $id)
+    {
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
+
+        $validated = $request->validate([
+            'phone' => ['required', 'string', 'max:50'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'tags' => ['nullable', 'array'],
+            'internal_notes' => ['nullable', 'string', 'max:4096'],
+        ]);
+
+        $cleanPhone = preg_replace('/[^0-9]/', '', $validated['phone']);
+
+        // Find or create Contact under the business's default group
+        $defaultGroup = \Modules\WhatsappSender\Models\WhatsappContactGroup::firstOrCreate(
+            ['whatsapp_business_id' => $business->id, 'name' => 'CRM Direct Inquiries'],
+            ['user_id' => $business->user_id, 'description' => 'Automated group for live chat contacts']
+        );
+
+        $contact = WhatsappContact::where('phone', $cleanPhone)
+            ->whereHas('group', fn($q) => $q->where('whatsapp_business_id', $business->id))
+            ->first();
+
+        if (!$contact) {
+            $contact = new WhatsappContact([
+                'whatsapp_contact_group_id' => $defaultGroup->id,
+                'phone' => $cleanPhone,
+            ]);
+        }
+
+        if (!empty($validated['name'])) {
+            $contact->name = trim($validated['name']);
+        }
+
+        $customFields = $contact->custom_fields ?? [];
+        if (isset($validated['tags'])) {
+            $customFields['tags'] = array_values(array_unique(array_filter($validated['tags'])));
+        }
+        if (isset($validated['internal_notes'])) {
+            $customFields['internal_notes'] = $validated['internal_notes'];
+        }
+
+        $contact->custom_fields = $customFields;
+        $contact->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact CRM details updated.',
+            'contact' => [
+                'name' => $contact->name,
+                'phone' => $contact->phone,
+                'group_name' => $contact->group?->name,
+                'custom_fields' => $contact->custom_fields,
+            ],
+        ]);
+    }
+
+    /**
+     * Get WhatsApp Business Profile & Health metrics for an account.
+     */
+    public function getAccountProfile(Request $request, int $id)
+    {
+        $user = $request->user();
+        $query = WhatsappAccount::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $account = $query->firstOrFail();
+
+        $profileResult = $this->whatsappService->getBusinessProfile($account);
+        $healthResult = $this->whatsappService->getPhoneHealthAndLimits($account);
+
+        return response()->json([
+            'success' => true,
+            'account' => [
+                'id' => $account->id,
+                'name' => $account->name,
+                'phone_number_id' => $account->phone_number_id,
+                'waba_id' => $account->waba_id,
+                'status' => $account->status,
+                'display_phone_number' => $account->display_phone_number,
+                'metadata' => $account->metadata,
+            ],
+            'profile' => $profileResult['data'] ?? ($account->metadata['business_profile'] ?? null),
+            'health' => $healthResult['data'] ?? null,
+            'is_sandbox' => $this->whatsappService->isSandboxToken($account->access_token),
+        ]);
+    }
+
+    /**
+     * Update WhatsApp Business Profile fields.
+     */
+    public function updateAccountProfile(Request $request, int $id)
+    {
+        $user = $request->user();
+        $query = WhatsappAccount::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $account = $query->firstOrFail();
+
+        $validated = $request->validate([
+            'about' => ['nullable', 'string', 'max:139'],
+            'description' => ['nullable', 'string', 'max:512'],
+            'address' => ['nullable', 'string', 'max:256'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'vertical' => ['nullable', 'string', 'max:50'],
+            'websites' => ['nullable', 'array', 'max:2'],
+            'websites.*' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $result = $this->whatsappService->updateBusinessProfile($account, $validated);
+
+        if ($result['success']) {
+            return response()->json([
+                'success' => true,
+                'message' => 'WhatsApp Business Profile updated successfully on Meta Cloud API.',
+                'profile' => $result['data'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => $result['error'] ?? 'Failed to update business profile.',
+        ], 422);
+    }
+
+    /**
+     * Upload & update WhatsApp Business Profile picture.
+     */
+    public function uploadAccountPhoto(Request $request, int $id)
+    {
+        $user = $request->user();
+        $query = WhatsappAccount::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $account = $query->firstOrFail();
+
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'], // Max 5MB
+        ]);
+
+        $result = $this->whatsappService->updateProfilePicture($account, $request->file('photo'));
+
+        if ($result['success']) {
+            return response()->json([
+                'success' => true,
+                'message' => 'WhatsApp profile picture updated successfully!',
+                'profile_picture_url' => $result['profile_picture_url'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => $result['error'] ?? 'Failed to upload profile picture.',
+        ], 422);
+    }
+
+    /**
+     * Delete WhatsApp Business Profile picture.
+     */
+    public function deleteAccountPhoto(Request $request, int $id)
+    {
+        $user = $request->user();
+        $query = WhatsappAccount::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $account = $query->firstOrFail();
+
+        $result = $this->whatsappService->deleteProfilePicture($account);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'WhatsApp profile picture removed.',
+        ]);
+    }
+
+    /**
+     * Set / Update Two-Step Verification PIN (6 digits).
+     */
+    public function updateAccountPin(Request $request, int $id)
+    {
+        $user = $request->user();
+        $query = WhatsappAccount::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $account = $query->firstOrFail();
+
+        $validated = $request->validate([
+            'pin' => ['required', 'string', 'size:6', 'regex:/^[0-9]{6}$/'],
+        ]);
+
+        $result = $this->whatsappService->setTwoStepVerificationPin($account, $validated['pin']);
+
+        if ($result['success']) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Two-Step Verification PIN updated successfully on Meta Cloud API.',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => $result['error'] ?? 'Failed to update Two-Step PIN.',
+        ], 422);
+    }
+
+    /**
+     * Sync Health & Quality Status for an account.
+     */
+    public function syncAccountHealth(Request $request, int $id)
+    {
+        $user = $request->user();
+        $query = WhatsappAccount::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+        $account = $query->firstOrFail();
+
+        $healthResult = $this->whatsappService->getPhoneHealthAndLimits($account);
+
+        if ($healthResult['success']) {
+            return response()->json([
+                'success' => true,
+                'message' => 'WhatsApp account health and limits synchronized with Meta.',
+                'health' => $healthResult['data'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => $healthResult['error'] ?? 'Failed to sync phone health status.',
+        ], 422);
+    }
 }
+

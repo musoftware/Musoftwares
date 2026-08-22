@@ -39,7 +39,8 @@ class MetaWhatsappService
         string $recipient,
         string $body,
         string $type = 'text',
-        ?array $templateData = null
+        ?array $templateData = null,
+        ?array $extraData = null
     ): array {
         $cleanPhone = preg_replace('/[^0-9]/', '', $recipient);
 
@@ -72,6 +73,92 @@ class MetaWhatsappService
             if (! empty($templateData['components'])) {
                 $payload['template']['components'] = $templateData['components'];
             }
+        } elseif ($type === 'image') {
+            $payload = [
+                'messaging_product' => 'whatsapp',
+                'recipient_type' => 'individual',
+                'to' => $cleanPhone,
+                'type' => 'image',
+                'image' => [
+                    'link' => $extraData['link'] ?? $extraData['url'] ?? $body,
+                ],
+            ];
+            $caption = $extraData['caption'] ?? (!str_starts_with($body, 'http') && !empty($body) ? $body : null);
+            if ($caption) {
+                $payload['image']['caption'] = $caption;
+            }
+        } elseif ($type === 'document') {
+            $payload = [
+                'messaging_product' => 'whatsapp',
+                'recipient_type' => 'individual',
+                'to' => $cleanPhone,
+                'type' => 'document',
+                'document' => [
+                    'link' => $extraData['link'] ?? $extraData['url'] ?? $body,
+                    'filename' => $extraData['filename'] ?? 'document.pdf',
+                ],
+            ];
+            $caption = $extraData['caption'] ?? (!str_starts_with($body, 'http') && !empty($body) ? $body : null);
+            if ($caption) {
+                $payload['document']['caption'] = $caption;
+            }
+        } elseif ($type === 'audio') {
+            $payload = [
+                'messaging_product' => 'whatsapp',
+                'recipient_type' => 'individual',
+                'to' => $cleanPhone,
+                'type' => 'audio',
+                'audio' => [
+                    'link' => $extraData['link'] ?? $extraData['url'] ?? $body,
+                ],
+            ];
+        } elseif ($type === 'video') {
+            $payload = [
+                'messaging_product' => 'whatsapp',
+                'recipient_type' => 'individual',
+                'to' => $cleanPhone,
+                'type' => 'video',
+                'video' => [
+                    'link' => $extraData['link'] ?? $extraData['url'] ?? $body,
+                ],
+            ];
+            if (!empty($extraData['caption'])) {
+                $payload['video']['caption'] = $extraData['caption'];
+            }
+        } elseif ($type === 'interactive') {
+            $rawButtons = $extraData['buttons'] ?? [];
+            $buttons = [];
+            foreach (array_slice($rawButtons, 0, 3) as $i => $btn) {
+                $title = is_array($btn) ? ($btn['title'] ?? $btn['text'] ?? "Option " . ($i + 1)) : (string) $btn;
+                $id = is_array($btn) ? ($btn['id'] ?? "btn_" . ($i + 1)) : "btn_" . ($i + 1);
+                $buttons[] = [
+                    'type' => 'reply',
+                    'reply' => [
+                        'id' => (string) $id,
+                        'title' => mb_substr(trim($title), 0, 20),
+                    ],
+                ];
+            }
+            if (empty($buttons)) {
+                $buttons[] = [
+                    'type' => 'reply',
+                    'reply' => ['id' => 'btn_1', 'title' => 'Yes'],
+                ];
+            }
+
+            $payload = [
+                'messaging_product' => 'whatsapp',
+                'recipient_type' => 'individual',
+                'to' => $cleanPhone,
+                'type' => 'interactive',
+                'interactive' => [
+                    'type' => 'button',
+                    'body' => ['text' => $body ?: 'Please choose an option:'],
+                    'action' => [
+                        'buttons' => $buttons,
+                    ],
+                ],
+            ];
         } else {
             $payload = [
                 'messaging_product' => 'whatsapp',
@@ -1002,4 +1089,417 @@ class MetaWhatsappService
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
+
+    /**
+     * Get WhatsApp Business Profile from Meta Graph API.
+     */
+    public function getBusinessProfile(WhatsappAccount $account): array
+    {
+        if ($this->isSandboxToken($account->access_token)) {
+            $metadata = $account->metadata ?? [];
+            return [
+                'success' => true,
+                'data' => $metadata['business_profile'] ?? [
+                    'about' => 'Welcome to our official WhatsApp service!',
+                    'description' => 'We provide top-quality digital solutions and 24/7 customer support.',
+                    'address' => '123 Business Avenue, Suite 400',
+                    'email' => 'contact@example.com',
+                    'websites' => ['https://musoftwares.com'],
+                    'vertical' => 'PROF_SERVICES',
+                    'profile_picture_url' => $metadata['profile_picture_url'] ?? null,
+                ],
+            ];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/whatsapp_business_profile";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->get($url, [
+                    'fields' => 'about,address,description,email,profile_picture_url,websites,vertical',
+                ]);
+
+            $json = $response->json();
+
+            if ($response->successful() && !empty($json['data'][0])) {
+                $profileData = $json['data'][0];
+
+                // Cache to account metadata
+                $metadata = $account->metadata ?? [];
+                $metadata['business_profile'] = $profileData;
+                if (!empty($profileData['profile_picture_url'])) {
+                    $metadata['profile_picture_url'] = $profileData['profile_picture_url'];
+                }
+                $account->update(['metadata' => $metadata]);
+
+                return [
+                    'success' => true,
+                    'data' => $profileData,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'error' => $json['error']['message'] ?? 'Failed to retrieve WhatsApp business profile.',
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] getBusinessProfile error: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Update WhatsApp Business Profile on Meta Graph API.
+     */
+    public function updateBusinessProfile(WhatsappAccount $account, array $data): array
+    {
+        if ($this->isSandboxToken($account->access_token)) {
+            $metadata = $account->metadata ?? [];
+            $existing = $metadata['business_profile'] ?? [];
+            $merged = array_merge($existing, $data);
+            $metadata['business_profile'] = $merged;
+            $account->update(['metadata' => $metadata]);
+
+            return [
+                'success' => true,
+                'data' => $merged,
+            ];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/whatsapp_business_profile";
+
+        $payload = [
+            'messaging_product' => 'whatsapp',
+        ];
+
+        if (isset($data['about'])) {
+            $payload['about'] = mb_substr($data['about'], 0, 139);
+        }
+        if (isset($data['description'])) {
+            $payload['description'] = mb_substr($data['description'], 0, 512);
+        }
+        if (isset($data['address'])) {
+            $payload['address'] = mb_substr($data['address'], 0, 256);
+        }
+        if (isset($data['email'])) {
+            $payload['email'] = $data['email'];
+        }
+        if (isset($data['vertical'])) {
+            $payload['vertical'] = $data['vertical'];
+        }
+        if (isset($data['websites']) && is_array($data['websites'])) {
+            $payload['websites'] = array_values(array_filter(array_slice($data['websites'], 0, 2)));
+        }
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->post($url, $payload);
+
+            $json = $response->json();
+
+            if ($response->successful() && ($json['success'] ?? false) === true) {
+                // Update local cached metadata
+                $metadata = $account->metadata ?? [];
+                $metadata['business_profile'] = array_merge($metadata['business_profile'] ?? [], $data);
+                $account->update(['metadata' => $metadata]);
+
+                return [
+                    'success' => true,
+                    'data' => $metadata['business_profile'],
+                ];
+            }
+
+            return [
+                'success' => false,
+                'error' => $json['error']['message'] ?? 'Failed to update WhatsApp business profile.',
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] updateBusinessProfile error: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Upload & update WhatsApp Business Profile Picture.
+     */
+    public function updateProfilePicture(WhatsappAccount $account, \Illuminate\Http\UploadedFile $file): array
+    {
+        $business = $account->business;
+        $appId = $business->facebook_client_id ?? config('services.facebook.client_id');
+
+        if ($this->isSandboxToken($account->access_token)) {
+            // In Sandbox/Test mode, store locally
+            $path = $file->store('whatsapp-profiles', 'public');
+            $url = asset('storage/' . $path);
+
+            $metadata = $account->metadata ?? [];
+            $metadata['profile_picture_url'] = $url;
+            $metadata['business_profile']['profile_picture_url'] = $url;
+            $account->update(['metadata' => $metadata]);
+
+            return [
+                'success' => true,
+                'profile_picture_url' => $url,
+            ];
+        }
+
+        try {
+            $fileLength = $file->getSize();
+            $mimeType = $file->getMimeType();
+
+            // Step 1: Create Resumable Upload Session
+            $sessionUrl = "https://graph.facebook.com/{$this->graphApiVersion}/app/uploads";
+            if (!empty($appId)) {
+                $sessionUrl = "https://graph.facebook.com/{$this->graphApiVersion}/{$appId}/uploads";
+            }
+
+            $sessionRes = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->post($sessionUrl, [
+                    'file_length' => $fileLength,
+                    'file_type' => $mimeType,
+                ]);
+
+            $sessionJson = $sessionRes->json();
+            $uploadSessionId = $sessionJson['id'] ?? null;
+
+            if (!$uploadSessionId) {
+                // Fallback: Store locally and return error from Meta
+                $errorMsg = $sessionJson['error']['message'] ?? 'Failed to initiate photo upload session on Meta.';
+                return ['success' => false, 'error' => $errorMsg];
+            }
+
+            // Step 2: Upload file bytes
+            $uploadRes = Http::withToken($account->access_token)
+                ->withHeaders([
+                    'file_offset' => 0,
+                    'Content-Type' => 'application/octet-stream',
+                ])
+                ->withBody(file_get_contents($file->getRealPath()), 'application/octet-stream')
+                ->post("https://graph.facebook.com/{$this->graphApiVersion}/{$uploadSessionId}");
+
+            $uploadJson = $uploadRes->json();
+            $profileHandle = $uploadJson['h'] ?? null;
+
+            if (!$profileHandle) {
+                return ['success' => false, 'error' => $uploadJson['error']['message'] ?? 'Failed to transfer photo bytes to Meta.'];
+            }
+
+            // Step 3: Attach profile picture handle to business profile
+            $attachUrl = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/whatsapp_business_profile";
+            $attachRes = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->post($attachUrl, [
+                    'messaging_product' => 'whatsapp',
+                    'profile_picture_handle' => $profileHandle,
+                ]);
+
+            $attachJson = $attachRes->json();
+
+            if ($attachRes->successful() && ($attachJson['success'] ?? false) === true) {
+                // Save locally to cache
+                $path = $file->store('whatsapp-profiles', 'public');
+                $localUrl = asset('storage/' . $path);
+
+                $metadata = $account->metadata ?? [];
+                $metadata['profile_picture_url'] = $localUrl;
+                $metadata['business_profile']['profile_picture_url'] = $localUrl;
+                $account->update(['metadata' => $metadata]);
+
+                return [
+                    'success' => true,
+                    'profile_picture_url' => $localUrl,
+                ];
+            }
+
+            return ['success' => false, 'error' => $attachJson['error']['message'] ?? 'Failed to set profile picture.'];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] updateProfilePicture error: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Delete/Reset Profile Picture.
+     */
+    public function deleteProfilePicture(WhatsappAccount $account): array
+    {
+        $metadata = $account->metadata ?? [];
+        unset($metadata['profile_picture_url']);
+        if (isset($metadata['business_profile']['profile_picture_url'])) {
+            unset($metadata['business_profile']['profile_picture_url']);
+        }
+        $account->update(['metadata' => $metadata]);
+
+        return ['success' => true];
+    }
+
+    /**
+     * Set / Update Two-Step Verification PIN (6 digits).
+     */
+    public function setTwoStepVerificationPin(WhatsappAccount $account, string $pin): array
+    {
+        if (!preg_match('/^\d{6}$/', $pin)) {
+            return ['success' => false, 'error' => 'PIN must be exactly 6 numeric digits.'];
+        }
+
+        if ($this->isSandboxToken($account->access_token)) {
+            $metadata = $account->metadata ?? [];
+            $metadata['has_2fa_pin'] = true;
+            $account->update(['metadata' => $metadata]);
+
+            return ['success' => true];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/two_step_verification";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->post($url, [
+                    'pin' => $pin,
+                ]);
+
+            $json = $response->json();
+
+            if ($response->successful() && ($json['success'] ?? false) === true) {
+                $metadata = $account->metadata ?? [];
+                $metadata['has_2fa_pin'] = true;
+                $account->update(['metadata' => $metadata]);
+
+                return ['success' => true];
+            }
+
+            return [
+                'success' => false,
+                'error' => $json['error']['message'] ?? 'Failed to set Two-Step Verification PIN.',
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] setTwoStepVerificationPin error: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Get Phone Quality, Tier Limits, and Verification info.
+     */
+    public function getPhoneHealthAndLimits(WhatsappAccount $account): array
+    {
+        if ($this->isSandboxToken($account->access_token)) {
+            return [
+                'success' => true,
+                'data' => [
+                    'id' => $account->phone_number_id,
+                    'verified_name' => $account->name . ' (Sandbox)',
+                    'display_phone_number' => $account->display_phone_number ?? '+1 555-0199',
+                    'quality_rating' => 'GREEN',
+                    'name_status' => 'APPROVED',
+                    'code_verification_status' => 'VERIFIED',
+                    'messaging_limit_tier' => 'TIER_1K',
+                ],
+            ];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->acceptJson()
+                ->get($url, [
+                    'fields' => 'verified_name,code_verification_status,display_phone_number,quality_rating,name_status,messaging_limit_tier',
+                ]);
+
+            $json = $response->json();
+
+            if ($response->successful() && isset($json['id'])) {
+                // Update local metadata
+                $metadata = $account->metadata ?? [];
+                $metadata['quality_rating'] = $json['quality_rating'] ?? $metadata['quality_rating'] ?? null;
+                $metadata['name_status'] = $json['name_status'] ?? $metadata['name_status'] ?? null;
+                $metadata['messaging_limit_tier'] = $json['messaging_limit_tier'] ?? $metadata['messaging_limit_tier'] ?? null;
+                $account->update([
+                    'display_phone_number' => $json['display_phone_number'] ?? $account->display_phone_number,
+                    'metadata' => $metadata,
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $json,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'error' => $json['error']['message'] ?? 'Failed to retrieve phone number health status.',
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] getPhoneHealthAndLimits error: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Upload rich media file to Meta Graph API Media endpoint.
+     */
+    public function uploadMedia(WhatsappAccount $account, \Illuminate\Http\UploadedFile $file, string $type = 'image'): array
+    {
+        $path = $file->store('whatsapp-media', 'public');
+        $publicUrl = asset('storage/' . $path);
+        $filename = $file->getClientOriginalName();
+        $mimeType = $file->getMimeType();
+
+        if ($this->isSandboxToken($account->access_token)) {
+            return [
+                'success' => true,
+                'media_id' => 'sandbox_media_' . uniqid(),
+                'url' => $publicUrl,
+                'filename' => $filename,
+                'mime_type' => $mimeType,
+            ];
+        }
+
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$account->phone_number_id}/media";
+
+        try {
+            $response = Http::withToken($account->access_token)
+                ->attach('file', file_get_contents($file->getRealPath()), $filename, ['Content-Type' => $mimeType])
+                ->post($url, [
+                    'messaging_product' => 'whatsapp',
+                    'type' => $mimeType,
+                ]);
+
+            $json = $response->json();
+
+            if ($response->successful() && !empty($json['id'])) {
+                return [
+                    'success' => true,
+                    'media_id' => $json['id'],
+                    'url' => $publicUrl,
+                    'filename' => $filename,
+                    'mime_type' => $mimeType,
+                ];
+            }
+
+            // If Meta API media endpoint fails, return public URL as fallback link
+            return [
+                'success' => true,
+                'media_id' => null,
+                'url' => $publicUrl,
+                'filename' => $filename,
+                'mime_type' => $mimeType,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[MetaWhatsappService] uploadMedia error: ' . $e->getMessage());
+            return [
+                'success' => true,
+                'media_id' => null,
+                'url' => $publicUrl,
+                'filename' => $filename,
+                'mime_type' => $mimeType,
+            ];
+        }
+    }
 }
+

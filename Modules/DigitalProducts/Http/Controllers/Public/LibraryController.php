@@ -2,7 +2,9 @@
 
 namespace Modules\DigitalProducts\Http\Controllers\Public;
 
+use App\Helpers\FinanceHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
@@ -16,7 +18,9 @@ class LibraryController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = DigitalProduct::with('category')
+        $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
+
+        $query = DigitalProduct::with(['category', 'currency'])
             ->where('is_published', true);
 
         // Search query
@@ -58,15 +62,29 @@ class LibraryController extends Controller
         };
 
         $products = $query->paginate(12)->withQueryString();
+
+        // Attach converted currency prices
+        $products->getCollection()->transform(function (DigitalProduct $p) use ($viewerCurrency) {
+            $p->converted_price = $p->getPriceInCurrency($viewerCurrency->id);
+            $p->viewer_price_formatted = $p->formatPriceInCurrency($viewerCurrency);
+            return $p;
+        });
+
         $categories = DigitalCategory::where('is_active', true)
             ->withCount('publishedProducts')
             ->orderBy('sort_order')
             ->get();
 
-        $featuredProducts = DigitalProduct::where('is_published', true)
+        $featuredProducts = DigitalProduct::with(['category', 'currency'])
+            ->where('is_published', true)
             ->where('is_featured', true)
             ->take(4)
-            ->get();
+            ->get()
+            ->transform(function (DigitalProduct $p) use ($viewerCurrency) {
+                $p->converted_price = $p->getPriceInCurrency($viewerCurrency->id);
+                $p->viewer_price_formatted = $p->formatPriceInCurrency($viewerCurrency);
+                return $p;
+            });
 
         $meta = [
             'title' => 'المكتبة الرقمية | كتب وأدلة إلكترونية حصرية - Musoftware',
@@ -75,14 +93,16 @@ class LibraryController extends Controller
             'type' => 'website',
         ];
 
-        return view('digitalproducts::public.index', compact('products', 'categories', 'featuredProducts', 'meta'));
+        return view('digitalproducts::public.index', compact('products', 'categories', 'featuredProducts', 'viewerCurrency', 'meta'));
     }
 
     /**
      * Display a single digital product / book details.
      */
-    public function show(string $slug): View
+    public function show(Request $request, string $slug): View
     {
+        $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
+
         $product = DigitalProduct::with(['category', 'currency'])
             ->where('slug', $slug)
             ->where('is_published', true)
@@ -91,12 +111,29 @@ class LibraryController extends Controller
         // Increment view count safely
         $product->increment('view_count');
 
+        $product->converted_price = $product->getPriceInCurrency($viewerCurrency->id);
+        $product->viewer_price_formatted = $product->formatPriceInCurrency($viewerCurrency);
+
+        // Determine user wallet currency for accurate purchasing feedback
+        $userCurrency = (auth()->check() && auth()->user()->currency_id)
+            ? (Currency::find(auth()->user()->currency_id) ?? $viewerCurrency)
+            : $viewerCurrency;
+
+        $userPriceFormatted = $product->formatPriceInCurrency($userCurrency);
+        $userConvertedPrice = $product->getPriceInCurrency($userCurrency->id);
+
         // Related products in same category
-        $relatedProducts = DigitalProduct::where('is_published', true)
+        $relatedProducts = DigitalProduct::with(['category', 'currency'])
+            ->where('is_published', true)
             ->where('id', '!=', $product->id)
             ->when($product->category_id, fn($q) => $q->where('category_id', $product->category_id))
             ->take(4)
-            ->get();
+            ->get()
+            ->transform(function (DigitalProduct $p) use ($viewerCurrency) {
+                $p->converted_price = $p->getPriceInCurrency($viewerCurrency->id);
+                $p->viewer_price_formatted = $p->formatPriceInCurrency($viewerCurrency);
+                return $p;
+            });
 
         $isPurchased = auth()->check() ? $product->isPurchasedBy(auth()->user()) : false;
 
@@ -108,6 +145,15 @@ class LibraryController extends Controller
             'type' => 'book',
         ];
 
-        return view('digitalproducts::public.show', compact('product', 'relatedProducts', 'isPurchased', 'meta'));
+        return view('digitalproducts::public.show', compact(
+            'product',
+            'relatedProducts',
+            'isPurchased',
+            'viewerCurrency',
+            'userCurrency',
+            'userPriceFormatted',
+            'userConvertedPrice',
+            'meta'
+        ));
     }
 }

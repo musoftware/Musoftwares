@@ -3,6 +3,7 @@
 namespace Modules\DigitalProducts\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Currency;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class AdminDigitalProductController extends Controller
 
     public function index(Request $request): Response
     {
-        $query = DigitalProduct::with(['category', 'purchases']);
+        $query = DigitalProduct::with(['category', 'currency', 'purchases']);
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -46,6 +47,7 @@ class AdminDigitalProductController extends Controller
 
         $products = $query->latest()->paginate(15)->withQueryString();
         $categories = DigitalCategory::orderBy('name')->get();
+        $currencies = Currency::all();
 
         $stats = [
             'total_books' => DigitalProduct::count(),
@@ -57,6 +59,7 @@ class AdminDigitalProductController extends Controller
         return Inertia::render('Admin/DigitalProducts/Index', [
             'products' => $products,
             'categories' => $categories,
+            'currencies' => $currencies,
             'stats' => $stats,
             'filters' => $request->only(['search', 'category_id', 'status']),
         ]);
@@ -65,8 +68,11 @@ class AdminDigitalProductController extends Controller
     public function create(): Response
     {
         $categories = DigitalCategory::where('is_active', true)->orderBy('name')->get();
+        $currencies = Currency::all();
+
         return Inertia::render('Admin/DigitalProducts/Create', [
             'categories' => $categories,
+            'currencies' => $currencies,
         ]);
     }
 
@@ -86,6 +92,7 @@ class AdminDigitalProductController extends Controller
             'free_edition_page_count' => 'nullable|integer|min:1',
             'category_id' => 'nullable|exists:digital_categories,id',
             'price' => 'nullable|numeric|min:0',
+            'currency_id' => 'nullable|exists:currencies,id',
             'is_free' => 'nullable|boolean',
             'author_name' => 'nullable|string|max:255',
             'publisher' => 'nullable|string|max:255',
@@ -139,6 +146,7 @@ class AdminDigitalProductController extends Controller
             'slug' => $validated['slug'] ?? Str::slug($validated['title']),
             'category_id' => $validated['category_id'] ?? null,
             'price' => $isFree ? 0 : $price,
+            'currency_id' => $validated['currency_id'] ?? 1,
             'is_free' => $isFree,
             'has_free_edition' => $hasFreeEdition && !empty($freeEditionFilePath),
             'free_edition_title' => $validated['free_edition_title'] ?? 'Playbook Edition (ملخص مجاني)',
@@ -176,12 +184,14 @@ class AdminDigitalProductController extends Controller
 
     public function edit(int $id): Response
     {
-        $product = DigitalProduct::findOrFail($id);
+        $product = DigitalProduct::with('currency')->findOrFail($id);
         $categories = DigitalCategory::where('is_active', true)->orderBy('name')->get();
+        $currencies = Currency::all();
 
         return Inertia::render('Admin/DigitalProducts/Edit', [
             'product' => $product,
             'categories' => $categories,
+            'currencies' => $currencies,
         ]);
     }
 
@@ -194,6 +204,7 @@ class AdminDigitalProductController extends Controller
             'slug' => 'required|string|max:255|unique:digital_products,slug,' . $product->id,
             'category_id' => 'nullable|exists:digital_categories,id',
             'price' => 'nullable|numeric|min:0',
+            'currency_id' => 'nullable|exists:currencies,id',
             'is_free' => 'nullable|boolean',
             'has_free_edition' => 'nullable|boolean',
             'free_edition_title' => 'nullable|string|max:255',
@@ -268,6 +279,7 @@ class AdminDigitalProductController extends Controller
             'slug' => $validated['slug'],
             'category_id' => $validated['category_id'] ?? null,
             'price' => $isFree ? 0 : $price,
+            'currency_id' => $validated['currency_id'] ?? $product->currency_id ?? 1,
             'is_free' => $isFree,
             'author_name' => $validated['author_name'] ?? $product->author_name,
             'publisher' => $validated['publisher'] ?? $product->publisher,

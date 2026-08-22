@@ -77,6 +77,7 @@ interface Props {
         to?: number;
     };
     categories: Category[];
+    currencies?: any[];
     stats: {
         total_books: number;
         total_downloads: number;

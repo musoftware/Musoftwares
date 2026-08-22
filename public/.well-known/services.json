@@ -1,5 +1,17 @@
 {
-    "updated_at": "2026-08-21T15:09:00+00:00",
-    "total_services": 0,
-    "services": []
+    "updated_at": "2026-08-22T15:08:24+00:00",
+    "total_services": 1,
+    "services": [
+        {
+            "id": 1,
+            "title": "Branding Kit",
+            "slug": "branding-kit",
+            "category": "Design",
+            "url": "http://localhost/marketplace/services/1/branding-kit",
+            "tagline": null,
+            "starting_price": 0,
+            "packages": [],
+            "tags": []
+        }
+    ]
 }

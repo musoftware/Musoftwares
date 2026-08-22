@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import {
-    ArrowLeft, ShieldCheck, CreditCard, AlertCircle, Wallet
+    ArrowLeft, ShieldCheck, CreditCard, AlertCircle, Wallet, Sparkles, Check
 } from 'lucide-react';
 import { Input } from '@/Components/ui/input';
-import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function AddBalance({ wallet, presets = [] }) {
     const defaultAmount = presets.length > 0 ? presets[0] : 50;
@@ -52,84 +51,108 @@ export default function AddBalance({ wallet, presets = [] }) {
     };
 
     const walletBalance = Number(wallet?.balance || 0);
-    const walletCurrency = wallet?.currency;
+    const walletCurrency = wallet?.currency || 'EGP';
 
     return (
-        <AuthenticatedLayout header={undefined}>
-            <Head title={__('general.add_balance')} />
+        <AuthenticatedLayout>
+            <Head title={`${__('general.add_balance')} — Musoftwares Studio`} />
 
-            <div className="max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
-                {/* Header */}
-                <div className="space-y-1">
-                    <Link
-                        href={safeRoute('dashboard', undefined, '/dashboard')}
-                        className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                        <ArrowLeft className="me-2 h-4 w-4" />{__('general.back_to_dashboard')}</Link>
-                    <h1 className="text-2xl font-semibold tracking-tight">{__('general.add_balance')}</h1>
-                    <p className="text-sm text-muted-foreground">{__('general.top_up_your_wallet_to_pay_for_subscriptions_and_platform_services')}</p>
-                </div>
+            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+                
+                {/* Header Banner */}
+                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
+                    <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="space-y-1.5">
+                            <Link
+                                href={safeRoute('dashboard', undefined, '/dashboard')}
+                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
+                            >
+                                <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
+                                {__('general.back_to_dashboard')}
+                            </Link>
+                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
+                                {__('general.add_balance')}
+                            </h1>
+                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
+                                {__('general.top_up_your_wallet_to_pay_for_subscriptions_and_platform_services')}
+                            </p>
+                        </div>
 
-                {/* Current Wallet Balance */}
-                <Card className="shadow-none border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 text-white">
-                    <CardContent className="p-6 flex items-center justify-between">
-                        <div>
-                            <p className="text-sm font-medium text-slate-400 mb-1">{__('general.current_wallet_balance')}</p>
-                            <div className="text-3xl font-bold tracking-tight">
-                                {formatMoney(walletBalance, walletCurrency)}
+                        {/* Current Wallet Balance Pill */}
+                        <div className="bg-[#f5f5f7] border border-black/5 rounded-[20px] p-4 flex items-center gap-4 shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
+                                <Wallet className="w-5 h-5" />
                             </div>
-                        </div>
-                        <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                            <Wallet className="w-6 h-6 text-white" />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Global error display */}
-                {errors && Object.keys(errors).length > 0 && (
-                    <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
-                        <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
-                        <div>
-                            <strong className="font-semibold block mb-1">{__('general.payment_error')}</strong>
-                            {Object.values(errors).map((err, i) => (
-                                <p key={i}>{err}</p>
-                            ))}
+                            <div>
+                                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50">
+                                    {__('general.current_wallet_balance')}
+                                </p>
+                                <div className="text-xl font-bold tracking-tight text-[#1d1d1f]">
+                                    {formatMoney(walletBalance, walletCurrency)}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                )}
+                </div>
 
-                {/* Deposit Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Main Form Body */}
+                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 py-8 space-y-6">
 
-                    {/* Amount Selection */}
-                    <Card className="shadow-none border-slate-200">
-                        <CardHeader className="pb-4">
-                            <CardTitle className="text-base font-semibold">{__('general.select_amount')}</CardTitle>
-                            <CardDescription>{__('general.choose_a_preset_or_enter_a_custom_amount_to_deposit')}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                                {presets.map((amount) => (
-                                    <Button
-                                        type="button"
-                                        key={amount}
-                                        variant={selectedPreset === amount ? 'default' : 'outline'}
-                                        onClick={() => handlePresetClick(amount)}
-                                        className={`h-11 text-sm font-semibold transition-all ${
-                                            selectedPreset === amount
-                                                ? 'bg-slate-900 text-white hover:bg-slate-800 border-slate-900'
-                                                : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-                                        }`}
-                                    >
-                                        {formatMoney(amount, walletCurrency)}
-                                    </Button>
+                    {/* Global error display */}
+                    {errors && Object.keys(errors).length > 0 && (
+                        <div className="flex items-start gap-3 p-4 rounded-[18px] bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm">
+                            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-500" />
+                            <div>
+                                <strong className="font-semibold block mb-1">{__('general.payment_error')}</strong>
+                                {Object.values(errors).map((err, i) => (
+                                    <p key={i}>{err}</p>
                                 ))}
                             </div>
+                        </div>
+                    )}
 
-                            <div className="space-y-1.5 max-w-xs">
-                                <Label htmlFor="custom-amount" className="text-sm font-medium">{__('general.custom_amount')}</Label>
+                    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+
+                        {/* Amount Selection Bento Card */}
+                        <div className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm space-y-6">
+                            <div>
+                                <h3 className="text-base font-bold text-[#1d1d1f] font-sans">
+                                    {__('general.select_amount')}
+                                </h3>
+                                <p className="text-xs text-[#1d1d1f]/60 mt-0.5">
+                                    {__('general.choose_a_preset_or_enter_a_custom_amount_to_deposit')}
+                                </p>
+                            </div>
+
+                            {/* Presets Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
+                                {presets.map((amount) => {
+                                    const isSelected = selectedPreset === amount;
+                                    return (
+                                        <button
+                                            type="button"
+                                            key={amount}
+                                            onClick={() => handlePresetClick(amount)}
+                                            className={`h-12 rounded-[980px] text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                                                isSelected
+                                                    ? 'bg-[#1d1d1f] text-white shadow-md'
+                                                    : 'bg-[#f5f5f7] border border-black/5 text-[#1d1d1f] hover:bg-black/5'
+                                            }`}
+                                        >
+                                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                                            {formatMoney(amount, walletCurrency)}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Custom Amount Input */}
+                            <div className="space-y-2 pt-2 border-t border-black/5 max-w-sm">
+                                <Label htmlFor="custom-amount" className="text-xs font-semibold text-[#1d1d1f]">
+                                    {__('general.custom_amount')}
+                                </Label>
                                 <div className="relative">
-                                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">
+                                    <span className="absolute start-4 top-1/2 -translate-y-1/2 text-[#1d1d1f]/40 font-semibold text-xs pointer-events-none">
                                         {walletCurrency}
                                     </span>
                                     <Input
@@ -140,75 +163,79 @@ export default function AddBalance({ wallet, presets = [] }) {
                                         placeholder="0.00"
                                         value={customAmount}
                                         onChange={handleCustomChange}
-                                        className={`ps-12 shadow-none ${
-                                            customAmount && !selectedPreset
-                                                ? 'border-primary ring-1 ring-primary'
-                                                : 'border-slate-200'
-                                        }`}
+                                        className="h-11 ps-14 pe-4 bg-white border border-black/10 rounded-xl text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:border-[#0071e3]"
                                     />
                                 </div>
                                 {errors.amount && (
-                                    <p className="text-sm font-medium text-destructive">{errors.amount}</p>
+                                    <p className="text-xs font-medium text-rose-600">{errors.amount}</p>
                                 )}
                             </div>
 
-                            {/* Amount summary */}
+                            {/* Amount Summary Preview */}
                             {data.amount >= 5 && (
-                                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
-                                    <span className="text-sm text-slate-600">You will deposit:</span>
-                                    <span className="font-bold text-slate-900 font-mono">
+                                <div className="bg-[#f5f5f7] border border-black/5 rounded-[16px] p-4 flex items-center justify-between">
+                                    <span className="text-xs font-medium text-[#1d1d1f]/70">You will deposit:</span>
+                                    <span className="font-bold text-[#1d1d1f] font-mono text-base">
                                         {formatMoney(data.amount, walletCurrency)}
                                     </span>
                                 </div>
                             )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Payment Method — Kashier only */}
-                    <Card className="shadow-none border-slate-200">
-                        <CardHeader className="pb-4">
-                            <CardTitle className="text-base font-semibold">{__('general.payment_method')}</CardTitle>
-                            <CardDescription>{__('general.payments_are_processed_securely_via_kashier')}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-primary bg-primary/5">
-                                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shrink-0">
-                                    <CreditCard className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-slate-900">{__('general.kashier_card_amp_wallet')}</p>
-                                    <p className="text-xs text-slate-500">{__('general.visa_mastercard_and_digital_wallets_accepted')}</p>
-                                </div>
-                                <div className="ms-auto w-2 h-2 rounded-full bg-emerald-500" />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Submit */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
-                        <Button
-                            type="submit"
-                            size="lg"
-                            disabled={processing || !data.amount || data.amount < 5}
-                            className="w-full sm:w-auto h-12 px-8 text-base bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm"
-                        >
-                            {processing
-                                ? 'Redirecting to payment...'
-                                : `Pay ${formatMoney(data.amount || 0, walletCurrency)} via Kashier`
-                            }
-                        </Button>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                            <span>256-bit SSL secured. Funds credited instantly after payment.</span>
                         </div>
-                    </div>
 
-                    <p className="text-xs text-slate-400 text-center">
-                        Minimum deposit: {formatMoney(5, walletCurrency)}. You will be redirected to Kashier's secure payment page to complete the transaction.
-                    </p>
-                </form>
+                        {/* Payment Method Card */}
+                        <div className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm space-y-4">
+                            <div>
+                                <h3 className="text-base font-bold text-[#1d1d1f] font-sans">
+                                    {__('general.payment_method')}
+                                </h3>
+                                <p className="text-xs text-[#1d1d1f]/60 mt-0.5">
+                                    {__('general.payments_are_processed_securely_via_kashier')}
+                                </p>
+                            </div>
+
+                            <div className="flex items-center gap-4 p-4 rounded-[18px] border-2 border-[#0071e3] bg-[#0071e3]/5">
+                                <div className="w-11 h-11 rounded-xl bg-[#0071e3] flex items-center justify-center text-white shrink-0 shadow-sm shadow-blue-500/20">
+                                    <CreditCard className="w-5 h-5" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-xs sm:text-sm font-bold text-[#1d1d1f]">
+                                        {__('general.kashier_card_amp_wallet')}
+                                    </p>
+                                    <p className="text-[11px] text-[#1d1d1f]/60 mt-0.5">
+                                        {__('general.visa_mastercard_and_digital_wallets_accepted')}
+                                    </p>
+                                </div>
+                                <div className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                            <button
+                                type="submit"
+                                disabled={processing || !data.amount || data.amount < 5}
+                                className="w-full sm:w-auto h-12 px-8 bg-[#0071e3] hover:bg-[#0077ed] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold rounded-[980px] shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                            >
+                                {processing
+                                    ? 'Redirecting to payment...'
+                                    : `Pay ${formatMoney(data.amount || 0, walletCurrency)} via Kashier`
+                                }
+                            </button>
+
+                            <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/60">
+                                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                                <span>256-bit SSL secured. Instant balance credit.</span>
+                            </div>
+                        </div>
+
+                        <p className="text-[11px] text-[#1d1d1f]/50 text-center">
+                            Minimum deposit: {formatMoney(5, walletCurrency)}. You will be redirected to Kashier's secure portal.
+                        </p>
+                    </form>
+
+                </div>
+
             </div>
         </AuthenticatedLayout>
     );
 }
-

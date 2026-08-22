@@ -12,8 +12,6 @@ use App\Models\AdminSettings;
 use App\Models\CostTransaction;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
-use App\Models\GoldPrice;
-use App\Models\GoldWorldPrice;
 use App\Models\Invoice;
 use App\Models\InvoiceCostLine;
 use App\Models\InvoiceItem;
@@ -1315,22 +1313,8 @@ class InvoiceController extends Controller
             $total_cost = round($total_cost / (1 - 0.06), 2);
         }
         if ($dest == 'redot') {
-            $item = GoldWorldPrice::query()
-                ->select(DB::raw('DATE(price_date) as price_date, avg(price_24k) as price_24k, avg(price_22k) as price_22k, avg(price_21k) as price_21k, avg(price_18k) as price_18k, avg(price_14k) as price_14k'))
-                ->groupBy(DB::raw('DATE(price_date)'))
-                ->orderBy(DB::raw('DATE(price_date)'), 'desc')
-                ->first();
-
-            if ($item) {
-                $usdPrice1 = CurrenciesExchange::RateByDate($item->price_date, $item->price_21k, 2, 1);
-                $price_21 = GoldPrice::query()->where(DB::raw('DATE(price_date)'), $item->price_date)->select(DB::raw('avg(price_21k) as price_21k'))->groupBy(DB::raw('DATE(price_date)'))->first();
-
-                if ($usdPrice1 > 0 && $price_21) {
-                    $total_cost = (int) $service_amount * ($price_21->price_21k / $usdPrice1);
-                    $total_cost = round($total_cost / (1 - 0.044), 2);
-                    $total_cost = round($total_cost / (1 - 0.035), 2);
-                }
-            }
+            $total_cost = round($total_cost / (1 - 0.044), 2);
+            $total_cost = round($total_cost / (1 - 0.035), 2);
         }
         if ($dest == 'wallet') {
             $total_cost = round($total_cost / (1 - 0.01), 2);

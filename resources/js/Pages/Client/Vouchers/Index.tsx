@@ -1,12 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Card, CardContent, CardFooter, CardHeader } from '@/Components/ui/card';
-import { Button } from '@/Components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
-import { Badge } from '@/Components/ui/badge';
-import { Info, Ticket, Wallet, Calendar, UserCheck, Users, ArrowRight, History } from 'lucide-react';
+import { 
+    Info, Ticket, Wallet, Calendar, UserCheck, 
+    Users, ArrowRight, History, ArrowLeft, Sparkles, Check 
+} from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
@@ -46,187 +44,204 @@ interface Props {
 }
 
 export default function Index({ auth, vouchers, redemptions }: Props) {
-    const userCurrency = auth.user?.currency;
+    const userCurrency = auth.user?.currency || 'EGP';
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('vouchers.title')} />
+            <Head title={`${__('vouchers.title')} — Musoftwares Studio`} />
 
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
-                        <h2 className="text-3xl font-bold flex items-center gap-2">
-                            <Ticket className="h-8 w-8 text-primary" />
-                            {__('vouchers.title')}
-                        </h2>
-                        <p className="text-muted-foreground mt-1">
-                            {__('vouchers.subtitle')}
-                        </p>
-                    </div>
-                    <Button asChild size="lg" className="shrink-0">
-                        <Link href={route('financial.add-balance')}>
-                            <Wallet className="me-2 h-5 w-5" />
-                            {__('vouchers.add_balance')}
+            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+                
+                {/* Hero Header */}
+                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
+                    <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="space-y-1.5">
+                            <Link
+                                href="/dashboard"
+                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
+                            >
+                                <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
+                                {__('general.back_to_dashboard')}
+                            </Link>
+                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
+                                {__('vouchers.title')}
+                            </h1>
+                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
+                                {__('vouchers.subtitle')}
+                            </p>
+                        </div>
+
+                        <Link
+                            href={route('financial.add-balance')}
+                            className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-blue-500/20 cursor-pointer shrink-0"
+                        >
+                            <Wallet className="w-4 h-4" />
+                            <span>{__('vouchers.add_balance')}</span>
                         </Link>
-                    </Button>
+                    </div>
                 </div>
 
-                {/* How it works info */}
-                {vouchers.length > 0 && (
-                    <Alert className="mb-8 bg-blue-50/50 border-blue-200 text-blue-900 dark:bg-blue-950/20 dark:border-blue-900 dark:text-blue-200">
-                        <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                        <AlertTitle className="text-blue-800 dark:text-blue-300 font-semibold">
-                            {__('vouchers.how_vouchers_work.title')}
-                        </AlertTitle>
-                        <AlertDescription className="text-blue-700 dark:text-blue-400/80">
-                            {__('vouchers.how_vouchers_work.description')}
-                        </AlertDescription>
-                    </Alert>
-                )}
+                {/* Main Content */}
+                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 py-8 space-y-8">
+                    
+                    {/* How it works alert */}
+                    {vouchers.length > 0 && (
+                        <div className="flex items-start gap-3 p-5 rounded-[20px] bg-white border border-black/5 shadow-sm text-xs sm:text-sm">
+                            <div className="w-9 h-9 rounded-xl bg-[#0071e3]/10 text-[#0071e3] flex items-center justify-center shrink-0">
+                                <Info className="w-4 h-4" />
+                            </div>
+                            <div>
+                                <strong className="font-bold text-[#1d1d1f] block mb-0.5">
+                                    {__('vouchers.how_vouchers_work.title')}
+                                </strong>
+                                <span className="text-[#1d1d1f]/70">
+                                    {__('vouchers.how_vouchers_work.description')}
+                                </span>
+                            </div>
+                        </div>
+                    )}
 
-                {/* Vouchers Grid */}
-                {vouchers.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
-                        {vouchers.map((voucher) => (
-                            <Card key={voucher.id} className="flex flex-col overflow-hidden border-0 shadow-md">
-                                <CardHeader className="bg-gradient-to-br from-violet-600 to-purple-700 text-white p-6">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h3 className="font-bold text-xl">{voucher.name}</h3>
-                                        <Badge variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0">
-                                            {voucher.type === 'percentage' ? `${voucher.reward_percentage}%` : __('vouchers.fixed')}
-                                        </Badge>
-                                    </div>
-                                    {voucher.description && (
-                                        <p className="text-white/80 text-sm line-clamp-2">
-                                            {voucher.description}
-                                        </p>
-                                    )}
-                                </CardHeader>
-                                <CardContent className="p-6 flex-1">
-                                    <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 mb-5 flex items-center justify-between border border-slate-100 dark:border-slate-800">
-                                        <div>
-                                            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block mb-1">
-                                                {__('vouchers.spend')}
-                                            </span>
-                                            <strong className="text-lg">
-                                                {formatCurrency(voucher.spend_amount_user_currency, userCurrency)}
-                                            </strong>
-                                        </div>
-                                        <ArrowRight className="h-6 w-6 text-primary/60 mx-2" />
-                                        <div className="text-end">
-                                            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block mb-1">
-                                                {__('vouchers.get')}
-                                            </span>
-                                            <strong className="text-lg text-emerald-600 dark:text-emerald-400">
-                                                {formatCurrency(voucher.reward_amount_user_currency, userCurrency)}
-                                            </strong>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-3 mb-6">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm text-muted-foreground flex items-center gap-1.5 mb-1">
-                                                <Calendar className="h-4 w-4" />
-                                                {__('vouchers.valid_until')}
-                                            </span>
+                    {/* Vouchers Bento Grid */}
+                    {vouchers.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {vouchers.map((voucher) => (
+                                <div
+                                    key={voucher.id}
+                                    className="bg-white border border-black/5 rounded-[24px] shadow-sm flex flex-col justify-between overflow-hidden hover:border-[#0071e3]/30 hover:shadow-md transition-all group"
+                                >
+                                    <div className="p-6 sm:p-7 space-y-5">
+                                        <div className="flex items-start justify-between gap-3">
                                             <div>
-                                                {voucher.expires_at ? (
-                                                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900">
-                                                        {voucher.expires_at}
-                                                    </Badge>
-                                                ) : (
-                                                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900">
-                                                        {__('vouchers.no_expiry')}
-                                                    </Badge>
-                                                )}
+                                                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0071e3] block mb-1">
+                                                    Studio Promo Reward
+                                                </span>
+                                                <h3 className="text-base font-bold text-[#1d1d1f] font-sans">
+                                                    {voucher.name}
+                                                </h3>
+                                            </div>
+                                            <span className="px-2.5 py-1 rounded-full text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
+                                                {voucher.type === 'percentage' ? `${voucher.reward_percentage}%` : __('vouchers.fixed')}
+                                            </span>
+                                        </div>
+
+                                        {voucher.description && (
+                                            <p className="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed">
+                                                {voucher.description}
+                                            </p>
+                                        )}
+
+                                        {/* Spend & Get Bento Box */}
+                                        <div className="bg-[#f5f5f7] rounded-[18px] p-4 flex items-center justify-between border border-black/5">
+                                            <div>
+                                                <span className="text-[10px] font-mono uppercase font-bold text-[#1d1d1f]/50 block mb-0.5">
+                                                    {__('vouchers.spend')}
+                                                </span>
+                                                <strong className="text-sm font-bold font-mono text-[#1d1d1f]">
+                                                    {formatCurrency(voucher.spend_amount_user_currency, userCurrency)}
+                                                </strong>
+                                            </div>
+                                            <ArrowRight className="h-4 w-4 text-[#0071e3]" />
+                                            <div className="text-end">
+                                                <span className="text-[10px] font-mono uppercase font-bold text-[#1d1d1f]/50 block mb-0.5">
+                                                    {__('vouchers.get')}
+                                                </span>
+                                                <strong className="text-sm font-bold font-mono text-emerald-600">
+                                                    {formatCurrency(voucher.reward_amount_user_currency, userCurrency)}
+                                                </strong>
                                             </div>
                                         </div>
 
-                                        {voucher.max_uses_per_user && (
-                                            <div className="text-sm text-muted-foreground flex items-center gap-1.5">
-                                                <UserCheck className="h-4 w-4" />
-                                                {__('vouchers.max')} {voucher.max_uses_per_user} {__('vouchers.per_user')}
+                                        <div className="space-y-2 text-xs text-[#1d1d1f]/60">
+                                            <div className="flex items-center gap-1.5">
+                                                <Calendar className="h-3.5 w-3.5 text-[#0071e3]" />
+                                                <span>{__('vouchers.valid_until')}:</span>
+                                                <span className="font-semibold text-[#1d1d1f]">
+                                                    {voucher.expires_at || __('vouchers.no_expiry')}
+                                                </span>
                                             </div>
-                                        )}
+
+                                            {voucher.max_uses_per_user && (
+                                                <div className="flex items-center gap-1.5">
+                                                    <UserCheck className="h-3.5 w-3.5 text-amber-600" />
+                                                    <span>{__('vouchers.max')} {voucher.max_uses_per_user} {__('vouchers.per_user')}</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    <Button asChild className="w-full mt-auto" size="lg">
-                                        <Link href={route('financial.add-balance')}>
-                                            <Wallet className="me-2 h-4 w-4" />
+                                    <div className="p-4 bg-[#f5f5f7]/60 border-t border-black/5 flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5 text-[11px] text-[#1d1d1f]/50 font-mono">
+                                            <Users className="h-3.5 w-3.5" />
+                                            <span>{voucher.current_uses} {__('vouchers.uses')}</span>
+                                        </div>
+
+                                        <Link
+                                            href={route('financial.add-balance')}
+                                            className="px-4 py-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold shadow-xs transition-all"
+                                        >
                                             {__('vouchers.add_balance_and_pay')}
                                         </Link>
-                                    </Button>
-                                </CardContent>
-                                <CardFooter className="bg-slate-50 dark:bg-slate-950 p-4 border-t flex justify-between items-center text-xs text-muted-foreground">
-                                    <div className="flex items-center gap-1">
-                                        <Users className="h-4 w-4" />
-                                        {voucher.current_uses} {__('vouchers.uses')}
                                     </div>
-                                    {voucher.max_total_uses && (
-                                        <div>
-                                            {__('vouchers.limit')}: {voucher.max_total_uses}
-                                        </div>
-                                    )}
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-20 px-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed mb-12">
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 mb-6">
-                            <Ticket className="h-10 w-10 text-slate-400" />
+                                </div>
+                            ))}
                         </div>
-                        <h3 className="text-2xl font-bold mb-2">{__('vouchers.empty.title')}</h3>
-                        <p className="text-muted-foreground max-w-7xl mx-auto">
-                            {__('vouchers.empty.description')}
-                        </p>
-                    </div>
-                )}
+                    ) : (
+                        <div className="bg-white border border-black/5 rounded-[24px] p-12 text-center shadow-sm max-w-xl mx-auto">
+                            <div className="w-14 h-14 rounded-2xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3] mx-auto mb-4">
+                                <Ticket className="w-7 h-7" />
+                            </div>
+                            <h3 className="text-base font-bold text-[#1d1d1f] font-sans">{__('vouchers.empty.title')}</h3>
+                            <p className="text-xs text-[#1d1d1f]/60 max-w-md mx-auto mt-1 leading-relaxed">
+                                {__('vouchers.empty.description')}
+                            </p>
+                        </div>
+                    )}
 
-                {/* Redemption History Table */}
-                {redemptions.data.length > 0 && (
-                    <Card className="border-0 shadow-sm">
-                        <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b pb-4">
-                            <h3 className="font-semibold text-lg flex items-center gap-2">
-                                <History className="h-5 w-5 text-muted-foreground" />
-                                {__('vouchers.redemptions.title')}
-                            </h3>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="hover:bg-transparent">
-                                        <TableHead>{__('vouchers.voucher')}</TableHead>
-                                        <TableHead>{__('vouchers.redemptions.spent')}</TableHead>
-                                        <TableHead>{__('vouchers.redemptions.reward_received')}</TableHead>
-                                        <TableHead>{__('vouchers.redemptions.date')}</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {redemptions.data.map((redemption) => (
-                                        <TableRow key={redemption.id}>
-                                            <TableCell className="font-medium">
-                                                {redemption.voucher.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatCurrency(redemption.spent_amount, userCurrency)}
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                    {/* Redemption History Table */}
+                    {redemptions?.data?.length > 0 && (
+                        <div className="bg-white rounded-[24px] border border-black/5 shadow-sm p-6 sm:p-8 space-y-6">
+                            <div className="flex items-center gap-2 border-b border-black/5 pb-4">
+                                <History className="h-5 w-5 text-[#0071e3]" />
+                                <h3 className="font-bold text-base text-[#1d1d1f] font-sans">
+                                    {__('vouchers.redemptions.title')}
+                                </h3>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-start border-collapse">
+                                    <thead>
+                                        <tr className="bg-[#f5f5f7]/60 text-[11px] font-semibold text-[#1d1d1f]/50 uppercase tracking-wider border-b border-black/5">
+                                            <th className="py-3 ps-6 text-start">{__('vouchers.voucher')}</th>
+                                            <th className="py-3 px-4 text-start">{__('vouchers.redemptions.spent')}</th>
+                                            <th className="py-3 px-4 text-start">{__('vouchers.redemptions.reward_received')}</th>
+                                            <th className="py-3 pe-6 text-end">{__('vouchers.redemptions.date')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-black/5 text-xs sm:text-sm">
+                                        {redemptions.data.map((redemption) => (
+                                            <tr key={redemption.id} className="hover:bg-[#f5f5f7]/40 transition-colors">
+                                                <td className="py-4 ps-6 font-semibold text-[#1d1d1f]">
+                                                    {redemption.voucher.name}
+                                                </td>
+                                                <td className="py-4 px-4 font-mono font-medium text-[#1d1d1f]/70">
+                                                    {formatCurrency(redemption.spent_amount, userCurrency)}
+                                                </td>
+                                                <td className="py-4 px-4 font-mono font-bold text-emerald-600">
                                                     +{formatCurrency(redemption.reward_amount, userCurrency)}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {new Date(redemption.created_at).toLocaleDateString()} {new Date(redemption.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                )}
+                                                </td>
+                                                <td className="py-4 pe-6 text-end text-xs text-[#1d1d1f]/50 font-sans">
+                                                    {new Date(redemption.created_at).toLocaleDateString()} {new Date(redemption.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+
             </div>
         </AuthenticatedLayout>
     );

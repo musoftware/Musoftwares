@@ -44,6 +44,7 @@ interface Props {
     testingAccountId: number | null;
     onReconnectAccount: (acc: Account) => void;
     onDeleteAccount: (id: number) => void;
+    onManageProfile?: (acc: Account) => void;
 }
 
 export default function AccountsHealthTab({
@@ -58,6 +59,7 @@ export default function AccountsHealthTab({
     testingAccountId,
     onReconnectAccount,
     onDeleteAccount,
+    onManageProfile,
 }: Props) {
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
@@ -241,6 +243,15 @@ export default function AccountsHealthTab({
 
                                         {openMenuId === acc.id && (
                                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-20 py-1 text-xs">
+                                                {onManageProfile && (
+                                                    <button
+                                                        onClick={() => { onManageProfile(acc); setOpenMenuId(null); }}
+                                                        className="w-full text-left px-4 py-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 flex items-center gap-2 font-semibold"
+                                                    >
+                                                        <Edit3 className="w-3.5 h-3.5 text-emerald-500" />
+                                                        Manage Business Profile
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={() => { onTestAccount(acc.id); setOpenMenuId(null); }}
                                                     className="w-full text-left px-4 py-2 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2"

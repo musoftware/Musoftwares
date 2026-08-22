@@ -2153,6 +2153,17 @@
             "manager_response_placeholder": "أدخل ردك أو سبب الرفض هنا..."
         },
         "general": {
+            "menu": "القائمة",
+            "explore_menu": "استكشاف الأنظمة والخدمات",
+            "workspace_projects": "مساحة العمل والمشاريع",
+            "cloud_apps": "الأنظمة السحابية والتطبيقات",
+            "financials_billing": "المالية والفواتير",
+            "services_tools": "الخدمات والأدوات",
+            "cost_estimator_desc": "حساب تكلفة وتفاصيل المشروع فوراً",
+            "deposit_to_wallet": "شحن وإيداع رصيد في المحفظة",
+            "gold_vault_hedging": "حفظ المدخرات والأصول بالذهب",
+            "manage_plans_and_addons": "إدارة الباقات والوحدات والإضافات",
+            "marketplace_services_desc": "تصفح وطلب الخدمات والحلول الرقمية",
             "solutions": "الحلول البرمجية",
             "estimator": "حاسبة التكلفة",
             "portfolio": "الأعمال والمشاريع",
@@ -10338,7 +10349,11 @@
             "desktop_apps": "برامج الديسك توب",
             "founder": "محمود أمين",
             "mobile_apps": "تطبيقات الموبايل",
-            "web_apps": "تطبيقات الويب"
+            "web_apps": "تطبيقات الويب",
+            "invoice_paid_successfully": "تم سداد الفاتورة بنجاح",
+            "invoice_settled_via_wallet": "تمت تسوية الفاتورة وخصمها من رصيد المحفظة بنجاح.",
+            "later": "لاحقاً",
+            "write_comment_or_feedback": "اكتب تعليقاً أو ملاحظة..."
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -11237,7 +11252,8 @@
                 "create_help_text": "احرص على كتابة عنوان ووصف واضح لجذب العملاء",
                 "edit_help_text": "تأكد من تحديث أسعار وباقات الخدمة عند التعديل",
                 "title": "نصيحة هامة"
-            }
+            },
+            "unexpected_payment_error": "حدث خطأ غير متوقع أثناء معالجة الدفع. يرجى المحاولة مرة أخرى."
         },
         "presets": {
             "ecommerce_title": "متجر إلكتروني",
@@ -14957,6 +14973,17 @@
             "your_musoftwares_account": "Your Musoftwares Account"
         },
         "general": {
+            "menu": "Menu",
+            "explore_menu": "Explore Systems & Services",
+            "workspace_projects": "Workspace & Projects",
+            "cloud_apps": "iSAAS Cloud Systems",
+            "financials_billing": "Financials & Billing",
+            "services_tools": "Services & Estimators",
+            "cost_estimator_desc": "Instant cost calculation",
+            "deposit_to_wallet": "Top-up wallet balance",
+            "gold_vault_hedging": "Gold savings & assets",
+            "manage_plans_and_addons": "Plans, modules & addons",
+            "marketplace_services_desc": "Browse & order digital services",
             "solutions": "Solutions",
             "estimator": "Estimator",
             "portfolio": "Work",
@@ -23142,7 +23169,11 @@
             "desktop_apps": "Desktop Apps",
             "founder": "Founder",
             "mobile_apps": "Mobile Apps",
-            "web_apps": "Web Apps"
+            "web_apps": "Web Apps",
+            "invoice_paid_successfully": "Invoice paid successfully",
+            "invoice_settled_via_wallet": "Invoice has been settled via your platform wallet.",
+            "later": "Later",
+            "write_comment_or_feedback": "Write a comment or feedback..."
         },
         "gold_saver": {
             "achieved": "Achieved",
@@ -24041,7 +24072,8 @@
             "total_net_pay": "Total Net Pay",
             "total_value": "Total Value",
             "view_in_admin_panel": "View In Admin Panel",
-            "yes_the_android_app_only": "Yes The Android App Only"
+            "yes_the_android_app_only": "Yes The Android App Only",
+            "unexpected_payment_error": "An unexpected error occurred during payment. Please try again."
         },
         "presets": {
             "ecommerce_title": "E-Commerce App",

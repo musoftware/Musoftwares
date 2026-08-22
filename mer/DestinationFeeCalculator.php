@@ -3,8 +3,6 @@
 namespace App\Services\Calculations\PayService;
 
 use App\Models\CurrenciesExchange;
-use App\Models\GoldWorldPrice;
-use App\Models\GoldPrice;
 use Illuminate\Support\Facades\DB;
 
 class DestinationFeeCalculator
@@ -55,28 +53,9 @@ class DestinationFeeCalculator
         }
 
         if ($dest === 'redot') {
-            // Note: The original logic overrides the entire cost and ignores source fees.
-            // Retaining original behavior based on the old script.
-            $item = GoldWorldPrice::query()
-                ->select(DB::raw('DATE(price_date) as price_date, avg(price_24k) as price_24k, avg(price_22k) as price_22k, avg(price_21k) as price_21k, avg(price_18k) as price_18k, avg(price_14k) as price_14k'))
-                ->groupBy(DB::raw('DATE(price_date)'))
-                ->orderBy(DB::raw('DATE(price_date)'), 'desc')
-                ->first();
-            
-            if ($item) {
-                $usdPrice1 = CurrenciesExchange::RateByDate($item->price_date, $item->price_21k, $usd_currency_id, 1);
-                $price_21 = GoldPrice::query()
-                    ->where(DB::raw('DATE(price_date)'), $item->price_date)
-                    ->select(DB::raw('avg(price_21k) as price_21k'))
-                    ->groupBy(DB::raw('DATE(price_date)'))
-                    ->first();
+            $cost = round($cost / (1 - 0.044), 2);
 
-                if ($usdPrice1 > 0 && $price_21) {
-                    $new_cost = (int)$original_amount * ($price_21->price_21k / $usdPrice1);
-                    $new_cost = round($new_cost / (1 - 0.044), 2);
-                    return round($new_cost / (1 - 0.035), 2);
-                }
-            }
+            return round($cost / (1 - 0.035), 2);
         }
 
         // 'cash', 'bank_transfer', 'paypal' passed from UI

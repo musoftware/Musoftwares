@@ -17,7 +17,21 @@ import {
     FileText,
     Smartphone,
     ArrowLeft,
-    Shield
+    Shield,
+    Paperclip,
+    Image as ImageIcon,
+    FileCode,
+    Tag,
+    StickyNote,
+    SlidersHorizontal,
+    Plus,
+    Trash2,
+    CornerDownLeft,
+    ChevronRight,
+    Edit2,
+    Save,
+    Smile,
+    Radio
 } from 'lucide-react';
 import {
     Tooltip,
@@ -66,6 +80,7 @@ interface Conversation {
     is_ctwa_ad?: boolean;
     referral?: any;
     free_window_expires_at?: string;
+    tags?: string[];
 }
 
 interface ChatMessage {
@@ -85,11 +100,25 @@ interface ChatMessage {
     account_name?: string | null;
 }
 
+interface QuickReply {
+    shortcut: string;
+    title: string;
+    message: string;
+}
+
 interface Props {
     business: Business;
     accounts: Account[];
     templates: Template[];
 }
+
+const AVAILABLE_TAGS = [
+    { label: 'VIP', color: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-950 dark:text-purple-300' },
+    { label: 'Lead', color: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950 dark:text-blue-300' },
+    { label: 'Urgent', color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300' },
+    { label: 'Pending', color: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300' },
+    { label: 'Resolved', color: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300' },
+];
 
 export default function DedicatedLiveChat({ business, accounts, templates }: Props) {
     const queryAccountId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('account_id') : null;
@@ -107,22 +136,61 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [activeContact, setActiveContact] = useState<{ name: string; phone: string; group_name?: string; custom_fields?: any } | null>(null);
+    const [freeWindowInfo, setFreeWindowInfo] = useState<any | null>(null);
     const [loadingConversations, setLoadingConversations] = useState(false);
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [sending, setSending] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [channelFilter, setChannelFilter] = useState<'all' | 'ctwa' | 'whatsapp'>('all');
+    const [tagFilter, setTagFilter] = useState<string>('all');
 
     const [messageText, setMessageText] = useState('');
-    const [messageType, setMessageType] = useState<'text' | 'template'>('text');
+    const [messageType, setMessageType] = useState<'text' | 'template' | 'interactive'>('text');
     const [selectedTemplate, setSelectedTemplate] = useState<string>('');
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+    // Rich Features States
+    const [quickReplies, setQuickReplies] = useState<QuickReply[]>([]);
+    const [showQuickRepliesPopup, setShowQuickRepliesPopup] = useState(false);
+    const [filteredQuickReplies, setFilteredQuickReplies] = useState<QuickReply[]>([]);
+    const [selectedQuickReplyIndex, setSelectedQuickReplyIndex] = useState(0);
+
+    // Media attachment state
+    const [showMediaModal, setShowMediaModal] = useState(false);
+    const [mediaType, setMediaType] = useState<'image' | 'document'>('image');
+    const [selectedMediaFile, setSelectedMediaFile] = useState<File | null>(null);
+    const [mediaCaption, setMediaCaption] = useState('');
+    const [mediaPreviewUrl, setMediaPreviewUrl] = useState<string | null>(null);
+
+    // Interactive buttons state
+    const [showInteractiveModal, setShowInteractiveModal] = useState(false);
+    const [interactiveBody, setInteractiveBody] = useState('How would you like to proceed?');
+    const [interactiveButtons, setInteractiveButtons] = useState<string[]>(['Yes, please', 'Talk to human', 'Not now']);
+
+    // Right CRM Sidebar
+    const [showCrmSidebar, setShowCrmSidebar] = useState(true);
+    const [isEditingContactName, setIsEditingContactName] = useState(false);
+    const [contactNameInput, setContactNameInput] = useState('');
+    const [contactNotesInput, setContactNotesInput] = useState('');
+    const [isSavingCrm, setIsSavingCrm] = useState(false);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const mediaInputRef = useRef<HTMLInputElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // Load Quick Replies
+    const fetchQuickReplies = async () => {
+        try {
+            const res = await axios.get(`/whatsapp-sender/businesses/${business.id}/quick-replies`);
+            if (res.data.success && Array.isArray(res.data.quick_replies)) {
+                setQuickReplies(res.data.quick_replies);
+            }
+        } catch (err) {
+            console.error('Failed to load quick replies:', err);
+        }
     };
 
     // Load active conversations
@@ -153,13 +221,18 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             });
             if (res.data) {
                 setMessages(res.data.messages || []);
+                setFreeWindowInfo(res.data.free_window || null);
                 if (res.data.contact) {
                     setActiveContact(res.data.contact);
+                    setContactNameInput(res.data.contact.name || '');
+                    setContactNotesInput(res.data.contact.custom_fields?.internal_notes || '');
                 } else {
                     setActiveContact({
                         name: `Customer ${phone}`,
                         phone: phone,
                     });
+                    setContactNameInput(`Customer ${phone}`);
+                    setContactNotesInput('');
                 }
             }
         } catch (err) {
@@ -170,9 +243,9 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
         }
     };
 
-    // Initial load & Single Polling interval (5s)
     useEffect(() => {
         fetchConversations();
+        fetchQuickReplies();
         const interval = setInterval(() => {
             fetchConversations();
             if (selectedPhoneRef.current) {
@@ -183,7 +256,6 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [business.id]);
 
-    // Fetch messages immediately when selectedPhone changes
     useEffect(() => {
         if (selectedPhone) {
             fetchChatMessages(selectedPhone);
@@ -192,6 +264,31 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPhone]);
+
+    // Handle Quick Reply `/` shortcut in textarea
+    const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const val = e.target.value;
+        setMessageText(val);
+
+        if (val.startsWith('/')) {
+            const query = val.toLowerCase();
+            const matches = quickReplies.filter(q =>
+                q.shortcut.toLowerCase().includes(query) ||
+                q.title.toLowerCase().includes(query) ||
+                q.message.toLowerCase().includes(query)
+            );
+            setFilteredQuickReplies(matches.length > 0 ? matches : quickReplies);
+            setShowQuickRepliesPopup(true);
+            setSelectedQuickReplyIndex(0);
+        } else {
+            setShowQuickRepliesPopup(false);
+        }
+    };
+
+    const applyQuickReply = (qr: QuickReply) => {
+        setMessageText(qr.message);
+        setShowQuickRepliesPopup(false);
+    };
 
     const handleSendMessage = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -222,7 +319,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
             if (messageType === 'text') {
                 payload.message_body = messageText.trim();
-            } else {
+            } else if (messageType === 'template') {
                 payload.template_name = selectedTemplate;
                 payload.template_language = templates.find(t => t.name === selectedTemplate)?.language || 'en_US';
             }
@@ -232,6 +329,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             if (res.data && res.data.success) {
                 setMessageText('');
                 setMessageType('text');
+                setShowQuickRepliesPopup(false);
                 if (res.data.log) {
                     setMessages(prev => [...prev, res.data.log]);
                     setTimeout(scrollToBottom, 100);
@@ -250,15 +348,139 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
         }
     };
 
+    const handleSendMedia = async () => {
+        if (!selectedPhone || !selectedMediaFile) return;
+        setSending(true);
+        setErrorMsg(null);
+
+        const formData = new FormData();
+        formData.append('whatsapp_account_id', String(selectedAccountId));
+        formData.append('recipient_phone', selectedPhone);
+        formData.append('message_type', mediaType);
+        formData.append('media_file', selectedMediaFile);
+        if (mediaCaption.trim()) {
+            formData.append('caption', mediaCaption.trim());
+        }
+
+        try {
+            const res = await axios.post(`/whatsapp-sender/businesses/${business.id}/send-chat-message`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            if (res.data && res.data.success) {
+                setShowMediaModal(false);
+                setSelectedMediaFile(null);
+                setMediaCaption('');
+                setMediaPreviewUrl(null);
+                if (res.data.log) {
+                    setMessages(prev => [...prev, res.data.log]);
+                    setTimeout(scrollToBottom, 100);
+                } else {
+                    fetchChatMessages(selectedPhone);
+                }
+                fetchConversations();
+            } else {
+                setErrorMsg(res.data.error || 'Failed to send media file.');
+            }
+        } catch (err: any) {
+            setErrorMsg(err.response?.data?.error || 'Failed to upload and send media.');
+        } finally {
+            setSending(false);
+        }
+    };
+
+    const handleSendInteractiveButtons = async () => {
+        if (!selectedPhone || !interactiveBody.trim()) return;
+        setSending(true);
+        setErrorMsg(null);
+
+        const validButtons = interactiveButtons.map(b => b.trim()).filter(Boolean);
+
+        try {
+            const res = await axios.post(`/whatsapp-sender/businesses/${business.id}/send-chat-message`, {
+                whatsapp_account_id: selectedAccountId,
+                recipient_phone: selectedPhone,
+                message_type: 'interactive',
+                message_body: interactiveBody.trim(),
+                buttons: validButtons,
+            });
+
+            if (res.data && res.data.success) {
+                setShowInteractiveModal(false);
+                if (res.data.log) {
+                    setMessages(prev => [...prev, res.data.log]);
+                    setTimeout(scrollToBottom, 100);
+                } else {
+                    fetchChatMessages(selectedPhone);
+                }
+                fetchConversations();
+            } else {
+                setErrorMsg(res.data.error || 'Failed to send interactive buttons.');
+            }
+        } catch (err: any) {
+            setErrorMsg(err.response?.data?.error || 'Failed to send interactive buttons.');
+        } finally {
+            setSending(false);
+        }
+    };
+
+    const handleSaveCrmDetails = async () => {
+        if (!selectedPhone) return;
+        setIsSavingCrm(true);
+        try {
+            const currentTags = activeContact?.custom_fields?.tags || [];
+            const res = await axios.post(`/whatsapp-sender/businesses/${business.id}/contacts/crm`, {
+                phone: selectedPhone,
+                name: contactNameInput,
+                tags: currentTags,
+                internal_notes: contactNotesInput,
+            });
+            if (res.data.success) {
+                setActiveContact(res.data.contact);
+                setIsEditingContactName(false);
+                fetchConversations();
+            }
+        } catch (err) {
+            console.error('Failed to save CRM details:', err);
+        } finally {
+            setIsSavingCrm(false);
+        }
+    };
+
+    const handleToggleTag = async (tagLabel: string) => {
+        if (!selectedPhone) return;
+        const currentTags: string[] = activeContact?.custom_fields?.tags || [];
+        const newTags = currentTags.includes(tagLabel)
+            ? currentTags.filter(t => t !== tagLabel)
+            : [...currentTags, tagLabel];
+
+        try {
+            const res = await axios.post(`/whatsapp-sender/businesses/${business.id}/contacts/crm`, {
+                phone: selectedPhone,
+                name: contactNameInput || activeContact?.name,
+                tags: newTags,
+                internal_notes: contactNotesInput,
+            });
+            if (res.data.success) {
+                setActiveContact(res.data.contact);
+                fetchConversations();
+            }
+        } catch (err) {
+            console.error('Failed to update tags:', err);
+        }
+    };
+
     // Filtered conversations
     const filteredConversations = conversations.filter(c => {
         const matchesSearch = c.recipient_phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
             c.contact_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (c.last_message && c.last_message.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        if (channelFilter === 'ctwa') return matchesSearch && (c.is_ctwa_ad || c.referral);
-        if (channelFilter === 'whatsapp') return matchesSearch && (c.channel === 'whatsapp' || !c.channel);
-        return matchesSearch;
+        if (!matchesSearch) return false;
+        if (tagFilter === 'all') return true;
+        if (tagFilter === 'ctwa') return c.is_ctwa_ad || c.referral;
+        const contactTags = c.tags || [];
+        return contactTags.includes(tagFilter);
     });
 
     const formatTimestamp = (dateStr: string) => {
@@ -283,22 +505,25 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
     const activeReferral = messages.find(m => m.referral)?.referral;
     const selectedAccount = accounts.find(a => a.id === selectedAccountId);
+    const activeContactTags: string[] = activeContact?.custom_fields?.tags || [];
+
+    const isWindowActive = freeWindowInfo?.is_active ?? true;
 
     return (
-        <div className="h-screen max-h-screen w-screen overflow-hidden flex bg-[#f0f2f5] text-zinc-800 font-sans antialiased select-none">
+        <div className="h-screen max-h-screen w-screen overflow-hidden flex bg-[#f0f2f5] dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 font-sans antialiased select-none">
             <Head title={`WhatsApp Web Live Chat - ${business.name}`} />
 
             {/* 1. Leftmost Slim Multi-Account Switcher Drawer */}
-            <div className="w-16 md:w-20 bg-[#f0f2f5] border-r border-[#e9edef] flex flex-col items-center py-3 space-y-4 shrink-0 z-10 overflow-hidden">
+            <div className="w-16 md:w-20 bg-[#f0f2f5] dark:bg-zinc-900 border-r border-[#e9edef] dark:border-zinc-800 flex flex-col items-center py-3 space-y-4 shrink-0 z-10 overflow-hidden">
                 <TooltipProvider>
                     {/* Return to Workspace Button */}
                     <Tooltip delayDuration={150}>
                         <TooltipTrigger asChild>
                             <Link
                                 href={route('whatsapp.businesses.workspace', business.id)}
-                                className="w-10 h-10 rounded-full bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-600 flex items-center justify-center transition shadow-xs"
+                                className="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition shadow-xs cursor-pointer"
                             >
-                                <ArrowLeft className="w-5 h-5 text-zinc-700" />
+                                <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-200" />
                             </Link>
                         </TooltipTrigger>
                         <TooltipContent side="right" className="bg-zinc-900 text-white font-bold border-zinc-800 text-xs px-3 py-1.5 shadow-xl">
@@ -306,7 +531,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                         </TooltipContent>
                     </Tooltip>
 
-                    <div className="w-8 border-b border-zinc-300"></div>
+                    <div className="w-8 border-b border-zinc-300 dark:border-zinc-700"></div>
 
                     {/* Multi-Account Drawer List */}
                     <div className="flex-1 w-full overflow-y-auto space-y-3 px-2 flex flex-col items-center">
@@ -322,14 +547,14 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         <TooltipTrigger asChild>
                                             <button
                                                 onClick={() => setSelectedAccountId(acc.id)}
-                                                className={`relative w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                                                className={`relative w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer ${
                                                     isAccSelected
                                                         ? 'bg-[#00a884] text-white shadow-sm border-2 border-[#00a884]'
-                                                        : 'bg-white hover:bg-zinc-100 text-zinc-600 border border-zinc-200'
+                                                        : 'bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
                                                 }`}
                                             >
                                                 <Smartphone className="w-5 h-5" />
-                                                <span className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isAccActive ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                                <span className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-zinc-800 ${isAccActive ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                                             </button>
                                         </TooltipTrigger>
                                         <TooltipContent side="right" className="bg-zinc-900 text-white font-bold border-zinc-800 text-xs px-3 py-1.5 shadow-xl">
@@ -344,15 +569,15 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             </div>
 
             {/* 2. Conversations & Search Column */}
-            <div className="w-80 md:w-96 bg-white border-r border-[#e9edef] flex flex-col h-full shrink-0 z-10">
+            <div className="w-80 md:w-96 bg-white dark:bg-zinc-900 border-r border-[#e9edef] dark:border-zinc-800 flex flex-col h-full shrink-0 z-10">
                 {/* Column Header */}
-                <div className="p-3.5 border-b border-[#e9edef] bg-[#f0f2f5] flex items-center justify-between">
+                <div className="p-3.5 border-b border-[#e9edef] dark:border-zinc-800 bg-[#f0f2f5] dark:bg-zinc-900 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-9 h-9 rounded-full bg-[#00a884] text-white flex items-center justify-center font-bold text-sm shadow-xs">
                             <MessageSquare className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-xs font-bold text-zinc-900 tracking-wide flex items-center gap-1.5">
+                            <h2 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 tracking-wide flex items-center gap-1.5">
                                 WhatsApp Web
                             </h2>
                             <p className="text-[11px] text-[#00a884] font-mono font-bold flex items-center gap-1">
@@ -364,50 +589,54 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
                     <button
                         onClick={() => { fetchConversations(); if (selectedPhone) fetchChatMessages(selectedPhone); }}
-                        className="p-2 rounded-lg bg-white hover:bg-zinc-100 text-zinc-600 transition border border-zinc-200"
+                        className="p-2 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition border border-zinc-200 dark:border-zinc-700 cursor-pointer"
                         title="Refresh Conversations"
                     >
                         <RefreshCw className={`w-4 h-4 ${loadingConversations || loadingMessages ? 'animate-spin text-[#00a884]' : ''}`} />
                     </button>
                 </div>
 
-                {/* Search & CTWA Filter Bar */}
-                <div className="p-2.5 border-b border-[#e9edef] space-y-2 bg-[#f0f2f5]">
+                {/* Search & Tag Filter Pills */}
+                <div className="p-2.5 border-b border-[#e9edef] dark:border-zinc-800 space-y-2 bg-[#f0f2f5] dark:bg-zinc-900">
                     <div className="relative">
                         <Search className="w-4 h-4 absolute left-3 top-2.5 text-zinc-400" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search or start new chat..."
-                            className="w-full pl-9 pr-3 py-1.5 bg-white border border-transparent rounded-lg text-xs text-zinc-800 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#00a884] transition-all shadow-xs"
+                            placeholder="Search chats or phone..."
+                            className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-zinc-800 border border-transparent rounded-lg text-xs text-zinc-800 dark:text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#00a884] transition-all shadow-xs"
                         />
                     </div>
 
-                    <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-zinc-200">
+                    {/* Tag Filter Pills */}
+                    <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-[10px]">
                         <button
-                            onClick={() => setChannelFilter('all')}
-                            className={`flex-1 py-1 text-[10px] font-semibold rounded-md transition-all ${channelFilter === 'all' ? 'bg-[#00a884] text-white shadow-xs' : 'text-zinc-600 hover:text-zinc-900'}`}
+                            onClick={() => setTagFilter('all')}
+                            className={`px-2.5 py-1 font-semibold rounded-lg shrink-0 transition-all cursor-pointer ${tagFilter === 'all' ? 'bg-[#00a884] text-white shadow-xs' : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'}`}
                         >
                             All
                         </button>
                         <button
-                            onClick={() => setChannelFilter('ctwa')}
-                            className={`flex-1 py-1 text-[10px] font-bold rounded-md transition-all ${channelFilter === 'ctwa' ? 'bg-amber-500 text-black shadow-xs' : 'text-amber-700 hover:text-amber-800'}`}
+                            onClick={() => setTagFilter('ctwa')}
+                            className={`px-2.5 py-1 font-bold rounded-lg shrink-0 transition-all cursor-pointer ${tagFilter === 'ctwa' ? 'bg-amber-500 text-black shadow-xs' : 'bg-white dark:bg-zinc-800 text-amber-600 border border-amber-200 dark:border-amber-900'}`}
                         >
                             🔥 CTWA Ads
                         </button>
-                        <button
-                            onClick={() => setChannelFilter('whatsapp')}
-                            className={`flex-1 py-1 text-[10px] font-semibold rounded-md transition-all ${channelFilter === 'whatsapp' ? 'bg-zinc-800 text-white shadow-xs' : 'text-zinc-600 hover:text-zinc-900'}`}
-                        >
-                            WhatsApp
-                        </button>
+                        {AVAILABLE_TAGS.map(t => (
+                            <button
+                                key={t.label}
+                                onClick={() => setTagFilter(tagFilter === t.label ? 'all' : t.label)}
+                                className={`px-2.5 py-1 font-semibold rounded-lg shrink-0 transition-all cursor-pointer ${tagFilter === t.label ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs' : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'}`}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
                 {/* Scrollable Conversations List */}
-                <div className="flex-1 overflow-y-auto divide-y divide-[#f0f2f5]">
+                <div className="flex-1 overflow-y-auto divide-y divide-[#f0f2f5] dark:divide-zinc-800/60">
                     {loadingConversations && conversations.length === 0 ? (
                         <div className="p-8 text-center text-zinc-400 text-xs flex flex-col items-center gap-2">
                             <RefreshCw className="w-5 h-5 animate-spin text-[#00a884]" />
@@ -415,7 +644,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                         </div>
                     ) : filteredConversations.length === 0 ? (
                         <div className="p-8 text-center text-zinc-400 text-xs">
-                            No chats found. Incoming webhook messages will appear here.
+                            No conversations match your filter.
                         </div>
                     ) : (
                         filteredConversations.map((conv) => {
@@ -427,20 +656,20 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                     onClick={() => setSelectedPhone(conv.recipient_phone)}
                                     className={`p-3 flex items-start gap-3 cursor-pointer transition-all ${
                                         isSelected
-                                            ? 'bg-[#f0f2f5] border-l-4 border-[#00a884]'
-                                            : 'hover:bg-zinc-50 border-l-4 border-transparent'
+                                            ? 'bg-[#f0f2f5] dark:bg-zinc-800 border-l-4 border-[#00a884]'
+                                            : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-l-4 border-transparent'
                                     }`}
                                 >
-                                    <div className={`w-11 h-11 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${isAd ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}`}>
-                                        {conv.contact_name ? conv.contact_name.charAt(0).toUpperCase() : <User className="w-4 h-4 text-emerald-700" />}
+                                    <div className={`w-11 h-11 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${isAd ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200'}`}>
+                                        {conv.contact_name ? conv.contact_name.charAt(0).toUpperCase() : <User className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />}
                                     </div>
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-1">
-                                            <h4 className="text-xs font-semibold text-zinc-900 truncate flex items-center gap-1">
+                                            <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate flex items-center gap-1">
                                                 {conv.contact_name || `+${conv.recipient_phone}`}
                                                 {isAd && (
-                                                    <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300 font-bold text-[9px]">
+                                                    <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 font-bold text-[9px]">
                                                         🔥 CTWA
                                                     </span>
                                                 )}
@@ -465,17 +694,17 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             </div>
 
             {/* 3. Main WhatsApp Web Chat Canvas */}
-            <div className="flex-1 bg-[#efeae2] flex flex-col h-full relative overflow-hidden">
+            <div className="flex-1 bg-[#efeae2] dark:bg-zinc-900 flex flex-col h-full relative overflow-hidden">
                 {selectedPhone ? (
                     <>
                         {/* Chat Header */}
-                        <div className="px-5 py-3 bg-[#f0f2f5] border-b border-[#e9edef] flex items-center justify-between shadow-xs z-10">
+                        <div className="px-5 py-3 bg-[#f0f2f5] dark:bg-zinc-900 border-b border-[#e9edef] dark:border-zinc-800 flex items-center justify-between shadow-xs z-10">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-[#00a884] flex items-center justify-center text-white font-bold text-sm shadow-xs">
                                     {activeContact?.name ? activeContact.name.charAt(0).toUpperCase() : 'C'}
                                 </div>
                                 <div>
-                                    <h3 className="text-xs font-bold text-zinc-900 flex items-center gap-2">
+                                    <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                                         {activeContact?.name || selectedPhone}
                                         <a
                                             href={`https://wa.me/${selectedPhone.replace(/[^0-9]/g, '')}`}
@@ -493,39 +722,71 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                 </div>
                             </div>
 
-                            {/* 72-Hour Golden Window Timer Badge */}
+                            {/* Window Badges & CRM Toggle */}
                             <div className="flex items-center gap-3">
                                 {activeReferral ? (
-                                    <div className="px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold flex items-center gap-1.5 shadow-xs">
+                                    <div className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-300 text-amber-900 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 shadow-xs">
                                         <Clock className="w-4 h-4 text-amber-600" />
-                                        <span>⚡ 72h Free Ad Window: {calculateRemainingTime(messages.find(m => m.referral)?.created_at ? new Date(new Date(messages.find(m => m.referral)!.created_at).getTime() + 72*3600*1000).toISOString() : undefined) || '71h left'}</span>
+                                        <span>⚡ 72h Free Ad Window</span>
                                     </div>
                                 ) : (
-                                    <div className="px-3 py-1 rounded-full bg-white border border-zinc-200 text-zinc-600 text-[11px] flex items-center gap-1.5 shadow-xs">
-                                        <Clock className="w-3.5 h-3.5 text-[#00a884]" />
-                                        <span>24h Customer Window</span>
+                                    <div className={`px-3 py-1 rounded-full border text-[11px] font-semibold flex items-center gap-1.5 shadow-xs ${
+                                        isWindowActive
+                                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
+                                            : 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
+                                    }`}>
+                                        <Clock className={`w-3.5 h-3.5 ${isWindowActive ? 'text-[#00a884]' : 'text-rose-500'}`} />
+                                        <span>{isWindowActive ? '24h Session Active' : '24h Window Expired (Use Template)'}</span>
                                     </div>
                                 )}
+
+                                <button
+                                    onClick={() => setShowCrmSidebar(!showCrmSidebar)}
+                                    className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                                        showCrmSidebar
+                                            ? 'bg-[#00a884] text-white border-[#00a884]'
+                                            : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
+                                    }`}
+                                    title="Toggle Contact CRM & Notes"
+                                >
+                                    <SlidersHorizontal className="w-4 h-4" />
+                                </button>
                             </div>
                         </div>
 
+                        {/* 24h Policy Safeguard Alert if window expired */}
+                        {!isWindowActive && (
+                            <div className="px-4 py-2 bg-amber-500 text-zinc-950 text-xs font-bold flex items-center justify-between shadow-xs">
+                                <span className="flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                    The 24-hour free customer session has expired. To resume conversation, Meta requires sending an approved Message Template.
+                                </span>
+                                <button
+                                    onClick={() => setMessageType('template')}
+                                    className="px-3 py-1 bg-zinc-900 text-white rounded-lg text-[11px] hover:bg-black transition-all cursor-pointer"
+                                >
+                                    Select Template
+                                </button>
+                            </div>
+                        )}
+
                         {/* WhatsApp Web Chat Thread Area */}
-                        <div className="flex-1 p-6 overflow-y-auto space-y-3 bg-[#efeae2] bg-[radial-gradient(#e5ddd0_1px,transparent_1px)] [background-size:16px_16px]">
+                        <div className="flex-1 p-6 overflow-y-auto space-y-3 bg-[#efeae2] dark:bg-zinc-950 bg-[radial-gradient(#e5ddd0_1px,transparent_1px)] dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px]">
                             {/* CTWA Meta Ad Referral Card */}
                             {activeReferral && (
-                                <div className="mb-4 p-4 bg-amber-50 border border-amber-300 rounded-2xl text-xs text-amber-900 flex items-start gap-3 shadow-sm">
+                                <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-2xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-3 shadow-sm">
                                     <Sparkles className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                     <div className="flex-1 space-y-1">
-                                        <div className="font-bold text-amber-900 flex items-center justify-between">
+                                        <div className="font-bold text-amber-900 dark:text-amber-200 flex items-center justify-between">
                                             <span>🔥 Came from Meta Ad: {activeReferral.headline || 'Click to WhatsApp Campaign'}</span>
                                             {activeReferral.ctwa_clid && (
-                                                <span className="font-mono text-[10px] bg-amber-200 px-2 py-0.5 rounded text-amber-900 border border-amber-300">
+                                                <span className="font-mono text-[10px] bg-amber-200 dark:bg-amber-900 px-2 py-0.5 rounded text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
                                                     CLID: {activeReferral.ctwa_clid}
                                                 </span>
                                             )}
                                         </div>
-                                        {activeReferral.body && <p className="text-[11px] text-amber-800">{activeReferral.body}</p>}
-                                        <div className="text-[10px] text-amber-700 font-mono">
+                                        {activeReferral.body && <p className="text-[11px] text-amber-800 dark:text-amber-300">{activeReferral.body}</p>}
+                                        <div className="text-[10px] text-amber-700 dark:text-amber-400 font-mono">
                                             Ad ID: {activeReferral.source_id || 'N/A'} {activeReferral.source_url && `| ${activeReferral.source_url}`}
                                         </div>
                                     </div>
@@ -545,6 +806,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             ) : (
                                 messages.map((msg) => {
                                     const isInbound = msg.direction === 'inbound' || msg.status === 'inbound';
+                                    const isInteractive = msg.message_type === 'interactive';
+                                    const isImage = msg.message_type === 'image';
+                                    const isDocument = msg.message_type === 'document';
+
                                     return (
                                         <div
                                             key={msg.id}
@@ -553,13 +818,48 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                             <div
                                                 className={`max-w-[75%] md:max-w-[65%] rounded-lg px-3.5 py-2 shadow-xs text-xs leading-relaxed ${
                                                     isInbound
-                                                        ? 'bg-white text-zinc-900 rounded-tl-none border border-zinc-200/80'
-                                                        : 'bg-[#d9fdd3] text-zinc-900 rounded-tr-none border border-[#b5eba9]'
+                                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-tl-none border border-zinc-200/80 dark:border-zinc-700'
+                                                        : 'bg-[#d9fdd3] dark:bg-emerald-950/80 text-zinc-900 dark:text-zinc-100 rounded-tr-none border border-[#b5eba9] dark:border-emerald-800'
                                                 }`}
                                             >
-                                                <div className="whitespace-pre-wrap font-sans break-words text-sm text-zinc-900">
+                                                {/* Image Message */}
+                                                {isImage && msg.payload?.image?.link && (
+                                                    <div className="mb-2 rounded-lg overflow-hidden max-w-xs border border-black/10">
+                                                        <img src={msg.payload.image.link} alt="Attachment" className="w-full h-auto object-cover max-h-64" />
+                                                    </div>
+                                                )}
+
+                                                {/* Document Message */}
+                                                {isDocument && (
+                                                    <div className="mb-2 p-2.5 rounded-lg bg-black/5 dark:bg-white/5 flex items-center gap-2.5 border border-black/10">
+                                                        <FileCode className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="font-semibold text-xs truncate">
+                                                                {msg.payload?.document?.filename || 'Document File'}
+                                                            </div>
+                                                            {msg.payload?.document?.link && (
+                                                                <a href={msg.payload.document.link} target="_blank" rel="noreferrer" className="text-[10px] text-emerald-600 underline">
+                                                                    Download Document
+                                                                </a>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="whitespace-pre-wrap font-sans break-words text-sm text-zinc-900 dark:text-zinc-100">
                                                     {msg.message_body}
                                                 </div>
+
+                                                {/* Interactive Buttons rendering */}
+                                                {isInteractive && msg.payload?.interactive?.action?.buttons && (
+                                                    <div className="mt-2 pt-2 border-t border-black/10 space-y-1">
+                                                        {msg.payload.interactive.action.buttons.map((btn: any, idx: number) => (
+                                                            <div key={idx} className="p-1.5 text-center bg-white/80 dark:bg-zinc-800 rounded text-emerald-600 dark:text-emerald-400 font-bold text-xs border border-emerald-200 dark:border-emerald-800">
+                                                                {btn.reply?.title || 'Option'}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
 
                                                 <div className="mt-1 flex items-center justify-end gap-1 text-[10px] text-zinc-400">
                                                     <span className="font-mono">{formatTimestamp(msg.created_at)}</span>
@@ -581,37 +881,78 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
                         {/* Error banner */}
                         {errorMsg && (
-                            <div className="px-6 py-2 bg-rose-100 border-t border-rose-200 text-rose-800 text-xs flex items-center justify-between">
+                            <div className="px-6 py-2 bg-rose-100 dark:bg-rose-950/60 border-t border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between">
                                 <span className="flex items-center gap-2">
                                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                                     {errorMsg}
                                 </span>
-                                <button onClick={() => setErrorMsg(null)} className="text-rose-600 hover:text-rose-800">
+                                <button onClick={() => setErrorMsg(null)} className="text-rose-600 hover:text-rose-800 cursor-pointer">
                                     <X className="w-4 h-4" />
                                 </button>
                             </div>
                         )}
 
+                        {/* Canned Quick Replies Suggestions Popover */}
+                        {showQuickRepliesPopup && (
+                            <div className="mx-4 mb-2 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-2xl space-y-1 max-h-56 overflow-y-auto z-20 animate-in fade-in slide-in-from-bottom-2">
+                                <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-3 py-1 flex items-center justify-between">
+                                    <span>⚡ Quick Replies (Type to filter)</span>
+                                    <span>Press click or Enter</span>
+                                </div>
+                                {filteredQuickReplies.length === 0 ? (
+                                    <div className="px-3 py-2 text-xs text-zinc-400">No matching quick replies found.</div>
+                                ) : (
+                                    filteredQuickReplies.map((qr, idx) => (
+                                        <button
+                                            key={qr.shortcut}
+                                            type="button"
+                                            onClick={() => applyQuickReply(qr)}
+                                            className="w-full text-left p-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/50 flex items-start gap-2.5 transition-colors cursor-pointer"
+                                        >
+                                            <span className="font-mono text-xs font-bold text-[#00a884] shrink-0 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-md">
+                                                {qr.shortcut}
+                                            </span>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{qr.title}</div>
+                                                <div className="text-[11px] text-zinc-500 truncate">{qr.message}</div>
+                                            </div>
+                                        </button>
+                                    ))
+                                )}
+                            </div>
+                        )}
+
                         {/* Bottom WhatsApp Web Composer */}
-                        <form onSubmit={handleSendMessage} className="p-3 bg-[#f0f2f5] border-t border-[#e9edef] flex flex-col gap-2">
+                        <div className="p-3 bg-[#f0f2f5] dark:bg-zinc-900 border-t border-[#e9edef] dark:border-zinc-800 flex flex-col gap-2">
                             <div className="flex items-center justify-between text-[11px] text-zinc-500">
-                                <button
-                                    type="button"
-                                    onClick={() => setMessageType(messageType === 'text' ? 'template' : 'text')}
-                                    className="text-[#00a884] hover:underline flex items-center gap-1 font-semibold"
-                                >
-                                    <FileText className="w-3.5 h-3.5" />
-                                    {messageType === 'text' ? 'Switch to Approved WABA Template' : 'Switch to Direct Text Reply'}
-                                </button>
-                                <span>Press Enter to send</span>
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMessageType(messageType === 'text' ? 'template' : 'text')}
+                                        className="text-[#00a884] hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                                    >
+                                        <FileText className="w-3.5 h-3.5" />
+                                        {messageType === 'text' ? 'Switch to Approved WABA Template' : 'Switch to Direct Text Reply'}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowInteractiveModal(true)}
+                                        className="text-zinc-600 dark:text-zinc-400 hover:text-[#00a884] flex items-center gap-1 font-semibold cursor-pointer"
+                                    >
+                                        <Radio className="w-3.5 h-3.5 text-emerald-500" />
+                                        Interactive Buttons
+                                    </button>
+                                </div>
+                                <span className="text-[10px] text-zinc-400">Type <strong className="text-[#00a884]">/</strong> for saved canned responses</span>
                             </div>
 
                             {messageType === 'template' ? (
-                                <div className="flex items-center gap-2">
+                                <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                                     <select
                                         value={selectedTemplate}
                                         onChange={(e) => setSelectedTemplate(e.target.value)}
-                                        className="flex-1 bg-white border border-zinc-200 rounded-lg px-4 py-2.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-[#00a884]"
+                                        className="flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-[#00a884]"
                                     >
                                         <option value="">Select Approved WABA Template...</option>
                                         {templates.map(t => (
@@ -623,118 +964,349 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                     <button
                                         type="submit"
                                         disabled={sending || !selectedTemplate}
-                                        className="px-6 py-2.5 bg-[#00a884] hover:bg-[#008f70] text-white rounded-lg font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-xs"
+                                        className="px-6 py-2.5 bg-[#00a884] hover:bg-[#008f70] text-white rounded-lg font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-xs cursor-pointer"
                                     >
                                         {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                                         Send Template
                                     </button>
-                                </div>
+                                </form>
                             ) : (
-                                <div className="flex items-center gap-3">
+                                <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                                    {/* Attachments button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMediaModal(true)}
+                                        className="p-2 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
+                                        title="Attach Image or Document"
+                                    >
+                                        <Paperclip className="w-4 h-4" />
+                                    </button>
+
+                                    {/* Quick Replies Shortcut button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFilteredQuickReplies(quickReplies);
+                                            setShowQuickRepliesPopup(!showQuickRepliesPopup);
+                                        }}
+                                        className="p-2 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-emerald-600 dark:text-emerald-400 border border-zinc-200 dark:border-zinc-700 transition cursor-pointer font-bold text-xs"
+                                        title="Quick Canned Replies (/)"
+                                    >
+                                        ⚡
+                                    </button>
+
                                     <textarea
                                         value={messageText}
-                                        onChange={(e) => setMessageText(e.target.value)}
+                                        onChange={handleTextChange}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' && !e.shiftKey) {
                                                 e.preventDefault();
                                                 handleSendMessage();
                                             }
                                         }}
-                                        placeholder="Type a message..."
+                                        placeholder="Type a message (or type / for quick reply)..."
                                         rows={1}
-                                        className="flex-1 bg-white border border-zinc-200 rounded-lg px-4 py-2 text-xs text-zinc-900 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#00a884] resize-none shadow-xs"
+                                        className="flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-4 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#00a884] resize-none shadow-xs"
                                     />
+
                                     <button
                                         type="submit"
                                         disabled={sending || !messageText.trim()}
-                                        className="h-9 px-5 bg-[#00a884] hover:bg-[#008f70] text-white rounded-lg font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-xs shrink-0"
+                                        className="h-9 px-5 bg-[#00a884] hover:bg-[#008f70] text-white rounded-lg font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-xs shrink-0 cursor-pointer"
                                     >
                                         {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                        Send
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-zinc-400 text-sm gap-2">
+                        <Smartphone className="w-12 h-12 text-zinc-300 dark:text-zinc-700" />
+                        Select a conversation from the left to start live chat
+                    </div>
+                )}
+            </div>
+
+            {/* 4. Right Contact CRM & Notes Drawer (Collapsible) */}
+            {selectedPhone && showCrmSidebar && (
+                <div className="w-80 bg-white dark:bg-zinc-900 border-l border-[#e9edef] dark:border-zinc-800 h-full flex flex-col shrink-0 overflow-y-auto p-5 space-y-6 z-10 animate-in slide-in-from-right-4">
+                    <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500">Contact CRM</h3>
+                        <button onClick={() => setShowCrmSidebar(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Contact Profile & Editable Name */}
+                    <div className="flex flex-col items-center text-center space-y-3">
+                        <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-black text-xl flex items-center justify-center border-2 border-emerald-300">
+                            {activeContact?.name?.charAt(0).toUpperCase() || 'C'}
+                        </div>
+
+                        <div className="w-full">
+                            {isEditingContactName ? (
+                                <div className="flex items-center gap-1.5">
+                                    <input
+                                        type="text"
+                                        value={contactNameInput}
+                                        onChange={(e) => setContactNameInput(e.target.value)}
+                                        className="flex-1 px-2.5 py-1 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-center font-bold"
+                                    />
+                                    <button
+                                        onClick={handleSaveCrmDetails}
+                                        disabled={isSavingCrm}
+                                        className="p-1.5 bg-[#00a884] text-white rounded-lg cursor-pointer"
+                                    >
+                                        <Save className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-1.5">
+                                    <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{activeContact?.name || selectedPhone}</h4>
+                                    <button onClick={() => setIsEditingContactName(true)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                                        <Edit2 className="w-3.5 h-3.5" />
                                     </button>
                                 </div>
                             )}
-                        </form>
-                    </>
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center p-8 text-center text-zinc-500 gap-4">
-                        <div className="w-20 h-20 rounded-full bg-[#f0f2f5] border border-zinc-200 flex items-center justify-center text-[#00a884] shadow-sm">
-                            <MessageSquare className="w-10 h-10" />
+                            <p className="text-xs text-zinc-500 font-mono mt-0.5">+{selectedPhone}</p>
                         </div>
-                        <h3 className="text-base font-bold text-zinc-800">WhatsApp Web Live Chat</h3>
-                        <p className="text-xs max-w-sm text-zinc-500 leading-relaxed">
-                            Select a chat thread from the left list to send and receive messages in real-time.
-                        </p>
                     </div>
-                )}
-            </div>
 
-            {/* 4. Customer & CRM Sidebar (Far Right) */}
-            <div className="hidden xl:flex w-72 bg-white border-l border-[#e9edef] p-5 flex-col gap-5 overflow-y-auto shrink-0">
-                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-                    <User className="w-4 h-4 text-[#00a884]" />
-                    CRM Contact Info
-                </h3>
+                    {/* Tags & Labels Card */}
+                    <div className="space-y-2.5">
+                        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-500">
+                            <Tag className="w-3.5 h-3.5 text-purple-500" />
+                            <span>Tags & Labels</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                            {AVAILABLE_TAGS.map(tag => {
+                                const isSelected = activeContactTags.includes(tag.label);
+                                return (
+                                    <button
+                                        key={tag.label}
+                                        onClick={() => handleToggleTag(tag.label)}
+                                        className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                                            isSelected
+                                                ? tag.color + ' ring-2 ring-emerald-500'
+                                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700 opacity-60 hover:opacity-100'
+                                        }`}
+                                    >
+                                        {isSelected ? `✓ ${tag.label}` : `+ ${tag.label}`}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
 
-                {selectedPhone ? (
-                    <>
-                        <div className="p-4 bg-[#f0f2f5] rounded-2xl border border-zinc-200 space-y-3 shadow-xs">
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#00a884] flex items-center justify-center text-white font-bold text-base shadow-xs">
-                                    {activeContact?.name ? activeContact.name.charAt(0).toUpperCase() : 'C'}
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-bold text-zinc-900">{activeContact?.name}</h4>
-                                    <p className="text-xs text-[#00a884] font-mono">+{selectedPhone}</p>
-                                </div>
+                    {/* Private Internal Team Notes Card */}
+                    <div className="space-y-2.5">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-500">
+                                <StickyNote className="w-3.5 h-3.5 text-amber-500" />
+                                <span>Internal Team Notes</span>
                             </div>
+                            <span className="text-[10px] text-amber-600 font-bold bg-amber-50 dark:bg-amber-950 px-1.5 py-0.5 rounded">Staff only</span>
+                        </div>
+                        <textarea
+                            rows={3}
+                            value={contactNotesInput}
+                            onChange={(e) => setContactNotesInput(e.target.value)}
+                            placeholder="Add private staff notes about this client (e.g. VIP lead, requested quotation for ERP)..."
+                            className="w-full p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none leading-relaxed"
+                        />
+                        <button
+                            onClick={handleSaveCrmDetails}
+                            disabled={isSavingCrm}
+                            className="w-full py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold rounded-xl transition cursor-pointer"
+                        >
+                            {isSavingCrm ? 'Saving Notes...' : 'Save Notes'}
+                        </button>
+                    </div>
 
-                            <div className="pt-3 border-t border-zinc-200 space-y-2 text-xs">
-                                <div className="flex items-center justify-between text-zinc-500">
-                                    <span>Segment Group:</span>
-                                    <span className="text-zinc-800 font-medium">{activeContact?.group_name || 'Inbound Customers'}</span>
-                                </div>
-                                <div className="flex items-center justify-between text-zinc-500">
-                                    <span>Total Messages:</span>
-                                    <span className="text-[#00a884] font-bold font-mono">{messages.length}</span>
-                                </div>
+                    {/* CTWA Meta Ad Referral Details */}
+                    {activeReferral && (
+                        <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-2xl space-y-2 text-xs">
+                            <div className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                                <Sparkles className="w-4 h-4 text-amber-600" />
+                                Meta Ad Attribution
+                            </div>
+                            <div className="text-[11px] text-amber-800 dark:text-amber-300 space-y-1">
+                                <div><strong>Campaign:</strong> {activeReferral.headline || 'Direct CTWA'}</div>
+                                {activeReferral.source_id && <div><strong>Ad ID:</strong> {activeReferral.source_id}</div>}
+                                {activeReferral.ctwa_clid && <div className="truncate font-mono"><strong>CLID:</strong> {activeReferral.ctwa_clid}</div>}
                             </div>
                         </div>
+                    )}
+                </div>
+            )}
 
-                        {/* CTWA Referral Card Details */}
-                        {activeReferral && (
-                            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs space-y-2 shadow-xs">
-                                <div className="flex items-center gap-2 text-amber-900 font-bold">
-                                    <Sparkles className="w-4 h-4 text-amber-600" />
-                                    Meta CTWA Ad Attributes
+            {/* Media Attachment Modal */}
+            {showMediaModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5">
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-bold text-base">Send Media Attachment</h3>
+                            <button onClick={() => setShowMediaModal(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Media Type Switcher */}
+                        <div className="flex items-center gap-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
+                            <button
+                                onClick={() => { setMediaType('image'); setSelectedMediaFile(null); }}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer ${mediaType === 'image' ? 'bg-white dark:bg-zinc-700 text-[#00a884] shadow-xs' : 'text-zinc-500'}`}
+                            >
+                                <ImageIcon className="w-4 h-4" /> Image
+                            </button>
+                            <button
+                                onClick={() => { setMediaType('document'); setSelectedMediaFile(null); }}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer ${mediaType === 'document' ? 'bg-white dark:bg-zinc-700 text-[#00a884] shadow-xs' : 'text-zinc-500'}`}
+                            >
+                                <FileCode className="w-4 h-4" /> Document / PDF
+                            </button>
+                        </div>
+
+                        {/* File Upload Box */}
+                        <div
+                            onClick={() => mediaInputRef.current?.click()}
+                            className="border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-2xl p-6 text-center hover:border-[#00a884] transition cursor-pointer space-y-2"
+                        >
+                            <input
+                                ref={mediaInputRef}
+                                type="file"
+                                accept={mediaType === 'image' ? 'image/jpeg,image/png,image/webp' : 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain'}
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setSelectedMediaFile(file);
+                                        if (mediaType === 'image') {
+                                            setMediaPreviewUrl(URL.createObjectURL(file));
+                                        }
+                                    }
+                                }}
+                            />
+                            {selectedMediaFile ? (
+                                <div className="space-y-2">
+                                    {mediaPreviewUrl && (
+                                        <img src={mediaPreviewUrl} alt="Preview" className="w-24 h-24 object-cover rounded-xl mx-auto border" />
+                                    )}
+                                    <div className="font-bold text-xs text-zinc-900 dark:text-zinc-100">{selectedMediaFile.name}</div>
+                                    <div className="text-[10px] text-zinc-400 font-mono">{(selectedMediaFile.size / 1024).toFixed(1)} KB</div>
                                 </div>
-                                <div className="space-y-1 text-[11px]">
-                                    <div className="text-amber-900 font-semibold">{activeReferral.headline}</div>
-                                    <div className="text-zinc-600 font-mono text-[10px]">Ad ID: {activeReferral.source_id}</div>
-                                    {activeReferral.ctwa_clid && (
-                                        <div className="text-amber-800 font-mono text-[10px] break-all">CLID: {activeReferral.ctwa_clid}</div>
+                            ) : (
+                                <>
+                                    <Paperclip className="w-8 h-8 mx-auto text-zinc-400" />
+                                    <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Click to select {mediaType === 'image' ? 'photo' : 'file'}</p>
+                                    <p className="text-[10px] text-zinc-400">Max size 16MB</p>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Caption input */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-zinc-500">Caption (Optional)</label>
+                            <input
+                                type="text"
+                                value={mediaCaption}
+                                onChange={(e) => setMediaCaption(e.target.value)}
+                                placeholder="Add a caption..."
+                                className="w-full px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-[#00a884] focus:outline-none"
+                            />
+                        </div>
+
+                        <button
+                            onClick={handleSendMedia}
+                            disabled={sending || !selectedMediaFile}
+                            className="w-full py-3 bg-[#00a884] hover:bg-[#008f70] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
+                        >
+                            {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                            Send {mediaType === 'image' ? 'Image' : 'Document'} to WhatsApp
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Interactive Buttons Modal */}
+            {showInteractiveModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Radio className="w-5 h-5 text-emerald-500" />
+                                <h3 className="font-bold text-base">Send Interactive Buttons</h3>
+                            </div>
+                            <button onClick={() => setShowInteractiveModal(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-zinc-500">
+                            Send quick-reply buttons (up to 3). Customers can tap any button to reply instantly.
+                        </p>
+
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-zinc-500">Message Body</label>
+                            <textarea
+                                rows={2}
+                                value={interactiveBody}
+                                onChange={(e) => setInteractiveBody(e.target.value)}
+                                placeholder="e.g. Would you like to speak to a specialist?"
+                                className="w-full p-3 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-[#00a884] focus:outline-none resize-none"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-semibold text-zinc-500">Button Labels (1 to 3 buttons)</label>
+                            {interactiveButtons.map((btn, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                    <span className="text-xs font-mono text-zinc-400 w-5">#{idx + 1}</span>
+                                    <input
+                                        type="text"
+                                        maxLength={20}
+                                        value={btn}
+                                        onChange={(e) => {
+                                            const newBtns = [...interactiveButtons];
+                                            newBtns[idx] = e.target.value;
+                                            setInteractiveButtons(newBtns);
+                                        }}
+                                        placeholder={`Button ${idx + 1} title (max 20 chars)`}
+                                        className="flex-1 px-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl"
+                                    />
+                                    {interactiveButtons.length > 1 && (
+                                        <button
+                                            onClick={() => setInteractiveButtons(interactiveButtons.filter((_, i) => i !== idx))}
+                                            className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg cursor-pointer"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     )}
                                 </div>
-                            </div>
-                        )}
+                            ))}
 
-                        {/* Wallet Fee Notice */}
-                        <div className="p-4 bg-[#f0f2f5] rounded-2xl border border-zinc-200 text-xs space-y-1.5 shadow-xs">
-                            <div className="flex items-center gap-2 text-[#00a884] font-bold">
-                                <Shield className="w-4 h-4" />
-                                Platform Message Fee
-                            </div>
-                            <p className="text-[11px] text-zinc-600 leading-relaxed">
-                                Outbound messages deduct <strong>${business.per_message_fee || '0.0010'} USD</strong> directly from your business balance.
-                            </p>
+                            {interactiveButtons.length < 3 && (
+                                <button
+                                    onClick={() => setInteractiveButtons([...interactiveButtons, `Option ${interactiveButtons.length + 1}`])}
+                                    className="text-xs text-[#00a884] hover:underline font-semibold flex items-center gap-1 cursor-pointer pt-1"
+                                >
+                                    <Plus className="w-3.5 h-3.5" /> Add Button
+                                </button>
+                            )}
                         </div>
-                    </>
-                ) : (
-                    <div className="p-6 text-center text-zinc-400 text-xs border border-zinc-200 rounded-2xl bg-[#f0f2f5]">
-                        Select a chat thread to view contact info.
+
+                        <button
+                            onClick={handleSendInteractiveButtons}
+                            disabled={sending || !interactiveBody.trim() || interactiveButtons.filter(b => b.trim()).length === 0}
+                            className="w-full py-3 bg-[#00a884] hover:bg-[#008f70] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
+                        >
+                            {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                            Send Interactive Message
+                        </button>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -8,7 +8,6 @@ use App\Http\Controllers\SsoController;
 use App\Http\Controllers\TrackerController;
 use App\Http\Controllers\WebhookController;
 use App\Models\Currency;
-use App\Models\GoldWorldPrice;
 use App\Services\IpGeolocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -168,25 +167,28 @@ Route::get('ip-country', function (Request $request) {
 })->name('api.ip-country');
 
 // ── Currencies ───────────────────────────────────────────────────────────────
-// Provides all currencies, their USD exchange rates, and global gold prices. Used by ERP and modules.
+// Provides all currencies and their USD exchange rates. Used by ERP and modules.
 Route::get('currencies', function () {
     $currencies = Currency::all();
     $rates = CurrencyHelper::prepare(date('Y-m-d'));
+
+    $usdCurrency = $currencies->firstWhere('currency', 'USD');
+    $usdId = $usdCurrency ? $usdCurrency->id : 1;
 
     $usdRates = [];
     foreach ($currencies as $currency) {
         $code = strtoupper($currency->currency);
         if (isset($rates[$code])) {
             $usdRates[$currency->id] = $rates[$code];
+        } else {
+            $usdRates[$currency->id] = \App\Models\CurrenciesExchange::RateToday(1, $usdId, $currency->id);
         }
     }
-
-    $latestGoldWorldPrice = GoldWorldPrice::orderBy('price_date', 'desc')->first();
 
     return response()->json([
         'currencies' => $currencies,
         'usd_rates' => $usdRates,
-        'gold_world_price' => $latestGoldWorldPrice,
+        'gold_world_price' => null,
     ]);
 })->name('api.currencies');
 

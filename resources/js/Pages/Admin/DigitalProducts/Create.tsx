@@ -31,16 +31,26 @@ interface Category {
     name: string;
 }
 
-interface Props {
-    categories: Category[];
+interface CurrencyItem {
+    id: number;
+    currency: string;
+    symbol: string;
 }
 
-export default function Create({ categories }: Props) {
+interface Props {
+    categories: Category[];
+    currencies?: CurrencyItem[];
+}
+
+export default function Create({ categories, currencies = [] }: Props) {
+    const defaultCurrencyId = currencies.find(c => c.currency === 'USD')?.id || currencies[0]?.id || 1;
+
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         slug: '',
         category_id: '',
         price: '0.00',
+        currency_id: String(defaultCurrencyId),
         is_free: true,
         author_name: '',
         publisher: 'Musoftware',
@@ -525,17 +535,31 @@ export default function Create({ categories }: Props) {
                                         </label>
 
                                         {!data.is_free && (
-                                            <div className="flex-1 relative">
+                                            <div className="flex-1 flex items-center gap-2">
                                                 <Input
                                                     type="number"
                                                     step="0.01"
                                                     min="0"
                                                     value={data.price}
                                                     onChange={(e) => setData('price', e.target.value)}
-                                                    className="h-10 text-xs font-bold pe-12"
+                                                    className="h-10 text-xs font-bold flex-1"
                                                     placeholder="Price"
                                                 />
-                                                <span className="absolute end-3 top-2.5 text-xs text-slate-400 font-bold">$ USD</span>
+                                                {currencies.length > 0 ? (
+                                                    <select
+                                                        value={data.currency_id}
+                                                        onChange={(e) => setData('currency_id', e.target.value)}
+                                                        className="h-10 px-2.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    >
+                                                        {currencies.map((c) => (
+                                                            <option key={c.id} value={c.id}>
+                                                                {c.currency} ({c.symbol})
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <span className="text-xs text-slate-400 font-bold px-2">USD</span>
+                                                )}
                                             </div>
                                         )}
                                     </div>

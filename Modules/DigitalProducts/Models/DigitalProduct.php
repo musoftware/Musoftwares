@@ -169,8 +169,43 @@ class DigitalProduct extends Model
             return app()->getLocale() === 'ar' ? 'مجاناً' : 'Free';
         }
 
-        $currencyCode = $this->currency?->code ?? 'USD';
-        return number_format((float)$this->price, 2) . ' ' . $currencyCode;
+        $currencyId = $this->currency_id ?? 1;
+        return \App\Helpers\FinanceHelper::instance()->format_money((float) $this->price, $currencyId);
+    }
+
+    /**
+     * Get product price converted to a target currency using current exchange rate.
+     */
+    public function getPriceInCurrency(?int $targetCurrencyId = null): float
+    {
+        $basePrice = (float) $this->price;
+        if ($this->is_free || $basePrice <= 0) {
+            return 0.0;
+        }
+
+        $fromCurrencyId = $this->currency_id ?? 1;
+        if (!$targetCurrencyId || $fromCurrencyId === $targetCurrencyId) {
+            return $basePrice;
+        }
+
+        return (float) \App\Models\CurrenciesExchange::RateToday($basePrice, $fromCurrencyId, $targetCurrencyId);
+    }
+
+    /**
+     * Format product price for a specific viewer currency.
+     */
+    public function formatPriceInCurrency(?Currency $currency): string
+    {
+        if ($this->is_free || $this->price <= 0) {
+            return app()->getLocale() === 'ar' ? 'مجاناً' : 'Free';
+        }
+
+        if (!$currency) {
+            return $this->formatted_price;
+        }
+
+        $converted = $this->getPriceInCurrency($currency->id);
+        return \App\Helpers\FinanceHelper::instance()->format_money($converted, $currency->id);
     }
 
     public function getFormattedFileSizeAttribute(): string

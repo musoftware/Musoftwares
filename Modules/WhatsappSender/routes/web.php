@@ -29,6 +29,12 @@ Route::middleware(['auth'])
         Route::match(['GET', 'POST'], '/accounts/{id}/sync', [WhatsappSenderController::class, 'syncAccountStatus'])->name('accounts.sync');
         Route::match(['GET', 'POST'], '/accounts/{id}/test', [WhatsappSenderController::class, 'testAccount'])->name('accounts.test');
         Route::match(['PUT', 'PATCH'], '/accounts/{id}/waba', [WhatsappSenderController::class, 'updateWabaId'])->name('accounts.waba.update');
+        Route::get('/accounts/{id}/profile', [WhatsappSenderController::class, 'getAccountProfile'])->name('accounts.profile.get');
+        Route::post('/accounts/{id}/profile', [WhatsappSenderController::class, 'updateAccountProfile'])->name('accounts.profile.update');
+        Route::post('/accounts/{id}/profile/photo', [WhatsappSenderController::class, 'uploadAccountPhoto'])->name('accounts.profile.photo.upload');
+        Route::delete('/accounts/{id}/profile/photo', [WhatsappSenderController::class, 'deleteAccountPhoto'])->name('accounts.profile.photo.delete');
+        Route::post('/accounts/{id}/pin', [WhatsappSenderController::class, 'updateAccountPin'])->name('accounts.pin.update');
+        Route::post('/accounts/{id}/health-sync', [WhatsappSenderController::class, 'syncAccountHealth'])->name('accounts.health.sync');
         Route::post('/send', [WhatsappSenderController::class, 'sendMessage'])->name('send');
 
         // Telegram Bots Management routes
@@ -48,6 +54,10 @@ Route::middleware(['auth'])
         Route::get('/businesses/{id}/chat-messages', [WhatsappSenderController::class, 'getChatMessages'])->name('businesses.chat-messages');
         Route::post('/businesses/{id}/send-chat-message', [WhatsappSenderController::class, 'sendChatMessage'])->name('businesses.send-chat-message');
         Route::get('/businesses/{id}/ad-performance', [WhatsappSenderController::class, 'getAdPerformanceStats'])->name('businesses.ad-performance');
+        Route::get('/businesses/{id}/quick-replies', [WhatsappSenderController::class, 'getQuickReplies'])->name('businesses.quick-replies.get');
+        Route::post('/businesses/{id}/quick-replies', [WhatsappSenderController::class, 'storeQuickReply'])->name('businesses.quick-replies.store');
+        Route::delete('/businesses/{id}/quick-replies/{shortcut}', [WhatsappSenderController::class, 'deleteQuickReply'])->where('shortcut', '.*')->name('businesses.quick-replies.delete');
+        Route::post('/businesses/{id}/contacts/crm', [WhatsappSenderController::class, 'updateContactCrm'])->name('businesses.contacts.crm.update');
 
         // Facebook Login OAuth routes
         Route::get('/auth/facebook', [FacebookAuthController::class, 'redirect'])->name('auth.facebook');

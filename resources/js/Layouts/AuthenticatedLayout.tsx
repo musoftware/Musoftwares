@@ -26,7 +26,8 @@ import {
     MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download,
     FolderKanban,
     ListTodo,
-    Calculator
+    Calculator,
+    Grid
 } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import ProductTourModal from '@/Components/ProductTourModal';
@@ -122,6 +123,25 @@ function AuthenticatedContent({
     const isPayoutMethodsMenuActive = isRouteActive('financial.payout-methods');
     const isReferralsMenuActive = isRouteActive('referrals');
     const isTicketsMenuActive = isRouteActive('tickets');
+    const isServicesMenuActive = isRouteActive('marketplace.services');
+    const isEstimatorMenuActive = isRouteActive('estimator');
+    const isSubscriptionsMenuActive = isRouteActive('subscriptions');
+    const isFbmbMenuActive = isRouteActive('fbmb');
+    const isWhatsappMenuActive = isRouteActive('whatsapp');
+    const isSmsGatewayMenuActive = isRouteActive('sms-payment-gateway');
+    const isUnifiedMenuActive = 
+        isWorkspaceActive || 
+        isErpActive || 
+        isCrmActive || 
+        isBookingActive || 
+        isToolsActive || 
+        isIntelligenceActive || 
+        isServicesMenuActive || 
+        isEstimatorMenuActive || 
+        isSubscriptionsMenuActive ||
+        isFbmbMenuActive ||
+        isWhatsappMenuActive ||
+        isSmsGatewayMenuActive;
     const activeModules = auth?.active_modules || { erp: true, marketplace: true, booking: true, tools: true, fbmb: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
@@ -237,64 +257,39 @@ function AuthenticatedContent({
  
                                                         <div className="mt-4 pt-2 border-t border-black/5">
                                                             <Accordion className="w-full">
+                                                                {/* 1. Workspace & Projects */}
                                                                 <AccordionItem value="workspace" className="border-b-0">
                                                                     <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] rounded-xl text-[#1d1d1f] hover:no-underline font-medium">
                                                                         <div className="flex items-center gap-3 font-medium">
-                                                                            <FolderKanban className="w-5 h-5 text-[#0071e3]" /> {__('general.workspace')}</div>
+                                                                            <FolderKanban className="w-5 h-5 text-[#0071e3]" /> {__('general.workspace_projects') || __('general.workspace')}
+                                                                        </div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 ms-5 ps-4">
-                                                                            <Link href={safeRoute('client.projects.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <FolderKanban className="w-4 h-4 text-[#0071e3]" /> {__('general.projects')}</Link>
-                                                                            <Link href={safeRoute('client.projects.all-tasks')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <ListTodo className="w-4 h-4 text-[#0071e3]" /> {__('general.all_tasks')}</Link>
-                                                                            <Link href={safeRoute('messages.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <MessageSquare className="w-4 h-4 text-[#0071e3]" /> {__('general.messages')}</Link>
-                                                                            <Link href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <FileText className="w-4 h-4 text-[#0071e3]" />{__('general.my_invoices')}</Link>
-                                                                            <Link href={safeRoute('financial.transactions')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <ArrowRightLeft className="w-4 h-4 text-[#0071e3]" /> {__('general.transactions')}</Link>
-                                                                            <Link href={safeRoute('financial.withdrawals')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <ArrowUpRight className="w-4 h-4 text-[#0071e3]" />{__('general.request_withdrawal')}</Link>
-                                                                            <Link href={safeRoute('financial.payout-methods.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <CreditCard className="w-4 h-4 text-[#0071e3]" />{__('general.payout_methods')}</Link>
-                                                                            <Link href={safeRoute('tickets.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <LifeBuoy className="w-4 h-4 text-[#0071e3]" />{__('general.support_tickets')}
-                                                                            </Link>
+                                                                            <SafeLink href={safeRoute('client.projects.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <FolderKanban className="w-4 h-4 text-[#0071e3]" /> {__('general.projects')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('client.projects.all-tasks')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <ListTodo className="w-4 h-4 text-[#0071e3]" /> {__('general.all_tasks')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('messages.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <MessageSquare className="w-4 h-4 text-[#0071e3]" /> {__('general.messages')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('tickets.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <LifeBuoy className="w-4 h-4 text-[#0071e3]" /> {__('general.support_tickets')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('referrals.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <Users className="w-4 h-4 text-[#0071e3]" /> {__('general.referrals')}
+                                                                            </SafeLink>
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
 
-                                                                <Link
-                                                                    href={safeRoute('marketplace.services.index')}
-                                                                    onClick={() => setIsMobileOpen(false)}
-                                                                    className={cn(
-                                                                        "flex items-center gap-3 px-3 py-2 rounded-xl font-medium transition-colors",
-                                                                        isRouteActive('marketplace.services')
-                                                                            ? "bg-[#0071e3]/10 text-[#0071e3]"
-                                                                            : "text-[#1d1d1f] hover:bg-[#f5f5f7]"
-                                                                    )}
-                                                                >
-                                                                    <Briefcase className="w-5 h-5 text-[#0071e3]" /> {__('general.services')}
-                                                                </Link>
-
-                                                                <Link
-                                                                    href={safeRoute('estimator', undefined, '/estimator')}
-                                                                    onClick={() => setIsMobileOpen(false)}
-                                                                    className={cn(
-                                                                        "flex items-center gap-3 px-3 py-2 rounded-xl font-medium transition-colors",
-                                                                        isRouteActive('estimator')
-                                                                            ? "bg-[#0071e3]/10 text-[#0071e3]"
-                                                                            : "text-[#1d1d1f] hover:bg-[#f5f5f7]"
-                                                                    )}
-                                                                >
-                                                                    <Calculator className="w-5 h-5 text-[#0071e3]" /> {__('general.estimator') || 'Estimator'}
-                                                                </Link>
-
+                                                                {/* 2. iSAAS Cloud Systems */}
                                                                 <AccordionItem value="isaas" className="border-b-0">
                                                                     <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] rounded-xl text-[#1d1d1f] hover:no-underline">
                                                                         <div className="flex items-center gap-3 font-medium">
-                                                                            <Sparkles className="w-5 h-5 text-[#0071e3]" /> iSAAS
+                                                                            <Sparkles className="w-5 h-5 text-[#0071e3]" /> {__('general.cloud_apps') || 'iSAAS'}
                                                                         </div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
@@ -313,20 +308,18 @@ function AuthenticatedContent({
                                                                             </SafeLink>
                                                                             <SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
                                                                                 <div className="flex items-center gap-3">
-                                                                                    <Calendar className="w-4 h-4 text-[#0071e3]" /> {__('general.booking')}</div>
+                                                                                    <Calendar className="w-4 h-4 text-[#0071e3]" /> {__('general.booking')}
+                                                                                </div>
                                                                                 {!activeModules.booking && <Lock className="w-3 h-3 text-[#1d1d1f]/40" />}
                                                                             </SafeLink>
-                                                                            <Link href={safeRoute('fbmb.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                            <SafeLink href={safeRoute('fbmb.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
                                                                                 <Activity className="w-4 h-4 text-[#0071e3]" /> {__('general.isaas_fb_lookup')}
-                                                                            </Link>
-                                                                            <Link href={safeRoute('whatsapp.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <MessageSquare className="w-4 h-4 text-emerald-600" /> WhatsApp Sender API
-                                                                            </Link>
-                                                                            <Link href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('whatsapp.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <MessageSquare className="w-4 h-4 text-emerald-600" /> WhatsApp API
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
                                                                                 <MessageSquare className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway')}
-                                                                            </Link>
-                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
-                                                                                <Coins className="w-4 h-4 text-yellow-600" /> {__('general.gold_savers')}
                                                                             </SafeLink>
                                                                             <SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
                                                                                 <Wrench className="w-4 h-4 text-purple-600" /> {__('general.tools_amp_plugins')}
@@ -335,11 +328,57 @@ function AuthenticatedContent({
                                                                     </AccordionContent>
                                                                 </AccordionItem>
 
+                                                                {/* 3. Financials & Billing */}
+                                                                <AccordionItem value="financials" className="border-b-0">
+                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] rounded-xl text-[#1d1d1f] hover:no-underline font-medium">
+                                                                        <div className="flex items-center gap-3 font-medium">
+                                                                            <FileText className="w-5 h-5 text-[#0071e3]" /> {__('general.financials_billing') || __('general.financials')}
+                                                                        </div>
+                                                                    </AccordionTrigger>
+                                                                    <AccordionContent className="pb-1 px-2">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 ms-5 ps-4">
+                                                                            <SafeLink href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <FileText className="w-4 h-4 text-[#0071e3]" /> {__('general.my_invoices')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('financial.transactions')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <ArrowRightLeft className="w-4 h-4 text-[#0071e3]" /> {__('general.transactions')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('financial.withdrawals')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <ArrowUpRight className="w-4 h-4 text-[#0071e3]" /> {__('general.request_withdrawal')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('financial.payout-methods.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.payout_methods')}
+                                                                            </SafeLink>
+                                                                        </div>
+                                                                    </AccordionContent>
+                                                                </AccordionItem>
+
+                                                                {/* 4. Services & Tools */}
+                                                                <AccordionItem value="services_tools" className="border-b-0">
+                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] rounded-xl text-[#1d1d1f] hover:no-underline font-medium">
+                                                                        <div className="flex items-center gap-3 font-medium">
+                                                                            <Briefcase className="w-5 h-5 text-[#0071e3]" /> {__('general.services_tools') || __('general.services')}
+                                                                        </div>
+                                                                    </AccordionTrigger>
+                                                                    <AccordionContent className="pb-1 px-2">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 ms-5 ps-4">
+                                                                            <SafeLink href={safeRoute('marketplace.services.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <Briefcase className="w-4 h-4 text-[#0071e3]" /> {__('general.services')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('estimator', undefined, '/estimator')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <Calculator className="w-4 h-4 text-[#0071e3]" /> {__('general.estimator') || 'Estimator'}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.subscription')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f]/80 font-medium">
+                                                                                <Coins className="w-4 h-4 text-yellow-600" /> {__('general.gold_savers')}
+                                                                            </SafeLink>
+                                                                        </div>
+                                                                    </AccordionContent>
+                                                                </AccordionItem>
                                                             </Accordion>
                                                         </div>
-
-                                                        <SafeLink href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 mt-2 rounded-xl hover:bg-amber-50 text-amber-800 font-medium">
-                                                            <CreditCard className="w-5 h-5 text-amber-600" /> {__('general.subscription')}</SafeLink>
                                                     </>
                                                 )}
                                             </div>
@@ -383,34 +422,32 @@ function AuthenticatedContent({
                                             <div className="relative inline-block">
                                                 <DropdownMenuTrigger className={cn(
                                                     "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium tracking-normal transition-all duration-150 outline-none select-none cursor-pointer",
-                                                    isWorkspaceActive 
+                                                    isUnifiedMenuActive 
                                                         ? "bg-[#0071e3]/10 text-[#0071e3] font-semibold" 
                                                         : "text-[#1d1d1f]/70 hover:bg-black/5 hover:text-[#1d1d1f]"
                                                 )}>
-                                                    <FolderKanban className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                                                    <span>{__('general.workspace')}</span>
+                                                    <Grid className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                                    <span>{__('general.menu') || 'Menu'}</span>
                                                     <ChevronDown className="ms-0.5 h-3 w-3 opacity-50 shrink-0" />
                                                 </DropdownMenuTrigger>
-                                                {isTourOpen && (tourStep === 2 || tourStep === 5) && (
+                                                {isTourOpen && (tourStep === 2 || tourStep === 4 || tourStep === 5) && (
                                                     <span className="absolute top-1 end-1 flex h-2.5 w-2.5">
                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0071e3]/40 opacity-75" />
                                                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0071e3]" />
                                                     </span>
                                                 )}
                                             </div>
-                                            <DropdownMenuContent align="start" className="w-[820px] p-5 grid grid-cols-3 gap-6 rounded-[24px] border border-black/10 bg-white/95 backdrop-blur-xl text-[#1d1d1f] isolate z-50 shadow-[0_20px_50px_rgba(0,0,0,0.12)]">
-                                                {/* Column 1: Projects & Collaboration */}
+                                            <DropdownMenuContent align="start" className="w-[960px] max-h-[85vh] overflow-y-auto p-5 grid grid-cols-4 gap-5 rounded-[24px] border border-black/10 bg-white/95 backdrop-blur-xl text-[#1d1d1f] isolate z-50 shadow-[0_20px_50px_rgba(0,0,0,0.12)]">
+                                                {/* Column 1: Workspace & Projects */}
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.projects_and_collaboration')}</p>
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.workspace_projects') || __('general.workspace')}</p>
                                                     </div>
                                                     
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isProjectsMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isProjectsMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
                                                         render={<SafeLink href={safeRoute('client.projects.index')} aria-current={isProjectsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
@@ -426,9 +463,7 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isAllTasksMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isAllTasksMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
                                                         render={<SafeLink href={safeRoute('client.projects.all-tasks')} aria-current={isAllTasksMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
@@ -444,9 +479,7 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isMessagesMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isMessagesMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
                                                         render={<SafeLink href={safeRoute('messages.index')} aria-current={isMessagesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
@@ -458,20 +491,199 @@ function AuthenticatedContent({
                                                             <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.messages_desc')}</p>
                                                         </div>
                                                     </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isTicketsMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('tickets.index')} aria-current={isTicketsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <LifeBuoy className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.support_tickets')}</p>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.support_tickets_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isReferralsMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('referrals.index')} aria-current={isReferralsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <Users className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.referrals')}</p>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.referrals_desc')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
                                                 </div>
 
-                                                {/* Column 2: Financials */}
+                                                {/* Column 2: iSAAS Cloud Systems */}
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.financials')}</p>
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.cloud_apps') || 'iSAAS'}</p>
+                                                    </div>
+                                                    
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isErpActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <Building2 className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-xs font-bold text-[#1d1d1f] font-sans">ERP</p>
+                                                                {isErpActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
+                                                                {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40" />}
+                                                            </div>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">
+                                                                {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
+                                                            </p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isCrmActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <Megaphone className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.lead_gen_crm')}</p>
+                                                                {isCrmActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
+                                                                {!activeModules.crm && <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40" />}
+                                                            </div>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">
+                                                                {!activeModules.crm ? 'Subscribe to access' : 'Capture leads & campaigns'}
+                                                            </p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isBookingActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <Calendar className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.booking')}</p>
+                                                                {isBookingActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
+                                                                {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40" />}
+                                                            </div>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">
+                                                                {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
+                                                            </p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isFbmbMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <Activity className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.isaas_fb_lookup')}</p>
+                                                                {isFbmbMenuActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
+                                                            </div>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">{__('general.search_mobile_by_fbid')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isWhatsappMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('whatsapp.index')} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                                            <MessageSquare className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-xs font-bold text-[#1d1d1f] font-sans">WhatsApp API</p>
+                                                                {isWhatsappMenuActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
+                                                            </div>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">Meta Cloud API &amp; Webhooks</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isSmsGatewayMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('sms-payment-gateway.index')} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                                                            <MessageSquare className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.payment_gateway')}</p>
+                                                                {isSmsGatewayMenuActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
+                                                            </div>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">{__('general.android_automated_sms')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isToolsActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all">
+                                                            <Wrench className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.tools_amp_plugins')}</p>
+                                                                {isToolsActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
+                                                            </div>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">{__('general.extensions_amp_licensing')}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                </div>
+
+                                                {/* Column 3: Financials & Ledger */}
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="px-2 py-2 mb-1 border-b border-black/5">
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.financials_billing') || __('general.financials')}</p>
                                                     </div>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isInvoicesMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isInvoicesMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
                                                         render={<SafeLink href={safeRoute('billing.invoices.index')} aria-current={isInvoicesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
@@ -487,9 +699,7 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isTransactionsMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isTransactionsMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
                                                         render={<SafeLink href={safeRoute('financial.transactions')} aria-current={isTransactionsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
@@ -505,9 +715,7 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isWithdrawalsMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isWithdrawalsMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
                                                         render={<SafeLink href={safeRoute('financial.withdrawals')} aria-current={isWithdrawalsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
@@ -523,9 +731,7 @@ function AuthenticatedContent({
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isPayoutMethodsMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isPayoutMethodsMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
                                                         render={<SafeLink href={safeRoute('financial.payout-methods.index')} aria-current={isPayoutMethodsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
@@ -539,248 +745,88 @@ function AuthenticatedContent({
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem 
-                                                        className={cn(
-                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isReferralsMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
-                                                        )}
-                                                        render={<SafeLink href={safeRoute('referrals.index')} aria-current={isReferralsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                        className="p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group hover:bg-emerald-50/70"
+                                                        render={<SafeLink href={safeRoute('financial.add-balance')} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
-                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
-                                                            <Users className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-center justify-center shrink-0 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                                            <Plus className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.referrals')}</p>
-                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.referrals_desc')}</p>
+                                                            <p className="text-xs font-bold text-emerald-800 font-sans">{__('general.add_balance')}</p>
+                                                            <p className="text-[11px] text-emerald-700/70 font-sans leading-tight mt-0.5">{__('general.deposit_to_wallet') || 'Top-up wallet balance'}</p>
                                                         </div>
                                                     </DropdownMenuItem>
                                                 </div>
 
-                                                {/* Column 3: Support */}
+                                                {/* Column 4: Services & Tools */}
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.support')}</p>
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.services_tools') || __('general.services')}</p>
                                                     </div>
 
                                                     <DropdownMenuItem 
                                                         className={cn(
                                                             "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                            isTicketsMenuActive
-                                                                ? "bg-[#f5f5f7]" 
-                                                                : "hover:bg-[#f5f5f7]"
+                                                            isServicesMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
                                                         )}
-                                                        render={<SafeLink href={safeRoute('tickets.index')} aria-current={isTicketsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                        render={<SafeLink href={safeRoute('marketplace.services.index')} aria-current={isServicesMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
                                                     >
                                                         <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
-                                                            <LifeBuoy className="w-4 h-4" />
+                                                            <Briefcase className="w-4 h-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.support_tickets')}</p>
-                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.support_tickets_desc')}</p>
+                                                            <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.services')}</p>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.marketplace_services_desc') || 'Browse & order digital services'}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isEstimatorMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('estimator', undefined, '/estimator')} aria-current={isEstimatorMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <Calculator className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.estimator') || 'Estimator'}</p>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.cost_estimator_desc') || 'Instant cost calculation'}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className={cn(
+                                                            "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
+                                                            isSubscriptionsMenuActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
+                                                        )}
+                                                        render={<SafeLink href={safeRoute('subscriptions.plans')} aria-current={isSubscriptionsMenuActive ? 'page' : undefined} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                            <CreditCard className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.subscription')}</p>
+                                                            <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5">{__('general.manage_plans_and_addons') || 'Plans, modules & addons'}</p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem 
+                                                        className="p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group hover:bg-yellow-50/70"
+                                                        render={<SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-yellow-50 border border-yellow-200/60 flex items-center justify-center shrink-0 text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-all">
+                                                            <Coins className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-yellow-800 font-sans">{__('general.gold_savers')}</p>
+                                                            <p className="text-[11px] text-yellow-700/70 font-sans leading-tight mt-0.5">{__('general.gold_vault_hedging') || 'Gold savings & assets'}</p>
                                                         </div>
                                                     </DropdownMenuItem>
                                                 </div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
-
-                                {/* SERVICES LINK */}
-                                <NavLink
-                                    href={safeRoute('marketplace.services.index')}
-                                    active={isRouteActive('marketplace.services')}
-                                >
-                                    <Briefcase className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                                    <span>{__('general.services')}</span>
-                                </NavLink>
-
-                                {/* iSAAS MEGA MENU */}
-                                <DropdownMenu>
-                                    <div className="relative inline-block">
-                                        <DropdownMenuTrigger className={cn(
-                                            "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium tracking-normal transition-all duration-150 outline-none select-none cursor-pointer",
-                                            isErpActive || isCrmActive || isBookingActive || isToolsActive || isIntelligenceActive
-                                                ? "bg-[#0071e3]/10 text-[#0071e3] font-semibold"
-                                                : "text-[#1d1d1f]/70 hover:bg-black/5 hover:text-[#1d1d1f]"
-                                        )}>
-                                            <Sparkles className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                                            <span>iSAAS</span>
-                                            <ChevronDown className="ms-0.5 h-3 w-3 opacity-50 shrink-0" />
-                                        </DropdownMenuTrigger>
-                                        {isTourOpen && tourStep === 4 && (
-                                            <span className="absolute top-1 end-1 flex h-2.5 w-2.5">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0071e3]/40 opacity-75" />
-                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0071e3]" />
-                                            </span>
-                                        )}
-                                    </div>
-                                    <DropdownMenuContent align="start" className="w-[640px] p-5 grid grid-cols-2 gap-6 rounded-[24px] border border-black/10 bg-white/95 backdrop-blur-xl text-[#1d1d1f] isolate z-50 shadow-[0_20px_50px_rgba(0,0,0,0.12)]">
-                                        {/* Column 1: Core Systems */}
-                                        <div className="flex flex-col gap-1.5">
-                                            <div className="px-2 py-2 mb-1 border-b border-black/5">
-                                                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.core_systems')}</p>
-                                            </div>
-                                            
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                    isErpActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
-                                                )}
-                                                render={<SafeLink href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 w-full" />}
-                                            >
-                                                <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
-                                                    <Building2 className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-xs font-bold text-[#1d1d1f] font-sans">ERP</p>
-                                                        {isErpActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
-                                                        {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40" />}
-                                                    </div>
-                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">
-                                                        {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
-                                                    </p>
-                                                </div>
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                    isCrmActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
-                                                )}
-                                                render={<SafeLink href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 w-full" />}
-                                            >
-                                                <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
-                                                    <Megaphone className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.lead_gen_crm')}</p>
-                                                        {isCrmActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
-                                                        {!activeModules.crm && <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40" />}
-                                                    </div>
-                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">
-                                                        {!activeModules.crm ? 'Subscribe to access' : 'Capture leads & campaigns'}
-                                                    </p>
-                                                </div>
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                    isBookingActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
-                                                )}
-                                                render={<SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 w-full" />}
-                                            >
-                                                <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
-                                                    <Calendar className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.booking')}</p>
-                                                        {isBookingActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
-                                                        {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40" />}
-                                                    </div>
-                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">
-                                                        {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
-                                                    </p>
-                                                </div>
-                                            </DropdownMenuItem>
-                                        </div>
-
-                                        {/* Column 2: Tools */}
-                                        <div className="flex flex-col gap-1.5">
-                                            <div className="px-2 py-2 mb-1 border-b border-black/5">
-                                                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.tools')}</p>
-                                            </div>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                    isRouteActive('fbmb.index') ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
-                                                )}
-                                                render={<SafeLink href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 w-full" />}
-                                            >
-                                                <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
-                                                    <Activity className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.isaas_fb_lookup')}</p>
-                                                        {isRouteActive('fbmb.index') && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
-                                                    </div>
-                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">{__('general.search_mobile_by_fbid')}</p>
-                                                </div>
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                    isRouteActive('whatsapp.index') ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
-                                                )}
-                                                render={<SafeLink href={safeRoute('whatsapp.index')} className="flex items-start gap-3 p-2.5 w-full" />}
-                                            >
-                                                <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                                                    <MessageSquare className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-xs font-bold text-[#1d1d1f] font-sans">WhatsApp API</p>
-                                                        {isRouteActive('whatsapp.index') && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
-                                                    </div>
-                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">Meta Cloud API &amp; Webhooks</p>
-                                                </div>
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                    isRouteActive('sms-payment-gateway.index') ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
-                                                )}
-                                                render={<SafeLink href={safeRoute('sms-payment-gateway.index')} className="flex items-start gap-3 p-2.5 w-full" />}
-                                            >
-                                                <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
-                                                    <MessageSquare className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.payment_gateway')}</p>
-                                                        {isRouteActive('sms-payment-gateway.index') && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
-                                                    </div>
-                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">{__('general.android_automated_sms')}</p>
-                                                </div>
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] group",
-                                                    isToolsActive ? "bg-[#f5f5f7]" : "hover:bg-[#f5f5f7]"
-                                                )}
-                                                render={<SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} className="flex items-start gap-3 p-2.5 w-full" />}
-                                            >
-                                                <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] border border-black/5 flex items-center justify-center shrink-0 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all">
-                                                    <Wrench className="w-4 h-4" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-xs font-bold text-[#1d1d1f] font-sans">{__('general.tools_amp_plugins')}</p>
-                                                        {isToolsActive && <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">{__('general.active')}</span>}
-                                                    </div>
-                                                    <p className="text-[11px] text-[#1d1d1f]/60 font-sans leading-tight mt-0.5 truncate">{__('general.extensions_amp_licensing')}</p>
-                                                </div>
-                                            </DropdownMenuItem>
-                                        </div>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                <NavLink href={safeRoute('estimator', undefined, '/estimator')} active={isRouteActive('estimator')}>
-                                    <Calculator className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                                    <span>{__('general.estimator') || 'Estimator'}</span>
-                                </NavLink>
-
-                                <NavLink href={safeRoute('subscriptions.plans')} active={isRouteActive('subscriptions')}>
-                                    <CreditCard className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                                    <span>{__('general.subscription')}</span>
-                                </NavLink>
                                     </>
                                 )}
                             </nav>

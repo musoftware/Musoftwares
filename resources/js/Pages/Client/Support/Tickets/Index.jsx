@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Plus, Ticket, MessageSquare, Eye, ExternalLink } from 'lucide-react';
+import { Plus, Ticket, MessageSquare, Eye, ExternalLink, ArrowLeft } from 'lucide-react';
 import { DataTable } from '@/Components/ui/DataTable';
-import { Button } from '@/Components/ui/button';
-import { EmptyState } from '@/Components/ui/EmptyState';
-import { PageHeader } from '@/Components/ui/PageHeader';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/Components/ui/sheet';
-
-import { AppPage } from '@/Components/ui/AppPage';
-import { SectionCard } from '@/Components/ui/SectionCard';
-import { ActionBar } from '@/Components/ui/ActionBar';
 import ChatWindow from '@/Components/Chat/ChatWindow';
 import { __ } from '@/lib/i18n';
 
@@ -46,28 +39,40 @@ export default function TicketsIndex({ tickets, isAdmin }) {
     };
 
     const columns = [
-        { key: 'id', label: 'ID', render: (row) => <span className="font-medium text-gray-900 font-mono">#{row.id}</span> },
-        { key: 'subject', label: 'Subject', render: (row) => <span className="font-medium">{row.ticket_subject || row.subject || row.title}</span> },
-        ...(isAdmin ? [{ key: 'client', label: 'Client', render: (row) => <span className="text-gray-600">{row.user?.name}</span> }] : []),
+        { 
+            key: 'id', 
+            label: 'ID', 
+            render: (row) => <span className="font-mono text-xs font-semibold text-[#1d1d1f]/60">#{row.id}</span> 
+        },
+        { 
+            key: 'subject', 
+            label: 'Subject', 
+            render: (row) => <span className="font-semibold text-xs sm:text-sm text-[#1d1d1f]">{row.ticket_subject || row.subject || row.title}</span> 
+        },
+        ...(isAdmin ? [{ key: 'client', label: 'Client', render: (row) => <span className="text-xs text-[#1d1d1f]/70">{row.user?.name}</span> }] : []),
         { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.ticket_status || row.status || 'open'} /> },
         {
             key: 'priority',
             label: 'Priority',
             render: (row) => (
                 <span
-                    className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider font-mono border ${
                         row.priority?.toLowerCase() === 'high'
-                            ? 'bg-red-50 text-red-700 border border-red-200/50'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200/60'
                             : row.priority?.toLowerCase() === 'medium'
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200/50'
-                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200/50'
+                              ? 'bg-amber-50 text-amber-700 border-amber-200/60'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
                     }`}
                 >
                     {row.priority}
                 </span>
             ),
         },
-        { key: 'updated_at', label: 'Last Reply', render: (row) => <span className="text-gray-500 text-[13px]">{new Date(row.updated_at).toLocaleDateString()}</span> },
+        { 
+            key: 'updated_at', 
+            label: 'Last Reply', 
+            render: (row) => <span className="text-[#1d1d1f]/50 text-xs font-sans">{new Date(row.updated_at).toLocaleDateString()}</span> 
+        },
         {
             key: 'action',
             label: '',
@@ -76,7 +81,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                     <button
                         type="button"
                         onClick={(e) => handleRowOpen(row.id, e.currentTarget)}
-                        className="inline-flex items-center rounded-md px-3 h-8 text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[#0071e3] hover:bg-[#0071e3]/10 transition-colors cursor-pointer"
                         aria-label={isAdmin ? 'View / Respond' : 'View Ticket'}
                     >
                         <Eye className="w-3.5 h-3.5 me-1.5" />
@@ -96,46 +101,52 @@ export default function TicketsIndex({ tickets, isAdmin }) {
             return true;
         }) || tickets?.data || [];
 
-    const emptyStateContent = (
-        <EmptyState
-            icon={Ticket}
-            tone="friendly"
-            title={__('general.no_support_tickets_yet') || 'No Support Tickets Yet'}
-            description={__('general.empty_tickets_friendly') || 'Quiet inbox. Need anything? We are here.'}
-            actionLabel="Open Ticket"
-            actionIcon={Plus}
-            onClick={() => router.visit(route('tickets.create'))}
-        />
-    );
-
     return (
-        <AuthenticatedLayout header="Support Tickets">
-            <Head title={__('general.support_tickets') || 'Support Tickets'} />
+        <AuthenticatedLayout>
+            <Head title={`${__('general.support_tickets') || 'Support Tickets'} — Musoftwares Studio`} />
 
-            <AppPage>
-                <PageHeader
-                    title={__('general.support_tickets') || 'Support Tickets'}
-                    subtitle={isAdmin ? "Manage client support requests and communications." : "Manage conversations and requests with the support team."}
-                    icon={MessageSquare}
-                    actions={
-                        !isAdmin && (
-                            <Link href={route('tickets.create')}>
-                                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
-                                    <Plus className="w-4 h-4 me-2" />
-                                    {__('general.open_ticket') || 'Open Ticket'}
-                                </Button>
+            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+                
+                {/* Hero Header */}
+                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
+                    <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="space-y-1.5">
+                            <Link
+                                href="/dashboard"
+                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
+                            >
+                                <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
+                                {__('general.back_to_dashboard')}
                             </Link>
-                        )
-                    }
-                />
+                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
+                                {__('general.support_tickets') || 'Support Tickets'}
+                            </h1>
+                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
+                                {isAdmin ? "Manage client support requests and communications." : "Direct communication channel with our engineering & support team."}
+                            </p>
+                        </div>
 
-                {isAdmin && (
-                    <ActionBar>
-                        <div className="flex gap-3 w-full max-w-md">
+                        {!isAdmin && (
+                            <Link
+                                href={route('tickets.create')}
+                                className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-blue-500/20 cursor-pointer shrink-0"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>{__('general.open_ticket') || 'Open Ticket'}</span>
+                            </Link>
+                        )}
+                    </div>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 py-8 space-y-6">
+                    
+                    {isAdmin && (
+                        <div className="flex gap-3 w-full max-w-md bg-white p-3 rounded-2xl border border-black/5 shadow-sm">
                             <select
                                 value={filterStatus}
                                 onChange={(e) => setFilterStatus(e.target.value)}
-                                className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                                className="h-10 w-full rounded-xl border-black/10 text-xs font-medium text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3]"
                             >
                                 <option value="">{__('general.all_statuses') || 'All Statuses'}</option>
                                 <option value="open">{__('general.open') || 'Open'}</option>
@@ -145,7 +156,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                             <select
                                 value={filterPriority}
                                 onChange={(e) => setFilterPriority(e.target.value)}
-                                className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                                className="h-10 w-full rounded-xl border-black/10 text-xs font-medium text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3]"
                             >
                                 <option value="">{__('general.all_priorities') || 'All Priorities'}</option>
                                 <option value="High">{__('general.high') || 'High'}</option>
@@ -153,31 +164,34 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 <option value="Low">Low</option>
                             </select>
                         </div>
-                    </ActionBar>
-                )}
+                    )}
 
-                <SectionCard noPadding>
-                    <DataTable
-                        columns={columns}
-                        data={isAdmin ? filteredTickets : tickets?.data || []}
-                        emptyState={emptyStateContent}
-                        className="border-0 shadow-none rounded-none"
-                    />
-                </SectionCard>
-            </AppPage>
+                    <div className="bg-white rounded-[24px] border border-black/5 shadow-sm p-6 sm:p-8">
+                        <DataTable
+                            columns={columns}
+                            data={isAdmin ? filteredTickets : tickets?.data || []}
+                            emptyTitle={__('general.no_support_tickets_yet') || 'No Support Tickets Yet'}
+                            emptyDescription={__('general.empty_tickets_friendly') || 'Quiet inbox. Need anything? We are here.'}
+                        />
+                    </div>
 
+                </div>
+
+            </div>
+
+            {/* Support Ticket Sheet */}
             <Sheet open={openTicketId != null} onOpenChange={(o) => (o ? null : handleClose())}>
                 <SheetContent
                     side="right"
-                    className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md"
+                    className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md bg-white border-s border-black/5 text-[#1d1d1f]"
                 >
                     {openTicket && (
                         <>
-                            <SheetHeader className="border-b border-slate-100 bg-slate-50/50 p-6 text-start">
-                                <SheetTitle className="text-lg font-semibold text-slate-900">
+                            <SheetHeader className="border-b border-black/5 bg-[#f5f5f7]/50 p-6 text-start">
+                                <SheetTitle className="text-base font-bold text-[#1d1d1f] font-sans">
                                     #{openTicket.id} — {openTicket.ticket_subject || openTicket.subject || openTicket.title}
                                 </SheetTitle>
-                                <SheetDescription className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                                <SheetDescription className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#1d1d1f]/60">
                                     <StatusBadge status={openTicket.ticket_status || openTicket.status || 'open'} />
                                     <span>·</span>
                                     <span className="capitalize">{openTicket.priority || 'medium'}</span>
@@ -195,10 +209,10 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     readOnly={openTicket.ticket_status === 'closed' || openTicket.ticket_status === 'resolved'}
                                 />
                             </div>
-                            <div className="border-t border-slate-100 p-4">
+                            <div className="border-t border-black/5 p-4 bg-[#f5f5f7]/30">
                                 <Link
                                     href={route('tickets.show', openTicket.id)}
-                                    className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed]"
                                 >
                                     <ExternalLink className="h-3.5 w-3.5" /> {__('general.open_in_page') || 'Open in page'}
                                 </Link>

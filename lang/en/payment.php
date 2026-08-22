@@ -194,5 +194,6 @@ return [
     'total_net_pay' => 'Total Net Pay',
     'total_value' => 'Total Value',
     'view_in_admin_panel' => 'View In Admin Panel',
-    'yes_the_android_app_only' => 'Yes The Android App Only'
+    'yes_the_android_app_only' => 'Yes The Android App Only',
+    'unexpected_payment_error' => 'An unexpected error occurred during payment. Please try again.'
 ];

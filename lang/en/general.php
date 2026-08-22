@@ -1,6 +1,17 @@
 <?php
 
 return array (
+  'menu' => 'Menu',
+  'explore_menu' => 'Explore Systems & Services',
+  'workspace_projects' => 'Workspace & Projects',
+  'cloud_apps' => 'iSAAS Cloud Systems',
+  'financials_billing' => 'Financials & Billing',
+  'services_tools' => 'Services & Estimators',
+  'cost_estimator_desc' => 'Instant cost calculation',
+  'deposit_to_wallet' => 'Top-up wallet balance',
+  'gold_vault_hedging' => 'Gold savings & assets',
+  'manage_plans_and_addons' => 'Plans, modules & addons',
+  'marketplace_services_desc' => 'Browse & order digital services',
   'solutions' => 'Solutions',
   'estimator' => 'Estimator',
   'portfolio' => 'Work',
@@ -8190,4 +8201,8 @@ return array (
   'founder' => 'Founder',
   'mobile_apps' => 'Mobile Apps',
   'web_apps' => 'Web Apps',
+  'invoice_paid_successfully' => 'Invoice paid successfully',
+  'invoice_settled_via_wallet' => 'Invoice has been settled via your platform wallet.',
+  'later' => 'Later',
+  'write_comment_or_feedback' => 'Write a comment or feedback...',
 );

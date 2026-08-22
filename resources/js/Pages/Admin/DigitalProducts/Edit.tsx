@@ -31,12 +31,20 @@ interface Category {
     name: string;
 }
 
+interface CurrencyItem {
+    id: number;
+    currency: string;
+    symbol: string;
+}
+
 interface Product {
     id: number;
     title: string;
     slug: string;
     category_id: number | null;
     price: number | string;
+    currency_id?: number | null;
+    currency?: CurrencyItem | null;
     is_free: boolean;
     has_free_edition: boolean;
     free_edition_title: string | null;
@@ -68,9 +76,10 @@ interface Product {
 interface Props {
     product: Product;
     categories: Category[];
+    currencies?: CurrencyItem[];
 }
 
-export default function Edit({ product, categories }: Props) {
+export default function Edit({ product, categories, currencies = [] }: Props) {
     const [submitting, setSubmitting] = useState(false);
 
     const [form, setForm] = useState({
@@ -78,6 +87,7 @@ export default function Edit({ product, categories }: Props) {
         slug: product.slug || '',
         category_id: product.category_id ? String(product.category_id) : '',
         price: product.price ? String(product.price) : '0.00',
+        currency_id: product.currency_id ? String(product.currency_id) : (currencies[0]?.id ? String(currencies[0].id) : '1'),
         is_free: Boolean(product.is_free),
         author_name: product.author_name || '',
         publisher: product.publisher || 'Musoftware',
@@ -137,6 +147,7 @@ export default function Edit({ product, categories }: Props) {
         formData.append('slug', form.slug);
         if (form.category_id) formData.append('category_id', form.category_id);
         formData.append('price', form.is_free ? '0.00' : form.price);
+        formData.append('currency_id', form.currency_id);
         formData.append('is_free', form.is_free ? '1' : '0');
         if (form.author_name) formData.append('author_name', form.author_name);
         if (form.publisher) formData.append('publisher', form.publisher);
@@ -468,16 +479,31 @@ export default function Edit({ product, categories }: Props) {
                                                 </label>
 
                                                 {!form.is_free && (
-                                                    <div className="flex-1 relative">
+                                                    <div className="flex-1 flex items-center gap-2">
                                                         <Input
                                                             type="number"
                                                             step="0.01"
                                                             min="0"
                                                             value={form.price}
                                                             onChange={(e) => setForm((prev) => ({ ...prev, price: e.target.value }))}
-                                                            className="h-10 text-xs font-bold pe-12"
+                                                            className="h-10 text-xs font-bold flex-1"
+                                                            placeholder="Price"
                                                         />
-                                                        <span className="absolute end-3 top-2.5 text-xs text-slate-400 font-bold">$ USD</span>
+                                                        {currencies.length > 0 ? (
+                                                            <select
+                                                                value={form.currency_id}
+                                                                onChange={(e) => setForm((prev) => ({ ...prev, currency_id: e.target.value }))}
+                                                                className="h-10 px-2.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                            >
+                                                                {currencies.map((c) => (
+                                                                    <option key={c.id} value={c.id}>
+                                                                        {c.currency} ({c.symbol})
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <span className="text-xs text-slate-400 font-bold px-2">USD</span>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

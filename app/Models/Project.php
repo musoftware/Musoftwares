@@ -185,20 +185,9 @@ class Project extends Model
 
     public function hour_rate_client()
     {
-        if ($this->client->currency == 2) {
-            $bank = CurrenciesExchange::RateToday($this->hour_rate, 1, $this->client->currency);
-            $item = GoldWorldPrice::query()
-                ->select(DB::raw('DATE(price_date) as price_date, avg(price_24k) as price_24k, avg(price_22k) as price_22k, avg(price_21k) as price_21k, avg(price_18k) as price_18k, avg(price_14k) as price_14k'))
-                ->groupBy(DB::raw('DATE(price_date)'))
-                ->orderBy(DB::raw('DATE(price_date)'), 'desc')
-                ->first();
-            $usdPrice1 = CurrenciesExchange::RateByDate($item->price_date, $item->price_21k, 2, 1);
-            $price_21 = GoldPrice::query()->where(DB::raw('DATE(price_date)'), $item->price_date)->select(DB::raw('avg(price_21k) as price_21k'))->groupBy(DB::raw('DATE(price_date)'))->first();
+        $clientCurrency = $this->client?->currency ?? 1;
 
-            return ((float) $bank + ($this->hour_rate * ($price_21->price_21k / $usdPrice1))) / 2;
-        }
-
-        return CurrenciesExchange::RateToday($this->hour_rate, 1, $this->client->currency);
+        return CurrenciesExchange::RateToday($this->hour_rate, 1, $clientCurrency);
     }
 
     public function work_time_diff()

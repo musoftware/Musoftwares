@@ -1,6 +1,17 @@
 <?php
 
 return array (
+  'menu' => 'القائمة',
+  'explore_menu' => 'استكشاف الأنظمة والخدمات',
+  'workspace_projects' => 'مساحة العمل والمشاريع',
+  'cloud_apps' => 'الأنظمة السحابية والتطبيقات',
+  'financials_billing' => 'المالية والفواتير',
+  'services_tools' => 'الخدمات والأدوات',
+  'cost_estimator_desc' => 'حساب تكلفة وتفاصيل المشروع فوراً',
+  'deposit_to_wallet' => 'شحن وإيداع رصيد في المحفظة',
+  'gold_vault_hedging' => 'حفظ المدخرات والأصول بالذهب',
+  'manage_plans_and_addons' => 'إدارة الباقات والوحدات والإضافات',
+  'marketplace_services_desc' => 'تصفح وطلب الخدمات والحلول الرقمية',
   'solutions' => 'الحلول البرمجية',
   'estimator' => 'حاسبة التكلفة',
   'portfolio' => 'الأعمال والمشاريع',
@@ -8190,4 +8201,8 @@ return array (
   'founder' => 'محمود أمين',
   'mobile_apps' => 'تطبيقات الموبايل',
   'web_apps' => 'تطبيقات الويب',
+  'invoice_paid_successfully' => 'تم سداد الفاتورة بنجاح',
+  'invoice_settled_via_wallet' => 'تمت تسوية الفاتورة وخصمها من رصيد المحفظة بنجاح.',
+  'later' => 'لاحقاً',
+  'write_comment_or_feedback' => 'اكتب تعليقاً أو ملاحظة...',
 );

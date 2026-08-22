@@ -6,6 +6,7 @@ import CrmChatTab from './Components/CrmChatTab';
 import AccountsHealthTab from './Components/AccountsHealthTab';
 import AudiencesTab from './Components/AudiencesTab';
 import AdPerformanceTab from './Components/AdPerformanceTab';
+import BusinessProfileTab from './Components/BusinessProfileTab';
 import OnboardingWizard from './Components/OnboardingWizard';
 import { ExternalLink, Smartphone } from 'lucide-react';
 
@@ -145,7 +146,12 @@ export default function Workspace({
     const flash = pageProps?.flash;
 
     const [activeChannel, setActiveChannel] = useState<'whatsapp' | 'telegram'>('whatsapp');
-    const [activeTab, setActiveTab] = useState<'connectors' | 'audiences' | 'ad_performance' | 'send' | 'templates' | 'groups' | 'schedules' | 'logs' | 'flows' | 'bots' | 'subscribers'>('connectors');
+    const queryTab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
+    const [activeTab, setActiveTab] = useState<'connectors' | 'profile' | 'audiences' | 'ad_performance' | 'send' | 'templates' | 'groups' | 'schedules' | 'logs' | 'flows' | 'bots' | 'subscribers'>(
+        (queryTab && ['connectors', 'profile', 'audiences', 'ad_performance', 'send', 'templates', 'groups', 'schedules', 'logs', 'flows', 'bots', 'subscribers'].includes(queryTab))
+            ? (queryTab as any)
+            : 'connectors'
+    );
     const [selectedGroup, setSelectedGroup] = useState<ContactGroup | null>(null);
 
     const firstActiveAccount = accounts.find(a => a.status === 'active') || accounts[0];
@@ -665,18 +671,19 @@ export default function Workspace({
                     {/* Tabs selection */}
                     <div className="flex border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-px gap-6">
                         {(activeChannel === 'whatsapp'
-                            ? ['connectors', 'audiences', 'ad_performance', 'send', 'templates', 'schedules', 'logs', 'flows'] as const
+                            ? ['connectors', 'profile', 'audiences', 'ad_performance', 'send', 'templates', 'schedules', 'logs', 'flows'] as const
                             : ['bots', 'subscribers', 'send', 'schedules', 'logs', 'flows'] as const
                         ).map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab as any)}
-                                className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize flex items-center gap-2 ${activeTab === tab
+                                className={`pb-4 text-sm font-semibold tracking-tight whitespace-nowrap border-b-2 transition duration-200 capitalize flex items-center gap-2 cursor-pointer ${activeTab === tab
                                         ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold'
                                         : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
                                     }`}
                             >
                                 {tab === 'connectors' ? '⚙️ Accounts & Health' :
+                                    tab === 'profile' ? '✨ Business Profile' :
                                     tab === 'audiences' ? '👥 Contacts & Audiences' :
                                         tab === 'ad_performance' ? '📊 CTWA Ad Analytics' :
                                             tab === 'send' ? '🚀 Broadcast & Campaigns' :
@@ -705,6 +712,16 @@ export default function Workspace({
                                 testingAccountId={testingAccountId}
                                 onReconnectAccount={(acc) => { setReconnectAccount(acc); setCodeRequested(false); setReconnectPin(''); }}
                                 onDeleteAccount={handleDeleteAccount}
+                                onManageProfile={(acc) => { setSelectedAccountId(acc.id); setActiveTab('profile'); }}
+                            />
+                        )}
+
+                        {activeTab === 'profile' && (
+                            <BusinessProfileTab
+                                business={business}
+                                accounts={accounts}
+                                selectedAccountId={selectedAccountId}
+                                onSelectAccount={(id) => setSelectedAccountId(id)}
                             />
                         )}
 

@@ -25,8 +25,8 @@
                 'image' => $product->cover_image_path ? $product->cover_url : null,
                 'offers' => [
                     '@type' => 'Offer',
-                    'price' => $product->is_free ? '0.00' : (string) $product->price,
-                    'priceCurrency' => $product->currency?->code ?? 'USD',
+                    'price' => $product->is_free ? '0.00' : (string) number_format($product->converted_price ?? $product->price, 2, '.', ''),
+                    'priceCurrency' => $viewerCurrency->currency ?? 'USD',
                     'availability' => 'https://schema.org/InStock',
                     'url' => route('library.show', $product->slug),
                 ],
@@ -244,12 +244,17 @@
                                 </div>
                             @endif
 
+                            @php
+                                $mainFormattedPrice = $product->viewer_price_formatted ?? $product->formatted_price;
+                                $convertedBasePrice = (float) ($product->converted_price ?? $product->price);
+                                $originalFormattedPrice = \App\Helpers\FinanceHelper::instance()->format_money($convertedBasePrice * 1.3, $viewerCurrency->id ?? 1);
+                            @endphp
                             <div class="flex items-baseline justify-between gap-4">
                                 <div>
                                     <span class="text-xs text-[#86868b] font-medium block mb-0.5">الإصدار الكامل المعتمد</span>
                                     <div class="flex items-baseline gap-2">
-                                        <span class="text-3xl sm:text-4xl font-bold font-mono text-[#0071e3]">${{ number_format($product->price, 2) }}</span>
-                                        <span class="text-xs text-[#86868b] line-through font-mono">${{ number_format($product->price * 1.3, 2) }}</span>
+                                        <span class="text-3xl sm:text-4xl font-bold font-mono text-[#0071e3]">{{ $mainFormattedPrice }}</span>
+                                        <span class="text-xs text-[#86868b] line-through font-mono">{{ $originalFormattedPrice }}</span>
                                     </div>
                                 </div>
                                 <span class="px-3 py-1 rounded-full bg-blue-50 text-[#0066cc] border border-blue-200/80 text-xs font-semibold">
@@ -260,22 +265,26 @@
                             @auth
                                 @php
                                     $userBal = (float) auth()->user()->available_balance();
+                                    $userBalFormatted = \App\Helpers\FinanceHelper::instance()->format_money($userBal, $userCurrency->id ?? 1);
+                                    $confirmMsg = app()->getLocale() === 'ar'
+                                        ? 'تأكيد شراء كتاب ' . addslashes($product->title) . ' بمبلغ ' . $userPriceFormatted . '؟'
+                                        : 'Confirm purchasing ' . addslashes($product->title) . ' for ' . $userPriceFormatted . '?';
                                 @endphp
                                 <form action="{{ route('library.buy.wallet', $product->slug) }}" method="POST">
                                     @csrf
-                                    <button type="submit" onclick="return confirm('تأكيد شراء كتاب {{ addslashes($product->title) }} بمبلغ ${{ number_format($product->price, 2) }}؟')" class="w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs shadow-xs transition-all flex items-center justify-center gap-2">
+                                    <button type="submit" onclick="return confirm('{{ $confirmMsg }}')" class="w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs shadow-xs transition-all flex items-center justify-center gap-2">
                                         <i class="ri-shopping-bag-3-fill text-base"></i>
-                                        <span>{{ app()->getLocale() === 'ar' ? 'شراء الكتاب من المحفظة — $' . number_format($product->price, 2) : 'Buy Book from Wallet — $' . number_format($product->price, 2) }}</span>
+                                        <span>{{ app()->getLocale() === 'ar' ? 'شراء الكتاب من المحفظة — ' . $userPriceFormatted : 'Buy Book from Wallet — ' . $userPriceFormatted }}</span>
                                     </button>
                                 </form>
 
                                 <div class="flex items-center justify-between text-xs text-[#86868b] pt-1 px-1">
-                                    <span>{{ app()->getLocale() === 'ar' ? 'رصيدك المتاح:' : 'Available Balance:' }} <strong class="text-[#1d1d1f] font-mono font-bold">${{ number_format($userBal, 2) }}</strong></span>
+                                    <span>{{ app()->getLocale() === 'ar' ? 'رصيدك المتاح:' : 'Available Balance:' }} <strong class="text-[#1d1d1f] font-mono font-bold">{{ $userBalFormatted }}</strong></span>
                                 </div>
                             @else
                                 <a href="{{ route('login') }}" class="w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs shadow-xs transition-all flex items-center justify-center gap-2">
                                     <i class="ri-login-box-line text-base"></i>
-                                    <span>{{ app()->getLocale() === 'ar' ? 'تسجيل الدخول لشراء الكتاب — $' . number_format($product->price, 2) : 'Sign In to Purchase — $' . number_format($product->price, 2) }}</span>
+                                    <span>{{ app()->getLocale() === 'ar' ? 'تسجيل الدخول لشراء الكتاب — ' . $mainFormattedPrice : 'Sign In to Purchase — ' . $mainFormattedPrice }}</span>
                                 </a>
                             @endauth
                         </div>
@@ -345,7 +354,7 @@
                         </div>
                         <div class="pt-2 border-t border-black/5 flex items-center justify-between text-xs">
                             <span class="font-semibold {{ $relIsFree ? 'text-emerald-700' : 'text-[#0071e3]' }}">
-                                {{ $relIsFree ? (app()->getLocale() === 'ar' ? 'مجاني' : 'Free') : '$' . number_format($relBook->price, 2) }}
+                                {{ $relIsFree ? (app()->getLocale() === 'ar' ? 'مجاني' : 'Free') : ($relBook->viewer_price_formatted ?? $relBook->formatted_price) }}
                             </span>
                             <a href="{{ route('library.show', $relBook->slug) }}" class="text-[#0066cc] hover:underline font-medium">
                                 {{ app()->getLocale() === 'ar' ? 'عرض' : 'View' }} ➔

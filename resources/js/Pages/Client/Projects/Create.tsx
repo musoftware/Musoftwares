@@ -2,8 +2,6 @@ import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, FolderKanban, Sparkles } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
-import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
 import { __ } from '@/lib/i18n';
@@ -32,45 +30,54 @@ export default function CreateProject() {
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('general.new_project') || 'New Project'} />
-            <div className="mx-auto w-full max-w-3xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+            <Head title={`${__('general.new_project') || 'New Project'} — Musoftwares Studio`} />
+
+            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
                 
-                {/* Header */}
-                <header className="space-y-4">
-                    <Link
-                        href={route('client.projects.index')}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 transition-colors hover:text-slate-700"
-                    >
-                        <ArrowLeft className="h-4 w-4" /> {__('general.back_to_projects') || 'Back to Projects'}
-                    </Link>
-                    <div>
-                        <h1 className="flex items-center gap-2 text-3xl font-extrabold tracking-tight text-slate-900">
-                            <FolderKanban className="h-8 w-8 text-indigo-500" />
+                {/* Hero Header */}
+                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
+                    <div className="max-w-[1400px] mx-auto space-y-1.5">
+                        <Link
+                            href={route('client.projects.index')}
+                            className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
+                        >
+                            <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
+                            {__('general.back_to_projects') || 'Back to Projects'}
+                        </Link>
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
                             {__('general.start_new_project') || 'Start a New Project'}
                         </h1>
-                        <p className="mt-1 text-sm text-slate-500">
-                            Create your project instantly. You can manage and adjust all details via a WhatsApp-style conversation.
+                        <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
+                            Create your project workspace instantly. Scope details and sprint timelines will be tracked automatically.
                         </p>
                     </div>
-                </header>
+                </div>
 
-                <Card className="rounded-2xl border-slate-200/80 shadow-md">
-                    <CardHeader className="border-b border-slate-50 bg-slate-50/50 px-6 py-5">
-                        <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
-                            <Sparkles className="h-5 w-5 text-indigo-500 animate-pulse" />
-                            Project Scope Details
-                        </CardTitle>
-                        <CardDescription className="text-xs text-slate-400">
-                            Give your project a name and briefly explain what you want to achieve.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        {/* Scoping Presets Grid */}
-                        <div className="space-y-2 mb-6 border-b border-slate-100 pb-5">
-                            <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
+                {/* Form Container */}
+                <div className="max-w-[900px] mx-auto px-6 sm:px-10 py-8 space-y-6">
+                    
+                    <div className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm space-y-6">
+                        
+                        <div className="flex items-center gap-3 pb-4 border-b border-black/5">
+                            <div className="w-10 h-10 rounded-xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
+                                <Sparkles className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-base font-bold text-[#1d1d1f] font-sans">
+                                    Project Scope &amp; Details
+                                </h2>
+                                <p className="text-xs text-[#1d1d1f]/60">
+                                    Give your project a name and briefly explain what you want to achieve.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Presets */}
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 block">
                                 {__('general.start_with_preset') || 'Or start with a preset template:'}
                             </label>
-                            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                                 {[
                                     {
                                         title: __('presets.ecommerce_title') || 'E-Commerce App',
@@ -103,20 +110,20 @@ export default function CreateProject() {
                                                 description: preset.desc,
                                             }));
                                         }}
-                                        className="flex flex-col items-center justify-center p-3 text-center border border-slate-200/80 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/20 active:bg-indigo-50 transition cursor-pointer"
+                                        className="flex flex-col items-start p-3.5 text-start bg-[#f5f5f7] hover:bg-[#0071e3]/5 hover:border-[#0071e3]/30 border border-black/5 rounded-2xl transition-all cursor-pointer group"
                                     >
-                                        <span className="text-xs font-bold text-slate-800">{preset.title}</span>
-                                        <span className="text-[10px] text-slate-400 mt-1">{__('general.quick_select') || 'Quick Select'}</span>
+                                        <span className="text-xs font-bold text-[#1d1d1f] group-hover:text-[#0071e3] transition-colors">{preset.title}</span>
+                                        <span className="text-[10px] text-[#1d1d1f]/50 mt-1">{__('general.quick_select') || 'Quick Select'}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6 pt-2">
                             
                             {/* Project Name */}
                             <div className="space-y-2">
-                                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                                <label className="text-xs font-semibold text-[#1d1d1f] block">
                                     Project Name <span className="text-rose-500">*</span>
                                 </label>
                                 <Input
@@ -124,52 +131,55 @@ export default function CreateProject() {
                                     placeholder="e.g., E-Commerce App, Corporate Website"
                                     value={data.project_name}
                                     onChange={(e) => setData('project_name', e.target.value)}
-                                    className="rounded-xl border-slate-250 focus:ring-indigo-500"
+                                    className="h-11 rounded-xl bg-white border-black/10 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-[#0071e3]"
                                     required
                                 />
                                 {errors.project_name && (
-                                    <p className="text-xs text-rose-500 font-medium">{errors.project_name}</p>
+                                    <p className="text-xs text-rose-600 font-medium">{errors.project_name}</p>
                                 )}
                             </div>
 
                             {/* Initial Description */}
                             <div className="space-y-2">
-                                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-                                    Initial Description / Message
+                                <label className="text-xs font-semibold text-[#1d1d1f] block">
+                                    Initial Description / Scope
                                 </label>
                                 <Textarea
-                                    placeholder="Describe your project, features required, budget constraints, or timeline..."
+                                    placeholder="Describe your project, required features, budget constraints, or expected timeline..."
                                     rows={5}
                                     value={data.description}
                                     onChange={(e) => setData('description', e.target.value)}
-                                    className="rounded-xl border-slate-250 focus:ring-indigo-500"
+                                    className="rounded-xl bg-white border-black/10 text-xs sm:text-sm focus:ring-2 focus:ring-[#0071e3]"
                                 />
                                 {errors.description && (
-                                    <p className="text-xs text-rose-500 font-medium">{errors.description}</p>
+                                    <p className="text-xs text-rose-600 font-medium">{errors.description}</p>
                                 )}
-                                <span className="text-[10px] text-slate-400 italic block">
-                                    Tip: You can change or add features anytime using the WhatsApp chat screen once the project is created!
+                                <span className="text-[11px] text-[#1d1d1f]/50 italic block">
+                                    Tip: You can refine or add features anytime using the real-time project board after creation.
                                 </span>
                             </div>
 
-                            {/* Buttons */}
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                                <Link href={route('client.projects.index')}>
-                                    <Button type="button" variant="outline" className="rounded-xl px-5">
-                                        Cancel
-                                    </Button>
-                                </Link>
-                                <Button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="rounded-xl bg-slate-900 hover:bg-slate-800 text-white px-6 font-bold"
+                            {/* Action Buttons */}
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-black/5">
+                                <Link
+                                    href={route('client.projects.index')}
+                                    className="px-5 py-2.5 text-xs font-semibold text-[#1d1d1f]/70 hover:text-[#1d1d1f] rounded-full transition-colors"
                                 >
-                                    {processing ? 'Creating...' : 'Create Project'}
-                                </Button>
+                                    Cancel
+                                </Link>
+                                <button
+                                    type="submit"
+                                    disabled={processing || !data.project_name.trim()}
+                                    className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:opacity-50 text-white text-xs font-semibold rounded-[980px] shadow-sm shadow-blue-500/20 transition-all cursor-pointer"
+                                >
+                                    {processing ? 'Creating...' : 'Create Project Workspace'}
+                                </button>
                             </div>
                         </form>
-                    </CardContent>
-                </Card>
+
+                    </div>
+
+                </div>
 
             </div>
         </AuthenticatedLayout>

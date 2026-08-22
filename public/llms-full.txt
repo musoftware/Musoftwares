@@ -13,16 +13,17 @@ Base URL: http://localhost
 - OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
 
 ## Service Categories
+- **Design**: http://localhost/marketplace/categories/design-fail
 
 ## Full Services Catalog
 
-## Full Blog Articles Catalog
+### Branding Kit
+- **ID**: 1
+- **Category**: Design
+- **URL**: http://localhost/marketplace/services/1/branding-kit
+- **Starting Price**: $0
+- **Tagline**: 
+- **Description**: Complete brand kit
 
-### Test Article
-- **Slug**: test-article
-- **URL**: http://localhost/blog/test-article
-- **Published At**: 2026-08-21T15:09:00+00:00
-- **Excerpt**: 
-- **Content**:
-This is a test article.
+## Full Blog Articles Catalog
 

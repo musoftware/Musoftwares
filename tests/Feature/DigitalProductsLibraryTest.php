@@ -209,6 +209,7 @@ class DigitalProductsLibraryTest extends TestCase
             ->post(route('admin.digitalproducts.store'), [
                 'title' => 'كتاب نماذج الأعمال والذكاء الاصطناعي',
                 'price' => 35.00,
+                'currency_id' => 1,
                 'is_free' => 0,
                 'page_count' => 120,
                 'pdf_file' => $fullPdfFile,
@@ -225,9 +226,88 @@ class DigitalProductsLibraryTest extends TestCase
         $this->assertDatabaseHas('digital_products', [
             'title' => 'كتاب نماذج الأعمال والذكاء الاصطناعي',
             'price' => 35.00,
+            'currency_id' => 1,
             'page_count' => 120,
             'has_free_edition' => 1,
             'free_edition_page_count' => 20,
         ]);
+    }
+
+    public function test_multi_currency_exchange_and_wallet_deduction(): void
+    {
+        \App\Models\CurrenciesExchange::flushCache();
+
+        $usd = Currency::firstOrCreate(['id' => 1], [
+            'currency' => 'USD',
+            'symbol' => '$',
+            'string_format' => '$%01.2f',
+            'is_default' => true,
+        ]);
+
+        $egp = Currency::firstOrCreate(['id' => 2], [
+            'currency' => 'EGP',
+            'symbol' => 'e£',
+            'string_format' => 'e£%01.2f',
+            'is_default' => false,
+        ]);
+
+        // Exchange rates: 1 USD = 50 EGP, 1 EGP = 0.02 USD
+        \App\Models\CurrenciesExchange::updateOrCreate(
+            ['currency1' => $usd->id, 'currency2' => $egp->id, 'date_string' => now('Africa/Cairo')->toDateString()],
+            ['rate' => 50.0]
+        );
+        \App\Models\CurrenciesExchange::updateOrCreate(
+            ['currency1' => $egp->id, 'currency2' => $usd->id, 'date_string' => now('Africa/Cairo')->toDateString()],
+            ['rate' => 0.02]
+        );
+        \App\Models\CurrenciesExchange::flushCache();
+
+        Storage::fake('local');
+        Storage::disk('local')->put('books/files/cloud-mastery.pdf', '%PDF-1.4 Cloud Mastery Guide');
+
+        // Book priced in USD ($10.00)
+        $book = DigitalProduct::create([
+            'title' => 'Cloud Architecture Mastery',
+            'slug' => 'cloud-architecture-mastery',
+            'price' => 10.00,
+            'currency_id' => $usd->id,
+            'is_free' => false,
+            'file_path' => 'books/files/cloud-mastery.pdf',
+            'page_count' => 95,
+            'is_published' => true,
+        ]);
+
+        // Client whose wallet currency is EGP (currency_id = 2)
+        $egpUser = User::factory()->create([
+            'currency_id' => $egp->id,
+            'onboarding_completed' => true,
+        ]);
+        $egpUser->assignRole('client');
+
+        // Deposit 1,000 EGP into client wallet
+        $egpUser->add_balance(1000.00, 'EGP Deposit', 'deposit', $egp->id);
+
+        // Check show page when logged in as EGP user
+        $showRes = $this->actingAs($egpUser)->get(route('library.show', $book->slug));
+        $showRes->assertStatus(200);
+        // Required amount should be 500 EGP (10 USD * 50)
+        $showRes->assertSee('500.00');
+
+        // Execute Purchase
+        $buyResponse = $this->actingAs($egpUser)->post(route('library.buy.wallet', $book->slug));
+        $buyResponse->assertStatus(302);
+        $buyResponse->assertRedirect(route('library.my_library'));
+
+        // Assert book is purchased
+        $this->assertTrue($book->isPurchasedBy($egpUser));
+
+        // Assert purchase record has amount_paid = 500 in EGP
+        $purchase = $book->purchases()->where('user_id', $egpUser->id)->first();
+        $this->assertNotNull($purchase);
+        $this->assertEquals(500.00, (float) $purchase->amount_paid);
+        $this->assertEquals($egp->id, $purchase->currency_id);
+
+        // Assert remaining available balance is 500 EGP
+        $this->assertEquals(500.00, (float) $egpUser->fresh()->available_balance());
     }
 }

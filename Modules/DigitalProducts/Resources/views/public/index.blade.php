@@ -160,7 +160,7 @@
                     $bookUrl = route('library.show', $book->slug);
                     $coverUrl = $book->cover_image ? (Str::startsWith($book->cover_image, ['http://', 'https://', '/']) ? $book->cover_image : asset($book->cover_image)) : asset('images/apple/web-mobile-suite.jpg');
                     $isFree = $book->is_free || (float)$book->price <= 0;
-                    $currencySymbol = $book->currency->symbol ?? '$';
+                    $formattedPrice = $book->viewer_price_formatted ?? $book->formatted_price;
                 @endphp
 
                 <!-- Apple Bento Book Card -->
@@ -184,7 +184,7 @@
                                     </span>
                                 @else
                                     <span class="px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider font-mono shadow-xs">
-                                        {{ $currencySymbol }}{{ number_format($book->price, 2) }}
+                                        {{ $formattedPrice }}
                                     </span>
                                 @endif
 

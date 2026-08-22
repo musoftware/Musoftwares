@@ -53,66 +53,87 @@ export default function ProjectReport({ project, report, comments = [] }: Props)
 
     return (
         <AuthenticatedLayout>
-            <Head title={report.title} />
-            <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-                <div>
-                    <Link href={route('client.projects.show', project.id)} className="mb-1 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
-                        <ArrowLeft className="h-4 w-4" /> {project.name}
-                    </Link>
-                    <div className="flex items-center gap-2 text-emerald-600">
-                        <FileText className="h-5 w-5" />
-                        <span className="text-xs font-semibold uppercase tracking-wide">{__('general.report')}</span>
+            <Head title={`${report.title} — Musoftwares Studio`} />
+
+            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+                
+                {/* Hero Header */}
+                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
+                    <div className="max-w-[1400px] mx-auto space-y-2">
+                        <Link
+                            href={route('client.projects.show', project.id)}
+                            className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
+                        >
+                            <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
+                            {project.name}
+                        </Link>
+                        <div className="flex items-center gap-2 text-[#0071e3]">
+                            <FileText className="h-4 w-4" />
+                            <span className="text-xs font-bold uppercase tracking-wider font-mono">{__('general.report')}</span>
+                        </div>
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
+                            {report.title}
+                        </h1>
+                        {report.published_at && (
+                            <p className="text-xs text-[#1d1d1f]/50 font-sans">{formatDate(report.published_at)}</p>
+                        )}
                     </div>
-                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">{report.title}</h1>
-                    {report.published_at && (
-                        <p className="mt-1 text-sm text-slate-400">{formatDate(report.published_at)}</p>
-                    )}
                 </div>
 
-                <article
-                    className="prose prose-slate max-w-none prose-headings:font-heading prose-a:text-emerald-600"
-                    dangerouslySetInnerHTML={{ __html: html }}
-                />
-
-                {/* Comments / feedback */}
-                <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
-                    <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
-                        <MessageSquare className="h-4 w-4" /> {__('general.comments')}
-                    </h2>
-
-                    {thread.length === 0 ? (
-                        <p className="py-4 text-center text-sm text-slate-400">{__('general.no_comments_yet')}</p>
-                    ) : (
-                        <ul className="space-y-3">
-                            {thread.map((c) => (
-                                <li key={c.id} className="rounded-lg bg-slate-50 p-3">
-                                    <div className="mb-0.5 flex items-center justify-between text-xs text-slate-400">
-                                        <span className="font-semibold text-slate-600">{c.author_name ?? __('general.anonymous')}</span>
-                                        {c.created_at && <span>{formatDate(c.created_at)}</span>}
-                                    </div>
-                                    <p className="whitespace-pre-wrap break-words text-sm text-slate-700">{c.body}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-
-                    <form onSubmit={submitComment} className="flex items-end gap-2">
-                        <textarea
-                            value={draft}
-                            onChange={(e) => setDraft(e.target.value)}
-                            rows={2}
-                            placeholder={__('general.write_a_comment')}
-                            className="flex-1 resize-none rounded-lg border border-slate-200 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                {/* Main Content Area */}
+                <div className="max-w-[900px] mx-auto px-6 sm:px-10 py-8 space-y-8">
+                    
+                    {/* Report Article Card */}
+                    <div className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm">
+                        <article
+                            className="prose prose-slate max-w-none prose-headings:font-sans prose-headings:font-bold prose-a:text-[#0071e3] text-xs sm:text-sm leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: html }}
                         />
-                        <button
-                            type="submit"
-                            disabled={sending || !draft.trim()}
-                            className="inline-flex h-9 items-center gap-1 rounded-lg bg-slate-900 px-3 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-40"
-                        >
-                            <Send className="h-3.5 w-3.5" /> {__('general.send')}
-                        </button>
-                    </form>
-                </section>
+                    </div>
+
+                    {/* Comments section */}
+                    <section className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm space-y-6">
+                        <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1d1d1f]/60 font-mono pb-2 border-b border-black/5">
+                            <MessageSquare className="h-4 w-4 text-[#0071e3]" /> {__('general.comments')}
+                        </h2>
+
+                        {thread.length === 0 ? (
+                            <p className="py-4 text-center text-xs text-[#1d1d1f]/40 italic">{__('general.no_comments_yet')}</p>
+                        ) : (
+                            <ul className="space-y-3">
+                                {thread.map((c) => (
+                                    <li key={c.id} className="rounded-2xl bg-[#f5f5f7] border border-black/5 p-4 space-y-1">
+                                        <div className="flex items-center justify-between text-xs text-[#1d1d1f]/50">
+                                            <span className="font-bold text-[#1d1d1f]">{c.author_name ?? __('general.anonymous')}</span>
+                                            {c.created_at && <span>{formatDate(c.created_at)}</span>}
+                                        </div>
+                                        <p className="whitespace-pre-wrap break-words text-xs sm:text-sm text-[#1d1d1f]/80">{c.body}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
+                        <form onSubmit={submitComment} className="flex items-end gap-3 pt-2">
+                            <textarea
+                                value={draft}
+                                onChange={(e) => setDraft(e.target.value)}
+                                placeholder={__('general.write_comment_or_feedback') || 'Write comment...'}
+                                rows={2}
+                                className="flex-1 rounded-xl bg-white border border-black/10 px-3.5 py-2 text-xs sm:text-sm text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
+                            />
+                            <button
+                                type="submit"
+                                disabled={sending || !draft.trim()}
+                                className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:opacity-50 text-white rounded-[980px] text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                            >
+                                <Send className="h-3.5 w-3.5" />
+                                <span>{__('general.post') || 'Post'}</span>
+                            </button>
+                        </form>
+                    </section>
+
+                </div>
+
             </div>
         </AuthenticatedLayout>
     );
