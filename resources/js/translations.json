@@ -619,7 +619,30 @@
             "work_days_per_month": "أيام العمل في الشهر",
             "yes_the_android_app_only": "نعم، يقرأ تطبيق الأندرويد فقط رسائل SMS من مزودي الدفع المعتمدين (مثل فودافون كاش) ولا يصل أبدًا إلى رسائلك الشخصية الأخرى.",
             "your_hourly_rate": "سعر الساعة الخاص بك",
-            "your_secure_webhook": "رابط الـ Webhook الآمن الخاص بك"
+            "your_secure_webhook": "رابط الـ Webhook الآمن الخاص بك",
+            "total_outstanding_amount": "إجمالي المستحقات غير المحصلة",
+            "remaining_due": "المتبقي للسداد",
+            "client_wallet": "محفظة العميل",
+            "copy_invoice_link": "نسخ الرابط العام",
+            "invoice_link_copied": "تم نسخ رابط الفاتورة بنجاح إلى الحافظة",
+            "send_whatsapp": "تذكير واتساب",
+            "bill_now": "سداد من المحفظة",
+            "sufficient_balance": "يتوفر رصيد كافٍ للسداد المباشر في محفظة العميل",
+            "overdue_by_days": "متأخرة :days يوم",
+            "overdue": "متأخرة",
+            "selected_invoices_count": "تم تحديد :count فاتورة",
+            "selected_total_amount": "إجمالي المبلغ المحدد:",
+            "clear_selection": "إلغاء التحديد",
+            "quick_actions": "إجراءات سريعة",
+            "all_unpaid_partial": "الكل (غير مدفوعة وجزئية)",
+            "unpaid_only": "غير مدفوعة فقط",
+            "partially_paid_only": "مدفوعة جزئياً فقط",
+            "sort_by": "ترتيب حسب",
+            "sort_asc": "تصاعدي",
+            "sort_desc": "تنازلي",
+            "created_date": "تاريخ الإنشاء",
+            "due_date": "تاريخ الاستحقاق",
+            "no_due_date": "بدون تاريخ استحقاق"
         },
         "auth": {
             "actions": "الإجراءات",
@@ -10355,7 +10378,8 @@
             "invoice_paid_successfully": "تم سداد الفاتورة بنجاح",
             "invoice_settled_via_wallet": "تمت تسوية الفاتورة وخصمها من رصيد المحفظة بنجاح.",
             "later": "لاحقاً",
-            "write_comment_or_feedback": "اكتب تعليقاً أو ملاحظة..."
+            "write_comment_or_feedback": "اكتب تعليقاً أو ملاحظة...",
+            "no_phone_number": "لا يوجد رقم هاتف مسجل لهذا العميل"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -13441,7 +13465,30 @@
             "work_days_per_month": "Work Days \/ Month",
             "yes_the_android_app_only": "Yes The Android App Only",
             "your_hourly_rate": "Your Hourly Rate",
-            "your_secure_webhook": "Your Secure Webhook URL"
+            "your_secure_webhook": "Your Secure Webhook URL",
+            "total_outstanding_amount": "Total Outstanding Amount",
+            "remaining_due": "Remaining Due",
+            "client_wallet": "Client Wallet",
+            "copy_invoice_link": "Copy Public Link",
+            "invoice_link_copied": "Invoice link copied to clipboard",
+            "send_whatsapp": "WhatsApp Reminder",
+            "bill_now": "Bill from Wallet",
+            "sufficient_balance": "Sufficient wallet balance available for instant billing",
+            "overdue_by_days": "Overdue by :days days",
+            "overdue": "Overdue",
+            "selected_invoices_count": ":count invoices selected",
+            "selected_total_amount": "Selected Total:",
+            "clear_selection": "Clear Selection",
+            "quick_actions": "Quick Actions",
+            "all_unpaid_partial": "All Unpaid & Partial",
+            "unpaid_only": "Unpaid Only",
+            "partially_paid_only": "Partially Paid Only",
+            "sort_by": "Sort By",
+            "sort_asc": "Ascending",
+            "sort_desc": "Descending",
+            "created_date": "Created Date",
+            "due_date": "Due Date",
+            "no_due_date": "No Due Date"
         },
         "auth": {
             "actions": "Actions",
@@ -23177,7 +23224,8 @@
             "invoice_paid_successfully": "Invoice paid successfully",
             "invoice_settled_via_wallet": "Invoice has been settled via your platform wallet.",
             "later": "Later",
-            "write_comment_or_feedback": "Write a comment or feedback..."
+            "write_comment_or_feedback": "Write a comment or feedback...",
+            "no_phone_number": "No phone number recorded for this client"
         },
         "gold_saver": {
             "achieved": "Achieved",

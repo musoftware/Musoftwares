@@ -276,4 +276,38 @@ class AdminInvoiceTest extends TestCase
         $this->assertFalse((bool) $inv1->fresh()->is_suspended);
         $this->assertFalse((bool) $inv2->fresh()->is_suspended);
     }
+
+    public function test_admin_can_view_unpaid_invoices_tab_with_stats(): void
+    {
+        $currency = Currency::firstOrCreate(['id' => 1], ['currency' => 'USD', 'symbol' => '$']);
+        $client = User::factory()->create([
+            'currency_id' => $currency->id,
+            'user_balance' => 500,
+        ]);
+        $client->assignRole('client');
+
+        $unpaidInv = Invoice::createInvoice($client, null, null);
+        $unpaidInv->items()->create([
+            'item_title' => 'Test Item',
+            'amount' => 150,
+            'qty' => 1,
+            'item_type' => 'simple',
+        ]);
+        $unpaidInv->unpaid = 150;
+        $unpaidInv->status = 'unpaid';
+        $unpaidInv->save();
+
+        $response = $this->actingAs($this->admin)->get(route('admin.invoices.unpaid', [
+            'sort_by' => 'amount',
+            'sort_dir' => 'desc',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Invoices/Index')
+            ->has('stats')
+            ->where('currentTab', 'unpaid')
+            ->has('invoices.data')
+        );
+    }
 }

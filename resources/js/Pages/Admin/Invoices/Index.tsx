@@ -1,10 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import ClientActionsSheet from '@/Pages/Admin/Users/ClientActionsSheet';
-import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus, List, Receipt, Clock, User, ClipboardList, CreditCard, Filter, FilterX, RotateCcw, Search, Briefcase, DollarSign } from 'lucide-react';
+import {
+    MoreHorizontal,
+    FileText,
+    CheckCircle,
+    XCircle,
+    ChevronDown,
+    Plus,
+    List,
+    Receipt,
+    Clock,
+    User,
+    ClipboardList,
+    CreditCard,
+    Filter,
+    RotateCcw,
+    Search,
+    Briefcase,
+    DollarSign,
+    Copy,
+    MessageSquare,
+    AlertCircle,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
+    Wallet,
+    ExternalLink,
+} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
@@ -37,6 +63,7 @@ import {
 } from '@/Components/ui/dialog';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { toast } from 'sonner';
+
 const perPageOptions = [
     { value: '12', label: '12' },
     { value: '20', label: '20' },
@@ -85,8 +112,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const [searchTerm, setSearchTerm] = useState<string>((filters as any).search || '');
     const [filterBy, setFilterBy] = useState<string>((filters as any).filter_by || 'all');
     const [perPage, setPerPage] = useState<string>((filters as any).per_page || '20');
+    const [sortBy, setSortBy] = useState<string>((filters as any).sort_by || 'created_at');
+    const [sortDir, setSortDir] = useState<string>((filters as any).sort_dir || 'desc');
 
-    const [selectedInvoices, setSelectedInvoices] = useState({});
+    const [selectedInvoices, setSelectedInvoices] = useState<Record<string, boolean>>({});
     const [selectAll, setSelectAll] = useState(false);
     const [bulkAction, setBulkAction] = useState('');
     const [bulkActionProject, setBulkActionProject] = useState('');
@@ -106,12 +135,14 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         setSearchTerm((filters as any).search || '');
         setFilterBy((filters as any).filter_by || 'all');
         setPerPage((filters as any).per_page || '20');
+        setSortBy((filters as any).sort_by || 'created_at');
+        setSortDir((filters as any).sort_dir || 'desc');
     }, [filters]);
 
     useEffect(() => {
         if (selectAll) {
-            const newSelected = {};
-            invoices.data.forEach(inv => {
+            const newSelected: Record<string, boolean> = {};
+            invoices.data.forEach((inv: any) => {
                 newSelected[inv.id] = true;
             });
             setSelectedInvoices(newSelected);
@@ -120,9 +151,21 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         }
     }, [selectAll, invoices.data]);
 
-    const handleSelectInvoice = (id, checked) => {
+    const handleSelectInvoice = (id: any, checked: boolean) => {
         setSelectedInvoices(prev => ({ ...prev, [id]: checked }));
     };
+
+    const selectedInvoiceIds = useMemo(() => {
+        return Object.keys(selectedInvoices).filter(id => selectedInvoices[id]);
+    }, [selectedInvoices]);
+
+    const selectedCount = selectedInvoiceIds.length;
+
+    const selectedTotalAmount = useMemo(() => {
+        return invoices.data
+            .filter((inv: any) => selectedInvoices[inv.id])
+            .reduce((sum: number, inv: any) => sum + (Number(inv.unpaid_amount) || Number(inv.amount) || 0), 0);
+    }, [selectedInvoices, invoices.data]);
 
     const handleFilter = (overrides: Record<string, any> = {}) => {
         const queryParams: Record<string, any> = {
@@ -137,6 +180,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             search: searchTerm || undefined,
             filter_by: (filterBy && filterBy !== 'all') ? filterBy : undefined,
             per_page: perPage !== '20' ? perPage : undefined,
+            sort_by: sortBy !== 'created_at' ? sortBy : undefined,
+            sort_dir: sortDir !== 'desc' ? sortDir : undefined,
             ...overrides,
         };
 
@@ -154,6 +199,38 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         );
     };
 
+    const handleSort = (column: string) => {
+        let nextDir = 'asc';
+        if (sortBy === column) {
+            nextDir = sortDir === 'asc' ? 'desc' : 'asc';
+        }
+        setSortBy(column);
+        setSortDir(nextDir);
+        handleFilter({ sort_by: column, sort_dir: nextDir });
+    };
+
+    const renderSortHeader = (title: string, column: string, className = '') => {
+        const isActive = sortBy === column;
+        return (
+            <button
+                type="button"
+                onClick={() => handleSort(column)}
+                className={`flex items-center gap-1 uppercase text-xs font-semibold hover:text-slate-900 transition-colors group ${className}`}
+            >
+                <span>{title}</span>
+                {isActive ? (
+                    sortDir === 'asc' ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                    )
+                ) : (
+                    <ArrowUpDown className="h-3 w-3 opacity-30 group-hover:opacity-100 transition-opacity" />
+                )}
+            </button>
+        );
+    };
+
     const handleClearFilters = () => {
         setClientId('');
         setProjectId('');
@@ -166,6 +243,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         setSearchTerm('');
         setFilterBy('all');
         setPerPage('20');
+        setSortBy('created_at');
+        setSortDir('desc');
 
         router.get(
             route(`admin.invoices.${currentTab === 'all' ? 'index' : currentTab}`),
@@ -185,7 +264,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         (jobStatus && jobStatus !== 'all') ||
         searchTerm ||
         (filterBy && filterBy !== 'all') ||
-        (perPage && perPage !== '20')
+        (perPage && perPage !== '20') ||
+        (sortBy && sortBy !== 'created_at')
     );
 
     const availableProjects = clientId
@@ -208,13 +288,19 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         })),
     ];
 
-    const statusOptions = [
-        { value: 'all', label: __('admin.all_statuses') || __('general.all_statuses') || 'All Statuses' },
-        { value: 'unpaid', label: __('general.unpaid') || 'Unpaid' },
-        { value: 'partially_paid', label: __('general.partially_paid') || 'Partially Paid' },
-        { value: 'paid', label: __('general.paid') || 'Paid' },
-        { value: 'cancelled', label: __('general.archived_cancelled') || 'Cancelled / Archived' },
-    ];
+    const statusOptions = currentTab === 'unpaid'
+        ? [
+            { value: 'all', label: __('admin.all_unpaid_partial') || 'All Unpaid & Partial' },
+            { value: 'unpaid', label: __('admin.unpaid_only') || 'Unpaid Only' },
+            { value: 'partially_paid', label: __('admin.partially_paid_only') || 'Partially Paid Only' },
+        ]
+        : [
+            { value: 'all', label: __('admin.all_statuses') || __('general.all_statuses') || 'All Statuses' },
+            { value: 'unpaid', label: __('general.unpaid') || 'Unpaid' },
+            { value: 'partially_paid', label: __('general.partially_paid') || 'Partially Paid' },
+            { value: 'paid', label: __('general.paid') || 'Paid' },
+            { value: 'cancelled', label: __('general.archived_cancelled') || 'Cancelled / Archived' },
+        ];
 
     const jobStatusOptions = [
         { value: 'all', label: __('general.all_job_statuses') || 'All Job Statuses' },
@@ -223,16 +309,39 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         { value: 'done', label: __('general.done') || 'Done' },
     ];
 
-    const handleLoginAs = (id) => {
+    const handleLoginAs = (id: any) => {
         router.post(route('admin.users.login-as', id));
     };
 
-    const handleResetPassword = (id) => {
+    const handleResetPassword = (id: any) => {
         router.post(route('admin.users.reset-password', id));
     };
 
     const handleMarkPaid = (id: any) => setPendingAction({ type: 'mark_paid', id });
     const handleBillBalance = (id: any) => setPendingAction({ type: 'bill_balance', id });
+
+    const handleCopyLink = (invoice: any, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (invoice.public_url) {
+            navigator.clipboard.writeText(invoice.public_url);
+            toast.success(__('admin.invoice_link_copied') || 'Invoice link copied to clipboard');
+        }
+    };
+
+    const handleWhatsAppReminder = (invoice: any, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        const phone = invoice.user?.phone_number || invoice.user?.phone;
+        if (!phone) {
+            toast.error(__('general.no_phone_number') || 'Client has no phone number recorded');
+            return;
+        }
+        const cleanPhone = phone.replace(/[^0-9]/g, '');
+        const amountText = invoice.unpaid_amount_str || formatCurrency(invoice.unpaid_amount || invoice.amount, invoice.currency);
+        const text = encodeURIComponent(
+            `مرحباً ${invoice.user?.name || ''}، تذكير بفاتورتكم #${invoice.invoice_number} بمبلغ متبقي ${amountText}. رابط الفاتورة: ${invoice.public_url}`
+        );
+        window.open(`https://wa.me/${cleanPhone}?text=${text}`, '_blank');
+    };
 
     const confirmMarkPaid = () => {
         if (!pendingAction || pendingAction.type !== 'mark_paid') return;
@@ -308,8 +417,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     };
 
     const applyBulkAction = () => {
-        const selectedIds = Object.keys(selectedInvoices).filter(id => selectedInvoices[id]);
-        if (selectedIds.length === 0) {
+        if (selectedInvoiceIds.length === 0) {
             toast.error(__('general.select_at_least_one_invoice') || 'Please select at least one invoice.');
             return;
         }
@@ -324,9 +432,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             send_whatsapp_reminder: __('general.confirm_send_whatsapp_reminders') || 'Send WhatsApp reminders for the selected invoices?',
             suspend: __('admin.confirm_suspend_invoices') || 'Are you sure you want to suspend the selected invoices?',
             unsuspend: __('admin.confirm_unsuspend_invoices') || 'Are you sure you want to unsuspend the selected invoices?',
+            bill_invoice: __('general.confirm_bill_balance') || 'Bill selected invoices from client balance?',
         };
 
-        setPendingAction({ type: 'bulk', id: { action: bulkAction, ids: selectedIds, projectId: bulkActionProject, message: messages[bulkAction] || __('general.confirm_bulk_action') || 'Apply this bulk action?' } });
+        setPendingAction({ type: 'bulk', id: { action: bulkAction, ids: selectedInvoiceIds, projectId: bulkActionProject, message: messages[bulkAction] || __('general.confirm_bulk_action') || 'Apply this bulk action?' } });
     };
 
     const confirmBulkAction = () => {
@@ -353,8 +462,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         });
     };
 
-    const getStatusBadge = (status) => {
-        switch (status) {
+    const getStatusBadge = (invoiceStatus: string) => {
+        switch (invoiceStatus) {
             case 'paid':
                 return <StatusBadge status="paid" />;
             case 'partially_paid':
@@ -367,8 +476,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         }
     };
 
-    const getJobStatusBadge = (status) => {
-        switch (status) {
+    const getJobStatusBadge = (statusValue: string) => {
+        switch (statusValue) {
             case 'done':
                 return <StatusBadge status="done" label={__('general.done')} className="bg-green-50 text-slate-900 border-green-100" />;
             case 'processing':
@@ -378,7 +487,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         }
     };
 
-    const buildTabUrl = (tab) => {
+    const buildTabUrl = (tab: string) => {
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.delete('page'); 
         const queryString = urlParams.toString();
@@ -389,36 +498,39 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     return (
         <AdminSidebarLayout title={__('general.platform_invoices')} header="Invoices Manager">
             
+            {/* Always-on Stats Cards */}
             {stats && (
-                <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                    <Card>
-                        <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.total_invoices')}</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.total}</dd>
+                <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardContent className="p-4">
+                            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.total_invoices')}</dt>
+                            <dd className="mt-1 text-2xl font-bold text-slate-900">{stats.total}</dd>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.paid')}</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.paid}</dd>
+                    <Card className="border-red-100 bg-red-50/20 shadow-sm">
+                        <CardContent className="p-4">
+                            <dt className="text-xs font-semibold text-red-700 uppercase tracking-wider">{__('general.unpaid')}</dt>
+                            <dd className="mt-1 text-2xl font-bold text-red-700">{stats.unpaid}</dd>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.unpaid')}</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.unpaid}</dd>
+                    <Card className="border-amber-200 bg-amber-50/30 shadow-sm">
+                        <CardContent className="p-4">
+                            <dt className="text-xs font-semibold text-amber-800 uppercase tracking-wider">{__('admin.total_outstanding_amount') || 'Total Outstanding'}</dt>
+                            <dd className="mt-1 text-2xl font-bold text-amber-900">
+                                {stats.total_unpaid_amount_str || stats.total_unpaid_amount || '0.00'}
+                            </dd>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.partially_paid')}</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.partially_paid}</dd>
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardContent className="p-4">
+                            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.partially_paid')}</dt>
+                            <dd className="mt-1 text-2xl font-bold text-slate-900">{stats.partially_paid}</dd>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('admin.suspended_invoices') || 'Suspended Invoices'}</dt>
-                            <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.suspended || 0}</dd>
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardContent className="p-4">
+                            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('admin.suspended_invoices') || 'Suspended Invoices'}</dt>
+                            <dd className="mt-1 text-2xl font-bold text-slate-900">{stats.suspended || 0}</dd>
                         </CardContent>
                     </Card>
                 </div>
@@ -460,7 +572,6 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 onChange={(val) => {
                                     const nextClientId = String(val || '');
                                     setClientId(nextClientId);
-                                    // If current project does not belong to new client, reset project
                                     let nextProjectId = projectId;
                                     if (nextClientId && projectId) {
                                         const proj = (projects as any[]).find(p => String(p.id) === String(projectId));
@@ -665,20 +776,38 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             onChange={(e) => setSelectAll(e.target.checked)}
                                         />
                                     </TableHead>
-                                    <TableHead className="hidden sm:table-cell uppercase text-xs">ID</TableHead>
-                                    <TableHead className="uppercase text-xs">{__('general.customer')}</TableHead>
-                                    <TableHead className="uppercase text-xs">{__('general.project')}</TableHead>
-                                    <TableHead className="uppercase text-xs">{__('general.date')}</TableHead>
-                                    <TableHead className="uppercase text-xs">{__('general.schedule_date')}</TableHead>
-                                    <TableHead className="text-end uppercase text-xs">{__('general.total')}</TableHead>
-                                    <TableHead className="text-center uppercase text-xs">{__('general.job_status')}</TableHead>
-                                    <TableHead className="text-center uppercase text-xs">{__('general.invoice_status')}</TableHead>
-                                    <TableHead className="text-end uppercase text-xs">{__('general.actions')}</TableHead>
+                                    <TableHead className="hidden sm:table-cell">
+                                        {renderSortHeader('ID', 'id')}
+                                    </TableHead>
+                                    <TableHead>
+                                        <span className="uppercase text-xs font-semibold">{__('general.customer')}</span>
+                                    </TableHead>
+                                    <TableHead>
+                                        <span className="uppercase text-xs font-semibold">{__('general.project')}</span>
+                                    </TableHead>
+                                    <TableHead>
+                                        {renderSortHeader(__('general.date') || 'Date', 'created_at')}
+                                    </TableHead>
+                                    <TableHead>
+                                        {renderSortHeader(__('admin.due_date') || 'Due Date', 'due_date')}
+                                    </TableHead>
+                                    <TableHead className="text-end">
+                                        {renderSortHeader(__('general.total') || 'Total', 'amount', 'justify-end')}
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                        <span className="uppercase text-xs font-semibold">{__('general.job_status')}</span>
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                        {renderSortHeader(__('general.invoice_status') || 'Status', 'status', 'justify-center')}
+                                    </TableHead>
+                                    <TableHead className="text-end">
+                                        <span className="uppercase text-xs font-semibold">{__('general.actions')}</span>
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {(invoices.data as any).map((invoice) => (
-                                    <TableRow key={invoice.id}>
+                                {(invoices.data as any).map((invoice: any) => (
+                                    <TableRow key={invoice.id} className="hover:bg-slate-50/70 transition-colors">
                                         <TableCell className="hidden sm:table-cell text-center" data-label="">
                                             <input 
                                                 type="checkbox" 
@@ -695,25 +824,36 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <TableCell data-label={__('general.customer')}>
                                             {invoice.user ? (
                                                 <div className="flex items-center gap-3">
-                                                    <Avatar className="h-10 w-10 border border-slate-200">
+                                                    <Avatar className="h-10 w-10 border border-slate-200 flex-shrink-0">
                                                         <AvatarImage src={invoice.user.avatar_url || ''} alt={invoice.user.name} />
-                                                        <AvatarFallback className="bg-slate-50 text-slate-900">
+                                                        <AvatarFallback className="bg-slate-50 text-slate-900 font-semibold">
                                                             <User className="h-5 w-5" />
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setSelectedClient(invoice.user)}
-                                                        className="flex flex-col text-start group"
-                                                    >
-                                                        <span className="font-semibold text-slate-900 group-hover:text-slate-900 transition-colors flex items-center gap-1">
-                                                            {invoice.user.name}
+                                                    <div className="flex flex-col text-start">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setSelectedClient(invoice.user)}
+                                                            className="font-semibold text-slate-900 hover:text-primary transition-colors flex items-center gap-1 text-start"
+                                                        >
+                                                            <span>{invoice.user.name}</span>
                                                             <ChevronDown className="h-3 w-3 text-muted-foreground hidden sm:inline-block" />
-                                                        </span>
-                                                        <span className="text-sm text-slate-500 font-normal">
+                                                        </button>
+                                                        <span className="text-xs text-slate-500 font-normal">
                                                             {invoice.user.email}
                                                         </span>
-                                                    </button>
+                                                        {Number(invoice.user.balance) > 0 && (
+                                                            <div className="mt-1">
+                                                                <span 
+                                                                    className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded shadow-xs" 
+                                                                    title={__('admin.sufficient_balance') || 'Client Wallet Balance'}
+                                                                >
+                                                                    <Wallet className="h-2.5 w-2.5" />
+                                                                    {__('admin.client_wallet') || 'Wallet'}: {invoice.user.balance_str || formatCurrency(invoice.user.balance, invoice.currency)}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <span className="font-semibold text-muted-foreground">{__('general.unknown')}</span>
@@ -723,33 +863,49 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             {invoice.project ? (
                                                 <Link
                                                     href={route('admin.projects.board.index', invoice.project.id)}
-                                                    className="text-primary hover:underline font-semibold"
+                                                    className="text-primary hover:underline font-semibold text-sm"
                                                 >
                                                     {invoice.project.project_name}
                                                 </Link>
                                             ) : (
-                                                '-'
+                                                <span className="text-slate-400 text-sm">-</span>
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground text-sm" data-label={__('general.date')}>
+                                        <TableCell className="text-muted-foreground text-xs whitespace-nowrap" data-label={__('general.date')}>
                                             {new Date(invoice.created_at).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground text-sm" data-label={__('general.schedule_date')}>
-                                            {invoice.scheduled_start_date ? new Date(invoice.scheduled_start_date).toLocaleDateString() : '-'}
+                                        <TableCell className="text-sm whitespace-nowrap" data-label={__('admin.due_date')}>
+                                            {invoice.due_date ? (
+                                                <div className="flex flex-col items-start gap-0.5">
+                                                    <span className="text-xs text-slate-700">{new Date(invoice.due_date).toLocaleDateString()}</span>
+                                                    {invoice.is_overdue && (
+                                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">
+                                                            <AlertCircle className="h-2.5 w-2.5" />
+                                                            {invoice.days_overdue > 0 
+                                                                ? (__('admin.overdue_by_days', { days: invoice.days_overdue }) || `Overdue ${invoice.days_overdue}d`)
+                                                                : (__('admin.overdue') || 'Overdue')}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-400 text-xs">-</span>
+                                            )}
                                         </TableCell>
                                         <TableCell className="text-end" data-label={__('general.total')}>
-                                            <div className="flex flex-col items-end gap-1">
-                                                <span className="font-semibold text-slate-900">
+                                            <div className="flex flex-col items-end gap-0.5">
+                                                <span className="font-semibold text-slate-900 text-sm">
                                                     {formatCurrency(invoice.amount, invoice.currency)}
                                                 </span>
-                                                {(invoice.business_currency && invoice.business_currency !== invoice.currency) && (
-                                                    <span className="text-xs text-muted-foreground font-medium" title={__('general.business_currency')}>
-                                                        ~ {formatCurrency(invoice.business_amount || invoice.amount, invoice.business_currency)}
+                                                
+                                                {(invoice.status === 'unpaid' || invoice.status === 'partially_paid') && (
+                                                    <span className="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">
+                                                        {__('admin.remaining_due') || 'Due'}: {invoice.unpaid_amount_str || formatCurrency(invoice.unpaid_amount, invoice.currency)}
                                                     </span>
                                                 )}
-                                                {invoice.status === 'partially_paid' && (
-                                                    <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20 mt-1">
-                                                        Paid {formatCurrency(invoice.paid_amount, invoice.currency)}
+
+                                                {(invoice.business_currency && invoice.business_currency !== invoice.currency) && (
+                                                    <span className="text-[10px] text-muted-foreground font-medium" title={__('general.business_currency')}>
+                                                        ~ {formatCurrency(invoice.business_amount || invoice.amount, invoice.business_currency)}
                                                     </span>
                                                 )}
                                             </div>
@@ -770,103 +926,166 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             <div className="flex flex-col items-center gap-1 justify-center">
                                                 {getStatusBadge(invoice.status)}
                                                 {invoice.is_suspended && (
-                                                    <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded uppercase leading-none">
+                                                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded uppercase leading-none">
                                                         {__('admin.suspended') || 'Suspended'}
                                                     </span>
                                                 )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-end" data-label={__('general.actions')}>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">{__('general.open_menu')}</span>
-                                                        <MoreHorizontal className="h-4 w-4" />
+                                            <div className="flex items-center justify-end gap-1">
+                                                {/* 1-Click Quick Bill from Wallet if sufficient balance */}
+                                                {(invoice.status === 'unpaid' || invoice.status === 'partially_paid') && 
+                                                 !invoice.is_suspended && 
+                                                 Number(invoice.user?.balance) >= Number(invoice.unpaid_amount) && 
+                                                 Number(invoice.unpaid_amount) > 0 && (
+                                                    <Button
+                                                        size="icon"
+                                                        variant="outline"
+                                                        className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+                                                        title={__('admin.bill_now') || 'Bill from Wallet Balance'}
+                                                        onClick={(e) => { e.stopPropagation(); handleBillBalance(invoice.id); }}
+                                                    >
+                                                        <CreditCard className="h-3.5 w-3.5" />
                                                     </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-56">
-                                                    <DropdownMenuLabel>{__('general.invoice_actions')}</DropdownMenuLabel>
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={route('admin.invoices.show', invoice.id)} className="flex w-full items-center">
-                                                            <FileText className="me-2 h-4 w-4 text-slate-900" />{__('general.view_details')}</Link>
-                                                    </DropdownMenuItem>
-                                                    
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/invoices/create?client_id=${invoice.user_id || invoice.user?.id}${(invoice.project_id || invoice.project?.id) ? `&project_id=${invoice.project_id || invoice.project?.id}` : ''}`} className="flex w-full items-center">
-                                                            <Plus className="me-2 h-4 w-4 text-slate-900" />{__('general.new_invoice')}</Link>
-                                                    </DropdownMenuItem>
-                                                    
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/invoices?client_id=${invoice.user_id || invoice.user?.id}`} className="flex w-full items-center">
-                                                            <List className="me-2 h-4 w-4 text-slate-500" />{__('general.all_invoices')}</Link>
-                                                    </DropdownMenuItem>
-                                                
-                                                    <DropdownMenuSeparator />
-                                                
-                                                    <DropdownMenuLabel>{__('general.client_reports')}</DropdownMenuLabel>
-                                                    <DropdownMenuItem asChild>
-                                                        <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Receipt className="me-2 h-4 w-4 text-slate-700" />{__('general.due_balance_sheet')}</a>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/reports`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Clock className="me-2 h-4 w-4 text-yellow-600" />{__('general.timer_balance_sheet')}</a>
-                                                    </DropdownMenuItem>
-                                                
-                                                    <DropdownMenuSeparator />
-                                                
-                                                    <DropdownMenuLabel>{__('general.profile_tasks')}</DropdownMenuLabel>
-                                                    <DropdownMenuItem asChild>
-                                                        <a href={`/admin/users/${invoice.user_id || invoice.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <User className="me-2 h-4 w-4 text-slate-900" />{__('general.user_profile')}</a>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/users/${invoice.user_id || invoice.user?.id}/tasks/add`} className="flex w-full items-center">
-                                                            <ClipboardList className="me-2 h-4 w-4 text-slate-900" />{__('general.add_tasks')}</Link>
-                                                    </DropdownMenuItem>
-                                                
-                                                    <DropdownMenuSeparator />
-                                                
-                                                    {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-                                                        <>
-                                                            <DropdownMenuItem onClick={() => handleToggleSuspend(invoice.id)}>
-                                                                {invoice.is_suspended ? (
-                                                                    <>
-                                                                        <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.unsuspend') || 'Unsuspend'}
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <XCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.suspend') || 'Suspend'}
-                                                                    </>
-                                                                )}
+                                                )}
+
+                                                {/* 1-Click Quick WhatsApp Reminder */}
+                                                {(invoice.status === 'unpaid' || invoice.status === 'partially_paid') && (
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                                        title={__('admin.send_whatsapp') || 'Send WhatsApp Reminder'}
+                                                        onClick={(e) => handleWhatsAppReminder(invoice, e)}
+                                                    >
+                                                        <MessageSquare className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                )}
+
+                                                {/* 1-Click Copy Public URL */}
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 text-slate-500 hover:text-slate-900"
+                                                    title={__('admin.copy_invoice_link') || 'Copy Public Invoice Link'}
+                                                    onClick={(e) => handleCopyLink(invoice, e)}
+                                                >
+                                                    <Copy className="h-3.5 w-3.5" />
+                                                </Button>
+
+                                                {/* Full Dropdown Menu */}
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">{__('general.open_menu')}</span>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-56">
+                                                        <DropdownMenuLabel>{__('general.invoice_actions')}</DropdownMenuLabel>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={route('admin.invoices.show', invoice.id)} className="flex w-full items-center">
+                                                                <FileText className="me-2 h-4 w-4 text-slate-900" />{__('general.view_details')}</Link>
+                                                        </DropdownMenuItem>
+
+                                                        {invoice.public_url && (
+                                                            <DropdownMenuItem onClick={() => window.open(invoice.public_url, '_blank')}>
+                                                                <ExternalLink className="me-2 h-4 w-4 text-slate-700" />
+                                                                {__('admin.view_link') || 'Open Public Link'}
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
-                                                                <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('general.mark_as_paid')}</DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleBillBalance(invoice.id)}>
-                                                                <CreditCard className="me-2 h-4 w-4 text-slate-900" />{__('general.bill_from_balance')}</DropdownMenuItem>
-                                                        </>
-                                                    )}
-                                                    {invoice.status !== 'cancelled' && (
-                                                        <DropdownMenuItem onClick={() => handleCancel(invoice.id)} className="text-red-600 focus:text-red-600">
-                                                            <XCircle className="me-2 h-4 w-4" />{__('general.cancel_invoice')}</DropdownMenuItem>
-                                                    )}
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                                        )}
+                                                        
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/admin/invoices/create?client_id=${invoice.user_id || invoice.user?.id}${(invoice.project_id || invoice.project?.id) ? `&project_id=${invoice.project_id || invoice.project?.id}` : ''}`} className="flex w-full items-center">
+                                                                <Plus className="me-2 h-4 w-4 text-slate-900" />{__('general.new_invoice')}</Link>
+                                                        </DropdownMenuItem>
+                                                        
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/admin/invoices?client_id=${invoice.user_id || invoice.user?.id}`} className="flex w-full items-center">
+                                                                <List className="me-2 h-4 w-4 text-slate-500" />{__('general.all_invoices')}</Link>
+                                                        </DropdownMenuItem>
+                                                    
+                                                        <DropdownMenuSeparator />
+                                                    
+                                                        <DropdownMenuLabel>{__('general.client_reports')}</DropdownMenuLabel>
+                                                        <DropdownMenuItem asChild>
+                                                            <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                                <Receipt className="me-2 h-4 w-4 text-slate-700" />{__('general.due_balance_sheet')}</a>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/reports`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                                <Clock className="me-2 h-4 w-4 text-yellow-600" />{__('general.timer_balance_sheet')}</a>
+                                                        </DropdownMenuItem>
+                                                    
+                                                        <DropdownMenuSeparator />
+                                                    
+                                                        <DropdownMenuLabel>{__('general.profile_tasks')}</DropdownMenuLabel>
+                                                        <DropdownMenuItem asChild>
+                                                            <a href={`/admin/users/${invoice.user_id || invoice.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                                <User className="me-2 h-4 w-4 text-slate-900" />{__('general.user_profile')}</a>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/admin/users/${invoice.user_id || invoice.user?.id}/tasks/add`} className="flex w-full items-center">
+                                                                <ClipboardList className="me-2 h-4 w-4 text-slate-900" />{__('general.add_tasks')}</Link>
+                                                        </DropdownMenuItem>
+                                                    
+                                                        <DropdownMenuSeparator />
+                                                    
+                                                        {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                                                            <>
+                                                                <DropdownMenuItem onClick={() => handleToggleSuspend(invoice.id)}>
+                                                                    {invoice.is_suspended ? (
+                                                                        <>
+                                                                            <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.unsuspend') || 'Unsuspend'}
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <XCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.suspend') || 'Suspend'}
+                                                                        </>
+                                                                    )}
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
+                                                                    <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('general.mark_as_paid')}</DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleBillBalance(invoice.id)}>
+                                                                    <CreditCard className="me-2 h-4 w-4 text-slate-900" />{__('general.bill_from_balance')}</DropdownMenuItem>
+                                                            </>
+                                                        )}
+                                                        {invoice.status !== 'cancelled' && (
+                                                            <DropdownMenuItem onClick={() => handleCancel(invoice.id)} className="text-red-600 focus:text-red-600">
+                                                                <XCircle className="me-2 h-4 w-4" />{__('general.cancel_invoice')}</DropdownMenuItem>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                                 
-                                {((filters as any).client_id || (filters as any).search === 'unpaid_partial' || (filters as any).search === 'archived') && (invoices.data as any).length > 0 && (
-                                    <TableRow className="bg-muted/30 font-semibold border-t">
-                                        <TableCell colSpan={6} className="text-end hidden sm:table-cell pe-4" data-label={__('general.total')}>
-                                            {__('general.total')}</TableCell>
-                                        <TableCell className="text-end sm:hidden" data-label={__('general.total')}>
-                                            {__('general.total')}</TableCell>
-                                        <TableCell className="text-end" data-label={__('general.total_amount')}>
-                                            {formatCurrency(
-                                                invoices.data.reduce((sum, inv) => sum + (Number(inv.business_amount) || Number(inv.amount) || 0), 0),
-                                                invoices.data[0]?.business_currency || invoices.data[0]?.currency
-                                            )}
+                                {/* Always-Visible Summary Footer Row */}
+                                {(invoices.data as any).length > 0 && (
+                                    <TableRow className="bg-slate-50 font-bold border-t border-slate-200">
+                                        <TableCell colSpan={6} className="text-end hidden sm:table-cell pe-4 text-xs uppercase text-slate-600">
+                                            {__('general.total')} ({__('general.page') || 'Page'})
+                                        </TableCell>
+                                        <TableCell className="text-end sm:hidden text-xs uppercase text-slate-600">
+                                            {__('general.total')}
+                                        </TableCell>
+                                        <TableCell className="text-end font-bold text-slate-900 text-sm">
+                                            <div className="flex flex-col items-end">
+                                                <span>
+                                                    {formatCurrency(
+                                                        invoices.data.reduce((sum: number, inv: any) => sum + (Number(inv.business_amount) || Number(inv.amount) || 0), 0),
+                                                        invoices.data[0]?.business_currency || invoices.data[0]?.currency
+                                                    )}
+                                                </span>
+                                                <span className="text-xs text-red-600 font-bold">
+                                                    {__('admin.remaining_due') || 'Due'}: {formatCurrency(
+                                                        invoices.data.reduce((sum: number, inv: any) => sum + (Number(inv.unpaid_amount) || 0), 0),
+                                                        invoices.data[0]?.business_currency || invoices.data[0]?.currency
+                                                    )}
+                                                </span>
+                                            </div>
                                         </TableCell>
                                         <TableCell colSpan={3} className="hidden sm:table-cell"></TableCell>
                                     </TableRow>
@@ -874,7 +1093,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
                                 {(invoices.data as any).length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">{__('general.no_invoices_found')}</TableCell>
+                                        <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">{__('general.no_invoices_found')}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -915,14 +1134,15 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             )}
 
                             <Button onClick={applyBulkAction} size="sm" className="h-9">
-                                {__('general.apply')}</Button>
+                                {__('general.apply')}
+                            </Button>
                         </div>
 
                         <div className="w-full md:ms-auto md:w-auto">
                             {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
                                 <div className="flex justify-center md:justify-end">
                                     <div className="inline-flex -space-x-px rounded-md shadow-sm">
-                                        {paginationLinks.map((link, i) => (
+                                        {paginationLinks.map((link: any, i: number) => (
                                             <Link
                                                 key={i}
                                                 href={link.url || '#'}
@@ -941,6 +1161,53 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Floating Sticky Bulk Action Bar */}
+            {selectedCount > 0 && (
+                <div className="fixed bottom-6 start-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-full shadow-2xl border border-slate-700 animate-in fade-in slide-in-from-bottom-5">
+                    <span className="text-xs font-semibold whitespace-nowrap">
+                        {__('admin.selected_invoices_count', { count: selectedCount }) || `${selectedCount} invoices selected`}
+                    </span>
+                    <span className="text-xs text-slate-300 font-medium whitespace-nowrap hidden sm:inline">
+                        ({__('admin.selected_total_amount') || 'Total:'} {formatCurrency(selectedTotalAmount, invoices.data[0]?.business_currency || invoices.data[0]?.currency)})
+                    </span>
+                    <div className="h-4 w-px bg-slate-700 mx-1 hidden sm:block" />
+                    <div className="w-40 sm:w-48 text-slate-900">
+                        <Select value={bulkAction} onValueChange={(val) => setBulkAction(val || '')}>
+                            <SelectTrigger className="h-8 text-xs bg-white text-slate-900 border-0">
+                                <SelectValue placeholder={__('general.bulk_actions')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {bulkActionOptions.map((opt) => (
+                                    <SelectItem key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    {bulkAction === 'change_project' && (
+                        <div className="w-36 sm:w-44 text-slate-900">
+                            <PremiumCombobox
+                                value={bulkActionProject}
+                                onChange={(val) => setBulkActionProject(String(val || ''))}
+                                options={(projects as any[]).map(p => ({ value: String(p.id), label: p.project_name }))}
+                                placeholder={__('general.select_project')}
+                            />
+                        </div>
+                    )}
+                    <Button onClick={applyBulkAction} size="sm" className="h-8 px-4 text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground">
+                        {__('general.apply')}
+                    </Button>
+                    <button 
+                        type="button" 
+                        onClick={() => { setSelectedInvoices({}); setSelectAll(false); }} 
+                        className="text-xs text-slate-400 hover:text-white underline ms-1"
+                    >
+                        {__('admin.clear_selection') || 'Clear'}
+                    </button>
+                </div>
+            )}
 
             <ClientActionsSheet 
                 client={selectedClient}

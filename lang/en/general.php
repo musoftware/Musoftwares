@@ -8205,4 +8205,5 @@ return array (
   'invoice_settled_via_wallet' => 'Invoice has been settled via your platform wallet.',
   'later' => 'Later',
   'write_comment_or_feedback' => 'Write a comment or feedback...',
+  'no_phone_number' => 'No phone number recorded for this client',
 );

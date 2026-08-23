@@ -9,6 +9,7 @@ use App\Models\Currency;
 use App\Models\Earning;
 use App\Models\Invoice;
 use App\Traits\ConvertsCurrency;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,14 +28,23 @@ class InvoiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $unpaidTotal = (float) $this->unpaid_total();
+        $isOverdue = in_array($this->status, ['unpaid', 'partially_paid']) && ! empty($this->due_date) && Carbon::parse($this->due_date)->isPast();
+        $daysOverdue = $isOverdue ? (int) Carbon::parse($this->due_date)->diffInDays(now()) : 0;
+
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
             'project_id' => $this->project_id,
             'invoice_number' => $this->enc_id(),
+            'public_url' => url('/invoices/'.$this->enc_id()),
             'user' => $this->whenLoaded('user', fn () => array_merge(
-                $this->user->only('id', 'name', 'email', 'address', 'phone_number'),
-                ['projects' => $this->user->relationLoaded('projects') ? $this->user->projects->map(fn ($p) => ['id' => $p->id, 'project_name' => $p->project_name])->values()->all() : []]
+                $this->user->only('id', 'name', 'email', 'address', 'phone_number', 'phone'),
+                [
+                    'projects' => $this->user->relationLoaded('projects') ? $this->user->projects->map(fn ($p) => ['id' => $p->id, 'project_name' => $p->project_name])->values()->all() : [],
+                    'balance' => (float) ($this->user->balance($this->currency) ?? 0),
+                    'balance_str' => FinanceHelper::instance()->format_money((float) ($this->user->balance($this->currency) ?? 0), $this->currency),
+                ]
             )),
             'project' => $this->whenLoaded('project', fn () => ['id' => $this->project->id, 'project_name' => $this->project->project_name]),
             'items' => InvoiceItemResource::collection($this->whenLoaded('items')),
@@ -43,6 +53,8 @@ class InvoiceResource extends JsonResource
             'discount' => $this->discount,
             'tax' => $this->tax(),
             'paid_amount' => $this->paid,
+            'unpaid_amount' => $unpaidTotal,
+            'unpaid_amount_str' => FinanceHelper::instance()->format_money($unpaidTotal, $this->currency),
             'currency' => Currency::findCached($this->currency)?->currency,
             'currency_symbol' => Currency::findCached($this->currency)?->symbol,
             'business_amount' => $this->business_total(),
@@ -53,6 +65,8 @@ class InvoiceResource extends JsonResource
             'job_status' => $this->job_status ?? 'pending',
             'created_at' => $this->created_at,
             'due_date' => $this->due_date ?? null,
+            'is_overdue' => $isOverdue,
+            'days_overdue' => $daysOverdue,
             'is_published' => $this->is_published ?? 0,
             'archive' => $this->archive ?? 0,
             'scheduled_start_date' => $this->scheduled_start_date,

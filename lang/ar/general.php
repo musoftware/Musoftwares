@@ -8205,4 +8205,5 @@ return array (
   'invoice_settled_via_wallet' => 'تمت تسوية الفاتورة وخصمها من رصيد المحفظة بنجاح.',
   'later' => 'لاحقاً',
   'write_comment_or_feedback' => 'اكتب تعليقاً أو ملاحظة...',
+  'no_phone_number' => 'لا يوجد رقم هاتف مسجل لهذا العميل',
 );

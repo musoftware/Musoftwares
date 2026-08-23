@@ -148,15 +148,28 @@ class InvoiceController extends Controller
             });
         }
 
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortDir = strtolower((string) $request->input('sort_dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'amount' || $sortBy === 'total') {
+            $query->orderBy('final_total', $sortDir);
+        } elseif ($sortBy === 'unpaid') {
+            $query->orderBy('unpaid', $sortDir);
+        } elseif ($sortBy === 'id') {
+            $query->orderBy('id', $sortDir);
+        } elseif ($sortBy === 'status') {
+            $query->orderBy('status', $sortDir);
+        } elseif ($sortBy === 'due_date') {
+            $query->orderBy('due_date', $sortDir);
+        } else {
+            $query->orderBy('created_at', $sortDir);
+        }
+
         return $query;
     }
 
     private function getStats(Request $request)
     {
-        if (! $request->filled('client_id') && ! $request->filled('project_id')) {
-            return null;
-        }
-
         $query = Invoice::query();
         if ($request->filled('client_id')) {
             $query->where('user_id', $request->client_id);
@@ -165,12 +178,26 @@ class InvoiceController extends Controller
             $query->where('project_id', $request->project_id);
         }
 
+        $businessCurrencyId = (int) AdminSettings::GetValue('business_currency', 2);
+        $businessCurrency = Currency::findCached($businessCurrencyId)?->currency ?? 'USD';
+
+        $totalUnpaidAmount = 0.0;
+        $unpaidInvoices = (clone $query)->whereIn('status', ['unpaid', 'partially_paid'])->where('is_suspended', false)->get();
+        foreach ($unpaidInvoices as $inv) {
+            $unpaidVal = (float) $inv->unpaid_total();
+            $convVal = CurrenciesExchange::RateToday($unpaidVal, $inv->currency_id, $businessCurrencyId);
+            $totalUnpaidAmount += (float) $convVal;
+        }
+
         return [
-            'total' => $query->clone()->count(),
-            'paid' => $query->clone()->where('status', 'paid')->count(),
-            'unpaid' => $query->clone()->where('status', 'unpaid')->where('is_suspended', false)->count(),
-            'partially_paid' => $query->clone()->where('status', 'partially_paid')->where('is_suspended', false)->count(),
-            'suspended' => $query->clone()->where('is_suspended', true)->count(),
+            'total' => (clone $query)->count(),
+            'paid' => (clone $query)->where('status', 'paid')->count(),
+            'unpaid' => (clone $query)->where('status', 'unpaid')->where('is_suspended', false)->count(),
+            'partially_paid' => (clone $query)->where('status', 'partially_paid')->where('is_suspended', false)->count(),
+            'suspended' => (clone $query)->where('is_suspended', true)->count(),
+            'total_unpaid_amount' => round($totalUnpaidAmount, 2),
+            'total_unpaid_amount_str' => FinanceHelper::instance()->format_money($totalUnpaidAmount, $businessCurrencyId),
+            'business_currency' => $businessCurrency,
         ];
     }
 
@@ -204,6 +231,8 @@ class InvoiceController extends Controller
             'amount_to',
             'status',
             'job_status',
+            'sort_by',
+            'sort_dir',
         ]);
     }
 
@@ -212,7 +241,7 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])->latest();
+        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines']);
         $query = $this->applyFilters($query, $request);
 
         $invoices = $query->paginate($request->input('per_page', 20))
@@ -236,8 +265,7 @@ class InvoiceController extends Controller
     {
         $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
             ->whereIn('status', ['unpaid', 'partially_paid'])
-            ->where('is_suspended', false)
-            ->latest();
+            ->where('is_suspended', false);
         $query = $this->applyFilters($query, $request);
 
         $invoices = $query->paginate($request->input('per_page', 20))
@@ -267,8 +295,7 @@ class InvoiceController extends Controller
     {
         $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
             ->where('status', 'cancelled')
-            ->where('is_suspended', false)
-            ->latest();
+            ->where('is_suspended', false);
         $query = $this->applyFilters($query, $request);
 
         $invoices = $query->paginate($request->input('per_page', 20))
@@ -291,8 +318,7 @@ class InvoiceController extends Controller
     public function suspended(Request $request)
     {
         $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
-            ->where('is_suspended', true)
-            ->latest();
+            ->where('is_suspended', true);
         $query = $this->applyFilters($query, $request);
 
         $invoices = $query->paginate($request->input('per_page', 20))
