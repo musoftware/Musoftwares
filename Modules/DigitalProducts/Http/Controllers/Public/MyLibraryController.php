@@ -25,9 +25,18 @@ class MyLibraryController extends Controller
     {
         $user = $request->user();
 
-        $purchasedProducts = DigitalProduct::whereHas('purchases', function ($q) use ($user) {
-            $q->where('user_id', $user->id);
-        })->with('category')->latest()->get();
+        $purchasedProducts = DigitalProduct::where(function ($query) use ($user) {
+            $query->whereHas('purchases', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })->orWhereHas('downloads', function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere('email', $user->email);
+            });
+        })->with([
+            'category',
+            'purchases' => fn($q) => $q->where('user_id', $user->id),
+            'downloads' => fn($q) => $q->where('user_id', $user->id)->orWhere('email', $user->email),
+        ])->latest()->get();
 
         $meta = [
             'title' => 'مكتبتي الرقمية | كتبك المشتراة والمحملة - Musoftware',
@@ -40,7 +49,7 @@ class MyLibraryController extends Controller
     }
 
     /**
-     * Permanent authenticated download for a book.
+     * Permanent authenticated download for a book or playbook.
      */
     public function download(Request $request, string $slug): BinaryFileResponse|RedirectResponse
     {
@@ -48,8 +57,10 @@ class MyLibraryController extends Controller
         $product = DigitalProduct::where('slug', $slug)
             ->firstOrFail();
 
+        $editionType = $request->get('edition', 'full');
+
         try {
-            return $this->downloadTokenService->serveDownloadForPurchaser($user, $product);
+            return $this->downloadTokenService->serveDownloadForPurchaser($user, $product, $editionType);
         } catch (Exception $e) {
             return redirect()->route('library.my_library')
                 ->with('error', $e->getMessage());

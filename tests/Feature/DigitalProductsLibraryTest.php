@@ -40,6 +40,35 @@ class DigitalProductsLibraryTest extends TestCase
         $response->assertSee('المكتبة الرقمية');
     }
 
+    public function test_library_index_renders_correct_cover_and_page_counts(): void
+    {
+        $category = DigitalCategory::create([
+            'name' => 'تطوير البرمجيات',
+            'slug' => 'software-development',
+            'is_active' => true,
+        ]);
+
+        $book = DigitalProduct::create([
+            'title' => 'كتاب المعمارية المتقدمة',
+            'slug' => 'advanced-architecture-book',
+            'category_id' => $category->id,
+            'price' => 20.00,
+            'is_free' => false,
+            'file_path' => 'books/files/adv-arch.pdf',
+            'cover_image_path' => 'storage/books/covers/sample-cover.webp',
+            'page_count' => 180,
+            'author_name' => 'Mahmoud Amin',
+            'is_published' => true,
+        ]);
+
+        $response = $this->get(route('library.index'));
+        $response->assertStatus(200);
+        $response->assertSee('180');
+        $response->assertSee('صفحة');
+        $response->assertSee('كتاب المعمارية المتقدمة');
+        $response->assertSee('sample-cover.webp');
+    }
+
     public function test_library_book_details_page_loads_with_seo_and_schema(): void
     {
         $category = DigitalCategory::create([
@@ -67,7 +96,25 @@ class DigitalProductsLibraryTest extends TestCase
         $response->assertSee('"@type": "Book"', false);
     }
 
-    public function test_free_book_email_download_generates_token_and_serves_download(): void
+    public function test_library_show_displays_chapters_and_curriculum(): void
+    {
+        $book = DigitalProduct::create([
+            'title' => 'دليل خوارزميات بايثون المتقدمة',
+            'slug' => 'python-algorithms-guide',
+            'price' => 15.00,
+            'is_free' => false,
+            'file_path' => 'books/files/py-algo.pdf',
+            'page_count' => 120,
+            'is_published' => true,
+        ]);
+
+        $response = $this->get(route('library.show', $book->slug));
+        $response->assertStatus(200);
+        $response->assertSee('فصول ومحتويات الكتاب');
+        $response->assertSee('خوارزميات');
+    }
+
+    public function test_guest_can_request_free_book_email_download(): void
     {
         Storage::fake('local');
         Storage::disk('local')->put('books/files/free-book.pdf', '%PDF-1.4 Fake PDF Content');
@@ -95,6 +142,80 @@ class DigitalProductsLibraryTest extends TestCase
         $downloadRes = $this->get(route('library.download.token', $downloadRecord->download_token));
         $downloadRes->assertStatus(200);
         $this->assertEquals('attachment; filename=free-download-book.pdf', $downloadRes->headers->get('content-disposition'));
+    }
+
+    public function test_authenticated_user_can_download_free_book_without_email_input(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('books/files/free-auth-book.pdf', '%PDF-1.4 Auth Free Book');
+
+        $book = DigitalProduct::create([
+            'title' => 'Free Book for Logged User',
+            'slug' => 'free-book-for-logged-user',
+            'price' => 0.00,
+            'is_free' => true,
+            'file_path' => 'books/files/free-auth-book.pdf',
+            'page_count' => 30,
+            'is_published' => true,
+        ]);
+
+        // Post without explicit email input (simulating logged in user submitting form)
+        $response = $this->actingAs($this->clientUser)
+            ->post(route('library.free_download', $book->slug), [
+                'edition_type' => 'full',
+            ]);
+
+        $response->assertStatus(302);
+
+        // Ownership should be recorded automatically
+        $this->assertTrue($book->isPurchasedBy($this->clientUser));
+
+        // Book should appear in My Library
+        $myLibRes = $this->actingAs($this->clientUser)->get(route('library.my_library'));
+        $myLibRes->assertStatus(200);
+        $myLibRes->assertSee('Free Book for Logged User');
+    }
+
+    public function test_authenticated_user_can_download_free_playbook_without_email_input(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('books/files/full-paid.pdf', '%PDF-1.4 Full Paid PDF');
+        Storage::disk('local')->put('books/files/free-playbook.pdf', '%PDF-1.4 Free Playbook PDF');
+
+        $book = DigitalProduct::create([
+            'title' => 'Master Architecture Playbook Book',
+            'slug' => 'master-architecture-playbook-book',
+            'price' => 45.00,
+            'is_free' => false,
+            'file_path' => 'books/files/full-paid.pdf',
+            'has_free_edition' => true,
+            'free_edition_title' => 'Architecture Fast Playbook',
+            'free_edition_file_path' => 'books/files/free-playbook.pdf',
+            'free_edition_page_count' => 15,
+            'is_published' => true,
+        ]);
+
+        // Logged-in user requests free playbook without typing email
+        $response = $this->actingAs($this->clientUser)
+            ->post(route('library.free_download', $book->slug), [
+                'edition_type' => 'playbook',
+            ]);
+
+        $response->assertStatus(302);
+
+        // Check My Library displays the book and allows downloading playbook
+        $myLibRes = $this->actingAs($this->clientUser)->get(route('library.my_library'));
+        $myLibRes->assertStatus(200);
+        $myLibRes->assertSee('Master Architecture Playbook Book');
+        $myLibRes->assertSee('تحميل الملخص Playbook PDF');
+
+        // Download playbook
+        $downloadRes = $this->actingAs($this->clientUser)->get(route('library.my_library.download', [
+            'slug' => $book->slug,
+            'edition' => 'playbook',
+        ]));
+        $downloadRes->assertStatus(200);
+        $this->assertEquals('attachment; filename=playbook-master-architecture-playbook-book.pdf', $downloadRes->headers->get('content-disposition'));
     }
 
     public function test_dual_edition_book_allows_free_playbook_download_and_paid_full_book(): void

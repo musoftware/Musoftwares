@@ -158,7 +158,7 @@
             @foreach($products as $book)
                 @php
                     $bookUrl = route('library.show', $book->slug);
-                    $coverUrl = $book->cover_image ? (Str::startsWith($book->cover_image, ['http://', 'https://', '/']) ? $book->cover_image : asset($book->cover_image)) : asset('images/apple/web-mobile-suite.jpg');
+                    $coverUrl = $book->cover_url;
                     $isFree = $book->is_free || (float)$book->price <= 0;
                     $formattedPrice = $book->viewer_price_formatted ?? $book->formatted_price;
                 @endphp
@@ -202,8 +202,8 @@
                         <!-- Category & Language -->
                         <div class="flex items-center justify-between gap-2 mb-1.5 text-[11px] text-[#86868b]">
                             <span class="truncate">{{ $book->category->name ?? 'Architecture' }}</span>
-                            @if($book->pages_count)
-                                <span class="flex-shrink-0 font-medium">{{ $book->pages_count }} {{ app()->getLocale() === 'ar' ? 'صفحة' : 'pages' }}</span>
+                            @if($book->page_count)
+                                <span class="flex-shrink-0 font-medium">{{ $book->page_count }} {{ app()->getLocale() === 'ar' ? 'صفحة' : 'pages' }}</span>
                             @endif
                         </div>
 

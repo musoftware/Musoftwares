@@ -28,20 +28,22 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach($purchasedProducts as $book)
                 @php
-                    $coverUrl = $book->cover_image_path ? $book->cover_url : ($book->cover_image ? asset($book->cover_image) : asset('images/apple/web-mobile-suite.jpg'));
+                    $coverUrl = $book->cover_url;
+                    $hasFullAccess = $book->is_free || $book->purchases->where('amount_paid', '>', 0)->isNotEmpty() || $book->purchases->where('payment_method', '!=', 'free_playbook')->isNotEmpty();
+                    $hasPlaybookAccess = $book->has_free_edition || $book->downloads->where('edition_type', 'playbook')->isNotEmpty() || $book->purchases->where('payment_method', 'free_playbook')->isNotEmpty();
                 @endphp
                 <article class="apple-bento-card p-4 flex flex-col justify-between group">
                     <div>
                         <!-- Cover -->
-                        <div class="aspect-[3/4] w-full rounded-[14px] overflow-hidden bg-[#f5f5f7] mb-3.5 border border-black/5">
+                        <a href="{{ route('library.show', $book->slug) }}" class="block aspect-[3/4] w-full rounded-[14px] overflow-hidden bg-[#f5f5f7] mb-3.5 border border-black/5 group-hover:scale-[1.02] transition-transform duration-300">
                             <img src="{{ $coverUrl }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
-                        </div>
+                        </a>
 
                         <span class="text-[10px] font-semibold text-[#0071e3] uppercase tracking-wider block mb-1">
                             {{ $book->category?->name ?? 'E-Book' }}
                         </span>
-                        <h3 class="text-xs sm:text-sm font-semibold text-[#1d1d1f] line-clamp-2 mb-1.5 leading-snug">
-                            {{ $book->title }}
+                        <h3 class="text-xs sm:text-sm font-semibold text-[#1d1d1f] group-hover:text-[#0071e3] transition-colors line-clamp-2 mb-1.5 leading-snug">
+                            <a href="{{ route('library.show', $book->slug) }}">{{ $book->title }}</a>
                         </h3>
                         <p class="text-[11px] text-[#86868b] mb-4 flex items-center gap-2">
                             <span>{{ $book->page_count ?? '—' }} {{ app()->getLocale() === 'ar' ? 'صفحة' : 'pages' }}</span>
@@ -50,11 +52,23 @@
                         </p>
                     </div>
 
-                    <!-- Direct Download CTA -->
-                    <a href="{{ route('library.my_library.download', $book->slug) }}" class="w-full h-10 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5 shadow-xs">
-                        <i class="ri-download-2-line text-sm"></i>
-                        <span>{{ app()->getLocale() === 'ar' ? 'تحميل الكتاب PDF' : 'Download PDF' }}</span>
-                    </a>
+                    <div class="space-y-2">
+                        @if($hasFullAccess)
+                            <!-- Full Book Download CTA -->
+                            <a href="{{ route('library.my_library.download', ['slug' => $book->slug, 'edition' => 'full']) }}" class="w-full h-10 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5 shadow-xs">
+                                <i class="ri-download-2-line text-sm"></i>
+                                <span>{{ app()->getLocale() === 'ar' ? 'تحميل الكتاب PDF' : 'Download PDF' }}</span>
+                            </a>
+                        @endif
+
+                        @if($hasPlaybookAccess && $book->has_free_edition)
+                            <!-- Playbook Edition Download CTA -->
+                            <a href="{{ route('library.my_library.download', ['slug' => $book->slug, 'edition' => 'playbook']) }}" class="w-full h-9 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 hover:bg-emerald-100 text-[11px] font-medium transition-all flex items-center justify-center gap-1.5">
+                                <i class="ri-file-text-line text-xs text-emerald-600"></i>
+                                <span>{{ app()->getLocale() === 'ar' ? 'تحميل الملخص Playbook PDF' : 'Download Playbook PDF' }}</span>
+                            </a>
+                        @endif
+                    </div>
                 </article>
             @endforeach
         </div>

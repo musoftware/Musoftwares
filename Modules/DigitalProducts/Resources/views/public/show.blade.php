@@ -148,18 +148,27 @@
                     
                     @if(!empty($isPurchased))
                         <!-- State 1: User Already Owns Book -->
-                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div>
-                                <span class="text-xs font-semibold text-emerald-600 flex items-center gap-1 mb-1">
-                                    <i class="ri-checkbox-circle-fill text-base"></i>
-                                    <span>{{ app()->getLocale() === 'ar' ? 'تمتلك هذا الإصدار في مكتبتك' : 'Owned in your library' }}</span>
-                                </span>
-                                <h4 class="text-base font-semibold text-[#1d1d1f]">{{ app()->getLocale() === 'ar' ? 'جاهز للتحميل والقراءة الفورية مدى الحياة' : 'Ready for direct lifetime download' }}</h4>
+                        <div class="space-y-4">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div>
+                                    <span class="text-xs font-semibold text-emerald-600 flex items-center gap-1 mb-1">
+                                        <i class="ri-checkbox-circle-fill text-base"></i>
+                                        <span>{{ app()->getLocale() === 'ar' ? 'تمتلك هذا الإصدار في مكتبتك' : 'Owned in your library' }}</span>
+                                    </span>
+                                    <h4 class="text-base font-semibold text-[#1d1d1f]">{{ app()->getLocale() === 'ar' ? 'جاهز للتحميل والقراءة الفورية مدى الحياة' : 'Ready for direct lifetime download' }}</h4>
+                                </div>
+                                <a href="{{ route('library.my_library.download', $product->slug) }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs shadow-xs transition-all">
+                                    <i class="ri-download-2-fill text-base"></i>
+                                    <span>{{ app()->getLocale() === 'ar' ? 'تحميل ملف الكتاب (PDF)' : 'Download PDF File' }}</span>
+                                </a>
                             </div>
-                            <a href="{{ route('library.my_library.download', $product->slug) }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs shadow-xs transition-all">
-                                <i class="ri-download-2-fill text-base"></i>
-                                <span>{{ app()->getLocale() === 'ar' ? 'تحميل ملف الكتاب (PDF)' : 'Download PDF File' }}</span>
-                            </a>
+
+                            <div class="pt-2 border-t border-black/5 flex items-center justify-between text-xs text-[#86868b]">
+                                <span>{{ app()->getLocale() === 'ar' ? 'الوصول الدائم لكافة التحديثات القادمة' : 'Lifetime access & future updates included' }}</span>
+                                <a href="{{ route('library.my_library') }}" class="text-[#0071e3] hover:underline font-medium">
+                                    {{ app()->getLocale() === 'ar' ? 'الذهاب إلى مكتبتي ➔' : 'Go to My Library ➔' }}
+                                </a>
+                            </div>
                         </div>
 
                     @elseif($product->is_free || (float)$product->price <= 0)
@@ -183,7 +192,9 @@
                                 @csrf
                                 <input type="hidden" name="edition_type" value="full">
                                 
-                                @guest
+                                @auth
+                                    <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                                @else
                                     <div class="relative">
                                         <input 
                                             type="email" 
@@ -194,7 +205,7 @@
                                         >
                                         <i class="ri-mail-send-line absolute end-4 top-3 text-[#86868b] text-base"></i>
                                     </div>
-                                @endguest
+                                @endauth
 
                                 <button type="submit" class="w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs shadow-xs transition-all flex items-center justify-center gap-2">
                                     <i class="ri-download-cloud-line text-base"></i>
@@ -213,7 +224,7 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
-                                                نسخة مجانية (Playbook)
+                                                {{ app()->getLocale() === 'ar' ? 'نسخة مجانية (Playbook)' : 'Free Playbook Edition' }}
                                             </span>
                                             <h4 class="text-sm font-semibold text-emerald-950">
                                                 {{ $product->free_edition_title ?: ($product->title . ' - Playbook') }}
@@ -227,7 +238,9 @@
                                     <form action="{{ route('library.free_download', $product->slug) }}" method="POST" class="space-y-2">
                                         @csrf
                                         <input type="hidden" name="edition_type" value="playbook">
-                                        @guest
+                                        @auth
+                                            <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                                        @else
                                             <input 
                                                 type="email" 
                                                 name="email" 
@@ -235,7 +248,7 @@
                                                 placeholder="{{ app()->getLocale() === 'ar' ? 'أدخل بريدك لتحميل الملخص المجاني...' : 'Enter email for free playbook...' }}"
                                                 class="w-full h-10 px-3 rounded-full bg-white border border-emerald-300 text-xs text-[#1d1d1f] focus:outline-none focus:border-emerald-600"
                                             >
-                                        @endguest
+                                        @endauth
                                         <button type="submit" class="w-full h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs shadow-xs transition-all flex items-center justify-center gap-1.5">
                                             <i class="ri-download-cloud-line text-sm"></i>
                                             <span>{{ app()->getLocale() === 'ar' ? 'تحميل النسخة المجانية (Playbook)' : 'Download Free Playbook' }}</span>
@@ -334,7 +347,63 @@
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <!-- 4. RELATED BOOKS RECOMMENDATIONS                                       -->
+    <!-- 4. CHAPTERS & TABLE OF CONTENTS SHOWCASE                               -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    @php
+        $chapters = $product->real_chapters ?? [];
+    @endphp
+    @if(!empty($chapters) && count($chapters) > 0)
+        <div class="rounded-[22px] bg-[#f5f5f7] border border-black/5 p-6 sm:p-10 lg:p-12 space-y-6">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                    <span class="text-xs font-semibold text-[#0071e3] uppercase tracking-wider block mb-1">
+                        {{ app()->getLocale() === 'ar' ? 'المنهج الدراسي وهيكل الكتاب' : 'Curriculum & Structure' }}
+                    </span>
+                    <h2 class="text-xl sm:text-2xl font-semibold text-[#1d1d1f]">
+                        {{ app()->getLocale() === 'ar' ? 'فصول ومحتويات الكتاب' : 'Table of Contents & Chapters' }}
+                    </h2>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-white border border-black/5 text-xs font-medium text-[#1d1d1f]">
+                    {{ count($chapters) }} {{ app()->getLocale() === 'ar' ? 'فصول رئيسية' : 'Chapters' }}
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                @foreach($chapters as $ch)
+                    <div class="p-5 rounded-[16px] bg-white border border-black/5 hover:border-[#0071e3]/30 transition-all shadow-xs space-y-3">
+                        <div class="flex items-start gap-4">
+                            <span class="w-8 h-8 rounded-full bg-[#f5f5f7] border border-black/5 text-[#0071e3] text-xs font-bold font-mono flex items-center justify-center shrink-0">
+                                {{ $ch['num'] ?? sprintf('%02d', $loop->iteration) }}
+                            </span>
+                            <div class="space-y-1.5 flex-1">
+                                <h3 class="text-sm sm:text-base font-semibold text-[#1d1d1f]">
+                                    {{ $ch['title'] }}
+                                </h3>
+                                @if(!empty($ch['subtopics']))
+                                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                                        @foreach($ch['subtopics'] as $sub)
+                                            <span class="px-2.5 py-0.5 rounded-full bg-[#f5f5f7] text-[#86868b] text-[11px]">
+                                                {{ $sub }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @if(!empty($ch['project']))
+                                    <div class="text-[12px] font-medium text-emerald-700 flex items-center gap-1.5 pt-1">
+                                        <i class="ri-check-double-line"></i>
+                                        <span>{{ $ch['project'] }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- 5. RELATED BOOKS RECOMMENDATIONS                                       -->
     <!-- ══════════════════════════════════════════════════════════════════════ -->
     @if(isset($relatedProducts) && $relatedProducts->count() > 0)
         <section class="space-y-6 pt-4">
@@ -345,7 +414,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 @foreach($relatedProducts as $relBook)
                     @php
-                        $relCover = $relBook->cover_image_path ? $relBook->cover_url : ($relBook->cover_image ? asset($relBook->cover_image) : asset('images/apple/web-mobile-suite.jpg'));
+                        $relCover = $relBook->cover_url;
                         $relIsFree = $relBook->is_free || (float)$relBook->price <= 0;
                     @endphp
                     <article class="apple-bento-card p-4 flex flex-col justify-between group">

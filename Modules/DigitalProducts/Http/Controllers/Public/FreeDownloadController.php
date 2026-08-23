@@ -28,31 +28,66 @@ class FreeDownloadController extends Controller
             ->where('is_published', true)
             ->firstOrFail();
 
+        $user = $request->user();
+
         $validated = $request->validate([
-            'email' => 'required|email|max:255',
+            'email' => $user ? 'nullable|email|max:255' : 'required|email|max:255',
             'edition_type' => 'nullable|string|in:full,playbook',
         ]);
+
+        $email = !empty($validated['email'])
+            ? strtolower(trim($validated['email']))
+            : ($user ? strtolower(trim($user->email)) : null);
+
+        if (empty($email)) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'البريد الإلكتروني مطلوب لتحميل الكتاب.',
+                ], 422);
+            }
+            return back()->with('error', 'البريد الإلكتروني مطلوب لتحميل الكتاب.');
+        }
 
         $editionType = $validated['edition_type'] ?? ($product->is_free ? 'full' : 'playbook');
 
         if ($editionType === 'full' && !$product->is_free) {
-            return response()->json([
-                'success' => false,
-                'message' => 'النسخة الكاملة من هذا الكتاب مدفوعة. يمكنك تحميل نسخة الـ Playbook مجاناً.',
-            ], 422);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'النسخة الكاملة من هذا الكتاب مدفوعة. يمكنك تحميل نسخة الـ Playbook مجاناً.',
+                ], 422);
+            }
+            return back()->with('error', 'النسخة الكاملة من هذا الكتاب مدفوعة. يمكنك تحميل نسخة الـ Playbook مجاناً.');
         }
 
         if ($editionType === 'playbook' && !$product->has_free_edition) {
-            return response()->json([
-                'success' => false,
-                'message' => 'نسخة الـ Playbook غير متوفرة لهذا الكتاب.',
-            ], 422);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'نسخة الـ Playbook غير متوفرة لهذا الكتاب.',
+                ], 422);
+            }
+            return back()->with('error', 'نسخة الـ Playbook غير متوفرة لهذا الكتاب.');
         }
 
-        $email = strtolower(trim($validated['email']));
-        $user = auth()->user();
-
         $downloadRecord = $this->downloadTokenService->generateTokenForFreeBook($product, $email, $user, $editionType);
+
+        // If user is authenticated, record ownership so it appears in My Library permanently
+        if ($user) {
+            \Modules\DigitalProducts\Models\DigitalProductPurchase::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'digital_product_id' => $product->id,
+                ],
+                [
+                    'amount_paid' => 0.00,
+                    'currency_id' => $user->currency_id ?? 1,
+                    'payment_method' => $editionType === 'playbook' ? 'free_playbook' : 'free',
+                    'status' => 'completed',
+                ]
+            );
+        }
 
         // Attempt sending email with download link
         try {
@@ -67,7 +102,7 @@ class FreeDownloadController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'تم إرسال رابط التحميل إلى بريدك الإلكتروني بنجاح!',
+                'message' => 'تم إنشاء رابط التحميل وإرسال نسخة إلى بريدك بنجاح!',
                 'download_url' => $directDownloadUrl,
             ]);
         }

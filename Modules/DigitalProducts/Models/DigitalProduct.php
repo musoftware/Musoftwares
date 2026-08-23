@@ -305,7 +305,17 @@ class DigitalProduct extends Model
             return false;
         }
 
-        return $this->purchases()->where('user_id', $user->id)->exists();
+        if ($this->purchases()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        if ($this->is_free && $this->downloads()->where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)->orWhere('email', strtolower(trim($user->email)));
+        })->exists()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
