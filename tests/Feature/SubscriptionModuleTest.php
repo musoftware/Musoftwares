@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Currency;
 use App\Models\User;
 use App\Models\UserSubscription;
 use App\Services\PricingService;
@@ -365,11 +366,11 @@ class SubscriptionModuleTest extends TestCase
 
     public function test_manage_page_shows_active_subscriptions_with_price()
     {
-        $egpCurrency = Currency::firstOrCreate(
-            ['currency' => 'EGP'],
-            ['symbol' => 'e£', 'string_format' => 'e£%01.2f']
+        $usdCurrency = Currency::firstOrCreate(
+            ['currency' => 'USD'],
+            ['symbol' => '$', 'string_format' => '$%01.2f']
         );
-        $user = User::factory()->create(['currency_id' => $egpCurrency->id]);
+        $user = User::factory()->create(['currency_id' => $usdCurrency->id]);
 
         UserSubscription::create([
             'user_id' => $user->id,
