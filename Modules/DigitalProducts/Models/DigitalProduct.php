@@ -183,12 +183,40 @@ class DigitalProduct extends Model
             return 0.0;
         }
 
-        $fromCurrencyId = $this->currency_id ?? 1;
-        if (!$targetCurrencyId || $fromCurrencyId === $targetCurrencyId) {
+        $fromCurrencyId = (int) ($this->currency_id ?: 1);
+        $targetCurrencyId = (int) ($targetCurrencyId ?: $fromCurrencyId);
+
+        if ($fromCurrencyId === $targetCurrencyId) {
             return $basePrice;
         }
 
-        return (float) \App\Models\CurrenciesExchange::RateToday($basePrice, $fromCurrencyId, $targetCurrencyId);
+        try {
+            $rate = (float) \App\Models\CurrenciesExchange::RateToday($basePrice, $fromCurrencyId, $targetCurrencyId);
+            return $rate > 0 ? $rate : $basePrice;
+        } catch (\Throwable $e) {
+            return $basePrice;
+        }
+    }
+
+    /**
+     * Get product price converted to USD ($).
+     */
+    public function getPriceInUsd(): float
+    {
+        return $this->getPriceInCurrency(1);
+    }
+
+    /**
+     * Format product price in USD ($).
+     */
+    public function formatPriceInUsd(): string
+    {
+        if ($this->is_free || $this->price <= 0) {
+            return app()->getLocale() === 'ar' ? 'مجاناً' : 'Free';
+        }
+
+        $usdPrice = $this->getPriceInUsd();
+        return \App\Helpers\FinanceHelper::instance()->format_money($usdPrice, 1);
     }
 
     /**

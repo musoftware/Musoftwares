@@ -1,4 +1,4 @@
-@extends('digitalproducts::layouts.library-master')
+@extends('layouts.public')
 
 @section('content')
 <div class="max-w-[1280px] mx-auto px-6 sm:px-10 py-8 sm:py-12 space-y-8">

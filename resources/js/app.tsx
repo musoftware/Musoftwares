@@ -72,39 +72,44 @@ if (typeof window !== 'undefined') {
         initScrollObserver();
     }
 }
-createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            [`./Pages/${name}.tsx`, `./Pages/${name}.jsx`],
-            import.meta.glob(['./Pages/**/*.tsx', './Pages/**/*.jsx', '!./Pages/**/*.test.*', '!./Pages/**/*.spec.*', '!./Pages/**/__tests__/**']),
-        ),
-    setup({ el, App, props }) {
-        const root = createRoot(el);
-        
-        const pageProps = props.initialPage.props as any;
-        if (pageProps.locale) {
-            syncDocumentDirection(pageProps.locale);
-        }
-        if (pageProps.currencies) {
-            (window as any).currencies = pageProps.currencies;
-        }
-        if (pageProps.wallet?.currency) {
-            (window as any).defaultCurrency = pageProps.wallet.currency;
-        } else if (pageProps.settings?.base_currency) {
-            (window as any).defaultCurrency = pageProps.settings.base_currency;
-        }
+const appElement = document.getElementById('app');
 
-        root.render(
-            <MarketplaceModeProvider>
-                <App {...props} />
-                <Toaster />
-                <SonnerToaster position="top-center" richColors />
-                <GlobalErrorHandler />
-            </MarketplaceModeProvider>
-        );
-    },
-    progress: {
-        color: '#4B5563',
-    },
-});
+if (appElement && appElement.dataset.page) {
+    createInertiaApp({
+        title: (title) => `${title} - ${appName}`,
+        resolve: (name) =>
+            resolvePageComponent(
+                [`./Pages/${name}.tsx`, `./Pages/${name}.jsx`],
+                import.meta.glob(['./Pages/**/*.tsx', './Pages/**/*.jsx', '!./Pages/**/*.test.*', '!./Pages/**/*.spec.*', '!./Pages/**/__tests__/**']),
+            ),
+        setup({ el, App, props }) {
+            const root = createRoot(el);
+            
+            const pageProps = props.initialPage.props as any;
+            if (pageProps.locale) {
+                syncDocumentDirection(pageProps.locale);
+            }
+            if (pageProps.currencies) {
+                (window as any).currencies = pageProps.currencies;
+            }
+            if (pageProps.wallet?.currency) {
+                (window as any).defaultCurrency = pageProps.wallet.currency;
+            } else if (pageProps.settings?.base_currency) {
+                (window as any).defaultCurrency = pageProps.settings.base_currency;
+            }
+
+            root.render(
+                <MarketplaceModeProvider>
+                    <App {...props} />
+                    <Toaster />
+                    <SonnerToaster position="top-center" richColors />
+                    <GlobalErrorHandler />
+                </MarketplaceModeProvider>
+            );
+        },
+        progress: {
+            color: '#4B5563',
+        },
+    });
+}
+

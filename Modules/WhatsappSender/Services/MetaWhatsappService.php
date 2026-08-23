@@ -70,8 +70,19 @@ class MetaWhatsappService
                     'language' => ['code' => $templateData['language'] ?? 'en_US'],
                 ],
             ];
-            if (! empty($templateData['components'])) {
-                $payload['template']['components'] = $templateData['components'];
+            if (! empty($templateData['components']) && is_array($templateData['components'])) {
+                $validComponents = [];
+                foreach ($templateData['components'] as $comp) {
+                    if (!is_array($comp)) continue;
+                    // Only accept runtime parameter structures (must contain 'parameters' array)
+                    if (!empty($comp['parameters']) && is_array($comp['parameters'])) {
+                        $comp['type'] = strtolower($comp['type'] ?? 'body');
+                        $validComponents[] = $comp;
+                    }
+                }
+                if (!empty($validComponents)) {
+                    $payload['template']['components'] = $validComponents;
+                }
             }
         } elseif ($type === 'image') {
             $payload = [
@@ -268,6 +279,88 @@ class MetaWhatsappService
 
             $errorMessage = $responseData['error']['message'] ?? $response->body();
             $errorCode = $responseData['error']['code'] ?? null;
+
+            // Auto-recover from Meta error 132001 ("Template name does not exist in the translation")
+            if ($type === 'template' && ($errorCode === 132001 || str_contains($errorMessage, 'does not exist in the translation'))) {
+                $requestedLang = $payload['template']['language']['code'] ?? 'en_US';
+                $languageFallbacksMap = [
+                    'en_US' => ['en', 'en_GB'],
+                    'en' => ['en_US', 'en_GB'],
+                    'en_GB' => ['en', 'en_US'],
+                    'ar' => ['ar_EG', 'ar_SA', 'ar_AE'],
+                    'ar_EG' => ['ar', 'ar_SA', 'ar_AE'],
+                    'ar_SA' => ['ar', 'ar_EG', 'ar_AE'],
+                    'ar_AE' => ['ar', 'ar_SA', 'ar_EG'],
+                    'es' => ['es_ES', 'es_LA', 'es_MX'],
+                    'es_ES' => ['es', 'es_LA', 'es_MX'],
+                    'es_LA' => ['es', 'es_ES'],
+                    'fr' => ['fr_FR'],
+                    'fr_FR' => ['fr'],
+                    'pt' => ['pt_BR', 'pt_PT'],
+                    'pt_BR' => ['pt_PT', 'pt'],
+                    'de' => ['de_DE'],
+                    'de_DE' => ['de'],
+                    'tr' => ['tr_TR'],
+                    'tr_TR' => ['tr'],
+                ];
+
+                $candidates = $languageFallbacksMap[$requestedLang] ?? [];
+                if (empty($candidates) && str_contains($requestedLang, '_')) {
+                    $candidates[] = explode('_', $requestedLang)[0];
+                }
+
+                foreach ($candidates as $fallbackLang) {
+                    $retryPayload = $payload;
+                    $retryPayload['template']['language']['code'] = $fallbackLang;
+
+                    $retryResponse = Http::withToken($account->access_token)
+                        ->acceptJson()
+                        ->post($url, $retryPayload);
+
+                    if ($retryResponse->successful()) {
+                        $retryData = $retryResponse->json();
+                        $metaMessageId = $retryData['messages'][0]['id'] ?? null;
+
+                        if ($business) {
+                            DB::transaction(function () use ($business, $fee, $cleanPhone) {
+                                $lockedBiz = WhatsappBusiness::where('id', $business->id)->lockForUpdate()->first();
+                                $newBalance = max(0, (float) $lockedBiz->wallet_balance - $fee);
+                                $lockedBiz->update(['wallet_balance' => $newBalance]);
+
+                                WhatsappTransaction::create([
+                                    'whatsapp_business_id' => $lockedBiz->id,
+                                    'user_id' => $lockedBiz->user_id,
+                                    'type' => 'debit_message_fee',
+                                    'amount' => $fee,
+                                    'balance_after' => $newBalance,
+                                    'description' => "Platform message fee ($0.0010) for recipient {$cleanPhone}",
+                                ]);
+                            });
+                        }
+
+                        $log = WhatsappLog::create([
+                            'user_id' => $account->user_id,
+                            'whatsapp_account_id' => $account->id,
+                            'whatsapp_business_id' => $business?->id,
+                            'recipient_phone' => $cleanPhone,
+                            'cost_charged' => $fee,
+                            'message_type' => $type,
+                            'message_body' => $body,
+                            'status' => 'sent',
+                            'meta_message_id' => $metaMessageId,
+                            'payload' => $retryPayload,
+                        ]);
+
+                        return [
+                            'success' => true,
+                            'meta_message_id' => $metaMessageId,
+                            'log_id' => $log->id,
+                            'cost_charged' => $fee,
+                            'response' => $retryData,
+                        ];
+                    }
+                }
+            }
 
             if ($errorCode === 133010) {
                 $metadata = $account->metadata ?? [];
@@ -1018,10 +1111,10 @@ class MetaWhatsappService
                         [
                             'whatsapp_business_id' => $businessId,
                             'name' => $tpl['name'],
+                            'language' => $tpl['language'] ?? 'en_US',
                         ],
                         [
                             'category' => $tpl['category'] ?? 'UTILITY',
-                            'language' => $tpl['language'] ?? 'en_US',
                             'components' => $tpl['components'] ?? [],
                             'status' => $tpl['status'] ?? 'PENDING',
                             'meta_template_id' => $tpl['id'] ?? null,

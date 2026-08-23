@@ -140,12 +140,16 @@ Route::get('v1/whatsapp/webhook/biz/{businessId}', [\Modules\WhatsappSender\Http
     ->name('api.v1.whatsapp.webhook.biz.verify');
 Route::post('v1/whatsapp/webhook/biz/{businessId}', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'handleBusiness'])
     ->name('api.v1.whatsapp.webhook.biz.handle');
+Route::get('whatsapp/webhook/biz/{businessId}', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'verifyBusiness']);
+Route::post('whatsapp/webhook/biz/{businessId}', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'handleBusiness']);
 
 // Fallback global Webhook routes
 Route::get('v1/whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'verify'])
     ->name('api.v1.whatsapp.webhook.verify');
 Route::post('v1/whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'handle'])
     ->name('api.v1.whatsapp.webhook.handle');
+Route::get('whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'verify']);
+Route::post('whatsapp/webhook', [\Modules\WhatsappSender\Http\Controllers\WhatsappWebhookController::class, 'handle']);
 
 // ── Incoming Webhooks ────────────────────────────────────────────────────────
 // Handles all incoming webhooks from external providers

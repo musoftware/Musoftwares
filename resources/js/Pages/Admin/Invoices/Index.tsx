@@ -50,6 +50,8 @@ const bulkActionOptions = [
     { value: 'merge', label: 'Merge' },
     { value: 'split', label: 'Split Invoice' },
     { value: 'change_project', label: 'Change Project' },
+    { value: 'suspend', label: 'Suspend' },
+    { value: 'unsuspend', label: 'Unsuspend' },
     { value: 'archive', label: 'Archive' },
     { value: 'unarchive', label: 'Unarchive' },
     { value: 'convert_to_transaction', label: 'Convert to Transaction' },
@@ -320,6 +322,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             convert_to_transaction: __('general.confirm_convert_to_transactions') || 'Convert these invoices to transactions?',
             delete: __('general.confirm_delete_invoices') || 'Permanently delete the selected invoices?',
             send_whatsapp_reminder: __('general.confirm_send_whatsapp_reminders') || 'Send WhatsApp reminders for the selected invoices?',
+            suspend: __('admin.confirm_suspend_invoices') || 'Are you sure you want to suspend the selected invoices?',
+            unsuspend: __('admin.confirm_unsuspend_invoices') || 'Are you sure you want to unsuspend the selected invoices?',
         };
 
         setPendingAction({ type: 'bulk', id: { action: bulkAction, ids: selectedIds, projectId: bulkActionProject, message: messages[bulkAction] || __('general.confirm_bulk_action') || 'Apply this bulk action?' } });

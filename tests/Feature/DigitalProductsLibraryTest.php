@@ -24,6 +24,7 @@ class DigitalProductsLibraryTest extends TestCase
         parent::setUp();
 
         $this->seed(RolesAndPermissionsSeeder::class);
+        app()->setLocale('ar');
 
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');

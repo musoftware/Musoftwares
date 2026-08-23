@@ -320,8 +320,15 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             if (messageType === 'text') {
                 payload.message_body = messageText.trim();
             } else if (messageType === 'template') {
-                payload.template_name = selectedTemplate;
-                payload.template_language = templates.find(t => t.name === selectedTemplate)?.language || 'en_US';
+                const chosenTemplate = templates.find(t => String(t.id) === selectedTemplate || t.name === selectedTemplate);
+                if (chosenTemplate) {
+                    payload.template_id = chosenTemplate.id;
+                    payload.template_name = chosenTemplate.name;
+                    payload.template_language = chosenTemplate.language;
+                } else {
+                    payload.template_name = selectedTemplate;
+                    payload.template_language = 'en_US';
+                }
             }
 
             const res = await axios.post(`/whatsapp-sender/businesses/${business.id}/send-chat-message`, payload);
@@ -438,6 +445,14 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             if (res.data.success) {
                 setActiveContact(res.data.contact);
                 setIsEditingContactName(false);
+                setConversations(prev => prev.map(c => {
+                    const cPhone = c.recipient_phone.replace(/[^0-9]/g, '');
+                    const sPhone = selectedPhone.replace(/[^0-9]/g, '');
+                    if (cPhone === sPhone || c.recipient_phone === selectedPhone) {
+                        return { ...c, contact_name: res.data.contact.name || c.contact_name, tags: currentTags };
+                    }
+                    return c;
+                }));
                 fetchConversations();
             }
         } catch (err) {
@@ -463,6 +478,14 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             });
             if (res.data.success) {
                 setActiveContact(res.data.contact);
+                setConversations(prev => prev.map(c => {
+                    const cPhone = c.recipient_phone.replace(/[^0-9]/g, '');
+                    const sPhone = selectedPhone.replace(/[^0-9]/g, '');
+                    if (cPhone === sPhone || c.recipient_phone === selectedPhone) {
+                        return { ...c, tags: newTags, contact_name: res.data.contact.name || c.contact_name };
+                    }
+                    return c;
+                }));
                 fetchConversations();
             }
         } catch (err) {
@@ -685,6 +708,25 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                             )}
                                             <span>{conv.last_message || `[${conv.last_message_type} message]`}</span>
                                         </p>
+
+                                        {/* Render conversation tags */}
+                                        {conv.tags && conv.tags.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mt-1.5">
+                                                {conv.tags.map(t => {
+                                                    const tagMeta = AVAILABLE_TAGS.find(at => at.label === t);
+                                                    return (
+                                                        <span
+                                                            key={t}
+                                                            className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${
+                                                                tagMeta ? tagMeta.color : 'bg-purple-100 text-purple-800 border-purple-300'
+                                                            }`}
+                                                        >
+                                                            {t}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -956,7 +998,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                     >
                                         <option value="">Select Approved WABA Template...</option>
                                         {templates.map(t => (
-                                            <option key={t.id} value={t.name}>
+                                            <option key={t.id} value={String(t.id)}>
                                                 {t.name} ({t.language}) - [{t.status}]
                                             </option>
                                         ))}

@@ -682,6 +682,12 @@ class InvoiceController extends Controller
             } elseif ($action == 'unarchive') {
                 $inv->archive = '0';
                 $inv->save();
+            } elseif ($action == 'suspend') {
+                $inv->is_suspended = true;
+                $inv->save();
+            } elseif ($action == 'unsuspend') {
+                $inv->is_suspended = false;
+                $inv->save();
             } elseif ($action == 'split') {
                 if ($inv->status != 'unpaid') {
                     return redirect()->back()->with('error', __('admin.only_unpaid_can_be_split'));

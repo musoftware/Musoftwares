@@ -229,8 +229,15 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
             if (messageType === 'text') {
                 payload.message_body = messageText.trim();
             } else {
-                payload.template_name = selectedTemplate;
-                payload.template_language = templates.find(t => t.name === selectedTemplate)?.language || 'en_US';
+                const chosenTemplate = templates.find(t => String(t.id) === selectedTemplate || t.name === selectedTemplate);
+                if (chosenTemplate) {
+                    payload.template_id = chosenTemplate.id;
+                    payload.template_name = chosenTemplate.name;
+                    payload.template_language = chosenTemplate.language;
+                } else {
+                    payload.template_name = selectedTemplate;
+                    payload.template_language = 'en_US';
+                }
             }
 
             const res = await axios.post(`/whatsapp-sender/businesses/${business.id}/send-chat-message`, payload);
@@ -603,7 +610,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                         >
                                             <option value="">Select Approved WABA Template...</option>
                                             {templates.map(t => (
-                                                <option key={t.id} value={t.name}>
+                                                <option key={t.id} value={String(t.id)}>
                                                     {t.name} ({t.language}) - [{t.status}]
                                                 </option>
                                             ))}
@@ -727,7 +734,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                                 key={t.id}
                                                 onClick={() => {
                                                     setMessageType('template');
-                                                    setSelectedTemplate(t.name);
+                                                    setSelectedTemplate(String(t.id));
                                                 }}
                                                 className="w-full text-left p-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-700 dark:text-zinc-300 flex items-center justify-between transition-colors shadow-xs"
                                             >

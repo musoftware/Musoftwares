@@ -242,4 +242,38 @@ class AdminInvoiceTest extends TestCase
         $this->assertEquals('unpaid', $newerInvoice->fresh()->status);
         $this->assertEquals(1000, $client->fresh()->user_balance);
     }
+
+    public function test_admin_can_bulk_suspend_and_unsuspend_invoices()
+    {
+        $currency = Currency::firstOrCreate(['id' => 1], ['currency' => 'USD', 'symbol' => '$']);
+        $client = User::factory()->create([
+            'currency_id' => $currency->id,
+        ]);
+        $client->assignRole('client');
+
+        $inv1 = Invoice::createInvoice($client, null, null);
+        $inv1->update(['is_suspended' => false]);
+        $inv2 = Invoice::createInvoice($client, null, null);
+        $inv2->update(['is_suspended' => false]);
+
+        // Bulk suspend
+        $response = $this->actingAs($this->admin)->post(route('admin.invoices.bulk-action'), [
+            'action' => 'suspend',
+            'invoices' => [$inv1->id, $inv2->id],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertTrue((bool) $inv1->fresh()->is_suspended);
+        $this->assertTrue((bool) $inv2->fresh()->is_suspended);
+
+        // Bulk unsuspend
+        $response = $this->actingAs($this->admin)->post(route('admin.invoices.bulk-action'), [
+            'action' => 'unsuspend',
+            'invoices' => [$inv1->id, $inv2->id],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertFalse((bool) $inv1->fresh()->is_suspended);
+        $this->assertFalse((bool) $inv2->fresh()->is_suspended);
+    }
 }

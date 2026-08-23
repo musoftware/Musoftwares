@@ -60,7 +60,12 @@
     }
     </script>
 
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+
     @vite(['resources/js/app.tsx'])
+
+    @stack('head')
 
     <style>
         :root {
@@ -184,6 +189,7 @@
                 <!-- Desktop Navigation Links -->
                 @auth
                     <nav class="hidden lg:flex items-center space-x-6 rtl:space-x-reverse text-[13px] font-normal text-[#1d1d1f]/75">
+                        <a href="{{ route('library.index') }}" class="hover:text-[#1d1d1f] transition-colors {{ request()->routeIs('library.*') ? 'font-semibold text-[#0071e3]' : '' }}">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Digital Library' }}</a>
                         <a href="/platforms" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'المنصات' : 'Platforms' }}</a>
                         <a href="/solutions" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'الحلول' : 'Solutions' }}</a>
                         <a href="/portfolio" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'معرض الأعمال' : 'Portfolio' }}</a>
@@ -193,6 +199,7 @@
                     </nav>
                 @else
                     <nav class="hidden lg:flex items-center space-x-6 rtl:space-x-reverse text-[13px] font-normal text-[#1d1d1f]/75">
+                        <a href="{{ route('library.index') }}" class="hover:text-[#1d1d1f] transition-colors {{ request()->routeIs('library.*') ? 'font-semibold text-[#0071e3]' : '' }}">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Digital Library' }}</a>
                         <a href="/#web" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'تطبيقات الويب' : 'Web Apps' }}</a>
                         <a href="/#mobile" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'تطبيقات الموبايل' : 'Mobile Apps' }}</a>
                         <a href="/#desktop" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'برامج الديسك توب' : 'Desktop Apps' }}</a>
@@ -214,6 +221,17 @@
                 </a>
 
                 @auth
+                    @php
+                        $userBal = (float) auth()->user()->available_balance();
+                        $userCurId = auth()->user()->currency_id ?: 1;
+                        $formattedBal = \App\Helpers\FinanceHelper::instance()->format_money($userBal, $userCurId);
+                    @endphp
+                    <!-- Wallet Balance Pill -->
+                    <a href="{{ Route::has('billing.invoices.index') ? route('billing.invoices.index') : url('/dashboard') }}" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-[980px] bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[12px] font-medium transition-all shadow-2xs hover:bg-emerald-100/70" title="{{ $locale === 'ar' ? 'رصيد المحفظة المتاح' : 'Available Wallet Balance' }}">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span class="font-mono font-semibold">{{ $formattedBal }}</span>
+                    </a>
+
                     <a href="/dashboard" class="px-3.5 py-1.5 rounded-[980px] border border-black/10 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] text-[12px] font-medium transition-all shadow-sm">
                         {{ $locale === 'ar' ? 'لوحة التحكم' : 'Dashboard' }} ➔
                     </a>
@@ -236,6 +254,7 @@
 
         <!-- Apple Mobile Menu Dropdown -->
         <div id="apple-mobile-menu" class="hidden lg:hidden bg-white/95 backdrop-blur-xl border-b border-black/[0.08] px-6 py-6 space-y-3 text-[14px] font-medium text-[#1d1d1f]">
+            <a href="{{ route('library.index') }}" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05] {{ request()->routeIs('library.*') ? 'text-[#0071e3] font-semibold' : '' }}">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Digital Library' }}</a>
             @auth
                 <a href="/platforms" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'المنصات السحابية' : 'Platforms' }}</a>
                 <a href="/solutions" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'الحلول القطاعية' : 'Solutions' }}</a>
@@ -406,5 +425,6 @@
         });
     </script>
 
+    @stack('scripts')
 </body>
 </html>

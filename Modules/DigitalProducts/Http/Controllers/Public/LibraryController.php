@@ -67,6 +67,7 @@ class LibraryController extends Controller
         $products->getCollection()->transform(function (DigitalProduct $p) use ($viewerCurrency) {
             $p->converted_price = $p->getPriceInCurrency($viewerCurrency->id);
             $p->viewer_price_formatted = $p->formatPriceInCurrency($viewerCurrency);
+            $p->usd_price_formatted = $p->formatPriceInUsd();
             return $p;
         });
 
@@ -83,6 +84,7 @@ class LibraryController extends Controller
             ->transform(function (DigitalProduct $p) use ($viewerCurrency) {
                 $p->converted_price = $p->getPriceInCurrency($viewerCurrency->id);
                 $p->viewer_price_formatted = $p->formatPriceInCurrency($viewerCurrency);
+                $p->usd_price_formatted = $p->formatPriceInUsd();
                 return $p;
             });
 
@@ -113,6 +115,7 @@ class LibraryController extends Controller
 
         $product->converted_price = $product->getPriceInCurrency($viewerCurrency->id);
         $product->viewer_price_formatted = $product->formatPriceInCurrency($viewerCurrency);
+        $product->usd_price_formatted = $product->formatPriceInUsd();
 
         // Determine user wallet currency for accurate purchasing feedback
         $userCurrency = (auth()->check() && auth()->user()->currency_id)
@@ -132,6 +135,7 @@ class LibraryController extends Controller
             ->transform(function (DigitalProduct $p) use ($viewerCurrency) {
                 $p->converted_price = $p->getPriceInCurrency($viewerCurrency->id);
                 $p->viewer_price_formatted = $p->formatPriceInCurrency($viewerCurrency);
+                $p->usd_price_formatted = $p->formatPriceInUsd();
                 return $p;
             });
 

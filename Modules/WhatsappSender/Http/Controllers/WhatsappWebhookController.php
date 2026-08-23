@@ -127,12 +127,20 @@ class WhatsappWebhookController extends Controller
 
             foreach ($entry['changes'] as $change) {
                 $value = $change['value'] ?? [];
-                $phoneNumberId = $value['metadata']['phone_number_id'] ?? null;
+                $phoneNumberId = !empty($value['metadata']['phone_number_id']) ? trim((string) $value['metadata']['phone_number_id']) : null;
+                $displayPhoneNumber = !empty($value['metadata']['display_phone_number']) ? trim((string) $value['metadata']['display_phone_number']) : null;
 
-                // 1. Resolve matching accounts and businesses via phone_number_id or routeBusinessId
+                // 1. Resolve matching accounts and businesses via phone_number_id, display phone, or routeBusinessId
                 $matchingAccounts = collect();
                 if ($phoneNumberId) {
                     $matchingAccounts = WhatsappAccount::where('phone_number_id', $phoneNumberId)->get();
+                }
+
+                if ($matchingAccounts->isEmpty() && $displayPhoneNumber) {
+                    $cleanDisplay = preg_replace('/[^0-9]/', '', $displayPhoneNumber);
+                    $matchingAccounts = WhatsappAccount::where('phone_number_id', 'like', "%{$cleanDisplay}%")
+                        ->orWhere('display_phone_number', 'like', "%{$cleanDisplay}%")
+                        ->get();
                 }
 
                 if ($matchingAccounts->isEmpty() && $routeBusinessId) {
@@ -152,6 +160,7 @@ class WhatsappWebhookController extends Controller
                 if ($matchingAccounts->isEmpty()) {
                     Log::warning('WhatsApp Webhook: Unable to resolve any Business Account for incoming payload', [
                         'phone_number_id' => $phoneNumberId,
+                        'display_phone' => $displayPhoneNumber,
                         'payload' => $value,
                     ]);
                     continue;
@@ -173,9 +182,9 @@ class WhatsappWebhookController extends Controller
                             if ($metaMsgId && $status) {
                                 $log = WhatsappLog::where('whatsapp_business_id', $businessId)
                                     ->where(function ($query) use ($metaMsgId) {
-                                        $query->where('metadata->messages->0->id', $metaMsgId)
-                                            ->orWhere('metadata->id', $metaMsgId)
-                                            ->orWhere('meta_message_id', $metaMsgId);
+                                        $query->where('meta_message_id', $metaMsgId)
+                                            ->orWhere('payload->messages->0->id', $metaMsgId)
+                                            ->orWhere('payload->id', $metaMsgId);
                                     })
                                     ->first();
 
@@ -234,50 +243,58 @@ class WhatsappWebhookController extends Controller
                                 'referral' => $referral,
                             ]);
 
-                            // Store inbound message into WhatsappLog for live CRM Inbox
-                            WhatsappLog::create([
-                                'user_id' => $business->user_id,
-                                'whatsapp_account_id' => $account->id,
-                                'whatsapp_business_id' => $businessId,
-                                'recipient_phone' => $senderPhone,
-                                'channel' => 'whatsapp',
-                                'cost_charged' => 0.0000,
-                                'message_type' => $msgType,
-                                'message_body' => $text ?: "[{$msgType} message]",
-                                'status' => 'inbound',
-                                'direction' => 'inbound',
-                                'meta_message_id' => $metaMsgId,
-                                'payload' => array_merge($msg, [
-                                    'referral' => $referral,
-                                ]),
-                            ]);
+                            try {
+                                // Store inbound message into WhatsappLog for live CRM Inbox
+                                WhatsappLog::create([
+                                    'user_id' => $business->user_id,
+                                    'whatsapp_account_id' => $account->id,
+                                    'whatsapp_business_id' => $businessId,
+                                    'recipient_phone' => $senderPhone,
+                                    'channel' => 'whatsapp',
+                                    'cost_charged' => 0.0000,
+                                    'message_type' => $msgType,
+                                    'message_body' => $text ?: "[{$msgType} message]",
+                                    'status' => 'inbound',
+                                    'direction' => 'inbound',
+                                    'meta_message_id' => $metaMsgId,
+                                    'payload' => array_merge($msg, [
+                                        'referral' => $referral,
+                                    ]),
+                                ]);
 
-                            // Auto-upsert contact to business contact group if available
-                            $group = WhatsappContactGroup::firstOrCreate(
-                                ['whatsapp_business_id' => $businessId, 'name' => 'Inbound Customers'],
-                                ['description' => 'Automatically created group for incoming customer inquiries']
-                            );
+                                // Auto-upsert contact to business contact group if available
+                                $group = WhatsappContactGroup::firstOrCreate(
+                                    ['whatsapp_business_id' => $businessId, 'name' => 'Inbound Customers'],
+                                    ['user_id' => $business->user_id, 'description' => 'Automatically created group for incoming customer inquiries']
+                                );
 
-                            $customFields = [];
-                            if ($referral) {
-                                $customFields['ctwa_clid'] = $referral['ctwa_clid'] ?? null;
-                                $customFields['last_ad_headline'] = $referral['headline'] ?? null;
-                                $customFields['last_ad_id'] = $referral['source_id'] ?? null;
-                            }
+                                $customFields = [];
+                                if ($referral) {
+                                    $customFields['ctwa_clid'] = $referral['ctwa_clid'] ?? null;
+                                    $customFields['last_ad_headline'] = $referral['headline'] ?? null;
+                                    $customFields['last_ad_id'] = $referral['source_id'] ?? null;
+                                }
 
-                            WhatsappContact::updateOrCreate(
-                                [
-                                    'whatsapp_contact_group_id' => $group->id,
-                                    'phone' => $senderPhone,
-                                ],
-                                [
-                                    'name' => $senderName ?: "Customer {$senderPhone}",
-                                    'custom_fields' => $customFields,
-                                ]
-                            );
+                                WhatsappContact::updateOrCreate(
+                                    [
+                                        'whatsapp_contact_group_id' => $group->id,
+                                        'phone' => $senderPhone,
+                                    ],
+                                    [
+                                        'name' => $senderName ?: "Customer {$senderPhone}",
+                                        'custom_fields' => $customFields,
+                                    ]
+                                );
 
-                            if ($text !== '') {
-                                $botFlowEngine->handleIncomingMessage('whatsapp', $businessId, $senderPhone, $text);
+                                if ($text !== '') {
+                                    $botFlowEngine->handleIncomingMessage('whatsapp', $businessId, $senderPhone, $text);
+                                }
+                            } catch (\Throwable $ex) {
+                                Log::error("WhatsApp Webhook processing error: " . $ex->getMessage(), [
+                                    'exception' => $ex,
+                                    'business_id' => $businessId,
+                                    'from' => $senderPhone,
+                                ]);
                             }
                         }
                     }

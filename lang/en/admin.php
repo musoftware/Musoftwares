@@ -288,6 +288,8 @@ return [
     'invoice_updated' => 'Invoice updated successfully.',
     'invoice_suspended' => 'Invoice has been suspended successfully.',
     'invoice_unsuspended' => 'Invoice has been unsuspended successfully.',
+    'confirm_suspend_invoices' => 'Are you sure you want to suspend the selected invoices?',
+    'confirm_unsuspend_invoices' => 'Are you sure you want to unsuspend the selected invoices?',
     'suspended_invoices' => 'Suspended Invoices',
     'ip_unblocked_successfully' => 'IP address unblocked successfully.',
     'job_status_updated' => 'Job status updated successfully.',

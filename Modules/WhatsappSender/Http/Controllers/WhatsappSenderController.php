@@ -657,17 +657,28 @@ class WhatsappSenderController extends Controller
         $contacts = WhatsappContact::whereHas('group', function ($q) use ($id) {
                 $q->where('whatsapp_business_id', $id);
             })
-            ->get()
-            ->keyBy('phone');
+            ->get();
 
-        $conversations = $latestLogs->map(function ($log) use ($contacts) {
+        $contactMap = [];
+        foreach ($contacts as $c) {
+            $rawP = $c->phone;
+            $cleanP = preg_replace('/[^0-9]/', '', $rawP);
+            $contactMap[$rawP] = $c;
+            $contactMap[$cleanP] = $c;
+            $contactMap['+' . $cleanP] = $c;
+        }
+
+        $conversations = $latestLogs->map(function ($log) use ($contactMap) {
             $phone = $log->recipient_phone;
-            $contact = $contacts->get($phone);
+            $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+            $contact = $contactMap[$phone] ?? $contactMap[$cleanPhone] ?? $contactMap['+' . $cleanPhone] ?? null;
             $hasReferral = !empty($log->payload['referral']);
 
             // Calculate free window: 72 hours for CTWA ads, 24 hours for organic customer inbound
             $hoursWindow = $hasReferral ? 72 : 24;
             $freeWindowExpiresAt = $log->created_at->addHours($hoursWindow)->toIso8601String();
+
+            $tags = $contact?->custom_fields['tags'] ?? [];
 
             return [
                 'recipient_phone' => $phone,
@@ -682,6 +693,7 @@ class WhatsappSenderController extends Controller
                 'is_ctwa_ad' => $hasReferral,
                 'referral' => $log->payload['referral'] ?? null,
                 'free_window_expires_at' => $freeWindowExpiresAt,
+                'tags' => is_array($tags) ? array_values($tags) : [],
             ];
         })->values();
 
@@ -705,8 +717,14 @@ class WhatsappSenderController extends Controller
             return response()->json(['messages' => [], 'contact' => null, 'free_window' => null]);
         }
 
+        $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+
         $messages = WhatsappLog::where('whatsapp_business_id', $id)
-            ->where('recipient_phone', $phone)
+            ->where(function ($q) use ($phone, $cleanPhone) {
+                $q->where('recipient_phone', $phone)
+                  ->orWhere('recipient_phone', $cleanPhone)
+                  ->orWhere('recipient_phone', '+' . $cleanPhone);
+            })
             ->with(['account:id,name,phone_number_id'])
             ->orderBy('created_at', 'asc')
             ->take(500)
@@ -737,7 +755,11 @@ class WhatsappSenderController extends Controller
         $contact = WhatsappContact::whereHas('group', function ($q) use ($id) {
                 $q->where('whatsapp_business_id', $id);
             })
-            ->where('phone', $phone)
+            ->where(function ($q) use ($phone, $cleanPhone) {
+                $q->where('phone', $phone)
+                  ->orWhere('phone', $cleanPhone)
+                  ->orWhere('phone', '+' . $cleanPhone);
+            })
             ->first();
 
         // Determine active free window from last inbound message
@@ -844,6 +866,7 @@ class WhatsappSenderController extends Controller
             'recipient_phone' => ['required', 'string', 'max:50'],
             'message_body' => ['nullable', 'string', 'max:4096'],
             'message_type' => ['nullable', 'string', 'in:text,template,image,document,audio,video,interactive'],
+            'template_id' => ['nullable', 'integer'],
             'template_name' => ['nullable', 'string'],
             'template_language' => ['nullable', 'string'],
             'template_components' => ['nullable', 'array'],
@@ -862,9 +885,25 @@ class WhatsappSenderController extends Controller
         $extraData = [];
 
         if ($messageType === 'template') {
+            $templateModel = null;
+            if (!empty($validated['template_id'])) {
+                $templateModel = \Modules\WhatsappSender\Models\WhatsappTemplate::find($validated['template_id']);
+            }
+            if (!$templateModel && !empty($validated['template_name'])) {
+                $templateQuery = \Modules\WhatsappSender\Models\WhatsappTemplate::where('whatsapp_business_id', $id)
+                    ->where('name', $validated['template_name']);
+                if (!empty($validated['template_language'])) {
+                    $templateQuery->where('language', $validated['template_language']);
+                }
+                $templateModel = $templateQuery->first() ?? \Modules\WhatsappSender\Models\WhatsappTemplate::where('name', $validated['template_name'])->first();
+            }
+
+            $templateName = $validated['template_name'] ?? ($templateModel ? $templateModel->name : 'hello_world');
+            $templateLanguage = $validated['template_language'] ?? ($templateModel ? $templateModel->language : 'en_US');
+
             $templateData = [
-                'name' => $validated['template_name'] ?? 'hello_world',
-                'language' => $validated['template_language'] ?? 'en_US',
+                'name' => $templateName,
+                'language' => $templateLanguage,
             ];
             if (!empty($validated['template_components'])) {
                 $templateData['components'] = $validated['template_components'];

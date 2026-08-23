@@ -288,6 +288,8 @@ return [
     'invoice_updated' => 'تم تحديث الفاتورة بنجاح.',
     'invoice_suspended' => 'تم وقف الفاتورة مؤقتاً بنجاح.',
     'invoice_unsuspended' => 'تم إلغاء وقف الفاتورة بنجاح.',
+    'confirm_suspend_invoices' => 'هل أنت متأكد من رغبتك في وقف الفواتير المحددة مؤقتاً؟',
+    'confirm_unsuspend_invoices' => 'هل أنت متأكد من رغبتك في إلغاء وقف الفواتير المحددة؟',
     'suspended_invoices' => 'فواتير موقوفة مؤقتاً',
     'ip_unblocked_successfully' => 'تم إلغاء حظر عنوان IP بنجاح.',
     'job_status_updated' => 'تم تحديث حالة العمل بنجاح.',

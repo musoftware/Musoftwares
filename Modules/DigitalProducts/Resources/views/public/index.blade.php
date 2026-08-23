@@ -1,4 +1,4 @@
-@extends('digitalproducts::layouts.library-master')
+@extends('layouts.public')
 
 @section('content')
 <div class="max-w-[1280px] mx-auto px-6 sm:px-10 py-8 sm:py-12">
@@ -183,8 +183,11 @@
                                         {{ app()->getLocale() === 'ar' ? 'مجاني' : 'FREE' }}
                                     </span>
                                 @else
-                                    <span class="px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider font-mono shadow-xs">
-                                        {{ $formattedPrice }}
+                                    <span class="px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-xs text-white text-[10px] font-bold tracking-wider font-mono shadow-xs flex items-center gap-1">
+                                        <span>{{ $formattedPrice }}</span>
+                                        @if(($viewerCurrency->id ?? 1) !== 1 && !empty($book->usd_price_formatted))
+                                            <span class="text-white/70 font-normal">({{ $book->usd_price_formatted }})</span>
+                                        @endif
                                     </span>
                                 @endif
 

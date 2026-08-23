@@ -1,4 +1,4 @@
-@extends('digitalproducts::layouts.library-master')
+@extends('layouts.public')
 
 @push('head')
 @php
@@ -251,13 +251,18 @@
                             @endphp
                             <div class="flex items-baseline justify-between gap-4">
                                 <div>
-                                    <span class="text-xs text-[#86868b] font-medium block mb-0.5">الإصدار الكامل المعتمد</span>
-                                    <div class="flex items-baseline gap-2">
+                                    <span class="text-xs text-[#86868b] font-medium block mb-0.5">{{ app()->getLocale() === 'ar' ? 'الإصدار الكامل المعتمد' : 'Official Full Edition' }}</span>
+                                    <div class="flex items-baseline gap-2.5 flex-wrap">
                                         <span class="text-3xl sm:text-4xl font-bold font-mono text-[#0071e3]">{{ $mainFormattedPrice }}</span>
+                                        @if(($viewerCurrency->id ?? 1) !== 1 && !empty($product->usd_price_formatted))
+                                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono font-semibold border border-black/5">
+                                                ≈ {{ $product->usd_price_formatted }}
+                                            </span>
+                                        @endif
                                         <span class="text-xs text-[#86868b] line-through font-mono">{{ $originalFormattedPrice }}</span>
                                     </div>
                                 </div>
-                                <span class="px-3 py-1 rounded-full bg-blue-50 text-[#0066cc] border border-blue-200/80 text-xs font-semibold">
+                                <span class="px-3 py-1 rounded-full bg-blue-50 text-[#0066cc] border border-blue-200/80 text-xs font-semibold shrink-0">
                                     Lifetime Access
                                 </span>
                             </div>
