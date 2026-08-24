@@ -1,12 +1,14 @@
 <?php
 
 use App\Helpers\CurrencyHelper;
-use App\Http\Controllers\Api\SerialDeviceController;
 use App\Http\Controllers\Api\ExchangeRateSyncController;
+use App\Http\Controllers\Api\PartnerGatewayController;
+use App\Http\Controllers\Api\SerialDeviceController;
 use App\Http\Controllers\Api\SubscriptionSyncController;
 use App\Http\Controllers\SsoController;
 use App\Http\Controllers\TrackerController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Middleware\VerifyPartnerHmac;
 use App\Models\Currency;
 use App\Services\IpGeolocationService;
 use Illuminate\Http\Request;
@@ -200,3 +202,11 @@ Route::post('/sso/verify', [SsoController::class, 'verify'])->name('sso.verify')
 Route::post('/sso/subscriptions/sync', [SubscriptionSyncController::class, 'sync'])->name('sso.subscriptions.sync');
 Route::post('/sso/notify', [\App\Http\Controllers\Api\SsoNotificationController::class, 'notify'])->name('sso.notify');
 Route::post('/sso/exchange-rates/sync', [ExchangeRateSyncController::class, 'sync'])->name('sso.exchange-rates.sync');
+
+// --- Partner Gateway API (B2B SaaS Metering & Credit Leases) ---
+Route::prefix('v1/partner')->middleware([VerifyPartnerHmac::class])->group(function () {
+    Route::get('/balance', [PartnerGatewayController::class, 'balance'])->name('api.partner.balance');
+    Route::post('/lease/acquire', [PartnerGatewayController::class, 'acquireLease'])->name('api.partner.lease.acquire');
+    Route::post('/lease/settle', [PartnerGatewayController::class, 'settleLease'])->name('api.partner.lease.settle');
+});
+

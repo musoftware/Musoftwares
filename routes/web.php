@@ -7,9 +7,10 @@ use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminCurrencyController;
 use App\Http\Controllers\Admin\AdminCurrencyExchangeController;
 use App\Http\Controllers\Admin\AdminFreeDownloadController;
-use App\Http\Controllers\Admin\AdminLanguageLineController;
 use App\Http\Controllers\Admin\AdminOutgoingEmailController;
+use App\Http\Controllers\Admin\AdminPartnerGatewayController;
 use App\Http\Controllers\Admin\AdminPaymentMethodController;
+use App\Http\Controllers\Client\ClientPartnerGatewayController;
 use App\Http\Controllers\Admin\AdminPointPackageController;
 use App\Http\Controllers\Admin\AdminPointsController;
 use App\Http\Controllers\Admin\AdminQuotationController;
@@ -977,9 +978,16 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
 
     Route::get('/transfer-api/calculate-fee', [WalletTransferController::class, 'calculateFee'])->name('transfer.calculate-fee');
     Route::get('/transfer-api/search-users', [WalletTransferController::class, 'searchUsers'])->name('transfer.search-users');
-    Route::post('/transfer', [WalletTransferController::class, 'store'])->name('transfer.store');
     Route::get('/transfer/history', [WalletTransferController::class, 'history'])->name('transfer.history');
     Route::get('/transfer/{id}', [WalletTransferController::class, 'show'])->name('transfer.show');
+});
+
+// Client Partner Gateway (Developer Portal & API Metering Recharge)
+Route::middleware(['auth', 'verified'])->prefix('partner-gateway')->name('client.partner-gateway.')->group(function () {
+    Route::get('/', [ClientPartnerGatewayController::class, 'index'])->name('index');
+    Route::post('/topup-wallet', [ClientPartnerGatewayController::class, 'topUpWallet'])->name('topup-wallet');
+    Route::post('/topup-online', [ClientPartnerGatewayController::class, 'topUpOnline'])->name('topup-online');
+    Route::post('/regenerate-secret', [ClientPartnerGatewayController::class, 'regenerateSecret'])->name('regenerate-secret');
 });
 
 // iSAAS Connected Apps Routes
@@ -1264,6 +1272,16 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::resource('payment-methods', AdminPaymentMethodController::class)->only(['index', 'show', 'update']);
 
     Route::resource('withdraw-requests', AdminWithdrawRequestController::class)->only(['index', 'show', 'update']);
+
+    // Admin Partner Gateway Management
+    Route::prefix('partner-gateway')->name('partner-gateway.')->group(function () {
+        Route::get('/', [AdminPartnerGatewayController::class, 'index'])->name('index');
+        Route::post('/', [AdminPartnerGatewayController::class, 'store'])->name('store');
+        Route::put('/{partnerClient}', [AdminPartnerGatewayController::class, 'update'])->name('update');
+        Route::post('/{partnerClient}/adjust-balance', [AdminPartnerGatewayController::class, 'adjustBalance'])->name('adjust-balance');
+        Route::post('/{partnerClient}/regenerate-secret', [AdminPartnerGatewayController::class, 'regenerateSecret'])->name('regenerate-secret');
+        Route::delete('/{partnerClient}', [AdminPartnerGatewayController::class, 'destroy'])->name('destroy');
+    });
 
 });
 

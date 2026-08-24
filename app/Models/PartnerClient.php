@@ -15,6 +15,7 @@ class PartnerClient extends Model
     protected $table = 'partner_clients';
 
     protected $fillable = [
+        'user_id',
         'client_name',
         'client_key',
         'client_secret',
@@ -33,6 +34,14 @@ class PartnerClient extends Model
     ];
 
     /**
+     * @return BelongsTo<User, PartnerClient>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * @return HasMany<PartnerCreditLease>
      */
     public function leases(): HasMany
@@ -49,15 +58,28 @@ class PartnerClient extends Model
     }
 
     /**
+     * Regenerate the partner client secret.
+     */
+    public function regenerateSecret(): string
+    {
+        $newSecret = 'sk_live_' . Str::random(48);
+        $this->update(['client_secret' => $newSecret]);
+
+        return $newSecret;
+    }
+
+    /**
      * Create a new partner client credential pair.
      */
     public static function createClient(
         string $name,
         float $initialBalance = 0.0,
         float $rate = 0.01,
-        string $pricingModel = 'PAYG_PER_MSG'
+        string $pricingModel = 'PAYG_PER_MSG',
+        ?int $userId = null
     ): self {
         return self::create([
+            'user_id' => $userId,
             'client_name' => $name,
             'client_key' => 'pk_live_' . Str::random(32),
             'client_secret' => 'sk_live_' . Str::random(48),

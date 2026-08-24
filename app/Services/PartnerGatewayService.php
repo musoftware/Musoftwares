@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use App\Models\PartnerClient;
 use App\Models\PartnerCreditLease;
 use App\Models\PartnerUsageLog;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 use RuntimeException;
 
 class PartnerGatewayService
@@ -187,5 +189,144 @@ class PartnerGatewayService
             'newBalance' => $newLeaseResponse ? $newLeaseResponse['remainingWalletBalance'] : $settlementData['newBalance'],
             'newLease' => $newLeaseResponse,
         ];
+    }
+
+    /**
+     * Top-up partner credit balance directly.
+     */
+    public function topUpBalance(
+        PartnerClient $client,
+        float $amount,
+        string $type = 'TOP_UP',
+        string $description = 'Partner Balance Top-up',
+        ?array $metadata = null
+    ): float {
+        if ($amount <= 0) {
+            throw new RuntimeException('Top-up amount must be greater than zero', 422);
+        }
+
+        return DB::transaction(function () use ($client, $amount, $type, $description, $metadata) {
+            /** @var PartnerClient $lockedClient */
+            $lockedClient = PartnerClient::where('id', $client->id)->lockForUpdate()->firstOrFail();
+
+            $lockedClient->increment('wallet_balance', $amount);
+            $lockedClient->refresh();
+
+            PartnerUsageLog::create([
+                'partner_client_id' => $lockedClient->id,
+                'lease_id' => null,
+                'type' => $type,
+                'amount' => $amount,
+                'balance_after' => $lockedClient->wallet_balance,
+                'description' => $description,
+                'metadata' => $metadata,
+            ]);
+
+            return (float)$lockedClient->wallet_balance;
+        });
+    }
+
+    /**
+     * Recharge partner balance by deducting from the user's platform account wallet balance.
+     */
+    public function topUpFromUserWallet(User $user, PartnerClient $client, float $amountUsd): array
+    {
+        if ($amountUsd <= 0) {
+            throw new RuntimeException('Recharge amount must be greater than zero', 422);
+        }
+
+        if ($client->user_id && $client->user_id !== $user->id) {
+            throw new RuntimeException('Unauthorized partner client ownership', 403);
+        }
+
+        $usdCurrency = Currency::where('currency', 'USD')->first();
+        $userCurrencyId = $user->currency_id ?? optional($usdCurrency)->id;
+
+        // Calculate cost in User's native wallet currency
+        $costInUserCurrency = $amountUsd;
+        if ($usdCurrency && $userCurrencyId && $usdCurrency->id !== $userCurrencyId) {
+            $costInUserCurrency = CurrenciesExchange::RateToday($amountUsd, $usdCurrency->id, $userCurrencyId);
+        }
+
+        return DB::transaction(function () use ($user, $client, $amountUsd, $costInUserCurrency, $usdCurrency) {
+            /** @var User $lockedUser */
+            $lockedUser = User::where('id', $user->id)->lockForUpdate()->firstOrFail();
+
+            if ((float)$lockedUser->user_balance < (float)$costInUserCurrency) {
+                throw new RuntimeException("Insufficient wallet balance. Available: {$lockedUser->user_balance}, Required: {$costInUserCurrency}", 402);
+            }
+
+            // Deduct from User's account balance
+            $lockedUser->add_balance(
+                -$amountUsd,
+                "Partner API Recharge for [{$client->client_name}]",
+                'used',
+                optional($usdCurrency)->id
+            );
+
+            // Add to Partner Client Balance
+            $newPartnerBalance = $this->topUpBalance(
+                $client,
+                $amountUsd,
+                'TOP_UP',
+                "Recharged via User Wallet by {$user->name} (#{$user->id})",
+                [
+                    'user_id' => $user->id,
+                    'debited_user_balance' => $costInUserCurrency,
+                    'credited_partner_usd' => $amountUsd,
+                ]
+            );
+
+            $lockedUser->refresh();
+
+            return [
+                'success' => true,
+                'rechargedAmount' => $amountUsd,
+                'newPartnerBalance' => $newPartnerBalance,
+                'remainingUserBalance' => (float)$lockedUser->user_balance,
+            ];
+        });
+    }
+
+    /**
+     * Admin manual balance adjustment (Credit or Debit).
+     */
+    public function adjustBalanceAdmin(PartnerClient $client, float $amount, string $reason, ?int $adminId = null): array
+    {
+        if ($amount == 0) {
+            throw new RuntimeException('Adjustment amount cannot be zero', 422);
+        }
+
+        return DB::transaction(function () use ($client, $amount, $reason, $adminId) {
+            /** @var PartnerClient $lockedClient */
+            $lockedClient = PartnerClient::where('id', $client->id)->lockForUpdate()->firstOrFail();
+
+            if ($amount < 0 && (float)$lockedClient->wallet_balance < abs($amount)) {
+                throw new RuntimeException('Cannot deduct more than the current partner balance', 422);
+            }
+
+            $lockedClient->increment('wallet_balance', $amount);
+            $lockedClient->refresh();
+
+            PartnerUsageLog::create([
+                'partner_client_id' => $lockedClient->id,
+                'lease_id' => null,
+                'type' => 'ADJUSTMENT',
+                'amount' => $amount,
+                'balance_after' => $lockedClient->wallet_balance,
+                'description' => "Admin Adjustment: {$reason}" . ($adminId ? " (Admin #{$adminId})" : ''),
+                'metadata' => [
+                    'admin_id' => $adminId,
+                    'reason' => $reason,
+                    'adjustment_amount' => $amount,
+                ],
+            ]);
+
+            return [
+                'success' => true,
+                'adjustmentAmount' => $amount,
+                'newBalance' => (float)$lockedClient->wallet_balance,
+            ];
+        });
     }
 }

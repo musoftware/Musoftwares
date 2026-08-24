@@ -11,6 +11,7 @@ return new class extends Migration
         if (!Schema::hasTable('partner_clients')) {
             Schema::create('partner_clients', function (Blueprint $table) {
                 $table->id();
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
                 $table->string('client_name', 100);
                 $table->string('client_key', 64)->unique();
                 $table->string('client_secret', 128);
@@ -21,6 +22,7 @@ return new class extends Migration
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
 
+                $table->index('user_id');
                 $table->index('is_active');
             });
         }

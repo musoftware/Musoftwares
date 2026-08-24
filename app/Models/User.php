@@ -760,6 +760,22 @@ class User extends Authenticatable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PartnerClient>
+     */
+    public function partnerClients(): HasMany
+    {
+        return $this->hasMany(PartnerClient::class, 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PartnerClient>
+     */
+    public function partnerClient(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PartnerClient::class, 'user_id')->latestOfMany();
+    }
+
+    /**
      * Override the notify method to intercept client notifications.
      */
     public function notify($instance)
