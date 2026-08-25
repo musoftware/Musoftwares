@@ -128,7 +128,7 @@ export default function ClientPartnerGatewayIndex({
 
   if (!partnerClient) {
     return (
-      <WorkspaceLayout>
+      <WorkspaceLayout title="Partner Gateway API">
         <Head title="Partner Gateway - Developer API" />
         <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 text-center space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
@@ -146,7 +146,7 @@ export default function ClientPartnerGatewayIndex({
   const isLowBalance = Number(partnerClient.wallet_balance) <= Number(partnerClient.low_balance_threshold);
 
   return (
-    <WorkspaceLayout>
+    <WorkspaceLayout title="Partner Gateway API">
       <Head title="Partner Gateway - Developer API" />
 
       <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6 space-y-8">
