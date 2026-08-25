@@ -50,7 +50,6 @@ class AdminPartnerGatewayController extends Controller
         // Eligible users list for quick activation
         $users = User::select('id', 'name', 'email')
             ->orderBy('name')
-            ->limit(100)
             ->get();
 
         return Inertia::render('Admin/PartnerGateway/Index', [

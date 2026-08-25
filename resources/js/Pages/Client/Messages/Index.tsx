@@ -20,6 +20,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { __ } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
@@ -449,22 +450,14 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                     {__('general.direct_chats_can_only_be_initiated_with_support_or_admin_staff') ||
                                         'Direct chats can only be sent to support or administration staff.'}
                                 </p>
-                                <select
-                                    id="recipient"
+                                <PremiumCombobox
+                                    className="mt-1"
                                     value={data.recipient_id}
-                                    onChange={(e) => setData('recipient_id', e.target.value)}
-                                    className="mt-1 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-medium text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    required
-                                >
-                                    <option value="">
-                                        -- {__('general.choose_a_recipient') || 'Choose Support Agent'} --
-                                    </option>
-                                    {users.map((u) => (
-                                        <option key={u.id} value={u.id}>
-                                            {u.name} ({u.role || 'Support'})
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(val) => setData('recipient_id', val ? String(val) : '')}
+                                    options={users.map((u) => ({ value: String(u.id), label: `${u.name} (${u.role || 'Support'})` }))}
+                                    placeholder={`-- ${__('general.choose_a_recipient') || 'Choose Support Agent'} --`}
+                                    searchPlaceholder={__('general.search_users')}
+                                />
                                 <InputError message={errors.recipient_id} className="mt-1" />
                             </div>
 

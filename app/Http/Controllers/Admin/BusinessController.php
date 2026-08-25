@@ -243,7 +243,7 @@ class BusinessController extends Controller
 
         $bCurrency = CurrencyHelper::getBusinessCurrency();
         $projectsList = Project::orderBy('project_name')->select('id', 'project_name', 'project_name as name')->limit(200)->get();
-        $usersList = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $usersList = User::orderBy('name')->select('id', 'name')->get();
         $currenciesList = collect($currencies)->map(fn ($c) => ['id' => $c->id, 'code' => $c->currency, 'symbol' => $c->symbol])->values();
         $categoriesList = Transaction::whereIn('type', ['received', 'refunded', 'sent'])
             ->whereNotNull('category')
@@ -463,7 +463,7 @@ class BusinessController extends Controller
 
         $bCurrency = CurrencyHelper::getBusinessCurrency();
         $projectsList = Project::orderBy('project_name')->select('id', 'project_name', 'project_name as name')->limit(200)->get();
-        $usersList = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $usersList = User::orderBy('name')->select('id', 'name')->get();
         $currenciesList = collect($currencies)->map(fn ($c) => ['id' => $c->id, 'code' => $c->currency, 'symbol' => $c->symbol])->values();
         $categoriesList = CostTransaction::excludingSalaries()
             ->whereNotNull('category')
@@ -804,7 +804,7 @@ class BusinessController extends Controller
 
     public function create_cost()
     {
-        $users = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $users = User::orderBy('name')->select('id', 'name')->get();
         $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->orderBy('project_name')->select('id', 'project_name', 'project_name as name', 'user_id')->limit(200)->get();
         $currencies = array_values(Currency::as_array());
         $businessCurrency = CurrencyHelper::getBusinessCurrency();
@@ -923,7 +923,7 @@ class BusinessController extends Controller
     {
         $cost = CostTransaction::withTrashed()->findOrFail($id);
 
-        $users = User::orderBy('name')->select('id', 'name')->limit(500)->get();
+        $users = User::orderBy('name')->select('id', 'name')->get();
         $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->orderBy('project_name')->select('id', 'project_name', 'project_name as name', 'user_id')->limit(200)->get();
         $currencies = array_values(Currency::as_array());
         $businessCurrency = CurrencyHelper::getBusinessCurrency();

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Separator } from '@/Components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -714,11 +715,9 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             <Row label={__('general.registered')}  value={detail.created_at ?? '—'} />
                             <Separator />
                             <Row label={__('general.client_assignment') ?? 'Client Assignment'} value={
-                                <select
-                                    className="text-sm rounded border border-slate-200 bg-white p-1 w-full focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
-                                    value={detail.userDeviceAssignment?.user?.id || ''}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
+                                <PremiumCombobox
+                                    value={detail.userDeviceAssignment?.user?.id ? String(detail.userDeviceAssignment.user.id) : ''}
+                                    onChange={(val) => {
                                         router.post(route('admin.serial-devices.assign-user', detail.id), {
                                             user_id: val ? Number(val) : null
                                         }, {
@@ -732,14 +731,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             }
                                         });
                                     }}
-                                >
-                                    <option value="">{__('general.unassigned') ?? 'Unassigned'}</option>
-                                    {users.map(u => (
-                                        <option key={u.id} value={u.id}>
-                                            {u.name} ({u.email})
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={[{ value: '', label: __('general.unassigned') ?? 'Unassigned' }, ...users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))]}
+                                    placeholder={__('general.unassigned') ?? 'Unassigned'}
+                                    searchPlaceholder={__('general.search_users')}
+                                />
                             } />
                             {detail.userDeviceAssignment?.user && (
                                 <Row label={__('general.profile_link') ?? 'Profile Link'} value={
@@ -786,11 +781,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                 <label className="text-xs font-semibold text-muted-foreground uppercase">
                                     {__('general.select_client') ?? 'Select Client'}
                                 </label>
-                                <select
-                                    className="text-sm rounded border border-slate-200 bg-white p-2 w-full focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
-                                    value={assignUserDevice.userDeviceAssignment?.user?.id || ''}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
+                                <PremiumCombobox
+                                    value={assignUserDevice.userDeviceAssignment?.user?.id ? String(assignUserDevice.userDeviceAssignment.user.id) : ''}
+                                    onChange={(val) => {
+                                        if (!assignUserDevice) return;
                                         router.post(route('admin.serial-devices.assign-user', assignUserDevice.id), {
                                             user_id: val ? Number(val) : null
                                         }, {
@@ -802,14 +796,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             }
                                         });
                                     }}
-                                >
-                                    <option value="">{__('general.unassigned') ?? 'Unassigned'}</option>
-                                    {users.map(u => (
-                                        <option key={u.id} value={u.id}>
-                                            {u.name} ({u.email})
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={[{ value: '', label: __('general.unassigned') ?? 'Unassigned' }, ...users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))]}
+                                    placeholder={__('general.unassigned') ?? 'Unassigned'}
+                                    searchPlaceholder={__('general.search_users')}
+                                />
                             </div>
 
                             <div className="flex justify-end gap-2 pt-2">

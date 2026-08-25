@@ -236,6 +236,12 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">{__('general.workspace_and_tools') || 'Workspace & Tools'}</DropdownMenuLabel>
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem asChild>
+                                        <Link href="/admin/partner-gateway" className="w-full cursor-pointer flex items-center bg-emerald-500/10 text-emerald-600 font-semibold rounded-md">
+                                            <Key className="me-2 h-4 w-4 text-emerald-600" />
+                                            <span>Partner Gateway (API & Wallet)</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/tasks/add`} className="w-full cursor-pointer flex items-center">
                                             <Briefcase className="me-2 h-4 w-4" />
                                             <span>{__('general.assign_task')}</span>

@@ -22,6 +22,7 @@ import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { toast } from 'sonner';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { __ } from '@/lib/i18n';
 
 declare const route: any;
@@ -503,14 +504,14 @@ export default function Index({
                                 <option value="pending">{__('general.pending')}</option>
                                 <option value="overdue">{__('general.overdue')}</option>
                             </select>
-                            <select
-                                className="rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white h-9 max-w-[180px]"
-                                value={selectedUserFilter}
-                                onChange={(e) => setSelectedUserFilter(e.target.value)}
-                            >
-                                <option value="">{__('general.all_users')}</option>
-                                {users.map((u: any) => <option key={u.id} value={u.id}>{u.name}</option>)}
-                            </select>
+                            <PremiumCombobox
+                                className="w-[180px]"
+                                value={selectedUserFilter || ''}
+                                onChange={(val) => setSelectedUserFilter(val ? String(val) : '')}
+                                options={[{ value: '', label: __('general.all_users') }, ...users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email || ''})` }))]}
+                                placeholder={__('general.all_users')}
+                                searchPlaceholder={__('general.search_users')}
+                            />
                             <Button onClick={applyFilters} variant="secondary" size="sm" className="h-9">{__('general.filter')}</Button>
                             {(filters.search || filters.category || filters.status || filters.user_id || searchTerm || selectedCategoryFilter || selectedStatusFilter || selectedUserFilter) && (
                                 <Button onClick={clearFilters} variant="ghost" size="sm" className="h-9 text-gray-500 hover:text-black">
@@ -603,10 +604,13 @@ export default function Index({
                                                 : currentTab === 'income' || newEntry.type === 'income' ? __('general.client_user_optional') || 'Client/User (Optional)'
                                                 : __('general.user_vendor_optional') || 'User/Vendor (Optional)'}
                                         </Label>
-                                        <select id="create-user" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newEntry.user_id} onChange={(e) => setNewEntry({ ...newEntry, user_id: e.target.value })} required={currentTab === 'salaries' || newEntry.type === 'salary'}>
-                                            <option value="">{__('general.select_user')}</option>
-                                            {users.map((u: any) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
-                                        </select>
+                                        <PremiumCombobox
+                                            value={newEntry.user_id ? String(newEntry.user_id) : ''}
+                                            onChange={(val) => setNewEntry({ ...newEntry, user_id: val ? String(val) : '' })}
+                                            options={users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email || ''})` }))}
+                                            placeholder={__('general.select_user')}
+                                            searchPlaceholder={__('general.search_users')}
+                                        />
                                         {errors.user_id && <p className="text-sm text-destructive mt-1">{errors.user_id}</p>}
                                     </div>
 
@@ -997,10 +1001,13 @@ export default function Index({
                                         : currentTab === 'income' || editingEntry.type === 'income' ? __('general.client_user_optional') || 'Client/User (Optional)'
                                         : __('general.user_vendor_optional') || 'User/Vendor (Optional)'}
                                 </Label>
-                                <select id="edit-user" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editingEntry.user_id} onChange={(e) => setEditingEntry({ ...editingEntry, user_id: e.target.value })} required={currentTab === 'salaries' || editingEntry.type === 'salary'}>
-                                    <option value="">{__('general.select_user')}</option>
-                                    {users.map((u: any) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
-                                </select>
+                                <PremiumCombobox
+                                    value={editingEntry.user_id ? String(editingEntry.user_id) : ''}
+                                    onChange={(val) => setEditingEntry({ ...editingEntry, user_id: val ? String(val) : '' })}
+                                    options={users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email || ''})` }))}
+                                    placeholder={__('general.select_user')}
+                                    searchPlaceholder={__('general.search_users')}
+                                />
                                 {errors.user_id && <p className="text-sm text-destructive mt-1">{errors.user_id}</p>}
                             </div>
 

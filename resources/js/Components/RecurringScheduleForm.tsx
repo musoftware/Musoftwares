@@ -144,31 +144,16 @@ export function RecurringScheduleForm({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="space-y-2">
                 <Label htmlFor="user_id">{userLabel}</Label>
-                {searchUsersEndpoint ? (
-                    <PremiumCombobox
-                        value={form.user_id || null}
-                        onChange={(val) => updateField('user_id', val as any)}
-                        options={builtUserOptions as any}
-                        asyncEndpoint={searchUsersEndpoint}
-                        searchParam="q"
-                        placeholder={selectUserPlaceholder}
-                        searchPlaceholder={`${__('general.search') || 'Search'} ${userLabel.toLowerCase()}...`}
-                        emptyText={__('general.no_results') || 'No clients found.'}
-                    />
-                ) : (
-                    <select
-                        id="user_id"
-                        required
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10"
-                        value={form.user_id}
-                        onChange={(e) => updateField('user_id', e.target.value)}
-                    >
-                        <option value="">{selectUserPlaceholder}</option>
-                        {users.map((u: any) => (
-                            <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                        ))}
-                    </select>
-                )}
+                <PremiumCombobox
+                    value={form.user_id ? String(form.user_id) : null}
+                    onChange={(val) => updateField('user_id', val as any)}
+                    options={builtUserOptions && builtUserOptions.length > 0 ? (builtUserOptions as any) : users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email})` }))}
+                    asyncEndpoint={searchUsersEndpoint || undefined}
+                    searchParam="q"
+                    placeholder={selectUserPlaceholder}
+                    searchPlaceholder={`${__('general.search') || 'Search'} ${userLabel.toLowerCase()}...`}
+                    emptyText={__('general.no_results') || 'No clients found.'}
+                />
                 <InputError message={errors.user_id} />
             </div>
 

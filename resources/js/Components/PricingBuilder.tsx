@@ -131,6 +131,7 @@ export default function PricingBuilder({
 
     useEffect(() => {
         setSelectedItems(activeItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isNewSystem]);
 
     const modules = useMemo(() => serviceItems.filter(item => item.type === 'module'), [serviceItems]);

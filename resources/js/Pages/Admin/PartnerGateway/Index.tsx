@@ -12,6 +12,7 @@ import {
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import {
   Key,
   Plus,
@@ -27,6 +28,10 @@ import {
   CheckCircle,
   XCircle,
   TrendingUp,
+  Eye,
+  EyeOff,
+  Terminal,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface PartnerClientItem {
@@ -34,6 +39,7 @@ interface PartnerClientItem {
   user_id: number | null;
   client_name: string;
   client_key: string;
+  client_secret: string;
   wallet_balance: number;
   pricing_model: string;
   cost_per_message: number;
@@ -82,7 +88,21 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<PartnerClientItem | null>(null);
+  const [credentialsModalClient, setCredentialsModalClient] = useState<PartnerClientItem | null>(null);
+  const [showModalSecret, setShowModalSecret] = useState(false);
+  const [revealedSecrets, setRevealedSecrets] = useState<Record<number, boolean>>({});
+  const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const toggleSecretReveal = (id: number) => {
+    setRevealedSecrets(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleCopyNamed = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedSection(label);
+    setTimeout(() => setCopiedSection(null), 2000);
+  };
 
   // Form for creating a new partner client
   const createForm = useForm({
@@ -264,7 +284,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                 <tr>
                   <th className="px-4 py-3">Partner Client</th>
                   <th className="px-4 py-3">Owner User</th>
-                  <th className="px-4 py-3">Client Key</th>
+                  <th className="px-4 py-3">API Credentials (Key & Secret)</th>
                   <th className="px-4 py-3">Rate / Msg</th>
                   <th className="px-4 py-3">Wallet Balance</th>
                   <th className="px-4 py-3">Active Leases</th>
@@ -296,21 +316,52 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                           <span className="text-xs text-muted-foreground italic">System / Direct</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <span>{client.client_key.substring(0, 16)}...</span>
+                      <td className="px-4 py-3 font-mono text-xs space-y-1 min-w-[220px]">
+                        {/* Client Key */}
+                        <div className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded border">
+                          <span className="text-[10px] font-bold text-muted-foreground tracking-wider shrink-0">KEY:</span>
+                          <span className="truncate max-w-[130px] select-all">{client.client_key.substring(0, 14)}...</span>
                           <button
                             type="button"
-                            onClick={() => handleCopy(client.client_key)}
-                            className="p-1 rounded hover:bg-muted text-muted-foreground"
-                            title="Copy Client Key"
+                            onClick={() => handleCopyNamed(client.client_key, `key-${client.id}`)}
+                            className="p-1 rounded hover:bg-background text-muted-foreground ms-auto shrink-0"
+                            title="Copy Client Key (pk_live_...)"
                           >
-                            {copiedKey === client.client_key ? (
+                            {copiedSection === `key-${client.id}` ? (
                               <Check className="w-3.5 h-3.5 text-emerald-500" />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
                           </button>
+                        </div>
+                        {/* Client Secret */}
+                        <div className="flex items-center gap-1.5 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/20">
+                          <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 tracking-wider shrink-0">SECRET:</span>
+                          <span className="truncate max-w-[130px] text-amber-600 dark:text-amber-400 select-all">
+                            {revealedSecrets[client.id] ? client.client_secret : '••••••••••••••••'}
+                          </span>
+                          <div className="flex items-center gap-0.5 ms-auto shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => toggleSecretReveal(client.id)}
+                              className="p-1 rounded hover:bg-background text-muted-foreground"
+                              title={revealedSecrets[client.id] ? "Hide Secret" : "Reveal Secret"}
+                            >
+                              {revealedSecrets[client.id] ? <EyeOff className="w-3.5 h-3.5 text-amber-500" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyNamed(client.client_secret, `secret-${client.id}`)}
+                              className="p-1 rounded hover:bg-background text-muted-foreground"
+                              title="Copy Secret Key (sk_live_...)"
+                            >
+                              {copiedSection === `secret-${client.id}` ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 font-mono">
@@ -339,6 +390,18 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-primary hover:bg-primary/10"
+                            onClick={() => {
+                              setCredentialsModalClient(client);
+                              setShowModalSecret(false);
+                            }}
+                            title="View Full API Credentials & .env config"
+                          >
+                            <Key className="w-3.5 h-3.5" />
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
@@ -395,22 +458,28 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
             </DialogHeader>
 
             <div className="space-y-4 py-4">
-              <div>
+              <div className="space-y-1.5">
                 <Label htmlFor="user_id">Select User / Client *</Label>
-                <select
-                  id="user_id"
-                  className="w-full mt-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
+                <PremiumCombobox
                   value={createForm.data.user_id}
-                  onChange={(e) => createForm.setData('user_id', e.target.value)}
-                  required
-                >
-                  <option value="">-- Choose User --</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name} ({u.email})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => {
+                    const strVal = val ? String(val) : '';
+                    createForm.setData('user_id', strVal);
+                    if (strVal && !createForm.data.client_name) {
+                      const u = users.find(usr => String(usr.id) === strVal);
+                      if (u) {
+                        createForm.setData(prev => ({
+                          ...prev,
+                          user_id: strVal,
+                          client_name: prev.client_name || `${u.name} Partner Client`
+                        }));
+                      }
+                    }
+                  }}
+                  options={users.map((u) => ({ value: String(u.id), label: `${u.name} (${u.email})` }))}
+                  placeholder="-- Choose User --"
+                  searchPlaceholder="Search user by name or email..."
+                />
                 {createForm.errors.user_id && (
                   <p className="text-xs text-destructive mt-1">{createForm.errors.user_id}</p>
                 )}
@@ -637,6 +706,124 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Full API Credentials Modal */}
+      <Dialog open={!!credentialsModalClient} onOpenChange={(open) => !open && setCredentialsModalClient(null)}>
+        <DialogContent className="sm:max-w-[580px]">
+          {credentialsModalClient && (
+            <div>
+              <DialogHeader>
+                <div className="flex items-center gap-2 text-primary">
+                  <Key className="w-5 h-5" />
+                  <DialogTitle>Partner API Credentials</DialogTitle>
+                </div>
+                <DialogDescription>
+                  Credentials and .env configuration snippet for <strong>{credentialsModalClient.client_name}</strong>.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 py-4 text-xs font-mono">
+                {/* Base URL */}
+                <div className="space-y-1">
+                  <div className="text-muted-foreground font-sans font-medium text-xs">Gateway API Base URL:</div>
+                  <div className="flex items-center justify-between bg-muted p-2 rounded-lg border">
+                    <span className="text-foreground select-all">https://musoftwares.com/api/v1/partner</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2"
+                      onClick={() => handleCopyNamed('https://musoftwares.com/api/v1/partner', 'env-base-url')}
+                    >
+                      {copiedSection === 'env-base-url' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Client Key */}
+                <div className="space-y-1">
+                  <div className="text-muted-foreground font-sans font-medium text-xs">MUSOFTWARES_CLIENT_KEY (Public Key):</div>
+                  <div className="flex items-center justify-between bg-muted p-2 rounded-lg border">
+                    <span className="text-foreground break-all select-all">{credentialsModalClient.client_key}</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 shrink-0 ms-2"
+                      onClick={() => handleCopyNamed(credentialsModalClient.client_key, 'env-client-key')}
+                    >
+                      {copiedSection === 'env-client-key' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Secret Key */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-muted-foreground font-sans font-medium text-xs">
+                    <span>MUSOFTWARES_CLIENT_SECRET (Secret Key):</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowModalSecret(!showModalSecret)}
+                      className="text-primary hover:underline flex items-center gap-1 font-sans text-xs"
+                    >
+                      {showModalSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      {showModalSecret ? 'Hide' : 'Reveal'}
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between bg-muted p-2 rounded-lg border">
+                    <span className="text-amber-500 break-all select-all">
+                      {showModalSecret ? credentialsModalClient.client_secret : '••••••••••••••••••••••••••••••••••••••••••••••••'}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 shrink-0 ms-2"
+                      onClick={() => handleCopyNamed(credentialsModalClient.client_secret, 'env-client-secret')}
+                    >
+                      {copiedSection === 'env-client-secret' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* .env snippet */}
+                <div className="space-y-1 pt-2">
+                  <div className="flex items-center justify-between text-muted-foreground font-sans font-medium text-xs">
+                    <span className="flex items-center gap-1.5"><Terminal className="w-3.5 h-3.5" /> Ready .env Snippet:</span>
+                  </div>
+                  <div className="relative bg-slate-950 text-emerald-400 p-3 rounded-lg border font-mono text-[11px] overflow-x-auto">
+                    <pre>{`MUSOFTWARES_GATEWAY_URL=https://musoftwares.com/api/v1/partner
+MUSOFTWARES_CLIENT_KEY=${credentialsModalClient.client_key}
+MUSOFTWARES_CLIENT_SECRET=${credentialsModalClient.client_secret}`}</pre>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="flex-col sm:flex-row gap-2">
+                <Button
+                  type="button"
+                  variant="default"
+                  className="w-full sm:w-auto"
+                  onClick={() => {
+                    const snippet = `MUSOFTWARES_GATEWAY_URL=https://musoftwares.com/api/v1/partner\nMUSOFTWARES_CLIENT_KEY=${credentialsModalClient.client_key}\nMUSOFTWARES_CLIENT_SECRET=${credentialsModalClient.client_secret}`;
+                    handleCopyNamed(snippet, 'all-env');
+                  }}
+                >
+                  {copiedSection === 'all-env' ? (
+                    <>
+                      <Check className="w-4 h-4 mr-1.5 text-emerald-300" /> Copied .env Configuration!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-1.5" /> Copy Complete .env Snippet
+                    </>
+                  )}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setCredentialsModalClient(null)}>
+                  Close
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </AdminSidebarLayout>

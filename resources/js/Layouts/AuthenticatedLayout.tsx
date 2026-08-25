@@ -20,7 +20,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { 
-    Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
+    Key, Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
     Settings, User, Users, History, Shield, CreditCard, Box, 
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
     MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download,
@@ -762,6 +762,19 @@ function AuthenticatedContent({
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5">
                                                         <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3]">{__('general.services_tools') || __('general.services')}</p>
+
+                                                    <DropdownMenuItem 
+                                                        className="p-0 outline-none border-0 transition-colors duration-150 cursor-pointer rounded-[14px] hover:bg-[#f5f5f7] group"
+                                                        render={<SafeLink href="/partner-gateway" className="flex items-start gap-3 p-2.5 w-full" />}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                                            <Key className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[13px] font-semibold tracking-tight text-emerald-600">Partner Gateway API</span>
+                                                            <span className="text-[11px] text-[#86868b] leading-tight line-clamp-1">Developer Keys & B2B Usage Wallet</span>
+                                                        </div>
+                                                    </DropdownMenuItem>
                                                     </div>
 
                                                     <DropdownMenuItem 

@@ -235,6 +235,7 @@ ${formData.projectNotes || 'Standard Architectural Implementation'}
 Looking forward to reviewing the technical proposal!`;
 
         return `https://wa.me/201015218548?text=${encodeURIComponent(message)}`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData]);
 
     const handleNext = () => {

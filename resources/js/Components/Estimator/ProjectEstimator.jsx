@@ -547,6 +547,7 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
         });
 
         return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlatforms]);
 
     // Categories filter configuration
@@ -637,6 +638,7 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
             itemizedPlatforms,
             itemizedAddons,
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlatforms, platformScreens, selectedOptions, availableOptions, exchangeRate]);
 
     const formatPrice = (usdAmount) => {
@@ -665,6 +667,7 @@ ${modulesList || 'Standard Core Setup'}
 Please let me know when we can review the technical specification!`;
 
         return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlatforms, platformScreens, costBreakdown, isUsd, phoneNumber]);
 
     // Handle Proposal Form Submission

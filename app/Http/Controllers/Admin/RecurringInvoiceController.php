@@ -81,7 +81,7 @@ class RecurringInvoiceController extends Controller
     public function create()
     {
         $currencies = Currency::all();
-        $users = User::select('id', 'name', 'email')->orderBy('name')->limit(50)->get();
+        $users = User::select('id', 'name', 'email')->orderBy('name')->get();
 
         return Inertia::render('Admin/Business/RecurringInvoices/Create', [
             'currencies' => $currencies,

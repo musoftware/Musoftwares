@@ -153,6 +153,8 @@ const items: MenuItem[] = [
         { title: "Musoftware Clients", url: "/admin/musoftware-clients" },
         { title: "Serial Softwares", url: "/admin/serial-softwares" },
         { title: "Serial Devices", url: "/admin/serial-devices" },
+        
+        { title: "Partner Gateway (B2B API)", url: "/admin/partner-gateway" },
         { title: "Settings", url: "/admin/settings" },
         { title: "Security & Rate Limits", url: "/admin/settings/security" },
     ]

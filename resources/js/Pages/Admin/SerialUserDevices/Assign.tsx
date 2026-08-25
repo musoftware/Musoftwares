@@ -8,6 +8,7 @@ import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Textarea } from '@/Components/ui/textarea';
 import { ArrowLeft, Monitor, User } from 'lucide-react';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
@@ -94,19 +95,13 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
 
                             <div className="space-y-2">
                                 <Label>{__('general.assign_to_user')}</Label>
-                                <Select value={form.user_id} onValueChange={v => setForm(f => ({ ...f, user_id: v || '' }))}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder={__('general.select_a_user')} />
-                                    </SelectTrigger>
-                                    <SelectContent className="max-h-60">
-                                        {users.map(u => (
-                                            <SelectItem key={u.id} value={String(u.id)}>
-                                                <span>{u.name}</span>
-                                                <span className="text-slate-500 ms-2 text-xs">{u.email}</span>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <PremiumCombobox
+                                    value={form.user_id}
+                                    onChange={(v) => setForm(f => ({ ...f, user_id: v ? String(v) : '' }))}
+                                    options={users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))}
+                                    placeholder={__('general.select_a_user')}
+                                    searchPlaceholder={__('general.search_users')}
+                                />
                                 {errors.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
                             </div>
 

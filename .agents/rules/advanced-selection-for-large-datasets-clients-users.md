@@ -1,73 +1,73 @@
-# Rule: Advanced Selection for Large Datasets (Clients/Users)
+# Rule: Advanced Searchable Selection for Users, Clients, and Large Datasets
 
 ## Problem Statement
-Standard HTML `<select>` elements, basic unpaginated dropdowns, and un-debounced select menus load all records into the DOM at once. For systems with large datasets (such as $10\text{K}+$ clients), this causes massive DOM performance degradation, high memory overhead, slow API response times, and an unusable user experience. 
+Standard HTML `<select>` elements and basic unsearchable dropdowns provide a poor user experience, lack instant search/filtering by name or email, and degrade performance when datasets grow.
 
 ---
 
 ## Rules & Guidelines
 
-### 1. Simple Dropdown Prohibition
-- **Never** use a standard `<select>` dropdown, simple Shadcn/UI `<Select>`, or unpaginated popovers for selecting entities that scale beyond $100$ records (e.g., Clients, Projects, Users).
-- **Example of Failure**:
-  ```tsx
-  // ❌ INCORRECT (Loads all 10K clients in memory at once)
-  <select value={selectedClient} onChange={handleChange}>
-      {clients.map(client => (
-          <option key={client.id} value={client.id}>{client.name}</option>
-      ))}
-  </select>
-  ```
+### 1. Mandatory Use of `PremiumCombobox`
+- **Strictly Prohibited**: Never use raw HTML `<select>` or standard non-searchable UI dropdowns for selecting **Users**, **Clients**, **Employees**, or **Projects** across any part of the system (forms, modals, drawers, detail sheets, and filter bars).
+- **Mandatory Component**: Always import and use `PremiumCombobox` from `@/Components/ui/PremiumCombobox`.
+
+### 2. Standard Implementation Patterns
+
+#### A. Static Array Data (e.g., users/clients passed from Inertia props)
+```tsx
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+
+<div className="space-y-1.5">
+    <Label>{__('general.select_user')}</Label>
+    <PremiumCombobox
+        value={form.data.user_id ? String(form.data.user_id) : ''}
+        onChange={(val) => form.setData('user_id', val ? String(val) : '')}
+        options={users.map((u: any) => ({
+            value: String(u.id),
+            label: `${u.name} (${u.email || ''})`
+        }))}
+        placeholder={__('general.select_user')}
+        searchPlaceholder={__('general.search_users')}
+    />
+    {form.errors.user_id && <p className="text-xs text-destructive">{form.errors.user_id}</p>}
+</div>
+```
+
+#### B. Asynchronous Data (Large Datasets with Search Endpoint)
+```tsx
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+
+<PremiumCombobox
+    value={selectedId}
+    onChange={(val, opt) => handleSelect(val, opt)}
+    asyncEndpoint={route('admin.users.search')}
+    searchParam="q"
+    placeholder={__('general.select_client')}
+    searchPlaceholder={__('general.search_clients')}
+    debounceMs={300}
+/>
+```
+
+#### C. Filter Bars & Quick Assignment Drawers
+When used inside filter bars or compact headers, maintain a fixed or bounded width:
+```tsx
+<PremiumCombobox
+    className="w-[180px] sm:w-[220px]"
+    value={selectedUserFilter || ''}
+    onChange={(val) => setSelectedUserFilter(val ? String(val) : '')}
+    options={[
+        { value: '', label: __('general.all_users') },
+        ...users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email || ''})` }))
+    ]}
+    placeholder={__('general.all_users')}
+    searchPlaceholder={__('general.search_users')}
+/>
+```
 
 ---
 
-### 2. Mandatory Asynchronous Searchable Comboboxes
-- Always use an asynchronous, search-on-type combobox or popover input (e.g. a custom Combobox/Autocomplete component powered by debounced state).
-- The dropdown options must load dynamically from the backend as the user types.
-- Pre-selected values (e.g., in "Edit Form" states) must be loaded and formatted correctly, mapping the existing record without forcing the load of the entire dataset.
-
----
-
-### 3. Backend Search & Pagination Constraints
-- The backend controller or API endpoint feeding the client selection must **never** return all clients at once (e.g. avoiding `$clients = Client::all()`).
-- Always implement input query filtering (`q` or `search`) and paginate or limit the results to a small set (e.g., $15$ to $20$ items).
-- **Example API Logic**:
-  ```php
-  // ✅ CORRECT (Filtered, paginated, lightweight)
-  public function search(Request $request)
-  {
-      $search = $request->input('q');
-      
-      $clients = TenantClient::where('tenant_id', session('tenant_id'))
-          ->when($search, function ($query, $search) {
-              $query->where(function ($sub) use ($search) {
-                  $sub->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('phone', 'like', "%{$search}%");
-              });
-          })
-          ->limit(20)
-          ->get(['id', 'name', 'email', 'currency_id']);
-          
-      return response()->json($clients);
-  }
-  ```
-
----
-
-### 4. Frontend Debouncing & UX Patterns
-- **Debounced Fetch**: Frontend search inputs must debounce network requests (waiting at least $300\text{ms}$ after the user stops typing) to prevent server overload.
-- **Visual Feedback**: Display a loading spinner or skeleton loader while fetching results.
-- **Refinement Indicators**: If the results are capped (e.g., 20 items), display a notice such as *"Showing top 20 matches. Type to refine..."*.
-
----
-
-### 5. Summary Checklist
-- [ ] Are dropdowns for entities with potential large records (e.g. Clients) asynchronously searched?
-- [ ] Is server-side query input debounced on the frontend by at least $300\text{ms}$?
-- [ ] Does the backend endpoint filter and limit/paginate the database results?
-- [ ] Does the edit view correctly pre-load and display the selected item details without loading the full list?
-
-
-
----
+## 3. Summary Checklist
+- [ ] Are all User/Client/Employee selectors using `PremiumCombobox`?
+- [ ] Is raw `<select>` completely absent from all User/Client selection logic?
+- [ ] Are options formatted with descriptive labels (e.g. `Name (email)` or `Name (role)`)?
+- [ ] Are pre-selected / edit values properly cast to `String` matching `option.value`?
