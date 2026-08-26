@@ -23,28 +23,46 @@ import StudioHeader from '@/Components/Studio/StudioHeader';
 export default function LeadershipBio() {
     const milestones = [
         {
-            year: '2026',
+            year: '2021 – Present',
             role: 'Founder & Chief Software Architect',
-            organization: 'Musoftwares Studio',
-            desc: 'Leading engineering for next-generation multi-tenant cloud ERP engines, Meta API cloud integrations, and the autonomous runtime ecosystem.',
+            organization: 'Musoftware Studio',
+            desc: 'Leading the engineering of multi-tenant cloud ERP engines, official Meta Graph & WhatsApp Cloud API integrations, autonomous execution runtimes, and agentic AI workflows.',
         },
         {
-            year: '2023 - 2025',
-            role: 'Enterprise Systems Architect',
-            organization: 'High-Scale SaaS & FinTech',
-            desc: 'Engineered sub-millisecond double-entry ledger engines, real-time gold trading terminals, and distributed WhatsApp multi-agent dispatchers handling 1M+ daily transactions.',
+            year: '2026',
+            role: 'FinTech & Algorithmic Trading Architect',
+            organization: 'High-Frequency Trading & Custom Payment Systems',
+            desc: 'Engineered sub-millisecond double-entry ledger engines, high-speed Python Sniper Bots for gold and crypto markets, and automated SMS-to-Wallet payment bridges for WordPress & WooCommerce.',
         },
         {
-            year: '2019 - 2022',
-            role: 'Senior Full-Stack & Desktop Engineer',
-            organization: 'Bespoke Business Solutions',
-            desc: 'Developed 20+ specialized POS systems, custom hardware thermal printer synchronizers, and cross-platform desktop scrapers in C# and Laravel.',
+            year: '2021 – 2022',
+            role: 'Lead Cloud & Systems Architect',
+            organization: 'AmcTasks & AmcTurbo Platforms',
+            desc: 'Architected the unified marketing automation cloud ecosystem combining full academy capabilities and multi-channel bots, alongside the lightweight high-velocity AmcTurbo package.',
         },
         {
-            year: '2015 - 2018',
-            role: 'Core Systems Developer',
-            organization: 'Enterprise IT & Accounting Software',
-            desc: 'Architected offline-first relational databases, tax-compliant invoice engines (ETA/ZATCA), and inventory tracking platforms.',
+            year: '2020 – 2021',
+            role: 'Bots & Workflow Automation Architect',
+            organization: 'AmcFounder Platform',
+            desc: 'Engineered interactive visual chatbot flow builders, multi-channel automated messaging engines across Telegram, Facebook Messenger, Viber, and external webhook bridges.',
+        },
+        {
+            year: '2018 – 2020',
+            role: 'SaaS & Platform Architect',
+            organization: 'AMC Academy Platform',
+            desc: 'Built comprehensive CodeIgniter SaaS platform featuring automated Android APK builders, real-time push notification managers, custom automation script runners, and audience search engines.',
+        },
+        {
+            year: '2016 – 2018',
+            role: 'Multi-Platform Desktop & RPA Lead',
+            organization: 'AM Internet Control',
+            desc: 'Developed multi-threaded cross-platform desktop automation and scraping suite across Facebook, Instagram, YouTube, and digital media channels with resilient session managers.',
+        },
+        {
+            year: '2014 – 2016',
+            role: 'Core Automation & Reverse Engineering Developer',
+            organization: 'Facebook Control Project',
+            desc: 'Engineered full Facebook API scrapers, automated authentication and login handlers, and high-concurrency data streaming pipelines handling large-scale continuous extraction.',
         },
     ];
 

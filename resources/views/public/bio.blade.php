@@ -94,35 +94,18 @@
                     </h4>
 
                     <div class="space-y-3">
+                        @for ($i = 1; $i <= 7; $i++)
                         <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
                             <div class="flex justify-between items-baseline font-sans text-xs">
-                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_1_role') }}</span>
-                                <span class="text-[#0071e3] font-semibold">2026</span>
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_' . $i . '_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_' . $i . '_year') }}</span>
                             </div>
-                            <p class="text-xs text-[#1d1d1f]/60 font-sans">
-                                {{ __('landing_bio.milestone_1_desc') }}
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_' . $i . '_org') }}</div>
+                            <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
+                                {{ __('landing_bio.milestone_' . $i . '_desc') }}
                             </p>
                         </div>
-
-                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
-                            <div class="flex justify-between items-baseline font-sans text-xs">
-                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_2_role') }}</span>
-                                <span class="text-[#0071e3] font-semibold">2023 - 2025</span>
-                            </div>
-                            <p class="text-xs text-[#1d1d1f]/60 font-sans">
-                                {{ __('landing_bio.milestone_2_desc') }}
-                            </p>
-                        </div>
-
-                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
-                            <div class="flex justify-between items-baseline font-sans text-xs">
-                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_3_role') }}</span>
-                                <span class="text-[#0071e3] font-semibold">2019 - 2022</span>
-                            </div>
-                            <p class="text-xs text-[#1d1d1f]/60 font-sans">
-                                {{ __('landing_bio.milestone_3_desc') }}
-                            </p>
-                        </div>
+                        @endfor
                     </div>
                 </div>
 
