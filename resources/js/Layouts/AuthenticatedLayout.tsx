@@ -35,6 +35,7 @@ import BackgroundTaskStatus from '@/Components/Tools/BackgroundTaskStatus';
 
 import axios from 'axios';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { __ } from '@/lib/i18n';
 import { useFCM } from '@/hooks/useFCM';
 import { PageTransition } from '@/Components/ui/PageTransition';
@@ -957,6 +958,9 @@ function AuthenticatedContent({
                                     </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>
+
+                            {/* Theme Auto / Dark / Light Switcher */}
+                            <ThemeToggle className="h-8 w-8" />
 
                             {/* Profile */}
                             <DropdownMenu>

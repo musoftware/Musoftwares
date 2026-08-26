@@ -9,7 +9,13 @@ import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
 import { syncDocumentDirection } from '@/lib/i18n';
+import { initTheme } from '@/lib/theme';
 // WebSockets disabled for main SaaS
+
+// Initialize Auto / System / Dark / Light theme reactivity
+if (typeof window !== 'undefined') {
+    initTheme();
+}
 
 // Listen for Inertia page transitions to keep document lang & dir synced
 router.on('navigate', (event) => {

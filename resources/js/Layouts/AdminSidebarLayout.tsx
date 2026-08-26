@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/Admin/AppSidebar';
 import { Head, Link, usePage } from '@inertiajs/react';
 import SafeLink from '@/Components/SafeLink';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 
@@ -54,6 +55,8 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                         </div>
                     )}
                     
+                    <ThemeToggle className="h-9 w-9" />
+
                     {/* User Profile Dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger className="outline-none relative shrink-0">

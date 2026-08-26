@@ -3,6 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
 import SafeLink from '@/Components/SafeLink';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { __ } from '@/lib/i18n';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import {
@@ -105,8 +106,9 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                             </nav>
                         </div>
 
-                        {/* Auth actions */}
+                        {/* Auth actions & Theme */}
                         <div className="flex items-center gap-3">
+                            <ThemeToggle className="h-8 w-8" />
                             {isAuthed ? (
                                 <SafeLink href="/dashboard">
                                     <Button variant="outline" className="rounded-full text-sm font-medium">

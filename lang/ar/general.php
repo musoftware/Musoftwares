@@ -8206,4 +8206,7 @@ return array (
   'later' => 'لاحقاً',
   'write_comment_or_feedback' => 'اكتب تعليقاً أو ملاحظة...',
   'no_phone_number' => 'لا يوجد رقم هاتف مسجل لهذا العميل',
+  'dark' => 'داكن',
+  'light' => 'فاتح',
+  'system_auto' => 'تلقائي (حسب النظام)',
 );

@@ -10379,7 +10379,10 @@
             "invoice_settled_via_wallet": "تمت تسوية الفاتورة وخصمها من رصيد المحفظة بنجاح.",
             "later": "لاحقاً",
             "write_comment_or_feedback": "اكتب تعليقاً أو ملاحظة...",
-            "no_phone_number": "لا يوجد رقم هاتف مسجل لهذا العميل"
+            "no_phone_number": "لا يوجد رقم هاتف مسجل لهذا العميل",
+            "dark": "داكن",
+            "light": "فاتح",
+            "system_auto": "تلقائي (حسب النظام)"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -23225,7 +23228,10 @@
             "invoice_settled_via_wallet": "Invoice has been settled via your platform wallet.",
             "later": "Later",
             "write_comment_or_feedback": "Write a comment or feedback...",
-            "no_phone_number": "No phone number recorded for this client"
+            "no_phone_number": "No phone number recorded for this client",
+            "dark": "Dark",
+            "light": "Light",
+            "system_auto": "Auto (System)"
         },
         "gold_saver": {
             "achieved": "Achieved",

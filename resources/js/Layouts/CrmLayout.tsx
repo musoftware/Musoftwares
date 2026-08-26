@@ -1,6 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import SafeLink from '@/Components/SafeLink';
+import ThemeToggle from '@/Components/ThemeToggle';
 import {
     ChevronRight, ArrowLeft, LayoutDashboard, Users, Mail, PlayCircle, Settings,
     Search, Tag, MessageCircle, Smartphone, Bookmark, Zap, Clock, BarChart2,
@@ -121,7 +122,8 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                         </div>
                         <span className="font-semibold text-slate-900 tracking-tight">{workspaceName}</span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                        <ThemeToggle className="h-8 w-8" />
                         {isTeamMember ? (
                             <Link
                                 href={route('crm.team.logout')}

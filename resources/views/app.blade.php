@@ -11,6 +11,29 @@
 
         <title inertia>{{ isset($meta) && isset($meta['title']) ? $meta['title'] : config('app.name', 'Laravel') }}</title>
         <script>
+            (function() {
+                try {
+                    var theme = 'system';
+                    var stored = localStorage.getItem('app-storage');
+                    if (stored) {
+                        var parsed = JSON.parse(stored);
+                        if (parsed && parsed.state && parsed.state.theme) {
+                            theme = parsed.state.theme;
+                        }
+                    } else {
+                        var legacyTheme = localStorage.getItem('theme');
+                        if (legacyTheme) theme = legacyTheme;
+                    }
+                    var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    if (isDark) {
+                        document.documentElement.classList.add('dark');
+                        document.documentElement.style.colorScheme = 'dark';
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        document.documentElement.style.colorScheme = 'light';
+                    }
+                } catch(e) {}
+            })();
             window.addEventListener('message', function(e) {
                 if (e.data && e.data.type === 'FORCE_TOP_REDIRECT' && e.data.url) {
                     try { window.top.location.href = e.data.url; } catch(err) { window.location.href = e.data.url; }

@@ -8206,4 +8206,7 @@ return array (
   'later' => 'Later',
   'write_comment_or_feedback' => 'Write a comment or feedback...',
   'no_phone_number' => 'No phone number recorded for this client',
+  'dark' => 'Dark',
+  'light' => 'Light',
+  'system_auto' => 'Auto (System)',
 );
