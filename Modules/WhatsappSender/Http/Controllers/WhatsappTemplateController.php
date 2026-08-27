@@ -44,9 +44,11 @@ class WhatsappTemplateController extends Controller
             'components' => ['required', 'array'],
         ]);
 
-        $business = WhatsappBusiness::where('user_id', $user->id)
-            ->where('id', $validated['whatsapp_business_id'])
-            ->firstOrFail();
+        $businessQuery = WhatsappBusiness::where('id', $validated['whatsapp_business_id']);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         // Check if there is an active account to submit to Facebook
         $account = WhatsappAccount::where('whatsapp_business_id', $business->id)
@@ -94,10 +96,13 @@ class WhatsappTemplateController extends Controller
      */
     public function destroy(Request $request, int $id): RedirectResponse
     {
+        $user = $request->user();
         $template = WhatsappTemplate::findOrFail($id);
-        $business = WhatsappBusiness::where('user_id', $request->user()->id)
-            ->where('id', $template->whatsapp_business_id)
-            ->firstOrFail();
+        $businessQuery = WhatsappBusiness::where('id', $template->whatsapp_business_id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         $account = WhatsappAccount::where('whatsapp_business_id', $business->id)
             ->where('status', 'active')
@@ -120,9 +125,12 @@ class WhatsappTemplateController extends Controller
      */
     public function sync(Request $request, int $businessId): RedirectResponse
     {
-        $business = WhatsappBusiness::where('user_id', $request->user()->id)
-            ->where('id', $businessId)
-            ->firstOrFail();
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $businessId);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         $account = WhatsappAccount::where('whatsapp_business_id', $business->id)
             ->where('status', 'active')

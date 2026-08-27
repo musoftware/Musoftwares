@@ -66,9 +66,11 @@ class WhatsappScheduleController extends Controller
         }
 
         // Check ownership of business
-        $business = WhatsappBusiness::where('user_id', $user->id)
-            ->where('id', $validated['whatsapp_business_id'])
-            ->firstOrFail();
+        $businessQuery = WhatsappBusiness::where('id', $validated['whatsapp_business_id']);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         $accountId = null;
         $botId = null;
@@ -116,9 +118,17 @@ class WhatsappScheduleController extends Controller
      */
     public function destroy(Request $request, int $id): RedirectResponse
     {
-        $schedule = WhatsappSchedule::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $user = $request->user();
+        $query = WhatsappSchedule::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHas('business', function ($bq) use ($user) {
+                      $bq->where('user_id', $user->id);
+                  });
+            });
+        }
+        $schedule = $query->firstOrFail();
 
         $businessId = $schedule->whatsapp_business_id;
 

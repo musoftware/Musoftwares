@@ -18,12 +18,75 @@ use Modules\WhatsappSender\Models\WhatsappSchedule;
 use Modules\WhatsappSender\Models\TelegramBot;
 use Modules\WhatsappSender\Jobs\SendGroupCampaignJob;
 use Modules\WhatsappSender\Services\MetaWhatsappService;
+use Modules\WhatsappSender\Services\TelegramBotService;
 
 class WhatsappSenderController extends Controller
 {
     public function __construct(
-        protected MetaWhatsappService $whatsappService
-    ) {}
+        protected MetaWhatsappService $whatsappService,
+        protected ?TelegramBotService $telegramService = null
+    ) {
+        if (!$this->telegramService) {
+            $this->telegramService = app(TelegramBotService::class);
+        }
+    }
+
+    /**
+     * Find a WhatsApp account accessible to the current user (owner, business owner, or admin).
+     */
+    protected function findAccessibleAccount(Request $request, int|string $id): WhatsappAccount
+    {
+        $user = $request->user();
+        $query = WhatsappAccount::where('id', $id);
+
+        if (!$user->isAdmin()) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHas('business', function ($bq) use ($user) {
+                      $bq->where('user_id', $user->id);
+                  });
+            });
+        }
+
+        return $query->firstOrFail();
+    }
+
+    /**
+     * Find a Contact Group accessible to the current user.
+     */
+    protected function findAccessibleGroup(Request $request, int|string $id): WhatsappContactGroup
+    {
+        $user = $request->user();
+        $query = WhatsappContactGroup::where('id', $id);
+
+        if (!$user->isAdmin()) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHas('business', function ($bq) use ($user) {
+                      $bq->where('user_id', $user->id);
+                  });
+            });
+        }
+
+        return $query->firstOrFail();
+    }
+
+    /**
+     * Find a Telegram Bot accessible to the current user.
+     */
+    protected function findAccessibleTelegramBot(Request $request, int|string $id): TelegramBot
+    {
+        $user = $request->user();
+        $query = TelegramBot::where('id', $id);
+
+        if (!$user->isAdmin()) {
+            $query->whereHas('business', function ($bq) use ($user) {
+                $bq->where('user_id', $user->id);
+            });
+        }
+
+        return $query->firstOrFail();
+    }
 
     /**
      * Display the WhatsApp Sender dashboard.
@@ -291,9 +354,7 @@ class WhatsappSenderController extends Controller
      */
     public function updateAccount(Request $request, int $id): RedirectResponse
     {
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -333,12 +394,19 @@ class WhatsappSenderController extends Controller
     }
 
     /**
-     * Send a WhatsApp message via the web form.
+     * Send a WhatsApp or Telegram message via the web form.
      */
     public function sendMessage(Request $request): RedirectResponse
     {
+        if ($request->isMethod('GET')) {
+            return redirect()->route('whatsapp.index');
+        }
+
         $validated = $request->validate([
-            'whatsapp_account_id' => ['required', 'exists:whatsapp_accounts,id'],
+            'channel' => ['nullable', 'string', 'in:whatsapp,telegram'],
+            'whatsapp_account_id' => ['nullable', 'exists:whatsapp_accounts,id'],
+            'telegram_bot_id' => ['nullable', 'exists:telegram_bots,id'],
+            'whatsapp_business_id' => ['nullable', 'exists:whatsapp_businesses,id'],
             'recipient_phone' => ['required', 'string', 'max:50'],
             'message_body' => ['nullable', 'required_unless:message_type,template', 'string', 'max:4096'],
             'message_type' => ['nullable', 'string', 'in:text,template'],
@@ -348,15 +416,70 @@ class WhatsappSenderController extends Controller
             'template_parameters' => ['nullable'],
         ]);
 
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $validated['whatsapp_account_id'])
-            ->firstOrFail();
+        $channel = $validated['channel'] ?? ($request->filled('telegram_bot_id') ? 'telegram' : 'whatsapp');
+
+        if ($channel === 'telegram') {
+            if (empty($validated['telegram_bot_id'])) {
+                return redirect()->back()->with('error', 'Please select a Telegram Bot.');
+            }
+            $bot = $this->findAccessibleTelegramBot($request, $validated['telegram_bot_id']);
+            $result = $this->telegramService->sendMessage(
+                $bot,
+                $validated['recipient_phone'],
+                $validated['message_body'] ?? ''
+            );
+
+            if ($result['success']) {
+                return redirect()->back()->with('success', "Telegram message sent successfully! (Charged \${$result['cost_charged']} USD platform fee)");
+            }
+
+            return redirect()->back()->with('error', $result['error'] ?? 'Telegram message delivery failed.');
+        }
+
+        $accountId = $validated['whatsapp_account_id'] ?? null;
+        if (!$accountId) {
+            return redirect()->back()->with('error', 'Please select a WhatsApp sender device.');
+        }
+
+        $account = $this->findAccessibleAccount($request, $accountId);
 
         $templateData = null;
         if (($validated['message_type'] ?? 'text') === 'template') {
+            $templateName = $validated['template_name'] ?? 'hello_world';
+            $templateLang = $validated['template_language'] ?? null;
+
+            // Auto-detect template language from template database record if not specified or to match exact locale code (e.g. 'en' vs 'en_US')
+            $templateModel = null;
+            if (!empty($validated['whatsapp_business_id'])) {
+                $templateModel = WhatsappTemplate::where('whatsapp_business_id', $validated['whatsapp_business_id'])
+                    ->where('name', $templateName)
+                    ->first();
+            }
+            if (!$templateModel && $account->whatsapp_business_id) {
+                $templateModel = WhatsappTemplate::where('whatsapp_business_id', $account->whatsapp_business_id)
+                    ->where('name', $templateName)
+                    ->first();
+            }
+            if (!$templateModel) {
+                $templateModel = WhatsappTemplate::where('name', $templateName)->first();
+            }
+
+            if ($templateModel && $templateModel->status === 'REJECTED') {
+                return redirect()->back()->with('error', "القالب '{$templateName}' مرفوض (REJECTED) من إدارة فيسبوك ولا يمكن الإرسال به. يرجى اختيار قالب معتمد (APPROVED) مثل hello_world أو pending_invoice.");
+            }
+            if ($templateModel && $templateModel->status === 'PENDING') {
+                return redirect()->back()->with('error', "القالب '{$templateName}' ما زال قيد المراجعة (PENDING) لدى فيسبوك ولم يتم اعتماده بعد.");
+            }
+
+            if ($templateModel && !empty($templateModel->language)) {
+                $templateLang = $templateModel->language;
+            } elseif (empty($templateLang)) {
+                $templateLang = 'en_US';
+            }
+
             $templateData = [
-                'name' => $validated['template_name'] ?? 'hello_world',
-                'language' => $validated['template_language'] ?? 'en_US',
+                'name' => $templateName,
+                'language' => $templateLang,
             ];
 
             if (!empty($validated['template_components'])) {
@@ -418,9 +541,7 @@ class WhatsappSenderController extends Controller
      */
     public function destroyAccount(Request $request, int $id): RedirectResponse
     {
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $account->delete();
 
@@ -436,9 +557,7 @@ class WhatsappSenderController extends Controller
             'waba_id' => ['required', 'string', 'max:255'],
         ]);
 
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $account->update([
             'waba_id' => trim($validated['waba_id']),
@@ -452,9 +571,7 @@ class WhatsappSenderController extends Controller
      */
     public function registerAccount(Request $request, int $id): RedirectResponse
     {
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         if ($request->isMethod('GET')) {
             if ($account->whatsapp_business_id) {
@@ -485,9 +602,7 @@ class WhatsappSenderController extends Controller
      */
     public function syncAccountStatus(Request $request, int $id): RedirectResponse
     {
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         if ($request->isMethod('GET')) {
             if ($account->whatsapp_business_id) {
@@ -525,9 +640,7 @@ class WhatsappSenderController extends Controller
      */
     public function testAccount(Request $request, int $id): RedirectResponse
     {
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         if ($request->isMethod('GET')) {
             if ($account->whatsapp_business_id) {
@@ -554,9 +667,7 @@ class WhatsappSenderController extends Controller
      */
     public function requestCodeAccount(Request $request, int $id): RedirectResponse
     {
-        $account = WhatsappAccount::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         if ($request->isMethod('GET')) {
             if ($account->whatsapp_business_id) {
@@ -592,6 +703,10 @@ class WhatsappSenderController extends Controller
      */
     public function sendGroupCampaign(Request $request): RedirectResponse
     {
+        if ($request->isMethod('GET')) {
+            return redirect()->route('whatsapp.index');
+        }
+
         $validated = $request->validate([
             'whatsapp_account_id' => ['required', 'exists:whatsapp_accounts,id'],
             'whatsapp_contact_group_id' => ['required', 'exists:whatsapp_contact_groups,id'],
@@ -602,15 +717,8 @@ class WhatsappSenderController extends Controller
             'template_components' => ['nullable', 'array'],
         ]);
 
-        $user = $request->user();
-
-        $account = WhatsappAccount::where('user_id', $user->id)
-            ->where('id', $validated['whatsapp_account_id'])
-            ->firstOrFail();
-
-        $group = WhatsappContactGroup::where('user_id', $user->id)
-            ->where('id', $validated['whatsapp_contact_group_id'])
-            ->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $validated['whatsapp_account_id']);
+        $group = $this->findAccessibleGroup($request, $validated['whatsapp_contact_group_id']);
 
         SendGroupCampaignJob::dispatch(
             $account,
@@ -1150,12 +1258,7 @@ class WhatsappSenderController extends Controller
      */
     public function getAccountProfile(Request $request, int $id)
     {
-        $user = $request->user();
-        $query = WhatsappAccount::where('id', $id);
-        if (!$user->isAdmin()) {
-            $query->where('user_id', $user->id);
-        }
-        $account = $query->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $profileResult = $this->whatsappService->getBusinessProfile($account);
         $healthResult = $this->whatsappService->getPhoneHealthAndLimits($account);
@@ -1182,12 +1285,7 @@ class WhatsappSenderController extends Controller
      */
     public function updateAccountProfile(Request $request, int $id)
     {
-        $user = $request->user();
-        $query = WhatsappAccount::where('id', $id);
-        if (!$user->isAdmin()) {
-            $query->where('user_id', $user->id);
-        }
-        $account = $query->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $validated = $request->validate([
             'about' => ['nullable', 'string', 'max:139'],
@@ -1220,12 +1318,7 @@ class WhatsappSenderController extends Controller
      */
     public function uploadAccountPhoto(Request $request, int $id)
     {
-        $user = $request->user();
-        $query = WhatsappAccount::where('id', $id);
-        if (!$user->isAdmin()) {
-            $query->where('user_id', $user->id);
-        }
-        $account = $query->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $request->validate([
             'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'], // Max 5MB
@@ -1252,12 +1345,7 @@ class WhatsappSenderController extends Controller
      */
     public function deleteAccountPhoto(Request $request, int $id)
     {
-        $user = $request->user();
-        $query = WhatsappAccount::where('id', $id);
-        if (!$user->isAdmin()) {
-            $query->where('user_id', $user->id);
-        }
-        $account = $query->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $result = $this->whatsappService->deleteProfilePicture($account);
 
@@ -1272,12 +1360,7 @@ class WhatsappSenderController extends Controller
      */
     public function updateAccountPin(Request $request, int $id)
     {
-        $user = $request->user();
-        $query = WhatsappAccount::where('id', $id);
-        if (!$user->isAdmin()) {
-            $query->where('user_id', $user->id);
-        }
-        $account = $query->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $validated = $request->validate([
             'pin' => ['required', 'string', 'size:6', 'regex:/^[0-9]{6}$/'],
@@ -1303,12 +1386,7 @@ class WhatsappSenderController extends Controller
      */
     public function syncAccountHealth(Request $request, int $id)
     {
-        $user = $request->user();
-        $query = WhatsappAccount::where('id', $id);
-        if (!$user->isAdmin()) {
-            $query->where('user_id', $user->id);
-        }
-        $account = $query->firstOrFail();
+        $account = $this->findAccessibleAccount($request, $id);
 
         $healthResult = $this->whatsappService->getPhoneHealthAndLimits($account);
 

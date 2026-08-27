@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminCurrencyController;
 use App\Http\Controllers\Admin\AdminCurrencyExchangeController;
 use App\Http\Controllers\Admin\AdminFreeDownloadController;
+use App\Http\Controllers\Admin\AdminLanguageLineController;
 use App\Http\Controllers\Admin\AdminOutgoingEmailController;
 use App\Http\Controllers\Admin\AdminPartnerGatewayController;
 use App\Http\Controllers\Admin\AdminPaymentMethodController;

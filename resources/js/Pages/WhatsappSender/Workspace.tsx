@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { Head, useForm, router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -327,6 +329,7 @@ export default function Workspace({
     };
 
     // 3. Quick Send & Scheduler form
+    const defaultTemplate = templates.find(t => t.status === 'APPROVED') || templates[0];
     const sendForm = useForm({
         channel: 'whatsapp',
         whatsapp_account_id: accounts[0]?.id || '',
@@ -336,23 +339,31 @@ export default function Workspace({
         recipient_phone: '',
         message_type: 'text',
         message_body: '',
-        template_name: templates[0]?.name || '',
-        template_language: 'en_US',
+        template_name: defaultTemplate?.name || '',
+        template_language: defaultTemplate?.language || 'en_US',
         template_components: [] as any[],
         is_scheduled: false,
         scheduled_at: '',
     });
 
     useEffect(() => {
-        sendForm.setData(data => ({
-            ...data,
-            channel: activeChannel,
-            whatsapp_account_id: accounts[0]?.id || '',
-            telegram_bot_id: bots[0]?.id || '',
-            message_type: activeChannel === 'telegram' ? 'text' : data.message_type
-        }));
+        const approvedTpl = templates.find(t => t.status === 'APPROVED') || templates[0];
+        sendForm.setData(data => {
+            const currentTpl = templates.find(t => t.name === data.template_name);
+            const validName = (currentTpl && currentTpl.status === 'APPROVED') ? currentTpl.name : approvedTpl?.name || '';
+            const validLang = (currentTpl && currentTpl.status === 'APPROVED') ? currentTpl.language : approvedTpl?.language || 'en_US';
+            return {
+                ...data,
+                channel: activeChannel,
+                whatsapp_account_id: accounts[0]?.id || '',
+                telegram_bot_id: bots[0]?.id || '',
+                template_name: validName,
+                template_language: validLang,
+                message_type: activeChannel === 'telegram' ? 'text' : data.message_type
+            };
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeChannel, accounts, bots]);
+    }, [activeChannel, accounts, bots, templates]);
 
     const [mappedVariables, setMappedVariables] = useState<{ [key: string]: string }>({});
 
@@ -369,7 +380,6 @@ export default function Workspace({
             const params = Array.from({ length: variableCount }).map((_, i) => ({
                 type: 'text',
                 text: mappedVariables[`var_${i + 1}`] || '',
-                value: mappedVariables[`var_${i + 1}`] || '',
             }));
             componentsPayload = [{
                 type: 'body',
@@ -377,7 +387,9 @@ export default function Workspace({
             }];
         }
 
-        const endpoint = sendForm.data.is_scheduled ? '/whatsapp-sender/schedules' : '/whatsapp-sender/send';
+        const endpoint = sendForm.data.is_scheduled
+            ? '/whatsapp-sender/schedules'
+            : (sendForm.data.recipient_source === 'group' ? '/whatsapp-sender/send-campaign' : '/whatsapp-sender/send');
 
         const payloadMessageBody = sendForm.data.message_type === 'template'
             ? (bodyText || sendForm.data.template_name || 'Template Message')
@@ -572,28 +584,33 @@ export default function Workspace({
                                     Active Workspace
                                 </span>
 
-                                {/* Stripe-style Test Mode Toggle */}
-                                <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 px-3 py-1 rounded-full">
-                                    <button
-                                        type="button"
-                                        onClick={() => router.post(route('whatsapp.businesses.toggle-test-mode', business.id))}
-                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                            business.is_test_mode ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'
-                                        }`}
-                                        title={business.is_test_mode ? 'Switch to Live Mode' : 'Switch to Test Mode (Sandbox)'}
-                                    >
-                                        <span
-                                            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                business.is_test_mode ? 'translate-x-4' : 'translate-x-0'
-                                            }`}
-                                        />
-                                    </button>
-                                    <span className={`text-xs font-bold uppercase tracking-wider ${
-                                        business.is_test_mode ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-500'
-                                    }`}>
-                                        {business.is_test_mode ? 'Test Mode' : 'Live'}
-                                    </span>
-                                </div>
+                                 {/* Stripe-style Test/Live Mode Toggle */}
+                                 <div className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-all duration-200 ${
+                                     business.is_test_mode
+                                         ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800'
+                                         : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800'
+                                 }`}>
+                                     <button
+                                         type="button"
+                                         onClick={() => router.post(route('whatsapp.businesses.toggle-test-mode', business.id))}
+                                         className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                             business.is_test_mode ? 'bg-amber-500' : 'bg-emerald-500'
+                                         }`}
+                                         title={business.is_test_mode ? 'Click to Switch to Live Production Mode' : 'Click to Switch to Sandbox Test Mode'}
+                                     >
+                                         <span
+                                             className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                 business.is_test_mode ? 'translate-x-0' : 'translate-x-4'
+                                             }`}
+                                         />
+                                     </button>
+                                     <span className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+                                         business.is_test_mode ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'
+                                     }`}>
+                                         <span className={`w-1.5 h-1.5 rounded-full ${business.is_test_mode ? 'bg-amber-500' : 'bg-emerald-500 animate-pulse'}`} />
+                                         {business.is_test_mode ? 'Test Mode (Sandbox)' : 'Live Production'}
+                                     </span>
+                                 </div>
 
                                 <button
                                     onClick={() => setShowEditModal(true)}
@@ -849,12 +866,27 @@ export default function Workspace({
                                                     <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2 font-medium">Select Approved Template</label>
                                                     <select
                                                         value={sendForm.data.template_name}
-                                                        onChange={e => sendForm.setData('template_name', e.target.value)}
+                                                        onChange={e => {
+                                                            const tpl = templates.find(t => t.name === e.target.value);
+                                                            sendForm.setData(data => ({
+                                                                ...data,
+                                                                template_name: e.target.value,
+                                                                template_language: tpl?.language || 'en_US',
+                                                            }));
+                                                        }}
                                                         className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                                     >
-                                                        {templates.map(tpl => (
-                                                            <option key={tpl.id} value={tpl.name}>{tpl.name} ({tpl.language})</option>
-                                                        ))}
+                                                        {templates
+                                                            .slice()
+                                                            .sort((a, b) => (a.status === 'APPROVED' ? -1 : 1))
+                                                            .map(tpl => {
+                                                                const isApproved = tpl.status === 'APPROVED';
+                                                                return (
+                                                                    <option key={tpl.id} value={tpl.name} disabled={!isApproved}>
+                                                                        {tpl.name} ({tpl.language}) — [{tpl.status}]{!isApproved ? ' (Cannot Send)' : ''}
+                                                                    </option>
+                                                                );
+                                                            })}
                                                         {templates.length === 0 && <option value="">No templates registered</option>}
                                                     </select>
                                                 </div>

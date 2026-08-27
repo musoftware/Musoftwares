@@ -67,8 +67,8 @@ class SendGroupCampaignJob implements ShouldQueue
                     if (!empty($comp['parameters'])) {
                         $resolvedParams = [];
                         foreach ($comp['parameters'] as $param) {
-                            $resolvedParam = ['type' => $param['type']];
-                            $valueKey = $param['value'] ?? '';
+                            $resolvedParam = ['type' => $param['type'] ?? 'text'];
+                            $valueKey = $param['text'] ?? $param['value'] ?? '';
 
                             if ($valueKey === 'name') {
                                 $resolvedParam['text'] = $contact->name ?? '';

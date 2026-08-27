@@ -76,8 +76,36 @@ class MetaWhatsappService
                     if (!is_array($comp)) continue;
                     // Only accept runtime parameter structures (must contain 'parameters' array)
                     if (!empty($comp['parameters']) && is_array($comp['parameters'])) {
-                        $comp['type'] = strtolower($comp['type'] ?? 'body');
-                        $validComponents[] = $comp;
+                        $sanitizedParams = [];
+                        foreach ($comp['parameters'] as $param) {
+                            if (!is_array($param)) continue;
+                            $paramType = strtolower($param['type'] ?? 'text');
+                            if ($paramType === 'image') {
+                                $sanitizedParams[] = [
+                                    'type' => 'image',
+                                    'image' => $param['image'] ?? ['link' => $param['link'] ?? $param['url'] ?? ''],
+                                ];
+                            } elseif ($paramType === 'document') {
+                                $sanitizedParams[] = [
+                                    'type' => 'document',
+                                    'document' => $param['document'] ?? ['link' => $param['link'] ?? $param['url'] ?? ''],
+                                ];
+                            } elseif ($paramType === 'video') {
+                                $sanitizedParams[] = [
+                                    'type' => 'video',
+                                    'video' => $param['video'] ?? ['link' => $param['link'] ?? $param['url'] ?? ''],
+                                ];
+                            } else {
+                                $sanitizedParams[] = [
+                                    'type' => 'text',
+                                    'text' => (string) ($param['text'] ?? $param['value'] ?? ''),
+                                ];
+                            }
+                        }
+                        $validComponents[] = [
+                            'type' => strtolower($comp['type'] ?? 'body'),
+                            'parameters' => $sanitizedParams,
+                        ];
                     }
                 }
                 if (!empty($validComponents)) {

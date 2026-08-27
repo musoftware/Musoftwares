@@ -35,7 +35,7 @@ Route::middleware(['auth'])
         Route::delete('/accounts/{id}/profile/photo', [WhatsappSenderController::class, 'deleteAccountPhoto'])->name('accounts.profile.photo.delete');
         Route::post('/accounts/{id}/pin', [WhatsappSenderController::class, 'updateAccountPin'])->name('accounts.pin.update');
         Route::post('/accounts/{id}/health-sync', [WhatsappSenderController::class, 'syncAccountHealth'])->name('accounts.health.sync');
-        Route::post('/send', [WhatsappSenderController::class, 'sendMessage'])->name('send');
+        Route::match(['GET', 'POST'], '/send', [WhatsappSenderController::class, 'sendMessage'])->name('send');
 
         // Telegram Bots Management routes
         Route::post('/telegram-bots', [TelegramBotController::class, 'store'])->name('telegram-bots.store');
@@ -80,7 +80,7 @@ Route::middleware(['auth'])
         // Scheduler & Campaigns routes
         Route::post('/schedules', [WhatsappScheduleController::class, 'store'])->name('schedules.store');
         Route::delete('/schedules/{id}', [WhatsappScheduleController::class, 'destroy'])->name('schedules.destroy');
-        Route::post('/send-campaign', [WhatsappSenderController::class, 'sendGroupCampaign'])->name('campaign.send');
+        Route::match(['GET', 'POST'], '/send-campaign', [WhatsappSenderController::class, 'sendGroupCampaign'])->name('campaign.send');
 
         // Telegram Subscribers Management routes
         Route::post('/telegram-subscriber-groups', [TelegramSubscriberController::class, 'storeGroup'])->name('telegram.groups.store');

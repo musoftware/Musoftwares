@@ -40,9 +40,17 @@ class WhatsappContactController extends Controller
      */
     public function destroyGroup(Request $request, int $id): RedirectResponse
     {
-        $group = WhatsappContactGroup::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $user = $request->user();
+        $query = WhatsappContactGroup::where('id', $id);
+        if (!$user->isAdmin()) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHas('business', function ($bq) use ($user) {
+                      $bq->where('user_id', $user->id);
+                  });
+            });
+        }
+        $group = $query->firstOrFail();
 
         $group->delete();
 
@@ -54,9 +62,17 @@ class WhatsappContactController extends Controller
      */
     public function storeContacts(Request $request, int $groupId): RedirectResponse
     {
-        $group = WhatsappContactGroup::where('user_id', $request->user()->id)
-            ->where('id', $groupId)
-            ->firstOrFail();
+        $user = $request->user();
+        $query = WhatsappContactGroup::where('id', $groupId);
+        if (!$user->isAdmin()) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHas('business', function ($bq) use ($user) {
+                      $bq->where('user_id', $user->id);
+                  });
+            });
+        }
+        $group = $query->firstOrFail();
 
         $validated = $request->validate([
             'contacts_text' => ['nullable', 'string'],
@@ -161,12 +177,20 @@ class WhatsappContactController extends Controller
      */
     public function destroyContact(Request $request, int $id): RedirectResponse
     {
+        $user = $request->user();
         $contact = WhatsappContact::findOrFail($id);
         
-        // Ensure user owns the group
-        WhatsappContactGroup::where('user_id', $request->user()->id)
-            ->where('id', $contact->whatsapp_contact_group_id)
-            ->firstOrFail();
+        // Ensure user has access to the group
+        $groupQuery = WhatsappContactGroup::where('id', $contact->whatsapp_contact_group_id);
+        if (!$user->isAdmin()) {
+            $groupQuery->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHas('business', function ($bq) use ($user) {
+                      $bq->where('user_id', $user->id);
+                  });
+            });
+        }
+        $groupQuery->firstOrFail();
 
         $contact->delete();
 

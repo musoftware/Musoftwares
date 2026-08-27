@@ -26,9 +26,12 @@ class TelegramBotController extends Controller
             'token' => ['required', 'string'],
         ]);
 
-        $business = WhatsappBusiness::where('user_id', $request->user()->id)
-            ->where('id', $validated['whatsapp_business_id'])
-            ->firstOrFail();
+        $user = $request->user();
+        $businessQuery = WhatsappBusiness::where('id', $validated['whatsapp_business_id']);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         // Query Telegram API to verify token and fetch details
         $details = $this->telegramService->getBotDetails($validated['token']);
@@ -67,10 +70,13 @@ class TelegramBotController extends Controller
      */
     public function destroy(Request $request, int $id): RedirectResponse
     {
+        $user = $request->user();
         $bot = TelegramBot::findOrFail($id);
-        $business = WhatsappBusiness::where('user_id', $request->user()->id)
-            ->where('id', $bot->whatsapp_business_id)
-            ->firstOrFail();
+        $businessQuery = WhatsappBusiness::where('id', $bot->whatsapp_business_id);
+        if (!$user->isAdmin()) {
+            $businessQuery->where('user_id', $user->id);
+        }
+        $business = $businessQuery->firstOrFail();
 
         // Delete Webhook from Telegram
         $this->telegramService->deleteWebhook($bot);

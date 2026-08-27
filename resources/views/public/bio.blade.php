@@ -94,18 +94,82 @@
                     </h4>
 
                     <div class="space-y-3">
-                        @for ($i = 1; $i <= 7; $i++)
                         <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
                             <div class="flex justify-between items-baseline font-sans text-xs">
-                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_' . $i . '_role') }}</span>
-                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_' . $i . '_year') }}</span>
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_1_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_1_year') }}</span>
                             </div>
-                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_' . $i . '_org') }}</div>
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_1_org') }}</div>
                             <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
-                                {{ __('landing_bio.milestone_' . $i . '_desc') }}
+                                {{ __('landing_bio.milestone_1_desc') }}
                             </p>
                         </div>
-                        @endfor
+
+                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
+                            <div class="flex justify-between items-baseline font-sans text-xs">
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_2_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_2_year') }}</span>
+                            </div>
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_2_org') }}</div>
+                            <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
+                                {{ __('landing_bio.milestone_2_desc') }}
+                            </p>
+                        </div>
+
+                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
+                            <div class="flex justify-between items-baseline font-sans text-xs">
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_3_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_3_year') }}</span>
+                            </div>
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_3_org') }}</div>
+                            <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
+                                {{ __('landing_bio.milestone_3_desc') }}
+                            </p>
+                        </div>
+
+                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
+                            <div class="flex justify-between items-baseline font-sans text-xs">
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_4_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_4_year') }}</span>
+                            </div>
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_4_org') }}</div>
+                            <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
+                                {{ __('landing_bio.milestone_4_desc') }}
+                            </p>
+                        </div>
+
+                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
+                            <div class="flex justify-between items-baseline font-sans text-xs">
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_5_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_5_year') }}</span>
+                            </div>
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_5_org') }}</div>
+                            <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
+                                {{ __('landing_bio.milestone_5_desc') }}
+                            </p>
+                        </div>
+
+                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
+                            <div class="flex justify-between items-baseline font-sans text-xs">
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_6_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_6_year') }}</span>
+                            </div>
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_6_org') }}</div>
+                            <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
+                                {{ __('landing_bio.milestone_6_desc') }}
+                            </p>
+                        </div>
+
+                        <div class="bg-white border border-black/5 rounded-[20px] shadow-sm p-6 space-y-2">
+                            <div class="flex justify-between items-baseline font-sans text-xs">
+                                <span class="text-[#1d1d1f] font-bold text-sm">{{ __('landing_bio.milestone_7_role') }}</span>
+                                <span class="text-[#0071e3] font-semibold">{{ __('landing_bio.milestone_7_year') }}</span>
+                            </div>
+                            <div class="text-xs text-[#1d1d1f]/50 font-medium">{{ __('landing_bio.milestone_7_org') }}</div>
+                            <p class="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed pt-1">
+                                {{ __('landing_bio.milestone_7_desc') }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
