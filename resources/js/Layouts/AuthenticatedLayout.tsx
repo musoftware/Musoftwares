@@ -245,6 +245,11 @@ function AuthenticatedContent({
                                         <div className="flex-1 overflow-y-auto p-4 space-y-6">
                                             {/* Mobile Nav Links */}
                                             <div className="space-y-1">
+                                                {isMarketplaceActive && (
+                                                    <div className="mb-3 px-1">
+                                                        <MarketplaceModeToggle />
+                                                    </div>
+                                                )}
                                                 {auth?.team_member ? (
                                                     <SafeLink href={safeRoute('sso.redirect', { system: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f] font-medium">
                                                         <LayoutDashboard className="w-5 h-5 text-[#0071e3]" /> {__('general.dashboard')}</SafeLink>
@@ -252,9 +257,35 @@ function AuthenticatedContent({
                                                     <>
                                                         <SafeLink href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] text-[#1d1d1f] font-medium">
                                                             <LayoutDashboard className="w-5 h-5 text-[#0071e3]" /> {__('general.dashboard')}</SafeLink>
-                                                        <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-emerald-50 text-emerald-700 font-medium">
-                                                            <Plus className="w-5 h-5 text-emerald-500" />{__('general.add_balance')}
-                                                        </Link>
+                                                        
+                                                        {/* Financials & Balance in Drawer */}
+                                                        <div className="my-2 p-3 bg-[#f5f5f7] rounded-2xl border border-black/5 space-y-2.5">
+                                                            <div className="flex items-center justify-between text-xs">
+                                                                <span className="text-[#1d1d1f]/60 font-medium">{__('general.wallet_balance')}</span>
+                                                                <SafeLink
+                                                                    href={safeRoute('financial.transactions')}
+                                                                    onClick={() => setIsMobileOpen(false)}
+                                                                    className="font-bold text-[#1d1d1f] hover:text-[#0071e3] flex items-center gap-1.5"
+                                                                >
+                                                                    <Wallet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                                                    <span>{wallet ? formatMoney(wallet.balance, wallet.currency) : formatMoney(0, (auth?.user as any)?.currency)}</span>
+                                                                </SafeLink>
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-xs">
+                                                                <span className="text-[#1d1d1f]/60 font-medium">{__('general.points_connects_balance')}</span>
+                                                                <SafeLink
+                                                                    href={safeRoute('points.index', undefined, '/points')}
+                                                                    onClick={() => setIsMobileOpen(false)}
+                                                                    className="font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1.5"
+                                                                >
+                                                                    <Coins className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                                                    <span>{user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}</span>
+                                                                </SafeLink>
+                                                            </div>
+                                                            <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-emerald-600 text-white font-medium text-xs hover:bg-emerald-700 transition-colors shadow-xs">
+                                                                <Plus className="w-4 h-4 text-white" />{__('general.add_balance')}
+                                                            </Link>
+                                                        </div>
  
                                                         <div className="mt-4 pt-2 border-t border-black/5">
                                                             <Accordion className="w-full">
@@ -849,7 +880,7 @@ function AuthenticatedContent({
                         {/* RIGHT: Financials, Tour Button & Profile */}
                         <div className="flex items-center gap-2 sm:gap-2.5">
                             {isMarketplaceActive && (
-                                <div className="me-1">
+                                <div className="hidden md:block me-1">
                                     <MarketplaceModeToggle />
                                 </div>
                             )}

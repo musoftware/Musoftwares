@@ -73,7 +73,7 @@ export default function Notes({ user, notes, stats }) {
 
     const idleTimerRef = useRef(null);
 
-    const [viewMode, setViewMode] = useState(() => localStorage.getItem('notes_view_mode') || 'card');
+    const [viewMode, setViewMode] = useState(() => localStorage.getItem('notes_view_mode') || 'list');
 
     useEffect(() => {
         localStorage.setItem('notes_view_mode', viewMode);
@@ -568,19 +568,19 @@ export default function Notes({ user, notes, stats }) {
                             <div className="flex items-center gap-1 border border-slate-200 rounded-lg p-0.5 bg-slate-50">
                                 <button
                                     type="button"
-                                    className={`h-8 w-8 rounded flex items-center justify-center transition-all ${viewMode === 'card' ? 'bg-white text-slate-900 shadow-sm border border-slate-200 font-bold' : 'text-slate-500 hover:text-slate-900'}`}
-                                    onClick={() => setViewMode('card')}
-                                    title={__('general.card_view') || 'Card View'}
-                                >
-                                    <LayoutGrid size={15} />
-                                </button>
-                                <button
-                                    type="button"
                                     className={`h-8 w-8 rounded flex items-center justify-center transition-all ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm border border-slate-200 font-bold' : 'text-slate-500 hover:text-slate-900'}`}
                                     onClick={() => setViewMode('list')}
                                     title={__('general.list_view') || 'List View'}
                                 >
                                     <List size={15} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`h-8 w-8 rounded flex items-center justify-center transition-all ${viewMode === 'card' ? 'bg-white text-slate-900 shadow-sm border border-slate-200 font-bold' : 'text-slate-500 hover:text-slate-900'}`}
+                                    onClick={() => setViewMode('card')}
+                                    title={__('general.card_view') || 'Card View'}
+                                >
+                                    <LayoutGrid size={15} />
                                 </button>
                                 <button
                                     type="button"
@@ -1426,121 +1426,73 @@ function ListViewRow({
     handleDelete,
     getCategoryIcon,
 }) {
-    const [pwdReveal, setPwdReveal] = useState(false);
-
-    const renderInlineParsed = () => {
-        if (!isPasswordSet || !note.parsed) {
-            return (
-                <span className="text-xs text-slate-400 font-medium">
-                    {isPasswordSet ? note.decryptedContent || '-' : '[Encrypted]'}
-                </span>
-            );
-        }
-        
-        const { username, password, anydeskId, anydeskPassword } = note.parsed;
-        
-        return (
-            <div className="flex flex-wrap gap-2 text-xs">
-                {username && (
-                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">U:</span>
-                        <span className="font-mono font-semibold">{username}</span>
-                        <button
-                            type="button"
-                            onClick={() => handleCopyCard(username, `${note.id}-u`)}
-                            className="text-slate-400 hover:text-slate-600"
-                        >
-                            {copiedId === `${note.id}-u` ? <Check size={10} /> : <Copy size={10} />}
-                        </button>
-                    </span>
-                )}
-                {password && (
-                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">P:</span>
-                        <span className="font-mono font-semibold">{pwdReveal ? password : '••••••••'}</span>
-                        <button
-                            type="button"
-                            onClick={() => setPwdReveal(!pwdReveal)}
-                            className="text-slate-400 hover:text-slate-600"
-                        >
-                            {pwdReveal ? <EyeOff size={10} /> : <Eye size={10} />}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handleCopyCard(password, `${note.id}-p`)}
-                            className="text-slate-400 hover:text-slate-600"
-                        >
-                            {copiedId === `${note.id}-p` ? <Check size={10} /> : <Copy size={10} />}
-                        </button>
-                    </span>
-                )}
-                {anydeskId && (
-                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">AD ID:</span>
-                        <span className="font-mono font-semibold">{anydeskId}</span>
-                        <button
-                            type="button"
-                            onClick={() => handleCopyCard(anydeskId, `${note.id}-ad-id`)}
-                            className="text-slate-400 hover:text-slate-600"
-                        >
-                            {copiedId === `${note.id}-ad-id` ? <Check size={10} /> : <Copy size={10} />}
-                        </button>
-                    </span>
-                )}
-                {anydeskPassword && (
-                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded text-slate-700">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">AD P:</span>
-                        <span className="font-mono font-semibold">{pwdReveal ? anydeskPassword : '••••••••'}</span>
-                        <button
-                            type="button"
-                            onClick={() => setPwdReveal(!pwdReveal)}
-                            className="text-slate-400 hover:text-slate-600"
-                        >
-                            {pwdReveal ? <EyeOff size={10} /> : <Eye size={10} />}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handleCopyCard(anydeskPassword, `${note.id}-ad-p`)}
-                            className="text-slate-400 hover:text-slate-600"
-                        >
-                            {copiedId === `${note.id}-ad-p` ? <Check size={10} /> : <Copy size={10} />}
-                        </button>
-                    </span>
-                )}
-            </div>
-        );
-    };
+    const isEncrypted = !isPasswordSet || !note.decryptedContent || String(note.decryptedContent).startsWith('🔒');
 
     return (
         <tr className={`hover:bg-slate-50/50 transition-colors ${selectedIds.includes(note.id) ? 'bg-slate-50' : ''}`}>
-            <td className="p-3">
+            <td className="p-3 align-top">
                 <Checkbox
                     checked={selectedIds.includes(note.id)}
                     onCheckedChange={() => toggleSelect(note.id)}
                     aria-label={__('general.select_note')}
                 />
             </td>
-            <td className="p-3 font-semibold text-slate-900">
-                <div className="flex items-center gap-1.5">
-                    {note.is_pinned && <Pin size={12} className="text-slate-800 fill-slate-800 shrink-0" />}
-                    <span className="truncate max-w-[200px]" title={note.decryptedTitle}>
-                        {note.decryptedTitle || note.title}
-                    </span>
+            <td className="p-3 align-top font-semibold text-slate-900">
+                <div className="flex flex-col gap-1 min-w-[140px] max-w-[200px]">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        {note.is_pinned && <Pin size={12} className="text-slate-800 fill-slate-800 shrink-0" />}
+                        <span className="break-words font-semibold text-sm text-slate-900" title={note.decryptedTitle}>
+                            {note.decryptedTitle || note.title}
+                        </span>
+                    </div>
+                    {note.is_expired && (
+                        <span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase w-fit">
+                            {__('general.expired')}
+                        </span>
+                    )}
                 </div>
             </td>
-            <td className="p-3">
-                <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium capitalize border border-slate-200">
+            <td className="p-3 align-top">
+                <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium capitalize border border-slate-200 whitespace-nowrap">
                     {getCategoryIcon(note.category)}
                     {note.category}
                 </span>
             </td>
-            <td className="p-3">
-                {renderInlineParsed()}
+            <td className="p-3 align-top">
+                {isEncrypted ? (
+                    <span className="text-xs text-slate-400 font-medium inline-flex items-center gap-1.5 py-1">
+                        <Key size={13} className="text-slate-400" />
+                        {__('general.encrypted_content_hidden') || '🔒 [Encrypted]'}
+                    </span>
+                ) : (
+                    <div className="relative group bg-slate-50 hover:bg-slate-100/70 transition-colors border border-slate-200 rounded-lg p-2.5 text-xs">
+                        <div className="absolute top-1.5 end-1.5 flex items-center gap-1">
+                            <button
+                                type="button"
+                                title={__('general.copy_text') || 'Copy Text'}
+                                onClick={() => handleCopyCard(note.decryptedContent, note.id)}
+                                className={`p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors bg-white/80 shadow-xs border border-slate-200 ${
+                                    copiedId === note.id ? 'text-green-600 border-green-300 bg-green-50' : ''
+                                }`}
+                            >
+                                {copiedId === note.id ? <Check size={12} /> : <Copy size={12} />}
+                            </button>
+                        </div>
+                        <div className="font-mono text-slate-800 whitespace-pre-wrap break-words select-all pe-7 leading-relaxed max-h-56 overflow-y-auto">
+                            {note.decryptedContent}
+                        </div>
+                    </div>
+                )}
             </td>
-            <td className="p-3 text-slate-400 text-xs">
+            <td className="p-3 align-top text-slate-400 text-xs whitespace-nowrap">
                 {new Date(note.created_at).toLocaleDateString()}
+                {note.author?.name && (
+                    <div className="text-[10px] text-slate-400 truncate max-w-[100px]">
+                        {note.author.name}
+                    </div>
+                )}
             </td>
-            <td className="p-3 text-right">
+            <td className="p-3 align-top text-right whitespace-nowrap">
                 <div className="inline-flex items-center gap-1">
                     <IconButton
                         title={note.is_pinned ? __('general.unpin') : __('general.pin')}

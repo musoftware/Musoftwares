@@ -50,7 +50,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                         )}
                     </div>
                     {actions && (
-                        <div className="flex items-center gap-2">
+                        <div className="hidden sm:flex items-center gap-2">
                             {actions}
                         </div>
                     )}

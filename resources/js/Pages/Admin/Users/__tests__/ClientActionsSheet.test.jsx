@@ -47,6 +47,12 @@ describe('ClientActionsSheet', () => {
             expect(linkElement).toHaveAttribute('href', href);
         };
 
+        // Profile & Security links
+        expect(screen.getAllByText('View profile').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Edit profile').closest('a')).toHaveAttribute('href', '/admin/users/1/edit');
+        expect(screen.getByText('User Subscriptions').closest('a')).toHaveAttribute('href', '/admin/users/1#subscriptions');
+        expect(screen.getByText('Manage email aliases & merge').closest('a')).toHaveAttribute('href', '/admin/users/1/emails');
+
         // Finance links
         expectLink('New invoice', '/admin/invoices/create?user=1');
         expectLink('Create a Recurring Invoice', '/admin/business/recurring/invoices/create?user=1');
@@ -65,11 +71,14 @@ describe('ClientActionsSheet', () => {
         expectLink('Files', '/admin/users/1/files');
         expectLink('Reports', '/admin/users/1/reports');
         expectLink('Manage Referrals', '/admin/users/1/referrals');
+        expectLink('Due Balance Sheet', '/admin/users/1/balance-sheet');
+        expectLink('Add Points', '/admin/points_controller/1/add');
 
         // Buttons (handlers / dynamic)
         expect(screen.getByText('Login As').closest('button')).toBeInTheDocument();
         expect(screen.getByText('Reset password').closest('button')).toBeInTheDocument();
         expect(screen.getByText('Change role').closest('button')).toBeInTheDocument();
+        expect(screen.getByText('Activate Membership').closest('button')).toBeInTheDocument();
         expect(screen.getByText('Recalc balance').closest('button')).toBeInTheDocument();
     });
 

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
@@ -20,7 +20,9 @@ import {
     UserPlus,
     LayoutGrid,
     ChevronDown,
-    ArrowUpRight
+    ArrowUpRight,
+    Menu,
+    X
 } from 'lucide-react';
 
 interface WebToolsLayoutProps extends PropsWithChildren {
@@ -31,6 +33,7 @@ interface WebToolsLayoutProps extends PropsWithChildren {
 export default function WebToolsLayout({ children, title, activeNav = '' }: WebToolsLayoutProps) {
     const { auth } = usePage().props as any;
     const isAuthed = !!auth?.user;
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const financialTools = [
         { label: 'InstaPay Calculator', href: route('tools.withdraw-instapay'), icon: Calculator },
@@ -110,23 +113,115 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                         <div className="flex items-center gap-3">
                             <ThemeToggle className="h-8 w-8" />
                             {isAuthed ? (
-                                <SafeLink href="/dashboard">
-                                    <Button variant="outline" className="rounded-full text-sm font-medium">
-                                        {__('general.dashboard')}</Button>
-                                </SafeLink>
+                                <div className="hidden md:flex items-center">
+                                    <SafeLink href="/dashboard">
+                                        <Button variant="outline" className="rounded-full text-sm font-medium">
+                                            {__('general.dashboard')}</Button>
+                                    </SafeLink>
+                                </div>
                             ) : (
-                                <>
-                                    <Link href={route('login')} className="hidden sm:block text-sm font-medium text-slate-600 hover:text-slate-900">
+                                <div className="hidden md:flex items-center gap-3">
+                                    <Link href={route('login')} className="text-sm font-medium text-slate-600 hover:text-slate-900">
                                         {__('general.sign_in')}</Link>
                                     <Link href={route('register')}>
                                         <Button className="rounded-full bg-slate-900 text-white hover:bg-slate-800 text-sm">
                                             {__('general.register_free')}</Button>
                                     </Link>
-                                </>
+                                </div>
                             )}
+
+                            {/* Mobile Hamburger Toggle */}
+                            <button
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors rounded-lg focus:outline-none"
+                                aria-label="Toggle Navigation"
+                            >
+                                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Drawer */}
+                {mobileMenuOpen && (
+                    <div className="md:hidden border-b border-slate-200 bg-white/98 backdrop-blur-md px-6 py-5 space-y-4 shadow-lg">
+                        <div className="space-y-3">
+                            <div>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                                    {__('general.financial')}
+                                </p>
+                                <div className="grid grid-cols-1 gap-1">
+                                    {financialTools.map((tool, idx) => {
+                                        const Icon = tool.icon;
+                                        return (
+                                            <Link
+                                                key={idx}
+                                                href={tool.href}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                                            >
+                                                <Icon className="w-4 h-4 text-slate-400" />
+                                                {tool.label}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            <div className="pt-2 border-t border-slate-100">
+                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                                    {__('general.utilities')}
+                                </p>
+                                <div className="grid grid-cols-1 gap-1">
+                                    {utilityTools.map((tool, idx) => {
+                                        const Icon = tool.icon;
+                                        return (
+                                            <Link
+                                                key={idx}
+                                                href={tool.href}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                                            >
+                                                <Icon className="w-4 h-4 text-slate-400" />
+                                                {tool.label}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Auth actions inside Mobile Drawer */}
+                            <div className="pt-3 border-t border-slate-100">
+                                {isAuthed ? (
+                                    <SafeLink
+                                        href="/dashboard"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-center w-full py-2.5 px-4 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
+                                    >
+                                        {__('general.dashboard')} ➔
+                                    </SafeLink>
+                                ) : (
+                                    <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+                                        <Link
+                                            href={route('login')}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="text-center py-2.5 px-4 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                        >
+                                            {__('general.sign_in')}
+                                        </Link>
+                                        <Link
+                                            href={route('register')}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="text-center py-2.5 px-4 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
+                                        >
+                                            {__('general.register_free')}
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </header>
 
             {/* Main */}

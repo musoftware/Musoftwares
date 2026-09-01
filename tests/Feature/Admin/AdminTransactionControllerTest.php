@@ -100,4 +100,39 @@ class AdminTransactionControllerTest extends TestCase
             'amount' => 100,
         ]);
     }
+
+    public function test_admin_sees_transaction_running_balance()
+    {
+        $admin = $this->createAdmin();
+        $client = $this->createClient();
+        $currencyId = Currency::first()->id ?? 1;
+
+        \App\Models\Transaction::create([
+            'user_id' => $client->id,
+            'amount' => 300,
+            'type' => 'received',
+            'currency_id' => $currencyId,
+            'reason' => 'Deposit',
+            'created_at' => now()->subDays(2),
+        ]);
+
+        \App\Models\Transaction::create([
+            'user_id' => $client->id,
+            'amount' => -75,
+            'type' => 'used',
+            'currency_id' => $currencyId,
+            'reason' => 'Invoice #1',
+            'created_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.transactions.index', ['user' => $client->id]));
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Transactions/Income')
+            ->has('transactions.data', 2)
+            ->where('transactions.data.0.balance', 225)
+            ->where('transactions.data.1.balance', 300)
+        );
+    }
 }

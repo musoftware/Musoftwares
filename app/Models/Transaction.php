@@ -173,6 +173,10 @@ class Transaction extends Model
 
     public function balance()
     {
+        if (! $this->user_id) {
+            return null;
+        }
+
         return Transaction::query()
             ->where('user_id', $this->user_id)
             ->where(function ($query) {

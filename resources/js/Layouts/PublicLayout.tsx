@@ -336,13 +336,15 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                         <ThemeToggle className="h-8 w-8" />
 
                         {auth?.user ? (
-                            <SafeLink href={route('dashboard')}>
-                                <button className="px-3.5 py-1.5 rounded-[980px] border border-black/10 dark:border-white/10 bg-white dark:bg-[#1d1d1f] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#2d2d2f] text-[12px] font-medium transition-all shadow-sm">
-                                    {__('general.console') || 'Dashboard'} ➔
-                                </button>
-                            </SafeLink>
+                            <div className="hidden lg:flex items-center">
+                                <SafeLink href={route('dashboard')}>
+                                    <button className="px-3.5 py-1.5 rounded-[980px] border border-black/10 dark:border-white/10 bg-white dark:bg-[#1d1d1f] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#2d2d2f] text-[12px] font-medium transition-all shadow-sm cursor-pointer">
+                                        {__('general.console') || 'Dashboard'} ➔
+                                    </button>
+                                </SafeLink>
+                            </div>
                         ) : (
-                            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                            <div className="hidden lg:flex items-center space-x-3 rtl:space-x-reverse">
                                 <SafeLink
                                     href={route('login')}
                                     className="text-[12px] font-medium text-[#1d1d1f]/75 dark:text-[#f5f5f7]/75 hover:text-[#1d1d1f] dark:hover:text-white transition-colors px-2"
@@ -350,7 +352,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     {__('general.sign_in') || 'Sign in'}
                                 </SafeLink>
                                 <SafeLink href="/start-project">
-                                    <button className="inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm">
+                                    <button className="inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm cursor-pointer">
                                         {__('general.start_a_project') || 'Start a Project'}
                                     </button>
                                 </SafeLink>
@@ -360,7 +362,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                         {/* Mobile Menu Toggle */}
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="lg:hidden p-2 text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70 hover:text-[#1d1d1f] dark:hover:text-white transition-colors"
+                            className="lg:hidden p-2 text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70 hover:text-[#1d1d1f] dark:hover:text-white transition-colors rounded-lg focus:outline-none"
                             aria-label="Toggle navigation"
                         >
                             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -370,44 +372,57 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
 
                 {/* Mobile Drawer */}
                 {mobileMenuOpen && (
-                    <div className="lg:hidden border-b border-black/5 dark:border-white/10 bg-white/95 dark:bg-[#1d1d1f]/95 backdrop-blur-xl px-6 py-5 space-y-3">
+                    <div className="lg:hidden border-b border-black/5 dark:border-white/10 bg-white/95 dark:bg-[#1d1d1f]/95 backdrop-blur-xl px-6 py-5 space-y-4">
                         <div className="flex flex-col space-y-2 text-sm text-[#1d1d1f] dark:text-[#f5f5f7]">
                             {navItems.map((item) => (
                                 <SafeLink
                                     key={item.id}
                                     href={item.href}
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="py-2 hover:text-[#0071e3] border-b border-black/5 dark:border-white/10"
+                                    className="py-2.5 px-2 hover:text-[#0071e3] border-b border-black/5 dark:border-white/10 font-medium transition-colors"
                                 >
                                     {item.label}
                                 </SafeLink>
                             ))}
-                            {!auth?.user && (
-                                <div className="pt-2 flex items-center gap-3">
+
+                            {/* WhatsApp Direct in Drawer */}
+                            <a
+                                href="https://wa.me/201015218548"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2.5 py-2.5 px-2 text-[#25D366] hover:opacity-80 font-medium border-b border-black/5 dark:border-white/10 transition-opacity"
+                            >
+                                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                                <span>{__('general.whatsapp_direct') || 'Direct Consultation'}</span>
+                            </a>
+
+                            {!auth?.user ? (
+                                <div className="pt-3 flex flex-col sm:flex-row items-stretch gap-3">
                                     <SafeLink
                                         href="/login"
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="flex-1 text-center py-2 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5"
+                                        className="text-center py-2.5 px-4 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                                     >
                                         {__('general.sign_in') || 'Sign in'}
                                     </SafeLink>
                                     <SafeLink
                                         href="/start-project"
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="flex-1 text-center py-2 rounded-xl bg-[#0071e3] text-white text-sm font-medium hover:bg-[#0077ed]"
+                                        className="text-center py-2.5 px-4 rounded-xl bg-[#0071e3] text-white text-sm font-medium hover:bg-[#0077ed] transition-colors shadow-sm"
                                     >
-                                        {__('general.start_a_project') || 'Start Project'}
+                                        {__('general.start_a_project') || 'Start a Project'}
                                     </SafeLink>
                                 </div>
-                            )}
-                            {auth?.user && (
-                                <SafeLink
-                                    href="/dashboard"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="py-2 text-[#0071e3] font-semibold"
-                                >
-                                    {__('general.console') || 'Dashboard ➔'}
-                                </SafeLink>
+                            ) : (
+                                <div className="pt-3">
+                                    <SafeLink
+                                        href="/dashboard"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-center py-2.5 px-4 rounded-xl bg-[#0071e3] text-white text-sm font-medium hover:bg-[#0077ed] transition-colors shadow-sm"
+                                    >
+                                        {__('general.console') || 'Dashboard'} ➔
+                                    </SafeLink>
+                                </div>
                             )}
                         </div>
                     </div>

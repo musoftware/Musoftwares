@@ -207,6 +207,31 @@ export default function ERPLayout({
                             </nav>
                         </div>
                     )}
+
+                    {/* Drawer Footer Actions */}
+                    <div className="mt-4 pt-3 border-t border-slate-100">
+                        {isTeamMember ? (
+                            <Link 
+                                href={route('erp.team.logout')} 
+                                method="post" 
+                                as="button" 
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 w-full transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>{__('general.logout')}</span>
+                            </Link>
+                        ) : (
+                            <SafeLink 
+                                href={route('dashboard')} 
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>{__('general.exit_to_main_hub')}</span>
+                            </SafeLink>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -233,9 +258,9 @@ export default function ERPLayout({
                         {isTeamMember ? (
                             <Link 
                                 href={route('erp.team.logout')} 
-                                method="post"
-                                as="button"
-                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                                method="post" 
+                                as="button" 
+                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" /> 
                                 <span>{__('general.logout')}</span>
@@ -243,11 +268,10 @@ export default function ERPLayout({
                         ) : (
                             <SafeLink 
                                 href={route('dashboard')} 
-                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" /> 
-                                <span className="hidden sm:inline">{__('general.exit_to_main_hub')}</span>
-                                <span className="sm:hidden">{__('general.exit')}</span>
+                                <span>{__('general.exit_to_main_hub')}</span>
                             </SafeLink>
                         )}
                     </div>

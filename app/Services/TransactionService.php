@@ -21,7 +21,7 @@ class TransactionService extends BaseService
         // No type filter — show ALL transaction types so admin sees the full picture
         // (earned, used, received, refunded, send, timer-received, etc.)
 
-        return $q->orderBy('created_at', 'desc')->paginate(50);
+        return $q->orderBy('created_at', 'desc')->orderBy('id', 'desc')->paginate(50);
     }
 
     public function getCostTransactions(array $filters)
@@ -30,7 +30,7 @@ class TransactionService extends BaseService
 
         $this->applyFilters($q, $filters);
 
-        return $q->orderBy('created_at', 'desc')->paginate(50);
+        return $q->orderBy('created_at', 'desc')->orderBy('id', 'desc')->paginate(50);
     }
 
     private function applyFilters($query, array $filters)

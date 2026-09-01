@@ -23,5 +23,9 @@ Interfaces that are overly complex or omit features on smaller screens create fr
 - **Clear & Simple Text**: Use plain, straightforward, everyday language for labels, buttons, validation errors, and instructions. Do not use technical jargon, developer-speak, or complex terminology. Assume the end user is a regular business person, not a tech genius.
 
 
+### 5. Clean Mobile Top Navigation Bar (No Top-Bar Buttons)
+- **Zero Action Buttons in Top Bar on Mobile**: Never place action buttons (e.g. Sign In, Register, Dashboard, Start Project, Add Balance, Exit, etc.) directly in the mobile top navigation row.
+- **Only Inside Hamburger Menu**: All action buttons, links, and navigation items on mobile must be housed exclusively inside the slide-out hamburger menu drawer/sheet (`SheetContent`).
+- **Clean Header Header Aesthetic**: On mobile, the top bar should strictly consist of the Logo/Monogram, the Hamburger Menu button, and non-intrusive icons like Theme Toggle, Notification Bell, or Profile Avatar.
 
 ---

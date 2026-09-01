@@ -150,6 +150,18 @@ export function TransactionsPage(props: TransactionsPageProps) {
                 </span>
             ),
         },
+        ...(type === 'income' ? [{
+            key: 'balance',
+            label: __('general.balance'),
+            className: 'text-end',
+            render: (tx: any) => (
+                <span className={`font-medium font-mono ${tx.balance !== undefined && tx.balance !== null ? (tx.balance < 0 ? 'text-rose-600' : tx.balance > 0 ? 'text-emerald-600' : 'text-slate-800') : 'text-slate-400'}`}>
+                    {tx.balance !== undefined && tx.balance !== null
+                        ? formatMoney(tx.balance, tx.currency)
+                        : '—'}
+                </span>
+            ),
+        }] : []),
         {
             key: 'reason',
             label: __('general.reason'),

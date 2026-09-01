@@ -17,6 +17,7 @@ class TransactionResource extends JsonResource
             'currency' => CurrencyHelper::getFrontendCurrency($this->currency_id),
             'business_amount' => (float) $this->business_amount,
             'business_currency' => CurrencyHelper::getBusinessCurrency(),
+            'balance' => method_exists($this->resource, 'balance') ? (float) $this->resource->balance() : null,
             'reason' => $this->reason,
             'status' => $this->status ?? 'completed', // fallback if status doesn't exist
             'is_reversed' => $this->is_reversed ?? false,

@@ -1,11 +1,11 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import SafeLink from '@/Components/SafeLink';
 import ThemeToggle from '@/Components/ThemeToggle';
 import {
     ChevronRight, ArrowLeft, LayoutDashboard, Users, Mail, PlayCircle, Settings,
     Search, Tag, MessageCircle, Smartphone, Bookmark, Zap, Clock, BarChart2,
-    UsersRound, FileText, Bot, PieChart, Send, Activity, UserPlus
+    UsersRound, FileText, Bot, PieChart, Send, Activity, UserPlus, Menu, X
 } from 'lucide-react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { __ } from '@/lib/i18n';
@@ -19,6 +19,7 @@ interface CrmLayoutProps extends PropsWithChildren {
 export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProps) {
     const { crm_features, auth } = usePage().props as any;
     useInertiaNotifications();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const workspaceName = "CRM Workspace";
     const tenantId = 'DRAFT';
 
@@ -113,10 +114,134 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
             <Head title={`CRM — ${title}`} />
 
+            {/* Mobile Menu Drawer Overlay */}
+            <div 
+                className={`fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${
+                    isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Mobile Menu Drawer Content */}
+            <div 
+                className={`fixed top-0 bottom-0 start-0 z-50 w-72 bg-white shadow-xl lg:hidden transform transition-transform duration-300 ease-in-out flex flex-col ${
+                    isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}
+            >
+                {/* Drawer Header */}
+                <div className="flex items-center justify-between p-4 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
+                            {workspaceName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                            <span className="block truncate text-sm font-semibold text-slate-900">
+                                {workspaceName}
+                            </span>
+                            <span className="block font-mono text-[10px] text-slate-400">
+                                Tenant ID: #{tenantId}
+                            </span>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
+                        aria-label="Close menu"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Drawer Menu Items */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    {menuGroups.map((group, groupIdx) => (
+                        <div key={groupIdx} className="space-y-1">
+                            <h3 className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                                {group.title}
+                            </h3>
+                            <nav className="space-y-0.5">
+                                {group.items.map((item) => {
+                                    const Icon = item.icon;
+                                    const classes = `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${item.isActive
+                                            ? 'bg-slate-100 font-medium text-slate-900'
+                                            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                        }`;
+
+                                    const content = (
+                                        <div className="flex items-center gap-3">
+                                            <Icon
+                                                className={`h-4 w-4 shrink-0 transition-colors ${item.isActive
+                                                        ? 'text-slate-900'
+                                                        : 'text-slate-400 group-hover:text-slate-600'
+                                                    }`}
+                                            />
+                                            <span>{item.label}</span>
+                                        </div>
+                                    );
+
+                                    return item.href ? (
+                                        <Link 
+                                            key={item.id} 
+                                            href={item.href} 
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className={classes}
+                                        >
+                                            {content}
+                                        </Link>
+                                    ) : (
+                                        <button 
+                                            key={item.id} 
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className={classes}
+                                        >
+                                            {content}
+                                        </button>
+                                    );
+                                })}
+                            </nav>
+                        </div>
+                    ))}
+
+                    {/* Drawer Footer Actions */}
+                    <div className="mt-4 pt-3 border-t border-slate-100">
+                        {isTeamMember ? (
+                            <Link
+                                href={route('crm.team.logout')}
+                                method="post"
+                                as="button"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 w-full transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>{__('general.logout')}</span>
+                            </Link>
+                        ) : (
+                            <SafeLink
+                                href={route('dashboard')}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>{__('general.exit_to_main_hub')}</span>
+                            </SafeLink>
+                        )}
+                    </div>
+                </div>
+            </div>
+
             {/* Standalone Minimalist Top Navigation */}
             <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200" style={{ height: '60px' }}>
                 <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-full w-full mx-auto">
                     <div className="flex items-center gap-3">
+                        {/* Hamburger Menu Toggle Button */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden -ms-2 p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
+                            aria-label="Open Navigation"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
                             {workspaceName.charAt(0).toUpperCase()}
                         </div>
@@ -129,7 +254,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                                 href={route('crm.team.logout')}
                                 method="post"
                                 as="button"
-                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 <span>{__('general.logout')}</span>
@@ -137,11 +262,10 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                         ) : (
                             <SafeLink
                                 href={route('dashboard')}
-                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                <span className="hidden sm:inline">{__('general.exit_to_main_hub')}</span>
-                                <span className="sm:hidden">{__('general.exit')}</span>
+                                <span>{__('general.exit_to_main_hub')}</span>
                             </SafeLink>
                         )}
                     </div>
@@ -160,8 +284,8 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                     </div>
 
                     <div className="flex flex-col items-start gap-8 lg:flex-row">
-                        {/* Left Sidebar */}
-                        <aside className="w-full shrink-0 lg:w-64">
+                        {/* Left Sidebar (Desktop Only) */}
+                        <aside className="hidden lg:block w-full shrink-0 lg:w-64">
                             <div className="space-y-6 rounded-xl border border-slate-200 bg-white py-4 shadow-sm">
 
                                 <div className="flex items-center gap-2 border-b border-slate-100 pb-3 px-4">

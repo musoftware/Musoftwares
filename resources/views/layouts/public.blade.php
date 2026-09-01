@@ -241,7 +241,7 @@
             <!-- Right Utilities & Action Buttons -->
             <div class="flex items-center space-x-3 sm:space-x-4 rtl:space-x-reverse shrink-0">
                 <!-- WhatsApp Direct Action -->
-                <a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex p-2 text-[#1d1d1f]/70 hover:text-[#25D366] transition-colors" title="{{ $locale === 'ar' ? 'محادثة مباشرة' : 'Direct Consultation' }}">
+                <a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="hidden lg:inline-flex p-2 text-[#1d1d1f]/70 hover:text-[#25D366] transition-colors" title="{{ $locale === 'ar' ? 'محادثة مباشرة' : 'Direct Consultation' }}">
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                 </a>
 
@@ -252,19 +252,19 @@
                         $formattedBal = \App\Helpers\FinanceHelper::instance()->format_money($userBal, $userCurId);
                     @endphp
                     <!-- Wallet Balance Pill -->
-                    <a href="{{ Route::has('billing.invoices.index') ? route('billing.invoices.index') : url('/dashboard') }}" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-[980px] bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[12px] font-medium transition-all shadow-2xs hover:bg-emerald-100/70" title="{{ $locale === 'ar' ? 'رصيد المحفظة المتاح' : 'Available Wallet Balance' }}">
+                    <a href="{{ Route::has('billing.invoices.index') ? route('billing.invoices.index') : url('/dashboard') }}" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-[980px] bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[12px] font-medium transition-all shadow-2xs hover:bg-emerald-100/70" title="{{ $locale === 'ar' ? 'رصيد المحفظة المتاح' : 'Available Wallet Balance' }}">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="font-mono font-semibold">{{ $formattedBal }}</span>
                     </a>
 
-                    <a href="/dashboard" class="px-3.5 py-1.5 rounded-[980px] border border-black/10 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] text-[12px] font-medium transition-all shadow-sm">
+                    <a href="/dashboard" class="hidden lg:inline-flex px-3.5 py-1.5 rounded-[980px] border border-black/10 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] text-[12px] font-medium transition-all shadow-sm">
                         {{ $locale === 'ar' ? 'لوحة التحكم' : 'Dashboard' }} ➔
                     </a>
                 @else
-                    <a href="/login" class="text-[12px] font-medium text-[#1d1d1f]/75 hover:text-[#1d1d1f] transition-colors px-2">
+                    <a href="/login" class="hidden lg:inline-flex text-[12px] font-medium text-[#1d1d1f]/75 hover:text-[#1d1d1f] transition-colors px-2">
                         {{ $locale === 'ar' ? 'دخول' : 'Sign in' }}
                     </a>
-                    <a href="/start-project" class="inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm">
+                    <a href="/start-project" class="hidden lg:inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm">
                         {{ $locale === 'ar' ? 'بدء مشروع' : 'Start a Project' }}
                     </a>
                 @endauth
@@ -298,24 +298,20 @@
                 <a href="/about/mahmoud-amin" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'عن محمود أمين' : 'About Mahmoud Amin' }}</a>
                 <a href="/company/contact" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'تواصل معنا' : 'Contact' }}</a>
                 <div class="pt-2 flex items-center gap-3">
-                    <a href="/login" class="flex-1 text-center py-2 rounded-xl border border-black/10 text-sm font-medium">{{ $locale === 'ar' ? 'دخول' : 'Sign in' }}</a>
-                    <a href="/start-project" class="flex-1 text-center py-2 rounded-xl bg-[#0071e3] text-white text-sm font-medium">{{ $locale === 'ar' ? 'بدء مشروع' : 'Start Project' }}</a>
+                    <a href="/login" class="flex-1 text-center py-2.5 rounded-xl border border-black/10 text-sm font-medium hover:bg-slate-50 transition-colors">{{ $locale === 'ar' ? 'دخول' : 'Sign in' }}</a>
+                    <a href="/start-project" class="flex-1 text-center py-2.5 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-medium transition-colors">{{ $locale === 'ar' ? 'بدء مشروع' : 'Start Project' }}</a>
                 </div>
             @endauth
         </div>
     </header>
 
     <!-- Apple Exact Announcement Ribbon Banner -->
-    <div class="w-full bg-[#fbfbfd] border-b border-black/[0.06] py-3 px-4 text-center text-[13px] text-[#1d1d1f] flex items-center justify-center gap-1.5">
+    <div class="w-full bg-[#fbfbfd] border-b border-black/[0.06] py-2.5 px-4 text-center text-[12px] sm:text-[13px] text-[#1d1d1f]/80">
         <span>
             {{ $locale === 'ar' 
                 ? 'استوديو تطوير برمجي متخصص: ملكية كاملة للكود المصدري بدون وسطاء أو اشتراكات شهرية.' 
                 : 'Boutique Studio: 100% Direct Source Code Ownership & Lifelong Sovereignty.' }}
         </span>
-        <a href="/start-project" class="text-[#0066cc] hover:underline font-medium inline-flex items-center gap-0.5">
-            <span>{{ $locale === 'ar' ? 'بدء معالج المواصفات' : 'Start Project' }}</span>
-            <span>›</span>
-        </a>
     </div>
 
     <!-- Main Content Stream -->

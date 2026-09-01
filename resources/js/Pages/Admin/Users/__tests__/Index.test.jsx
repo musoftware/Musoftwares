@@ -138,7 +138,7 @@ describe('Clients Index', () => {
         fireEvent.click(menuButton);
         
         // Click Reset Password
-        const resetPasswordMenuItem = await screen.findByText('Reset Password');
+        const resetPasswordMenuItem = await screen.findByText(/Reset Password/i);
         fireEvent.click(resetPasswordMenuItem);
         
         // Click Yes Reset Password button in custom dialog
