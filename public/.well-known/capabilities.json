@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-09-02T11:10:00+00:00",
+    "updated_at": "2026-09-02T19:47:55+00:00",
     "platform": "Musoftwares Marketplace Engine",
     "version": "1.0.0",
     "capabilities": [
@@ -26,6 +26,13 @@
                 "package_id",
                 "requirements_data"
             ]
+        },
+        {
+            "capability_id": "service_1",
+            "name": "AI Service Test",
+            "description": "AI Service Test",
+            "endpoint": "http://localhost/marketplace/api/v1/services/1",
+            "method": "GET"
         }
     ]
 }

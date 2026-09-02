@@ -35,7 +35,7 @@ class InvoiceEditRestrictionTest extends TestCase
             'user_id' => $user->id,
             'status' => 'unpaid',
             'currency_id' => 1,
-            'created_at' => now('Africa/Cairo')->subDays(4),
+            'created_at' => now()->subDays(4),
         ]);
 
         $this->assertFalse($invoice->canBeEdited());

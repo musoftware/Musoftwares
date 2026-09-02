@@ -27,7 +27,7 @@ User's Machine
         ├── WS Server    → ws://127.0.0.1:18401/ws
         │    └── Real-time events to browser/platform
         │
-        └── Outbound HTTP → https://tools.musoftware.com (Platform)
+        └── Outbound HTTP → https://tools.musoftwares.com (Platform)
               └── License verification, plugin sync, auth callback
 ```
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Modules\Marketplace\Models\Service;
@@ -92,7 +93,7 @@ class BlogArticle extends Model
         return $this->belongsTo(Service::class);
     }
 
-    public function translations()
+    public function translations(): HasMany
     {
         return $this->hasMany(BlogArticle::class, 'group_id', 'group_id');
     }

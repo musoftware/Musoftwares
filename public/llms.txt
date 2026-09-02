@@ -20,9 +20,15 @@ All endpoints automatically negotiate content and deliver pure JSON payload cont
 
 ## Featured Services
 
+### AI Service Test
+- **Category**: General
+- **Starting Price**: $0
+- **Tagline**: 
+- **URL**: http://localhost/marketplace/services/1/ai-service-test
+
 ## Recent Blog Insights
 
-### Test Article
-- **Excerpt**: 
-- **URL**: http://localhost/blog/test-article
+### English Service Blog Post
+- **Excerpt**: AI Excerpt
+- **URL**: http://localhost/blog/english-service-blog-post
 

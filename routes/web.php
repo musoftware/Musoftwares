@@ -491,7 +491,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
 
 // ── Client-Facing Billing Routes ─────────────────────────────────────
 // Platform users (subscribers) view their invoices issued by admin and pay them.
-// These are CORE platform billing routes — NOT related to the ERP module.
+Route::redirect('/billing', '/subscriptions/manage');
+Route::redirect('/subscriptions', '/subscriptions/manage');
+
 Route::middleware(['auth', 'verified', 'onboarding'])->prefix('billing')->name('billing.')->group(function () {
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{uuid}/pay', [InvoiceController::class, 'show'])->name('invoices.pay');

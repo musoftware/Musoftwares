@@ -1,5 +1,17 @@
 {
-    "updated_at": "2026-09-02T11:10:00+00:00",
-    "total_services": 0,
-    "services": []
+    "updated_at": "2026-09-02T19:47:55+00:00",
+    "total_services": 1,
+    "services": [
+        {
+            "id": 1,
+            "title": "AI Service Test",
+            "slug": "ai-service-test",
+            "category": "General",
+            "url": "http://localhost/marketplace/services/1/ai-service-test",
+            "tagline": null,
+            "starting_price": 0,
+            "packages": [],
+            "tags": []
+        }
+    ]
 }

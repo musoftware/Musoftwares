@@ -612,4 +612,17 @@ class SubscriptionModuleTest extends TestCase
         $user->refresh();
         $this->assertEquals(10000 - 189.99, $user->user_balance);
     }
+
+    public function test_billing_route_redirects_to_subscriptions_manage()
+    {
+        $response = $this->get('/billing');
+        $response->assertRedirect('/subscriptions/manage');
+    }
+
+    public function test_subscriptions_route_redirects_to_subscriptions_manage()
+    {
+        $response = $this->get('/subscriptions');
+        $response->assertRedirect('/subscriptions/manage');
+    }
 }
+

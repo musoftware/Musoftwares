@@ -125,7 +125,7 @@ ERP_REFERRAL_COMMISSION_L1=5   # percentage
 
 ```bash
 # musoftware-runtime/.env
-PLATFORM_URL=https://musoftware.com
+MUSOFTWARE_PLATFORM=https://tools.musoftwares.com
 HTTP_PORT=18400
 WS_PORT=18401
 PLUGINS_DIR=./plugins
@@ -311,9 +311,9 @@ cat > /var/www/musoftware/public/downloads/runtime/latest.json << EOF
   "minimum_supported": "1.0.0",
   "channel": "stable",
   "downloads": {
-    "windows": "https://tools.musoftware.com/downloads/runtime/musoftware-runtime-win.exe",
-    "mac": "https://tools.musoftware.com/downloads/runtime/musoftware-runtime-mac",
-    "linux": "https://tools.musoftware.com/downloads/runtime/musoftware-runtime-linux"
+    "windows": "https://tools.musoftwares.com/downloads/runtime/musoftware-runtime-win.exe",
+    "mac": "https://tools.musoftwares.com/downloads/runtime/musoftware-runtime-mac",
+    "linux": "https://tools.musoftwares.com/downloads/runtime/musoftware-runtime-linux"
   },
   "changelog": [
     "Initial release"

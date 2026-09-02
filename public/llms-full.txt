@@ -16,13 +16,21 @@ Base URL: http://localhost
 
 ## Full Services Catalog
 
+### AI Service Test
+- **ID**: 1
+- **Category**: General
+- **URL**: http://localhost/marketplace/services/1/ai-service-test
+- **Starting Price**: $0
+- **Tagline**: 
+- **Description**: Test AI generation.
+
 ## Full Blog Articles Catalog
 
-### Test Article
-- **Slug**: test-article
-- **URL**: http://localhost/blog/test-article
-- **Published At**: 2026-09-02T11:10:00+00:00
-- **Excerpt**: 
+### English Service Blog Post
+- **Slug**: english-service-blog-post
+- **URL**: http://localhost/blog/english-service-blog-post
+- **Published At**: 2026-09-02T19:47:54+00:00
+- **Excerpt**: AI Excerpt
 - **Content**:
-This is a test article.
+AI content body.
 
