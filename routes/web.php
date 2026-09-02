@@ -82,6 +82,7 @@ use App\Http\Controllers\iSaaS\ClientPortalController;
 use App\Http\Controllers\iSaaS\ContractController;
 use App\Http\Controllers\iSaaS\ProjectProposalController;
 use App\Http\Controllers\KycController;
+use App\Http\Controllers\LocaleRedirectController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingController;
@@ -219,6 +220,12 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Canonical locale prefix redirects (e.g. /ar/blog/{slug} -> /blog/{slug})
+Route::get('/{locale}/{path?}', [LocaleRedirectController::class, 'redirect'])
+    ->where('locale', 'ar|en')
+    ->where('path', '.*')
+    ->name('locale.redirect');
 
 // Public Free Tools
 Route::get('/tools', [PublicToolsController::class, 'index'])->name('public.tools.index');

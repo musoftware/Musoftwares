@@ -14,15 +14,8 @@
 - مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
-- [Design](http://localhost/marketplace/categories/design-fail): تصفح الخدمات المتاحة.
 
 ## الخدمات المميزة
-
-### Branding Kit
-- **التصنيف**: Design
-- **سعر البدء**: $0
-- **الوصف المختصر**: 
-- **الرابط**: http://localhost/marketplace/services/1/branding-kit?lang=ar
 
 ## مقالات المدونة الحديثة
 

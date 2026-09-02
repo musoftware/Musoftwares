@@ -46,7 +46,43 @@ class BlogController extends Controller
         $article = BlogArticle::with(['service.seller', 'service.packages.currency'])
             ->published()
             ->where('slug', $slug)
-            ->firstOrFail();
+            ->first();
+
+        $currentLocale = app()->getLocale();
+
+        if ($article) {
+            if ($article->language !== $currentLocale && ! empty($article->group_id)) {
+                $localizedTranslation = BlogArticle::published()
+                    ->where('group_id', $article->group_id)
+                    ->where('language', $currentLocale)
+                    ->first();
+
+                if ($localizedTranslation && $localizedTranslation->id !== $article->id) {
+                    return redirect()->route('blog.show', $localizedTranslation->slug, 301);
+                }
+            }
+        } else {
+            $translationArticle = BlogArticle::published()
+                ->whereHas('translations', function ($q) use ($slug) {
+                    $q->where('slug', $slug);
+                })
+                ->where('language', $currentLocale)
+                ->first();
+
+            if (! $translationArticle) {
+                $translationArticle = BlogArticle::published()
+                    ->whereHas('translations', function ($q) use ($slug) {
+                        $q->where('slug', $slug);
+                    })
+                    ->first();
+            }
+
+            if ($translationArticle) {
+                return redirect()->route('blog.show', $translationArticle->slug, 301);
+            }
+
+            abort(404);
+        }
 
         if ($article->service) {
             $viewerCurrency = FinanceHelper::instance()->getViewerCurrency(request());

@@ -13,17 +13,8 @@
 - مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
-- **Design**: http://localhost/marketplace/categories/design-fail
 
 ## دليل الخدمات الشامل
-
-### Branding Kit
-- **معرف الخدمة (ID)**: 1
-- **التصنيف**: Design
-- **رابط الخدمة**: http://localhost/marketplace/services/1/branding-kit?lang=ar
-- **سعر البدء**: $0
-- **الوصف المختصر**: 
-- **تفاصيل الخدمة**: Complete brand kit
 
 ## فهرس المقالات الكامل باللغة العربية
 

@@ -311,9 +311,9 @@ cat > /var/www/musoftware/public/downloads/runtime/latest.json << EOF
   "minimum_supported": "1.0.0",
   "channel": "stable",
   "downloads": {
-    "windows": "https://musoftware.com/downloads/runtime/musoftware-runtime-win.exe",
-    "mac": "https://musoftware.com/downloads/runtime/musoftware-runtime-mac",
-    "linux": "https://musoftware.com/downloads/runtime/musoftware-runtime-linux"
+    "windows": "https://tools.musoftware.com/downloads/runtime/musoftware-runtime-win.exe",
+    "mac": "https://tools.musoftware.com/downloads/runtime/musoftware-runtime-mac",
+    "linux": "https://tools.musoftware.com/downloads/runtime/musoftware-runtime-linux"
   },
   "changelog": [
     "Initial release"
