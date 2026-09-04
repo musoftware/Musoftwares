@@ -23,6 +23,9 @@ class RecurringInvoice extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'cost' => 'decimal:2',
+        'amount' => 'decimal:2',
+        'days_before' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -43,6 +46,16 @@ class RecurringInvoice extends Model
     public function current_amount_str()
     {
         return FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
+    }
+
+    public function current_cost()
+    {
+        return $this->cost ?? 0;
+    }
+
+    public function current_cost_str()
+    {
+        return FinanceHelper::instance()->format_money($this->current_cost(), $this->currency_id);
     }
 
     public function records(): HasMany
@@ -66,96 +79,152 @@ class RecurringInvoice extends Model
         }
     }
 
-    public function apply()
+    public function createInvoiceForDate(Carbon $targetDate, ?Carbon $targetTime = null, bool $dispatchEvents = true): ?Invoice
     {
-        $now = Carbon::now();
-        if ($this->isToday($now)) {
-            if (! $this->createdBefore($now)) {
-                $user = $this->user;
-                if (! $user) {
-                    return;
-                }
+        if ($this->createdBefore($targetDate)) {
+            return null;
+        }
 
-                $userCurrencyId = $user->currency_id ?? $user->currency;
-                if (! $userCurrencyId) {
-                    return;
-                }
+        $user = $this->user;
+        if (! $user) {
+            return null;
+        }
 
-                // Convert amount to user's currency
-                $convertedAmount = CurrenciesExchange::RateToday($this->amount, $this->currency_id, $userCurrencyId);
+        $userCurrencyId = $user->currency_id ?? $user->currency;
+        if (! $userCurrencyId) {
+            return null;
+        }
 
-                DB::transaction(function () use ($user, $userCurrencyId, $convertedAmount, $now) {
-                    $invoice = new Invoice;
-                    $invoice->uuid = (string) Str::uuid();
-                    $invoice->user_id = $user->id;
-                    $invoice->currency_id = $userCurrencyId;
-                    $invoice->status = 'unpaid';
-                    $invoice->job_status = 'pending';
-                    $invoice->save();
+        // Convert amount & cost to user's currency
+        $convertedAmount = CurrenciesExchange::RateToday($this->amount, $this->currency_id, $userCurrencyId);
+        $convertedCost = ($this->cost && (float) $this->cost > 0)
+            ? CurrenciesExchange::RateToday((float) $this->cost, $this->currency_id, $userCurrencyId)
+            : 0;
 
-                    $item = new InvoiceItem;
-                    $item->invoice_id = $invoice->id;
-                    $item->item_title = $this->title;
-                    $item->item_type = 'simple';
-                    $item->qty = 1;
-                    $item->amount = $convertedAmount;
-                    $item->save();
+        $recordTime = $targetTime ?? now();
 
-                    $invoice->unpaid = $invoice->total();
-                    $invoice->save();
+        return DB::transaction(function () use ($user, $userCurrencyId, $convertedAmount, $convertedCost, $targetDate, $recordTime, $dispatchEvents) {
+            $invoice = new Invoice;
+            $invoice->uuid = (string) Str::uuid();
+            $invoice->user_id = $user->id;
+            $invoice->currency_id = $userCurrencyId;
+            $invoice->status = 'unpaid';
+            $invoice->job_status = 'pending';
+            $invoice->cost = $convertedCost;
+            $invoice->cost_calculated = '0';
+            if ($recordTime) {
+                $invoice->created_at = $recordTime;
+                $invoice->updated_at = $recordTime;
+            }
+            $invoice->save();
 
-                    DB::table('recurring_invoice_records')->insert([
-                        'recurring_invoice_id' => $this->id,
-                        'invoice_id' => $invoice->id,
-                        'unique_id' => $this->unique_id($now),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+            $item = new InvoiceItem;
+            $item->invoice_id = $invoice->id;
+            $item->item_title = $this->title;
+            $item->item_type = 'simple';
+            $item->qty = 1;
+            $item->amount = $convertedAmount;
+            if ($recordTime) {
+                $item->created_at = $recordTime;
+                $item->updated_at = $recordTime;
+            }
+            $item->save();
 
-                    // Fire after the transaction commits so any notification
-                    // listener that reads the freshly-persisted invoice sees
-                    // it (avoids race conditions in ShouldQueue handlers).
-                    DB::afterCommit(function () use ($invoice, $user) {
-                        $autoPaid = false;
-                        try {
-                            $user->try_pay_unpaid_invoices();
-                            $freshInvoice = $invoice->fresh();
-                            if ($freshInvoice && $freshInvoice->status === 'paid') {
-                                $autoPaid = true;
-                            }
-                        } catch (\Throwable $e) {
-                            Log::warning('RecurringInvoice: failed during try_pay_unpaid_invoices', [
-                                'recurring_invoice_id' => $this->id,
-                                'user_id' => $user->id,
-                                'error' => $e->getMessage(),
-                            ]);
+            $invoice->unpaid = $invoice->total();
+            $invoice->save();
+
+            DB::table('recurring_invoice_records')->insert([
+                'recurring_invoice_id' => $this->id,
+                'invoice_id' => $invoice->id,
+                'unique_id' => $this->unique_id($targetDate),
+                'created_at' => $recordTime,
+                'updated_at' => $recordTime,
+            ]);
+
+            if ($dispatchEvents) {
+                DB::afterCommit(function () use ($invoice, $user) {
+                    $autoPaid = false;
+                    try {
+                        $user->try_pay_unpaid_invoices();
+                        $freshInvoice = $invoice->fresh();
+                        if ($freshInvoice && $freshInvoice->status === 'paid') {
+                            $autoPaid = true;
                         }
+                    } catch (\Throwable $e) {
+                        Log::warning('RecurringInvoice: failed during try_pay_unpaid_invoices', [
+                            'recurring_invoice_id' => $this->id,
+                            'user_id' => $user->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
+                    try {
+                        event(new InvoiceCreated($invoice->fresh()));
+                    } catch (\Throwable $e) {
+                        Log::warning('RecurringInvoice: failed to dispatch InvoiceCreated event', [
+                            'recurring_invoice_id' => $this->id,
+                            'invoice_id' => $invoice->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+
+                    if (! $autoPaid) {
                         try {
-                            event(new InvoiceCreated($invoice->fresh()));
+                            $user->notify(new \App\Notifications\RecurringInvoiceInsufficientBalanceNotification($invoice->fresh()));
                         } catch (\Throwable $e) {
-                            Log::warning('RecurringInvoice: failed to dispatch InvoiceCreated event', [
+                            Log::warning('RecurringInvoice: failed to dispatch insufficient balance notification', [
                                 'recurring_invoice_id' => $this->id,
                                 'invoice_id' => $invoice->id,
                                 'error' => $e->getMessage(),
                             ]);
                         }
-
-                        if (! $autoPaid) {
-                            try {
-                                $user->notify(new \App\Notifications\RecurringInvoiceInsufficientBalanceNotification($invoice->fresh()));
-                            } catch (\Throwable $e) {
-                                Log::warning('RecurringInvoice: failed to dispatch insufficient balance notification', [
-                                    'recurring_invoice_id' => $this->id,
-                                    'invoice_id' => $invoice->id,
-                                    'error' => $e->getMessage(),
-                                ]);
-                            }
-                        }
-                    });
+                    }
                 });
             }
+
+            return $invoice;
+        });
+    }
+
+    public function apply()
+    {
+        $timezone = config('app.timezone', 'Africa/Cairo');
+        $today = Carbon::today($timezone);
+
+        // Daily recurring invoices fire on the day itself to prevent bulk future charges.
+        $daysBefore = ($this->recurring === 'day')
+            ? 0
+            : max(0, min(30, (int) ($this->days_before ?? 3)));
+
+        $nextDate = $this->getNextExecutionDate($today);
+        if ($nextDate) {
+            $diffDays = $today->diffInDays($nextDate, false);
+            if ($diffDays >= 0 && $diffDays <= $daysBefore && ! $this->createdBefore($nextDate)) {
+                $this->createInvoiceForDate($nextDate);
+            }
         }
+    }
+
+    public function fireForDate(Carbon $targetDate): ?Invoice
+    {
+        $timezone = config('app.timezone', 'Africa/Cairo');
+        $today = Carbon::today($timezone);
+        $targetDateCairo = $targetDate->copy()->setTimezone($timezone)->startOfDay();
+
+        if (! $this->isToday($targetDateCairo)) {
+            throw new \InvalidArgumentException('Target date is not a valid scheduled recurrence date for this invoice.');
+        }
+
+        if ($this->createdBefore($targetDateCairo)) {
+            throw new \InvalidArgumentException('This scheduled recurrence has already been generated.');
+        }
+
+        $daysDiff = $today->diffInDays($targetDateCairo, false);
+        if ($daysDiff > 3) {
+            throw new \InvalidArgumentException('Cannot fire invoice more than 3 days in advance.');
+        }
+
+        return $this->createInvoiceForDate($targetDateCairo);
     }
 
     public function generateMissingRuns(?Carbon $until = null): int
@@ -168,18 +237,6 @@ class RecurringInvoice extends Model
             return 0;
         }
 
-        $user = $this->user;
-        if (! $user) {
-            return 0;
-        }
-
-        $userCurrencyId = $user->currency_id ?? $user->currency;
-        if (! $userCurrencyId) {
-            return 0;
-        }
-
-        $convertedAmount = CurrenciesExchange::RateToday($this->amount, $this->currency_id, $userCurrencyId);
-
         $generatedCount = 0;
         $diffDays = $startDate->diffInDays($until);
 
@@ -187,41 +244,10 @@ class RecurringInvoice extends Model
             $checkDate = $startDate->copy()->addDays($i);
             if ($this->isToday($checkDate) && ! $this->createdBefore($checkDate)) {
                 $targetTime = $checkDate->copy()->setTime(3, 0, 0);
-
-                DB::transaction(function () use ($user, $userCurrencyId, $convertedAmount, $checkDate, $targetTime) {
-                    $invoice = new Invoice;
-                    $invoice->uuid = (string) Str::uuid();
-                    $invoice->user_id = $user->id;
-                    $invoice->currency_id = $userCurrencyId;
-                    $invoice->status = 'unpaid';
-                    $invoice->job_status = 'pending';
-                    $invoice->created_at = $targetTime;
-                    $invoice->updated_at = $targetTime;
-                    $invoice->save();
-
-                    $item = new InvoiceItem;
-                    $item->invoice_id = $invoice->id;
-                    $item->item_title = $this->title;
-                    $item->item_type = 'simple';
-                    $item->qty = 1;
-                    $item->amount = $convertedAmount;
-                    $item->created_at = $targetTime;
-                    $item->updated_at = $targetTime;
-                    $item->save();
-
-                    $invoice->unpaid = $invoice->total();
-                    $invoice->save();
-
-                    DB::table('recurring_invoice_records')->insert([
-                        'recurring_invoice_id' => $this->id,
-                        'invoice_id' => $invoice->id,
-                        'unique_id' => $this->unique_id($checkDate),
-                        'created_at' => $targetTime,
-                        'updated_at' => $targetTime,
-                    ]);
-                });
-
-                $generatedCount++;
+                $invoice = $this->createInvoiceForDate($checkDate, $targetTime, false);
+                if ($invoice) {
+                    $generatedCount++;
+                }
             }
         }
 

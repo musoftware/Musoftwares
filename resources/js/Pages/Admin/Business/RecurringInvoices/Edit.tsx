@@ -17,6 +17,8 @@ export default function Edit({ invoice, currencies, users }) {
         user_id: invoice.user_id,
         title: invoice.title,
         amount: invoice.amount,
+        cost: invoice.cost ?? '',
+        days_before: invoice.days_before ?? 3,
         currency: invoice.currency,
         reason: invoice.reason,
         start_date: invoice.start_date,

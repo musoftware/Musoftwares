@@ -55,6 +55,24 @@ export function RecurringScheduleView({
     const scheduleItems: any[] = Array.isArray(upcomingSchedule) ? upcomingSchedule : [];
     const [pendingDelete, setPendingDelete] = useState<number | null>(null);
     const [generating, setGenerating] = useState(false);
+    const [firingDate, setFiringDate] = useState<string | null>(null);
+
+    const handleFireRun = (date: string) => {
+        const confirmMsg = __('general.confirm_fire_invoice_for_date') || `Are you sure you want to fire this recurring invoice for ${date}?`;
+        if (confirm(confirmMsg)) {
+            setFiringDate(date);
+            router.post(route('admin.recurring_invoices.fire_run', item.id), { date }, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success(__('general.recurring_invoice_fired_successfully') || 'Invoice fired successfully');
+                },
+                onError: (err: any) => {
+                    toast.error(err?.message || __('general.failed_to_fire_recurring_invoice') || 'Failed to fire invoice');
+                },
+                onFinish: () => setFiringDate(null),
+            });
+        }
+    };
 
     const handleGenerateMissing = () => {
         const genRoute = kind === 'salary' ? 'admin.recurring_salaries.generate_missing' : 'admin.recurring_invoices.generate_missing';
@@ -142,11 +160,23 @@ export function RecurringScheduleView({
                             </div>
                         </div>
                         <div>
-                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">{__('general.salary_rate')}</span>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">
+                                {kind === 'salary' ? __('general.salary_rate') : __('general.amount')}
+                            </span>
                             <span className="text-sm font-bold text-slate-900 block mt-1 break-words">
                                 {formatMoney(item.amount, item.currency)}
                             </span>
                         </div>
+                        {kind === 'invoice' && item.cost !== undefined && (
+                            <div>
+                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">
+                                    {__('general.cost') || 'Cost'}
+                                </span>
+                                <span className="text-sm font-bold text-slate-700 block mt-1 break-words">
+                                    {formatMoney(item.cost, item.currency)}
+                                </span>
+                            </div>
+                        )}
                         <div className="mt-2">
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">{__('general.title_description')}</span>
                             <span className="text-sm font-medium text-slate-800">{item.title}</span>
@@ -169,6 +199,16 @@ export function RecurringScheduleView({
                                 <Clock className="w-4 h-4 text-slate-500" /> {item.next_date ? new Date(item.next_date).toLocaleDateString() : (item.current_date ? new Date(item.current_date).toLocaleDateString() : '—')}
                             </span>
                         </div>
+                        {kind === 'invoice' && item.days_before !== undefined && (
+                            <div className="mt-2">
+                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">
+                                    {__('general.fire_in_advance_days') || 'Advance Notice'}
+                                </span>
+                                <span className="text-sm font-medium text-slate-800 block mt-0.5">
+                                    {item.days_before} {__('general.days_before_due') || 'days before'}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -277,6 +317,9 @@ export function RecurringScheduleView({
                                         <TableHead className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.projected_date')}</TableHead>
                                         <TableHead className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.status')}</TableHead>
                                         <TableHead className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.amount')}</TableHead>
+                                        {kind === 'invoice' && (
+                                            <TableHead className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.actions')}</TableHead>
+                                        )}
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -302,6 +345,27 @@ export function RecurringScheduleView({
                                                     {run.is_actual ? __('general.actual_amount') : __('general.estimated_amount')}
                                                 </span>
                                             </TableCell>
+                                            {kind === 'invoice' && (
+                                                <TableCell className="px-4 py-3 whitespace-nowrap text-end">
+                                                    {run.can_fire && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="h-7 text-xs border-blue-200 bg-blue-50/60 hover:bg-blue-100 text-blue-700 flex items-center gap-1 ms-auto"
+                                                            onClick={() => handleFireRun(run.date)}
+                                                            disabled={firingDate === run.date}
+                                                        >
+                                                            <Play className="w-3 h-3 fill-current" />
+                                                            {firingDate === run.date ? (__('general.firing') || 'Firing...') : (__('general.fire_now') || 'Fire Now')}
+                                                        </Button>
+                                                    )}
+                                                    {!run.can_fire && !run.recorded && run.days_away > 3 && (
+                                                        <span className="text-xs text-gray-400">
+                                                            {run.days_away}d away
+                                                        </span>
+                                                    )}
+                                                </TableCell>
+                                            )}
                                         </TableRow>
                                     ))}
                                 </TableBody>

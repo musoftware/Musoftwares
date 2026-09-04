@@ -22,6 +22,7 @@ class RecurringInvoiceController extends Controller
         $invoices = RecurringInvoice::with('user')->withCount('records')->latest()->paginate(50);
         $invoices->getCollection()->transform(function ($invoice) {
             $invoice->currency = CurrencyHelper::getFrontendCurrency($invoice->currency_id);
+            $invoice->cost_str = $invoice->current_cost_str();
             $invoice->next_date = $invoice->getNextExecutionDate()?->toDateString();
 
             return $invoice;
@@ -44,6 +45,8 @@ class RecurringInvoiceController extends Controller
             'title' => 'required|string|max:255',
             'start_date' => 'required|date',
             'amount' => 'required|numeric|min:0',
+            'cost' => 'nullable|numeric|min:0',
+            'days_before' => 'nullable|integer|min:0|max:30',
             'recurring_times' => 'required|integer|min:1',
             'recurring' => 'required|in:day,week,month,year',
             'currency' => 'required|exists:currencies,id',
@@ -55,6 +58,8 @@ class RecurringInvoiceController extends Controller
         $invoice->start_date = $request->input('start_date');
         $invoice->current_date = $request->input('start_date');
         $invoice->amount = (float) $request->input('amount');
+        $invoice->cost = (float) $request->input('cost', 0);
+        $invoice->days_before = (int) $request->input('days_before', 3);
         $invoice->currency_id = (int) $request->input('currency');
         $invoice->recurring = $request->input('recurring');
         $invoice->recurring_times = (int) $request->input('recurring_times');
@@ -101,6 +106,8 @@ class RecurringInvoiceController extends Controller
                 'user_id' => $invoice->user_id,
                 'title' => $invoice->title,
                 'amount' => $invoice->amount,
+                'cost' => $invoice->cost ?? 0,
+                'days_before' => $invoice->days_before ?? 3,
                 'currency' => $invoice->currency_id,
                 'start_date' => $invoice->start_date,
                 'recurring' => $invoice->recurring,
@@ -121,6 +128,8 @@ class RecurringInvoiceController extends Controller
             'title' => 'required|string|max:255',
             'start_date' => 'required|date',
             'amount' => 'required|numeric|min:0',
+            'cost' => 'nullable|numeric|min:0',
+            'days_before' => 'nullable|integer|min:0|max:30',
             'recurring_times' => 'required|integer|min:1',
             'recurring' => 'required|in:day,week,month,year',
             'currency' => 'required|exists:currencies,id',
@@ -132,6 +141,8 @@ class RecurringInvoiceController extends Controller
         $invoice->start_date = $request->input('start_date');
         $invoice->current_date = $request->input('start_date');
         $invoice->amount = (float) $request->input('amount');
+        $invoice->cost = (float) $request->input('cost', 0);
+        $invoice->days_before = (int) $request->input('days_before', 3);
         $invoice->currency_id = (int) $request->input('currency');
         $invoice->recurring = $request->input('recurring');
         $invoice->recurring_times = (int) $request->input('recurring_times');
@@ -199,11 +210,16 @@ class RecurringInvoiceController extends Controller
                     }
                 }
 
+                $diffDays = $baseDate->diffInDays($checkDate, false);
+                $canFire = ! $isRecorded && ($diffDays >= 0 && $diffDays <= 3);
+
                 $upcomingSchedule[] = [
                     'date' => $checkDate->toDateString(),
                     'amount_str' => $actualAmountStr ?? $invoice->current_amount_str(),
                     'is_actual' => $actualAmountStr !== null,
                     'recorded' => $isRecorded,
+                    'can_fire' => $canFire,
+                    'days_away' => $diffDays,
                 ];
             }
         }
@@ -216,6 +232,9 @@ class RecurringInvoiceController extends Controller
                 'user' => $invoice->user ? ['id' => $invoice->user->id, 'name' => $invoice->user->name, 'email' => $invoice->user->email] : null,
                 'title' => $invoice->title,
                 'amount' => $invoice->amount,
+                'cost' => $invoice->cost ?? 0,
+                'cost_str' => $invoice->current_cost_str(),
+                'days_before' => $invoice->days_before ?? 3,
                 'currency' => $currencyModel,
                 'start_date' => $invoice->start_date,
                 'current_date' => $invoice->current_date,
@@ -230,6 +249,30 @@ class RecurringInvoiceController extends Controller
                 'entries_count' => $invoice->records()->count(),
             ],
         ]);
+    }
+
+    public function fireRun(Request $request, $id)
+    {
+        $request->validate([
+            'date' => 'required|date',
+        ]);
+
+        $invoice = RecurringInvoice::findOrFail($id);
+        $timezone = config('app.timezone', 'Africa/Cairo');
+        $targetDate = Carbon::parse($request->input('date'), $timezone)->startOfDay();
+
+        try {
+            $createdInvoice = $invoice->fireForDate($targetDate);
+            if ($createdInvoice) {
+                return redirect()->back()->with('success', __('general.recurring_invoice_fired_successfully'));
+            }
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', __('general.failed_to_fire_recurring_invoice'));
+        }
+
+        return redirect()->back()->with('info', __('general.run_already_generated'));
     }
 
     public function delete($id)

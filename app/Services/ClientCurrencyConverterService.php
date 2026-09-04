@@ -167,6 +167,7 @@ class ClientCurrencyConverterService extends BaseService
                     foreach ($rows as $row) {
                         DB::table('recurring_invoices')->where('id', $row->id)->update([
                             'amount' => $convert($row->created_at, $row->amount),
+                            'cost' => isset($row->cost) ? $convert($row->created_at, $row->cost) : 0,
                             'currency_id' => $newId,
                         ]);
                         $counts['recurring_invoices']++;

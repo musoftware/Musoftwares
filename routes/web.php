@@ -1259,6 +1259,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::delete('invoices/{id}/delete', [RecurringInvoiceController::class, 'delete'])->name('recurring_invoices.delete');
         Route::post('invoices/{id}/toggle-status', [RecurringInvoiceController::class, 'toggle'])->name('recurring_invoices.toggle');
         Route::post('invoices/{id}/generate-missing', [RecurringInvoiceController::class, 'generateMissing'])->name('recurring_invoices.generate_missing');
+        Route::post('invoices/{id}/fire-run', [RecurringInvoiceController::class, 'fireRun'])->name('recurring_invoices.fire_run');
         Route::delete('invoices/{invoice}/records/{record}', [RecurringInvoiceController::class, 'deleteRecord'])->name('recurring_invoices.records.delete');
 
         // Notices — managed inline from the Board page (no admin CRUD pages).

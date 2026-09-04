@@ -18,6 +18,8 @@ export interface RecurringScheduleValues {
     user_id: string | number;
     title: string;
     amount: string;
+    cost?: string | number;
+    days_before?: number | string;
     currency: string | number;
     reason: string;
     start_date: string;
@@ -32,6 +34,8 @@ export const EMPTY_RECURRING_FORM: RecurringScheduleValues = {
     user_id: '',
     title: '',
     amount: '',
+    cost: '',
+    days_before: 3,
     currency: '',
     reason: '',
     start_date: new Date().toISOString().slice(0, 10),
@@ -117,10 +121,15 @@ export function RecurringScheduleForm({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        const parsedDaysBefore = form.days_before !== undefined && form.days_before !== ''
+            ? parseInt(String(form.days_before), 10)
+            : 3;
         onSubmit({
             ...form,
             user_id: parseInt(String(form.user_id)) || form.user_id,
             currency: parseInt(String(form.currency)) || form.currency,
+            cost: form.cost !== undefined && form.cost !== '' ? parseFloat(String(form.cost)) : 0,
+            days_before: isNaN(parsedDaysBefore) ? 3 : parsedDaysBefore,
         });
     };
 
@@ -200,6 +209,39 @@ export function RecurringScheduleForm({
                     <InputError message={errors.currency} />
                 </div>
             </div>
+
+            {kind === 'invoice' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-50 border rounded-lg">
+                    <div className="space-y-2">
+                        <Label htmlFor="cost">{__('general.cost') || 'Cost'} ({__('general.optional') || 'Optional'})</Label>
+                        <Input
+                            id="cost"
+                            type="number"
+                            step="any"
+                            min="0"
+                            value={form.cost ?? ''}
+                            onChange={(e) => updateField('cost', e.target.value)}
+                            placeholder="0.00"
+                        />
+                        <p className="text-xs text-muted-foreground">{__('general.recurring_invoice_cost_help') || 'Cost amount that will attach to the generated invoice.'}</p>
+                        <InputError message={errors.cost} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="days_before">{__('general.fire_in_advance_days') || 'Issue in advance (days before)'}</Label>
+                        <Input
+                            id="days_before"
+                            type="number"
+                            min="0"
+                            max="30"
+                            value={form.days_before ?? 3}
+                            onChange={(e) => updateField('days_before', e.target.value ? parseInt(e.target.value, 10) : 0)}
+                            placeholder="3"
+                        />
+                        <p className="text-xs text-muted-foreground">{__('general.fire_in_advance_help') || 'Generate and fire this invoice up to X days before its scheduled date (default 3).'}</p>
+                        <InputError message={errors.days_before} />
+                    </div>
+                </div>
+            )}
 
             <div className="space-y-2">
                 <Label htmlFor="reason">Note / Custom Reason (Optional)</Label>
