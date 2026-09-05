@@ -212,7 +212,68 @@ class AdminSecurityHardeningTest extends TestCase
         ]);
 
         $response->assertOk();
-        $response->assertJson(['status' => 'active']);
+        $response->assertJson(['status' => 'active', 'has_linked_user' => false]);
+    }
+
+    public function test_serial_device_lookup_or_link_user(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'client@testsoftware.com',
+            'name' => 'Client Test',
+        ]);
+
+        // 1. Existing user -> links device and returns active
+        $resFound = $this->postJson('/api/serial/device/link-user', [
+            'program_name' => 'DemoSoft',
+            'device_id' => 'dev-user-123',
+            'email' => 'client@testsoftware.com',
+        ]);
+        $resFound->assertOk();
+        $resFound->assertJson([
+            'status' => 'active',
+            'user_exists' => true,
+        ]);
+
+        // 2. Non-existing user -> returns not_found
+        $resNotFound = $this->postJson('/api/serial/device/link-user', [
+            'program_name' => 'DemoSoft',
+            'device_id' => 'dev-user-456',
+            'email' => 'nonexistent@testsoftware.com',
+        ]);
+        $resNotFound->assertOk();
+        $resNotFound->assertJson([
+            'status' => 'not_found',
+            'user_exists' => false,
+        ]);
+    }
+
+    public function test_serial_device_register_user_and_device(): void
+    {
+        $resRegister = $this->postJson('/api/serial/device/register-user', [
+            'program_name' => 'DemoSoft',
+            'device_id' => 'dev-reg-789',
+            'email' => 'brandnewuser@testsoftware.com',
+            'name' => 'Brand New Client',
+            'phone' => '1012345678',
+            'country_code' => '+20',
+        ]);
+
+        $resRegister->assertOk();
+        $resRegister->assertJson([
+            'status' => 'active',
+            'user_exists' => true,
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'brandnewuser@testsoftware.com',
+            'name' => 'Brand New Client',
+            'mobile_1' => '1012345678',
+        ]);
+
+        $this->assertDatabaseHas('serial_devices', [
+            'device_id' => 'dev-reg-789',
+            'status' => 'active',
+        ]);
     }
 
     // ── set password controller single-use ─────────────────────────────────

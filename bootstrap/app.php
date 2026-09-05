@@ -64,6 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest/quotations/payment/webhook',
             'pay/webhook',
             'api/serial/device',   // Serial license check-in — called by client software, no browser session
+            'api/serial/device/*', // Serial link and user registration from desktop client dialogs
             'crm/whatsapp/webhook/*', // WhatsApp provider webhooks — external POST requests
             'sms-pay/*/verify', // Hosted checkout embedded via iframe across domains
         ]);

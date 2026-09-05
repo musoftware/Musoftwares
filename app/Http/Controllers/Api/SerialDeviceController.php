@@ -96,9 +96,192 @@ class SerialDeviceController extends Controller
             $device->save();
         }
 
+        // Check if device is linked to a user
+        $hasLinkedUser = \App\Models\SerialUserDevice::where('device_id', $validated['device_id'])
+            ->whereNotNull('user_id')
+            ->whereHas('user')
+            ->exists();
+
         // Return the device status — client software acts on this.
         return response()->json([
-            'status' => $device->status,
+            'status'          => $device->status,
+            'has_linked_user' => (bool) $hasLinkedUser,
+        ]);
+    }
+
+    /**
+     * Check if user exists by email and link device if found.
+     * Called when client enters email in the connection/activation dialog.
+     */
+    public function lookupOrLinkUser(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'program_name' => ['required', 'string', 'max:255'],
+            'device_id'    => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'email', 'max:255'],
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $user = \App\Models\User::whereRaw('LOWER(email) = ?', [$email])->first();
+
+        // If user not found, tell client to display registration dialog
+        if (! $user) {
+            return response()->json([
+                'status'      => 'not_found',
+                'user_exists' => false,
+                'message'     => 'User with this email was not found.',
+            ]);
+        }
+
+        // Ensure software & device records exist
+        $software = SerialSoftware::firstOrCreate(
+            ['name' => $validated['program_name']],
+            ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
+        );
+
+        $device = SerialDevice::firstOrCreate(
+            [
+                'serial_software_id' => $software->id,
+                'device_id'          => $validated['device_id'],
+            ],
+            [
+                'status' => SerialDevice::STATUS_ACTIVE,
+            ]
+        );
+
+        // Link device to user (handling potential soft deletes cleanly)
+        $userDevice = \App\Models\SerialUserDevice::withTrashed()
+            ->where('device_id', $validated['device_id'])
+            ->first();
+
+        if ($userDevice) {
+            if ($userDevice->trashed()) {
+                $userDevice->restore();
+            }
+            $userDevice->update([
+                'user_id' => $user->id,
+                'status'  => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+            ]);
+        } else {
+            \App\Models\SerialUserDevice::create([
+                'device_id' => $validated['device_id'],
+                'user_id'   => $user->id,
+                'status'    => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+            ]);
+        }
+
+        // Ensure device status is active
+        $device->update([
+            'status'          => SerialDevice::STATUS_ACTIVE,
+            'last_check_date' => now(),
+        ]);
+
+        return response()->json([
+            'status'      => SerialDevice::STATUS_ACTIVE,
+            'user_exists' => true,
+            'user_name'   => $user->name,
+            'message'     => 'Device linked successfully to user account.',
+        ]);
+    }
+
+    /**
+     * Register a new user and link the device immediately.
+     * Called when client fills in the new user dialog (Name, Phone, Country Code, Email).
+     */
+    public function registerUserAndDevice(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'program_name' => ['required', 'string', 'max:255'],
+            'device_id'    => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'email', 'max:255'],
+            'name'         => ['required', 'string', 'max:255'],
+            'phone'        => ['nullable', 'string', 'max:50'],
+            'country_code' => ['nullable', 'string', 'max:10'],
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $user = \App\Models\User::whereRaw('LOWER(email) = ?', [$email])->first();
+
+        // If user already exists, update info if provided
+        if (! $user) {
+            $user = new \App\Models\User();
+            $user->name = trim($validated['name']);
+            $user->email = $email;
+            $user->password = \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16));
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'phone')) {
+                $user->phone = $validated['phone'] ?? null;
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'mobile_1')) {
+                $user->mobile_1 = $validated['phone'] ?? null;
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp_number')) {
+                $user->whatsapp_number = $validated['phone'] ?? null;
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'country')) {
+                $user->country = $validated['country_code'] ?? null;
+            }
+            $user->save();
+
+            // Assign client role if Spatie roles available
+            try {
+                if (method_exists($user, 'syncRoles')) {
+                    $user->syncRoles(['client']);
+                } elseif (method_exists($user, 'assignRole')) {
+                    $user->assignRole('client');
+                }
+            } catch (\Throwable $e) {
+                // Ignore role assignment failure if roles table not initialized
+            }
+        }
+
+        // Ensure software & device records exist
+        $software = SerialSoftware::firstOrCreate(
+            ['name' => $validated['program_name']],
+            ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
+        );
+
+        $device = SerialDevice::firstOrCreate(
+            [
+                'serial_software_id' => $software->id,
+                'device_id'          => $validated['device_id'],
+            ],
+            [
+                'status' => SerialDevice::STATUS_ACTIVE,
+            ]
+        );
+
+        // Link device to user (handling potential soft deletes cleanly)
+        $userDevice = \App\Models\SerialUserDevice::withTrashed()
+            ->where('device_id', $validated['device_id'])
+            ->first();
+
+        if ($userDevice) {
+            if ($userDevice->trashed()) {
+                $userDevice->restore();
+            }
+            $userDevice->update([
+                'user_id' => $user->id,
+                'status'  => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+            ]);
+        } else {
+            \App\Models\SerialUserDevice::create([
+                'device_id' => $validated['device_id'],
+                'user_id'   => $user->id,
+                'status'    => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+            ]);
+        }
+
+        // Ensure device status is active
+        $device->update([
+            'status'          => SerialDevice::STATUS_ACTIVE,
+            'last_check_date' => now(),
+        ]);
+
+        return response()->json([
+            'status'      => SerialDevice::STATUS_ACTIVE,
+            'user_exists' => true,
+            'user_name'   => $user->name,
+            'message'     => 'User registered and device activated successfully.',
         ]);
     }
 }
