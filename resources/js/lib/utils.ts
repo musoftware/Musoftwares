@@ -60,6 +60,20 @@ export function formatMoney(amount: number | string, currency?: any) {
             String(c.id) === curCode
         );
     }
+    const KNOWN_ID_MAP: Record<string, string> = {
+        '1': 'USD',
+        '2': 'EGP',
+        '3': 'EUR',
+        '4': 'GBP',
+        '5': 'AED',
+        '6': 'SAR',
+        '7': 'MAD',
+        '8': 'IQD',
+    };
+
+    if (!found && KNOWN_ID_MAP[curCode]) {
+        curCode = KNOWN_ID_MAP[curCode];
+    }
 
     if (found) {
         curCode = found.currency ? found.currency.toUpperCase() : curCode;

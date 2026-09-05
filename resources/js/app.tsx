@@ -19,9 +19,17 @@ if (typeof window !== 'undefined') {
 
 // Listen for Inertia page transitions to keep document lang & dir synced
 router.on('navigate', (event) => {
-    const locale = (event.detail.page.props as any)?.locale;
-    if (locale) {
-        syncDocumentDirection(locale);
+    const props = event.detail.page.props as any;
+    if (props?.locale) {
+        syncDocumentDirection(props.locale);
+    }
+    if (props?.currencies) {
+        (window as any).currencies = props.currencies;
+    }
+    if (props?.wallet?.currency) {
+        (window as any).defaultCurrency = props.wallet.currency;
+    } else if (props?.settings?.base_currency) {
+        (window as any).defaultCurrency = props.settings.base_currency;
     }
 });
 

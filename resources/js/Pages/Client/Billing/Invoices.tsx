@@ -15,6 +15,8 @@ interface Invoice {
     amount: number;
     paid_amount: number;
     remaining: number;
+    wallet_amount?: number;
+    wallet_remaining?: number;
     currency: any;
     status: string;
     due_date: string;
@@ -47,6 +49,7 @@ interface IndexProps {
     };
     unpaid_invoices?: Invoice[];
     paid_invoices?: Invoice[];
+    total_outstanding?: number;
     client_balance?: number;
     wallet_currency?: any;
 }
@@ -56,10 +59,15 @@ export default function Invoices({
     invoices,
     unpaid_invoices = [],
     paid_invoices = [],
+    total_outstanding,
     client_balance = 0.0,
     wallet_currency = 'USD',
 }: IndexProps) {
-    const totalOutstanding = unpaid_invoices.reduce((sum, inv) => sum + inv.remaining, 0);
+    const totalOutstanding = total_outstanding !== undefined
+        ? total_outstanding
+        : unpaid_invoices
+            .filter((inv) => inv.status === 'unpaid' || inv.status === 'partially_paid')
+            .reduce((sum, inv) => sum + inv.remaining, 0);
 
     const columns = [
         {
@@ -100,13 +108,24 @@ export default function Invoices({
         {
             key: 'amount',
             label: __('general.amount'),
-            render: (row: Invoice) => (
-                <CurrencyDisplay
-                    amount={row.amount}
-                    currency={row.currency}
-                    className="font-bold text-[#1d1d1f] text-xs sm:text-sm font-mono"
-                />
-            ),
+            render: (row: Invoice) => {
+                const isDifferentCurrency =
+                    row.wallet_amount !== undefined &&
+                    row.currency &&
+                    wallet_currency &&
+                    ((row.currency.id && wallet_currency.id && row.currency.id !== wallet_currency.id) ||
+                     (row.currency.currency && wallet_currency.currency && row.currency.currency !== wallet_currency.currency));
+
+                return (
+                    <CurrencyDisplay
+                        amount={row.amount}
+                        currency={row.currency}
+                        businessAmount={isDifferentCurrency ? row.wallet_amount : undefined}
+                        businessCurrency={wallet_currency}
+                        className="font-bold text-[#1d1d1f] text-xs sm:text-sm font-mono"
+                    />
+                );
+            },
         },
         {
             key: 'paid_amount',
@@ -122,13 +141,24 @@ export default function Invoices({
         {
             key: 'remaining',
             label: __('general.remaining'),
-            render: (row: Invoice) => (
-                <CurrencyDisplay
-                    amount={row.remaining}
-                    currency={row.currency}
-                    className="font-bold text-[#1d1d1f] text-xs sm:text-sm font-mono"
-                />
-            ),
+            render: (row: Invoice) => {
+                const isDifferentCurrency =
+                    row.wallet_remaining !== undefined &&
+                    row.currency &&
+                    wallet_currency &&
+                    ((row.currency.id && wallet_currency.id && row.currency.id !== wallet_currency.id) ||
+                     (row.currency.currency && wallet_currency.currency && row.currency.currency !== wallet_currency.currency));
+
+                return (
+                    <CurrencyDisplay
+                        amount={row.remaining}
+                        currency={row.currency}
+                        businessAmount={isDifferentCurrency ? row.wallet_remaining : undefined}
+                        businessCurrency={wallet_currency}
+                        className="font-bold text-[#1d1d1f] text-xs sm:text-sm font-mono"
+                    />
+                );
+            },
         },
         {
             key: 'status',

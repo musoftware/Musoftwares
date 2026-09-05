@@ -40,6 +40,12 @@ class Invoice extends Model
             if (empty($invoice->uuid)) {
                 $invoice->uuid = (string) Str::uuid();
             }
+            if (empty($invoice->currency_id) && ! empty($invoice->user_id)) {
+                $user = $invoice->user ?? User::find($invoice->user_id);
+                if ($user && ! empty($user->currency_id)) {
+                    $invoice->currency_id = $user->currency_id;
+                }
+            }
         });
 
         static::saving(function ($invoice) {
@@ -67,6 +73,10 @@ class Invoice extends Model
 
     public function getCurrencyAttribute()
     {
+        if ($this->relationLoaded('currency')) {
+            return $this->getRelation('currency');
+        }
+
         return $this->attributes['currency_id'] ?? null;
     }
 

@@ -331,7 +331,7 @@ class User extends Authenticatable
         $invoices = $invoices->get();
         $unpaid = 0;
         foreach ($invoices as $invoice) {
-            $unpaid += CurrenciesExchange::RateToday($invoice->unpaid_total(), $invoice->currency, $this->currency_id);
+            $unpaid += CurrenciesExchange::RateToday($invoice->unpaid_total(), $invoice->currency_id, $this->currency_id);
         }
 
         return $unpaid;

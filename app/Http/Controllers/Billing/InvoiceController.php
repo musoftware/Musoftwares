@@ -23,38 +23,52 @@ class InvoiceController extends Controller
     {
         $user = Auth::user();
 
+        $walletCurrencyId = $user->currency_id;
+        if (! $walletCurrencyId) {
+            throw new \Exception("User {$user->id} is missing a currency configuration.");
+        }
+        $walletCurrency = Currency::findCached($walletCurrencyId) ?? Currency::find($walletCurrencyId);
+
         $invoices = Invoice::where('user_id', $user->id)
             ->where('is_suspended', false)
             ->with(['currency'])
             ->latest()
             ->paginate(14)
-            ->through(fn ($inv) => [
-                'id' => $inv->id,
-                'uuid' => $inv->uuid,
-                'invoice_number' => $inv->id, // Platform invoices might use id or enc_id(), check this
-                'amount' => round((float) $inv->total(), 2),
-                'paid_amount' => round((float) $inv->paid, 2),
-                'remaining' => $inv->unpaid_total(),
-                'currency' => $inv->currency_id,
-                'status' => $inv->status,
-                'due_date' => $inv->schedule['start_date'] ?? null, // fallback
-                'issued_at' => $inv->created_at?->format('Y-m-d'),
-            ]);
+            ->through(function ($inv) use ($walletCurrencyId, $walletCurrency) {
+                $curr = Currency::findCached($inv->currency_id) ?? Currency::find($inv->currency_id) ?? $walletCurrency;
+
+                return [
+                    'id' => $inv->id,
+                    'uuid' => $inv->uuid,
+                    'invoice_number' => $inv->id,
+                    'amount' => round((float) $inv->total(), 2),
+                    'paid_amount' => round((float) $inv->paid, 2),
+                    'remaining' => $inv->unpaid_total(),
+                    'wallet_amount' => round((float) CurrenciesExchange::RateToday($inv->total(), $inv->currency_id, $walletCurrencyId), 2),
+                    'wallet_remaining' => round((float) CurrenciesExchange::RateToday($inv->unpaid_total(), $inv->currency_id, $walletCurrencyId), 2),
+                    'currency' => $curr ? [
+                        'id' => $curr->id,
+                        'currency' => $curr->currency,
+                        'symbol' => $curr->symbol,
+                        'string_format' => $curr->string_format,
+                    ] : null,
+                    'status' => $inv->status,
+                    'due_date' => $inv->schedule['start_date'] ?? null,
+                    'issued_at' => $inv->created_at?->format('Y-m-d'),
+                ];
+            });
 
         $collection = $invoices->getCollection();
-        $unpaidInvoices = $collection->filter(fn ($i) => $i['status'] !== 'paid')->values();
+        $unpaidInvoices = $collection->filter(fn ($i) => in_array($i['status'], ['unpaid', 'partially_paid']))->values();
         $paidInvoices = $collection->filter(fn ($i) => $i['status'] === 'paid')->values();
 
-        $walletCurrencyId = $user->currency_id;
-        if (! $walletCurrencyId) {
-            throw new \Exception("User {$user->id} is missing a currency configuration.");
-        }
-        $walletCurrency = Currency::find($walletCurrencyId);
+        $totalOutstanding = round((float) $user->unpaid_invoices_amount(true), 2);
 
         return Inertia::render('Client/Billing/Invoices', [
             'invoices' => $invoices,
             'unpaid_invoices' => $unpaidInvoices,
             'paid_invoices' => $paidInvoices,
+            'total_outstanding' => $totalOutstanding,
             'client_balance' => round((float) $user->balance(), 2),
             'wallet_currency' => $walletCurrency,
         ]);
@@ -95,7 +109,12 @@ class InvoiceController extends Controller
                 'amount' => round((float) $invoice->total(), 2),
                 'paid_amount' => round((float) $invoice->paid, 2),
                 'remaining' => $invoice->unpaid_total(),
-                'currency' => $invoice->currency_id,
+                'currency' => ($curr = Currency::findCached($invoice->currency_id) ?? Currency::find($invoice->currency_id) ?? $walletCurrency) ? [
+                    'id' => $curr->id,
+                    'currency' => $curr->currency,
+                    'symbol' => $curr->symbol,
+                    'string_format' => $curr->string_format,
+                ] : null,
                 'status' => $invoice->status,
                 'due_date' => $invoice->schedule['start_date'] ?? null,
                 'issued_at' => $invoice->created_at?->format('Y-m-d'),
