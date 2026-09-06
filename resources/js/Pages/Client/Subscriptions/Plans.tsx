@@ -70,17 +70,17 @@ export default function Plans({
 
                 {/* ── Active Subscription Workspace Banner & Mode Switcher ── */}
                 {hasActiveSub && (
-                    <div className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4 transition-colors">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center shrink-0">
                                     <ShieldCheck className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-semibold text-slate-900">
+                                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
                                         Active Workspace Modules
                                     </h4>
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
                                         Your current plan has active features
                                         {activeSubscription.expires_at && ` • Renews on ${activeSubscription.expires_at}`}
                                     </p>
@@ -88,18 +88,18 @@ export default function Plans({
                             </div>
 
                             {/* Mode Switcher */}
-                            <div className="flex bg-slate-100 p-1 rounded-xl shrink-0 self-start sm:self-auto">
+                            <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl shrink-0 self-start sm:self-auto border border-transparent dark:border-white/10">
                                 <button
                                     type="button"
                                     onClick={() => setIsNewSystem(false)}
                                     className={cn(
                                         'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5',
                                         !isNewSystem
-                                            ? 'bg-white text-slate-900 shadow-2xs'
-                                            : 'text-slate-500 hover:text-slate-900'
+                                            ? 'bg-white dark:bg-[#1e293b] text-slate-900 dark:text-white shadow-2xs'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     )}
                                 >
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                     <span>Add to Current Workspace</span>
                                 </button>
                                 <button
@@ -108,11 +108,11 @@ export default function Plans({
                                     className={cn(
                                         'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5',
                                         isNewSystem
-                                            ? 'bg-white text-slate-900 shadow-2xs'
-                                            : 'text-slate-500 hover:text-slate-900'
+                                            ? 'bg-white dark:bg-[#1e293b] text-slate-900 dark:text-white shadow-2xs'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                     )}
                                 >
-                                    <PlusCircle className="w-3.5 h-3.5 text-indigo-600" />
+                                    <PlusCircle className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                                     <span>New Workspace</span>
                                 </button>
                             </div>

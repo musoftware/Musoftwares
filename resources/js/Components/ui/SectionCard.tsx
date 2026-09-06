@@ -22,12 +22,12 @@ export function SectionCard({
     ...props
 }: SectionCardProps) {
     return (
-        <div className={cn('bg-white shadow-sm border border-slate-100 rounded-2xl overflow-hidden', className)} {...props}>
+        <div className={cn('bg-white dark:bg-zinc-900/80 shadow-sm border border-slate-100 dark:border-zinc-800 rounded-2xl overflow-hidden transition-colors', className)} {...props}>
             {(title || description || action) && (
-                <div className={cn('flex flex-row items-center justify-between border-b border-slate-100 p-6', noPadding && 'pb-4')}>
+                <div className={cn('flex flex-row items-center justify-between border-b border-slate-100 dark:border-zinc-800 p-6', noPadding && 'pb-4')}>
                     <div className="space-y-1">
-                        {title && <h3 className="text-lg font-semibold text-slate-900">{title}</h3>}
-                        {description && <p className="text-sm text-slate-500">{description}</p>}
+                        {title && <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>}
+                        {description && <p className="text-sm text-slate-500 dark:text-zinc-400">{description}</p>}
                     </div>
                     {action && <div className="shrink-0 ms-4">{action}</div>}
                 </div>
@@ -36,7 +36,7 @@ export function SectionCard({
                 {children}
             </div>
             {footer && (
-                <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-4">
+                <div className="border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/40 px-6 py-4">
                     {footer}
                 </div>
             )}

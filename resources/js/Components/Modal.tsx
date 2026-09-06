@@ -35,7 +35,7 @@ export default function Modal({
             <DialogContent
                 showCloseButton={closeable}
                 className={cn(
-                    'w-full max-w-none rounded-xl bg-white p-0 shadow-xl ring-1 ring-slate-200',
+                    'w-full max-w-none rounded-xl bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 p-0 shadow-xl ring-1 ring-slate-200 dark:ring-zinc-800',
                     maxWidthClasses[maxWidth],
                 )}
             >

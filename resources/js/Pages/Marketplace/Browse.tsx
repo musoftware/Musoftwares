@@ -127,7 +127,7 @@ export default function Browse({ services, categories, filters }: any) {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder={__('general.what_service_are_you_looking_for_today')}
-                            className="w-full rounded-full py-4 pe-32 ps-6 text-lg text-gray-900 shadow-lg focus:ring-4 focus:ring-indigo-300 focus:outline-none"
+                            className="w-full rounded-full py-4 pe-32 ps-6 text-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 shadow-lg focus:ring-4 focus:ring-indigo-300 focus:outline-none border-0 dark:border dark:border-white/10"
                         />
                         <button
                             type="submit"
@@ -150,12 +150,12 @@ export default function Browse({ services, categories, filters }: any) {
 
             {/* Active Filter Indicators */}
             {(filters.category || filters.search) && (
-                <div className="border-b border-gray-200 bg-gray-50 py-3">
+                <div className="border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#090d16] py-3">
                     <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                            <span className="font-medium text-gray-500">{__('general.filtering_by') || 'Filtering by'}:</span>
+                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300">
+                            <span className="font-medium text-gray-500 dark:text-slate-400">{__('general.filtering_by') || 'Filtering by'}:</span>
                             {filters.category && (
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 dark:bg-indigo-950/50 px-3 py-1 text-xs font-semibold text-indigo-800 dark:text-indigo-300">
                                     {filters.category_name || categories.find((c: any) =>
                                         (c?.id && filters.category_id && c.id.toString() === filters.category_id.toString()) ||
                                         (c?.slug && c.slug.toLowerCase() === filters.category?.toString().toLowerCase()) ||
@@ -165,14 +165,14 @@ export default function Browse({ services, categories, filters }: any) {
                                     <button
                                         type="button"
                                         onClick={() => selectCategory('')}
-                                        className="ms-1 font-bold hover:text-indigo-950"
+                                        className="ms-1 font-bold hover:text-indigo-950 dark:hover:text-white"
                                     >
                                         ×
                                     </button>
                                 </span>
                             )}
                             {filters.search && (
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-800">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-200 dark:bg-white/10 px-3 py-1 text-xs font-semibold text-gray-800 dark:text-slate-200">
                                     "{filters.search}"
                                     <button
                                         type="button"
@@ -184,7 +184,7 @@ export default function Browse({ services, categories, filters }: any) {
                                                 { preserveState: true }
                                             );
                                         }}
-                                        className="ms-1 font-bold hover:text-gray-950"
+                                        className="ms-1 font-bold hover:text-gray-950 dark:hover:text-white"
                                     >
                                         ×
                                     </button>
@@ -202,7 +202,7 @@ export default function Browse({ services, categories, filters }: any) {
                                     { preserveState: true }
                                 );
                             }}
-                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                            className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                         >
                             {__('general.clear_all_filters') || 'Clear all'}
                         </button>
@@ -212,22 +212,22 @@ export default function Browse({ services, categories, filters }: any) {
 
 
             {/* Services Grid with Skeleton Loader */}
-            <div className="min-h-screen bg-gray-50 py-12">
+            <div className="min-h-screen bg-gray-50 dark:bg-[#090d16] py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {loading ? (
                         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                             {[1, 2, 3, 4, 5, 6].map((n) => (
-                                <div key={n} className="flex h-96 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse">
-                                    <div className="h-48 w-full rounded-lg bg-gray-200" />
+                                <div key={n} className="flex h-96 flex-col overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f172a] p-4 shadow-sm animate-pulse">
+                                    <div className="h-48 w-full rounded-lg bg-gray-200 dark:bg-slate-800" />
                                     <div className="mt-4 flex items-center gap-2">
-                                        <div className="h-6 w-6 rounded-full bg-indigo-100" />
-                                        <div className="h-4 w-28 rounded bg-gray-200" />
+                                        <div className="h-6 w-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50" />
+                                        <div className="h-4 w-28 rounded bg-gray-200 dark:bg-slate-800" />
                                     </div>
-                                    <div className="mt-3 h-5 w-3/4 rounded bg-gray-200" />
-                                    <div className="mt-2 h-4 w-1/2 rounded bg-gray-200" />
-                                    <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
-                                        <div className="h-4 w-16 rounded bg-gray-200" />
-                                        <div className="h-6 w-20 rounded bg-gray-200" />
+                                    <div className="mt-3 h-5 w-3/4 rounded bg-gray-200 dark:bg-slate-800" />
+                                    <div className="mt-2 h-4 w-1/2 rounded bg-gray-200 dark:bg-slate-800" />
+                                    <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/10">
+                                        <div className="h-4 w-16 rounded bg-gray-200 dark:bg-slate-800" />
+                                        <div className="h-6 w-20 rounded bg-gray-200 dark:bg-slate-800" />
                                     </div>
                                 </div>
                             ))}
@@ -261,10 +261,10 @@ export default function Browse({ services, categories, filters }: any) {
                                     className="group block h-full"
                                 >
                                     <div
-                                        className={`flex h-full flex-col overflow-hidden rounded-xl border bg-white transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl ${service.is_featured ? 'border-2 border-amber-400' : 'border-gray-200'}`}
+                                        className={`flex h-full flex-col overflow-hidden rounded-xl border bg-white dark:bg-[#0f172a] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl ${service.is_featured ? 'border-2 border-amber-400' : 'border-gray-200 dark:border-white/10'}`}
                                     >
                                         {/* Cover Image */}
-                                        <div className="relative h-52 overflow-hidden bg-gray-200">
+                                        <div className="relative h-52 overflow-hidden bg-gray-200 dark:bg-slate-800">
                                             {(service.thumbnail || service.cover_image) ? (
                                                 <img
                                                     src={service.thumbnail || service.cover_image}
@@ -272,8 +272,8 @@ export default function Browse({ services, categories, filters }: any) {
                                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                 />
                                             ) : (
-                                                <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400 transition-transform duration-500 group-hover:scale-105">
-                                                    <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                                <div className="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 transition-transform duration-500 group-hover:scale-105">
+                                                    <svg className="h-10 w-10 text-gray-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                     </svg>
                                                 </div>
@@ -297,7 +297,7 @@ export default function Browse({ services, categories, filters }: any) {
                                                         { preserveScroll: true }
                                                     );
                                                 }}
-                                                className={`absolute top-3 end-3 rounded-full bg-white/90 p-2 shadow-sm transition-colors ${service.is_favorited ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+                                                className={`absolute top-3 end-3 rounded-full bg-white/90 dark:bg-slate-900/90 p-2 shadow-sm transition-colors ${service.is_favorited ? 'text-red-500 hover:text-red-600' : 'text-gray-400 dark:text-slate-400 hover:text-red-500'}`}
                                                 title={service.is_favorited ? __('general.remove_from_favorites') || 'Remove from favorites' : __('general.add_to_favorites') || 'Add to favorites'}
                                             >
                                                 <svg
@@ -319,18 +319,18 @@ export default function Browse({ services, categories, filters }: any) {
                                         <div className="flex flex-1 flex-col p-5">
                                             {/* Seller Info */}
                                             <div className="mb-3 flex items-center gap-2">
-                                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+                                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-xs font-bold text-indigo-700 dark:text-indigo-300">
                                                     {service.seller?.name?.charAt(
                                                         0,
                                                     ) || '?'}
                                                 </div>
-                                                <span className="truncate text-sm font-medium text-gray-900">
+                                                <span className="truncate text-sm font-medium text-gray-900 dark:text-white">
                                                     {service.seller?.name}
                                                 </span>
                                             </div>
 
                                             {/* Title */}
-                                            <h3 className="line-clamp-2 flex-1 text-base leading-tight text-gray-800 transition-colors group-hover:text-indigo-600">
+                                            <h3 className="line-clamp-2 flex-1 text-base leading-tight text-gray-800 dark:text-slate-100 transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
                                                 {service.title}
                                             </h3>
 
@@ -347,7 +347,7 @@ export default function Browse({ services, categories, filters }: any) {
                                                     <span className="text-sm font-bold">
                                                         {rating}
                                                     </span>
-                                                    <span className="text-sm text-gray-500">
+                                                    <span className="text-sm text-gray-500 dark:text-slate-400">
                                                         ({reviewsCount})
                                                     </span>
                                                 </div>
@@ -355,8 +355,8 @@ export default function Browse({ services, categories, filters }: any) {
                                         </div>
 
                                         {/* Footer / Price */}
-                                        <div className="flex items-center justify-between border-t border-gray-100 px-5 py-4">
-                                            <div className="cursor-pointer text-gray-500 hover:text-indigo-600">
+                                        <div className="flex items-center justify-between border-t border-gray-100 dark:border-white/10 px-5 py-4">
+                                            <div className="cursor-pointer text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
                                                 <svg
                                                     className="h-5 w-5"
                                                     fill="none"
@@ -372,13 +372,13 @@ export default function Browse({ services, categories, filters }: any) {
                                                 </svg>
                                             </div>
                                             <div className="text-end">
-                                                <span className="text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.starting_at')}</span>
+                                                <span className="text-xs font-medium tracking-wider text-gray-500 dark:text-slate-400 uppercase">{__('general.starting_at')}</span>
                                                 <div className="flex items-center gap-1.5 justify-end">
-                                                    <span className="block text-lg font-bold text-gray-900">
+                                                    <span className="block text-lg font-bold text-gray-900 dark:text-white">
                                                         {formatCurrency(startingPrice, startingCurrency)}
                                                     </span>
                                                     {hasDiscount && oldPrice && (
-                                                        <span className="text-xs font-medium text-gray-400 line-through">
+                                                        <span className="text-xs font-medium text-gray-400 dark:text-slate-500 line-through">
                                                             {formatCurrency(oldPrice, startingCurrency)}
                                                         </span>
                                                     )}
@@ -393,9 +393,9 @@ export default function Browse({ services, categories, filters }: any) {
                     )}
 
                     {!loading && ((servicesData?.data || services?.data || []) as any).length === 0 && (
-                        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-12 text-center text-gray-500 shadow-sm">
+                        <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f172a] p-12 text-center text-gray-500 dark:text-slate-400 shadow-sm">
                             <svg
-                                className="mx-auto mb-4 h-12 w-12 text-gray-400"
+                                className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-slate-500"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -407,15 +407,15 @@ export default function Browse({ services, categories, filters }: any) {
                                     d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                 ></path>
                             </svg>
-                            <h3 className="text-lg font-medium text-gray-900">{__('general.no_services_found')}</h3>
-                            <p className="mt-1 text-sm text-gray-500">{__('general.try_adjusting_your_search_or_category_filters')}</p>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">{__('general.no_services_found')}</h3>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{__('general.try_adjusting_your_search_or_category_filters')}</p>
                             <button
                                 onClick={() => {
                                     setSearch('');
                                     setCategoryId('');
                                     handleSearch();
                                 }}
-                                className="mt-4 font-medium text-indigo-600 hover:text-indigo-500"
+                                className="mt-4 font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
                             >{__('general.clear_all_filters')}</button>
                         </div>
                     )}
@@ -438,7 +438,7 @@ export default function Browse({ services, categories, filters }: any) {
                                             );
                                     }}
                                     disabled={!link.url}
-                                    className={`rounded-md border px-4 py-2 text-sm font-medium transition ${link.active ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'} ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
+                                    className={`rounded-md border px-4 py-2 text-sm font-medium transition ${link.active ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 dark:border-white/10 bg-white dark:bg-[#1e293b] text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700'} ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                     dangerouslySetInnerHTML={{
                                         __html: link.label,
                                     }}

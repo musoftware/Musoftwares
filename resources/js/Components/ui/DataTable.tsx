@@ -105,13 +105,13 @@ export function DataTable({
     return (
         <div
             className={cn(
-                'flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm',
+                'flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 shadow-sm transition-colors duration-200',
                 className,
             )}
         >
             {/* Top Bar: Search & Filters */}
             {(onSearch || filters?.extra) && (
-                <div className="flex items-center justify-between gap-4 border-b border-slate-100 p-4">
+                <div className="flex items-center justify-between gap-4 border-b border-slate-100 dark:border-zinc-800 p-4">
                     {onSearch && (
                         <div className="w-full sm:max-w-sm">
                             <SearchInput
@@ -132,12 +132,12 @@ export function DataTable({
                             {/* Mobile Popover filters */}
                             <div className="sm:hidden flex items-center">
                                 <Popover>
-                                    <PopoverTrigger className={cn(buttonVariants({ variant: "outline", size: "icon" }), "h-9 w-9 shrink-0 text-slate-500")}>
+                                    <PopoverTrigger className={cn(buttonVariants({ variant: "outline", size: "icon" }), "h-9 w-9 shrink-0 text-slate-500 dark:text-zinc-400")}>
                                         <Filter className="h-4 w-4" />
                                     </PopoverTrigger>
                                     <PopoverContent align="end" className="w-[280px]">
                                         <div className="space-y-4">
-                                            <h4 className="font-medium text-sm text-slate-900">{__('general.filters') || 'Filters'}</h4>
+                                            <h4 className="font-medium text-sm text-slate-900 dark:text-zinc-100">{__('general.filters') || 'Filters'}</h4>
                                             <div className="flex flex-col gap-3 [&_select]:w-full [&_.flex]:flex-col [&_.flex]:items-start [&_.flex]:w-full">
                                                 {filters.extra}
                                             </div>
@@ -153,15 +153,15 @@ export function DataTable({
             {/* Table Area */}
             <div className="relative flex-1 overflow-x-auto">
                 <table className="w-full border-collapse text-start font-sans text-[13px]">
-                    <thead className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50">
+                    <thead className="sticky top-0 z-10 border-b border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950/70">
                         <tr>
                             {normalized.map((col, idx) => (
                                 <th
                                     key={idx}
                                     className={cn(
-                                        'px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap',
+                                        'px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 whitespace-nowrap',
                                         col.sortable
-                                            ? 'cursor-pointer select-none transition-colors hover:text-slate-900'
+                                            ? 'cursor-pointer select-none transition-colors hover:text-slate-900 dark:hover:text-zinc-100'
                                             : '',
                                         col.className,
                                     )}
@@ -174,27 +174,27 @@ export function DataTable({
                                         {col.sortable &&
                                             filters?.sort === col.key &&
                                             (filters?.dir === 'asc' ? (
-                                                <ChevronUp className="h-3.5 w-3.5 text-indigo-600" />
+                                                 <ChevronUp className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                                             ) : (
-                                                <ChevronDown className="h-3.5 w-3.5 text-indigo-600" />
+                                                 <ChevronDown className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                                             ))}
                                     </div>
                                 </th>
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-slate-100">
+                    <tbody className="bg-white dark:bg-transparent divide-y divide-slate-100 dark:divide-zinc-800/80">
                         {(data as any).length > 0 ? (
                             (data as any).map((row, rowIndex) => (
                                 <tr
                                     key={row.id ?? rowIndex}
-                                    className="transition-colors duration-100 hover:bg-slate-50/70"
+                                    className="transition-colors duration-100 hover:bg-slate-50/70 dark:hover:bg-zinc-800/50"
                                 >
                                     {normalized.map((col, colIndex) => (
                                         <td
                                             key={colIndex}
                                             className={cn(
-                                                'px-4 py-3 text-slate-700',
+                                                'px-4 py-3 text-slate-700 dark:text-zinc-200',
                                                 col.className,
                                             )}
                                         >
@@ -214,7 +214,7 @@ export function DataTable({
                                             icon={emptyIcon}
                                             title={emptyTitle}
                                             description={emptyDescription}
-                                            className="rounded-none border-0 bg-white py-12"
+                                            className="rounded-none border-0 bg-transparent py-12"
                                         />
                                     )}
                                 </td>
@@ -226,11 +226,11 @@ export function DataTable({
 
             {/* Pagination Bar */}
             {pagination && pagination.total > 0 && (
-                <div className="flex items-center justify-between gap-4 border-t border-slate-200 bg-white px-4 py-3 text-[13px] text-slate-600">
+                <div className="flex items-center justify-between gap-4 border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/40 px-4 py-3 text-[13px] text-slate-600 dark:text-zinc-400">
                     <div className="flex items-center gap-2">
-                        <span className="text-slate-400 text-xs">{__('general.show')}</span>
+                        <span className="text-slate-400 dark:text-zinc-500 text-xs">{__('general.show')}</span>
                         <select
-                            className="h-7 rounded-md border border-slate-200 bg-white ps-2 pe-6 text-[12px] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            className="h-7 rounded-md border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-200 ps-2 pe-6 text-[12px] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             value={pagination.per_page}
                             onChange={(e) =>
                                 onPerPageChange?.(Number(e.target.value))
@@ -260,15 +260,15 @@ export function DataTable({
                                             className={cn(
                                                 'rounded-md px-2.5 py-1 text-[12px] transition-colors min-w-[28px] text-center',
                                                 link.active
-                                                    ? 'bg-slate-900 font-medium text-white shadow-sm'
-                                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                                                    ? 'bg-slate-900 dark:bg-white font-medium text-white dark:text-slate-900 shadow-sm'
+                                                    : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-zinc-100'
                                             )}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ) : (
                                         <span
                                             key={idx}
-                                            className="rounded-md px-2.5 py-1 text-[12px] text-slate-300 cursor-not-allowed min-w-[28px] text-center"
+                                            className="rounded-md px-2.5 py-1 text-[12px] text-slate-300 dark:text-zinc-600 cursor-not-allowed min-w-[28px] text-center"
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     )
@@ -281,13 +281,13 @@ export function DataTable({
                                         onPageChange?.(pagination.current_page - 1)
                                     }
                                     disabled={pagination.current_page === 1}
-                                    className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
+                                    className="rounded-md p-1.5 text-slate-500 dark:text-zinc-400 transition-colors hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     <ChevronLeft className="h-4 w-4" />
                                 </button>
 
                                 <div className="flex items-center gap-1 px-2">
-                                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-900 font-medium text-white text-[12px]">
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-900 dark:bg-white font-medium text-white dark:text-slate-900 text-[12px]">
                                         {pagination.current_page}
                                     </span>
                                 </div>
@@ -299,7 +299,7 @@ export function DataTable({
                                     disabled={
                                         pagination.current_page === pagination.last_page
                                     }
-                                    className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
+                                    className="rounded-md p-1.5 text-slate-500 dark:text-zinc-400 transition-colors hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     <ChevronRight className="h-4 w-4" />
                                 </button>

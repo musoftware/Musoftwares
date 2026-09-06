@@ -53,8 +53,22 @@ export default function ERPLayout({
 
     const safeWorkspaceName = workspaceName || 'Workspace';
 
+    const getMenuItemClasses = (isActive: boolean) =>
+        `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
+            isActive
+                ? 'bg-slate-100 dark:bg-zinc-800 font-medium text-slate-900 dark:text-white'
+                : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-800/60 hover:text-slate-900 dark:hover:text-white'
+        }`;
+
+    const getAddonClasses = (isActive: boolean) =>
+        `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
+            isActive
+                ? 'bg-slate-100/70 dark:bg-zinc-800/70 text-slate-500 dark:text-zinc-400 opacity-75'
+                : 'text-slate-400 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-800/50 hover:text-slate-500 dark:hover:text-zinc-300 opacity-60 hover:opacity-80'
+        }`;
+
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#090d16] font-sans text-slate-900 dark:text-slate-100 flex flex-col">
             <Head title={`ERP — ${title}`} />
 
             {/* Mobile Menu Drawer Overlay */}
@@ -67,18 +81,18 @@ export default function ERPLayout({
 
             {/* Mobile Menu Drawer Content */}
             <div 
-                className={`fixed top-0 bottom-0 start-0 z-50 w-72 bg-white shadow-xl lg:hidden transform transition-transform duration-300 ease-in-out flex flex-col ${
+                className={`fixed top-0 bottom-0 start-0 z-50 w-72 bg-white dark:bg-zinc-900 border-e border-slate-100 dark:border-zinc-800 shadow-xl lg:hidden transform transition-transform duration-300 ease-in-out flex flex-col ${
                     isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 {/* Drawer Header */}
-                <div className="flex items-center justify-between p-4 border-b border-slate-100">
+                <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-zinc-800">
                     <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
                             {safeWorkspaceName.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                            <span className="block truncate text-sm font-semibold text-slate-900">
+                            <span className="block truncate text-sm font-semibold text-slate-900 dark:text-white">
                                 {safeWorkspaceName}
                             </span>
                             <span className="block font-mono text-[10px] text-slate-400">
@@ -88,7 +102,7 @@ export default function ERPLayout({
                     </div>
                     <button 
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
+                        className="p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none"
                         aria-label={__('general.close_navigation_menu')}
                     >
                         <X className="w-5 h-5" />
@@ -100,11 +114,7 @@ export default function ERPLayout({
                     <nav className="space-y-0.5">
                         {menuItems.map((item) => {
                             const Icon = item.icon;
-                            const classes = `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
-                                item.isActive
-                                    ? 'bg-slate-100 font-medium text-slate-900'
-                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                            }`;
+                            const classes = getMenuItemClasses(item.isActive);
                             
                             const content = (
                                 <>
@@ -112,8 +122,8 @@ export default function ERPLayout({
                                         <Icon
                                             className={`h-4 w-4 shrink-0 transition-colors ${
                                                 item.isActive
-                                                    ? 'text-slate-900'
-                                                    : 'text-slate-400 group-hover:text-slate-600'
+                                                    ? 'text-slate-900 dark:text-white'
+                                                    : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'
                                             }`}
                                         />
                                         <span>{item.label}</span>
@@ -122,8 +132,8 @@ export default function ERPLayout({
                                         <span
                                             className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
                                                 item.isActive
-                                                    ? 'border border-slate-200 bg-white text-slate-900 shadow-sm'
-                                                    : 'bg-slate-100 text-slate-500'
+                                                    ? 'border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm'
+                                                    : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
                                             }`}
                                         >
                                             {item.badge}
@@ -161,25 +171,21 @@ export default function ERPLayout({
 
                     {/* Locked Addon Upsells in Drawer */}
                     {lockedAddons.length > 0 && (
-                        <div className="mt-2 pt-3 border-t border-slate-100">
+                        <div className="mt-2 pt-3 border-t border-slate-100 dark:border-zinc-800">
                             <div className="px-3 pb-2">
-                                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300">{__('general.available_add_ons')}</span>
+                                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-zinc-500">{__('general.available_add_ons')}</span>
                             </div>
                             <nav className="space-y-0.5">
                                 {lockedAddons.map((addon) => {
                                     const AddonIcon = addon.icon;
-                                    const addonClasses = `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
-                                        addon.isActive
-                                            ? 'bg-slate-100/70 text-slate-500 opacity-75'
-                                            : 'text-slate-400 hover:bg-slate-50 hover:text-slate-500 opacity-60 hover:opacity-80'
-                                    }`;
+                                    const addonClasses = getAddonClasses(addon.isActive);
                                     const addonContent = (
                                         <>
                                             <div className="flex items-center gap-3">
-                                                <AddonIcon className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-slate-400" />
+                                                <AddonIcon className="h-4 w-4 shrink-0 text-slate-400 dark:text-zinc-500 group-hover:text-slate-500 dark:group-hover:text-zinc-400" />
                                                 <span>{addon.label}</span>
                                             </div>
-                                            <Lock className="h-3 w-3 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                            <Lock className="h-3 w-3 text-slate-400 dark:text-zinc-500 group-hover:text-indigo-400 transition-colors" />
                                         </>
                                     );
                                     return addon.onClick ? (
@@ -209,14 +215,14 @@ export default function ERPLayout({
                     )}
 
                     {/* Drawer Footer Actions */}
-                    <div className="mt-4 pt-3 border-t border-slate-100">
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800">
                         {isTeamMember ? (
                             <Link 
                                 href={route('erp.team.logout')} 
                                 method="post" 
                                 as="button" 
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 w-full transition-colors"
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 w-full transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 <span>{__('general.logout')}</span>
@@ -225,7 +231,7 @@ export default function ERPLayout({
                             <SafeLink 
                                 href={route('dashboard')} 
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full transition-colors"
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white w-full transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 <span>{__('general.exit_to_main_hub')}</span>
@@ -236,13 +242,13 @@ export default function ERPLayout({
             </div>
 
             {/* Standalone Minimalist Top Navigation */}
-            <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200" style={{ height: '60px' }}>
+            <header className="sticky top-0 z-40 w-full bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-zinc-800" style={{ height: '60px' }}>
                 <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-full w-full mx-auto">
                     <div className="flex items-center gap-3">
                         {/* Hamburger Menu Toggle Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden -ms-2 p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
+                            className="lg:hidden -ms-2 p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none"
                             aria-label={__('general.open_navigation_menu')}
                         >
                             <Menu className="w-5 h-5" />
@@ -251,7 +257,7 @@ export default function ERPLayout({
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
                             {safeWorkspaceName.charAt(0).toUpperCase()}
                         </div>
-                        <span className="font-semibold text-slate-900 tracking-tight">{safeWorkspaceName} System</span>
+                        <span className="font-semibold text-slate-900 dark:text-white tracking-tight">{safeWorkspaceName} System</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <ThemeToggle className="h-8 w-8" />
@@ -260,7 +266,7 @@ export default function ERPLayout({
                                 href={route('erp.team.logout')} 
                                 method="post" 
                                 as="button" 
-                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" /> 
                                 <span>{__('general.logout')}</span>
@@ -268,7 +274,7 @@ export default function ERPLayout({
                         ) : (
                             <SafeLink 
                                 href={route('dashboard')} 
-                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" /> 
                                 <span>{__('general.exit_to_main_hub')}</span>
@@ -281,24 +287,24 @@ export default function ERPLayout({
             <div className="flex-1 overflow-auto">
                 <div className="mx-auto w-full space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                     {/* Contextual Breadcrumb Navigator */}
-                    <div className="mb-8 flex items-center gap-1.5 text-sm text-slate-500">
-                        <span className="cursor-pointer transition-colors hover:text-slate-900">
+                    <div className="mb-8 flex items-center gap-1.5 text-sm text-slate-500 dark:text-zinc-400">
+                        <span className="cursor-pointer transition-colors hover:text-slate-900 dark:hover:text-white">
                             {safeWorkspaceName}
                         </span>
-                        <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-                        <span className="font-medium text-slate-900">{activeMenuLabel}</span>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 dark:text-zinc-500" />
+                        <span className="font-medium text-slate-900 dark:text-white">{activeMenuLabel}</span>
                     </div>
 
                     <div className="flex flex-col items-start gap-8 lg:flex-row">
                         {/* Left Sidebar */}
                         <aside className="hidden lg:block w-full shrink-0 lg:w-64">
-                            <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                                <div className="flex items-center gap-2 border-b border-slate-100 pb-3 px-3">
+                            <div className="space-y-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm">
+                                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3 px-3">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
                                         {safeWorkspaceName.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="min-w-0">
-                                        <span className="block truncate text-sm font-semibold text-slate-900">
+                                        <span className="block truncate text-sm font-semibold text-slate-900 dark:text-white">
                                             {safeWorkspaceName}
                                         </span>
                                         <span className="block font-mono text-[11px] text-slate-400">
@@ -310,11 +316,7 @@ export default function ERPLayout({
                                 <nav className="space-y-0.5">
                                     {menuItems.map((item) => {
                                         const Icon = item.icon;
-                                        const classes = `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
-                                            item.isActive
-                                                ? 'bg-slate-100 font-medium text-slate-900'
-                                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                                        }`;
+                                        const classes = getMenuItemClasses(item.isActive);
                                         
                                         const content = (
                                             <>
@@ -322,8 +324,8 @@ export default function ERPLayout({
                                                     <Icon
                                                         className={`h-4 w-4 shrink-0 transition-colors ${
                                                             item.isActive
-                                                                ? 'text-slate-900'
-                                                                : 'text-slate-400 group-hover:text-slate-600'
+                                                                ? 'text-slate-900 dark:text-white'
+                                                                : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'
                                                         }`}
                                                     />
                                                     <span>{item.label}</span>
@@ -332,8 +334,8 @@ export default function ERPLayout({
                                                     <span
                                                         className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
                                                             item.isActive
-                                                                ? 'border border-slate-200 bg-white text-slate-900 shadow-sm'
-                                                                : 'bg-slate-100 text-slate-500'
+                                                                ? 'border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm'
+                                                                : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
                                                         }`}
                                                     >
                                                         {item.badge}
@@ -356,25 +358,21 @@ export default function ERPLayout({
 
                                 {/* Locked Addon Upsells */}
                                 {lockedAddons.length > 0 && (
-                                    <div className="mt-2 pt-3 border-t border-slate-100">
+                                    <div className="mt-2 pt-3 border-t border-slate-100 dark:border-zinc-800">
                                         <div className="px-3 pb-2">
-                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300">{__('general.available_add_ons')}</span>
+                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-zinc-500">{__('general.available_add_ons')}</span>
                                         </div>
                                         <nav className="space-y-0.5">
                                             {lockedAddons.map((addon) => {
                                                 const AddonIcon = addon.icon;
-                                                const addonClasses = `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
-                                                    addon.isActive
-                                                        ? 'bg-slate-100/70 text-slate-500 opacity-75'
-                                                        : 'text-slate-400 hover:bg-slate-50 hover:text-slate-500 opacity-60 hover:opacity-80'
-                                                }`;
+                                                const addonClasses = getAddonClasses(addon.isActive);
                                                 const addonContent = (
                                                     <>
                                                         <div className="flex items-center gap-3">
-                                                            <AddonIcon className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-slate-400" />
+                                                            <AddonIcon className="h-4 w-4 shrink-0 text-slate-400 dark:text-zinc-500 group-hover:text-slate-500 dark:group-hover:text-zinc-400" />
                                                             <span>{addon.label}</span>
                                                         </div>
-                                                        <Lock className="h-3 w-3 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                                        <Lock className="h-3 w-3 text-slate-400 dark:text-zinc-500 group-hover:text-indigo-400 transition-colors" />
                                                     </>
                                                 );
                                                 return addon.onClick ? (

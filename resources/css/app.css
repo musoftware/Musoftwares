@@ -265,4 +265,56 @@
   .paper-shadow {
     box-shadow: var(--shadow-card-soft);
   }
+
+  /* --- Apple-Grade Unified Theme Utilities --- */
+  .bg-surface-apple {
+    background-color: #f5f5f7;
+  }
+  :where(.dark, .dark *) .bg-surface-apple {
+    background-color: #090d16;
+  }
+
+  .bg-card-apple {
+    background-color: #ffffff;
+  }
+  :where(.dark, .dark *) .bg-card-apple {
+    background-color: rgba(15, 23, 42, 0.75);
+  }
+
+  .border-apple {
+    border-color: rgba(0, 0, 0, 0.05);
+  }
+  :where(.dark, .dark *) .border-apple {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .text-primary-apple {
+    color: #1d1d1f;
+  }
+  :where(.dark, .dark *) .text-primary-apple {
+    color: #f8fafc;
+  }
+
+  .text-muted-apple {
+    color: rgba(29, 29, 31, 0.6);
+  }
+  :where(.dark, .dark *) .text-muted-apple {
+    color: #94a3b8;
+  }
+
+  /* --- Smooth Dark Mode Scrollbars --- */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .dark ::-webkit-scrollbar-track {
+    background: #090d16;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
 }

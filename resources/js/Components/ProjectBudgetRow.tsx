@@ -24,25 +24,25 @@ export function ProjectBudgetRow({
         : 'flex flex-wrap items-center justify-between gap-x-4 gap-y-2';
 
     return (
-        <div className={cn('border-b border-slate-100 pb-3', className)}>
+        <div className={cn('border-b border-slate-100 dark:border-white/10 pb-3', className)}>
             <div className={layoutClass}>
                 <div className="flex min-w-0 items-center gap-2">
-                    <Wallet className="icon-md shrink-0 text-slate-400" aria-hidden="true" />
-                    <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                    <Wallet className="icon-md shrink-0 text-slate-400 dark:text-slate-400" aria-hidden="true" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                         {__('general.budget')}
                     </span>
                     <IsoCurrencyAmount amount={budget} currency={currency} size="sm" />
                 </div>
                 <div className="flex min-w-0 items-center gap-2">
                     <CheckCircle2 className="icon-md shrink-0 text-emerald-500" aria-hidden="true" />
-                    <span className="text-[11px] font-semibold uppercase tracking-wide text-emerald-500/70">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-emerald-500/70 dark:text-emerald-400/80">
                         {__('general.paid')}
                     </span>
                     <IsoCurrencyAmount
                         amount={totalPaid}
                         currency={currency}
                         size="sm"
-                        className="text-emerald-700"
+                        className="text-emerald-700 dark:text-emerald-400"
                     />
                 </div>
             </div>

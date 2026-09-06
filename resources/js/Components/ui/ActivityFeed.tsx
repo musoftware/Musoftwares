@@ -64,11 +64,11 @@ const COLOR_MAP: Record<string, string> = {
 };
 
 const WORKSPACE_COLORS: Record<string, string> = {
-    erp:         'text-blue-600 bg-blue-50',
-    marketplace: 'text-indigo-600 bg-indigo-50',
-    freelance:   'text-violet-600 bg-violet-50',
-    booking:     'text-cyan-600 bg-cyan-50',
-    system:      'text-slate-600 bg-slate-100',
+    erp:         'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40',
+    marketplace: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40',
+    freelance:   'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40',
+    booking:     'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40',
+    system:      'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/10',
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -90,16 +90,16 @@ function timeAgo(dateStr: string): string {
 function UserAvatar({ user }: { user: ActivityEventItem['user'] }) {
     if (!user) {
         return (
-            <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
-                <span className="text-[9px] font-bold text-slate-500">S</span>
+            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400">S</span>
             </div>
         );
     }
     return user.avatar ? (
         <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-full object-cover shrink-0" />
     ) : (
-        <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-            <span className="text-[9px] font-bold text-indigo-700">{user.name.charAt(0).toUpperCase()}</span>
+        <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-950/50 flex items-center justify-center shrink-0">
+            <span className="text-[9px] font-bold text-indigo-700 dark:text-indigo-300">{user.name.charAt(0).toUpperCase()}</span>
         </div>
     );
 }
@@ -109,7 +109,7 @@ function UserAvatar({ user }: { user: ActivityEventItem['user'] }) {
 export function ActivityFeed({ items, className, showWorkspace = false }: ActivityFeedProps) {
     if (!items || items.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+            <div className="flex flex-col items-center justify-center py-10 text-slate-400 dark:text-slate-500">
                 <Activity className="w-8 h-8 mb-3 opacity-40" />
                 <p className="text-sm font-medium">{__('general.no_activity_yet')}</p>
                 <p className="text-xs mt-1">{__('general.actions_across_the_platform_will_appear_here')}</p>
@@ -129,12 +129,12 @@ export function ActivityFeed({ items, className, showWorkspace = false }: Activi
                         {/* Timeline spine + dot */}
                         <div className="flex flex-col items-center shrink-0">
                             <div className={cn(
-                                'w-8 h-8 rounded-full flex items-center justify-center z-10 shrink-0 shadow-sm ring-2 ring-white',
+                                'w-8 h-8 rounded-full flex items-center justify-center z-10 shrink-0 shadow-sm ring-2 ring-white dark:ring-[#0f172a]',
                                 dotColor
                             )}>
                                 <Icon className="w-3.5 h-3.5 text-white" />
                             </div>
-                            {!isLast && <div className="w-[1px] flex-1 bg-slate-100 mt-1 mb-1 min-h-[20px]" />}
+                            {!isLast && <div className="w-[1px] flex-1 bg-slate-100 dark:bg-white/10 mt-1 mb-1 min-h-[20px]" />}
                         </div>
 
                         {/* Content */}
@@ -143,20 +143,20 @@ export function ActivityFeed({ items, className, showWorkspace = false }: Activi
                                 <div className="flex items-start gap-2 flex-1 min-w-0">
                                     <UserAvatar user={item.user} />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm text-slate-800 leading-snug">
+                                        <p className="text-sm text-slate-800 dark:text-slate-200 leading-snug">
                                             {item.user && (
-                                                <span className="font-semibold text-slate-900">{item.user.name} </span>
+                                                <span className="font-semibold text-slate-900 dark:text-white">{item.user.name} </span>
                                             )}
                                             {item.description}
                                         </p>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-[11px] text-slate-400 font-medium">
+                                            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
                                                 {timeAgo(item.created_at)}
                                             </span>
                                             {showWorkspace && item.workspace && (
                                                 <span className={cn(
                                                     'text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded',
-                                                    WORKSPACE_COLORS[item.workspace] ?? 'text-slate-600 bg-slate-100'
+                                                    WORKSPACE_COLORS[item.workspace] ?? 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/10'
                                                 )}>
                                                     {item.workspace}
                                                 </span>

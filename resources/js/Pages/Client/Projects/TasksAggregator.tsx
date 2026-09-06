@@ -81,18 +81,18 @@ interface Bucket {
 }
 
 const PRIORITY_STYLES: Record<string, string> = {
-    high: 'bg-rose-50 text-rose-700 border-rose-200/60',
-    urgent: 'bg-rose-50 text-rose-700 border-rose-200/60',
-    normal: 'bg-[#f5f5f7] text-[#1d1d1f]/70 border-black/5',
-    low: 'bg-[#f5f5f7] text-[#1d1d1f]/70 border-black/5',
+    high: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40',
+    urgent: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40',
+    normal: 'bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f]/70 dark:text-white/70 border-black/5 dark:border-white/10',
+    low: 'bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f]/70 dark:text-white/70 border-black/5 dark:border-white/10',
 };
 
 const TONE_LABEL: Record<Bucket['tone'], string> = {
-    danger: 'text-rose-600',
-    today: 'text-[#0071e3]',
-    soon: 'text-sky-600',
-    later: 'text-[#1d1d1f]/70',
-    none: 'text-[#1d1d1f]/50',
+    danger: 'text-rose-600 dark:text-rose-400',
+    today: 'text-[#0071e3] dark:text-[#2997ff]',
+    soon: 'text-sky-600 dark:text-sky-400',
+    later: 'text-[#1d1d1f]/70 dark:text-white/70',
+    none: 'text-[#1d1d1f]/50 dark:text-white/50',
 };
 
 function startOfDay(d: Date): Date {
@@ -200,23 +200,23 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
         <AuthenticatedLayout>
             <Head title={`${__('general.all_tasks')} — Musoftwares Studio`} />
 
-            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+            <div className="w-full bg-[#f5f5f7] dark:bg-[#090d16] text-[#1d1d1f] dark:text-[#f8fafc] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3] transition-colors">
                 
                 {/* Hero Header */}
-                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
+                <div className="w-full bg-white dark:bg-[#0f172a] border-b border-black/5 dark:border-white/10 py-8 px-6 sm:px-10 transition-colors">
                     <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="space-y-1.5">
                             <Link
                                 href={route('client.projects.index')}
-                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
+                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:text-[#0077ed] transition-colors mb-1"
                             >
                                 <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
                                 {__('general.projects')}
                             </Link>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
+                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
                                 {__('general.all_tasks')}
                             </h1>
-                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
+                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 dark:text-white/60 font-sans">
                                 {__('general.all_tasks_desc')}
                             </p>
                         </div>
@@ -228,45 +228,45 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                     
                     {/* 4-Pillar Summary Bento */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-                        <div className="bg-white border border-black/5 rounded-[20px] p-5 shadow-sm">
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 block mb-1">
+                        <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[20px] p-5 shadow-sm transition-colors">
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 dark:text-white/50 block mb-1">
                                 {__('general.total')}
                             </span>
-                            <span className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] font-sans">
+                            <span className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] dark:text-white font-sans">
                                 {stats.total}
                             </span>
                         </div>
-                        <div className="bg-white border border-black/5 rounded-[20px] p-5 shadow-sm">
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 block mb-1">
+                        <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[20px] p-5 shadow-sm transition-colors">
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 dark:text-white/50 block mb-1">
                                 {__('general.tasks')}
                             </span>
-                            <span className="text-2xl sm:text-3xl font-bold text-[#0071e3] font-sans">
+                            <span className="text-2xl sm:text-3xl font-bold text-[#0071e3] dark:text-[#2997ff] font-sans">
                                 {stats.tasks}
                             </span>
                         </div>
-                        <div className="bg-white border border-black/5 rounded-[20px] p-5 shadow-sm">
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 block mb-1">
+                        <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[20px] p-5 shadow-sm transition-colors">
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 dark:text-white/50 block mb-1">
                                 {__('general.todos')}
                             </span>
-                            <span className="text-2xl sm:text-3xl font-bold text-amber-600 font-sans">
+                            <span className="text-2xl sm:text-3xl font-bold text-amber-600 dark:text-amber-400 font-sans">
                                 {stats.todos}
                             </span>
                         </div>
-                        <div className="bg-white border border-black/5 rounded-[20px] p-5 shadow-sm">
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 block mb-1">
+                        <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[20px] p-5 shadow-sm transition-colors">
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 dark:text-white/50 block mb-1">
                                 {__('general.completed')}
                             </span>
-                            <span className="text-2xl sm:text-3xl font-bold text-emerald-600 font-sans">
+                            <span className="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400 font-sans">
                                 {stats.completed}
                             </span>
                         </div>
                     </div>
 
                     {/* Filter Bar */}
-                    <div className="bg-white border border-black/5 rounded-[20px] p-4 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[20px] p-4 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between transition-colors">
                         <div className="flex items-center gap-2">
-                            <Filter className="h-4 w-4 text-[#0071e3]" />
-                            <span className="text-xs font-bold text-[#1d1d1f] uppercase tracking-wider font-mono">
+                            <Filter className="h-4 w-4 text-[#0071e3] dark:text-[#2997ff]" />
+                            <span className="text-xs font-bold text-[#1d1d1f] dark:text-white uppercase tracking-wider font-mono">
                                 Filter Workspaces
                             </span>
                         </div>
@@ -280,10 +280,10 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                                     applyFilters({ project_id: next });
                                 }}
                             >
-                                <SelectTrigger className="w-full sm:w-[220px] h-10 rounded-xl bg-white border-black/10 text-xs font-semibold text-[#1d1d1f]">
+                                <SelectTrigger className="w-full sm:w-[220px] h-10 rounded-xl bg-white dark:bg-white/5 border-black/10 dark:border-white/10 text-xs font-semibold text-[#1d1d1f] dark:text-white">
                                     <SelectValue placeholder={__('general.all_projects') ?? ''} />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl border-black/10 shadow-lg">
+                                <SelectContent className="rounded-xl border-black/10 dark:border-white/10 bg-white dark:bg-[#1e293b] text-[#1d1d1f] dark:text-white shadow-lg">
                                     <SelectItem value="all">{__('general.all_projects')}</SelectItem>
                                     {projects.map((p) => (
                                         <SelectItem key={p.id} value={String(p.id)}>
@@ -303,8 +303,8 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                                 }}
                                 className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                                     showCompleted
-                                        ? 'bg-[#1d1d1f] text-white shadow-xs'
-                                        : 'bg-[#f5f5f7] border border-black/5 text-[#1d1d1f]/70 hover:bg-black/5'
+                                        ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#090d16] shadow-xs'
+                                        : 'bg-[#f5f5f7] dark:bg-white/5 border border-black/5 dark:border-white/10 text-[#1d1d1f]/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/10'
                                 }`}
                             >
                                 {showCompleted ? __('general.hide_completed') : __('general.show_completed')}
@@ -314,14 +314,14 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
 
                     {/* Task Buckets */}
                     {buckets.length === 0 ? (
-                        <div className="bg-white border border-black/5 rounded-[24px] p-12 text-center shadow-sm max-w-xl mx-auto">
-                            <div className="w-14 h-14 rounded-2xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3] mx-auto mb-4">
+                        <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[24px] p-12 text-center shadow-sm max-w-xl mx-auto transition-colors">
+                            <div className="w-14 h-14 rounded-2xl bg-[#0071e3]/10 dark:bg-[#2997ff]/20 flex items-center justify-center text-[#0071e3] dark:text-[#2997ff] mx-auto mb-4">
                                 <Sparkles className="w-7 h-7" />
                             </div>
-                            <h3 className="text-base font-bold text-[#1d1d1f] font-sans">
+                            <h3 className="text-base font-bold text-[#1d1d1f] dark:text-white font-sans">
                                 {__('general.all_tasks_empty_title')}
                             </h3>
-                            <p className="text-xs text-[#1d1d1f]/60 max-w-md mx-auto mt-1.5 leading-relaxed">
+                            <p className="text-xs text-[#1d1d1f]/60 dark:text-white/60 max-w-md mx-auto mt-1.5 leading-relaxed">
                                 {__('general.all_tasks_empty_desc')}
                             </p>
                         </div>
@@ -337,11 +337,11 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                                                 <CalendarClock className="h-4 w-4" />
                                             )}
                                             {bucket.label}
-                                            <span className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-bold text-[#1d1d1f]/60 border border-black/5 shadow-2xs">
+                                            <span className="rounded-full bg-white dark:bg-white/5 px-2.5 py-0.5 text-[10px] font-bold text-[#1d1d1f]/60 dark:text-white/60 border border-black/5 dark:border-white/10 shadow-2xs">
                                                 {bucket.items.length}
                                             </span>
                                         </h2>
-                                        {bucket.hint && <span className="text-[11px] text-[#1d1d1f]/40">{bucket.hint}</span>}
+                                        {bucket.hint && <span className="text-[11px] text-[#1d1d1f]/40 dark:text-white/40">{bucket.hint}</span>}
                                     </div>
 
                                     <div className="space-y-2.5">
@@ -366,15 +366,15 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
             <Sheet open={openItemKey != null} onOpenChange={(o) => (o ? null : handleClose())}>
                 <SheetContent
                     side="right"
-                    className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md bg-white border-s border-black/5 text-[#1d1d1f]"
+                    className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md bg-white dark:bg-[#0f172a] border-s border-black/5 dark:border-white/10 text-[#1d1d1f] dark:text-white"
                 >
                     {openItem && (
                         <>
-                            <SheetHeader className="border-b border-black/5 bg-[#f5f5f7]/50 p-6 text-start">
-                                <SheetTitle className="text-base font-bold text-[#1d1d1f] font-sans">
+                            <SheetHeader className="border-b border-black/5 dark:border-white/10 bg-[#f5f5f7]/50 dark:bg-white/[0.02] p-6 text-start">
+                                <SheetTitle className="text-base font-bold text-[#1d1d1f] dark:text-white font-sans">
                                     {openItem.title}
                                 </SheetTitle>
-                                <SheetDescription className="mt-1 text-xs text-[#1d1d1f]/60">
+                                <SheetDescription className="mt-1 text-xs text-[#1d1d1f]/60 dark:text-white/60">
                                     {openItem.kind === 'task' ? __('general.task') : __('general.todo')} ·{' '}
                                     {openItem.project_name}
                                 </SheetDescription>
@@ -382,7 +382,7 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                             <div className="space-y-5 p-6 text-xs sm:text-sm">
                                 {openItem.priority && (
                                     <div className="flex items-center gap-2">
-                                        <Flag className="h-3.5 w-3.5 text-[#1d1d1f]/40" />
+                                        <Flag className="h-3.5 w-3.5 text-[#1d1d1f]/40 dark:text-white/40" />
                                         <span
                                             className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize border ${
                                                 PRIORITY_STYLES[openItem.priority] ?? PRIORITY_STYLES.normal
@@ -393,20 +393,20 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                                     </div>
                                 )}
                                 {openItem.due_date && (
-                                    <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/60">
-                                        <CalendarClock className="h-3.5 w-3.5 text-[#0071e3]" /> {formatDate(openItem.due_date)}
+                                    <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/60 dark:text-white/60">
+                                        <CalendarClock className="h-3.5 w-3.5 text-[#0071e3] dark:text-[#2997ff]" /> {formatDate(openItem.due_date)}
                                     </div>
                                 )}
                                 {openItem.description ? (
-                                    <p className="whitespace-pre-wrap text-xs sm:text-sm text-[#1d1d1f]/80 leading-relaxed bg-[#f5f5f7] p-4 rounded-xl border border-black/5">
+                                    <p className="whitespace-pre-wrap text-xs sm:text-sm text-[#1d1d1f]/80 dark:text-white/80 leading-relaxed bg-[#f5f5f7] dark:bg-white/5 p-4 rounded-xl border border-black/5 dark:border-white/10">
                                         {openItem.description}
                                     </p>
                                 ) : (
-                                    <p className="text-xs text-[#1d1d1f]/40 italic">{__('general.no_description')}</p>
+                                    <p className="text-xs text-[#1d1d1f]/40 dark:text-white/40 italic">{__('general.no_description')}</p>
                                 )}
                                 <Link
                                     href={route('client.projects.show', openItem.project_id)}
-                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed]"
+                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:text-[#0077ed]"
                                 >
                                     <ExternalLink className="h-3.5 w-3.5" /> {__('general.open_project')}
                                 </Link>
@@ -427,19 +427,19 @@ function TaskRow({ item, onOpen }: { item: Item; onOpen: (item: Item) => void })
     return (
         <div
             onClick={() => onOpen(item)}
-            className={`bg-white border rounded-[18px] p-4 shadow-sm transition-all hover:border-[#0071e3]/30 hover:shadow-md flex items-start gap-4 cursor-pointer ${
-                isOverdue ? 'border-rose-200' : 'border-black/5'
+            className={`bg-white dark:bg-[#0f172a] border rounded-[18px] p-4 shadow-sm transition-all hover:border-[#0071e3]/30 dark:hover:border-[#2997ff]/40 hover:shadow-md flex items-start gap-4 cursor-pointer ${
+                isOverdue ? 'border-rose-200 dark:border-rose-900/50' : 'border-black/5 dark:border-white/10'
             }`}
         >
             {item.completed ? (
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
             ) : (
-                <Circle className="mt-0.5 h-5 w-5 shrink-0 text-[#1d1d1f]/20" />
+                <Circle className="mt-0.5 h-5 w-5 shrink-0 text-[#1d1d1f]/20 dark:text-white/20" />
             )}
 
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-3">
-                    <h3 className={`text-xs sm:text-sm font-semibold text-[#1d1d1f] truncate ${
+                    <h3 className={`text-xs sm:text-sm font-semibold text-[#1d1d1f] dark:text-white truncate ${
                         item.completed ? 'line-through opacity-50' : ''
                     }`}>
                         {item.title}
@@ -453,12 +453,12 @@ function TaskRow({ item, onOpen }: { item: Item; onOpen: (item: Item) => void })
                     )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 mt-1.5 text-[11px] text-[#1d1d1f]/50">
-                    <span className="font-medium text-[#1d1d1f]/70">
+                <div className="flex flex-wrap items-center gap-3 mt-1.5 text-[11px] text-[#1d1d1f]/50 dark:text-white/50">
+                    <span className="font-medium text-[#1d1d1f]/70 dark:text-white/70">
                         {item.project_name}
                     </span>
                     {item.due_date && (
-                        <span className={`flex items-center gap-1 ${isOverdue ? 'text-rose-600 font-semibold' : ''}`}>
+                        <span className={`flex items-center gap-1 ${isOverdue ? 'text-rose-600 dark:text-rose-400 font-semibold' : ''}`}>
                             <CalendarClock className="w-3 h-3" />
                             {formatDate(item.due_date)}
                         </span>

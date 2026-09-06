@@ -43,7 +43,7 @@ export default function MarketplaceCategoryNav() {
     }
 
     return (
-        <div className="hidden md:block w-full border-b border-slate-200/80 bg-slate-50/50">
+        <div className="hidden md:block w-full border-b border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-900/50 backdrop-blur-sm transition-colors">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <nav className="flex items-center h-11 overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 py-1">
                     <Link
@@ -51,14 +51,14 @@ export default function MarketplaceCategoryNav() {
                         className={`inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold px-3 py-1.5 rounded-full transition-all shrink-0 ${
                             !activeCategory
                                 ? 'bg-indigo-600 text-white shadow-2xs'
-                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-zinc-800'
                         }`}
                     >
                         <Sparkles className="w-3 h-3" />
                         <span>{__('general.all_services') || 'All Services'}</span>
                     </Link>
 
-                    <div className="h-4 w-px bg-slate-200 shrink-0 mx-1"></div>
+                    <div className="h-4 w-px bg-slate-200 dark:bg-zinc-800 shrink-0 mx-1"></div>
 
                     {loading ? (
                         Array.from({ length: 8 }).map((_, i) => (
@@ -89,8 +89,8 @@ export default function MarketplaceCategoryNav() {
                                     href={`/marketplace/services?category=${encodeURIComponent(category.slug || category.id || '')}`}
                                     className={`whitespace-nowrap text-xs font-medium px-3 py-1.5 rounded-full transition-all shrink-0 ${
                                         isActive
-                                            ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200/80'
-                                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                                            ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200/80 dark:border-indigo-800/80'
+                                            : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-zinc-800'
                                     }`}
                                 >
                                     {category.name || ''}

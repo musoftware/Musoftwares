@@ -5,7 +5,11 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
-import { FileText, CreditCard, Wallet, Eye, Download, Plus, ArrowLeft } from 'lucide-react';
+import { PageShell } from '@/Components/ui/PageShell';
+import { PageHeroHeader } from '@/Components/ui/PageHeroHeader';
+import { BentoStatCard } from '@/Components/ui/BentoStatCard';
+import { ContentCard } from '@/Components/ui/ContentCard';
+import { FileText, CreditCard, Wallet, Eye, Download, Plus } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 interface Invoice {
@@ -76,7 +80,7 @@ export default function Invoices({
             render: (row: Invoice) => (
                 <Link
                     href={route('billing.invoices.pay', row.uuid)}
-                    className="font-mono text-[#1d1d1f] font-semibold hover:text-[#0071e3] transition-colors text-xs sm:text-sm"
+                    className="font-mono text-[#1d1d1f] dark:text-[#f8fafc] font-semibold hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors text-xs sm:text-sm"
                 >
                     {row.invoice_number}
                 </Link>
@@ -86,7 +90,7 @@ export default function Invoices({
             key: 'issued_at',
             label: __('general.issued'),
             render: (row: Invoice) => (
-                <DateDisplay date={row.issued_at} className="text-[#1d1d1f]/60 text-xs font-sans" />
+                <DateDisplay date={row.issued_at} className="text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 text-xs font-sans" />
             ),
         },
         {
@@ -100,7 +104,7 @@ export default function Invoices({
                 return (
                     <DateDisplay
                         date={row.due_date}
-                        className={isOverdue ? 'text-rose-600 font-semibold text-xs' : 'text-[#1d1d1f]/60 text-xs'}
+                        className={isOverdue ? 'text-rose-600 dark:text-rose-400 font-semibold text-xs' : 'text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 text-xs'}
                     />
                 );
             },
@@ -122,7 +126,7 @@ export default function Invoices({
                         currency={row.currency}
                         businessAmount={isDifferentCurrency ? row.wallet_amount : undefined}
                         businessCurrency={wallet_currency}
-                        className="font-bold text-[#1d1d1f] text-xs sm:text-sm font-mono"
+                        className="font-bold text-[#1d1d1f] dark:text-[#f8fafc] text-xs sm:text-sm font-mono"
                     />
                 );
             },
@@ -134,7 +138,7 @@ export default function Invoices({
                 <CurrencyDisplay
                     amount={row.paid_amount}
                     currency={row.currency}
-                    className="font-medium text-[#1d1d1f]/60 text-xs font-mono"
+                    className="font-medium text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 text-xs font-mono"
                 />
             ),
         },
@@ -155,7 +159,7 @@ export default function Invoices({
                         currency={row.currency}
                         businessAmount={isDifferentCurrency ? row.wallet_remaining : undefined}
                         businessCurrency={wallet_currency}
-                        className="font-bold text-[#1d1d1f] text-xs sm:text-sm font-mono"
+                        className="font-bold text-[#1d1d1f] dark:text-[#f8fafc] text-xs sm:text-sm font-mono"
                     />
                 );
             },
@@ -182,7 +186,7 @@ export default function Invoices({
                     ) : (
                         <Link
                             href={route('billing.invoices.pay', row.uuid)}
-                            className="w-8 h-8 rounded-full bg-[#f5f5f7] hover:bg-black/5 text-[#1d1d1f]/60 hover:text-[#1d1d1f] inline-flex items-center justify-center transition-colors"
+                            className="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 hover:bg-black/5 dark:hover:bg-zinc-700 text-[#1d1d1f]/60 dark:text-zinc-300 hover:text-[#1d1d1f] dark:hover:text-white inline-flex items-center justify-center transition-colors"
                             title="View"
                         >
                             <Eye className="w-3.5 h-3.5" />
@@ -190,7 +194,7 @@ export default function Invoices({
                     )}
                     <a
                         href={route('billing.invoices.pdf', row.uuid)}
-                        className="w-8 h-8 rounded-full bg-[#f5f5f7] hover:bg-black/5 text-[#1d1d1f]/60 hover:text-[#1d1d1f] inline-flex items-center justify-center transition-colors"
+                        className="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 hover:bg-black/5 dark:hover:bg-zinc-700 text-[#1d1d1f]/60 dark:text-zinc-300 hover:text-[#1d1d1f] dark:hover:text-white inline-flex items-center justify-center transition-colors"
                         target="_blank"
                         rel="noreferrer"
                         title={__('general.download')}
@@ -208,27 +212,14 @@ export default function Invoices({
         <AuthenticatedLayout>
             <Head title={`${__('erp.billing_invoices')} — Musoftwares Studio`} />
 
-            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
-                
+            <div className="w-full">
                 {/* Hero Header */}
-                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
-                    <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-1.5">
-                            <Link
-                                href="/dashboard"
-                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
-                            >
-                                <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
-                                {__('general.back_to_dashboard')}
-                            </Link>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                                {__('erp.billing_invoices')}
-                            </h1>
-                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
-                                {__('erp.view_outstanding_statements_and_settle')}
-                            </p>
-                        </div>
-
+                <PageHeroHeader
+                    backHref="/dashboard"
+                    backLabel={__('general.back_to_dashboard')}
+                    title={__('erp.billing_invoices')}
+                    description={__('erp.view_outstanding_statements_and_settle')}
+                    actions={
                         <Link
                             href={route('financial.add-balance')}
                             className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-blue-500/20 cursor-pointer shrink-0"
@@ -236,66 +227,37 @@ export default function Invoices({
                             <Plus className="w-4 h-4" />
                             <span>{__('general.charge_balance')}</span>
                         </Link>
-                    </div>
-                </div>
+                    }
+                />
 
                 {/* Main Content Area */}
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 py-8 space-y-8">
-                    
+                <PageShell maxWidth="7xl" className="space-y-8">
                     {/* Dashboard Bento Stats Panel */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
                         {/* 1. Wallet Balance */}
-                        <div className="bg-white p-6 sm:p-7 rounded-[24px] border border-black/5 shadow-sm flex items-center justify-between group hover:border-[#0071e3]/30 hover:shadow-md transition-all">
-                            <div className="space-y-2">
-                                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 block">
-                                    {__('erp.wallet_balance')}
-                                </span>
-                                <span className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] tracking-tight block">
-                                    <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
-                                </span>
-                                <p className="text-xs text-[#1d1d1f]/60 leading-normal max-w-sm">
-                                    {__('erp.your_current_available_balance_which')}
-                                </p>
-                            </div>
-                            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-center justify-center shrink-0 ms-4">
-                                <Wallet className="w-7 h-7" />
-                            </div>
-                        </div>
+                        <BentoStatCard
+                            label={__('erp.wallet_balance')}
+                            value={<CurrencyDisplay amount={client_balance} currency={wallet_currency} />}
+                            description={__('erp.your_current_available_balance_which')}
+                            icon={Wallet}
+                            accentColor="emerald"
+                        />
 
                         {/* 2. Outstanding Balance */}
-                        <div className="bg-white p-6 sm:p-7 rounded-[24px] border border-black/5 shadow-sm flex items-center justify-between group hover:border-amber-500/30 hover:shadow-md transition-all">
-                            <div className="space-y-2">
-                                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 block">
-                                    {__('erp.total_outstanding_invoices')}
-                                </span>
-                                <span className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] tracking-tight block">
-                                    <CurrencyDisplay amount={totalOutstanding} currency={wallet_currency} />
-                                </span>
-                                <p className="text-xs text-[#1d1d1f]/60 leading-normal max-w-sm">
-                                    {__('erp.settle_outstanding_payments_instantly_with')}
-                                </p>
-                            </div>
-                            <div className="w-14 h-14 rounded-2xl bg-[#0071e3]/10 border border-[#0071e3]/20 text-[#0071e3] flex items-center justify-center shrink-0 ms-4">
-                                <FileText className="w-7 h-7" />
-                            </div>
-                        </div>
-
+                        <BentoStatCard
+                            label={__('erp.total_outstanding_invoices')}
+                            value={<CurrencyDisplay amount={totalOutstanding} currency={wallet_currency} />}
+                            description={__('erp.settle_outstanding_payments_instantly_with')}
+                            icon={FileText}
+                            accentColor="blue"
+                        />
                     </div>
 
                     {/* Invoices List Table Card */}
-                    <div className="bg-white rounded-[24px] border border-black/5 shadow-sm p-6 sm:p-8 space-y-6">
-                        <div className="flex items-center justify-between border-b border-black/5 pb-4">
-                            <div>
-                                <h2 className="text-base font-bold text-[#1d1d1f] font-sans">
-                                    {__('billing.billing_history')}
-                                </h2>
-                                <p className="text-xs text-[#1d1d1f]/60 mt-0.5">
-                                    Track all issued and settled invoices with official tax statements.
-                                </p>
-                            </div>
-                        </div>
-
+                    <ContentCard
+                        title={__('billing.billing_history')}
+                        subtitle="Track all issued and settled invoices with official tax statements."
+                    >
                         <DataTable
                             columns={columns}
                             data={tableData}
@@ -316,10 +278,8 @@ export default function Invoices({
                             emptyTitle={__('erp.no_invoices')}
                             emptyDescription={__('billing.there_are_currently_no_billing')}
                         />
-                    </div>
-
-                </div>
-
+                    </ContentCard>
+                </PageShell>
             </div>
         </AuthenticatedLayout>
     );

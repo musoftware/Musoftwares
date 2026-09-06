@@ -34,8 +34,8 @@ export function StatCard({
                         <p
                             className={cn(
                                 'mt-1 text-xs',
-                                trend === 'up' && 'text-green-600',
-                                trend === 'down' && 'text-red-600',
+                                trend === 'up' && 'text-green-600 dark:text-emerald-400',
+                                trend === 'down' && 'text-red-600 dark:text-rose-400',
                                 trend === 'neutral' && 'text-muted-foreground',
                                 !trend && 'text-muted-foreground',
                             )}

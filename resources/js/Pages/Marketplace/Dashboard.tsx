@@ -110,17 +110,17 @@ export default function MarketplaceDashboard({
         <MarketplaceLayout>
             <Head title={isBuyer ? __('general.buyer_dashboard') || 'Buyer Dashboard' : __('general.seller_dashboard') || 'Seller Workspace'} />
 
-            <div className="min-h-screen bg-slate-50/50 pb-16">
+            <div className="min-h-screen bg-slate-50/50 dark:bg-[#090d16] text-[#1d1d1f] dark:text-[#f8fafc] pb-16 transition-colors">
                 
                 {/* ── Top Operational Bar & Mode Switcher ───────────────── */}
-                <div className="bg-white border-b border-slate-200">
+                <div className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/10 transition-colors">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             
                             {/* Dashboard Title & User Welcome */}
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                                    <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                                         {isBuyer ? (
                                             <span>{__('general.buyer_dashboard') || 'Buyer Dashboard'}</span>
                                         ) : (
@@ -129,13 +129,13 @@ export default function MarketplaceDashboard({
                                     </h1>
                                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
                                         isBuyer 
-                                            ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' 
-                                            : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                            ? 'bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/40' 
+                                            : 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
                                     }`}>
                                         {isBuyer ? 'Buying Mode' : 'Seller Mode'}
                                     </span>
                                 </div>
-                                <p className="text-sm text-slate-500 font-medium">
+                                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
                                     {isBuyer 
                                         ? (__('general.what_should_i_do_now') || 'Track your active orders, deliverable approvals, and seller messages.')
                                         : (__('general.what_work_should_i_do_now') || 'Manage client orders, work queue, revisions, and revenue.')
@@ -145,14 +145,14 @@ export default function MarketplaceDashboard({
 
                             {/* Mode Switcher Tabs & Quick CTA */}
                             <div className="flex items-center gap-3">
-                                <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 shadow-2xs">
+                                <div className="inline-flex rounded-xl bg-slate-100 dark:bg-white/5 p-1 border border-slate-200 dark:border-white/10 shadow-2xs">
                                     <button
                                         type="button"
                                         onClick={() => setMode('client')}
-                                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                             isBuyer
-                                                ? 'bg-white text-indigo-700 shadow-xs'
-                                                : 'text-slate-600 hover:text-slate-900'
+                                                ? 'bg-white dark:bg-[#1e293b] text-indigo-700 dark:text-indigo-300 shadow-xs'
+                                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                         }`}
                                     >
                                         <ShoppingBag className="w-3.5 h-3.5" />
@@ -161,10 +161,10 @@ export default function MarketplaceDashboard({
                                     <button
                                         type="button"
                                         onClick={() => setMode('seller')}
-                                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                             !isBuyer
-                                                ? 'bg-white text-emerald-700 shadow-xs'
-                                                : 'text-slate-600 hover:text-slate-900'
+                                                ? 'bg-white dark:bg-[#1e293b] text-emerald-700 dark:text-emerald-300 shadow-xs'
+                                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                                         }`}
                                     >
                                         <Store className="w-3.5 h-3.5" />
@@ -205,33 +205,33 @@ export default function MarketplaceDashboard({
                             
                             {/* SECTION 1: Needs Your Action */}
                             {needsActionPurchases.length > 0 && (
-                                <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-6 space-y-4">
-                                    <div className="flex items-center gap-2 text-amber-900 font-bold text-base">
-                                        <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+                                <div className="rounded-2xl border border-amber-200/80 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 p-6 space-y-4">
+                                    <div className="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold text-base">
+                                        <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
                                         <span>{__('general.needs_your_action') || 'Needs Your Action'}</span>
-                                        <span className="ms-auto rounded-full bg-amber-200/80 text-amber-900 text-xs px-2.5 py-0.5 font-extrabold">
+                                        <span className="ms-auto rounded-full bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 text-xs px-2.5 py-0.5 font-extrabold">
                                             {needsActionPurchases.length}
                                         </span>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {needsActionPurchases.map((order) => (
-                                            <div key={order.id} className="bg-white border border-amber-200 rounded-xl p-4 shadow-xs flex flex-col justify-between space-y-3">
+                                            <div key={order.id} className="bg-white dark:bg-[#0f172a] border border-amber-200 dark:border-amber-900/40 rounded-xl p-4 shadow-xs flex flex-col justify-between space-y-3 transition-colors">
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="space-y-1">
-                                                        <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                                                        <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
                                                             {order.actionNeededText || 'Action Required'}
                                                         </span>
-                                                        <h4 className="font-bold text-slate-900 text-sm line-clamp-1">
+                                                        <h4 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">
                                                             Order #{order.id}: {order.title}
                                                         </h4>
-                                                        <p className="text-xs text-slate-500">
-                                                            Seller: <span className="font-medium text-slate-700">{order.sellerName}</span>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                            Seller: <span className="font-medium text-slate-700 dark:text-slate-300">{order.sellerName}</span>
                                                         </p>
                                                     </div>
                                                     <StatusBadge status={order.status} />
                                                 </div>
-                                                <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-                                                    <span className="text-xs font-semibold text-slate-900">
+                                                <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/10 pt-3">
+                                                    <span className="text-xs font-semibold text-slate-900 dark:text-white">
                                                         {formatMoney(order.amount, auth?.user?.currency)}
                                                     </span>
                                                     <Link
@@ -249,20 +249,20 @@ export default function MarketplaceDashboard({
                             )}
 
                             {/* SECTION 2: Active Orders Queue */}
-                            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden transition-colors">
+                                <div className="p-6 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
                                     <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                                        <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                                             <Clock className="w-4 h-4" />
                                         </div>
                                         <div>
-                                            <h2 className="font-extrabold text-slate-900 text-base">
+                                            <h2 className="font-extrabold text-slate-900 dark:text-white text-base">
                                                 {__('general.active_orders') || 'Active Orders'}
                                             </h2>
-                                            <p className="text-xs text-slate-500">Track orders currently in progress with sellers</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Track orders currently in progress with sellers</p>
                                         </div>
                                     </div>
-                                    <Link href="/marketplace/orders" className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
+                                    <Link href="/marketplace/orders" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors flex items-center gap-1">
                                         <span>View All Orders</span>
                                         <ChevronRight className="w-3.5 h-3.5" />
                                     </Link>
@@ -270,12 +270,12 @@ export default function MarketplaceDashboard({
 
                                 {activePurchases.length === 0 ? (
                                     <div className="p-12 text-center space-y-4">
-                                        <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-500 mx-auto">
+                                        <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/40 flex items-center justify-center text-indigo-500 dark:text-indigo-400 mx-auto">
                                             <ShoppingBag className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <h3 className="font-bold text-slate-900 text-base">{__('general.no_orders_yet') || 'No Orders Yet'}</h3>
-                                            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-base">{__('general.no_orders_yet') || 'No Orders Yet'}</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                                                 You don't have any active orders in progress right now. Explore professional services to get started!
                                             </p>
                                         </div>
@@ -288,30 +288,30 @@ export default function MarketplaceDashboard({
                                         </Link>
                                     </div>
                                 ) : (
-                                    <div className="divide-y divide-slate-100">
+                                    <div className="divide-y divide-slate-100 dark:divide-white/10">
                                         {activePurchases.map((order) => (
-                                            <div key={order.id} className="p-5 hover:bg-slate-50/70 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div key={order.id} className="p-5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                 <div className="space-y-1.5">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-mono text-xs font-bold text-slate-400">#{order.id}</span>
-                                                        <Link href={`/marketplace/orders/${order.id}`} className="font-bold text-slate-900 text-sm hover:text-indigo-600 transition line-clamp-1">
+                                                        <span className="font-mono text-xs font-bold text-slate-400 dark:text-slate-500">#{order.id}</span>
+                                                        <Link href={`/marketplace/orders/${order.id}`} className="font-bold text-slate-900 dark:text-white text-sm hover:text-indigo-600 dark:hover:text-indigo-400 transition line-clamp-1">
                                                             {order.title}
                                                         </Link>
                                                     </div>
-                                                    <div className="flex items-center gap-4 text-xs text-slate-500">
-                                                        <span>Seller: <strong className="text-slate-700">{order.sellerName}</strong></span>
-                                                        {order.deliveryDate && <span>Due: <strong className="text-slate-700">{formatDate(order.deliveryDate)}</strong></span>}
+                                                    <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+                                                        <span>Seller: <strong className="text-slate-700 dark:text-slate-300">{order.sellerName}</strong></span>
+                                                        {order.deliveryDate && <span>Due: <strong className="text-slate-700 dark:text-slate-300">{formatDate(order.deliveryDate)}</strong></span>}
                                                     </div>
                                                 </div>
 
                                                 <div className="flex items-center gap-4 shrink-0">
-                                                    <span className="font-extrabold text-slate-900 text-sm">
+                                                    <span className="font-extrabold text-slate-900 dark:text-white text-sm">
                                                         {formatMoney(order.amount, auth?.user?.currency)}
                                                     </span>
                                                     <StatusBadge status={order.status} />
                                                     <Link
                                                         href={`/marketplace/orders/${order.id}`}
-                                                        className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-bold text-xs text-slate-700 shadow-2xs transition-colors"
+                                                        className="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 font-bold text-xs text-slate-700 dark:text-slate-300 shadow-2xs transition-colors"
                                                     >
                                                         View Order
                                                     </Link>
@@ -324,20 +324,20 @@ export default function MarketplaceDashboard({
 
                             {/* SECTION 3: Recent Activity Stream */}
                             {buyerActivity.length > 0 && (
-                                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-                                    <h3 className="font-extrabold text-slate-900 text-base">Recent Order Activity</h3>
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs p-6 space-y-4 transition-colors">
+                                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base">Recent Order Activity</h3>
                                     <div className="space-y-3">
                                         {buyerActivity.map((activity) => (
-                                            <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                                                <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 mt-0.5">
+                                            <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/10 text-xs">
+                                                <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5">
                                                     <FileText className="w-3.5 h-3.5" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-slate-900 font-medium">
-                                                        Order #{activity.orderId} ({activity.serviceTitle}) status changed to <span className="font-bold text-indigo-700 uppercase">{activity.newStatus}</span> by {activity.changedByName}.
+                                                    <p className="text-slate-900 dark:text-slate-200 font-medium">
+                                                        Order #{activity.orderId} ({activity.serviceTitle}) status changed to <span className="font-bold text-indigo-700 dark:text-indigo-400 uppercase">{activity.newStatus}</span> by {activity.changedByName}.
                                                     </p>
-                                                    {activity.note && <p className="text-slate-500 italic mt-0.5">"{activity.note}"</p>}
-                                                    <span className="text-[10px] text-slate-400 mt-1 block">{activity.timestamp}</span>
+                                                    {activity.note && <p className="text-slate-500 dark:text-slate-400 italic mt-0.5">"{activity.note}"</p>}
+                                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">{activity.timestamp}</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -346,18 +346,18 @@ export default function MarketplaceDashboard({
                             )}
 
                             {/* SECTION 4: Statistics (At the bottom) */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
-                                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-1">
-                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Spent</span>
-                                    <p className="text-2xl font-black text-slate-900">{formatMoney(buyerStats.totalSpent, auth?.user?.currency)}</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Spent</span>
+                                    <p className="text-2xl font-black text-slate-900 dark:text-white">{formatMoney(buyerStats.totalSpent, auth?.user?.currency)}</p>
                                 </div>
-                                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-1">
-                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Purchases</span>
-                                    <p className="text-2xl font-black text-indigo-600">{buyerStats.activeOrders}</p>
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Purchases</span>
+                                    <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{buyerStats.activeOrders}</p>
                                 </div>
-                                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-1">
-                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Protected Escrow</span>
-                                    <p className="text-2xl font-black text-emerald-600">{formatMoney(buyerStats.lockedEscrow, auth?.user?.currency)}</p>
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Protected Escrow</span>
+                                    <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{formatMoney(buyerStats.lockedEscrow, auth?.user?.currency)}</p>
                                 </div>
                             </div>
                         </div>
@@ -371,33 +371,33 @@ export default function MarketplaceDashboard({
                             
                             {/* SECTION 1: Orders Need Attention (Seller) */}
                             {needsActionSales.length > 0 && (
-                                <div className="rounded-2xl border border-rose-200 bg-rose-50/40 p-6 space-y-4">
-                                    <div className="flex items-center gap-2 text-rose-900 font-bold text-base">
-                                        <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                                <div className="rounded-2xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 p-6 space-y-4">
+                                    <div className="flex items-center gap-2 text-rose-900 dark:text-rose-300 font-bold text-base">
+                                        <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
                                         <span>{__('general.orders_need_attention') || 'Orders Need Attention'}</span>
-                                        <span className="ms-auto rounded-full bg-rose-200 text-rose-900 text-xs px-2.5 py-0.5 font-extrabold">
+                                        <span className="ms-auto rounded-full bg-rose-200 dark:bg-rose-900/60 text-rose-900 dark:text-rose-200 text-xs px-2.5 py-0.5 font-extrabold">
                                             {needsActionSales.length}
                                         </span>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {needsActionSales.map((order) => (
-                                            <div key={order.id} className="bg-white border border-rose-200 rounded-xl p-4 shadow-xs flex flex-col justify-between space-y-3">
+                                            <div key={order.id} className="bg-white dark:bg-[#0f172a] border border-rose-200 dark:border-rose-900/40 rounded-xl p-4 shadow-xs flex flex-col justify-between space-y-3 transition-colors">
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="space-y-1">
-                                                        <span className="text-xs font-bold text-rose-700 uppercase tracking-wider">
+                                                        <span className="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">
                                                             {order.actionNeededText || 'Work Submission Due'}
                                                         </span>
-                                                        <h4 className="font-bold text-slate-900 text-sm line-clamp-1">
+                                                        <h4 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">
                                                             Order #{order.id}: {order.title}
                                                         </h4>
-                                                        <p className="text-xs text-slate-500">
-                                                            Client: <span className="font-medium text-slate-700">{order.buyerName}</span>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                            Client: <span className="font-medium text-slate-700 dark:text-slate-300">{order.buyerName}</span>
                                                         </p>
                                                     </div>
                                                     <StatusBadge status={order.status} />
                                                 </div>
-                                                <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-                                                    <span className="text-xs font-semibold text-slate-900">
+                                                <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/10 pt-3">
+                                                    <span className="text-xs font-semibold text-slate-900 dark:text-white">
                                                         {formatMoney(order.amount, auth?.user?.currency)}
                                                     </span>
                                                     <Link
@@ -415,20 +415,20 @@ export default function MarketplaceDashboard({
                             )}
 
                             {/* SECTION 2: Seller Work Queue / Active Orders */}
-                            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden transition-colors">
+                                <div className="p-6 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
                                     <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                                        <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                             <Briefcase className="w-4 h-4" />
                                         </div>
                                         <div>
-                                            <h2 className="font-extrabold text-slate-900 text-base">
+                                            <h2 className="font-extrabold text-slate-900 dark:text-white text-base">
                                                 {__('general.active_client_orders') || 'Active Client Orders'}
                                             </h2>
-                                            <p className="text-xs text-slate-500">Deliverables and client orders currently assigned to you</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Deliverables and client orders currently assigned to you</p>
                                         </div>
                                     </div>
-                                    <Link href="/marketplace/orders" className="text-xs font-bold text-emerald-600 hover:text-emerald-800 transition-colors flex items-center gap-1">
+                                    <Link href="/marketplace/orders" className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors flex items-center gap-1">
                                         <span>Manage All Orders</span>
                                         <ChevronRight className="w-3.5 h-3.5" />
                                     </Link>
@@ -436,12 +436,12 @@ export default function MarketplaceDashboard({
 
                                 {activeSales.length === 0 ? (
                                     <div className="p-12 text-center space-y-4">
-                                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 mx-auto">
+                                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center text-emerald-500 dark:text-emerald-400 mx-auto">
                                             <Store className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <h3 className="font-bold text-slate-900 text-base">{__('general.no_client_orders_yet') || 'No Active Orders'}</h3>
-                                            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-base">{__('general.no_client_orders_yet') || 'No Active Orders'}</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                                                 You don't have any incoming client orders to deliver right now. Keep your Gigs updated!
                                             </p>
                                         </div>
@@ -454,30 +454,30 @@ export default function MarketplaceDashboard({
                                         </Link>
                                     </div>
                                 ) : (
-                                    <div className="divide-y divide-slate-100">
+                                    <div className="divide-y divide-slate-100 dark:divide-white/10">
                                         {activeSales.map((order) => (
-                                            <div key={order.id} className="p-5 hover:bg-slate-50/70 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div key={order.id} className="p-5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                 <div className="space-y-1.5">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-mono text-xs font-bold text-slate-400">#{order.id}</span>
-                                                        <Link href={`/marketplace/orders/${order.id}`} className="font-bold text-slate-900 text-sm hover:text-emerald-600 transition line-clamp-1">
+                                                        <span className="font-mono text-xs font-bold text-slate-400 dark:text-slate-500">#{order.id}</span>
+                                                        <Link href={`/marketplace/orders/${order.id}`} className="font-bold text-slate-900 dark:text-white text-sm hover:text-emerald-600 dark:hover:text-emerald-400 transition line-clamp-1">
                                                             {order.title}
                                                         </Link>
                                                     </div>
-                                                    <div className="flex items-center gap-4 text-xs text-slate-500">
-                                                        <span>Client: <strong className="text-slate-700">{order.buyerName}</strong></span>
-                                                        {order.deliveryDate && <span>Due: <strong className="text-slate-700">{formatDate(order.deliveryDate)}</strong></span>}
+                                                    <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+                                                        <span>Client: <strong className="text-slate-700 dark:text-slate-300">{order.buyerName}</strong></span>
+                                                        {order.deliveryDate && <span>Due: <strong className="text-slate-700 dark:text-slate-300">{formatDate(order.deliveryDate)}</strong></span>}
                                                     </div>
                                                 </div>
 
                                                 <div className="flex items-center gap-4 shrink-0">
-                                                    <span className="font-extrabold text-slate-900 text-sm">
+                                                    <span className="font-extrabold text-slate-900 dark:text-white text-sm">
                                                         {formatMoney(order.amount, auth?.user?.currency)}
                                                     </span>
                                                     <StatusBadge status={order.status} />
                                                     <Link
                                                         href={`/marketplace/orders/${order.id}`}
-                                                        className="px-3.5 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 font-bold text-xs text-emerald-800 transition-colors"
+                                                        className="px-3.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 font-bold text-xs text-emerald-800 dark:text-emerald-300 transition-colors"
                                                     >
                                                         Deliver / Workspace
                                                     </Link>
@@ -489,11 +489,11 @@ export default function MarketplaceDashboard({
                             </div>
 
                             {/* SECTION 3: My Published Services / Gigs */}
-                            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-4">
+                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs p-6 space-y-4 transition-colors">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="font-extrabold text-slate-900 text-base">{__('general.my_gigs') || 'My Services & Gigs'}</h3>
-                                        <p className="text-xs text-slate-500">Services you offer in the marketplace catalog</p>
+                                        <h3 className="font-extrabold text-slate-900 dark:text-white text-base">{__('general.my_gigs') || 'My Services & Gigs'}</h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">Services you offer in the marketplace catalog</p>
                                     </div>
                                     <Link
                                         href="/marketplace/services/create"
@@ -505,11 +505,11 @@ export default function MarketplaceDashboard({
                                 </div>
 
                                 {listedGigs.length === 0 ? (
-                                    <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-3">
-                                        <p className="text-xs text-slate-500">You haven't created any marketplace services yet.</p>
+                                    <div className="p-8 text-center bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-dashed border-slate-200 dark:border-white/10 space-y-3">
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">You haven't created any marketplace services yet.</p>
                                         <Link
                                             href="/marketplace/services/create"
-                                            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:underline"
+                                            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
                                         >
                                             <Plus className="w-3.5 h-3.5" />
                                             <span>Publish Your First Service</span>
@@ -518,14 +518,14 @@ export default function MarketplaceDashboard({
                                 ) : (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                         {listedGigs.map((gig) => (
-                                            <div key={gig.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-200 transition space-y-3 flex flex-col justify-between">
+                                            <div key={gig.id} className="border border-slate-200 dark:border-white/10 rounded-xl p-4 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-white dark:hover:bg-white/[0.05] hover:border-indigo-200 dark:hover:border-indigo-500/40 transition space-y-3 flex flex-col justify-between">
                                                 <div className="space-y-2">
                                                     <div className="flex items-start justify-between gap-2">
-                                                        <h4 className="font-bold text-slate-900 text-sm line-clamp-2">{gig.title}</h4>
+                                                        <h4 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-2">{gig.title}</h4>
                                                         <div className="flex items-center gap-1 shrink-0">
                                                             <Link
                                                                 href={route('marketplace.services.edit', gig.id)}
-                                                                className="p-1 text-slate-400 hover:text-indigo-600 rounded hover:bg-slate-100 transition-colors"
+                                                                className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
                                                                 title={__('general.edit') || 'Edit'}
                                                             >
                                                                 <Edit className="w-4 h-4" />
@@ -533,7 +533,7 @@ export default function MarketplaceDashboard({
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleDeleteGig(gig.id, gig.title)}
-                                                                className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-100 transition-colors"
+                                                                className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
                                                                 title={__('general.delete') || 'Delete'}
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -541,12 +541,12 @@ export default function MarketplaceDashboard({
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-200/60">
-                                                    <span className="font-bold text-slate-900">From {formatMoney(gig.price, auth?.user?.currency)}</span>
-                                                    <div className="flex items-center gap-1 text-amber-600 font-bold">
+                                                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/60 dark:border-white/10">
+                                                    <span className="font-bold text-slate-900 dark:text-white">From {formatMoney(gig.price, auth?.user?.currency)}</span>
+                                                    <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
                                                         <Star className="w-3.5 h-3.5 fill-current" />
                                                         <span>{gig.rating > 0 ? gig.rating.toFixed(1) : 'New'}</span>
-                                                        <span className="text-slate-400 font-normal">({gig.reviews})</span>
+                                                        <span className="text-slate-400 dark:text-slate-500 font-normal">({gig.reviews})</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -556,22 +556,22 @@ export default function MarketplaceDashboard({
                             </div>
 
                             {/* SECTION 4: Revenue & Analytics (At the bottom) */}
-                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-200">
-                                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-1">
-                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Sales</span>
-                                    <p className="text-2xl font-black text-emerald-600">{formatMoney(sellerStats.totalSales, auth?.user?.currency)}</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Sales</span>
+                                    <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{formatMoney(sellerStats.totalSales, auth?.user?.currency)}</p>
                                 </div>
-                                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-1">
-                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Held Escrow</span>
-                                    <p className="text-2xl font-black text-slate-900">{formatMoney(sellerStats.lockedEscrow, auth?.user?.currency)}</p>
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Held Escrow</span>
+                                    <p className="text-2xl font-black text-slate-900 dark:text-white">{formatMoney(sellerStats.lockedEscrow, auth?.user?.currency)}</p>
                                 </div>
-                                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-1">
-                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Completion Rate</span>
-                                    <p className="text-2xl font-black text-indigo-600">{sellerStats.completionRate}%</p>
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Completion Rate</span>
+                                    <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{sellerStats.completionRate}%</p>
                                 </div>
-                                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-1">
-                                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Services</span>
-                                    <p className="text-2xl font-black text-slate-900">{sellerStats.servicesListed}</p>
+                                <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Services</span>
+                                    <p className="text-2xl font-black text-slate-900 dark:text-white">{sellerStats.servicesListed}</p>
                                 </div>
                             </div>
                         </div>

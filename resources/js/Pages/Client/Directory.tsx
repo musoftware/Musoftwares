@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { PageShell } from '@/Components/ui/PageShell';
+import { PageHeroHeader } from '@/Components/ui/PageHeroHeader';
+import { FilterPillGroup } from '@/Components/ui/FilterPillGroup';
 import { 
     Building2, Users, MessageSquare, Megaphone, Smartphone, 
     Calendar, Coins, Share2, FileCheck2, ShoppingBag, 
     Store, Wallet, FileText, ArrowRightLeft, Ticket, 
-    ArrowUpRight, Award, ShieldCheck, Search, ArrowRight, Sparkles 
+    ArrowUpRight, Award, ShieldCheck, Search, ArrowRight 
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
@@ -187,74 +190,34 @@ export default function Directory() {
         <AuthenticatedLayout>
             <Head title="Systems & Tools Directory — Musoftwares Studio" />
 
-            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
-                
+            <div className="w-full">
                 {/* Hero Header */}
-                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
-                    <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-3">
-                                <span className="px-3 py-1 bg-[#0071e3]/10 text-[#0071e3] text-xs font-semibold rounded-full border border-[#0071e3]/20 flex items-center gap-1.5">
-                                    <Sparkles className="w-3.5 h-3.5" />
-                                    Studio Ecosystem Directory
-                                </span>
-                                <span className="text-xs font-sans text-[#1d1d1f]/60 font-medium">
-                                    {directoryItems.length} Integrated Modules
-                                </span>
-                            </div>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                                Applications &amp; Features Directory
-                            </h1>
-                            <p className="text-xs sm:text-sm text-[#1d1d1f]/70 font-sans max-w-2xl">
-                                Explore and launch all core SaaS applications, automation tools, financial portals, and platform extensions from one centralized index.
-                            </p>
-                        </div>
-
-                        {/* Search Input */}
-                        <div className="w-full md:w-80 relative">
-                            <Search className="w-4 h-4 text-[#1d1d1f]/40 absolute start-3.5 top-1/2 -translate-y-1/2" />
-                            <input
-                                type="text"
-                                placeholder="Search applications & tools..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full h-11 ps-10 pe-4 bg-[#f5f5f7] border border-black/5 rounded-[980px] text-xs sm:text-sm text-[#1d1d1f] placeholder:text-[#1d1d1f]/40 focus:outline-none focus:ring-2 focus:ring-[#0071e3] focus:bg-white transition-all shadow-inner"
-                            />
-                        </div>
-                    </div>
-                </div>
+                <PageHeroHeader
+                    badge="Studio Ecosystem Directory"
+                    title="Applications & Features Directory"
+                    description="Explore and launch all core SaaS applications, automation tools, financial portals, and platform extensions from one centralized index."
+                    searchValue={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    searchPlaceholder="Search applications & tools..."
+                />
 
                 {/* Main Content Area */}
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 py-8 space-y-6">
-                    
+                <PageShell maxWidth="7xl" className="space-y-6">
                     {/* Category Filter Pills */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                        {categories.map((cat) => {
-                            const isSelected = activeCategory === cat;
-                            return (
-                                <button
-                                    key={cat}
-                                    onClick={() => setActiveCategory(cat)}
-                                    className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                                        isSelected
-                                            ? 'bg-[#1d1d1f] text-white shadow-sm'
-                                            : 'bg-white text-[#1d1d1f]/70 border border-black/5 hover:bg-[#f5f5f7] hover:text-[#1d1d1f]'
-                                    }`}
-                                >
-                                    {cat}
-                                </button>
-                            );
-                        })}
-                    </div>
+                    <FilterPillGroup
+                        options={categories}
+                        selected={activeCategory}
+                        onChange={setActiveCategory}
+                    />
 
                     {/* Bento Grid */}
                     {filteredItems.length === 0 ? (
-                        <div className="bg-white border border-black/5 rounded-[24px] p-12 text-center shadow-sm">
-                            <div className="w-12 h-12 rounded-full bg-[#f5f5f7] flex items-center justify-center mx-auto text-[#1d1d1f]/40 mb-3">
+                        <div className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-12 text-center shadow-sm">
+                            <div className="w-12 h-12 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 flex items-center justify-center mx-auto text-[#1d1d1f]/40 dark:text-zinc-500 mb-3">
                                 <Search className="w-6 h-6" />
                             </div>
-                            <h3 className="text-base font-semibold text-[#1d1d1f]">No applications match your search</h3>
-                            <p className="text-xs text-[#1d1d1f]/60 mt-1">Try searching with a different keyword or select another category.</p>
+                            <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-[#f8fafc]">No applications match your search</h3>
+                            <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 mt-1">Try searching with a different keyword or select another category.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -263,39 +226,39 @@ export default function Directory() {
                                 return (
                                     <div
                                         key={idx}
-                                        className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-7 flex flex-col justify-between group hover:border-[#0071e3]/30 hover:shadow-md transition-all shadow-sm relative overflow-hidden"
+                                        className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 sm:p-7 flex flex-col justify-between group hover:border-[#0071e3]/30 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all shadow-sm relative overflow-hidden"
                                     >
                                         <div>
                                             <div className="flex items-center justify-between mb-5">
-                                                <div className="w-11 h-11 rounded-2xl bg-[#0071e3]/10 border border-[#0071e3]/15 flex items-center justify-center text-[#0071e3] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
+                                                <div className="w-11 h-11 rounded-2xl bg-[#0071e3]/10 dark:bg-[#0071e3]/20 border border-[#0071e3]/15 flex items-center justify-center text-[#0071e3] dark:text-[#2997ff] group-hover:bg-[#0071e3] group-hover:text-white transition-all">
                                                     <IconComponent className="w-5 h-5" />
                                                 </div>
-                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#f5f5f7] border border-black/5 text-[#1d1d1f]/60 font-mono">
+                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 border border-black/5 dark:border-white/10 text-[#1d1d1f]/60 dark:text-zinc-300 font-mono">
                                                     {item.category}
                                                 </span>
                                             </div>
 
                                             <div className="space-y-1.5 mb-6">
                                                 <div className="flex items-center gap-2">
-                                                    <h3 className="text-base font-bold text-[#1d1d1f] font-sans group-hover:text-[#0071e3] transition-colors">
+                                                    <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] font-sans group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] transition-colors">
                                                         {item.name}
                                                     </h3>
                                                     {item.badge && (
-                                                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
                                                             {item.badge}
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-xs text-[#1d1d1f]/60 font-sans leading-relaxed">
+                                                <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans leading-relaxed">
                                                     {item.desc}
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <div className="pt-4 border-t border-black/5 flex items-center justify-between">
+                                        <div className="pt-4 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
                                             <Link
                                                 href={item.href}
-                                                className="w-full flex items-center justify-between text-xs font-semibold text-[#0071e3] group-hover:text-[#0077ed] py-1"
+                                                className="w-full flex items-center justify-between text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] group-hover:text-[#0077ed] dark:group-hover:text-[#52a9ff] py-1"
                                             >
                                                 <span>{item.btnText}</span>
                                                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
@@ -306,9 +269,7 @@ export default function Directory() {
                             })}
                         </div>
                     )}
-
-                </div>
-
+                </PageShell>
             </div>
         </AuthenticatedLayout>
     );

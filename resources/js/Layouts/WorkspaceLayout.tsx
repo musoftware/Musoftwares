@@ -36,27 +36,27 @@ export default function WorkspaceLayout({
 
             <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 {/* Contextual Breadcrumb Navigator */}
-                <div className="mb-8 flex items-center gap-1.5 text-sm text-slate-500">
-                    <span className="cursor-pointer transition-colors hover:text-slate-900">
+                <div className="mb-8 flex items-center gap-1.5 text-sm text-slate-500 dark:text-zinc-400">
+                    <span className="cursor-pointer transition-colors hover:text-slate-900 dark:hover:text-white">
                         {safeWorkspaceName}
                     </span>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-                    <span className="font-medium text-slate-900">{activeMenuLabel}</span>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 dark:text-zinc-600" />
+                    <span className="font-medium text-slate-900 dark:text-white">{activeMenuLabel}</span>
                 </div>
 
                 <div className="flex flex-col items-start gap-8 lg:flex-row">
                     {/* Left Sidebar */}
                     <aside className="w-full shrink-0 lg:w-64">
-                        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <div className="flex items-center gap-2 border-b border-slate-100 pb-3 px-3">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
+                        <div className="space-y-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] p-4 shadow-sm">
+                            <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/10 pb-3 px-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100 dark:shadow-none">
                                     {safeWorkspaceName.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="min-w-0">
-                                    <span className="block truncate text-sm font-semibold text-slate-900">
+                                    <span className="block truncate text-sm font-semibold text-slate-900 dark:text-white">
                                         {safeWorkspaceName}
                                     </span>
-                                    <span className="block font-mono text-[11px] text-slate-400">
+                                    <span className="block font-mono text-[11px] text-slate-400 dark:text-zinc-500">
                                         Active Tenant ID: #{tenantId}
                                     </span>
                                 </div>
@@ -67,8 +67,8 @@ export default function WorkspaceLayout({
                                     const Icon = item.icon;
                                     const classes = `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
                                         item.isActive
-                                            ? 'bg-slate-100 font-medium text-slate-900'
-                                            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                            ? 'bg-slate-100 dark:bg-zinc-800 font-medium text-slate-900 dark:text-white'
+                                            : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-800/60 hover:text-slate-900 dark:hover:text-white'
                                     }`;
                                     
                                     const content = (
@@ -77,8 +77,8 @@ export default function WorkspaceLayout({
                                                 <Icon
                                                     className={`h-4 w-4 shrink-0 transition-colors ${
                                                         item.isActive
-                                                            ? 'text-slate-900'
-                                                            : 'text-slate-400 group-hover:text-slate-600'
+                                                            ? 'text-slate-900 dark:text-white'
+                                                            : 'text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300'
                                                     }`}
                                                 />
                                                 <span>{item.label}</span>
@@ -87,8 +87,8 @@ export default function WorkspaceLayout({
                                                 <span
                                                     className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
                                                         item.isActive
-                                                            ? 'border border-slate-200 bg-white text-slate-900 shadow-sm'
-                                                            : 'bg-slate-100 text-slate-500'
+                                                            ? 'border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm'
+                                                            : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
                                                     }`}
                                                 >
                                                     {item.badge}

@@ -54,17 +54,17 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                 >
                     {favorites.data.length === 0 ? (
                         <div className="p-12 text-center text-slate-400 space-y-3">
-                            <Heart className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5]" />
-                            <p className="text-sm font-medium text-slate-700">
+                            <Heart className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 stroke-[1.5]" />
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                 {__('general.no_saved_favorites_yet') || 'Your wishlist is currently empty.'}
                             </p>
-                            <p className="text-xs text-slate-400 max-w-md mx-auto">
+                            <p className="text-xs text-slate-400 dark:text-slate-500 max-w-md mx-auto">
                                 Click the heart icon on any service listing to bookmark it for quick access later.
                             </p>
                             <div className="pt-2">
                                 <Link
                                     href="/marketplace/services"
-                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 transition"
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium hover:bg-slate-800 dark:hover:bg-slate-100 transition"
                                 >
                                     <ShoppingBag className="w-4 h-4" />
                                     Browse Catalog Services
@@ -80,9 +80,9 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                                 return (
                                     <div
                                         key={fav.id}
-                                        className="group border border-slate-200 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition flex flex-col justify-between"
+                                        className="group border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden bg-white dark:bg-[#0f172a] hover:shadow-lg transition flex flex-col justify-between"
                                     >
-                                        <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                                        <div className="relative aspect-video bg-slate-100 dark:bg-slate-800 overflow-hidden">
                                             <img
                                                 src={srv.cover_image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80'}
                                                 alt={srv.title}
@@ -90,7 +90,7 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                                             />
                                             <button
                                                 onClick={() => handleRemove(srv.id)}
-                                                className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm text-red-500 hover:bg-red-500 hover:text-white transition shadow-sm"
+                                                className="absolute top-3 right-3 p-2 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm text-red-500 dark:text-red-400 hover:bg-red-500 hover:text-white transition shadow-sm"
                                                 title="Remove from favorites"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -102,12 +102,12 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                                                 <div className="text-xs text-slate-400 font-medium">
                                                     Seller: {srv.seller?.name || 'Verified Creator'}
                                                 </div>
-                                                <h4 className="font-bold text-slate-900 text-base line-clamp-2 group-hover:text-indigo-600 transition">
+                                                <h4 className="font-bold text-slate-900 dark:text-white text-base line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
                                                     {srv.title}
                                                 </h4>
                                             </div>
 
-                                            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                                            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/10">
                                                 <div className="flex items-center gap-1 text-xs text-amber-500 font-semibold">
                                                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                                                     <span>{srv.avg_rating || '5.0'}</span>
@@ -116,7 +116,7 @@ export default function Index({ favorites }: FavoritesIndexProps) {
 
                                                 <Link
                                                     href={`/marketplace/services/${srv.id}`}
-                                                    className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                                                    className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                                                 >
                                                     View Details <ArrowRight className="w-3.5 h-3.5" />
                                                 </Link>
