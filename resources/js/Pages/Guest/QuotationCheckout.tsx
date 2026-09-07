@@ -7,6 +7,7 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Badge } from '@/Components/ui/badge';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { 
     ArrowRight, Lock, ShieldCheck, CheckCircle2, 
     CreditCard, Sparkles, User, Mail, Phone, Building2, FileText
@@ -58,46 +59,49 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500 selection:text-white pb-24">
+        <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white pb-24 transition-colors duration-200">
             <Head title={`استكمال البيانات وسداد الدفعة - ${quotation.title}`} />
 
             {/* Header */}
-            <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
+            <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <ApplicationLogo className="w-8 h-8 fill-current text-slate-900" />
+                        <ApplicationLogo className="w-8 h-8 fill-current text-foreground" />
                         <div>
-                            <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
+                            <span className="font-extrabold text-base tracking-tight text-foreground block leading-none">
                                 MUSOFTWARE
                             </span>
-                            <span className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">
+                            <span className="text-[10px] text-muted-foreground font-medium tracking-wider uppercase">
                                 Secure Checkout
                             </span>
                         </div>
                     </div>
 
-                    <Link href={backUrl} className="inline-flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-900 font-medium">
-                        <ArrowRight className="w-4 h-4" />
-                        العودة لتفاصيل العرض
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <ThemeToggle className="h-8 w-8" />
+                        <Link href={backUrl} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium">
+                            <ArrowRight className="w-4 h-4" />
+                            العودة لتفاصيل العرض
+                        </Link>
+                    </div>
                 </div>
             </header>
 
             <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
                 {/* Step Indicator */}
                 <div className="mb-8 flex items-center justify-center gap-2 sm:gap-4 text-xs font-semibold">
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                        <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-600">1</span>
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground">1</span>
                         <span>مراجعة العرض</span>
                     </div>
-                    <div className="w-8 h-0.5 bg-slate-200" />
-                    <div className="flex items-center gap-1.5 text-indigo-600">
-                        <span className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center">2</span>
+                    <div className="w-8 h-0.5 bg-border" />
+                    <div className="flex items-center gap-1.5 text-primary">
+                        <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">2</span>
                         <span className="font-bold">بيانات العميل والسداد</span>
                     </div>
-                    <div className="w-8 h-0.5 bg-slate-200" />
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                        <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-600">3</span>
+                    <div className="w-8 h-0.5 bg-border" />
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground">3</span>
                         <span>تأكيد البدء</span>
                     </div>
                 </div>
@@ -105,13 +109,13 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* Left 7 Cols: Customer Information Form */}
                     <div className="lg:col-span-7 space-y-6">
-                        <Card className="border-slate-200/80 shadow-sm bg-white">
-                            <CardHeader className="border-b border-slate-100 pb-4">
-                                <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                    <User className="w-5 h-5 text-indigo-600" />
+                        <Card className="border-border shadow-sm bg-card text-card-foreground">
+                            <CardHeader className="border-b border-border pb-4">
+                                <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+                                    <User className="w-5 h-5 text-primary" />
                                     بيانات التواصل والحساب
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="text-muted-foreground">
                                     سيتم إنشاء حسابك التلقائي وإصدار الفاتورة الرسمية باسم هذه البيانات فور إتمام السداد.
                                 </CardDescription>
                             </CardHeader>
@@ -119,8 +123,8 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                 <form onSubmit={submit} id="checkout-form" className="space-y-4">
                                     {/* Full Name */}
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="client_name" className="text-xs font-bold text-slate-700">
-                                            الاسم الكامل <span className="text-red-500">*</span>
+                                        <Label htmlFor="client_name" className="text-xs font-bold text-foreground">
+                                            الاسم الكامل <span className="text-destructive">*</span>
                                         </Label>
                                         <div className="relative">
                                             <Input
@@ -129,17 +133,17 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                                 placeholder="مثال: أحمد محمود"
                                                 value={data.client_name}
                                                 onChange={(e) => setData('client_name', e.target.value)}
-                                                className="bg-slate-50/50"
+                                                className="bg-background text-foreground border-input focus-visible:ring-primary"
                                                 required
                                             />
                                         </div>
-                                        {errors.client_name && <p className="text-xs text-red-500">{errors.client_name}</p>}
+                                        {errors.client_name && <p className="text-xs text-destructive">{errors.client_name}</p>}
                                     </div>
 
                                     {/* Email */}
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="client_email" className="text-xs font-bold text-slate-700">
-                                            البريد الإلكتروني <span className="text-red-500">*</span>
+                                        <Label htmlFor="client_email" className="text-xs font-bold text-foreground">
+                                            البريد الإلكتروني <span className="text-destructive">*</span>
                                         </Label>
                                         <Input
                                             id="client_email"
@@ -147,17 +151,17 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                             placeholder="name@example.com"
                                             value={data.client_email}
                                             onChange={(e) => setData('client_email', e.target.value)}
-                                            className="bg-slate-50/50 font-mono text-sm"
+                                            className="bg-background text-foreground border-input focus-visible:ring-primary font-mono text-sm"
                                             required
                                         />
-                                        {errors.client_email && <p className="text-xs text-red-500">{errors.client_email}</p>}
-                                        <span className="text-[11px] text-slate-400">ستصلك بيانات الدخول والفاتورة وإشعارات المشروع على هذا البريد.</span>
+                                        {errors.client_email && <p className="text-xs text-destructive">{errors.client_email}</p>}
+                                        <span className="text-[11px] text-muted-foreground">ستصلك بيانات الدخول والفاتورة وإشعارات المشروع على هذا البريد.</span>
                                     </div>
 
                                     {/* Phone & WhatsApp */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <Label htmlFor="client_phone" className="text-xs font-bold text-slate-700">
+                                            <Label htmlFor="client_phone" className="text-xs font-bold text-foreground">
                                                 رقم الهاتف / الموبايل
                                             </Label>
                                             <Input
@@ -173,12 +177,12 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                                         client_whatsapp: prev.client_whatsapp || val,
                                                     }));
                                                 }}
-                                                className="bg-slate-50/50 font-mono text-sm"
+                                                className="bg-background text-foreground border-input focus-visible:ring-primary font-mono text-sm"
                                             />
                                         </div>
 
                                         <div className="space-y-1.5">
-                                            <Label htmlFor="client_whatsapp" className="text-xs font-bold text-slate-700">
+                                            <Label htmlFor="client_whatsapp" className="text-xs font-bold text-foreground">
                                                 رقم الواتساب (WhatsApp)
                                             </Label>
                                             <Input
@@ -187,14 +191,14 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                                 placeholder="010XXXXXXXX"
                                                 value={data.client_whatsapp}
                                                 onChange={(e) => setData('client_whatsapp', e.target.value)}
-                                                className="bg-slate-50/50 font-mono text-sm"
+                                                className="bg-background text-foreground border-input focus-visible:ring-primary font-mono text-sm"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Company Name */}
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="company_name" className="text-xs font-bold text-slate-700">
+                                        <Label htmlFor="company_name" className="text-xs font-bold text-foreground">
                                             اسم الشركة / المؤسسة (اختياري)
                                         </Label>
                                         <Input
@@ -203,13 +207,13 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                             placeholder="اسم شركتك أو علامتك التجارية"
                                             value={data.company_name}
                                             onChange={(e) => setData('company_name', e.target.value)}
-                                            className="bg-slate-50/50"
+                                            className="bg-background text-foreground border-input focus-visible:ring-primary"
                                         />
                                     </div>
 
                                     {/* Notes */}
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="notes" className="text-xs font-bold text-slate-700">
+                                        <Label htmlFor="notes" className="text-xs font-bold text-foreground">
                                             ملاحظات أو متطلبات إضافية (اختياري)
                                         </Label>
                                         <Textarea
@@ -218,7 +222,7 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                             value={data.notes}
                                             onChange={(e) => setData('notes', e.target.value)}
                                             rows={3}
-                                            className="bg-slate-50/50 text-sm"
+                                            className="bg-background text-foreground border-input focus-visible:ring-primary text-sm"
                                         />
                                     </div>
                                 </form>
@@ -228,35 +232,35 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
 
                     {/* Right 5 Cols: Order Summary & Checkout Action */}
                     <div className="lg:col-span-5 space-y-6">
-                        <Card className="border-slate-200/80 shadow-md bg-white overflow-hidden">
-                            <CardHeader className="bg-slate-900 text-white p-5">
-                                <span className="font-mono text-xs text-indigo-300 font-semibold">{quotation.quotation_number}</span>
-                                <CardTitle className="text-base font-bold text-white mt-1 line-clamp-2">
+                        <Card className="border-border shadow-md bg-card text-card-foreground overflow-hidden">
+                            <CardHeader className="bg-primary text-primary-foreground p-5">
+                                <span className="font-mono text-xs text-primary-foreground/80 font-semibold">{quotation.quotation_number}</span>
+                                <CardTitle className="text-base font-bold text-primary-foreground mt-1 line-clamp-2">
                                     {quotation.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6 space-y-4">
-                                <div className="space-y-2.5 pb-4 border-b border-slate-100 text-sm">
-                                    <div className="flex items-center justify-between text-slate-600">
+                                <div className="space-y-2.5 pb-4 border-b border-border text-sm">
+                                    <div className="flex items-center justify-between text-muted-foreground">
                                         <span>إجمالي أعمال المشروع:</span>
-                                        <span className="font-mono font-bold text-slate-900">{quotation.development_total} {quotation.currency}</span>
+                                        <span className="font-mono font-bold text-foreground">{quotation.development_total} {quotation.currency}</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-slate-600">
+                                    <div className="flex items-center justify-between text-muted-foreground">
                                         <span>نسبة الدفعة المقدمة:</span>
-                                        <span className="font-mono font-semibold text-emerald-600">{quotation.deposit_percentage}%</span>
+                                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">{quotation.deposit_percentage}%</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-slate-600">
+                                    <div className="flex items-center justify-between text-muted-foreground">
                                         <span>المتبقي عند التسليم:</span>
-                                        <span className="font-mono text-slate-500">{quotation.remaining_amount} {quotation.currency}</span>
+                                        <span className="font-mono text-muted-foreground">{quotation.remaining_amount} {quotation.currency}</span>
                                     </div>
                                 </div>
 
-                                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/80 space-y-1 text-center">
-                                    <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
-                                        المبلغ المستحق للدفع الآن (50%)
+                                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1 text-center">
+                                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider block">
+                                        المبلغ المستحق للدفع الآن ({quotation.deposit_percentage}%)
                                     </span>
-                                    <div className="text-3xl font-extrabold font-mono text-emerald-700">
-                                        {quotation.deposit_amount} <span className="text-sm font-normal text-emerald-600">{quotation.currency}</span>
+                                    <div className="text-3xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+                                        {quotation.deposit_amount} <span className="text-sm font-normal text-muted-foreground">{quotation.currency}</span>
                                     </div>
                                 </div>
 
@@ -265,23 +269,23 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                         type="submit"
                                         form="checkout-form"
                                         disabled={processing}
-                                        className="w-full bg-slate-900 text-white hover:bg-slate-800 text-base font-bold py-6 rounded-2xl shadow-lg hover:shadow-xl transition-all gap-2"
+                                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base font-bold py-6 rounded-2xl shadow-lg hover:shadow-xl transition-all gap-2"
                                     >
-                                        <Lock className="w-4 h-4 text-emerald-400" />
+                                        <Lock className="w-4 h-4 text-emerald-300" />
                                         {processing ? 'جاري التوجيه لبوابة الدفع...' : 'الانتقال للدفع الآمن الآن'}
                                     </Button>
-                                    <p className="text-[11px] text-center text-slate-400">
+                                    <p className="text-[11px] text-center text-muted-foreground">
                                         سيتم نقلك بأمان إلى بوابة الدفع لإتمام العملية بواسطة البطاقة البنكية أو المحافظ.
                                     </p>
                                 </div>
 
-                                <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-3 text-xs text-slate-400 font-medium">
+                                <div className="pt-4 border-t border-border flex items-center justify-center gap-3 text-xs text-muted-foreground font-medium">
                                     <span className="flex items-center gap-1">
                                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                                         تشفير 256-bit SSL
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500" />
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                                         فاتورة رسمية فورية
                                     </span>
                                 </div>

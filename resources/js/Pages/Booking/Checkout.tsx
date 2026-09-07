@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { CheckCircle2, Wallet, CreditCard, ShieldCheck, ArrowRight, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { __ } from '@/lib/i18n';
+import ThemeToggle from '@/Components/ThemeToggle';
 
 export default function Checkout({ booking, walletBalance }: any) {
     const { eventType } = booking;
@@ -28,45 +29,48 @@ export default function Checkout({ booking, walletBalance }: any) {
     const isProcessing = processingWallet || processingCard;
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 py-12 selection:bg-slate-200">
+        <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 py-12 selection:bg-primary selection:text-white transition-colors duration-200">
             <Head title={__('general.complete_your_booking')} />
             
             <div className="max-w-3xl w-full">
+                <div className="flex justify-end mb-4">
+                    <ThemeToggle className="h-9 w-9" />
+                </div>
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-semibold text-slate-900 tracking-tight mb-2">{__('general.complete_your_booking')}</h1>
-                    <p className="text-slate-500">{__('general.you_re_almost_there_secure_your_session_by_completing_payment')}</p>
+                    <h1 className="text-3xl font-semibold text-foreground tracking-tight mb-2">{__('general.complete_your_booking')}</h1>
+                    <p className="text-muted-foreground">{__('general.you_re_almost_there_secure_your_session_by_completing_payment')}</p>
                 </div>
 
                 <div className="grid md:grid-cols-5 gap-6">
                     {/* Left Col - Payment Form */}
                     <div className="md:col-span-3 space-y-6">
-                        <Card className="border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                            <CardHeader className="bg-white border-b border-slate-50">
-                                <CardTitle className="text-lg">{__('general.payment_method')}</CardTitle>
-                                <CardDescription>{__('general.select_how_you_d_like_to_pay_for_this_session')}</CardDescription>
+                        <Card className="border-border shadow-sm rounded-2xl overflow-hidden bg-card text-card-foreground">
+                            <CardHeader className="bg-muted/20 border-b border-border">
+                                <CardTitle className="text-lg text-foreground">{__('general.payment_method')}</CardTitle>
+                                <CardDescription className="text-muted-foreground">{__('general.select_how_you_d_like_to_pay_for_this_session')}</CardDescription>
                             </CardHeader>
                             <CardContent className="p-6 space-y-4">
                                 {/* Credit Card Option */}
                                 <div 
                                     className={`relative flex cursor-pointer rounded-xl border p-4 transition-all ${
                                         paymentMethod === 'card' 
-                                            ? 'border-slate-900 bg-slate-50/50 shadow-sm' 
-                                            : 'border-slate-200 hover:border-slate-300 bg-white'
+                                            ? 'border-primary bg-primary/5 shadow-sm' 
+                                            : 'border-border hover:border-primary/50 bg-card'
                                     }`}
                                     onClick={() => setPaymentMethod('card')}
                                 >
                                     <div className="flex w-full items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-full ${paymentMethod === 'card' ? 'bg-white shadow-sm' : 'bg-slate-50'}`}>
-                                                <CreditCard className="h-5 w-5 text-slate-700" />
+                                            <div className={`p-2 rounded-full ${paymentMethod === 'card' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                                                <CreditCard className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <p className="font-medium text-slate-900">{__('general.credit_or_debit_card')}</p>
-                                                <p className="text-sm text-slate-500">{__('general.powered_securely_by_kashier')}</p>
+                                                <p className="font-medium text-foreground">{__('general.credit_or_debit_card')}</p>
+                                                <p className="text-sm text-muted-foreground">{__('general.powered_securely_by_kashier')}</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'card' ? 'border-slate-900' : 'border-slate-300'}`}>
-                                            {paymentMethod === 'card' && <div className="h-2.5 w-2.5 rounded-full bg-slate-900" />}
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'card' ? 'border-primary' : 'border-border'}`}>
+                                            {paymentMethod === 'card' && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
                                         </div>
                                     </div>
                                 </div>
@@ -75,28 +79,28 @@ export default function Checkout({ booking, walletBalance }: any) {
                                 <div 
                                     className={`relative flex rounded-xl border p-4 transition-all ${
                                         paymentMethod === 'wallet' 
-                                            ? 'border-slate-900 bg-slate-50/50 shadow-sm' 
-                                            : 'border-slate-200 bg-white'
-                                    } ${!hasEnoughBalance ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-slate-300'}`}
+                                            ? 'border-primary bg-primary/5 shadow-sm' 
+                                            : 'border-border bg-card'
+                                    } ${!hasEnoughBalance ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-primary/50'}`}
                                     onClick={() => hasEnoughBalance && setPaymentMethod('wallet')}
                                 >
                                     <div className="flex w-full items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-full ${paymentMethod === 'wallet' ? 'bg-white shadow-sm' : 'bg-slate-50'}`}>
-                                                <Wallet className="h-5 w-5 text-slate-700" />
+                                            <div className={`p-2 rounded-full ${paymentMethod === 'wallet' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                                                <Wallet className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <p className="font-medium text-slate-900">{__('general.pay_with_wallet_balance')}</p>
+                                                    <p className="font-medium text-foreground">{__('general.pay_with_wallet_balance')}</p>
                                                     {!hasEnoughBalance && (
-                                                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">{__('general.insufficient')}</span>
+                                                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">{__('general.insufficient')}</span>
                                                     )}
                                                 </div>
-                                                <p className="text-sm text-slate-500">Available: {walletBalance.toFixed(2)} {booking.currency}</p>
+                                                <p className="text-sm text-muted-foreground">Available: {walletBalance.toFixed(2)} {booking.currency}</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'wallet' ? 'border-slate-900' : 'border-slate-300'}`}>
-                                            {paymentMethod === 'wallet' && <div className="h-2.5 w-2.5 rounded-full bg-slate-900" />}
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'wallet' ? 'border-primary' : 'border-border'}`}>
+                                            {paymentMethod === 'wallet' && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
                                         </div>
                                     </div>
                                 </div>
@@ -106,7 +110,7 @@ export default function Checkout({ booking, walletBalance }: any) {
                         <form onSubmit={handlePayment}>
                             <Button 
                                 type="submit" 
-                                className="w-full rounded-xl h-14 text-lg font-medium shadow-sm hover:shadow-md transition-all"
+                                className="w-full rounded-xl h-14 text-lg font-medium shadow-sm hover:shadow-md transition-all bg-primary hover:bg-primary/90 text-primary-foreground"
                                 disabled={isProcessing}
                             >
                                 {isProcessing ? (
@@ -119,7 +123,7 @@ export default function Checkout({ booking, walletBalance }: any) {
                             </Button>
                         </form>
                         
-                        <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                             <ShieldCheck className="h-4 w-4" />
                             <span>{__('general.payments_are_secure_and_encrypted')}</span>
                         </div>
@@ -127,37 +131,37 @@ export default function Checkout({ booking, walletBalance }: any) {
 
                     {/* Right Col - Order Summary */}
                     <div className="md:col-span-2 space-y-6">
-                        <Card className="border-slate-100 shadow-sm rounded-2xl bg-white">
-                            <CardHeader className="pb-4 border-b border-slate-50">
-                                <CardTitle className="text-lg">{__('general.booking_summary')}</CardTitle>
+                        <Card className="border-border shadow-sm rounded-2xl bg-card text-card-foreground">
+                            <CardHeader className="pb-4 border-b border-border bg-muted/20">
+                                <CardTitle className="text-lg text-foreground">{__('general.booking_summary')}</CardTitle>
                             </CardHeader>
                             <CardContent className="p-6 space-y-6">
                                 <div>
-                                    <h3 className="font-medium text-slate-900 mb-1">{eventType.title}</h3>
-                                    <p className="text-sm text-slate-500 flex items-center gap-1.5">
+                                    <h3 className="font-medium text-foreground mb-1">{eventType.title}</h3>
+                                    <p className="text-sm text-muted-foreground flex items-center gap-1.5">
                                         <Clock className="h-3.5 w-3.5" />
                                         {eventType.duration_minutes} minutes
                                     </p>
                                 </div>
                                 
-                                <div className="space-y-3 pt-4 border-t border-slate-100">
+                                <div className="space-y-3 pt-4 border-t border-border">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">{__('general.date')}</span>
-                                        <span className="font-medium text-slate-900">{format(new Date(booking.starts_at), 'MMM d, yyyy')}</span>
+                                        <span className="text-muted-foreground">{__('general.date')}</span>
+                                        <span className="font-medium text-foreground">{format(new Date(booking.starts_at), 'MMM d, yyyy')}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">{__('general.time')}</span>
-                                        <span className="font-medium text-slate-900">{format(new Date(booking.starts_at), 'h:mm a')}</span>
+                                        <span className="text-muted-foreground">{__('general.time')}</span>
+                                        <span className="font-medium text-foreground">{format(new Date(booking.starts_at), 'h:mm a')}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">{__('general.guest')}</span>
-                                        <span className="font-medium text-slate-900">{booking.guest_name}</span>
+                                        <span className="text-muted-foreground">{__('general.guest')}</span>
+                                        <span className="font-medium text-foreground">{booking.guest_name}</span>
                                     </div>
                                 </div>
                                 
-                                <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                                    <span className="font-medium text-slate-900">{__('general.total')}</span>
-                                    <span className="text-xl font-semibold text-slate-900">{booking.price} {booking.currency}</span>
+                                <div className="pt-4 border-t border-border flex justify-between items-center">
+                                    <span className="font-medium text-foreground">{__('general.total')}</span>
+                                    <span className="text-xl font-semibold text-foreground">{booking.price} {booking.currency}</span>
                                 </div>
                             </CardContent>
                         </Card>

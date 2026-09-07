@@ -216,7 +216,7 @@
             }
         </script>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased bg-background text-foreground transition-colors duration-150">
         <!-- Google Tag Manager (noscript) -->
         @if($gtm_id)
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtm_id }}"

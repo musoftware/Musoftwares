@@ -110,6 +110,11 @@ if ($AssetsOnly) {
                 }
             }
         }
+        # Also include files from latest commit to ensure newly committed assets are deployed
+        $recentCommitFiles = & git diff --name-only HEAD~1 HEAD 2>$null
+        if ($recentCommitFiles) {
+            $rawGitFiles += $recentCommitFiles
+        }
     }
 
     $excludedPatterns = @(

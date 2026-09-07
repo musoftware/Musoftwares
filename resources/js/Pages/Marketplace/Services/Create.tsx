@@ -79,13 +79,13 @@ export default function CreateService({ categories, seller }: Props) {
         <MarketplaceLayout>
             <Head title={__('general.publish_a_service')} />
 
-            <div className="min-h-screen bg-slate-50">
+            <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
                 {/* Top bar */}
-                <div className="bg-white border-b border-slate-200 sticky top-0 z-30">
+                <div className="bg-card border-b border-border sticky top-0 z-30">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-                        <Link href="/marketplace/dashboard" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors">
+                        <Link href="/marketplace/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                             <ArrowLeft className="w-4 h-4" /> {__('general.back')}</Link>
-                        <h1 className="text-base font-semibold text-slate-900">{__('general.publish_a_service')}</h1>
+                        <h1 className="text-base font-semibold text-foreground">{__('general.publish_a_service')}</h1>
                         <div className="text-xs text-slate-400">Step {step} of {STEPS.length}</div>
                     </div>
 
