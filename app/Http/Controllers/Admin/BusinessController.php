@@ -215,12 +215,12 @@ class BusinessController extends Controller
         // Client and Category breakdowns (relative to selected time filter)
         $monthlyClientData = (clone $incomeQuery)->get()->groupBy('user_id');
         $monthlyClientBreakdown = [];
-        foreach ($monthlyClientData as $userId => $txs) {
-            $user = $txs->first()->user;
+        foreach ($monthlyClientData as $clientTxs) {
+            $user = $clientTxs->first()->user;
             $userName = $user ? $user->name : 'Unknown';
-            $cReceived = $txs->where('type', 'received')->sum('business_amount');
-            $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
-            $cSent = $txs->where('type', 'sent')->sum('business_amount');
+            $cReceived = $clientTxs->where('type', 'received')->sum('business_amount');
+            $cRefunded = $clientTxs->where('type', 'refunded')->sum('business_amount');
+            $cSent = $clientTxs->where('type', 'sent')->sum('business_amount');
             $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
             if ($cNet > 0) {
                 $monthlyClientBreakdown[] = ['name' => $userName, 'value' => $cNet];

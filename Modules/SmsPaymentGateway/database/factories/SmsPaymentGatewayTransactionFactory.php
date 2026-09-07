@@ -22,16 +22,7 @@ class SmsPaymentGatewayTransactionFactory extends Factory
      */
     public function definition()
     {
-        $tenantId = \Modules\ERP\Models\Tenant::first()->id ?? \Modules\ERP\Models\Tenant::insertGetId([
-            'user_id' => User::factory()->create()->id,
-            'name' => 'Test Tenant',
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
         return [
-            'tenant_id' => $tenantId,
             'device_id' => \Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice::factory(),
             'user_id' => User::factory(),
             'amount' => $this->faker->randomFloat(2, 10, 1000),

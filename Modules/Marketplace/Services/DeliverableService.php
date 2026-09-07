@@ -14,7 +14,7 @@ class DeliverableService
     /**
      * Submit work deliverable with note and file attachment.
      */
-    public function submitDeliverable(ServiceOrder $order, string $note, ?string $filePath = null): ServiceOrder
+    public function submitDeliverable(ServiceOrder $order, string $note, ?string $filePath = null, ?string $links = null): ServiceOrder
     {
         $allowedStatuses = [
             ServiceOrderStatus::PENDING,
@@ -27,7 +27,7 @@ class DeliverableService
             throw new Exception(__('marketplace.deliverable_cannot_submit_in_status'));
         }
 
-        DB::transaction(function () use ($order, $note, $filePath) {
+        DB::transaction(function () use ($order, $note, $filePath, $links) {
             if ($filePath) {
                 OrderDeliveryFile::create([
                     'order_id' => $order->id,
@@ -44,6 +44,7 @@ class DeliverableService
                 'delivery_count' => ($order->delivery_count ?? 0) + 1,
                 'delivery_payload' => [
                     'message' => $note,
+                    'links' => $links,
                     'file_path' => $filePath,
                 ],
             ]);

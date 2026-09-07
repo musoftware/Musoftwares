@@ -34,6 +34,26 @@ class Invoice extends Model
         'paid_at' => 'datetime',
     ];
 
+    /**
+     * Cleanly resolves an Invoice model from an instance or ID.
+     */
+    public static function resolve(mixed $invoice): ?self
+    {
+        if ($invoice instanceof self) {
+            return $invoice;
+        }
+
+        if (is_numeric($invoice)) {
+            return self::find((int) $invoice);
+        }
+
+        if (is_object($invoice) && isset($invoice->id) && is_numeric($invoice->id)) {
+            return self::find((int) $invoice->id);
+        }
+
+        return null;
+    }
+
     protected static function booted()
     {
         static::creating(function ($invoice) {
@@ -73,10 +93,6 @@ class Invoice extends Model
 
     public function getCurrencyAttribute()
     {
-        if ($this->relationLoaded('currency')) {
-            return $this->getRelation('currency');
-        }
-
         return $this->attributes['currency_id'] ?? null;
     }
 
@@ -186,6 +202,11 @@ class Invoice extends Model
     }
 
     public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency_id');
+    }
+
+    public function currencyRelation(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'currency_id');
     }

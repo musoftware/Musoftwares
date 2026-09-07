@@ -32,7 +32,7 @@ class WhatsappContactController extends Controller
             'description' => $validated['description'] ?? null,
         ]);
 
-        return redirect()->back()->with('success', 'Contact group created successfully.');
+        return redirect()->back(fallback: route('whatsapp.index'))->with('success', 'Contact group created successfully.');
     }
 
     /**
@@ -54,7 +54,7 @@ class WhatsappContactController extends Controller
 
         $group->delete();
 
-        return redirect()->back()->with('success', 'Contact group deleted successfully.');
+        return redirect()->back(fallback: route('whatsapp.index'))->with('success', 'Contact group deleted successfully.');
     }
 
     /**
@@ -169,7 +169,7 @@ class WhatsappContactController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', "Imported {$imported} contacts into group successfully.");
+        return redirect()->back(fallback: route('whatsapp.index'))->with('success', "Imported {$imported} contacts into group successfully.");
     }
 
     /**

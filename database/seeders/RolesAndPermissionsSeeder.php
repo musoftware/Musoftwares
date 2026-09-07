@@ -24,6 +24,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'impersonate users',
             'manage settings',
             'manage referrals',
+            'manage reseller devices',
+            'assign reseller software',
         ];
 
         foreach ($permissions as $permission) {
@@ -41,6 +43,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'seller',
             'employee',
             'tenant_admin',
+            'software_reseller',
         ];
 
         foreach ($roles as $roleName) {
@@ -55,6 +58,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 $role->givePermissionTo(['manage marketplace', 'manage services', 'manage users']);
             } elseif ($roleName === 'support_agent') {
                 $role->givePermissionTo(['impersonate users']);
+            } elseif ($roleName === 'software_reseller') {
+                $role->givePermissionTo(['manage reseller devices']);
             }
         }
     }

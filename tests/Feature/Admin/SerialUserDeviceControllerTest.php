@@ -149,4 +149,43 @@ class SerialUserDeviceControllerTest extends TestCase
             'temp_valid_until' => $date,
         ]);
     }
+
+    public function test_admin_can_allocate_and_deallocate_software_to_reseller()
+    {
+        $software = \App\Models\SerialSoftware::create([
+            'name' => 'ClinicPro',
+            'default_status' => 'active',
+        ]);
+
+        $reseller = User::factory()->create(['onboarding_completed' => true]);
+        $reseller->assignRole('software_reseller');
+
+        // Allocate software with max 10 devices
+        $response = $this->actingAs($this->admin)->post("/admin/users/{$reseller->id}/reseller-softwares", [
+            'serial_software_id' => $software->id,
+            'max_devices' => 10,
+            'notes' => 'Authorized distributor for Cairo',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('serial_software_resellers', [
+            'user_id' => $reseller->id,
+            'serial_software_id' => $software->id,
+            'max_devices' => 10,
+            'status' => 'active',
+        ]);
+
+        $allocation = \App\Models\SerialSoftwareReseller::where('user_id', $reseller->id)
+            ->where('serial_software_id', $software->id)
+            ->first();
+
+        // Deallocate software
+        $deleteResponse = $this->actingAs($this->admin)->delete("/admin/users/{$reseller->id}/reseller-softwares/{$allocation->id}");
+        $deleteResponse->assertRedirect();
+        $deleteResponse->assertSessionHas('success');
+        $this->assertDatabaseMissing('serial_software_resellers', [
+            'id' => $allocation->id,
+        ]);
+    }
 }

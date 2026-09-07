@@ -346,7 +346,7 @@ class WhatsappSenderController extends Controller
             ]
         );
 
-        return redirect()->back()->with('success', __('whatsapp-sender::messages.account_saved_successfully') ?? 'Account credentials saved successfully.');
+        return redirect()->back(fallback: route('whatsapp.index'))->with('success', __('whatsapp-sender::messages.account_saved_successfully') ?? 'Account credentials saved successfully.');
     }
 
     /**
@@ -545,7 +545,7 @@ class WhatsappSenderController extends Controller
 
         $account->delete();
 
-        return redirect()->back()->with('success', __('whatsapp-sender::messages.account_deleted_successfully') ?? 'Account disconnected successfully.');
+        return redirect()->back(fallback: route('whatsapp.index'))->with('success', __('whatsapp-sender::messages.account_deleted_successfully') ?? 'Account disconnected successfully.');
     }
 
     /**
@@ -587,12 +587,12 @@ class WhatsappSenderController extends Controller
         $result = $this->whatsappService->registerPhoneNumber($account, $validated['pin']);
 
         if ($result['success']) {
-            return redirect()->back()
+            return redirect()->back(fallback: route('whatsapp.index'))
                 ->with('success', $result['message'] ?? 'Phone number registered and activated on Meta Cloud API successfully!')
                 ->with('meta_response', $result['response'] ?? null);
         }
 
-        return redirect()->back()
+        return redirect()->back(fallback: route('whatsapp.index'))
             ->with('error', $result['error'] ?? 'Failed to register phone number.')
             ->with('meta_response', $result['response'] ?? null);
     }
@@ -619,7 +619,7 @@ class WhatsappSenderController extends Controller
         if ($verification['valid']) {
             $metadata = $verification['data'];
             $status = 'active';
-            if (isset($metadata['status']) && $metadata['status'] !== 'CONNECTED') {
+            if (isset($metadata['status']) && !in_array($metadata['status'], ['CONNECTED', 'APPROVED', 'VERIFIED'], true)) {
                 $status = 'unregistered';
             }
 
@@ -629,10 +629,10 @@ class WhatsappSenderController extends Controller
             ]);
 
             $statusText = isset($metadata['status']) ? $metadata['status'] : 'active';
-            return redirect()->back()->with('success', "Account status synced successfully! Current Meta status: {$statusText}.");
+            return redirect()->back(fallback: route('whatsapp.index'))->with('success', "Account status synced successfully! Current Meta status: {$statusText}.");
         }
 
-        return redirect()->back()->with('error', $verification['error'] ?? 'Failed to sync account status from Meta.');
+        return redirect()->back(fallback: route('whatsapp.index'))->with('error', $verification['error'] ?? 'Failed to sync account status from Meta.');
     }
 
     /**
@@ -652,12 +652,12 @@ class WhatsappSenderController extends Controller
         $result = $this->whatsappService->testAccountConnection($account);
 
         if (!empty($result['is_connected']) || !empty($result['success'])) {
-            return redirect()->back()
+            return redirect()->back(fallback: route('whatsapp.index'))
                 ->with('success', $result['message'])
                 ->with('meta_response', $result['data']);
         }
 
-        return redirect()->back()
+        return redirect()->back(fallback: route('whatsapp.index'))
             ->with('error', $result['message'] ?? ($result['error'] ?? 'Meta API Connection Test Failed.'))
             ->with('meta_response', $result['data'] ?? null);
     }
@@ -688,12 +688,12 @@ class WhatsappSenderController extends Controller
         );
 
         if ($result['success']) {
-            return redirect()->back()
+            return redirect()->back(fallback: route('whatsapp.index'))
                 ->with('success', $result['message'])
                 ->with('meta_response', $result['response'] ?? null);
         }
 
-        return redirect()->back()
+        return redirect()->back(fallback: route('whatsapp.index'))
             ->with('error', $result['error'] ?? 'Failed to request verification code.')
             ->with('meta_response', $result['response'] ?? null);
     }

@@ -3,6 +3,7 @@
 #
 # Usage:
 #   .\deploy\deploy.ps1                  # Interactive menu
+#   .\deploy\deploy.ps1 -Mode Fast       # Ultra-fast live deploy (changed files + assets in ~5s)
 #   .\deploy\deploy.ps1 -Mode QuickPHP   # Fast PHP push (changed files)
 #   .\deploy\deploy.ps1 -Mode Full       # Full build + PHP + Assets + Tests
 #   .\deploy\deploy.ps1 -Mode Migrate    # Remote schema sync & migrations
@@ -10,8 +11,8 @@
 #   .\deploy\deploy.ps1 -Mode Assets     # Build & upload compiled JS/CSS assets
 
 param(
-    [ValidateSet("Full", "QuickPHP", "Migrate", "Cache", "Assets", "Menu")]
-    [string]$Mode = "Full",
+    [ValidateSet("Fast", "Full", "QuickPHP", "Migrate", "Cache", "Assets", "Menu")]
+    [string]$Mode = "Fast",
     [string]$Commit = "",
     [switch]$SkipTests,
     [switch]$DryRun,
@@ -34,22 +35,24 @@ function Show-Menu {
     Show-Header
     Write-Host " Select Deployment Action:" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "  [1] Full Production Deploy (Checks + Build Assets + Push) [DEFAULT]" -ForegroundColor Green
-    Write-Host "  [2] Quick PHP Push (Upload changed PHP files + Clear Cache)" -ForegroundColor Green
-    Write-Host "  [3] Run Migrations & Schema Sync (Remote DB update)" -ForegroundColor Green
-    Write-Host "  [4] Upload Build Assets (JS/CSS assets compile & push)" -ForegroundColor Green
-    Write-Host "  [5] Clear & Re-optimize Remote Cache" -ForegroundColor Green
-    Write-Host "  [6] Check Missing Translations (Local scan)" -ForegroundColor Green
+    Write-Host "  [0] FAST LIVE DEPLOY (Changed files + Compiled assets in ~5s) [RECOMMENDED]" -ForegroundColor Green
+    Write-Host "  [1] Full Production Deploy (Checks + Build Assets + Push)" -ForegroundColor Cyan
+    Write-Host "  [2] Quick PHP Push (Upload changed PHP files + Clear Cache)" -ForegroundColor Cyan
+    Write-Host "  [3] Run Migrations & Schema Sync (Remote DB update)" -ForegroundColor Cyan
+    Write-Host "  [4] Upload Build Assets (JS/CSS assets compile & push)" -ForegroundColor Cyan
+    Write-Host "  [5] Clear & Re-optimize Remote Cache" -ForegroundColor Cyan
+    Write-Host "  [6] Check Missing Translations (Local scan)" -ForegroundColor Cyan
     Write-Host "  [Q] Quit" -ForegroundColor Red
     Write-Host ""
 
-    $choice = Read-Host " Enter option [1-6, Q]"
+    $choice = Read-Host " Enter option [0-6, Q]"
     return $choice
 }
 
 if ($Mode -eq "Menu") {
     $choice = Show-Menu
     switch ($choice.ToUpper()) {
+        "0" { $Mode = "Fast" }
         "1" { $Mode = "Full" }
         "2" { $Mode = "QuickPHP" }
         "3" { $Mode = "Migrate" }
@@ -75,6 +78,14 @@ Write-Host " Executing Mode: $Mode" -ForegroundColor White
 Write-Host ""
 
 switch ($Mode) {
+    "Fast" {
+        $params = @{}
+        if ($Commit) { $params["Commit"] = $Commit }
+        if ($DryRun) { $params["DryRun"] = $true }
+        if ($NoPassword) { $params["NoPassword"] = $true }
+
+        & "$PSScriptRoot\fast.ps1" @params
+    }
     "QuickPHP" {
         $params = @{}
         if ($Commit) { $params["Commit"] = $Commit }

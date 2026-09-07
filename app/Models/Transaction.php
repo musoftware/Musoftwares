@@ -74,10 +74,7 @@ class Transaction extends Model
                 throw new \Exception('Transaction is missing an associated currency relation and no user fallback is available.');
             }
 
-            $businessCurrencyId = AdminSettings::business_currency();
-            if (is_object($businessCurrencyId)) {
-                $businessCurrencyId = $businessCurrencyId->id;
-            }
+            $businessCurrencyId = Currency::resolve(AdminSettings::business_currency())?->id ?? 1;
 
             $date = $transaction->created_at ?? now();
             $transaction->business_amount = CurrenciesExchange::RateByDateNoRound(

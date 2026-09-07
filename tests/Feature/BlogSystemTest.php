@@ -104,12 +104,12 @@ class BlogSystemTest extends TestCase
         $response->assertStatus(200);
         
         // Assert that the page renders the service details and the converted price (100 * 50 = 5000 EGP)
-        $inertiaData = $response->original->getData()['page']['props'];
-        $packages = $inertiaData['article']['service']['packages'];
+        $viewArticle = $response->viewData('article') ?? $response->original->getData()['article'];
+        $packages = $viewArticle->service->packages;
         
         $this->assertNotEmpty($packages);
-        $this->assertEquals(5000.00, $packages[0]['price']);
-        $this->assertEquals($egp->id, $packages[0]['currency_id']);
+        $this->assertEquals(5000.00, $packages[0]->price);
+        $this->assertEquals($egp->id, $packages[0]->currency_id);
     }
 
     public function test_artisan_command_generates_unique_articles_using_ai(): void

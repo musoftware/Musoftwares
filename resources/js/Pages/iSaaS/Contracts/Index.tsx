@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
-import { MoreHorizontal, FileText, Send, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { MoreHorizontal, FileText, Send, CheckCircle, XCircle, Trash2, Sparkles } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import {
     DropdownMenu,
@@ -28,14 +28,14 @@ export default function Index({ contracts, currentTab }) {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'signed':
-                return <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{__('general.signed')}</span>;
+                return <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">{__('general.signed')}</span>;
             case 'sent':
-                return <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">{__('general.sent')}</span>;
+                return <span className="inline-flex items-center rounded-full bg-sky-500/10 px-2.5 py-0.5 text-xs font-medium text-sky-600 dark:text-sky-400 border border-sky-500/20">{__('general.sent')}</span>;
             case 'cancelled':
-                return <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">{__('general.cancelled')}</span>;
+                return <span className="inline-flex items-center rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive border border-destructive/20">{__('general.cancelled')}</span>;
             case 'draft':
             default:
-                return <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{__('general.draft')}</span>;
+                return <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground border border-border">{__('general.draft')}</span>;
         }
     };
 
@@ -45,79 +45,80 @@ export default function Index({ contracts, currentTab }) {
             
             <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mb-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-3 border border-slate-200">{__('general.freelance_tools')}</span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground mb-3 border border-border">{__('general.freelance_tools')}</span>
                     <div className="flex items-baseline gap-3">
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{__('general.contracts_manager')}</h1>
-                        <span className="text-slate-500 font-medium">/ iSAAS</span>
+                        <h1 className="text-3xl font-bold tracking-tight text-foreground">{__('general.contracts_manager')}</h1>
+                        <span className="text-muted-foreground font-medium">/ iSAAS</span>
                     </div>
                 </div>
 
                 <div className="mb-6 flex items-center justify-between">
-                    <div className="flex space-x-4">
+                    <div className="flex space-x-2">
                         <Link
                             href={route('isaas.contracts.index', { status: 'all' })}
-                            className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'all' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                         >{__('general.all_contracts')}</Link>
                         <Link
                             href={route('isaas.contracts.index', { status: 'draft' })}
-                            className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'draft' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'draft' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                         >
                             {__('general.drafts')}</Link>
                         <Link
                             href={route('isaas.contracts.index', { status: 'sent' })}
-                            className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'sent' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'sent' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                         >
                             {__('general.sent')}</Link>
                         <Link
                             href={route('isaas.contracts.index', { status: 'signed' })}
-                            className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'signed' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'signed' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                         >
                             {__('general.signed')}</Link>
                     </div>
                     <div className="flex items-center gap-3">
                         <Link href="/admin/contracts/quick-create">
-                            <Button variant="outline" className="gap-2 border-amber-500 text-amber-900 bg-amber-50 hover:bg-amber-100 font-extrabold shadow-sm">
-                                ✨ التسعير والعقد السريع
+                            <Button variant="outline" className="gap-2 border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 font-bold shadow-sm">
+                                <Sparkles className="h-4 w-4 text-amber-500" />
+                                {__('general.quick_pricing_and_contract', { default: 'التسعير والعقد السريع' })}
                             </Button>
                         </Link>
                         <Link href={route('isaas.contracts.create')}>
-                            <Button className="bg-slate-900 hover:bg-slate-800 text-white">
+                            <Button>
                                 + Create Contract
                             </Button>
                         </Link>
                     </div>
                 </div>
 
-                <div className="overflow-hidden rounded-lg bg-white shadow border border-slate-200">
+                <div className="overflow-hidden rounded-lg bg-card text-card-foreground shadow border border-border">
                     <table className="w-full text-start text-sm">
-                        <thead className="border-b bg-gray-50/55">
+                        <thead className="border-b border-border bg-muted/40">
                             <tr>
-                                <th className="p-4 font-semibold text-slate-600">{__('general.reference')}</th>
-                                <th className="p-4 font-semibold text-slate-600">{__('general.client_user')}</th>
-                                <th className="p-4 font-semibold text-slate-600">{__('general.project')}</th>
-                                <th className="p-4 font-semibold text-slate-600 text-end">{__('general.amount')}</th>
-                                <th className="p-4 font-semibold text-slate-600 text-center">{__('general.status')}</th>
-                                <th className="p-4 font-semibold text-slate-600 text-center">{__('general.valid_until')}</th>
-                                <th className="p-4 font-semibold text-slate-600 text-end">{__('general.actions')}</th>
+                                <th className="p-4 font-semibold text-muted-foreground">{__('general.reference')}</th>
+                                <th className="p-4 font-semibold text-muted-foreground">{__('general.client_user')}</th>
+                                <th className="p-4 font-semibold text-muted-foreground">{__('general.project')}</th>
+                                <th className="p-4 font-semibold text-muted-foreground text-end">{__('general.amount')}</th>
+                                <th className="p-4 font-semibold text-muted-foreground text-center">{__('general.status')}</th>
+                                <th className="p-4 font-semibold text-muted-foreground text-center">{__('general.valid_until')}</th>
+                                <th className="p-4 font-semibold text-muted-foreground text-end">{__('general.actions')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-border">
                             {(contracts.data as any).map((contract) => (
-                                <tr key={contract.id} className="hover:bg-gray-50/30">
-                                    <td className="p-4 font-medium text-gray-900">{contract.reference || `CTR-${contract.id}`}</td>
+                                <tr key={contract.id} className="hover:bg-muted/30">
+                                    <td className="p-4 font-medium text-foreground">{contract.reference || `CTR-${contract.id}`}</td>
                                     <td className="p-4">
-                                        <div className="font-medium text-gray-900">{contract.client_name || 'Unknown'}</div>
+                                        <div className="font-medium text-foreground">{contract.client_name || 'Unknown'}</div>
                                     </td>
-                                    <td className="p-4 text-gray-700">
-                                        <div className="font-medium">{contract.project_name || 'N/A'}</div>
+                                    <td className="p-4 text-muted-foreground">
+                                        <div className="font-medium text-foreground">{contract.project_name || 'N/A'}</div>
                                     </td>
-                                    <td className="p-4 text-end font-medium text-gray-900">
+                                    <td className="p-4 text-end font-medium text-foreground">
                                         {contract.total_amount ? `${parseFloat(contract.total_amount).toFixed(2)} ${contract.currency}` : '-'}
                                     </td>
                                     <td className="p-4 text-center">
                                         {getStatusBadge(contract.status)}
                                     </td>
-                                    <td className="p-4 text-center text-gray-500">
+                                    <td className="p-4 text-center text-muted-foreground">
                                         {contract.valid_until ? new Date(contract.valid_until).toLocaleDateString() : '-'}
                                     </td>
                                     <td className="p-4 text-end">
@@ -155,7 +156,7 @@ export default function Index({ contracts, currentTab }) {
                             ))}
                             {(contracts.data as any).length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-gray-500">{__('general.no_contracts_found')}</td>
+                                    <td colSpan={7} className="p-8 text-center text-muted-foreground">{__('general.no_contracts_found')}</td>
                                 </tr>
                             )}
                         </tbody>
@@ -170,7 +171,7 @@ export default function Index({ contracts, currentTab }) {
                                 <Link
                                     key={i}
                                     href={link.url || '#'}
-                                    className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-slate-100 border-slate-500 text-slate-800' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} ${i === 0 ? 'rounded-s-md' : ''} ${i === contracts.links.length - 1 ? 'rounded-e-md' : ''}`}
+                                    className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-primary text-primary-foreground border-primary' : 'bg-card border-border text-muted-foreground hover:bg-muted'} ${i === 0 ? 'rounded-s-md' : ''} ${i === contracts.links.length - 1 ? 'rounded-e-md' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

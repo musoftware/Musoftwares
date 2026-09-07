@@ -151,33 +151,25 @@ class CostTransaction extends Model
         if ($amount == 0) {
             return null;
         }
-        $user_id = null;
-        if (is_object($user)) {
-            $user_id = $user->id;
-        } elseif ($user != null) {
-            $user = User::find($user);
-            $user_id = $user->id;
-        }
+
+        $userModel = User::resolve($user);
+        $projectModel = Project::resolve($project);
 
         $c = new CostTransaction;
-        $c->user_id = $user_id;
-        if (is_numeric($project) || is_string($project)) {
-            $c->project_id = $project;
-        } else {
-            $c->project_id = optional($project)->id;
-        }
+        $c->user_id = $userModel?->id;
+        $c->project_id = $projectModel?->id ?? (is_numeric($project) ? (int) $project : null);
         $c->amount = $amount;
         $c->reason = $reason;
-        $c->currency = $currency ?? optional($user)->currency_id;
+        $c->currency = Currency::resolve($currency)?->id ?? $userModel?->currency_id;
         if ($createdAt) {
             $c->created_at = Carbon::parse($createdAt);
             $c->updated_at = Carbon::parse($createdAt);
         }
 
-        DB::transaction(function () use ($c, $user) {
+        DB::transaction(function () use ($c, $userModel) {
             $c->save();
-            if ($user) {
-                BalancesHelper::instance()->CalcCostBalance($user);
+            if ($userModel) {
+                BalancesHelper::instance()->CalcCostBalance($userModel);
             }
         });
 

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Helpers\FinanceHelper;
+use App\Models\Currency;
 use App\Notifications\Traits\BuildsFcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -54,7 +55,7 @@ class InvoicePaidNotification extends Notification implements ShouldQueue
         return [
             'invoice_id' => $this->invoice->id ?? null,
             'amount' => $this->invoice->amount ?? $this->invoice->total ?? null,
-            'currency' => $this->invoice->currency?->currency ?? null,
+            'currency' => Currency::findCached($this->invoice->currency_id ?? $this->invoice->currency)?->currency,
             'message' => 'Invoice '.($this->invoice->invoice_number ?? '').' has been marked as paid.',
         ];
     }

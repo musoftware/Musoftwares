@@ -96,16 +96,32 @@ class SerialDeviceController extends Controller
             $device->save();
         }
 
-        // Check if device is linked to a user
-        $hasLinkedUser = \App\Models\SerialUserDevice::where('device_id', $validated['device_id'])
+        // Check if device is linked to a user and check expiration
+        $userDevice = \App\Models\SerialUserDevice::where('device_id', $validated['device_id'])
             ->whereNotNull('user_id')
             ->whereHas('user')
-            ->exists();
+            ->first();
+
+        $hasLinkedUser = (bool) $userDevice;
+        $isExpired = false;
+        $status = $device->status;
+
+        // If device assignment has an expiration date that has passed,
+        // override status to inactive so client software safely stops execution.
+        if ($userDevice && $userDevice->expires_at) {
+            $hasTempOverride = $userDevice->user?->temp_valid_until && now()->lessThanOrEqualTo($userDevice->user->temp_valid_until);
+            if (! $hasTempOverride && now()->greaterThan($userDevice->expires_at)) {
+                $isExpired = true;
+                $status = SerialDevice::STATUS_INACTIVE;
+            }
+        }
 
         // Return the device status — client software acts on this.
         return response()->json([
-            'status'          => $device->status,
-            'has_linked_user' => (bool) $hasLinkedUser,
+            'status'          => $status,
+            'has_linked_user' => $hasLinkedUser,
+            'is_expired'      => $isExpired,
+            'expires_at'      => $userDevice?->expires_at?->toIso8601String(),
         ]);
     }
 

@@ -27,7 +27,8 @@ import {
     FolderKanban,
     ListTodo,
     Calculator,
-    Grid
+    Grid,
+    Laptop
 } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import ProductTourModal from '@/Components/ProductTourModal';
@@ -856,6 +857,13 @@ function AuthenticatedContent({
                                                         render={<SafeLink href={safeRoute('seller.dashboard')} className="flex items-center w-full font-bold" />}
                                                     >
                                                         <Building2 className="me-2 h-3.5 w-3.5 text-[#0071e3] dark:text-[#3898ec]" />Seller Portal</DropdownMenuItem>
+                                                )}
+                                                {(user?.roles?.includes('software_reseller') || user?.role === 'admin') && (
+                                                    <DropdownMenuItem 
+                                                        className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#0071e3] dark:text-[#3898ec] bg-[#0071e3]/10 dark:bg-[#0071e3]/20 hover:bg-[#0071e3]/20 mb-1 p-2"
+                                                        render={<SafeLink href={safeRoute('portal.devices.index')} className="flex items-center w-full font-bold" />}
+                                                    >
+                                                        <Laptop className="me-2 h-3.5 w-3.5 text-[#0071e3] dark:text-[#3898ec]" />Reseller Portal</DropdownMenuItem>
                                                 )}
                                                 {(user?.roles?.includes('moderator') || user?.roles?.includes('support_agent')) && (
                                                     <DropdownMenuItem 

@@ -40,4 +40,12 @@ class SerialSoftware extends Model
     {
         return $this->hasMany(SerialDevice::class);
     }
+
+    /**
+     * @return HasMany<SerialSoftwareReseller>
+     */
+    public function resellers(): HasMany
+    {
+        return $this->hasMany(SerialSoftwareReseller::class, 'serial_software_id');
+    }
 }

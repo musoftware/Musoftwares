@@ -95,7 +95,35 @@ return [
 ];
 ```
 
+### Rule 5: Currency Attribute vs. Relation Invariance
+
+1. **Column Aliases Must Always Return Integer IDs**:
+   If a model has a `currency_id` column in the database and an accessor `getCurrencyAttribute()`, the accessor MUST return the integer ID only. It must NEVER dynamically return the related model object based on whether the relation was eager-loaded:
+   ```php
+   // ✅ CORRECT — Consistent return type (int) regardless of eager loading
+   public function getCurrencyAttribute()
+   {
+       return $this->attributes['currency_id'] ?? null;
+   }
+
+   // ❌ FORBIDDEN — Breaks downstream code with "Object of class Currency could not be converted to int"
+   public function getCurrencyAttribute()
+   {
+       if ($this->relationLoaded('currency')) {
+           return $this->getRelation('currency');
+       }
+       return $this->attributes['currency_id'] ?? null;
+   }
+   ```
+2. **Explicit Relation Access**:
+   When code needs the actual Eloquent relation model, provide and use `currencyRelation(): BelongsTo` or explicit lookups via `Currency::findCached($model->currency_id)`.
+3. **Defensive Parameter Normalization**:
+   Core currency methods (`CurrenciesExchange::RateToday`, `User::balance`, `FinanceHelper::format_money`, `AdminSettings::GetRecommendedHourlyRate`) must defensively unwrap `Currency` model instances to their integer `id` before performing string conversions, integer casts, or SQL comparisons.
+
 #### Summary Checklist
 - [ ] Is every monetary number accompanied by a currency symbol or code in the UI?
 - [ ] Are aggregate/normalized amounts (e.g., page-wide KPIs in business currency) sent with `business_currency` containing `code` and `symbol`?
 - [ ] Is the frontend formatter receiving the currency info, not just the raw number?
+- [ ] Does `getCurrencyAttribute()` consistently return a scalar integer ID without mutating when relations are eager-loaded?
+- [ ] Do rate calculation methods defensively unwrap `Currency` model instances?
+

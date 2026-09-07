@@ -80,7 +80,7 @@ class WhatsappTemplateController extends Controller
                 'meta_template_id' => $result['id'] ?? null,
             ]);
 
-            return redirect()->back()->with('success', 'Template created and submitted to Facebook successfully.');
+            return redirect()->back(fallback: route('whatsapp.index'))->with('success', 'Template created and submitted to Facebook successfully.');
         }
 
         // Clean up local record if Meta submission fails
@@ -117,7 +117,7 @@ class WhatsappTemplateController extends Controller
 
         $template->delete();
 
-        return redirect()->back()->with('success', 'Template deleted successfully.');
+        return redirect()->back(fallback: route('whatsapp.index'))->with('success', 'Template deleted successfully.');
     }
 
     /**

@@ -71,7 +71,7 @@ class NotificationHelper
             return false;
         }
 
-        return $this->sendMulticast($target instanceof User ? $target : null, $title, $body, $link, $customData, $image, $android);
+        return $this->sendMulticast(User::resolve($target), $title, $body, $link, $customData, $image, $android);
     }
 
     public function NotifyBySystemUser(?User $user, object $notification, ?string $link = null): void

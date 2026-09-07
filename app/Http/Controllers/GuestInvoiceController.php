@@ -64,7 +64,7 @@ class GuestInvoiceController extends Controller
             return redirect()->back()->with('error', __('general.invoice_total_zero'));
         }
 
-        $currencyModel = Currency::findCached($invoice->currency_id ?? $invoice->currency);
+        $currencyModel = Currency::resolve($invoice->currency_id ?? $invoice->currency);
         if (! $currencyModel) {
             throw new \Exception("Invoice {$invoice->id} is missing an associated currency relation.");
         }

@@ -19,9 +19,15 @@ class SerialUserDevice extends Model
 
     protected $fillable = [
         'user_id',
+        'reseller_id',
         'device_id',
         'status',
+        'expires_at',
         'notes',
+    ];
+
+    protected $casts = [
+        'expires_at' => 'datetime',
     ];
 
     /**
@@ -52,10 +58,47 @@ class SerialUserDevice extends Model
     }
 
     /**
+     * Get the reseller that assigned this device.
+     */
+    public function reseller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reseller_id');
+    }
+
+    /**
      * Get the serial devices checking in with this device_id.
      */
     public function devices(): HasMany
     {
         return $this->hasMany(SerialDevice::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * Determine if this device assignment has passed its expiration date.
+     */
+    public function isExpired(): bool
+    {
+        return $this->expires_at !== null && now()->greaterThan($this->expires_at);
+    }
+
+    /**
+     * Scope for active non-expired assignments.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::STATUS_ACTIVE)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
+    }
+
+    /**
+     * Scope for expired assignments.
+     */
+    public function scopeExpired($query)
+    {
+        return $query->whereNotNull('expires_at')
+            ->where('expires_at', '<=', now());
     }
 }

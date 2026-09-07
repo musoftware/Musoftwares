@@ -103,6 +103,35 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Cleanly resolves a User model from a User instance, ID, email, or user-like object.
+     */
+    public static function resolve(mixed $user): ?self
+    {
+        if ($user instanceof self) {
+            return $user;
+        }
+
+        if (is_numeric($user)) {
+            return self::find((int) $user);
+        }
+
+        if (is_string($user) && filter_var($user, FILTER_VALIDATE_EMAIL)) {
+            return self::where('email', trim($user))->first();
+        }
+
+        if (is_object($user)) {
+            if (isset($user->id) && is_numeric($user->id)) {
+                return self::find((int) $user->id);
+            }
+            if (isset($user->email) && is_string($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                return self::where('email', trim($user->email))->first();
+            }
+        }
+
+        return null;
+    }
+
     public function getCurrencyAttribute()
     {
         return $this->attributes['currency_id'] ?? null;
@@ -436,7 +465,9 @@ class User extends Authenticatable
 
     public function balance($currency = null)
     {
-        return CurrenciesExchange::RateToday($this->user_balance, $this->currency_id, $currency);
+        $currencyId = Currency::resolve($currency)?->id ?? $this->currency_id;
+
+        return CurrenciesExchange::RateToday($this->user_balance, $this->currency_id, $currencyId);
     }
 
     public function add_balance($amount, $reason, $type, $currencyId = null, ?Project $project = null, $createdAt = null)
@@ -446,7 +477,8 @@ class User extends Authenticatable
         }
 
         if ($currencyId !== null) {
-            $amount = CurrenciesExchange::RateToday($amount, (int) $currencyId, $this->currency_id);
+            $resolvedCurrencyId = Currency::resolve($currencyId)?->id ?? (int) $currencyId;
+            $amount = CurrenciesExchange::RateToday($amount, $resolvedCurrencyId, $this->currency_id);
         }
         $currency = $this->currency_id;
 
@@ -513,6 +545,22 @@ class User extends Authenticatable
     public function serialUserDevices(): HasMany
     {
         return $this->hasMany(SerialUserDevice::class, 'user_id');
+    }
+
+    /**
+     * Softwares allocated to this user as a reseller.
+     */
+    public function resellerSoftwares(): HasMany
+    {
+        return $this->hasMany(SerialSoftwareReseller::class, 'user_id');
+    }
+
+    /**
+     * Customer devices managed by this user as a reseller.
+     */
+    public function resellerManagedDevices(): HasMany
+    {
+        return $this->hasMany(SerialUserDevice::class, 'reseller_id');
     }
 
     public function subscriptions(): HasMany
@@ -635,7 +683,8 @@ class User extends Authenticatable
     {
         $percent = $this->affiliateCommissionPercent();
 
-        if ($referredUser instanceof User && ! empty($referredUser->first_referral_payment_at)) {
+        $referredUser = self::resolve($referredUser);
+        if ($referredUser && ! empty($referredUser->first_referral_payment_at)) {
             $boostPercent = (float) config('referrals.boost_percent', 10);
             $boostDays = (int) config('referrals.boost_days', 30);
             $windowEnd = $referredUser->first_referral_payment_at->copy()->addDays($boostDays);
@@ -710,6 +759,14 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->hasRole(['super_admin', 'admin', 'superadmin', 'Admin']);
+    }
+
+    /**
+     * Check if the user is a software reseller/distributor.
+     */
+    public function isReseller(): bool
+    {
+        return $this->hasRole(['software_reseller', 'reseller']) || $this->isAdmin();
     }
 
     /**

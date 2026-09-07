@@ -25,8 +25,10 @@ Musoftwares uses a Modular Monolith architecture via `nwidart/laravel-modules`. 
 
 ## 3. Mandatory Use of Soft Deletes
 
-Data integrity and historical auditing are paramount.
-- **Enforcement**: Soft deletes are MANDATORY on all core and modular tables (e.g., Users, Transactions, Projects, Leads, etc.) to maintain historical integrity and prevent accidental data loss.
+Data integrity and historical auditing are paramount for core business records.
+- **Enforcement**: Soft deletes are MANDATORY on transactional entity tables (e.g., Users, Invoices, Transactions, Projects, Leads, etc.) to maintain historical integrity and prevent accidental data loss.
+- **Lookup/Static Tables Exempt**: Reference tables with fixed IDs, lookup configurations, or immutable rows (e.g., `currencies`, `currencies_exchanges`, or simple junction pivots) must NOT use `SoftDeletes` unless specifically designed with historical versioning.
+- **Trait-to-Schema Invariant (CRITICAL)**: NEVER add `use SoftDeletes;` to an Eloquent model without verifying that a database migration exists and that `$table->softDeletes()` is present on the table schema. Adding the trait to a model without the column causes immediate SQL crashes on all queries.
 - **Implementation**: Always use the `Illuminate\Database\Eloquent\SoftDeletes` trait in your models and add `$table->softDeletes()` in your migrations.
 - **Permanent Deletion**: Hard deletes should only be used in specific, well-justified cleanup jobs or temporary tables.
 

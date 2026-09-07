@@ -129,8 +129,8 @@
     --danger:         #ef4444;
     --danger-light:   #450a0a;
     --text-primary:   #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted:     #64748b;
+    --text-secondary: #cbd5e1;
+    --text-muted:     #94a3b8;
 
     /* Shadcn compatibility vars for Dark Mode */
     --foreground: hsl(210, 40%, 98%);
@@ -138,7 +138,7 @@
     --card-foreground: hsl(210, 40%, 98%);
     --popover: #0f172a;
     --popover-foreground: hsl(210, 40%, 98%);
-    --primary-foreground: hsl(222.2, 47.4%, 11.2%);
+    --primary-foreground: hsl(210, 40%, 98%);
     --secondary: hsl(217.2, 32.6%, 17.5%);
     --secondary-foreground: hsl(210, 40%, 98%);
     --muted: hsl(217.2, 32.6%, 17.5%);
@@ -170,8 +170,102 @@
     color: var(--text-primary);
     font-family: var(--font-sans);
   }
-  /* Global transition on ALL elements removed to prevent extreme performance bottlenecks and layout thrashing. */
-  /* If you need transitions, use Tailwind's transition utilities (e.g., transition-colors, transition-all) on specific elements. */
+
+  /* ==========================================================================
+     Universal Contrast Safety Engine (Dark Mode Visibility Guarantee)
+     Prevents text and surface clashes across all pages when hardcoded light/dark
+     classes are used without dark-mode equivalents.
+     ========================================================================== */
+  .dark :where(.min-h-screen):not([data-theme="light"] *):not([class*="dark:bg-"]) {
+    background-color: var(--background, #090d16);
+    color: var(--foreground, #f8fafc);
+  }
+
+  .dark [data-slot="card"]:not([data-theme="light"] *):not([class*="dark:bg-"]) {
+    background-color: var(--card, #0f172a);
+    color: var(--card-foreground, #f8fafc);
+  }
+
+  .dark :where(.text-gray-950, .text-gray-900, .text-slate-950, .text-slate-900, .text-zinc-950, .text-zinc-900, .text-neutral-950, .text-neutral-900, .text-black):not([class*="dark:text-"]):not([data-theme="light"] *, .light-surface *) {
+    color: var(--foreground) !important;
+  }
+
+  .dark :where(.text-gray-800, .text-slate-800, .text-zinc-800, .text-neutral-800):not([class*="dark:text-"]):not([data-theme="light"] *, .light-surface *) {
+    color: #f1f5f9 !important;
+  }
+
+  .dark :where(.text-gray-700, .text-slate-700, .text-zinc-700, .text-neutral-700):not([class*="dark:text-"]):not([data-theme="light"] *, .light-surface *) {
+    color: #cbd5e1 !important;
+  }
+
+  .dark :where(.text-gray-600, .text-slate-600, .text-zinc-600, .text-neutral-600):not([class*="dark:text-"]):not([data-theme="light"] *, .light-surface *) {
+    color: #94a3b8 !important;
+  }
+
+  .dark :where(.text-gray-500, .text-slate-500, .text-zinc-500, .text-neutral-500):not([class*="dark:text-"]):not([data-theme="light"] *, .light-surface *) {
+    color: #94a3b8 !important;
+  }
+
+  /* Hardcoded white backgrounds and slash-opacity variants without dark:bg become dark card surface */
+  .dark :where(.bg-white, [class*="bg-white/"]):not([class*="dark:bg-"]):not([data-theme="light"] *):not(.light-surface *) {
+    background-color: var(--card, #0f172a) !important;
+  }
+
+  /* Adapt hardcoded light backgrounds inside dark mode to subtle dark surfaces */
+  .dark :where(.bg-gray-50, [class*="bg-gray-50/"], .bg-slate-50, [class*="bg-slate-50/"], .bg-zinc-50, [class*="bg-zinc-50/"], .bg-neutral-50, [class*="bg-neutral-50/"]):not([class*="dark:bg-"]):not([data-theme="light"] *):not(.light-surface *) {
+    background-color: var(--surface-raised, #1e293b) !important;
+  }
+
+  .dark :where(.bg-gray-100, [class*="bg-gray-100/"], .bg-slate-100, [class*="bg-slate-100/"], .bg-zinc-100, [class*="bg-zinc-100/"], .bg-neutral-100, [class*="bg-neutral-100/"]):not([class*="dark:bg-"]):not([data-theme="light"] *):not(.light-surface *) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* Form inputs in dark mode */
+  .dark :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):not([class*="dark:bg-"]):not([data-theme="light"] *) {
+    background-color: var(--background, #090d16) !important;
+    color: var(--foreground, #f8fafc) !important;
+    border-color: var(--input, #1e293b) !important;
+  }
+
+  /* Table headers in dark mode */
+  .dark :where(thead, thead tr):not([class*="dark:bg-"]):not([data-theme="light"] *) {
+    background-color: var(--surface-raised, #1e293b) !important;
+    color: #cbd5e1 !important;
+  }
+
+  /* Pastel surfaces in dark mode */
+  .dark :where(.bg-amber-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(245, 158, 11, 0.12) !important; }
+  .dark :where(.bg-emerald-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(16, 185, 129, 0.12) !important; }
+  .dark :where(.bg-sky-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(14, 165, 233, 0.12) !important; }
+  .dark :where(.bg-rose-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(244, 63, 94, 0.12) !important; }
+  .dark :where(.bg-violet-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(139, 92, 246, 0.12) !important; }
+  .dark :where(.bg-pink-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(236, 72, 153, 0.12) !important; }
+  .dark :where(.bg-indigo-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(99, 102, 241, 0.12) !important; }
+  .dark :where(.bg-purple-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(168, 85, 247, 0.12) !important; }
+  .dark :where(.bg-green-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(34, 197, 94, 0.12) !important; }
+  .dark :where(.bg-red-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(239, 68, 68, 0.12) !important; }
+  .dark :where(.bg-blue-50):not([data-theme="light"] *):not(.light-surface *) { background-color: rgba(59, 130, 246, 0.12) !important; }
+
+  /* Pastel text in dark mode */
+  .dark :where(.text-amber-950, .text-amber-900, .text-amber-800):not([data-theme="light"] *):not(.light-surface *) { color: #fde68a !important; }
+  .dark :where(.text-emerald-950, .text-emerald-900, .text-emerald-800):not([data-theme="light"] *):not(.light-surface *) { color: #a7f3d0 !important; }
+  .dark :where(.text-sky-950, .text-sky-900, .text-sky-800):not([data-theme="light"] *):not(.light-surface *) { color: #bae6fd !important; }
+  .dark :where(.text-rose-950, .text-rose-900, .text-rose-800):not([data-theme="light"] *):not(.light-surface *) { color: #fecdd3 !important; }
+  .dark :where(.text-violet-950, .text-violet-900, .text-violet-800):not([data-theme="light"] *):not(.light-surface *) { color: #ddd6fe !important; }
+  .dark :where(.text-pink-950, .text-pink-900, .text-pink-800):not([data-theme="light"] *):not(.light-surface *) { color: #fbcfe8 !important; }
+  .dark :where(.text-indigo-950, .text-indigo-900, .text-indigo-800):not([data-theme="light"] *):not(.light-surface *) { color: #c7d2fe !important; }
+  .dark :where(.text-green-800, .text-green-900):not([data-theme="light"] *):not(.light-surface *) { color: #bbf7d0 !important; }
+  .dark :where(.text-red-800, .text-red-900):not([data-theme="light"] *):not(.light-surface *) { color: #fecaca !important; }
+  .dark :where(.text-blue-800, .text-blue-900):not([data-theme="light"] *):not(.light-surface *) { color: #bfdbfe !important; }
+
+  /* Adapt light borders inside dark mode */
+  .dark :where(.border-gray-100, [class*="border-gray-100/"], .border-gray-200, [class*="border-gray-200/"], .border-slate-100, [class*="border-slate-100/"], .border-slate-200, [class*="border-slate-200/"], .border-zinc-100, .border-zinc-200):not([class*="dark:border-"]):not([data-theme="light"] *, .light-surface *) {
+    border-color: var(--border, #1e293b) !important;
+  }
+
+  .dark :where(.divide-gray-100, .divide-gray-200, .divide-slate-100, .divide-slate-200) > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--border, #1e293b) !important;
+  }
 }
 
 @layer utilities {

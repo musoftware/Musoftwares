@@ -19,4 +19,25 @@ class ServiceCategory extends Model
     {
         return $this->hasMany(Service::class, 'category_id');
     }
+
+    /**
+     * Cleanly resolves a ServiceCategory model from an instance, ID, or slug.
+     */
+    public static function resolve(self|int|string|null $category): ?self
+    {
+        if ($category instanceof self) {
+            return $category;
+        }
+
+        if (is_numeric($category)) {
+            return self::find((int) $category);
+        }
+
+        if (is_string($category) && trim($category) !== '') {
+            $slug = trim($category);
+            return self::where('slug', $slug)->first();
+        }
+
+        return null;
+    }
 }

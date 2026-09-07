@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class CurrenciesExchange extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -40,8 +41,16 @@ class CurrenciesExchange extends Model
         static::$memoryCache = [];
     }
 
+    public static function normalizeCurrencyId(Currency|int|string|null $cur): string
+    {
+        return (string) (Currency::resolve($cur)?->id ?? $cur ?? '');
+    }
+
     public static function is_exist($currency1, $currency2, $date): bool
     {
+        $currency1 = static::normalizeCurrencyId($currency1);
+        $currency2 = static::normalizeCurrencyId($currency2);
+
         $count = CurrenciesExchange::where('currency1', $currency1)
             ->where('currency2', $currency2)
             ->where('date_string', $date)
@@ -63,6 +72,8 @@ class CurrenciesExchange extends Model
 
     public static function RateByMonth($m, $y, $amount, $cur1, $cur2)
     {
+        $cur1 = static::normalizeCurrencyId($cur1);
+        $cur2 = static::normalizeCurrencyId($cur2);
         if ($cur1 == $cur2) {
             return $amount;
         }
@@ -88,6 +99,7 @@ class CurrenciesExchange extends Model
 
     public static function RateBusiness($amount, $cur1)
     {
+        $cur1 = static::normalizeCurrencyId($cur1);
         return static::RateToday($amount, $cur1, static::BusinessCurrency());
     }
 
@@ -98,8 +110,8 @@ class CurrenciesExchange extends Model
 
     public static function RateToday($amount, $cur1, $cur2)
     {
-        $cur1 = (string) $cur1;
-        $cur2 = (string) $cur2;
+        $cur1 = static::normalizeCurrencyId($cur1);
+        $cur2 = static::normalizeCurrencyId($cur2);
         if (trim($cur1) == trim($cur2)) {
             return round($amount, 2);
         }
@@ -140,8 +152,8 @@ class CurrenciesExchange extends Model
 
     public static function RateTodayNoRound($amount, $cur1, $cur2)
     {
-        $cur1 = (string) $cur1;
-        $cur2 = (string) $cur2;
+        $cur1 = static::normalizeCurrencyId($cur1);
+        $cur2 = static::normalizeCurrencyId($cur2);
         if (trim($cur1) == trim($cur2)) {
             return number_format($amount, 9, '.', '');
         }
@@ -175,8 +187,8 @@ class CurrenciesExchange extends Model
 
     public static function RateByDate($date, $amount, $cur1, $cur2)
     {
-        $cur1 = (string) $cur1;
-        $cur2 = (string) $cur2;
+        $cur1 = static::normalizeCurrencyId($cur1);
+        $cur2 = static::normalizeCurrencyId($cur2);
         if ($cur1 == $cur2) {
             return 1 * $amount;
         }
@@ -238,8 +250,8 @@ class CurrenciesExchange extends Model
 
     public static function RateByDateNoRound($date, $amount, $cur1, $cur2)
     {
-        $cur1 = (string) $cur1;
-        $cur2 = (string) $cur2;
+        $cur1 = static::normalizeCurrencyId($cur1);
+        $cur2 = static::normalizeCurrencyId($cur2);
         if ($cur1 == $cur2) {
             return 1 * $amount;
         }
@@ -294,8 +306,8 @@ class CurrenciesExchange extends Model
 
     public static function Rate($date, $cur1, $cur2)
     {
-        $cur1 = (string) $cur1;
-        $cur2 = (string) $cur2;
+        $cur1 = static::normalizeCurrencyId($cur1);
+        $cur2 = static::normalizeCurrencyId($cur2);
         if ($cur1 == $cur2) {
             return 1;
         }

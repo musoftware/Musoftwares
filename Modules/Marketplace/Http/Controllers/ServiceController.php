@@ -32,14 +32,7 @@ class ServiceController extends Controller
 
         if (! empty($categoryParam)) {
             $paramStr = trim((string) $categoryParam);
-
-            if (is_numeric($paramStr)) {
-                $resolvedCategory = ServiceCategory::find((int) $paramStr);
-            }
-
-            if (! $resolvedCategory) {
-                $resolvedCategory = ServiceCategory::where('slug', $paramStr)->first();
-            }
+            $resolvedCategory = ServiceCategory::resolve($paramStr);
 
             if (! $resolvedCategory) {
                 $aliases = [

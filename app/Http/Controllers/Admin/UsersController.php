@@ -16,6 +16,8 @@ use App\Models\Currency;
 use App\Models\Earning;
 use App\Models\ModulePlan;
 use App\Models\SerialDevice;
+use App\Models\SerialSoftware;
+use App\Models\SerialSoftwareReseller;
 use App\Models\SerialUserDevice;
 use App\Models\User;
 use App\Models\UserEmail;
@@ -267,6 +269,25 @@ class UsersController extends Controller
                 ];
             });
 
+        $resellerAllocations = SerialSoftwareReseller::with('software')
+            ->where('user_id', $user->id)
+            ->get()
+            ->map(function ($alloc) {
+                return [
+                    'id' => $alloc->id,
+                    'serial_software_id' => $alloc->serial_software_id,
+                    'software_name' => $alloc->software?->name ?? 'Unknown Software',
+                    'max_devices' => $alloc->max_devices,
+                    'active_devices_count' => $alloc->activeDevicesCount(),
+                    'remaining_quota' => $alloc->remainingQuota(),
+                    'is_unlimited' => $alloc->isUnlimitedDevices(),
+                    'status' => $alloc->status,
+                    'notes' => $alloc->notes,
+                ];
+            });
+
+        $allSerialSoftwares = SerialSoftware::orderBy('name')->get(['id', 'name']);
+
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
             'loans' => $user->loans,
@@ -278,7 +299,49 @@ class UsersController extends Controller
             'projectsCount' => $projectsCount,
             'serialUserDevices' => $serialUserDevices,
             'availableDevices' => $availableDevices,
+            'resellerAllocations' => $resellerAllocations,
+            'allSerialSoftwares' => $allSerialSoftwares,
         ]);
+    }
+
+    /**
+     * Allocate serial software to a reseller user.
+     */
+    public function allocateResellerSoftware(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'serial_software_id' => ['required', 'integer', 'exists:serial_softwares,id'],
+            'max_devices' => ['nullable', 'integer', 'min:1'],
+            'notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        SerialSoftwareReseller::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'serial_software_id' => $validated['serial_software_id'],
+            ],
+            [
+                'max_devices' => $validated['max_devices'] ?? null,
+                'status' => SerialSoftwareReseller::STATUS_ACTIVE,
+                'notes' => $validated['notes'] ?? null,
+            ]
+        );
+
+        return back()->with('success', __('Software allocated to reseller successfully.'));
+    }
+
+    /**
+     * Remove serial software allocation from a reseller user.
+     */
+    public function deallocateResellerSoftware(User $user, SerialSoftwareReseller $allocation)
+    {
+        if ($allocation->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $allocation->delete();
+
+        return back()->with('success', __('Software allocation removed.'));
     }
 
     /**

@@ -45,10 +45,30 @@ Enterprise software must feel premium. The ultimate goal is: **"Apple designed e
 - Prefer steps, cards, previews, and smart defaults.
 - Always show inline validation errors using the Shadcn `<Form>` wrapper.
 
+## 6. Contrast Invariant & Semantic Color Mandate (ZERO INVISIBLE TEXT)
+
+To prevent invisible text and contrast failures across Dark and Light modes:
+
+1. **Strictly Forbidden Hardcoded Grays on Theme Surfaces**:
+   - **NEVER** use `text-gray-900`, `text-slate-900`, `text-gray-800`, `text-slate-800`, or `text-black` on cards, pages, or modals.
+   - **NEVER** use hardcoded light backgrounds like `bg-gray-50` or `bg-slate-50` for page wrappers or card containers without a dark variant.
+
+2. **Mandatory Semantic Token Replacements**:
+   - **Primary Page/Surface Text**: Use `text-foreground` or `text-card-foreground` (renders dark in light mode, bright white in dark mode).
+   - **Secondary/Supporting Text**: Use `text-muted-foreground` (renders balanced slate/gray in both modes).
+   - **Dividers and Borders**: Use `border-border` and `divide-border` (adapts cleanly to light and dark borders).
+   - **Page Backgrounds**: Use `bg-background` (never hardcode `bg-gray-50` on the root page wrapper).
+   - **Sub-cards and Panels**: Use `bg-muted/40` or `bg-muted/50 border border-border`.
+
+3. **Universal Contrast Safety Engine Invariant**:
+   The global stylesheet `resources/css/app.css` includes an automatic contrast safety engine that forces `:where(.text-gray-900, .text-slate-900)` in `.dark` to map to `var(--foreground)`. Never remove or bypass this safety engine. Always test UI components under both Light and Dark modes.
+
 ## Summary Checklist
 - [ ] Does the UI feel calm, minimal, and premium (Linear/Apple inspired)?
 - [ ] Are you using whitespace intentionally with minimal color usage?
 - [ ] Does the visual hierarchy clearly prioritize the next operational action?
+- [ ] Are you using semantic tokens (`text-foreground`, `text-muted-foreground`, `border-border`) instead of hardcoded dark grays (`text-gray-900`)?
+- [ ] Does the component maintain high contrast and clear readability in both Light and Dark modes?
 
 
 # Tool UI Architecture System

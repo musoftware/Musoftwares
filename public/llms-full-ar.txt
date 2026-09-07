@@ -13,24 +13,17 @@
 - مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
+- **Digital Goods**: http://localhost/marketplace/categories/digital-goods
 
 ## دليل الخدمات الشامل
 
-### AI Service Test
+### API Access Keys
 - **معرف الخدمة (ID)**: 1
-- **التصنيف**: عام
-- **رابط الخدمة**: http://localhost/marketplace/services/1/ai-service-test?lang=ar
+- **التصنيف**: Digital Goods
+- **رابط الخدمة**: http://localhost/marketplace/services/1/api-access-keys?lang=ar
 - **سعر البدء**: $0
 - **الوصف المختصر**: 
-- **تفاصيل الخدمة**: Test AI generation.
+- **تفاصيل الخدمة**: Vouchers
 
 ## فهرس المقالات الكامل باللغة العربية
-
-### Arabic Service Blog Post
-- **المعرف الفريد (Slug)**: arabic-service-blog-post
-- **الرابط**: http://localhost/blog/arabic-service-blog-post?lang=ar
-- **تاريخ النشر**: 2026-09-02T19:47:55+00:00
-- **مقتطف المقال**: AI Excerpt Arabic
-- **محتوى المقال**:
-AI content body Arabic.
 

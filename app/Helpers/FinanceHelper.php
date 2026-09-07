@@ -29,45 +29,51 @@ class FinanceHelper
         return self::$instance;
     }
 
-    public function format_money($amount, $currency_id): string
+    public function format_money(float|int|string|null $amount, Currency|int|string|null $currency = null): string
     {
-        $currencyModel = is_numeric($currency_id)
-            ? Currency::findCached($currency_id)
-            : Currency::cachedAll()->where('currency', $currency_id)->first();
-
-        $formattedAmount = number_format((float) $amount, 2, '.', ',');
+        $currencyModel = Currency::resolve($currency);
+        $formattedAmount = number_format((float) ($amount ?? 0), 2, '.', ',');
 
         if ($currencyModel) {
-            $symbol = $currencyModel->symbol ?? $currencyModel->currency;
-            if ($currencyModel->string_format) {
-                $fmt = $currencyModel->string_format;
-                if (str_contains($fmt, '%')) {
-                    $specifiers = ['%01.2f', '%s', '%.2f'];
-                    foreach ($specifiers as $spec) {
-                        if (str_contains($fmt, $spec)) {
-                            return str_replace($spec, $formattedAmount, $fmt);
-                        }
-                    }
-                    try {
-                        return sprintf($fmt, $amount);
-                    } catch (\Throwable $e) {
-                        // ignore and fallback
-                    }
-                }
+            return $this->applyFormatPattern($currencyModel, (float) ($amount ?? 0), $formattedAmount);
+        }
 
-                return str_replace(
-                    ['{symbol}', '{amount}', '{code}'],
-                    [$symbol, $formattedAmount, $currencyModel->currency],
-                    $fmt
-                );
-            }
+        $fallbackCode = is_string($currency) && trim($currency) !== ''
+            ? strtoupper(trim($currency))
+            : (string) config('app.business_currency', 'USD');
 
+        return $formattedAmount.' '.$fallbackCode;
+    }
+
+    private function applyFormatPattern(Currency $currencyModel, float $rawAmount, string $formattedAmount): string
+    {
+        $symbol = $currencyModel->symbol ?? $currencyModel->currency;
+        $format = $currencyModel->string_format;
+
+        if (! $format) {
             return $symbol.$formattedAmount;
         }
 
-        $fallbackCurrency = is_string($currency_id) ? strtoupper($currency_id) : config('app.business_currency', 'USD');
+        if (str_contains($format, '%')) {
+            $specifiers = ['%01.2f', '%s', '%.2f'];
+            foreach ($specifiers as $spec) {
+                if (str_contains($format, $spec)) {
+                    return str_replace($spec, $formattedAmount, $format);
+                }
+            }
 
-        return $formattedAmount.' '.$fallbackCurrency;
+            try {
+                return sprintf($format, $rawAmount);
+            } catch (\Throwable $e) {
+                // Fall through to placeholder replace
+            }
+        }
+
+        return str_replace(
+            ['{symbol}', '{amount}', '{code}'],
+            [$symbol, $formattedAmount, $currencyModel->currency],
+            $format
+        );
     }
 
     public function format_money_egp($amount): string
@@ -727,11 +733,8 @@ class FinanceHelper
      */
     public function price_fixer($price, $currency): float
     {
-        $code = is_string($currency) ? strtoupper($currency) : null;
-        if ($code === null && is_numeric($currency)) {
-            $model = Currency::find((int) $currency);
-            $code = $model ? strtoupper((string) $model->currency) : 'USD';
-        }
+        $currencyModel = Currency::resolve($currency);
+        $code = $currencyModel ? strtoupper((string) $currencyModel->currency) : (is_string($currency) ? strtoupper($currency) : 'USD');
         $price = (float) $price;
         if ($price <= 0) {
             return 0.0;

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\User;
 use App\Models\UserSubscription;
@@ -370,6 +371,16 @@ class SubscriptionModuleTest extends TestCase
             ['currency' => 'USD'],
             ['symbol' => '$', 'string_format' => '$%01.2f']
         );
+        $egpCurrency = Currency::firstOrCreate(
+            ['currency' => 'EGP'],
+            ['symbol' => 'E£', 'string_format' => 'E£%01.2f']
+        );
+        CurrenciesExchange::firstOrCreate(
+            ['currency1' => $usdCurrency->id, 'currency2' => $egpCurrency->id],
+            ['rate' => 50.0, 'date_string' => now()->toDateString()]
+        );
+        CurrenciesExchange::flushCache();
+
         $user = User::factory()->create(['currency_id' => $usdCurrency->id]);
 
         UserSubscription::create([
@@ -389,7 +400,7 @@ class SubscriptionModuleTest extends TestCase
             ->has('subscriptions', 1)
             ->where('subscriptions.0.plan_slug', 'erp')
             ->where('subscriptions.0.status', 'active')
-            ->where('subscriptions.0.amount', 999.99)
+            ->where('subscriptions.0.amount', 19.99)
         );
     }
 
@@ -610,7 +621,8 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         $user->refresh();
-        $this->assertEquals(10000 - 189.99, $user->user_balance);
+        // 100 EGP + 90 EGP (10% volume discount) = 190 EGP / 50 rate = $3.80 -> psychological_price = $3.99
+        $this->assertEquals(10000 - 3.99, $user->user_balance);
     }
 
     public function test_billing_route_redirects_to_subscriptions_manage()

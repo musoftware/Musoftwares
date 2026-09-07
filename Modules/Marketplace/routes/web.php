@@ -9,8 +9,10 @@ use Modules\Marketplace\Http\Controllers\CheckoutController;
 use Modules\Marketplace\Http\Controllers\DeliverableController;
 use Modules\Marketplace\Http\Controllers\FreeDownloadController;
 use Modules\Marketplace\Http\Controllers\ServiceSerialController;
+use Modules\Marketplace\Http\Controllers\OrderMessageController;
 use Modules\Marketplace\Http\Controllers\PromotionsController;
 use Modules\Marketplace\Http\Controllers\ReferralController;
+use Modules\Marketplace\Http\Controllers\ServiceReviewController;
 use Modules\Marketplace\Http\Controllers\WishlistController;
 
 // Single group — order matters: literal routes BEFORE wildcards
@@ -78,6 +80,9 @@ Route::middleware('web')
             // Work Deliverables & Revisions
             Route::post('/orders/{order}/deliver', [DeliverableController::class, 'submitWork'])->name('orders.deliver');
             Route::post('/orders/{order}/revision',[DeliverableController::class, 'requestRevision'])->name('orders.revision');
+            Route::post('/orders/{order}/messages', [OrderMessageController::class, 'store'])->name('orders.messages.store');
+            Route::post('/orders/{order}/review',   [ServiceReviewController::class, 'store'])->name('orders.review.store');
+            Route::post('/orders/{order}/reviews',  [ServiceReviewController::class, 'store']);
 
             // Cart Checkout
             Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');

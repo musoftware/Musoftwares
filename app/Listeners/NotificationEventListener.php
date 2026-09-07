@@ -51,7 +51,7 @@ class NotificationEventListener
      * Note: Invoice::client() returns belongsTo(User::class, 'user_id'), so
      * $invoice->client IS the User already — there is no nested ->user.
      */
-    protected function resolveInvoiceRecipient($invoice)
+    protected function resolveInvoiceRecipient($invoice): ?User
     {
         if (! $invoice) {
             return null;
@@ -59,17 +59,7 @@ class NotificationEventListener
 
         $client = $invoice->client ?? null;
 
-        // Modern shape: client relationship returns the User directly.
-        if ($client instanceof User) {
-            return $client;
-        }
-
-        // Legacy fallback: a nested Client model that exposes a user().
-        if ($client && method_exists($client, 'user')) {
-            return $client->user;
-        }
-
-        return null;
+        return User::resolve($client) ?? (method_exists($client, 'user') ? $client->user : null);
     }
 
     /**
@@ -160,11 +150,8 @@ class NotificationEventListener
 
     private function handleAmountReceived(AmountReceived $event): void
     {
-        // AmountReceived carries the client User instance directly.
-        $client = $event->client;
-
-        $user = $client instanceof User ? $client : null;
-        $email = is_object($client) ? ($client->email ?? null) : null;
+        $user = User::resolve($event->client);
+        $email = $user?->email ?? (is_object($event->client) ? ($event->client->email ?? null) : null);
 
         $this->notifyRecipient(
             $user,
@@ -179,22 +166,11 @@ class NotificationEventListener
             return null;
         }
 
-        // Common shapes: ->client->user, ->user, or ->client being the User.
-        if (method_exists($withdrawal, 'client')) {
-            $client = $withdrawal->client;
-            if ($client instanceof User) {
-                return $client;
-            }
-            if ($client && method_exists($client, 'user')) {
-                return $client->user;
-            }
-        }
+        $client = method_exists($withdrawal, 'client') ? $withdrawal->client : null;
 
-        if (method_exists($withdrawal, 'user')) {
-            return $withdrawal->user;
-        }
-
-        return null;
+        return User::resolve($client)
+            ?? (method_exists($client, 'user') ? $client->user : null)
+            ?? (method_exists($withdrawal, 'user') ? $withdrawal->user : null);
     }
 
     private function handleWithdrawalRequested(WithdrawalRequested $event): void

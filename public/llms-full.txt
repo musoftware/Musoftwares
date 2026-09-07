@@ -13,24 +13,17 @@ Base URL: http://localhost
 - OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
 
 ## Service Categories
+- **Digital Goods**: http://localhost/marketplace/categories/digital-goods
 
 ## Full Services Catalog
 
-### AI Service Test
+### API Access Keys
 - **ID**: 1
-- **Category**: General
-- **URL**: http://localhost/marketplace/services/1/ai-service-test
+- **Category**: Digital Goods
+- **URL**: http://localhost/marketplace/services/1/api-access-keys
 - **Starting Price**: $0
 - **Tagline**: 
-- **Description**: Test AI generation.
+- **Description**: Vouchers
 
 ## Full Blog Articles Catalog
-
-### English Service Blog Post
-- **Slug**: english-service-blog-post
-- **URL**: http://localhost/blog/english-service-blog-post
-- **Published At**: 2026-09-02T19:47:54+00:00
-- **Excerpt**: AI Excerpt
-- **Content**:
-AI content body.
 

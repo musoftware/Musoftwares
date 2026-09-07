@@ -138,9 +138,7 @@ class CurrencyHelper
             return null;
         }
 
-        $currency = is_numeric($currencyId)
-            ? Currency::find($currencyId)
-            : Currency::where('currency', $currencyId)->first();
+        $currency = Currency::resolve($currencyId);
 
         if (! $currency) {
             return [

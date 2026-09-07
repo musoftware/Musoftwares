@@ -53,6 +53,26 @@ class Project extends Model
         'last_ai_charged_at' => 'datetime',
     ];
 
+    /**
+     * Cleanly resolves a Project model from an instance or ID.
+     */
+    public static function resolve(mixed $project): ?self
+    {
+        if ($project instanceof self) {
+            return $project;
+        }
+
+        if (is_numeric($project)) {
+            return self::find((int) $project);
+        }
+
+        if (is_object($project) && isset($project->id) && is_numeric($project->id)) {
+            return self::find((int) $project->id);
+        }
+
+        return null;
+    }
+
     public function getAiStageAttribute($value)
     {
         return $value ?: 'greeting';

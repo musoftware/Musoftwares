@@ -147,4 +147,26 @@ class AdminBusinessTest extends TestCase
             ->where('stats.lifetime_income', 10000)
         );
     }
+
+    public function test_admin_income_index_does_not_preselect_client_when_no_client_requested(): void
+    {
+        // Create transaction with client user
+        $t = new Transaction;
+        $t->user_id = $this->clientUser->id;
+        $t->amount = 2500.00;
+        $t->type = 'received';
+        $t->reason = 'Client Project Fee';
+        $t->currency_id = $this->currency->id;
+        $t->created_at = now();
+        $t->save();
+
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.income.index'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/Business/Income')
+            ->where('filters.user_id', null)
+        );
+    }
 }

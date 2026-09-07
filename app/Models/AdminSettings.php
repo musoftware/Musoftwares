@@ -123,9 +123,7 @@ class AdminSettings extends Model
 
     public static function GetRecommendedHourlyRate($currencyId = null)
     {
-        if ($currencyId === null) {
-            $currencyId = static::business_currency();
-        }
+        $currencyId = Currency::resolve($currencyId ?? static::business_currency())?->id ?? (int) static::business_currency();
 
         if (array_key_exists($currencyId, static::$recommendedHourlyRates)) {
             return static::$recommendedHourlyRates[$currencyId];

@@ -455,7 +455,7 @@ class MetaWhatsappService
                     'verified_name' => 'Meta Sandbox Test Number',
                     'display_phone_number' => '+1 555-0199',
                     'quality_rating' => 'GREEN',
-                    'status' => 'APPROVED',
+                    'status' => 'CONNECTED',
                 ],
             ];
         }
@@ -856,6 +856,28 @@ class MetaWhatsappService
             ];
         } catch (\Throwable $e) {
             $rawResponses['strategy_1_me_permissions'] = ['error' => $e->getMessage()];
+        }
+
+        // Strategy 1.5: Direct User WABAs via /me/whatsapp_business_accounts, etc.
+        foreach (['whatsapp_business_accounts', 'client_whatsapp_business_accounts', 'shared_whatsapp_business_accounts'] as $endpoint) {
+            try {
+                $meWabaRes = Http::withToken($accessToken)->get("https://graph.facebook.com/{$this->graphApiVersion}/me/{$endpoint}", [
+                    'fields' => 'id,name',
+                ]);
+                $rawResponses["strategy_1_me_{$endpoint}"] = [
+                    'status' => $meWabaRes->status(),
+                    'body' => $meWabaRes->json(),
+                ];
+                if ($meWabaRes->successful()) {
+                    foreach ($meWabaRes->json()['data'] ?? [] as $waba) {
+                        if (!empty($waba['id'])) {
+                            $discoveredWabas[(string) $waba['id']] = $waba['name'] ?? null;
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                $rawResponses["strategy_1_me_{$endpoint}"] = ['error' => $e->getMessage()];
+            }
         }
 
         // Strategy 2: Business Managers /me/businesses & WABAs per business

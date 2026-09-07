@@ -177,22 +177,22 @@ class FiverrCloneWorkflowTest extends TestCase
 
         $response = $this->actingAs($this->buyer)->get(route('marketplace.services.index'));
         $response->assertStatus(200);
-
-        $response->assertInertia(fn ($page) => $page
-            ->component('Marketplace/Browse')
-            ->has('services.data', 1)
-            ->where('services.data.0.title', 'Active Writing Service')
-        );
+        $response->assertViewIs('marketplace::public.index');
+        $services = $response->viewData('services');
+        $this->assertEquals(1, $services->total());
+        $this->assertEquals('Active Writing Service', $services->first()->title);
 
         // Filter by category
         $responseFiltered = $this->actingAs($this->buyer)->get(route('marketplace.services.index', ['category_id' => $this->category->id]));
         $responseFiltered->assertStatus(200);
+        $filteredServices = $responseFiltered->viewData('services');
+        $this->assertEquals(1, $filteredServices->total());
 
         // Filter by search query
         $responseSearch = $this->actingAs($this->buyer)->get(route('marketplace.services.index', ['search' => 'Writing']));
-        $responseSearch->assertInertia(fn ($page) => $page
-            ->where('services.data.0.title', 'Active Writing Service')
-        );
+        $responseSearch->assertStatus(200);
+        $searchServices = $responseSearch->viewData('services');
+        $this->assertEquals('Active Writing Service', $searchServices->first()->title);
     }
 
     /**

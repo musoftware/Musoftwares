@@ -87,37 +87,46 @@ export default function Costs() {
     const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    const buildCleanQuery = (overrides: Record<string, any> = {}) => {
+        const query: Record<string, any> = {};
+        const source = { ...(filters || {}), ...overrides };
+        const allowedKeys = [
+            'year', 'month', 'search', 'preset', 'project_id', 'user_id',
+            'currency_id', 'category', 'min_amount', 'max_amount',
+            'recurring_only', 'with_trashed', 'sort_by', 'sort_dir'
+        ];
+        for (const key of allowedKeys) {
+            const val = source[key];
+            if (val !== undefined && val !== null && val !== '' && val !== ALL_VALUE) {
+                query[key] = val;
+            }
+        }
+        return query;
+    };
+
     const handleFilterChange = (key: string, value: string | boolean) => {
         const finalValue = value === ALL_VALUE || value === '' ? '' : value;
-        router.get(route('admin.costs.index'), {
-            ...(filters || {}),
-            [key]: finalValue,
-        }, { preserveState: true, preserveScroll: true });
+        const query = buildCleanQuery({ [key]: finalValue });
+        router.get(route('admin.costs.index'), query, { preserveState: true, preserveScroll: true });
     };
 
     const clearFilter = (key: string) => {
-        const next = { ...(filters || {}) };
-        delete next[key];
-        router.get(route('admin.costs.index'), next, { preserveState: true, preserveScroll: true });
+        const query = buildCleanQuery({ [key]: '' });
+        router.get(route('admin.costs.index'), query, { preserveState: true, preserveScroll: true });
     };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('admin.costs.index'), {
-            ...(filters || {}),
-            search: searchTerm,
-        }, { preserveState: true });
+        const query = buildCleanQuery({ search: searchTerm });
+        router.get(route('admin.costs.index'), query, { preserveState: true });
     };
 
     const handleSort = (field: string) => {
         const newDir = filters?.sort_by === field
             ? (filters.sort_dir === 'asc' ? 'desc' : 'asc')
             : 'desc';
-        router.get(route('admin.costs.index'), {
-            ...(filters || {}),
-            sort_by: field,
-            sort_dir: newDir,
-        }, { preserveState: true, preserveScroll: true });
+        const query = buildCleanQuery({ sort_by: field, sort_dir: newDir });
+        router.get(route('admin.costs.index'), query, { preserveState: true, preserveScroll: true });
     };
 
     const handleSelectAll = (checked: boolean) => {
@@ -442,7 +451,7 @@ export default function Costs() {
                                 variant="ghost"
                                 size="sm"
                                 className="h-9 ms-auto text-slate-500"
-                                onClick={() => router.get(route('admin.costs.index'), { preset: '' }, { preserveState: true, preserveScroll: true })}
+                                onClick={() => router.get(route('admin.costs.index'), {}, { preserveState: false, preserveScroll: true })}
                             >
                                 <X className="h-3 w-3 me-1" /> Clear all
                             </Button>

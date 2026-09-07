@@ -32,8 +32,14 @@ class ScopePricingEngine
      * @param array $options Additional options (context_type, hourly_rate_usd, currency_id).
      * @return array
      */
-    public function calculateValuation(Project $project, array $components = [], array $options = []): array
+    public function calculateValuation(Project $project, array $components = [], array|string|null $options = []): array
     {
+        if (is_string($options)) {
+            $options = ['context_type' => $options, 'archetype' => $options, 'custom_text' => $options];
+        } elseif (!is_array($options)) {
+            $options = [];
+        }
+
         $contextType = $options['context_type'] ?? $this->detectContextType($components, $project);
 
         // 1. Resolve USD and EGP models using cached helper to determine USD -> EGP rate
@@ -754,4 +760,56 @@ class ScopePricingEngine
 
         return 'NEW_PROJECT';
     }
+
+    /**
+     * Detect project archetype cleanly from text.
+     */
+    public function detectArchetype(string $text): string
+    {
+        $text = mb_strtolower($text);
+
+        if (
+            str_contains($text, 'todo') || str_contains($text, 'to-do') ||
+            str_contains($text, 'قائمة مهام') || str_contains($text, 'مهام بسيطة') ||
+            str_contains($text, 'crud') ||
+            (str_contains($text, 'تطبيق') && (str_contains($text, 'بسيط') || str_contains($text, 'صغير') || str_contains($text, 'تدريبي')))
+        ) {
+            return 'todo_simple_crud';
+        }
+
+        if (str_contains($text, 'متجر') || str_contains($text, 'e-commerce') || str_contains($text, 'store') || str_contains($text, 'بيع')) {
+            return 'ecommerce_store';
+        }
+
+        if (
+            str_contains($text, 'mobile app') || str_contains($text, 'تطبيق موبايل') ||
+            str_contains($text, 'android') || str_contains($text, 'ios') || str_contains($text, 'اندرويد') ||
+            (str_contains($text, 'تطبيق') && (str_contains($text, 'ايفون') || str_contains($text, 'جوال')))
+        ) {
+            return 'mobile_application';
+        }
+
+        if (str_contains($text, 'crm') || str_contains($text, 'إدارة عملاء') || str_contains($text, 'علاقات عملاء')) {
+            return 'crm_system';
+        }
+
+        if (str_contains($text, 'erp') || str_contains($text, 'حسابات') || str_contains($text, 'مخازن') || str_contains($text, 'موارد بشرية')) {
+            return 'erp_system';
+        }
+
+        if (str_contains($text, 'هبوط') || str_contains($text, 'landing')) {
+            return 'landing_page';
+        }
+
+        if (str_contains($text, 'داشبورد') || str_contains($text, 'dashboard') || str_contains($text, 'لوحة تحكم')) {
+            return 'admin_dashboard';
+        }
+
+        if (str_contains($text, 'web app') || str_contains($text, 'تطبيق ويب') || str_contains($text, 'mvp')) {
+            return 'mvp_web_app';
+        }
+
+        return 'corporate_website';
+    }
 }
+

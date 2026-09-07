@@ -84,9 +84,9 @@ class MarketplaceOrderTest extends TestCase
         $buyer->refresh();
         $this->assertEquals(900, $buyer->user_balance);
 
-        // Assert NO ERP records are created (Complete Isolation)
-        $this->assertDatabaseCount('projects', 0);
-        $this->assertDatabaseCount('tasks', 0);
+        // Assert project and kickoff tasks are created via kickoff event listener, with zero invoices
+        $this->assertDatabaseCount('projects', 1);
+        $this->assertDatabaseCount('tasks', 4);
         $this->assertDatabaseCount('invoices', 0);
     }
 
@@ -182,9 +182,9 @@ class MarketplaceOrderTest extends TestCase
         $seller->refresh();
         $this->assertGreaterThan(0, $seller->user_balance);
 
-        // 5. Verify zero ERP records exist
-        $this->assertDatabaseCount('projects', 0);
-        $this->assertDatabaseCount('tasks', 0);
+        // 5. Verify kickoff project & tasks exist, but zero invoices exist
+        $this->assertDatabaseCount('projects', 1);
+        $this->assertDatabaseCount('tasks', 4);
         $this->assertDatabaseCount('invoices', 0);
     }
 }

@@ -27,7 +27,7 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import UserLoansTab from './UserLoansTab';
 
-export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0, serialUserDevices = [], availableDevices = [] }) {
+export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0, serialUserDevices = [], availableDevices = [], resellerAllocations = [], allSerialSoftwares = [] }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [resetPasswordInfo, setResetPasswordInfo] = useState(null);
@@ -44,6 +44,14 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
     const [isAssignDeviceOpen, setIsAssignDeviceOpen] = useState(false);
     const [assignDeviceForm, setAssignDeviceForm] = useState({ device_id: '', notes: '' });
     const [tempValidUntil, setTempValidUntil] = useState(client.temp_valid_until || '');
+
+    // Reseller Software Allocation States
+    const [isAllocateSoftwareOpen, setIsAllocateSoftwareOpen] = useState(false);
+    const [allocateSoftwareForm, setAllocateSoftwareForm] = useState({
+        serial_software_id: allSerialSoftwares[0]?.id || '',
+        max_devices: '',
+        notes: '',
+    });
 
     const handleRecalcBalance = () => {
         if (!confirm('Recalculate balance from transactions? This will update user_balance to match the sum of all transactions.')) return;
@@ -114,6 +122,28 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                 setIsChangeRoleOpen(false);
                 alert(__("general.user_role_updated_successfully"));
             }
+        });
+    };
+
+    const submitAllocateSoftware = (e) => {
+        e.preventDefault();
+        router.post(`/admin/users/${client.id}/reseller-softwares`, allocateSoftwareForm, {
+            preserveState: true,
+            onSuccess: () => {
+                setIsAllocateSoftwareOpen(false);
+                setAllocateSoftwareForm({
+                    serial_software_id: allSerialSoftwares[0]?.id || '',
+                    max_devices: '',
+                    notes: '',
+                });
+            }
+        });
+    };
+
+    const submitDeallocateSoftware = (allocationId) => {
+        if (!confirm('Are you sure you want to remove this software allocation from this reseller?')) return;
+        router.delete(`/admin/users/${client.id}/reseller-softwares/${allocationId}`, {
+            preserveState: true,
         });
     };
 
@@ -462,6 +492,61 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                 </DialogContent>
             </Dialog>
 
+            {/* Allocate Software to Reseller Dialog */}
+            <Dialog open={isAllocateSoftwareOpen} onOpenChange={setIsAllocateSoftwareOpen}>
+                <DialogContent>
+                    <form onSubmit={submitAllocateSoftware}>
+                        <DialogHeader>
+                            <DialogTitle>Allocate Software to Reseller</DialogTitle>
+                            <DialogDescription>
+                                Grant this reseller permission to distribute and manage licenses for a specific software product.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div>
+                                <Label>Software Product</Label>
+                                <select 
+                                    className="border border-slate-300 rounded-md w-full p-2 mt-1 text-sm bg-white"
+                                    value={allocateSoftwareForm.serial_software_id}
+                                    onChange={e => setAllocateSoftwareForm({...allocateSoftwareForm, serial_software_id: e.target.value})}
+                                    required
+                                >
+                                    <option value="">-- Select a Software Product --</option>
+                                    {allSerialSoftwares.map(sw => (
+                                        <option key={sw.id} value={sw.id}>{sw.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <Label>Max Active Devices Quota (Optional)</Label>
+                                <Input 
+                                    type="number" 
+                                    min="1"
+                                    placeholder="Leave blank for unlimited devices"
+                                    value={allocateSoftwareForm.max_devices}
+                                    onChange={e => setAllocateSoftwareForm({...allocateSoftwareForm, max_devices: e.target.value})}
+                                    className="mt-1"
+                                />
+                                <p className="text-[11px] text-slate-500 mt-1">Leave empty to grant unlimited device allocations.</p>
+                            </div>
+                            <div>
+                                <Label>Notes / Contract Terms</Label>
+                                <textarea 
+                                    className="border border-slate-300 rounded-md w-full p-2 mt-1 text-sm bg-white h-20 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                                    value={allocateSoftwareForm.notes}
+                                    onChange={e => setAllocateSoftwareForm({...allocateSoftwareForm, notes: e.target.value})}
+                                    placeholder="Optional terms or territory notes..."
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsAllocateSoftwareOpen(false)}>Cancel</Button>
+                            <Button type="submit" disabled={!allocateSoftwareForm.serial_software_id}>Allocate Software</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             <Dialog open={isActivateMembershipOpen} onOpenChange={setIsActivateMembershipOpen}>
                 <DialogContent>
                     <form onSubmit={submitActivateMembership}>
@@ -524,6 +609,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 >
                                     <option value="client">{__("erp.client")}</option>
                                     <option value="user">{__("general.user")}</option>
+                                    <option value="software_reseller">Software Reseller</option>
                                     <option value="admin">{__("admin.admin")}</option>
                                     <option value="manager">{__("general.manager")}</option>
                                     <option value="employee">{__("general.employee")}</option>
@@ -1112,6 +1198,81 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                             </p>
                         )}
                     </div>
+
+                    {/* Software Reseller Allocations & Quotas */}
+                    {(client.role === 'software_reseller' || (client.roles && client.roles.includes('software_reseller')) || (resellerAllocations && resellerAllocations.length > 0)) && (
+                        <div id="reseller-allocations" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">
+                            <div className="flex justify-between items-center mb-4 border-b pb-2">
+                                <div>
+                                    <h2 className="text-lg font-bold font-sora text-slate-900 flex items-center gap-2">
+                                        <ShieldCheck size={18} className="text-[#0071e3]" />Software Reseller Allocations & Quotas
+                                    </h2>
+                                    <p className="text-xs text-slate-500 mt-0.5">Software products allocated to this user for distribution and device management.</p>
+                                </div>
+                                <Button 
+                                    onClick={() => setIsAllocateSoftwareOpen(true)}
+                                    className="bg-[#0071e3] text-white text-xs px-3 py-1.5 rounded-lg hover:bg-[#0077ed] transition flex items-center gap-1 font-semibold"
+                                >
+                                    <Plus size={14} /> Allocate Software
+                                </Button>
+                            </div>
+
+                            {resellerAllocations && resellerAllocations.length > 0 ? (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-start text-sm">
+                                        <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                            <tr>
+                                                <th className="p-3">Software</th>
+                                                <th className="p-3 text-center">Active Devices</th>
+                                                <th className="p-3 text-center">Device Quota</th>
+                                                <th className="p-3 text-center">Remaining</th>
+                                                <th className="p-3 text-center">Status</th>
+                                                <th className="p-3 text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {resellerAllocations.map((alloc) => (
+                                                <tr key={alloc.id} className="hover:bg-slate-50/70">
+                                                    <td className="p-3 font-semibold text-slate-900">
+                                                        {alloc.software_name}
+                                                        {alloc.notes && <div className="text-xs font-normal text-slate-400">{alloc.notes}</div>}
+                                                    </td>
+                                                    <td className="p-3 text-center font-bold text-emerald-600">
+                                                        {alloc.active_devices_count}
+                                                    </td>
+                                                    <td className="p-3 text-center text-slate-700">
+                                                        {alloc.is_unlimited ? 'Unlimited' : alloc.max_devices}
+                                                    </td>
+                                                    <td className="p-3 text-center font-medium text-slate-700">
+                                                        {alloc.is_unlimited ? 'Unlimited' : alloc.remaining_quota}
+                                                    </td>
+                                                    <td className="p-3 text-center">
+                                                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                            {alloc.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-3 text-end">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                                                            onClick={() => submitDeallocateSoftware(alloc.id)}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">
+                                    No software allocated to this reseller yet. Click "Allocate Software" to grant access.
+                                </p>
+                            )}
+                        </div>
+                    )}
 
                     {/* User Subscriptions List */}
                     <div id="subscriptions" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">

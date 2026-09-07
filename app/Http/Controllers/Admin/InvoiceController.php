@@ -182,19 +182,34 @@ class InvoiceController extends Controller
         $businessCurrency = Currency::findCached($businessCurrencyId)?->currency ?? 'USD';
 
         $totalUnpaidAmount = 0.0;
-        $unpaidInvoices = (clone $query)->whereIn('status', ['unpaid', 'partially_paid'])->where('is_suspended', false)->get();
-        foreach ($unpaidInvoices as $inv) {
-            $unpaidVal = (float) $inv->unpaid_total();
-            $convVal = CurrenciesExchange::RateToday($unpaidVal, $inv->currency_id, $businessCurrencyId);
+        $unpaidTotals = (clone $query)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->where('is_suspended', false)
+            ->groupBy('currency_id')
+            ->selectRaw('currency_id, SUM(unpaid) as total_unpaid')
+            ->pluck('total_unpaid', 'currency_id');
+
+        foreach ($unpaidTotals as $currencyId => $unpaidSum) {
+            $convVal = CurrenciesExchange::RateToday((float) $unpaidSum, $currencyId, $businessCurrencyId);
             $totalUnpaidAmount += (float) $convVal;
         }
 
+        $counts = (clone $query)
+            ->selectRaw('
+                COUNT(*) as total,
+                COUNT(CASE WHEN status = "paid" THEN 1 END) as paid,
+                COUNT(CASE WHEN status = "unpaid" AND is_suspended = 0 THEN 1 END) as unpaid,
+                COUNT(CASE WHEN status = "partially_paid" AND is_suspended = 0 THEN 1 END) as partially_paid,
+                COUNT(CASE WHEN is_suspended = 1 THEN 1 END) as suspended
+            ')
+            ->first();
+
         return [
-            'total' => (clone $query)->count(),
-            'paid' => (clone $query)->where('status', 'paid')->count(),
-            'unpaid' => (clone $query)->where('status', 'unpaid')->where('is_suspended', false)->count(),
-            'partially_paid' => (clone $query)->where('status', 'partially_paid')->where('is_suspended', false)->count(),
-            'suspended' => (clone $query)->where('is_suspended', true)->count(),
+            'total' => (int) ($counts?->total ?? 0),
+            'paid' => (int) ($counts?->paid ?? 0),
+            'unpaid' => (int) ($counts?->unpaid ?? 0),
+            'partially_paid' => (int) ($counts?->partially_paid ?? 0),
+            'suspended' => (int) ($counts?->suspended ?? 0),
             'total_unpaid_amount' => round($totalUnpaidAmount, 2),
             'total_unpaid_amount_str' => FinanceHelper::instance()->format_money($totalUnpaidAmount, $businessCurrencyId),
             'business_currency' => $businessCurrency,

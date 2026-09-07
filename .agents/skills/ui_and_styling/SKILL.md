@@ -13,6 +13,16 @@ This skill enforces strict guidelines for developing frontend components, layout
 *   **Tailwind CSS v4:** Use Tailwind CSS v4 for all custom styling, layout, and spacing. Use `@tailwindcss/vite`, `lightningcss`, `clsx`, and `tailwind-merge` for utility class management.
 *   **Custom CSS:** Minimize the use of custom CSS files. If required, rely strictly on Tailwind utility classes and theme configuration. 
 
+### 1.1 Semantic Color Tokens & Theme Parity
+*   **Zero Invisible Text:** Hardcoded dark text classes (e.g. `text-gray-900`, `text-slate-900`, `text-black`) are strictly forbidden inside dynamic or card components. They cause text to become invisible in dark mode.
+*   **Always Use Semantic Tokens:**
+    *   Primary text: `text-foreground` or `text-card-foreground`
+    *   Muted/secondary text: `text-muted-foreground`
+    *   Page wrapper: `bg-background text-foreground`
+    *   Cards: `<Card className="border border-border">`
+    *   Footers/Sub-panels: `bg-muted/40 border-border text-foreground`
+*   **Accent Badges & Metrics:** When using colored metric panels (e.g. blue, emerald, purple), use semi-transparent alpha variants with explicit dark mode text (e.g. `bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-600 dark:text-blue-400`). 
+
 ## 2. Accessibility & ARIA Compliance
 
 *   **Radix UI Primitives:** Leverage Radix UI primitives underlying Shadcn components to ensure robust accessibility.

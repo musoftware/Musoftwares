@@ -88,6 +88,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PayoutMethodController;
 use App\Http\Controllers\PointPurchaseController;
+use App\Http\Controllers\Portal\ResellerDeviceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\SearchController;
@@ -347,6 +348,15 @@ Route::middleware('auth')->group(function () {
 
     // FCM Device Token
     Route::post('/device-tokens', [DeviceTokenController::class, 'store'])->name('device-tokens.store');
+});
+
+// ── Software Reseller Portal ─────────────────────────────────────────────
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('portal')->name('portal.')->group(function () {
+    Route::get('/devices', [ResellerDeviceController::class, 'index'])->name('devices.index');
+    Route::post('/devices', [ResellerDeviceController::class, 'store'])->name('devices.store');
+    Route::post('/devices/{serialUserDevice}/renew', [ResellerDeviceController::class, 'renew'])->name('devices.renew');
+    Route::patch('/devices/{serialUserDevice}/status', [ResellerDeviceController::class, 'updateStatus'])->name('devices.status');
+    Route::delete('/devices/{serialUserDevice}', [ResellerDeviceController::class, 'destroy'])->name('devices.destroy');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -803,6 +813,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::put('/users/{id}/membership/{sub_id}', [UsersController::class, 'updateMembership'])->name('users.membership.update');
     Route::delete('/users/{id}/membership/{sub_id}', [UsersController::class, 'deleteMembership'])->name('users.membership.delete');
     Route::post('/users/{id}/update-role', [UsersController::class, 'updateRole'])->name('users.update-role');
+    Route::post('/users/{user}/reseller-softwares', [UsersController::class, 'allocateResellerSoftware'])->name('users.reseller-softwares.store');
+    Route::delete('/users/{user}/reseller-softwares/{allocation}', [UsersController::class, 'deallocateResellerSoftware'])->name('users.reseller-softwares.destroy');
 
     // ── Points Control ───────────────────────────────────────────────
     Route::get('/points_controller', [AdminPointsController::class, 'index'])->name('points.index');

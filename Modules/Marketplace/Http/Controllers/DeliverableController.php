@@ -20,7 +20,9 @@ class DeliverableController extends Controller
         }
 
         $validated = $request->validate([
-            'note' => 'required|string',
+            'note' => 'nullable|string',
+            'message' => 'nullable|string',
+            'links' => 'nullable|string',
             'file' => 'nullable|file|max:50000',
         ]);
 
@@ -29,8 +31,11 @@ class DeliverableController extends Controller
             $filePath = $request->file('file')->store('deliveries/'.$order->id, 'public');
         }
 
+        $note = $validated['note'] ?? $validated['message'] ?? '';
+        $links = $validated['links'] ?? null;
+
         try {
-            $updatedOrder = $this->deliverableService->submitDeliverable($order, $validated['note'], $filePath);
+            $updatedOrder = $this->deliverableService->submitDeliverable($order, $note, $filePath, $links);
 
             return $this->respondSuccess($request, __('general.work_submitted_successfully'), ['order' => $updatedOrder]);
         } catch (\Exception $e) {

@@ -28,6 +28,7 @@ class InvoiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $currencyId = $this->getCurrencyId();
         $unpaidTotal = (float) $this->unpaid_total();
         $isOverdue = in_array($this->status, ['unpaid', 'partially_paid']) && ! empty($this->due_date) && Carbon::parse($this->due_date)->isPast();
         $daysOverdue = $isOverdue ? (int) Carbon::parse($this->due_date)->diffInDays(now()) : 0;
@@ -42,8 +43,8 @@ class InvoiceResource extends JsonResource
                 $this->user->only('id', 'name', 'email', 'address', 'phone_number', 'phone'),
                 [
                     'projects' => $this->user->relationLoaded('projects') ? $this->user->projects->map(fn ($p) => ['id' => $p->id, 'project_name' => $p->project_name])->values()->all() : [],
-                    'balance' => (float) ($this->user->balance($this->currency) ?? 0),
-                    'balance_str' => FinanceHelper::instance()->format_money((float) ($this->user->balance($this->currency) ?? 0), $this->currency),
+                    'balance' => (float) ($this->user->balance($currencyId) ?? 0),
+                    'balance_str' => FinanceHelper::instance()->format_money((float) ($this->user->balance($currencyId) ?? 0), $currencyId),
                 ]
             )),
             'project' => $this->whenLoaded('project', fn () => ['id' => $this->project->id, 'project_name' => $this->project->project_name]),
@@ -54,9 +55,9 @@ class InvoiceResource extends JsonResource
             'tax' => $this->tax(),
             'paid_amount' => $this->paid,
             'unpaid_amount' => $unpaidTotal,
-            'unpaid_amount_str' => FinanceHelper::instance()->format_money($unpaidTotal, $this->currency),
-            'currency' => Currency::findCached($this->currency)?->currency,
-            'currency_symbol' => Currency::findCached($this->currency)?->symbol,
+            'unpaid_amount_str' => FinanceHelper::instance()->format_money($unpaidTotal, $currencyId),
+            'currency' => Currency::findCached($currencyId)?->currency,
+            'currency_symbol' => Currency::findCached($currencyId)?->symbol,
             'business_amount' => $this->business_total(),
             'business_currency' => Currency::findCached(AdminSettings::GetValue('business_currency', 2))?->currency,
             'status' => $this->status,
@@ -136,7 +137,8 @@ class InvoiceResource extends JsonResource
                     $estimatedDirect = $estimatedFull;
                 }
 
-                $estimatedInAffiliateCurrency = CurrenciesExchange::RateToday($estimatedDirect, $this->currency, $affiliate->currency);
+                $invoiceCurrencyId = $this->getCurrencyId();
+                $estimatedInAffiliateCurrency = CurrenciesExchange::RateToday($estimatedDirect, $invoiceCurrencyId, $affiliate->currency);
                 $estimatedStr = FinanceHelper::instance()->format_money(round($estimatedInAffiliateCurrency, 2), $affiliate->currency);
 
                 return [
@@ -153,9 +155,14 @@ class InvoiceResource extends JsonResource
         ];
     }
 
+    protected function getCurrencyId(): int
+    {
+        return Currency::resolve($this->currency_id ?? $this->currency)?->id ?? 2;
+    }
+
     protected function calculateFairPrice()
     {
-        $recommended_rate = AdminSettings::GetRecommendedHourlyRate($this->currency ?? 1);
+        $recommended_rate = AdminSettings::GetRecommendedHourlyRate($this->getCurrencyId());
 
         $non_timer_total = 0;
         if ($this->relationLoaded('items')) {
@@ -188,7 +195,7 @@ class InvoiceResource extends JsonResource
     protected function calculateTimerMetrics(): array
     {
         $invoice = $this->resource;
-        $currencyId = (int) ($invoice->currency ?? 2);
+        $currencyId = $this->getCurrencyId();
         $user = $invoice->user;
 
         $baseRate = FinanceHelper::calculateOverheadHourlyRate();

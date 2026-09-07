@@ -333,6 +333,24 @@ class AiContextBuilder
                 'External Services'       => 'تكاليف الاستضافة، والدومينات، وبوابات الدفع والتطبيقات الخارجية يتحملها العميل بشكل مستقل.',
                 'Source Code Ownership'   => 'الكود المصدري كاملاً ملك للعميل فور سداد مستحقات المشروع بالكامل.',
             ],
+            // Backward-compatible keys for tests and internal consumers
+            'current_context' => [
+                'stage'     => $this->resolveStage($project),
+                'goal'      => $context['current_goal'] ?? $project->description ?? 'بناء وتطوير البرمجيات',
+                'archetype' => $context['current_archetype'] ?? null,
+            ],
+            'invoice_payment_status' => [
+                'budget_usd'          => $budget,
+                'total_paid_usd'      => $totalPaid,
+                'is_50pct_paid'       => $is50PctPaid,
+                'is_fully_paid'       => $budget > 0 ? ($totalPaid >= $budget) : false,
+            ],
+            'company_policies' => [
+                'pricing'                 => 'التسعير يعتمد على معايير السوق المحلية وتكلفة المكونات الدقيقة (Micro-Components).',
+                'support'                 => '30 يوماً دعم مجاني بعد التسليم النهائي لإصلاح أي عيوب برمجية (Bugs) داخل العقد.',
+                'external_services'       => 'تكاليف الاستضافة، والدومينات، وبوابات الدفع والتطبيقات الخارجية يتحملها العميل بشكل مستقل.',
+                'source_code_ownership'   => 'الكود المصدري كاملاً ملك للعميل فور سداد مستحقات المشروع بالكامل.',
+            ],
         ];
     }
 }
