@@ -282,6 +282,7 @@ class UsersController extends Controller
                     'serial_software_id' => $alloc->serial_software_id,
                     'software_name' => $alloc->software?->name ?? 'Unknown Software',
                     'max_devices' => $alloc->max_devices,
+                    'can_view_all_devices' => (bool) $alloc->can_view_all_devices,
                     'active_devices_count' => $alloc->activeDevicesCount(),
                     'remaining_quota' => $alloc->remainingQuota(),
                     'is_unlimited' => $alloc->isUnlimitedDevices(),
@@ -316,6 +317,7 @@ class UsersController extends Controller
         $validated = $request->validate([
             'serial_software_id' => ['required', 'integer', 'exists:serial_softwares,id'],
             'max_devices' => ['nullable', 'integer', 'min:1'],
+            'can_view_all_devices' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -326,6 +328,7 @@ class UsersController extends Controller
             ],
             [
                 'max_devices' => $validated['max_devices'] ?? null,
+                'can_view_all_devices' => (bool) ($validated['can_view_all_devices'] ?? false),
                 'status' => SerialSoftwareReseller::STATUS_ACTIVE,
                 'notes' => $validated['notes'] ?? null,
             ]
@@ -351,6 +354,25 @@ class UsersController extends Controller
         $allocation->delete();
 
         return back()->with('success', __('Software allocation removed.'));
+    }
+
+    /**
+     * Toggle reseller scope for a specific software between all devices vs own devices.
+     */
+    public function toggleResellerSoftwareScope(User $user, SerialSoftwareReseller $allocation)
+    {
+        if ($allocation->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $allocation->can_view_all_devices = ! (bool) $allocation->can_view_all_devices;
+        $allocation->save();
+
+        $message = $allocation->can_view_all_devices
+            ? __('Scope updated: Reseller can now view all devices for this software.')
+            : __('Scope updated: Reseller restricted to own assigned devices for this software.');
+
+        return back()->with('success', $message);
     }
 
     /**

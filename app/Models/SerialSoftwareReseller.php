@@ -20,12 +20,14 @@ class SerialSoftwareReseller extends Model
         'user_id',
         'serial_software_id',
         'max_devices',
+        'can_view_all_devices',
         'status',
         'notes',
     ];
 
     protected $casts = [
         'max_devices' => 'integer',
+        'can_view_all_devices' => 'boolean',
     ];
 
     public static function statuses(): array

@@ -36,12 +36,70 @@ class ResellerDeviceService extends BaseService
                     'serial_software_id' => $allocation->serial_software_id,
                     'software_name' => $allocation->software?->name ?? 'Unknown',
                     'max_devices' => $quota,
+                    'can_view_all_devices' => (bool) $allocation->can_view_all_devices,
                     'active_devices_count' => $activeCount,
                     'remaining_quota' => $remaining,
                     'is_unlimited' => $allocation->isUnlimitedDevices(),
                     'status' => $allocation->status,
                 ];
             });
+    }
+
+    /**
+     * Apply reseller device visibility scope (per software).
+     */
+    public function applyResellerDeviceScope(Builder $query, User $reseller): void
+    {
+        if ($reseller->isAdmin()) {
+            return;
+        }
+
+        $allDevicesSoftwareIds = SerialSoftwareReseller::where('user_id', $reseller->id)
+            ->where('status', SerialSoftwareReseller::STATUS_ACTIVE)
+            ->where('can_view_all_devices', true)
+            ->pluck('serial_software_id')
+            ->toArray();
+
+        $ownDevicesSoftwareIds = SerialSoftwareReseller::where('user_id', $reseller->id)
+            ->where('status', SerialSoftwareReseller::STATUS_ACTIVE)
+            ->where('can_view_all_devices', false)
+            ->pluck('serial_software_id')
+            ->toArray();
+
+        // Fallback if legacy user-level flag is true
+        if ($reseller->can_view_all_devices) {
+            $allAllocated = array_unique(array_merge($allDevicesSoftwareIds, $ownDevicesSoftwareIds));
+            $query->whereHas('devices', function ($q) use ($allAllocated) {
+                $q->whereIn('serial_software_id', $allAllocated);
+            });
+            return;
+        }
+
+        $query->where(function (Builder $q) use ($reseller, $allDevicesSoftwareIds, $ownDevicesSoftwareIds) {
+            $hasCondition = false;
+
+            if (! empty($allDevicesSoftwareIds)) {
+                $q->whereHas('devices', function ($sub) use ($allDevicesSoftwareIds) {
+                    $sub->whereIn('serial_software_id', $allDevicesSoftwareIds);
+                });
+                $hasCondition = true;
+            }
+
+            if (! empty($ownDevicesSoftwareIds)) {
+                $method = $hasCondition ? 'orWhere' : 'where';
+                $q->$method(function ($sub) use ($reseller, $ownDevicesSoftwareIds) {
+                    $sub->where('reseller_id', $reseller->id)
+                        ->whereHas('devices', function ($d) use ($ownDevicesSoftwareIds) {
+                            $d->whereIn('serial_software_id', $ownDevicesSoftwareIds);
+                        });
+                });
+                $hasCondition = true;
+            }
+
+            if (! $hasCondition) {
+                $q->whereRaw('1 = 0');
+            }
+        });
     }
 
     /**
@@ -52,19 +110,7 @@ class ResellerDeviceService extends BaseService
         $cairoNow = now()->setTimezone('Africa/Cairo');
 
         $baseQuery = SerialUserDevice::query();
-
-        if ($reseller->canViewAllDevices()) {
-            $allocatedSoftwareIds = SerialSoftwareReseller::where('user_id', $reseller->id)
-                ->where('status', SerialSoftwareReseller::STATUS_ACTIVE)
-                ->pluck('serial_software_id')
-                ->toArray();
-
-            $baseQuery->whereHas('devices', function ($q) use ($allocatedSoftwareIds) {
-                $q->whereIn('serial_software_id', $allocatedSoftwareIds);
-            });
-        } else {
-            $baseQuery->where('reseller_id', $reseller->id);
-        }
+        $this->applyResellerDeviceScope($baseQuery, $reseller);
 
         $totalDevices = (clone $baseQuery)->count();
         $activeDevices = (clone $baseQuery)->where('status', SerialUserDevice::STATUS_ACTIVE)
@@ -112,18 +158,7 @@ class ResellerDeviceService extends BaseService
         $query = SerialUserDevice::query()
             ->with(['user:' . $userCols, 'reseller:id,name,email', 'devices.software:id,name']);
 
-        if ($reseller->canViewAllDevices()) {
-            $allocatedSoftwareIds = SerialSoftwareReseller::where('user_id', $reseller->id)
-                ->where('status', SerialSoftwareReseller::STATUS_ACTIVE)
-                ->pluck('serial_software_id')
-                ->toArray();
-
-            $query->whereHas('devices', function ($q) use ($allocatedSoftwareIds) {
-                $q->whereIn('serial_software_id', $allocatedSoftwareIds);
-            });
-        } else {
-            $query->where('reseller_id', $reseller->id);
-        }
+        $this->applyResellerDeviceScope($query, $reseller);
 
         // Filter by search
         if (! empty($filters['search'])) {

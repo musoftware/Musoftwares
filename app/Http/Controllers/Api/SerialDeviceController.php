@@ -109,6 +109,41 @@ class SerialDeviceController extends Controller
         $hasLinkedUser = (bool) $userDevice;
         $isExpired = false;
         $status = $device->status;
+        $hasActiveLicense = false;
+
+        // If software requires payment, enforce active license verification
+        if ($software->requires_payment) {
+            if ($userDevice && $userDevice->user_id) {
+                $userLicense = \App\Models\SerialSoftwareLicense::where('user_id', $userDevice->user_id)
+                    ->where('serial_software_id', $software->id)
+                    ->active()
+                    ->first();
+
+                if ($userLicense) {
+                    $hasActiveLicense = true;
+                    if ($userLicense->expires_at && (! $userDevice->expires_at || $userDevice->expires_at != $userLicense->expires_at)) {
+                        $userDevice->update(['expires_at' => $userLicense->expires_at]);
+                    }
+                }
+            }
+
+            $hasTempOverride = $userDevice?->user?->temp_valid_until && now()->lessThanOrEqualTo($userDevice->user->temp_valid_until);
+
+            if (! $hasActiveLicense && ! $hasTempOverride) {
+                $status = SerialDevice::STATUS_INACTIVE;
+                if ($device->status === SerialDevice::STATUS_ACTIVE) {
+                    $device->update(['status' => SerialDevice::STATUS_INACTIVE]);
+                }
+                if ($userDevice && $userDevice->status === \App\Models\SerialUserDevice::STATUS_ACTIVE) {
+                    $userDevice->update(['status' => \App\Models\SerialUserDevice::STATUS_INACTIVE]);
+                }
+            } else {
+                if ($device->status !== SerialDevice::STATUS_ACTIVE) {
+                    $device->update(['status' => SerialDevice::STATUS_ACTIVE]);
+                    $status = SerialDevice::STATUS_ACTIVE;
+                }
+            }
+        }
 
         // If device assignment has an expiration date that has passed,
         // override status to inactive so client software safely stops execution.
@@ -117,6 +152,9 @@ class SerialDeviceController extends Controller
             if (! $hasTempOverride && now()->greaterThan($userDevice->expires_at)) {
                 $isExpired = true;
                 $status = SerialDevice::STATUS_INACTIVE;
+                if ($device->status === SerialDevice::STATUS_ACTIVE) {
+                    $device->update(['status' => SerialDevice::STATUS_INACTIVE]);
+                }
             }
         }
 
@@ -124,6 +162,7 @@ class SerialDeviceController extends Controller
         return response()->json([
             'status'               => $status,
             'has_linked_user'      => $hasLinkedUser,
+            'has_active_license'   => $hasActiveLicense,
             'is_expired'           => $isExpired,
             'expires_at'           => $userDevice?->expires_at?->toIso8601String(),
             'custom_keys'          => $device->getResolvedCustomKeys(),
@@ -185,7 +224,7 @@ class SerialDeviceController extends Controller
 
         $hasActiveLicense = (bool) $userLicense;
 
-        $targetStatus = (! $software->requires_payment || $hasActiveLicense || $device->status === SerialDevice::STATUS_ACTIVE)
+        $targetStatus = (! $software->requires_payment || $hasActiveLicense)
             ? SerialDevice::STATUS_ACTIVE
             : SerialDevice::STATUS_INACTIVE;
 
@@ -314,13 +353,23 @@ class SerialDeviceController extends Controller
             ]
         );
 
-        $targetStatus = $software->requires_payment
-            ? ($device->status === SerialDevice::STATUS_ACTIVE ? SerialDevice::STATUS_ACTIVE : SerialDevice::STATUS_INACTIVE)
-            : SerialDevice::STATUS_ACTIVE;
+        // Check if user owns an active license for this software
+        $userLicense = \App\Models\SerialSoftwareLicense::where('user_id', $user->id)
+            ->where('serial_software_id', $software->id)
+            ->active()
+            ->first();
+
+        $hasActiveLicense = (bool) $userLicense;
+
+        $targetStatus = (! $software->requires_payment || $hasActiveLicense)
+            ? SerialDevice::STATUS_ACTIVE
+            : SerialDevice::STATUS_INACTIVE;
 
         $userDeviceStatus = $targetStatus === SerialDevice::STATUS_ACTIVE
             ? \App\Models\SerialUserDevice::STATUS_ACTIVE
             : \App\Models\SerialUserDevice::STATUS_INACTIVE;
+
+        $expiresAt = $userLicense?->expires_at;
 
         // Link device to user (handling potential soft deletes cleanly)
         $userDevice = \App\Models\SerialUserDevice::withTrashed()
@@ -331,15 +380,20 @@ class SerialDeviceController extends Controller
             if ($userDevice->trashed()) {
                 $userDevice->restore();
             }
-            $userDevice->update([
+            $updateData = [
                 'user_id' => $user->id,
                 'status'  => $userDeviceStatus,
-            ]);
+            ];
+            if ($expiresAt) {
+                $updateData['expires_at'] = $expiresAt;
+            }
+            $userDevice->update($updateData);
         } else {
             \App\Models\SerialUserDevice::create([
-                'device_id' => $validated['device_id'],
-                'user_id'   => $user->id,
-                'status'    => $userDeviceStatus,
+                'device_id'  => $validated['device_id'],
+                'user_id'    => $user->id,
+                'status'     => $userDeviceStatus,
+                'expires_at' => $expiresAt,
             ]);
         }
 

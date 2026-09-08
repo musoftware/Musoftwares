@@ -23,6 +23,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { Switch } from '@/Components/ui/switch';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import UserLoansTab from './UserLoansTab';
@@ -50,6 +51,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
     const [allocateSoftwareForm, setAllocateSoftwareForm] = useState({
         serial_software_id: allSerialSoftwares[0]?.id || '',
         max_devices: '',
+        can_view_all_devices: false,
         notes: '',
     });
 
@@ -134,6 +136,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                 setAllocateSoftwareForm({
                     serial_software_id: allSerialSoftwares[0]?.id || '',
                     max_devices: '',
+                    can_view_all_devices: false,
                     notes: '',
                 });
             }
@@ -143,6 +146,12 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
     const submitDeallocateSoftware = (allocationId) => {
         if (!confirm('Are you sure you want to remove this software allocation from this reseller?')) return;
         router.delete(`/admin/users/${client.id}/reseller-softwares/${allocationId}`, {
+            preserveState: true,
+        });
+    };
+
+    const submitToggleResellerSoftwareScope = (allocationId) => {
+        router.patch(`/admin/users/${client.id}/reseller-softwares/${allocationId}/toggle-scope`, {}, {
             preserveState: true,
         });
     };
@@ -558,6 +567,20 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                     value={allocateSoftwareForm.notes}
                                     onChange={e => setAllocateSoftwareForm({...allocateSoftwareForm, notes: e.target.value})}
                                     placeholder="Optional terms or territory notes..."
+                                />
+                            </div>
+                            <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50">
+                                <div>
+                                    <Label className="text-xs font-semibold text-slate-900">Device Visibility Scope</Label>
+                                    <p className="text-[11px] text-slate-500">
+                                        {allocateSoftwareForm.can_view_all_devices
+                                            ? 'Reseller can view and manage all registered devices for this software.'
+                                            : 'Reseller can only view and manage devices they personally assign.'}
+                                    </p>
+                                </div>
+                                <Switch
+                                    checked={allocateSoftwareForm.can_view_all_devices}
+                                    onCheckedChange={val => setAllocateSoftwareForm({...allocateSoftwareForm, can_view_all_devices: val})}
                                 />
                             </div>
                         </div>
@@ -1253,21 +1276,6 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 <p className="text-xs text-slate-500 mt-0.5">Software products allocated to this user for distribution and device management.</p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={submitToggleResellerAllDevices}
-                                    className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition flex items-center gap-1.5 ${
-                                        client.can_view_all_devices
-                                            ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
-                                            : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
-                                    }`}
-                                    title="Toggle whether this reseller can view all devices or only their own"
-                                >
-                                    <span className={`w-2 h-2 rounded-full ${client.can_view_all_devices ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                                    <span>Scope: {client.can_view_all_devices ? 'All Allocated Devices' : 'Own Devices Only'}</span>
-                                </Button>
-
                                 <Button 
                                     onClick={() => setIsAllocateSoftwareOpen(true)}
                                     className="bg-[#0071e3] text-white text-xs px-3 py-1.5 rounded-lg hover:bg-[#0077ed] transition flex items-center gap-1 font-semibold"
@@ -1283,6 +1291,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                     <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
                                         <tr>
                                             <th className="p-3">Software</th>
+                                            <th className="p-3 text-center">Scope</th>
                                             <th className="p-3 text-center">Active Devices</th>
                                             <th className="p-3 text-center">Device Quota</th>
                                             <th className="p-3 text-center">Remaining</th>
@@ -1296,6 +1305,23 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                                 <td className="p-3 font-semibold text-slate-900">
                                                     {alloc.software_name}
                                                     {alloc.notes && <div className="text-xs font-normal text-slate-400">{alloc.notes}</div>}
+                                                </td>
+                                                <td className="p-3 text-center">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => submitToggleResellerSoftwareScope(alloc.id)}
+                                                        className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition inline-flex items-center gap-1.5 ${
+                                                            alloc.can_view_all_devices
+                                                                ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                                                                : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
+                                                        }`}
+                                                        title="Toggle whether this reseller can view all devices or only their own for this software"
+                                                    >
+                                                        <span className={`w-2 h-2 rounded-full ${alloc.can_view_all_devices ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                                                        <span>{alloc.can_view_all_devices ? 'All Allocated Devices' : 'Own Devices Only'}</span>
+                                                    </Button>
                                                 </td>
                                                 <td className="p-3 text-center font-bold text-emerald-600">
                                                     {alloc.active_devices_count}

@@ -822,6 +822,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/users/{id}/update-role', [UsersController::class, 'updateRole'])->name('users.update-role');
     Route::post('/users/{user}/reseller-softwares', [UsersController::class, 'allocateResellerSoftware'])->name('users.reseller-softwares.store');
     Route::delete('/users/{user}/reseller-softwares/{allocation}', [UsersController::class, 'deallocateResellerSoftware'])->name('users.reseller-softwares.destroy');
+    Route::patch('/users/{user}/reseller-softwares/{allocation}/toggle-scope', [UsersController::class, 'toggleResellerSoftwareScope'])->name('users.reseller-softwares.toggle-scope');
     Route::post('/users/{user}/toggle-reseller-all-devices', [UsersController::class, 'toggleResellerAllDevices'])->name('users.toggle-reseller-all-devices');
 
     // ── Points Control ───────────────────────────────────────────────

@@ -73,16 +73,20 @@ class ResellerDeviceController extends Controller
             return;
         }
 
-        if ($user->canViewAllDevices()) {
-            $allocatedSoftwareIds = \App\Models\SerialSoftwareReseller::where('user_id', $user->id)
-                ->where('status', \App\Models\SerialSoftwareReseller::STATUS_ACTIVE)
-                ->pluck('serial_software_id')
-                ->toArray();
+        $canViewSoftwareIds = \App\Models\SerialSoftwareReseller::where('user_id', $user->id)
+            ->where('status', \App\Models\SerialSoftwareReseller::STATUS_ACTIVE)
+            ->where(function ($q) use ($user) {
+                $q->where('can_view_all_devices', true);
+                if ($user->can_view_all_devices) {
+                    $q->orWhereRaw('1 = 1');
+                }
+            })
+            ->pluck('serial_software_id')
+            ->toArray();
 
-            $deviceSoftwareIds = $serialUserDevice->devices()->pluck('serial_software_id')->toArray();
-            if (! empty(array_intersect($allocatedSoftwareIds, $deviceSoftwareIds))) {
-                return;
-            }
+        $deviceSoftwareIds = $serialUserDevice->devices()->pluck('serial_software_id')->toArray();
+        if (! empty(array_intersect($canViewSoftwareIds, $deviceSoftwareIds))) {
+            return;
         }
 
         abort(403, __('Unauthorized to modify this device.'));
