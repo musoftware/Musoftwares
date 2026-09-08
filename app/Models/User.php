@@ -404,15 +404,17 @@ class User extends Authenticatable
     public function timer_report()
     {
         $driver = DB::connection()->getDriverName();
-        if ($driver === 'sqlite') {
-            $secondsSql = 'SUM(strftime(\'%s\', date_end) - strftime(\'%s\', date_start))';
-        } else {
-            $secondsSql = 'SUM(TIMESTAMPDIFF(SECOND, date_start, date_end))';
-        }
+        $secondsExpression = ($driver === 'sqlite')
+            ? 'SUM(strftime(\'%s\', date_end) - strftime(\'%s\', date_start))'
+            : 'SUM(TIMESTAMPDIFF(SECOND, date_start, date_end))';
 
         return $this->invoice_item_timers()
-            ->select(DB::raw("DATE(date_start) as ds, min(date_end) as min_date, max(date_end) as max_date, sum(amount) as sum_amount, {$secondsSql} as sum_seconds"))
-            ->groupBy(DB::raw('ds'));
+            ->selectRaw('DATE(date_start) as ds')
+            ->selectRaw('MIN(date_end) as min_date')
+            ->selectRaw('MAX(date_end) as max_date')
+            ->selectRaw('SUM(amount) as sum_amount')
+            ->selectRaw($secondsExpression . ' as sum_seconds')
+            ->groupBy(DB::raw('DATE(date_start)'));
     }
 
     public function currency_name()

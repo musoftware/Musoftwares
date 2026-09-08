@@ -238,3 +238,18 @@ resources/js/tra3D29.tmp
 resources/js/tra3CBA.tmp
 resources/js/tra3D97.tmp
 resources/js/*.tmp
+
+# Database dumps & local binary stores
+*.sql
+*.sqlite
+*_db
+u962989541_*
+/dev_scripts/*.sql
+
+# Scratch & test outputs
+lint-results*.json
+pest_results*.txt
+pest*.txt
+tsc_output*.txt
+err.txt
+out.txt

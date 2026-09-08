@@ -110,8 +110,8 @@ if ($AssetsOnly) {
                 }
             }
         }
-        # Also include files from latest commit to ensure newly committed assets are deployed
-        $recentCommitFiles = & git diff --name-only HEAD~1 HEAD 2>$null
+        # Also include files from recent commits to ensure newly committed assets are deployed
+        $recentCommitFiles = & git diff --name-only HEAD~2 HEAD 2>$null
         if ($recentCommitFiles) {
             $rawGitFiles += $recentCommitFiles
         }
