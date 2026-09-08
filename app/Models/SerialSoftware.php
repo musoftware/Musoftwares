@@ -17,19 +17,39 @@ class SerialSoftware extends Model
 
     public const DEFAULT_STATUS_INACTIVE = 'inactive';
 
+    public const PRICING_FREE = 'free';
+
+    public const PRICING_SINGLE = 'single';
+
+    public const PRICING_PACKAGES = 'packages';
+
+    public const CYCLE_LIFETIME = 'lifetime';
+
+    public const CYCLE_MONTHLY = 'monthly';
+
+    public const CYCLE_ANNUAL = 'annual';
+
+    public const CYCLE_CUSTOM = 'custom';
+
     protected $fillable = [
         'name',
+        'is_active',
         'default_status',
+        'pricing_type',
         'requires_payment',
         'price',
         'currency',
+        'billing_cycle',
+        'billing_days',
         'whatsapp_number',
         'payment_instructions',
     ];
 
     protected $casts = [
+        'is_active' => 'boolean',
         'requires_payment' => 'boolean',
         'price' => 'decimal:2',
+        'billing_days' => 'integer',
     ];
 
     /**
@@ -41,6 +61,29 @@ class SerialSoftware extends Model
             self::DEFAULT_STATUS_ACTIVE,
             self::DEFAULT_STATUS_INACTIVE,
         ];
+    }
+
+    public function isFree(): bool
+    {
+        return $this->pricing_type === self::PRICING_FREE;
+    }
+
+    public function isSinglePaid(): bool
+    {
+        return $this->pricing_type === self::PRICING_SINGLE;
+    }
+
+    public function hasPackages(): bool
+    {
+        return $this->pricing_type === self::PRICING_PACKAGES;
+    }
+
+    /**
+     * @return HasMany<SerialSoftwarePackage>
+     */
+    public function packages(): HasMany
+    {
+        return $this->hasMany(SerialSoftwarePackage::class, 'serial_software_id')->orderBy('sort_order');
     }
 
     /**

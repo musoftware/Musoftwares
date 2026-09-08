@@ -21,6 +21,7 @@ class SerialSoftwareLicense extends Model
     protected $fillable = [
         'user_id',
         'serial_software_id',
+        'package_id',
         'status',
         'expires_at',
         'max_devices',
@@ -46,6 +47,14 @@ class SerialSoftwareLicense extends Model
     public function software(): BelongsTo
     {
         return $this->belongsTo(SerialSoftware::class, 'serial_software_id');
+    }
+
+    /**
+     * Get the package associated with this license.
+     */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(SerialSoftwarePackage::class, 'package_id');
     }
 
     /**

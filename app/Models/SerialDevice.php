@@ -20,6 +20,7 @@ class SerialDevice extends Model
 
     protected $fillable = [
         'serial_software_id',
+        'package_id',
         'device_id',
         'status',
         'user_name',
@@ -60,6 +61,14 @@ class SerialDevice extends Model
     }
 
     /**
+     * @return BelongsTo<SerialSoftwarePackage, self>
+     */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(SerialSoftwarePackage::class, 'package_id');
+    }
+
+    /**
      * Get the user device assignment for this device.
      */
     public function userDeviceAssignment()
@@ -76,7 +85,7 @@ class SerialDevice extends Model
     }
 
     /**
-     * Get resolved custom keys combining software defaults and device overrides.
+     * Get resolved custom keys combining software defaults, package overrides, and device overrides.
      *
      * @return array<string, string>
      */
@@ -87,15 +96,47 @@ class SerialDevice extends Model
             return [];
         }
 
+        // Determine assigned package if any
+        $packageId = $this->package_id;
+        if (! $packageId && $this->userDeviceAssignment) {
+            $packageId = $this->userDeviceAssignment->package_id;
+        }
+        if (! $packageId && $this->userDeviceAssignment?->user_id) {
+            $license = SerialSoftwareLicense::where('user_id', $this->userDeviceAssignment->user_id)
+                ->where('serial_software_id', $this->serial_software_id)
+                ->active()
+                ->first();
+            $packageId = $license?->package_id;
+        }
+
+        $packageCustomValues = [];
+        if ($packageId) {
+            $pkg = SerialSoftwarePackage::find($packageId);
+            if ($pkg && is_array($pkg->custom_values)) {
+                $packageCustomValues = $pkg->custom_values;
+            }
+        }
+
         $deviceOverrides = SerialDeviceKey::where('serial_device_id', $this->id)
             ->pluck('value', 'serial_software_key_id')
             ->toArray();
 
         $resolved = [];
         foreach ($softwareKeys as $swKey) {
-            $resolved[$swKey->key] = isset($deviceOverrides[$swKey->id])
-                ? (string) $deviceOverrides[$swKey->id]
-                : (string) ($swKey->default_value ?? '');
+            // 1. Software default
+            $val = (string) ($swKey->default_value ?? '');
+
+            // 2. Package override
+            if (array_key_exists($swKey->key, $packageCustomValues) && $packageCustomValues[$swKey->key] !== null && $packageCustomValues[$swKey->key] !== '') {
+                $val = (string) $packageCustomValues[$swKey->key];
+            }
+
+            // 3. Device specific override
+            if (isset($deviceOverrides[$swKey->id])) {
+                $val = (string) $deviceOverrides[$swKey->id];
+            }
+
+            $resolved[$swKey->key] = $val;
         }
 
         return $resolved;

@@ -166,7 +166,7 @@ class SerialSoftwareSettingsTest extends TestCase
             'is_active' => false,
         ]);
 
-        $response = $this->postJson(route('api.serial-devices.register'), [
+        $response = $this->postJson('/api/serial/device', [
             'program_name' => 'Deactivated App',
             'device_id' => 'DEV-KILL-12345',
         ]);
@@ -204,7 +204,7 @@ class SerialSoftwareSettingsTest extends TestCase
             'custom_values' => ['limit_per_day' => '500'],
         ]);
 
-        $response = $this->postJson(route('api.serial-devices.register'), [
+        $response = $this->postJson('/api/serial/device', [
             'program_name' => 'Packaged App',
             'device_id' => 'DEV-PKG-TEST',
         ]);

@@ -206,8 +206,140 @@ class SerialSoftwareController extends Controller
             'payment_instructions' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $this->serialSoftwareService->updatePaymentSettings($serialSoftware, $validated);
+        $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);
 
         return back()->with('success', 'Payment settings updated successfully.');
+    }
+
+    /**
+     * Dedicated full-page settings management.
+     */
+    public function settings(SerialSoftware $serialSoftware): Response
+    {
+        $serialSoftware->load([
+            'customKeys',
+            'packages' => fn ($q) => $q->orderBy('sort_order')->orderBy('id'),
+        ]);
+
+        $serialSoftware->loadCount([
+            'devices as total_devices',
+            'devices as active_count' => fn ($q) => $q->where('status', 'active'),
+            'devices as inactive_count' => fn ($q) => $q->where('status', 'inactive'),
+            'devices as blocked_count' => fn ($q) => $q->where('status', 'blocked'),
+        ]);
+
+        $commonCurrencies = ['USD', 'EUR', 'GBP', 'EGP', 'SAR', 'AED', 'KWD', 'QAR', 'OMR', 'BHD'];
+
+        return Inertia::render('Admin/SerialSoftwares/Settings', [
+            'software' => [
+                'id' => $serialSoftware->id,
+                'name' => $serialSoftware->name,
+                'is_active' => (bool) ($serialSoftware->is_active ?? true),
+                'default_status' => $serialSoftware->default_status,
+                'pricing_type' => $serialSoftware->pricing_type ?? ($serialSoftware->requires_payment ? 'single' : 'free'),
+                'requires_payment' => (bool) $serialSoftware->requires_payment,
+                'price' => $serialSoftware->price !== null ? (float) $serialSoftware->price : null,
+                'currency' => $serialSoftware->currency ?? 'USD',
+                'billing_cycle' => $serialSoftware->billing_cycle ?? 'lifetime',
+                'billing_days' => $serialSoftware->billing_days,
+                'whatsapp_number' => $serialSoftware->whatsapp_number ?? '',
+                'payment_instructions' => $serialSoftware->payment_instructions ?? '',
+                'total_devices' => $serialSoftware->total_devices ?? 0,
+                'active_count' => $serialSoftware->active_count ?? 0,
+                'inactive_count' => $serialSoftware->inactive_count ?? 0,
+                'blocked_count' => $serialSoftware->blocked_count ?? 0,
+                'created_at' => $serialSoftware->created_at?->diffForHumans(),
+                'custom_keys' => $serialSoftware->customKeys,
+                'packages' => $serialSoftware->packages,
+            ],
+            'commonCurrencies' => $commonCurrencies,
+        ]);
+    }
+
+    /**
+     * Save full software settings.
+     */
+    public function updateSettings(Request $request, SerialSoftware $serialSoftware): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'is_active' => ['required', 'boolean'],
+            'default_status' => ['required', 'in:active,inactive'],
+            'pricing_type' => ['required', 'in:free,single,packages'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'max:10'],
+            'billing_cycle' => ['nullable', 'in:lifetime,monthly,annual,custom'],
+            'billing_days' => ['nullable', 'integer', 'min:1'],
+            'whatsapp_number' => ['nullable', 'string', 'max:50'],
+            'payment_instructions' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);
+
+        return back()->with('success', 'Software settings saved successfully.');
+    }
+
+    /**
+     * Create a new package for this software.
+     */
+    public function storePackage(Request $request, SerialSoftware $serialSoftware): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'max:10'],
+            'billing_cycle' => ['required', 'in:lifetime,monthly,annual,custom'],
+            'billing_days' => ['nullable', 'integer', 'min:1'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'is_active' => ['boolean'],
+            'is_default' => ['boolean'],
+            'sort_order' => ['integer'],
+            'custom_values' => ['nullable', 'array'],
+        ]);
+
+        $this->serialSoftwareService->createPackage($serialSoftware, $validated);
+
+        return back()->with('success', 'Package created successfully.');
+    }
+
+    /**
+     * Update an existing package.
+     */
+    public function updatePackage(Request $request, SerialSoftware $serialSoftware, \App\Models\SerialSoftwarePackage $package): RedirectResponse
+    {
+        if ($package->serial_software_id !== $serialSoftware->id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'max:10'],
+            'billing_cycle' => ['required', 'in:lifetime,monthly,annual,custom'],
+            'billing_days' => ['nullable', 'integer', 'min:1'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'is_active' => ['boolean'],
+            'is_default' => ['boolean'],
+            'sort_order' => ['integer'],
+            'custom_values' => ['nullable', 'array'],
+        ]);
+
+        $this->serialSoftwareService->updatePackage($package, $validated);
+
+        return back()->with('success', 'Package updated successfully.');
+    }
+
+    /**
+     * Delete a package.
+     */
+    public function destroyPackage(SerialSoftware $serialSoftware, \App\Models\SerialSoftwarePackage $package): RedirectResponse
+    {
+        if ($package->serial_software_id !== $serialSoftware->id) {
+            abort(404);
+        }
+
+        $this->serialSoftwareService->deletePackage($package);
+
+        return back()->with('success', 'Package deleted successfully.');
     }
 }

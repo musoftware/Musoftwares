@@ -19,6 +19,7 @@ class SerialUserDevice extends Model
 
     protected $fillable = [
         'user_id',
+        'package_id',
         'reseller_id',
         'device_id',
         'status',
@@ -55,6 +56,14 @@ class SerialUserDevice extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the assigned package.
+     */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(SerialSoftwarePackage::class, 'package_id');
     }
 
     /**

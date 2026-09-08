@@ -894,6 +894,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/serial-softwares/{serialSoftware}/keys', [SerialSoftwareController::class, 'storeKey'])->name('serial-softwares.keys.store');
     Route::delete('/serial-softwares/{serialSoftware}/keys/{serialSoftwareKey}', [SerialSoftwareController::class, 'destroyKey'])->name('serial-softwares.keys.destroy');
     Route::patch('/serial-softwares/{serialSoftware}/payment', [SerialSoftwareController::class, 'updatePaymentSettings'])->name('serial-softwares.payment');
+    Route::get('/serial-softwares/{serialSoftware}/settings', [SerialSoftwareController::class, 'settings'])->name('serial-softwares.settings');
+    Route::put('/serial-softwares/{serialSoftware}/settings', [SerialSoftwareController::class, 'updateSettings'])->name('serial-softwares.settings.update');
+    Route::post('/serial-softwares/{serialSoftware}/packages', [SerialSoftwareController::class, 'storePackage'])->name('serial-softwares.packages.store');
+    Route::put('/serial-softwares/{serialSoftware}/packages/{package}', [SerialSoftwareController::class, 'updatePackage'])->name('serial-softwares.packages.update');
+    Route::delete('/serial-softwares/{serialSoftware}/packages/{package}', [SerialSoftwareController::class, 'destroyPackage'])->name('serial-softwares.packages.destroy');
 
     // Software & Tools Store Management (Admin catalog)
     Route::get('/store-tools', [StoreToolController::class, 'index'])->name('store-tools.index');

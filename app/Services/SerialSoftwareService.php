@@ -16,8 +16,13 @@ class SerialSoftwareService extends BaseService
         return SerialSoftware::create($data);
     }
 
-    public function updatePaymentSettings(SerialSoftware $serialSoftware, array $data): void
+    public function updateFullSettings(SerialSoftware $serialSoftware, array $data): SerialSoftware
     {
+        // Sync requires_payment flag with pricing_type
+        if (isset($data['pricing_type'])) {
+            $data['requires_payment'] = ($data['pricing_type'] !== SerialSoftware::PRICING_FREE);
+        }
+
         $serialSoftware->update($data);
 
         if (! empty($data['requires_payment'])) {
@@ -32,7 +37,7 @@ class SerialSoftwareService extends BaseService
                 ->pluck('device_id')
                 ->toArray();
 
-            // Deactivate all devices for this software that don't have an active license
+            // Deactivate devices for this software that don't have an active license
             \App\Models\SerialDevice::where('serial_software_id', $serialSoftware->id)
                 ->whereNotIn('device_id', $licensedDeviceIds)
                 ->update(['status' => \App\Models\SerialDevice::STATUS_INACTIVE]);
@@ -46,6 +51,33 @@ class SerialSoftwareService extends BaseService
                 })
                 ->update(['status' => \App\Models\SerialUserDevice::STATUS_INACTIVE]);
         }
+
+        return $serialSoftware;
+    }
+
+    public function createPackage(SerialSoftware $serialSoftware, array $data): \App\Models\SerialSoftwarePackage
+    {
+        if (! empty($data['is_default'])) {
+            $serialSoftware->packages()->update(['is_default' => false]);
+        }
+
+        return $serialSoftware->packages()->create($data);
+    }
+
+    public function updatePackage(\App\Models\SerialSoftwarePackage $package, array $data): \App\Models\SerialSoftwarePackage
+    {
+        if (! empty($data['is_default'])) {
+            $package->software->packages()->where('id', '!=', $package->id)->update(['is_default' => false]);
+        }
+
+        $package->update($data);
+
+        return $package;
+    }
+
+    public function deletePackage(\App\Models\SerialSoftwarePackage $package): void
+    {
+        $package->delete();
     }
 
     public function deleteSoftware(SerialSoftware $serialSoftware): void

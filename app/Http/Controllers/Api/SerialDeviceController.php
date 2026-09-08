@@ -54,6 +54,29 @@ class SerialDeviceController extends Controller
             ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
         );
 
+        // Master Kill Switch: If software is not active as a whole, deny access to all devices
+        if (! ($software->is_active ?? true)) {
+            return response()->json([
+                'status'               => SerialDevice::STATUS_INACTIVE,
+                'is_active'            => false,
+                'software_disabled'    => true,
+                'has_linked_user'      => false,
+                'has_active_license'   => false,
+                'is_expired'           => false,
+                'expires_at'           => null,
+                'custom_keys'          => [],
+                'pricing_type'         => $software->pricing_type ?? 'free',
+                'billing_cycle'        => $software->billing_cycle ?? 'lifetime',
+                'packages'             => [],
+                'requires_payment'     => (bool) $software->requires_payment,
+                'price'                => $software->price !== null ? (float) $software->price : null,
+                'currency'             => $software->currency ?? 'USD',
+                'whatsapp_number'      => $software->whatsapp_number,
+                'payment_instructions' => $software->payment_instructions,
+                'message'              => 'This software is currently disabled by administrator.',
+            ]);
+        }
+
         // Inherit paid settings from alias if this is a newly created software (e.g. Trenz Extract vs WAContactsExtract)
         if (! $softwareExisted && in_array($validated['program_name'], ['Trenz Extract', 'WAContactsExtract'])) {
             $existingPaid = SerialSoftware::whereIn('name', ['WAContactsExtract', 'Trenz Extract'])
@@ -80,15 +103,7 @@ class SerialDeviceController extends Controller
             ? SerialDevice::STATUS_INACTIVE
             : $software->default_status;
 
-        $device = SerialDevice::firstOrCreate(
-            [
-                'serial_software_id' => $software->id,
-                'device_id' => $validated['device_id'],
-            ],
-            [
-                'status' => $initialStatus,
-            ]
-        );
+        $device = $this->findOrCreateDevice($software, $validated['device_id'], $initialStatus);
 
         // Auto-register device in SerialUserDevice so it immediately appears in Devices management
         $userDevice = \App\Models\SerialUserDevice::withTrashed()->where('device_id', $validated['device_id'])->first();
@@ -113,6 +128,8 @@ class SerialDeviceController extends Controller
             if ($resellerAllocation) {
                 $userDevice->update(['reseller_id' => $resellerAllocation->user_id]);
             }
+        } elseif ($userDevice->trashed()) {
+            $userDevice->restore();
         }
 
         // Build update payload — always refresh last_check_date.
@@ -195,9 +212,30 @@ class SerialDeviceController extends Controller
             }
         }
 
+        $packages = [];
+        if ($software->hasPackages()) {
+            $packages = $software->packages()->active()->get()->map(fn ($pkg) => [
+                'id'            => $pkg->id,
+                'name'          => $pkg->name,
+                'price'         => (float) $pkg->price,
+                'currency'      => $pkg->currency,
+                'billing_cycle' => $pkg->billing_cycle,
+                'billing_days'  => $pkg->billing_days,
+                'description'   => $pkg->description,
+                'is_default'    => (bool) $pkg->is_default,
+                'custom_values' => $pkg->custom_values ?? [],
+            ])->values()->all();
+        }
+
         // Return the device status — client software acts on this.
         return response()->json([
             'status'               => $status,
+            'is_active'            => (bool) ($software->is_active ?? true),
+            'pricing_type'         => $software->pricing_type ?? ($software->requires_payment ? 'single' : 'free'),
+            'billing_cycle'        => $software->billing_cycle ?? 'lifetime',
+            'billing_days'         => $software->billing_days,
+            'packages'             => $packages,
+            'package_id'           => $device->package_id ?? $userDevice?->package_id,
             'has_linked_user'      => $hasLinkedUser,
             'has_active_license'   => $hasActiveLicense,
             'is_expired'           => $isExpired,
@@ -241,17 +279,18 @@ class SerialDeviceController extends Controller
             ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
         );
 
+        if (! ($software->is_active ?? true)) {
+            return response()->json([
+                'status'            => SerialDevice::STATUS_INACTIVE,
+                'is_active'         => false,
+                'software_disabled' => true,
+                'message'           => 'This software is currently disabled by administrator.',
+            ]);
+        }
+
         $initialStatus = $software->requires_payment ? SerialDevice::STATUS_INACTIVE : SerialDevice::STATUS_ACTIVE;
 
-        $device = SerialDevice::firstOrCreate(
-            [
-                'serial_software_id' => $software->id,
-                'device_id'          => $validated['device_id'],
-            ],
-            [
-                'status' => $initialStatus,
-            ]
-        );
+        $device = $this->findOrCreateDevice($software, $validated['device_id'], $initialStatus);
 
         // Check if user owns an active license for this software
         $userLicense = \App\Models\SerialSoftwareLicense::where('user_id', $user->id)
@@ -307,8 +346,28 @@ class SerialDeviceController extends Controller
             ? 'Device linked and activated successfully.'
             : 'Account linked. Please complete payment to activate your license.';
 
+        $packages = [];
+        if ($software->hasPackages()) {
+            $packages = $software->packages()->active()->get()->map(fn ($pkg) => [
+                'id'            => $pkg->id,
+                'name'          => $pkg->name,
+                'price'         => (float) $pkg->price,
+                'currency'      => $pkg->currency,
+                'billing_cycle' => $pkg->billing_cycle,
+                'billing_days'  => $pkg->billing_days,
+                'description'   => $pkg->description,
+                'is_default'    => (bool) $pkg->is_default,
+                'custom_values' => $pkg->custom_values ?? [],
+            ])->values()->all();
+        }
+
         return response()->json([
             'status'               => $targetStatus,
+            'is_active'            => (bool) ($software->is_active ?? true),
+            'pricing_type'         => $software->pricing_type ?? ($software->requires_payment ? 'single' : 'free'),
+            'billing_cycle'        => $software->billing_cycle ?? 'lifetime',
+            'billing_days'         => $software->billing_days,
+            'packages'             => $packages,
             'user_exists'          => true,
             'user_name'            => $user->name,
             'requires_payment'     => (bool) $software->requires_payment,
@@ -378,17 +437,18 @@ class SerialDeviceController extends Controller
             ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
         );
 
+        if (! ($software->is_active ?? true)) {
+            return response()->json([
+                'status'            => SerialDevice::STATUS_INACTIVE,
+                'is_active'         => false,
+                'software_disabled' => true,
+                'message'           => 'This software is currently disabled by administrator.',
+            ]);
+        }
+
         $initialStatus = $software->requires_payment ? SerialDevice::STATUS_INACTIVE : SerialDevice::STATUS_ACTIVE;
 
-        $device = SerialDevice::firstOrCreate(
-            [
-                'serial_software_id' => $software->id,
-                'device_id'          => $validated['device_id'],
-            ],
-            [
-                'status' => $initialStatus,
-            ]
-        );
+        $device = $this->findOrCreateDevice($software, $validated['device_id'], $initialStatus);
 
         // Check if user owns an active license for this software
         $userLicense = \App\Models\SerialSoftwareLicense::where('user_id', $user->id)
@@ -444,8 +504,28 @@ class SerialDeviceController extends Controller
             ? 'User registered and device activated successfully.'
             : 'User registered. Please complete payment to activate your license.';
 
+        $packages = [];
+        if ($software->hasPackages()) {
+            $packages = $software->packages()->active()->get()->map(fn ($pkg) => [
+                'id'            => $pkg->id,
+                'name'          => $pkg->name,
+                'price'         => (float) $pkg->price,
+                'currency'      => $pkg->currency,
+                'billing_cycle' => $pkg->billing_cycle,
+                'billing_days'  => $pkg->billing_days,
+                'description'   => $pkg->description,
+                'is_default'    => (bool) $pkg->is_default,
+                'custom_values' => $pkg->custom_values ?? [],
+            ])->values()->all();
+        }
+
         return response()->json([
             'status'               => $targetStatus,
+            'is_active'            => (bool) ($software->is_active ?? true),
+            'pricing_type'         => $software->pricing_type ?? ($software->requires_payment ? 'single' : 'free'),
+            'billing_cycle'        => $software->billing_cycle ?? 'lifetime',
+            'billing_days'         => $software->billing_days,
+            'packages'             => $packages,
             'user_exists'          => true,
             'user_name'            => $user->name,
             'requires_payment'     => (bool) $software->requires_payment,
@@ -455,5 +535,31 @@ class SerialDeviceController extends Controller
             'payment_instructions' => $software->payment_instructions,
             'message'              => $message,
         ]);
+    }
+
+    /**
+     * Find or create device while properly handling soft-deleted rows.
+     */
+    private function findOrCreateDevice(SerialSoftware $software, string $deviceId, string $initialStatus): SerialDevice
+    {
+        $device = SerialDevice::withTrashed()
+            ->where('serial_software_id', $software->id)
+            ->where('device_id', $deviceId)
+            ->first();
+
+        if (! $device) {
+            return SerialDevice::create([
+                'serial_software_id' => $software->id,
+                'device_id'          => $deviceId,
+                'status'             => $initialStatus,
+            ]);
+        }
+
+        if ($device->trashed()) {
+            $device->restore();
+            $device->update(['status' => $initialStatus]);
+        }
+
+        return $device;
     }
 }

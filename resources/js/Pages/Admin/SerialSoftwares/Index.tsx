@@ -33,8 +33,12 @@ import {
   Key,
   CreditCard,
   MessageSquare,
-  DollarSign } from
-'lucide-react';
+  DollarSign,
+  Sliders,
+  Settings as SettingsIcon,
+  ShieldAlert,
+  Package as PackageIcon,
+} from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/Components/ui/dialog';
 import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
@@ -51,10 +55,15 @@ interface SoftwareKey {
 interface Software {
   id: number;
   name: string;
+  is_active: boolean;
   default_status: string;
+  pricing_type?: 'free' | 'single' | 'packages';
   requires_payment?: boolean;
   price?: number | null;
   currency?: string | null;
+  billing_cycle?: string;
+  billing_days?: number | null;
+  packages_count?: number;
   whatsapp_number?: string | null;
   payment_instructions?: string | null;
   total_devices: number;
@@ -493,7 +502,15 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                     <div className="w-8 h-8 rounded-lg border flex items-center justify-center bg-muted shrink-0">
                                                         <Layers className="w-4 h-4 text-muted-foreground" />
                                                     </div>
-                                                    <span className="font-medium">{sw.name}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium">{sw.name}</span>
+                                                        {sw.is_active === false && (
+                                                            <span className="text-[10px] text-red-600 dark:text-red-400 font-semibold flex items-center gap-0.5">
+                                                                <ShieldAlert className="w-3 h-3" />
+                                                                {__('general.disabled_as_whole', {}, 'Disabled as whole')}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </Link>
                                             </TableCell>
 
@@ -533,16 +550,19 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                 </Button>
                                             </TableCell>
 
-                                            {/* Pricing / Payment */}
+                                            {/* Pricing / Payment (Links to full Settings page) */}
                                             <TableCell className="text-center">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => openPaymentModal(sw)}
-                                                    className="h-7 px-2 text-xs font-normal hover:bg-muted"
-                                                    title={sw.whatsapp_number ? `WhatsApp: ${sw.whatsapp_number}` : __('general.edit_payment_settings', {}, 'Payment Settings')}
+                                                <Link
+                                                    href={route('admin.serial-softwares.settings', sw.id)}
+                                                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs hover:bg-muted transition-colors"
+                                                    title={__('general.edit_settings', {}, 'Configure full software settings')}
                                                 >
-                                                    {sw.requires_payment ? (
+                                                    {sw.pricing_type === 'packages' ? (
+                                                        <span className="inline-flex items-center gap-1 text-primary font-medium">
+                                                            <PackageIcon className="w-3.5 h-3.5" />
+                                                            <span>{sw.packages_count ? `${sw.packages_count} Plans` : __('general.packages', {}, 'Packages')}</span>
+                                                        </span>
+                                                    ) : sw.requires_payment ? (
                                                         <span className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
                                                             <CreditCard className="w-3.5 h-3.5" />
                                                             <span>{sw.price ? `${sw.price} ${sw.currency || ''}`.trim() : __('general.paid', {}, 'Paid')}</span>
@@ -552,7 +572,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                             <span>{__('general.free_instant', {}, 'Free / Direct')}</span>
                                                         </span>
                                                     )}
-                                                </Button>
+                                                </Link>
                                             </TableCell>
 
                                             {/* Default Status (inline select) */}
@@ -584,6 +604,12 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" side="bottom">
+                                                        <DropdownMenuItem
+                                                            onClick={() => router.visit(route('admin.serial-softwares.settings', sw.id))}>
+                                                            <Sliders className="w-4 h-4 me-2 text-primary" />
+                                                            {__('general.settings_and_pricing', {}, 'Settings & Pricing')}
+                                                        </DropdownMenuItem>
+
                                                         <DropdownMenuItem
                             onClick={() => router.visit(route('admin.serial-devices.index', { software_id: sw.id }))}>
                             
