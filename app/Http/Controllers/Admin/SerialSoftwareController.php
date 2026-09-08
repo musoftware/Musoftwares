@@ -239,6 +239,7 @@ class SerialSoftwareController extends Controller
                 'pricing_type' => $serialSoftware->pricing_type ?? ($serialSoftware->requires_payment ? 'single' : 'free'),
                 'requires_payment' => (bool) $serialSoftware->requires_payment,
                 'price' => $serialSoftware->price !== null ? (float) $serialSoftware->price : null,
+                'reseller_price' => $serialSoftware->reseller_price !== null ? (float) $serialSoftware->reseller_price : null,
                 'currency' => $serialSoftware->currency ?? 'USD',
                 'billing_cycle' => $serialSoftware->billing_cycle ?? 'lifetime',
                 'billing_days' => $serialSoftware->billing_days,
@@ -267,6 +268,7 @@ class SerialSoftwareController extends Controller
             'default_status' => ['required', 'in:active,inactive'],
             'pricing_type' => ['required', 'in:free,single,packages'],
             'price' => ['nullable', 'numeric', 'min:0'],
+            'reseller_price' => ['nullable', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'max:10'],
             'billing_cycle' => ['nullable', 'in:lifetime,monthly,annual,custom'],
             'billing_days' => ['nullable', 'integer', 'min:1'],
@@ -287,6 +289,7 @@ class SerialSoftwareController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'reseller_price' => ['nullable', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'max:10'],
             'billing_cycle' => ['required', 'in:lifetime,monthly,annual,custom'],
             'billing_days' => ['nullable', 'integer', 'min:1'],
@@ -314,6 +317,7 @@ class SerialSoftwareController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'reseller_price' => ['nullable', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'max:10'],
             'billing_cycle' => ['required', 'in:lifetime,monthly,annual,custom'],
             'billing_days' => ['nullable', 'integer', 'min:1'],

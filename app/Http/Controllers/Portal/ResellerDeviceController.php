@@ -59,6 +59,8 @@ class ResellerDeviceController extends Controller
             'availableDevices' => $availableDevices,
             'filters' => $filters,
             'canViewAllDevices' => $user->canViewAllDevices(),
+            'walletBalance' => (float) $user->available_balance(),
+            'walletCurrency' => $user->currency?->currency ?? 'USD',
         ]);
     }
 
@@ -112,6 +114,7 @@ class ResellerDeviceController extends Controller
         $this->resellerDeviceService->renewDevice(
             $serialUserDevice,
             $request->validated('duration_preset'),
+            $request->validated('package_id'),
             $request->validated('custom_expires_at')
         );
 
@@ -144,10 +147,13 @@ class ResellerDeviceController extends Controller
         $serialUserDevice->load([
             'user',
             'reseller',
-            'devices.software',
+            'package',
+            'devices.software.packages' => fn ($q) => $q->active(),
         ]);
 
         $firstDevice = $serialUserDevice->devices->first();
+        $software = $firstDevice?->software ?? $serialUserDevice->package?->software;
+        $user = $request->user();
 
         $expiryInfo = [
             'expires_at' => $serialUserDevice->expires_at?->toDateString(),
@@ -159,12 +165,22 @@ class ResellerDeviceController extends Controller
         ];
 
         return Inertia::render('Portal/Devices/Show', [
+            'walletBalance' => (float) $user->available_balance(),
+            'walletCurrency' => $user->currency?->currency ?? 'USD',
             'device' => [
                 'id' => $serialUserDevice->id,
                 'device_id' => $serialUserDevice->device_id,
                 'status' => $serialUserDevice->status,
                 'expires_at' => $serialUserDevice->expires_at?->toIso8601String(),
                 'notes' => $serialUserDevice->notes,
+                'package' => $serialUserDevice->package ? [
+                    'id' => $serialUserDevice->package->id,
+                    'name' => $serialUserDevice->package->name,
+                    'price' => (float) $serialUserDevice->package->price,
+                    'reseller_price' => $serialUserDevice->package->reseller_price !== null ? (float) $serialUserDevice->package->reseller_price : (float) $serialUserDevice->package->price,
+                    'currency' => $serialUserDevice->package->currency,
+                    'billing_cycle' => $serialUserDevice->package->billing_cycle,
+                ] : null,
                 'created_at' => $serialUserDevice->created_at?->toDateString(),
                 'updated_at' => $serialUserDevice->updated_at?->toDateTimeString(),
                 'user' => $serialUserDevice->user ? [
@@ -195,6 +211,18 @@ class ResellerDeviceController extends Controller
                     'software' => $firstDevice->software ? [
                         'id' => $firstDevice->software->id,
                         'name' => $firstDevice->software->name,
+                        'pricing_type' => $firstDevice->software->pricing_type,
+                        'price' => $firstDevice->software->price !== null ? (float) $firstDevice->software->price : null,
+                        'reseller_price' => $firstDevice->software->reseller_price !== null ? (float) $firstDevice->software->reseller_price : null,
+                        'currency' => $firstDevice->software->currency,
+                        'packages' => $firstDevice->software->packages->map(fn ($p) => [
+                            'id' => $p->id,
+                            'name' => $p->name,
+                            'price' => (float) $p->price,
+                            'reseller_price' => $p->reseller_price !== null ? (float) $p->reseller_price : (float) $p->price,
+                            'currency' => $p->currency,
+                            'billing_cycle' => $p->billing_cycle,
+                        ]),
                     ] : null,
                 ] : null,
             ],

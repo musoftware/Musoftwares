@@ -160,7 +160,7 @@ export default function SerialDeviceShow({
         }
     };
 
-    const handleAssignClient = (userId: string) => {
+    const handleAssignClient = (userId: string | number | null) => {
         router.post(route('admin.serial-devices.assign-user', device.id), {
             user_id: userId ? Number(userId) : null,
         }, {

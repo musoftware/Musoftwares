@@ -23,6 +23,7 @@ class SerialSoftwarePackage extends Model
         'serial_software_id',
         'name',
         'price',
+        'reseller_price',
         'currency',
         'billing_cycle',
         'billing_days',
@@ -35,6 +36,7 @@ class SerialSoftwarePackage extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'reseller_price' => 'decimal:2',
         'billing_days' => 'integer',
         'is_active' => 'boolean',
         'is_default' => 'boolean',

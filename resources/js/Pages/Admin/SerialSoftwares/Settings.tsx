@@ -46,6 +46,7 @@ interface SoftwarePackage {
   serial_software_id: number;
   name: string;
   price: number;
+  reseller_price: number | null;
   currency: string;
   billing_cycle: 'lifetime' | 'monthly' | 'annual' | 'custom';
   billing_days: number | null;
@@ -65,6 +66,7 @@ interface Software {
   pricing_type: 'free' | 'single' | 'packages';
   requires_payment: boolean;
   price: number | null;
+  reseller_price: number | null;
   currency: string;
   billing_cycle: 'lifetime' | 'monthly' | 'annual' | 'custom';
   billing_days: number | null;
@@ -92,6 +94,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     default_status: software.default_status || 'active',
     pricing_type: software.pricing_type || (software.requires_payment ? 'single' : 'free'),
     price: software.price !== null ? String(software.price) : '',
+    reseller_price: software.reseller_price !== null ? String(software.reseller_price) : '',
     currency: software.currency || 'USD',
     billing_cycle: software.billing_cycle || 'lifetime',
     billing_days: software.billing_days !== null ? String(software.billing_days) : '',
@@ -111,6 +114,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
   const [packageForm, setPackageForm] = useState({
     name: '',
     price: '',
+    reseller_price: '',
     currency: software.currency || 'USD',
     billing_cycle: 'monthly' as 'lifetime' | 'monthly' | 'annual' | 'custom',
     billing_days: '',
@@ -135,6 +139,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
         default_status: form.default_status,
         pricing_type: form.pricing_type,
         price: form.pricing_type === 'single' && form.price !== '' ? parseFloat(form.price) : null,
+        reseller_price: form.pricing_type === 'single' && form.reseller_price !== '' ? parseFloat(form.reseller_price) : null,
         currency: form.currency,
         billing_cycle: form.pricing_type === 'single' ? form.billing_cycle : null,
         billing_days: form.pricing_type === 'single' && form.billing_cycle === 'custom' && form.billing_days !== '' ? parseInt(form.billing_days) : null,
@@ -187,6 +192,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     setPackageForm({
       name: '',
       price: '',
+      reseller_price: '',
       currency: form.currency || 'USD',
       billing_cycle: 'monthly',
       billing_days: '',
@@ -211,6 +217,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     setPackageForm({
       name: pkg.name,
       price: String(pkg.price),
+      reseller_price: pkg.reseller_price !== null ? String(pkg.reseller_price) : '',
       currency: pkg.currency || form.currency || 'USD',
       billing_cycle: pkg.billing_cycle,
       billing_days: pkg.billing_days !== null ? String(pkg.billing_days) : '',
@@ -231,6 +238,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     const payload = {
       name: packageForm.name,
       price: parseFloat(packageForm.price),
+      reseller_price: packageForm.reseller_price !== '' ? parseFloat(packageForm.reseller_price) : null,
       currency: packageForm.currency,
       billing_cycle: packageForm.billing_cycle,
       billing_days: packageForm.billing_cycle === 'custom' && packageForm.billing_days !== '' ? parseInt(packageForm.billing_days) : null,
@@ -527,10 +535,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                     </Badge>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="space-y-1.5">
                       <Label htmlFor="single-price" className="text-xs font-semibold">
-                        {__('general.price', {}, 'Price')}
+                        {__('general.customer_price', {}, 'Customer Price (Retail)')}
                       </Label>
                       <Input
                         id="single-price"
@@ -541,6 +549,21 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                         value={form.price}
                         onChange={(e) => setForm({ ...form, price: e.target.value })}
                         required={form.pricing_type === 'single'}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="single-reseller-price" className="text-xs font-semibold">
+                        {__('general.reseller_price', {}, 'Reseller Price (Cost)')}
+                      </Label>
+                      <Input
+                        id="single-reseller-price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="e.g. 29.99"
+                        value={form.reseller_price}
+                        onChange={(e) => setForm({ ...form, reseller_price: e.target.value })}
                       />
                     </div>
 
@@ -640,7 +663,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                         <TableHeader>
                           <TableRow className="bg-muted/40">
                             <TableHead>{__('general.package_name', {}, 'Package')}</TableHead>
-                            <TableHead>{__('general.price', {}, 'Price')}</TableHead>
+                            <TableHead>{__('general.customer_price', {}, 'Customer Price')}</TableHead>
+                            <TableHead>{__('general.reseller_price', {}, 'Reseller Price')}</TableHead>
                             <TableHead>{__('general.cycle', {}, 'Cycle')}</TableHead>
                             <TableHead>{__('general.key_overrides', {}, 'Key Values')}</TableHead>
                             <TableHead>{__('general.status', {}, 'Status')}</TableHead>
@@ -665,8 +689,11 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                                   )}
                                 </div>
                               </TableCell>
-                              <TableCell className="font-semibold">
+                              <TableCell className="font-medium">
                                 {pkg.price} {pkg.currency}
+                              </TableCell>
+                              <TableCell className="font-semibold text-primary">
+                                {pkg.reseller_price !== null ? `${pkg.reseller_price} ${pkg.currency}` : `${pkg.price} ${pkg.currency}`}
                               </TableCell>
                               <TableCell>
                                 <Badge variant="outline" className="text-xs capitalize font-normal">
@@ -951,8 +978,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
           </DialogHeader>
 
           <form onSubmit={handleSavePackage} className="space-y-4 pt-2">
-            {/* Name, Price, Currency */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Name, Customer Price, Reseller Price, Currency */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="pkg-name" className="text-xs font-semibold">{__('general.package_name', {}, 'Package Name')}</Label>
                 <Input
@@ -965,7 +992,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="pkg-price" className="text-xs font-semibold">{__('general.price', {}, 'Price')}</Label>
+                <Label htmlFor="pkg-price" className="text-xs font-semibold">{__('general.customer_price', {}, 'Customer Price')}</Label>
                 <Input
                   id="pkg-price"
                   type="number"
@@ -975,6 +1002,19 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                   value={packageForm.price}
                   onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
                   required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="pkg-reseller-price" className="text-xs font-semibold">{__('general.reseller_price', {}, 'Reseller Price')}</Label>
+                <Input
+                  id="pkg-reseller-price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="19.99"
+                  value={packageForm.reseller_price}
+                  onChange={(e) => setPackageForm({ ...packageForm, reseller_price: e.target.value })}
                 />
               </div>
 

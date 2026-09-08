@@ -20,7 +20,8 @@ class AssignDeviceRequest extends FormRequest
             'customer_name' => ['required_without:customer_user_id', 'nullable', 'string', 'max:255'],
             'customer_email' => ['required_without:customer_user_id', 'nullable', 'email', 'max:255'],
             'customer_phone' => ['nullable', 'string', 'max:50'],
-            'duration_preset' => ['required', 'string', 'in:1_month,3_months,6_months,1_year,lifetime,custom'],
+            'duration_preset' => ['required', 'string', 'in:1_day_trial,1_month,3_months,6_months,1_year,lifetime,package,custom'],
+            'package_id' => ['nullable', 'integer', 'exists:serial_software_packages,id'],
             'custom_expires_at' => ['required_if:duration_preset,custom', 'nullable', 'date'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];

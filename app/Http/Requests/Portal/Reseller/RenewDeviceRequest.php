@@ -14,7 +14,8 @@ class RenewDeviceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'duration_preset' => ['required', 'string', 'in:1_month,3_months,6_months,1_year,lifetime,custom'],
+            'duration_preset' => ['required', 'string', 'in:1_month,3_months,6_months,1_year,lifetime,package,custom'],
+            'package_id' => ['nullable', 'integer', 'exists:serial_software_packages,id'],
             'custom_expires_at' => ['required_if:duration_preset,custom', 'nullable', 'date'],
         ];
     }

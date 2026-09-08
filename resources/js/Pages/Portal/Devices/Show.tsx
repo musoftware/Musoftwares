@@ -9,6 +9,7 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Separator } from '@/Components/ui/separator';
 import {
+    AlertTriangle,
     ArrowLeft,
     Calendar,
     Check,
@@ -49,10 +50,22 @@ interface TelemetryInfo {
     current_culture: string | null;
     last_check_date: string | null;
     last_check_date_full: string | null;
-    software?: {
-        id: number;
-        name: string;
-    } | null;
+        software?: {
+            id: number;
+            name: string;
+            pricing_type?: string;
+            price?: number | null;
+            reseller_price?: number | null;
+            currency?: string;
+            packages?: Array<{
+                id: number;
+                name: string;
+                price: number;
+                reseller_price: number;
+                currency: string;
+                billing_cycle: string;
+            }>;
+        } | null;
 }
 
 interface DeviceAssignmentDetail {
@@ -61,6 +74,14 @@ interface DeviceAssignmentDetail {
     status: 'active' | 'inactive';
     expires_at: string | null;
     notes: string | null;
+    package?: {
+        id: number;
+        name: string;
+        price: number;
+        reseller_price: number;
+        currency: string;
+        billing_cycle: string;
+    } | null;
     created_at: string;
     updated_at: string;
     user: UserInfo | null;
@@ -84,9 +105,16 @@ interface ExpiryInfo {
 interface Props {
     device: DeviceAssignmentDetail;
     expiryInfo: ExpiryInfo;
+    walletBalance?: number;
+    walletCurrency?: string;
 }
 
-export default function ResellerDeviceShow({ device, expiryInfo }: Props) {
+export default function ResellerDeviceShow({
+    device,
+    expiryInfo,
+    walletBalance = 0,
+    walletCurrency = 'USD',
+}: Props) {
     const [copiedDeviceId, setCopiedDeviceId] = useState(false);
     const [copiedDirectory, setCopiedDirectory] = useState(false);
 
@@ -101,6 +129,29 @@ export default function ResellerDeviceShow({ device, expiryInfo }: Props) {
         notes: device.notes ?? '',
     });
 
+    const software = device.telemetry?.software;
+
+    const getCostInfo = () => {
+        if (!software) return { cost: 0, customerPrice: 0, currency: 'USD' };
+
+        const baseReseller = software.reseller_price !== null && software.reseller_price !== undefined
+            ? software.reseller_price
+            : (software.price || 0);
+        const baseCustomer = software.price || 0;
+
+        const mult = renewForm.data.duration_preset === '3_months' ? 3
+            : renewForm.data.duration_preset === '6_months' ? 6
+            : renewForm.data.duration_preset === '1_year' ? 12 : 1;
+
+        return {
+            cost: baseReseller * mult,
+            customerPrice: baseCustomer * mult,
+            currency: software.currency || 'USD',
+        };
+    };
+
+    const costInfo = getCostInfo();
+
     const copyToClipboard = (text: string, type: 'device' | 'dir') => {
         navigator.clipboard.writeText(text);
         if (type === 'device') {
@@ -113,7 +164,8 @@ export default function ResellerDeviceShow({ device, expiryInfo }: Props) {
     };
 
     const handleQuickRenew = () => {
-        if (confirm(`Extend license by 1 Month for customer ${device.user?.name || device.device_id}?`)) {
+        const costStr = costInfo.cost > 0 ? ` for ${costInfo.cost.toFixed(2)} ${costInfo.currency}` : '';
+        if (confirm(`Extend license by 1 Month for customer ${device.user?.name || device.device_id}${costStr}?`)) {
             router.post(`/portal/devices/${device.id}/renew`, {
                 duration_preset: '1_month',
             }, {
@@ -343,9 +395,37 @@ export default function ResellerDeviceShow({ device, expiryInfo }: Props) {
                                         </div>
                                     )}
 
+                                    {/* Cost & Wallet Balance Summary */}
+                                    <div className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 space-y-2">
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="text-zinc-500">Your Wallet Balance:</span>
+                                            <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+                                                {walletBalance.toFixed(2)} {walletCurrency}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="text-zinc-500">Renewal Cost:</span>
+                                            <span className="font-bold font-mono text-[#0071e3]">
+                                                {costInfo.cost.toFixed(2)} {costInfo.currency}
+                                            </span>
+                                        </div>
+                                        {costInfo.customerPrice > 0 && (
+                                            <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                                                <span>Suggested Retail:</span>
+                                                <span>{costInfo.customerPrice.toFixed(2)} {costInfo.currency}</span>
+                                            </div>
+                                        )}
+                                        {costInfo.cost > 0 && walletBalance < costInfo.cost && (
+                                            <div className="text-xs text-red-600 dark:text-red-400 font-medium flex items-center gap-1.5 pt-1 border-t border-red-200 dark:border-red-900/50">
+                                                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                                                <span>Insufficient wallet balance. Please top up before renewing.</span>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <Button
                                         type="submit"
-                                        disabled={renewForm.processing}
+                                        disabled={renewForm.processing || (costInfo.cost > 0 && walletBalance < costInfo.cost)}
                                         className="w-full sm:w-auto bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs px-6"
                                     >
                                         {renewForm.processing ? 'Processing Renewal...' : 'Apply License Renewal'}

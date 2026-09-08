@@ -38,6 +38,7 @@ class SerialSoftware extends Model
         'pricing_type',
         'requires_payment',
         'price',
+        'reseller_price',
         'currency',
         'billing_cycle',
         'billing_days',
@@ -49,6 +50,7 @@ class SerialSoftware extends Model
         'is_active' => 'boolean',
         'requires_payment' => 'boolean',
         'price' => 'decimal:2',
+        'reseller_price' => 'decimal:2',
         'billing_days' => 'integer',
     ];
 
@@ -124,5 +126,13 @@ class SerialSoftware extends Model
     public function storeTools(): HasMany
     {
         return $this->hasMany(StoreTool::class, 'serial_software_id');
+    }
+
+    /**
+     * @return HasMany<SerialDeviceTrialLog>
+     */
+    public function trialLogs(): HasMany
+    {
+        return $this->hasMany(SerialDeviceTrialLog::class, 'serial_software_id');
     }
 }
