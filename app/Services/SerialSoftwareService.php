@@ -16,6 +16,11 @@ class SerialSoftwareService extends BaseService
         return SerialSoftware::create($data);
     }
 
+    public function updatePaymentSettings(SerialSoftware $serialSoftware, array $data): void
+    {
+        $serialSoftware->update($data);
+    }
+
     public function deleteSoftware(SerialSoftware $serialSoftware): void
     {
         $serialSoftware->delete();

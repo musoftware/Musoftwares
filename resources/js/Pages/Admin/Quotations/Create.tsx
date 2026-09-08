@@ -44,7 +44,7 @@ export default function Create({ currencies, defaultCurrencyId, defaultCurrencyC
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         currency_id: defaultCurrencyId || (currencies[0]?.id || ''),
-        currency: defaultCurrencyCode || (currencies[0]?.currency || 'USD'),
+        currency: defaultCurrencyCode || (currencies[0]?.currency || ''),
         deposit_percentage: 50,
         status: 'active',
         valid_until: '',

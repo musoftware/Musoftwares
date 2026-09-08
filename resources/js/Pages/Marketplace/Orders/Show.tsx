@@ -512,7 +512,7 @@ export default function Show({ order, conversation }: any) {
                                                     <div className="flex justify-between text-gray-500 dark:text-slate-400">
                                                         <span>{__('general.price')}</span>
                                                         <span>
-                                                            {formatCurrency(order.amount, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
+                                                            {formatCurrency(order.amount, order.currency || order.package?.service?.currency)}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between text-red-500 dark:text-red-400">
@@ -520,13 +520,13 @@ export default function Show({ order, conversation }: any) {
                                                             {__('general.platform_fee_label')}
                                                         </span>
                                                         <span>
-                                                            -{formatCurrency(order.commission_amount, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
+                                                            -{formatCurrency(order.commission_amount, order.currency || order.package?.service?.currency)}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between border-t border-gray-100 dark:border-white/10 pt-2 font-bold text-gray-900 dark:text-white">
                                                         <span>{__('general.your_earnings')}</span>
                                                         <span>
-                                                            {formatCurrency(sellerEarnings, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
+                                                            {formatCurrency(sellerEarnings, order.currency || order.package?.service?.currency)}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -534,7 +534,7 @@ export default function Show({ order, conversation }: any) {
                                                 <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-white">
                                                     <span>{__('general.total_paid')}</span>
                                                     <span>
-                                                        {formatCurrency(order.amount, order.currency || order.package?.service?.currency || auth?.user?.currency || 'USD')}
+                                                        {formatCurrency(order.amount, order.currency || order.package?.service?.currency)}
                                                     </span>
                                                 </div>
                                             )}

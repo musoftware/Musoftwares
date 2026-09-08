@@ -31,6 +31,8 @@ class SerialDeviceResource extends JsonResource
             'software' => $this->whenLoaded('software'),
             // Key matches frontend: device.userDeviceAssignment
             'userDeviceAssignment' => $this->whenLoaded('userDeviceAssignment'),
+            'resolved_custom_keys' => $this->getResolvedCustomKeys(),
+            'device_keys' => $this->whenLoaded('deviceKeys'),
         ];
     }
 }

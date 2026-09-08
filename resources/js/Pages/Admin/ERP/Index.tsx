@@ -111,7 +111,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                             <div className="me-auto space-y-1">
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.overall_platform_revenue')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">
-                                    {formatMoney(stats.total_revenue, (stats as any)?.currency || 'USD')}
+                                    {formatMoney(stats.total_revenue, (stats as any)?.currency)}
                                 </h3>
                             </div>
                             <div className="p-3 bg-slate-50 text-slate-900 rounded-lg">
@@ -210,7 +210,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-end font-bold text-slate-900 font-mono">
-                                                {formatMoney(tenant.revenue, tenant.currency || 'USD')}
+                                                {formatMoney(tenant.revenue, tenant.currency)}
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 font-mono text-xs">
                                                 {tenant.created_at}

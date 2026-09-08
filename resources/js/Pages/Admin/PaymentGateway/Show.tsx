@@ -262,19 +262,19 @@ export default function Show({ client, payments, stats }: Props) {
                 <StatCard
                     icon={DollarSign}
                     label={__('general.total_volume')}
-                    value={formatCurrency(stats.total_volume, 'EGP')}
+                    value={formatCurrency(stats.total_volume, payments[0]?.currency)}
                     sub={`${stats.successful_count} successful payments`}
                 />
                 <StatCard
                     icon={TrendingUp}
                     label={`Our Commission (${stats.commission_rate}%)`}
-                    value={formatCurrency(stats.total_commission, 'EGP')}
+                    value={formatCurrency(stats.total_commission, payments[0]?.currency)}
                     accent="text-green-700"
                 />
                 <StatCard
                     icon={CreditCard}
                     label={__('general.client_net_60')}
-                    value={formatCurrency(stats.total_net, 'EGP')}
+                    value={formatCurrency(stats.total_net, payments[0]?.currency)}
                 />
                 <StatCard
                     icon={Activity}

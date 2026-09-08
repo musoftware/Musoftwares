@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
-import { MoreHorizontal, Plus, Wallet, Edit, Trash2 } from 'lucide-react';
-import { formatMoney } from '@/lib/utils'; // Assuming this exists or using fallback
+import { MoreHorizontal, Plus, Wallet, Trash2, CreditCard } from 'lucide-react';
 
 export default function UserLoansTab({ client, loans }) {
     const { props } = usePage();
@@ -16,6 +15,7 @@ export default function UserLoansTab({ client, loans }) {
     const [addLoanForm, setAddLoanForm] = useState({
         amount: '',
         currency_id: client.currency_id || (currencies.length > 0 ? currencies[0].id : ''),
+        type: 'on_client',
         date: new Date().toISOString().split('T')[0],
         note: ''
     });
@@ -23,6 +23,14 @@ export default function UserLoansTab({ client, loans }) {
     const [isRepayOpen, setIsRepayOpen] = useState(false);
     const [activeLoan, setActiveLoan] = useState(null);
     const [repayForm, setRepayForm] = useState({
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        note: ''
+    });
+
+    const [isRechargeOpen, setIsRechargeOpen] = useState(false);
+    const [rechargeLoan, setRechargeLoan] = useState(null);
+    const [rechargeForm, setRechargeForm] = useState({
         amount: '',
         date: new Date().toISOString().split('T')[0],
         note: ''
@@ -41,6 +49,7 @@ export default function UserLoansTab({ client, loans }) {
                 setAddLoanForm({
                     amount: '',
                     currency_id: client.currency_id || (currencies.length > 0 ? currencies[0].id : ''),
+                    type: 'on_client',
                     date: new Date().toISOString().split('T')[0],
                     note: ''
                 });
@@ -68,6 +77,27 @@ export default function UserLoansTab({ client, loans }) {
         });
     };
 
+    const openRechargeModal = (loan) => {
+        setRechargeLoan(loan);
+        const remaining = (parseFloat(loan.amount) - parseFloat(loan.paid_amount)).toFixed(2);
+        setRechargeForm({
+            amount: remaining,
+            date: new Date().toISOString().split('T')[0],
+            note: ''
+        });
+        setIsRechargeOpen(true);
+    };
+
+    const submitRecharge = (e) => {
+        e.preventDefault();
+        router.post(`/admin/users/${client.id}/loans/${rechargeLoan.id}/recharge-balance`, rechargeForm, {
+            onSuccess: () => {
+                setIsRechargeOpen(false);
+                setRechargeLoan(null);
+            }
+        });
+    };
+
     const deleteLoan = (loanId) => {
         if (confirm("Are you sure you want to delete this loan? This will also delete its repayments.")) {
             router.delete(`/admin/users/${client.id}/loans/${loanId}`);
@@ -91,11 +121,12 @@ export default function UserLoansTab({ client, loans }) {
                         <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs">
                             <tr>
                                 <th className="px-4 py-3">{__('admin.date')}</th>
+                                <th className="px-4 py-3">{__('admin.loan_type') || 'نوع السلفة'}</th>
                                 <th className="px-4 py-3">{__('admin.amount')}</th>
                                 <th className="px-4 py-3">{__('admin.paid_amount')}</th>
                                 <th className="px-4 py-3">{__('admin.remaining')}</th>
                                 <th className="px-4 py-3">{__('admin.status')}</th>
-                                <th className="px-4 py-3 text-end"></th>
+                                <th className="px-4 py-3 text-end">{__('general.actions') || 'الإجراءات'}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -104,6 +135,17 @@ export default function UserLoansTab({ client, loans }) {
                                 return (
                                     <tr key={loan.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-4 py-3 text-slate-600">{new Date(loan.date).toLocaleDateString()}</td>
+                                        <td className="px-4 py-3">
+                                            {loan.type === 'on_business' ? (
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-900 text-white border border-slate-900">
+                                                    {__('admin.loan_on_business') || 'عليا (على الشركة)'}
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                                    {__('admin.loan_on_client') || 'ليا (على العميل)'}
+                                                </span>
+                                            )}
+                                        </td>
                                         <td className="px-4 py-3 font-semibold text-slate-900">{formatCurrencyFallback(loan.amount, loan.currency)}</td>
                                         <td className="px-4 py-3 text-green-600 font-medium">{formatCurrencyFallback(loan.paid_amount, loan.currency)}</td>
                                         <td className="px-4 py-3 text-red-600 font-medium">{formatCurrencyFallback(remaining, loan.currency)}</td>
@@ -115,23 +157,45 @@ export default function UserLoansTab({ client, loans }) {
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-end">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <MoreHorizontal className="h-4 w-4 text-slate-500" />
+                                            <div className="flex items-center justify-end gap-1.5">
+                                                {loan.type === 'on_business' && loan.status !== 'paid' && (
+                                                    <Button 
+                                                        type="button"
+                                                        variant="outline" 
+                                                        size="sm" 
+                                                        className="h-8 px-2.5 text-xs font-medium border-slate-300 hover:bg-slate-100 hover:text-black"
+                                                        onClick={() => openRechargeModal(loan)}
+                                                        title={__('admin.recharge_client_balance')}
+                                                    >
+                                                        <CreditCard size={14} className="me-1 text-slate-700" />
+                                                        {__('admin.recharge_client_balance') || 'شحن رصيد'}
                                                     </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    {loan.status !== 'paid' && (
-                                                        <DropdownMenuItem onClick={() => openRepayModal(loan)}>
-                                                            <Wallet className="me-2 h-4 w-4" /> {__('admin.add_repayment') || 'إضافة سداد'}
+                                                )}
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <MoreHorizontal className="h-4 w-4 text-slate-500" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        {loan.status !== 'paid' && (
+                                                            <>
+                                                                {loan.type === 'on_business' && (
+                                                                    <DropdownMenuItem onClick={() => openRechargeModal(loan)}>
+                                                                        <CreditCard className="me-2 h-4 w-4 text-slate-700" /> {__('admin.recharge_client_balance') || 'شحن رصيد العميل'}
+                                                                    </DropdownMenuItem>
+                                                                )}
+                                                                <DropdownMenuItem onClick={() => openRepayModal(loan)}>
+                                                                    <Wallet className="me-2 h-4 w-4 text-slate-700" /> {__('admin.add_repayment') || 'إضافة سداد'}
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
+                                                        <DropdownMenuItem className="text-red-600" onClick={() => deleteLoan(loan.id)}>
+                                                            <Trash2 className="me-2 h-4 w-4" /> {__('general.delete')}
                                                         </DropdownMenuItem>
-                                                    )}
-                                                    <DropdownMenuItem className="text-red-600" onClick={() => deleteLoan(loan.id)}>
-                                                        <Trash2 className="me-2 h-4 w-4" /> {__('general.delete')}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
                                         </td>
                                     </tr>
                                 );
@@ -151,9 +215,38 @@ export default function UserLoansTab({ client, loans }) {
                     <form onSubmit={submitAddLoan}>
                         <DialogHeader>
                             <DialogTitle>{__('admin.add_loan') || 'إضافة سلفة جديدة'}</DialogTitle>
-                            <DialogDescription>{__('admin.add_loan_desc') || 'أدخل تفاصيل السلفة الممنوحة للعميل.'}</DialogDescription>
+                            <DialogDescription>{__('admin.add_loan_desc') || 'أدخل تفاصيل السلفة الممنوحة أو المستحقة.'}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
+                            <div>
+                                <Label>{__('admin.loan_type') || 'نوع السلفة'}</Label>
+                                <div className="grid grid-cols-2 gap-3 mt-1.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => setAddLoanForm({ ...addLoanForm, type: 'on_client' })}
+                                        className={`p-3 text-start border rounded-lg transition-all ${
+                                            addLoanForm.type === 'on_client'
+                                                ? 'border-slate-900 bg-slate-50 text-slate-900 font-semibold ring-1 ring-slate-900'
+                                                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                        <div className="text-sm font-medium">{__('admin.loan_on_client') || 'ليا (على العميل)'}</div>
+                                        <div className="text-xs text-slate-500 font-normal mt-0.5">العميل مدين للشركة (مستحق لنا)</div>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAddLoanForm({ ...addLoanForm, type: 'on_business' })}
+                                        className={`p-3 text-start border rounded-lg transition-all ${
+                                            addLoanForm.type === 'on_business'
+                                                ? 'border-slate-900 bg-slate-50 text-slate-900 font-semibold ring-1 ring-slate-900'
+                                                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                        <div className="text-sm font-medium">{__('admin.loan_on_business') || 'عليا (على الشركة)'}</div>
+                                        <div className="text-xs text-slate-500 font-normal mt-0.5">الشركة مدينة للعميل (يمكن شحن رصيده منها)</div>
+                                    </button>
+                                </div>
+                            </div>
                             <div>
                                 <Label>{__('admin.amount')}</Label>
                                 <Input type="number" step="0.01" min="0.01" required value={addLoanForm.amount} onChange={e => setAddLoanForm({...addLoanForm, amount: e.target.value})} />
@@ -190,7 +283,7 @@ export default function UserLoansTab({ client, loans }) {
                     <form onSubmit={submitRepay}>
                         <DialogHeader>
                             <DialogTitle>{__('admin.add_repayment') || 'تسجيل سداد سلفة'}</DialogTitle>
-                            <DialogDescription>{__('admin.add_repayment_desc') || 'أدخل المبلغ الذي قام العميل بتسديده من هذه السلفة.'}</DialogDescription>
+                            <DialogDescription>{__('admin.add_repayment_desc') || 'أدخل المبلغ المسدد من هذه السلفة.'}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             {activeLoan && (
@@ -214,6 +307,72 @@ export default function UserLoansTab({ client, loans }) {
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsRepayOpen(false)}>{__('general.cancel')}</Button>
                             <Button type="submit">{__('general.save')}</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Recharge Client Balance Modal */}
+            <Dialog open={isRechargeOpen} onOpenChange={setIsRechargeOpen}>
+                <DialogContent>
+                    <form onSubmit={submitRecharge}>
+                        <DialogHeader>
+                            <DialogTitle>{__('admin.recharge_client_balance') || 'شحن رصيد العميل من السلفة'}</DialogTitle>
+                            <DialogDescription>
+                                {__('admin.recharge_client_balance_desc') || 'خصم مبلغ من السلفة المستحقة وإيداعه مباشرة في رصيد محفظة العميل كدفعة مستلمة (received).'}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            {rechargeLoan && (
+                                <div className="p-3 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-slate-500">المبلغ المتبقي من السلفة:</span>
+                                        <strong className="font-semibold text-slate-900">
+                                            {formatCurrencyFallback(
+                                                (parseFloat(rechargeLoan.amount) - parseFloat(rechargeLoan.paid_amount)).toFixed(2),
+                                                rechargeLoan.currency
+                                            )}
+                                        </strong>
+                                    </div>
+                                    <div className="text-xs text-slate-500 mt-2">
+                                        سيتم تسجيل هذا الإجراء كسداد للسلفة وشحن المبلغ في محفظة العميل بنوع <strong>received</strong> ليتمكن من طلب الخدمات وتنفيذ الفواتير به.
+                                    </div>
+                                </div>
+                            )}
+                            <div>
+                                <Label>{__('admin.amount')}</Label>
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    max={rechargeLoan ? (parseFloat(rechargeLoan.amount) - parseFloat(rechargeLoan.paid_amount)) : undefined}
+                                    required
+                                    value={rechargeForm.amount}
+                                    onChange={e => setRechargeForm({ ...rechargeForm, amount: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <Label>{__('admin.date')}</Label>
+                                <Input
+                                    type="date"
+                                    required
+                                    value={rechargeForm.date}
+                                    onChange={e => setRechargeForm({ ...rechargeForm, date: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <Label>{__('admin.note')}</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="ملاحظة اختيارية (تظهر في قيود المحفظة وسجل السلفة)"
+                                    value={rechargeForm.note}
+                                    onChange={e => setRechargeForm({ ...rechargeForm, note: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsRechargeOpen(false)}>{__('general.cancel')}</Button>
+                            <Button type="submit">{__('admin.recharge_client_balance') || 'تأكيد شحن الرصيد'}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

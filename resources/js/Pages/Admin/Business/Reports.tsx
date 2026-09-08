@@ -201,7 +201,7 @@ export default function Reports({
         );
     }
 
-    const businessCurrency = stats.business_currency_code || 'USD';
+    const businessCurrency = stats.business_currency_code;
     const isPositiveProfit = (stats.net_profit ?? 0) >= 0;
 
     const formatYAxis = (value: number): string => {

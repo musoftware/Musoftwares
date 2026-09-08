@@ -6271,6 +6271,8 @@ return array (
   'select_project' => 'اختر Project',
   'select_provider' => 'اختر Provider',
   'select_role' => 'اختر Role',
+  'software_reseller' => 'موزع برامج (Reseller)',
+  'allocate_software' => 'تخصيص برنامج للموزع (Allocate Software)',
   'select_sender' => 'اختر sender',
   'select_source_project' => 'اختر Source Project',
   'select_source_target' => 'حدد عملة المصدر والهدف.',

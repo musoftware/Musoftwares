@@ -43,6 +43,7 @@ class SerialSoftwareController extends Controller
         }
 
         $query = SerialSoftware::query()
+            ->with('customKeys')
             ->withCount(['devices as total_devices'])
             ->withCount(['devices as active_count' => fn ($q) => $q->where('status', 'active')])
             ->withCount(['devices as inactive_count' => fn ($q) => $q->where('status', 'inactive')])
@@ -159,5 +160,54 @@ class SerialSoftwareController extends Controller
         $this->serialSoftwareService->deleteSoftware($serialSoftware);
 
         return back()->with('success', __('general.software_deleted_successfully'));
+    }
+
+    public function storeKey(Request $request, SerialSoftware $serialSoftware): RedirectResponse
+    {
+        $validated = $request->validate([
+            'key' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z0-9_\-]+$/'],
+            'default_value' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        \App\Models\SerialSoftwareKey::updateOrCreate(
+            [
+                'serial_software_id' => $serialSoftware->id,
+                'key' => $validated['key'],
+            ],
+            [
+                'default_value' => $validated['default_value'],
+                'description' => $validated['description'] ?? null,
+            ]
+        );
+
+        return back()->with('success', 'Custom key saved successfully.');
+    }
+
+    public function destroyKey(SerialSoftware $serialSoftware, \App\Models\SerialSoftwareKey $serialSoftwareKey): RedirectResponse
+    {
+        if ($serialSoftwareKey->serial_software_id === $serialSoftware->id) {
+            $serialSoftwareKey->delete();
+        }
+
+        return back()->with('success', 'Custom key deleted successfully.');
+    }
+
+    /**
+     * Update payment and activation settings for a software.
+     */
+    public function updatePaymentSettings(Request $request, SerialSoftware $serialSoftware): RedirectResponse
+    {
+        $validated = $request->validate([
+            'requires_payment' => ['required', 'boolean'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'max:10'],
+            'whatsapp_number' => ['nullable', 'string', 'max:50'],
+            'payment_instructions' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $this->serialSoftwareService->updatePaymentSettings($serialSoftware, $validated);
+
+        return back()->with('success', 'Payment settings updated successfully.');
     }
 }

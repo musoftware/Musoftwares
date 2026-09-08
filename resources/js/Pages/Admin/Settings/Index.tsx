@@ -181,8 +181,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
 
     const businessCurrencyObj = currencies.find(c => String(c.id) === String(form.business_currency)) 
         || currencies.find(c => String(c.currency) === String(form.business_currency))
-        || currencies[0];
-    const businessCurrencyCode = businessCurrencyObj?.currency ?? 'EGP';
+    const businessCurrencyCode = businessCurrencyObj?.currency ?? currencies[0]?.currency;
 
     // Invoice-created notification channels (globally configured; defaults to mail+fcm).
     const availableChannels: string[] =

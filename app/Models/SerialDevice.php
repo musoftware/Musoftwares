@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SerialDevice extends Model
@@ -64,5 +65,39 @@ class SerialDevice extends Model
     public function userDeviceAssignment()
     {
         return $this->hasOne(SerialUserDevice::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * @return HasMany<SerialDeviceKey>
+     */
+    public function deviceKeys(): HasMany
+    {
+        return $this->hasMany(SerialDeviceKey::class, 'serial_device_id');
+    }
+
+    /**
+     * Get resolved custom keys combining software defaults and device overrides.
+     *
+     * @return array<string, string>
+     */
+    public function getResolvedCustomKeys(): array
+    {
+        $softwareKeys = SerialSoftwareKey::where('serial_software_id', $this->serial_software_id)->get();
+        if ($softwareKeys->isEmpty()) {
+            return [];
+        }
+
+        $deviceOverrides = SerialDeviceKey::where('serial_device_id', $this->id)
+            ->pluck('value', 'serial_software_key_id')
+            ->toArray();
+
+        $resolved = [];
+        foreach ($softwareKeys as $swKey) {
+            $resolved[$swKey->key] = isset($deviceOverrides[$swKey->id])
+                ? (string) $deviceOverrides[$swKey->id]
+                : (string) ($swKey->default_value ?? '');
+        }
+
+        return $resolved;
     }
 }

@@ -139,7 +139,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                 <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center sm:text-start">
                                     <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">{__('general.workspace_revenue')}</span>
                                     <span className="text-lg font-mono font-bold text-slate-900">
-                                        {formatCurrency(tenant.revenue, (tenant as any).currency || 'USD')}
+                                        {formatCurrency(tenant.revenue, (tenant as any).currency)}
                                     </span>
                                 </div>
                                 <Button 

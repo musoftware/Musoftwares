@@ -232,6 +232,10 @@ class UsersController extends Controller
                     'id' => $assignment->id,
                     'device_id' => $assignment->device_id,
                     'status' => $assignment->status,
+                    'expires_at' => $assignment->expires_at?->toIso8601String(),
+                    'expires_at_formatted' => $assignment->expires_at?->toDateString(),
+                    'is_expired' => $assignment->isExpired(),
+                    'remaining_days' => $assignment->expires_at ? max(0, (int) ceil(now()->diffInDays($assignment->expires_at, false))) : null,
                     'notes' => $assignment->notes,
                     'created_at' => $assignment->created_at?->toDateString(),
                     'updated_at' => $assignment->updated_at?->toDateTimeString(),
@@ -290,7 +294,7 @@ class UsersController extends Controller
 
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
-            'loans' => $user->loans,
+            'loans' => $user->loans()->with('currency')->latest('date')->get(),
             'currencies' => $currencies,
             'stats' => $stats,
             'modulePlans' => $modulePlans,
@@ -327,6 +331,11 @@ class UsersController extends Controller
             ]
         );
 
+        if (! $user->hasRole('software_reseller') && ! $user->isAdmin()) {
+            Role::findOrCreate('software_reseller', 'web');
+            $user->assignRole('software_reseller');
+        }
+
         return back()->with('success', __('Software allocated to reseller successfully.'));
     }
 
@@ -345,12 +354,27 @@ class UsersController extends Controller
     }
 
     /**
+     * Toggle reseller scope between all devices vs own devices.
+     */
+    public function toggleResellerAllDevices(Request $request, User $user)
+    {
+        $user->can_view_all_devices = ! (bool) $user->can_view_all_devices;
+        $user->save();
+
+        $message = $user->can_view_all_devices
+            ? __('Reseller can now view and manage all devices for allocated softwares.')
+            : __('Reseller restricted to viewing own assigned devices only.');
+
+        return back()->with('success', $message);
+    }
+
+    /**
      * Show create user form.
      */
     public function create()
     {
         return Inertia::render('Admin/Users/Create', [
-            'roles' => ['admin', 'client'],
+            'roles' => ['admin', 'client', 'software_reseller', 'employee', 'manager', 'moderator'],
             'currencies' => Currency::all(),
         ]);
     }
@@ -576,7 +600,7 @@ class UsersController extends Controller
                 'source' => $e->source,
                 'created_at' => $e->created_at?->toIso8601String(),
             ])->values(),
-            'roles' => ['client', 'user', 'admin', 'manager', 'employee', 'moderator'],
+            'roles' => ['client', 'user', 'software_reseller', 'admin', 'manager', 'employee', 'moderator'],
             'currencies' => Currency::all(),
             'plans' => ModulePlan::where('is_active', true)->get(),
             'statuses' => ['active', 'blocked', 'suspended'],
@@ -1222,7 +1246,7 @@ class UsersController extends Controller
         }
 
         $request->validate([
-            'role' => 'required|string|in:admin,client,employee,manager,moderator',
+            'role' => 'required|string|in:admin,client,employee,manager,moderator,software_reseller,user',
         ]);
 
         $roleName = $request->input('role');

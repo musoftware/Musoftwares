@@ -29,7 +29,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
     };
 
     const maxAvailable = Number(wallet?.earned_balance || 0);
-    const currency = wallet?.currency || 'EGP';
+    const currency = wallet?.currency;
 
     return (
         <AuthenticatedLayout>

@@ -117,18 +117,18 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <MetricCard
             label="الرصيد العام الحالي"
-            value={formatMoney(stats.totalBalance, 'EGP')}
+            value={formatMoney(stats.totalBalance)}
             icon={Wallet}
             className="border-primary/20" />
           
                     <MetricCard
             label="إجمالي التبرعات"
-            value={formatMoney(stats.totalReceived, 'EGP')}
+            value={formatMoney(stats.totalReceived)}
             icon={TrendingUp} />
           
                     <MetricCard
             label="إجمالي المصروفات"
-            value={formatMoney(stats.totalSpent, 'EGP')}
+            value={formatMoney(stats.totalSpent)}
             icon={TrendingDown} />
           
                     <MetricCard
@@ -154,7 +154,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                                     <span>الرصيد العام الحالي</span>
                                 </div>
                                 <div className="text-4xl font-bold text-primary mb-1">
-                                    {formatMoney(stats.totalBalance, 'EGP')}
+                                    {formatMoney(stats.totalBalance)}
                                 </div>
                                 <p className="text-sm text-primary/80">إجمالي جميع تبرعات المستخدمين</p>
                             </div>
@@ -229,7 +229,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                                                     </div>
                                                 </td>
                                                 <td className="py-3 px-4 text-muted-foreground">{counter.user.email}</td>
-                                                <td className="py-3 px-4 font-bold text-success">{formatMoney(counter.total_received, 'EGP')}</td>
+                                                <td className="py-3 px-4 font-bold text-success">{formatMoney(counter.total_received)}</td>
                                                 <td className="py-3 px-4 text-muted-foreground">
                                                     {new Date(counter.updated_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
                                                 </td>
@@ -317,7 +317,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                     <form onSubmit={handleSubtractSubmit} className="space-y-4 py-4">
                         <div className="p-3 bg-muted rounded-md mb-4 flex justify-end gap-4 items-center">
                             <span className="me-auto text-sm font-medium">الرصيد العام الحالي:</span>
-                            <span className="font-bold text-primary">{formatMoney(stats.totalBalance, 'EGP')}</span>
+                            <span className="font-bold text-primary">{formatMoney(stats.totalBalance)}</span>
                         </div>
                         
                         <div className="space-y-2">

@@ -72,7 +72,7 @@ export default function HoursCalendar({ years, auth }: any) {
                 setChartData(responseData.chart_30_days || []);
                 setMarketHourlyRate(responseData.market_hourly_rate || 0);
                 setRecommendedHourlyRate(responseData.recommended_hourly_rate || 0);
-                setBusinessCurrency(responseData.business_currency || 'USD');
+                setBusinessCurrency(responseData.business_currency);
                 setLast30DaysTimers(responseData.last_30_days_timers || []);
             } else {
                 setData(responseData);

@@ -102,6 +102,7 @@ const items: MenuItem[] = [
         { title: "Contracts", url: "/admin/contracts" },
         { title: "Contract Price List", url: "/admin/contract-price-items" },
         { title: "Project Cost Estimator", url: "/estimator" },
+        { title: "Commissions", url: "/admin/commissions" },
     ]
   },
   { 

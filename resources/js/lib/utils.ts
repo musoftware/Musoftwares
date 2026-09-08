@@ -20,7 +20,7 @@ const CURRENCY_FORMATS: Record<string, string> = {
 export function formatMoney(amount: number | string, currency?: any) {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
 
-    let curCode = 'USD';
+    let curCode = '';
     if (typeof currency === 'string' && currency.trim() !== '') {
         curCode = currency;
     } else if (typeof currency === 'number') {
@@ -37,7 +37,18 @@ export function formatMoney(amount: number | string, currency?: any) {
             }
         }
     }
-    curCode = curCode.trim().toUpperCase();
+    curCode = curCode ? curCode.trim().toUpperCase() : '';
+
+    if (!curCode) {
+        if (isNaN(numericAmount)) return '0.00';
+        const isNegative = numericAmount < 0;
+        const absoluteAmount = Math.abs(numericAmount);
+        const numberPart = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(absoluteAmount);
+        return isNegative ? `-${numberPart}` : numberPart;
+    }
 
     if (isNaN(numericAmount)) return `${curCode} 0.00`;
 

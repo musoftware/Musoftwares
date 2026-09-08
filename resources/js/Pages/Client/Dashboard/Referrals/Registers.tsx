@@ -35,7 +35,7 @@ export default function Registers({
     global_commission_total,
 }: RegistersProps) {
     const { currencies, auth } = usePage().props as any;
-    const userCurrency = currencies?.find((c: any) => c.id === auth?.user?.currency_id) || { symbol: '$', currency: 'USD' };
+    const userCurrency = currencies?.find((c: any) => c.id === auth?.user?.currency_id);
 
     const handleTabChange = (val: string) => {
         router.visit(route(val));

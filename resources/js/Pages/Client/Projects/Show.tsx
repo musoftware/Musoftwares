@@ -263,7 +263,7 @@ export default function ProjectShow({
         return null;
     };
 
-    const currencySymbol = project.currency?.symbol || 'EGP';
+    const currencySymbol = project.currency?.symbol || project.currency?.currency || '$';
 
     return (
         <AuthenticatedLayout>

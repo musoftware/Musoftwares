@@ -43,7 +43,7 @@ export default function Index({ services }: any) {
                         'offers': {
                             '@type': 'Offer',
                             'price': service.price || 0,
-                            'priceCurrency': service.currency_code || 'USD'
+                            'priceCurrency': service.currency_code
                         }
                     }
                 }))

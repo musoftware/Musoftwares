@@ -85,7 +85,7 @@ class SerialDeviceController extends Controller
 
         $devices = $query->paginate($filters['per_page'])->withQueryString()->through(fn ($d) => (new SerialDeviceResource($d))->resolve());
 
-        $softwares = SerialSoftware::orderBy('name')->get(['id', 'name']);
+        $softwares = SerialSoftware::with('customKeys')->orderBy('name')->get(['id', 'name']);
 
         $stats = [
             'total' => SerialDevice::count(),
@@ -223,7 +223,7 @@ class SerialDeviceController extends Controller
      */
     private function buildFilteredQuery(array $filters): Builder
     {
-        $query = SerialDevice::query()->with(['software', 'userDeviceAssignment.user']);
+        $query = SerialDevice::query()->with(['software.customKeys', 'deviceKeys', 'userDeviceAssignment.user']);
 
         // Text search
         $query->when($filters['search'] ?? null, function ($q, string $search) {
@@ -303,5 +303,44 @@ class SerialDeviceController extends Controller
         );
 
         return back()->with('success', __('general.device_assigned_successfully'));
+    }
+
+    /**
+     * Set a custom key override for this device.
+     */
+    public function setKeyOverride(Request $request, SerialDevice $serialDevice): RedirectResponse
+    {
+        $validated = $request->validate([
+            'serial_software_key_id' => ['required', 'exists:serial_software_keys,id'],
+            'value' => ['required', 'string'],
+        ]);
+
+        $softwareKey = \App\Models\SerialSoftwareKey::where('id', $validated['serial_software_key_id'])
+            ->where('serial_software_id', $serialDevice->serial_software_id)
+            ->firstOrFail();
+
+        \App\Models\SerialDeviceKey::updateOrCreate(
+            [
+                'serial_device_id' => $serialDevice->id,
+                'serial_software_key_id' => $softwareKey->id,
+            ],
+            [
+                'value' => $validated['value'],
+            ]
+        );
+
+        return back()->with('success', 'Device key override saved successfully.');
+    }
+
+    /**
+     * Remove key override for this device, reverting back to software default.
+     */
+    public function removeKeyOverride(SerialDevice $serialDevice, \App\Models\SerialDeviceKey $serialDeviceKey): RedirectResponse
+    {
+        if ($serialDeviceKey->serial_device_id === $serialDevice->id) {
+            $serialDeviceKey->delete();
+        }
+
+        return back()->with('success', 'Device key override removed (reverted to default).');
     }
 }

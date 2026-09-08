@@ -209,4 +209,20 @@ class SerialUserDeviceController extends Controller
 
         return back()->with('success', "Temporary validity updated for {$user->name}.");
     }
+
+    /**
+     * Update expires_at for a specific device assignment.
+     */
+    public function updateExpiresAt(Request $request, SerialUserDevice $serialUserDevice): RedirectResponse
+    {
+        $validated = $request->validate([
+            'expires_at' => ['nullable', 'date'],
+        ]);
+
+        $serialUserDevice->update([
+            'expires_at' => $validated['expires_at'],
+        ]);
+
+        return back()->with('success', 'Expiration date updated successfully.');
+    }
 }

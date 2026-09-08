@@ -59,13 +59,17 @@ class SerialDeviceController extends Controller
             ->where('device_id', $validated['device_id'])
             ->exists();
 
+        $initialStatus = $software->requires_payment
+            ? SerialDevice::STATUS_INACTIVE
+            : $software->default_status;
+
         $device = SerialDevice::firstOrCreate(
             [
                 'serial_software_id' => $software->id,
                 'device_id' => $validated['device_id'],
             ],
             [
-                'status' => $software->default_status,
+                'status' => $initialStatus,
             ]
         );
 
@@ -118,10 +122,16 @@ class SerialDeviceController extends Controller
 
         // Return the device status — client software acts on this.
         return response()->json([
-            'status'          => $status,
-            'has_linked_user' => $hasLinkedUser,
-            'is_expired'      => $isExpired,
-            'expires_at'      => $userDevice?->expires_at?->toIso8601String(),
+            'status'               => $status,
+            'has_linked_user'      => $hasLinkedUser,
+            'is_expired'           => $isExpired,
+            'expires_at'           => $userDevice?->expires_at?->toIso8601String(),
+            'custom_keys'          => $device->getResolvedCustomKeys(),
+            'requires_payment'     => (bool) $software->requires_payment,
+            'price'                => $software->price !== null ? (float) $software->price : null,
+            'currency'             => $software->currency ?? 'USD',
+            'whatsapp_number'      => $software->whatsapp_number,
+            'payment_instructions' => $software->payment_instructions,
         ]);
     }
 
@@ -155,15 +165,35 @@ class SerialDeviceController extends Controller
             ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
         );
 
+        $initialStatus = $software->requires_payment ? SerialDevice::STATUS_INACTIVE : SerialDevice::STATUS_ACTIVE;
+
         $device = SerialDevice::firstOrCreate(
             [
                 'serial_software_id' => $software->id,
                 'device_id'          => $validated['device_id'],
             ],
             [
-                'status' => SerialDevice::STATUS_ACTIVE,
+                'status' => $initialStatus,
             ]
         );
+
+        // Check if user owns an active license for this software
+        $userLicense = \App\Models\SerialSoftwareLicense::where('user_id', $user->id)
+            ->where('serial_software_id', $software->id)
+            ->active()
+            ->first();
+
+        $hasActiveLicense = (bool) $userLicense;
+
+        $targetStatus = (! $software->requires_payment || $hasActiveLicense || $device->status === SerialDevice::STATUS_ACTIVE)
+            ? SerialDevice::STATUS_ACTIVE
+            : SerialDevice::STATUS_INACTIVE;
+
+        $userDeviceStatus = $targetStatus === SerialDevice::STATUS_ACTIVE
+            ? \App\Models\SerialUserDevice::STATUS_ACTIVE
+            : \App\Models\SerialUserDevice::STATUS_INACTIVE;
+
+        $expiresAt = $userLicense?->expires_at;
 
         // Link device to user (handling potential soft deletes cleanly)
         $userDevice = \App\Models\SerialUserDevice::withTrashed()
@@ -174,29 +204,45 @@ class SerialDeviceController extends Controller
             if ($userDevice->trashed()) {
                 $userDevice->restore();
             }
-            $userDevice->update([
+            $updateData = [
                 'user_id' => $user->id,
-                'status'  => \App\Models\SerialUserDevice::STATUS_ACTIVE,
-            ]);
+                'status'  => $userDeviceStatus,
+            ];
+            if ($expiresAt) {
+                $updateData['expires_at'] = $expiresAt;
+            }
+            $userDevice->update($updateData);
         } else {
             \App\Models\SerialUserDevice::create([
-                'device_id' => $validated['device_id'],
-                'user_id'   => $user->id,
-                'status'    => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+                'device_id'  => $validated['device_id'],
+                'user_id'    => $user->id,
+                'status'     => $userDeviceStatus,
+                'expires_at' => $expiresAt,
             ]);
         }
 
-        // Ensure device status is active
+        // Update device status and check date
         $device->update([
-            'status'          => SerialDevice::STATUS_ACTIVE,
+            'status'          => $targetStatus,
             'last_check_date' => now(),
         ]);
 
+        $message = $targetStatus === SerialDevice::STATUS_ACTIVE
+            ? 'Device linked and activated successfully.'
+            : 'Account linked. Please complete payment to activate your license.';
+
         return response()->json([
-            'status'      => SerialDevice::STATUS_ACTIVE,
-            'user_exists' => true,
-            'user_name'   => $user->name,
-            'message'     => 'Device linked successfully to user account.',
+            'status'               => $targetStatus,
+            'user_exists'          => true,
+            'user_name'            => $user->name,
+            'requires_payment'     => (bool) $software->requires_payment,
+            'has_active_license'   => $hasActiveLicense,
+            'expires_at'           => $expiresAt?->toIso8601String(),
+            'price'                => $software->price !== null ? (float) $software->price : null,
+            'currency'             => $software->currency ?? 'USD',
+            'whatsapp_number'      => $software->whatsapp_number,
+            'payment_instructions' => $software->payment_instructions,
+            'message'              => $message,
         ]);
     }
 
@@ -256,15 +302,25 @@ class SerialDeviceController extends Controller
             ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
         );
 
+        $initialStatus = $software->requires_payment ? SerialDevice::STATUS_INACTIVE : SerialDevice::STATUS_ACTIVE;
+
         $device = SerialDevice::firstOrCreate(
             [
                 'serial_software_id' => $software->id,
                 'device_id'          => $validated['device_id'],
             ],
             [
-                'status' => SerialDevice::STATUS_ACTIVE,
+                'status' => $initialStatus,
             ]
         );
+
+        $targetStatus = $software->requires_payment
+            ? ($device->status === SerialDevice::STATUS_ACTIVE ? SerialDevice::STATUS_ACTIVE : SerialDevice::STATUS_INACTIVE)
+            : SerialDevice::STATUS_ACTIVE;
+
+        $userDeviceStatus = $targetStatus === SerialDevice::STATUS_ACTIVE
+            ? \App\Models\SerialUserDevice::STATUS_ACTIVE
+            : \App\Models\SerialUserDevice::STATUS_INACTIVE;
 
         // Link device to user (handling potential soft deletes cleanly)
         $userDevice = \App\Models\SerialUserDevice::withTrashed()
@@ -277,27 +333,36 @@ class SerialDeviceController extends Controller
             }
             $userDevice->update([
                 'user_id' => $user->id,
-                'status'  => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+                'status'  => $userDeviceStatus,
             ]);
         } else {
             \App\Models\SerialUserDevice::create([
                 'device_id' => $validated['device_id'],
                 'user_id'   => $user->id,
-                'status'    => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+                'status'    => $userDeviceStatus,
             ]);
         }
 
-        // Ensure device status is active
+        // Update device status and check date
         $device->update([
-            'status'          => SerialDevice::STATUS_ACTIVE,
+            'status'          => $targetStatus,
             'last_check_date' => now(),
         ]);
 
+        $message = $targetStatus === SerialDevice::STATUS_ACTIVE
+            ? 'User registered and device activated successfully.'
+            : 'User registered. Please complete payment to activate your license.';
+
         return response()->json([
-            'status'      => SerialDevice::STATUS_ACTIVE,
-            'user_exists' => true,
-            'user_name'   => $user->name,
-            'message'     => 'User registered and device activated successfully.',
+            'status'               => $targetStatus,
+            'user_exists'          => true,
+            'user_name'            => $user->name,
+            'requires_payment'     => (bool) $software->requires_payment,
+            'price'                => $software->price !== null ? (float) $software->price : null,
+            'currency'             => $software->currency ?? 'USD',
+            'whatsapp_number'      => $software->whatsapp_number,
+            'payment_instructions' => $software->payment_instructions,
+            'message'              => $message,
         ]);
     }
 }

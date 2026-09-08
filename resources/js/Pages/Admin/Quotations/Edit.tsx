@@ -58,7 +58,7 @@ export default function Edit({ quotation, currencies }: EditProps) {
     const { data, setData, put, processing, errors } = useForm({
         title: quotation.title || '',
         currency_id: quotation.currency_id || '',
-        currency: quotation.currency || 'USD',
+        currency: quotation.currency || '',
         deposit_percentage: quotation.deposit_percentage || 50,
         status: quotation.status || 'active',
         valid_until: quotation.valid_until ? quotation.valid_until.split('T')[0] : '',

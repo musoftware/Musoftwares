@@ -129,7 +129,7 @@ export default function Show({ service }: any) {
         'offers': {
             '@type': 'Offer',
             'price': selectedPackage?.price || service.starting_price || 0,
-            'priceCurrency': selectedPackage?.currency?.code || 'USD',
+            'priceCurrency': selectedPackage?.currency?.code,
             'availability': 'https://schema.org/InStock',
             'url': serviceCanonicalUrl
         },
@@ -365,7 +365,7 @@ export default function Show({ service }: any) {
                                                         )}
                                                     </div>
                                                     <span className="font-bold text-indigo-600 dark:text-indigo-400 text-sm bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-md border border-indigo-100 dark:border-indigo-500/20">
-                                                        + {formatCurrency(extra.price, selectedPackage?.currency || 'USD')}
+                                                        + {formatCurrency(extra.price, selectedPackage?.currency)}
                                                     </span>
                                                 </div>
                                             ))}

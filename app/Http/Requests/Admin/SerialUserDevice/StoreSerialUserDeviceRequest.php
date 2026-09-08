@@ -19,6 +19,7 @@ class StoreSerialUserDeviceRequest extends FormRequest
             'user_id' => ['required', 'exists:users,id'],
             'device_id' => ['required', 'string', 'unique:serial_user_devices,device_id'],
             'status' => ['required', 'string', Rule::in(SerialUserDevice::statuses())],
+            'expires_at' => ['nullable', 'date'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

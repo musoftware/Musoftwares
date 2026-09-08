@@ -134,8 +134,8 @@ export default function Index({ clients, totals }: Props) {
             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
                 <StatCard icon={Users} label={__('general.total_clients')} value={String(totals.total_clients)} sub={`${totals.active_clients} active`} />
                 <StatCard icon={CheckCircle} label={__('general.payments_done')} value={String(totals.total_payments)} />
-                <StatCard icon={DollarSign} label={__('general.total_volume')} value={formatCurrency(totals.total_volume, 'EGP')} />
-                <StatCard icon={TrendingUp} label={__('general.our_commission')} value={formatCurrency(totals.total_commission, 'EGP')} />
+                <StatCard icon={DollarSign} label={__('general.total_volume')} value={formatCurrency(totals.total_volume, 'USD')} />
+                <StatCard icon={TrendingUp} label={__('general.our_commission')} value={formatCurrency(totals.total_commission, 'USD')} />
                 <StatCard icon={Percent} label={__('general.default_rate')} value="40%" sub="Per payment" />
             </div>
 
@@ -192,10 +192,10 @@ export default function Index({ clients, totals }: Props) {
                                     </span>
                                 </td>
                                 <td className="p-4 font-medium text-gray-900">
-                                    {formatCurrency(client.stats.total_volume, 'EGP')}
+                                    {formatCurrency(client.stats.total_volume, 'USD')}
                                 </td>
                                 <td className="p-4 font-semibold text-green-700">
-                                    {formatCurrency(client.stats.total_commission, 'EGP')}
+                                    {formatCurrency(client.stats.total_commission, 'USD')}
                                 </td>
                                 <td className="p-4">
                                     {client.status === 'active' ?

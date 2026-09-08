@@ -253,7 +253,7 @@ export default function Show({ article }: ShowProps) {
                                                     if (article.service.is_free) return __('general.free') || 'Free';
                                                     if (!pkgs || pkgs.length === 0) return '$5';
                                                     const cheapest = pkgs.reduce((min, p) => Number(p.price) < Number(min.price) ? p : min, pkgs[0]);
-                                                    return formatCurrency(cheapest.price, cheapest.currency || 'USD');
+                                                    return formatCurrency(cheapest.price, cheapest.currency);
                                                 })()}
                                             </span>
                                         </div>

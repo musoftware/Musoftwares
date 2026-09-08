@@ -18,6 +18,11 @@ class StoreSerialSoftwareRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', 'unique:serial_softwares,name'],
             'default_status' => ['required', Rule::in(SerialSoftware::statuses())],
+            'requires_payment' => ['nullable', 'boolean'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'max:10'],
+            'whatsapp_number' => ['nullable', 'string', 'max:50'],
+            'payment_instructions' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

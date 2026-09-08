@@ -7,7 +7,7 @@ import { BentoStatCard } from '@/Components/ui/BentoStatCard';
 import { ContentCard } from '@/Components/ui/ContentCard';
 import { 
     Folder, Wallet, FileText, ArrowRight, ArrowUpRight, 
-    Server, Zap, Shield, MessageSquare 
+    Server, Zap, Shield, MessageSquare, Laptop, Coins, CreditCard, Wrench, Key 
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
@@ -37,15 +37,15 @@ export default function Dashboard({
     userProjects = [],
     realNotifications = [],
     authUser = {},
-    userBalanceFormatted = '0.00 EGP',
+    userBalanceFormatted = '',
     userPoints = 0,
     unpaidCount = 0,
     unpaidAmount = 0,
-    totalDueFormatted = '0.00 EGP'
+    totalDueFormatted = ''
 }: DashboardProps) {
     const user = authUser?.name ? authUser : {};
     const walletBalance = stats?.walletBalance ?? 0;
-    const currency = stats?.currency?.symbol ?? 'EGP';
+    const currency = stats?.currency?.symbol || stats?.currency?.currency;
 
     const projectsList = (userProjects && userProjects.length > 0) 
         ? userProjects 
@@ -174,77 +174,97 @@ export default function Dashboard({
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {/* ERP Card */}
-                            <a href="/sso/erp" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-[#0071e3]/40 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all group block shadow-sm">
+                            {/* Gold Saver Card */}
+                            <a href="/sso/goldsaversys" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-amber-500/40 dark:hover:border-amber-400/40 hover:shadow-md transition-all group block shadow-sm">
                                 <div className="flex items-center justify-between mb-5">
-                                    <div className="w-12 h-12 rounded-2xl bg-[#0071e3]/10 dark:bg-[#0071e3]/20 flex items-center justify-center text-[#0071e3] dark:text-[#2997ff]">
-                                        <Server className="w-6 h-6" />
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                                        <Coins className="w-6 h-6" />
                                     </div>
-                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full">
+                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60 rounded-full">
                                         Live
                                     </span>
                                 </div>
-                                <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] tracking-tight transition-colors">
-                                    Enterprise ERP Console
+                                <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-amber-600 dark:group-hover:text-amber-400 tracking-tight transition-colors">
+                                    Gold Saver & Assets
                                 </h3>
                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Financial operations, double-entry journal ledger, and VAT reports.
+                                    Real-time gold vault, hedging, gram rates & personal asset tracking.
                                 </p>
                             </a>
 
-                            {/* CRM Card */}
-                            <a href="/sso/crm" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-[#0071e3]/40 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all group block shadow-sm">
+                            {/* Payment Gateway Card */}
+                            <a href="/sms-payment-gateway" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-rose-500/40 dark:hover:border-rose-400/40 hover:shadow-md transition-all group block shadow-sm">
                                 <div className="flex items-center justify-between mb-5">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                                        <Zap className="w-6 h-6" />
+                                    <div className="w-12 h-12 rounded-2xl bg-rose-500/10 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                                        <CreditCard className="w-6 h-6" />
                                     </div>
-                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f]/70 dark:text-zinc-300 border border-black/5 dark:border-white/10 rounded-full">
+                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/60 rounded-full">
                                         Active
                                     </span>
                                 </div>
-                                <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] tracking-tight transition-colors">
-                                    CRM Customer Pipeline
+                                <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-rose-600 dark:group-hover:text-rose-400 tracking-tight transition-colors">
+                                    Automated Payment Gateway
                                 </h3>
                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Lead tracking, interaction history, and client contracts sync.
+                                    Automated SMS verification, webhook notifications & mobile wallet settlements.
                                 </p>
                             </a>
 
-                            {/* Meta API & WhatsApp */}
-                            <a href="/services/whatsapp-business-verification" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-[#0071e3]/40 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all group block shadow-sm">
+                            {/* Software Store Card */}
+                            <Link href="/store/tools" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-[#0071e3]/40 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all group block shadow-sm">
                                 <div className="flex items-center justify-between mb-5">
-                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                                        <MessageSquare className="w-6 h-6" />
+                                    <div className="w-12 h-12 rounded-2xl bg-[#0071e3]/10 dark:bg-[#0071e3]/20 flex items-center justify-center text-[#0071e3] dark:text-[#2997ff]">
+                                        <Wrench className="w-6 h-6" />
                                     </div>
-                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full">
-                                        Connected
+                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 rounded-full">
+                                        Store
                                     </span>
                                 </div>
                                 <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] tracking-tight transition-colors">
-                                    WhatsApp Cloud API
+                                    Software & Tools Store
                                 </h3>
                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Meta Graph webhooks, automated reply flows, and high-speed delivery.
-                                </p>
-                            </a>
-
-                            {/* Direct Architect Support */}
-                            <Link href="/company/contact" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-[#0071e3]/40 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all group block shadow-sm">
-                                <div className="flex items-center justify-between mb-5">
-                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                                        <Shield className="w-6 h-6" />
-                                    </div>
-                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60 rounded-full">
-                                        Priority
-                                    </span>
-                                </div>
-                                <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] tracking-tight transition-colors">
-                                    Direct Studio Support
-                                </h3>
-                                <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Dedicated architect contact with 24-hour turnaround on technical requests.
+                                    Desktop utilities with instant automated activation linked to your email.
                                 </p>
                             </Link>
+
+                            {/* My Licenses & Devices Card */}
+                            <Link href="/my-licenses" className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-emerald-500/40 dark:hover:border-emerald-400/40 hover:shadow-md transition-all group block shadow-sm">
+                                <div className="flex items-center justify-between mb-5">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                        <Key className="w-6 h-6" />
+                                    </div>
+                                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full">
+                                        Licenses
+                                    </span>
+                                </div>
+                                <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 tracking-tight transition-colors">
+                                    My Licenses & Devices
+                                </h3>
+                                <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
+                                    Manage your purchased software tools, linked computers, and hardware keys.
+                                </p>
+                            </Link>
+
+                            {/* Reseller Portal Card (if reseller or admin) */}
+                            {(authUser?.is_reseller || authUser?.roles?.includes('software_reseller') || authUser?.role === 'software_reseller' || authUser?.is_admin || authUser?.role === 'admin') && (
+                                <Link href="/portal/devices" className="bg-white dark:bg-zinc-900/80 border border-[#0071e3]/30 dark:border-[#0071e3]/40 rounded-[24px] p-6 hover:border-[#0071e3] dark:hover:border-[#3898ec] hover:shadow-md transition-all group block shadow-sm">
+                                    <div className="flex items-center justify-between mb-5">
+                                        <div className="w-12 h-12 rounded-2xl bg-[#0071e3]/10 dark:bg-[#0071e3]/20 flex items-center justify-center text-[#0071e3] dark:text-[#3898ec]">
+                                            <Laptop className="w-6 h-6" />
+                                        </div>
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-[#0071e3] dark:text-[#3898ec] border border-[#0071e3]/20 rounded-full">
+                                            Reseller
+                                        </span>
+                                    </div>
+                                    <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#3898ec] tracking-tight transition-colors">
+                                        Software Reseller Portal
+                                    </h3>
+                                    <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
+                                        Manage client device activations, quotas, and software licenses.
+                                    </p>
+                                </Link>
+                            )}
                         </div>
                     </div>
 
@@ -275,7 +295,7 @@ export default function Dashboard({
                                                 <td className="py-3 px-2 text-[#1d1d1f]/70 dark:text-zinc-300">{txn.date}</td>
                                                 <td className="py-3 px-2 text-[#1d1d1f] dark:text-[#f8fafc] font-medium">{txn.method}</td>
                                                 <td className={`py-3 px-2 text-right rtl:text-left font-bold ${txn.type === 'deposit' ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#1d1d1f] dark:text-[#f8fafc]'}`}>
-                                                    {txn.amount > 0 ? `+${Number(txn.amount).toLocaleString()}` : Number(txn.amount).toLocaleString()} {txn.currency?.symbol || 'EGP'}
+                                                    {txn.amount > 0 ? `+${Number(txn.amount).toLocaleString()}` : Number(txn.amount).toLocaleString()} {txn.currency?.symbol || txn.currency?.currency || currency}
                                                 </td>
                                             </tr>
                                         ))}

@@ -1033,14 +1033,14 @@ class Invoice extends Model
 
             if (! empty($this->project_id)) {
                 $project = Project::find($this->project_id);
-                $transaction_id = $project->add_balance(-1 * $paid, 'Invoice #'.$this->id, 'used', $this->currency);
+                $transaction_id = $project->add_balance(-1 * $paid, 'Invoice #'.$this->id, 'used', $this->currency_id);
             } else {
 
                 $client = User::find($this->user_id);
-                $transaction_id = $client->add_balance(-1 * $paid, 'Invoice #'.$this->id, 'used', $this->currency);
+                $transaction_id = $client->add_balance(-1 * $paid, 'Invoice #'.$this->id, 'used', $this->currency_id);
             }
             $this->transactions()->attach($transaction_id);
-            $this->user->calc_ref($paid, $this->id, $this->currency);
+            $this->user->calc_ref($paid, $this->id, $this->currency_id);
 
             $this->status = 'partially_paid';
             $this->paid += round($paid, 2);

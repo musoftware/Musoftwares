@@ -126,7 +126,7 @@ export default function Index({ proposals }) {
                                                     <div className="text-xs text-muted-foreground">{new Date(proposal.created_at).toLocaleDateString()}</div>
                                                 </div>
                                                 <div className="text-sm font-bold text-foreground">
-                                                    {formatMoney(proposal.total_cost_egp, 'EGP')}
+                                                    {formatMoney(proposal.total_cost_egp, proposal.currency || proposal.currency_id)}
                                                 </div>
                                             </div>
                                             {proposal.status === 'converted_to_contract' ? (
@@ -171,7 +171,7 @@ export default function Index({ proposals }) {
                                             </div>
                                             <div className="p-4 rounded-lg border border-border bg-muted/40">
                                                 <div className="text-sm text-muted-foreground font-medium">{__('general.estimated_cost')}</div>
-                                                <div className="text-2xl font-bold text-foreground">{formatMoney(aiResult.total_cost_egp, 'EGP')}</div>
+                                                <div className="text-2xl font-bold text-foreground">{formatMoney(aiResult.total_cost_egp, aiResult.currency || aiResult.currency_id)}</div>
                                             </div>
                                         </div>
                                         

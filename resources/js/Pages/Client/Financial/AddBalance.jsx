@@ -51,7 +51,7 @@ export default function AddBalance({ wallet, presets = [] }) {
     };
 
     const walletBalance = Number(wallet?.balance || 0);
-    const walletCurrency = wallet?.currency || 'EGP';
+    const walletCurrency = wallet?.currency;
 
     return (
         <AuthenticatedLayout>

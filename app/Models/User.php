@@ -49,6 +49,7 @@ class User extends Authenticatable
         'kyc_notes',
         'workspace_settings',
         'max_devices',
+        'can_view_all_devices',
         'temp_valid_until',
         'enable_custom_hour_rate',
         'hour_rate',
@@ -97,6 +98,7 @@ class User extends Authenticatable
             'kyc_verified_at' => 'datetime',
             'workspace_settings' => 'array',
             'max_devices' => 'integer',
+            'can_view_all_devices' => 'boolean',
             'enable_notifications' => 'boolean',
             'enable_custom_hour_rate' => 'boolean',
             'enable_3d_dashboard' => 'boolean',
@@ -417,11 +419,16 @@ class User extends Authenticatable
             ->groupBy(DB::raw('DATE(date_start)'));
     }
 
+    public function currencyRelation()
+    {
+        return $this->belongsTo(Currency::class, 'currency_id');
+    }
+
     public function currency_name()
     {
-        $currency = Currency::query()->find($this->currency_id);
+        $currency = $this->currencyRelation ?? Currency::findCached($this->currency_id);
 
-        return $currency ? $currency->currency : '--';
+        return $currency ? $currency->currency : null;
     }
 
     public function client_balance()
@@ -547,6 +554,14 @@ class User extends Authenticatable
     public function serialUserDevices(): HasMany
     {
         return $this->hasMany(SerialUserDevice::class, 'user_id');
+    }
+
+    /**
+     * Active software licenses owned by this user.
+     */
+    public function softwareLicenses(): HasMany
+    {
+        return $this->hasMany(SerialSoftwareLicense::class, 'user_id');
     }
 
     /**
@@ -769,6 +784,14 @@ class User extends Authenticatable
     public function isReseller(): bool
     {
         return $this->hasRole(['software_reseller', 'reseller']) || $this->isAdmin();
+    }
+
+    /**
+     * Check if reseller is permitted to view all devices for their allocated software.
+     */
+    public function canViewAllDevices(): bool
+    {
+        return (bool) ($this->can_view_all_devices ?? false) || $this->isAdmin();
     }
 
     /**

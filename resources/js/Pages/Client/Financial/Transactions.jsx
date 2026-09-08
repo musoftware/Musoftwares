@@ -9,7 +9,7 @@ import { __ } from '@/lib/i18n';
 import { formatMoney } from '@/lib/utils';
 
 export default function Transactions({ transactions, wallet }) {
-    const currency = wallet?.currency || 'EGP';
+    const currency = wallet?.currency;
 
     return (
         <AuthenticatedLayout>
@@ -193,13 +193,13 @@ export default function Transactions({ transactions, wallet }) {
                                                     <td className={`py-4 px-4 font-mono font-bold text-xs sm:text-sm ${
                                                         isCredit ? 'text-emerald-600' : 'text-rose-600'
                                                     }`}>
-                                                        {isCredit ? '+' : '-'}{formatMoney(tx.amount || 0, currency)}
+                                                        {isCredit ? '+' : '-'}{formatMoney(tx.amount || 0, tx.currency || currency)}
                                                     </td>
                                                     <td className="py-4 px-4 font-mono text-xs text-[#1d1d1f]/60">
-                                                        {formatMoney(tx.balance_before || 0, currency)}
+                                                        {formatMoney(tx.balance_before || 0, tx.currency || currency)}
                                                     </td>
                                                     <td className="py-4 px-4 font-mono text-xs font-semibold text-[#1d1d1f]">
-                                                        {formatMoney(tx.balance_after || 0, currency)}
+                                                        {formatMoney(tx.balance_after || 0, tx.currency || currency)}
                                                     </td>
                                                     <td className="py-4 ps-4 pe-6 text-end text-xs text-[#1d1d1f]/60 font-sans">
                                                         {new Date(tx.created_at).toLocaleDateString(undefined, {

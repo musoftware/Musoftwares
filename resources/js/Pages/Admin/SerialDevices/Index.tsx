@@ -33,9 +33,25 @@ import {
     Filter,
     BarChart3,
     User,
+    Key,
 } from 'lucide-react';
 
 /* ─── Types ─────────────────────────────────────────────────────── */
+
+interface DeviceKey {
+    id: number;
+    serial_device_id: number;
+    serial_software_key_id: number;
+    value: string;
+}
+
+interface SoftwareKeyItem {
+    id: number;
+    serial_software_id: number;
+    key: string;
+    default_value: string | null;
+    description: string | null;
+}
 
 interface Device {
     id: number;
@@ -54,8 +70,20 @@ interface Device {
     last_check_date: string | null;
     last_check_date_full: string | null;
     created_at: string | null;
-    software?: { id: number; name: string } | null;
-    userDeviceAssignment?: { user?: { id: number; name: string; email: string } } | null;
+    software?: {
+        id: number;
+        name: string;
+        custom_keys?: SoftwareKeyItem[];
+    } | null;
+    userDeviceAssignment?: {
+        expires_at?: string | null;
+        expires_at_formatted?: string | null;
+        is_expired?: boolean;
+        remaining_days?: number | null;
+        user?: { id: number; name: string; email: string };
+    } | null;
+    resolved_custom_keys?: Record<string, string>;
+    device_keys?: DeviceKey[];
 }
 
 interface Software { id: number; name: string; }
@@ -118,6 +146,63 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
     const [bulkAction, setBulkAction]              = useState<string>('');
     const [assignUserDevice, setAssignUserDevice]  = useState<Device | null>(null);
+    const [keysDevice, setKeysDevice]              = useState<Device | null>(null);
+    const [overrideForm, setOverrideForm]          = useState<{ serial_software_key_id: number | ''; value: string }>({
+        serial_software_key_id: '',
+        value: '',
+    });
+    const [keySaving, setKeySaving]                = useState(false);
+
+    const handleSetOverride = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!keysDevice || !overrideForm.serial_software_key_id) return;
+        setKeySaving(true);
+        router.post(
+            route('admin.serial-devices.keys.set', keysDevice.id),
+            {
+                serial_software_key_id: Number(overrideForm.serial_software_key_id),
+                value: overrideForm.value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: (page: any) => {
+                    const updatedList = page.props.devices?.data as Device[];
+                    const updated = updatedList?.find(d => d.id === keysDevice.id);
+                    if (updated) {
+                        setKeysDevice(updated);
+                        if (detail && detail.id === updated.id) {
+                            setDetail(updated);
+                        }
+                    }
+                    setOverrideForm({ serial_software_key_id: '', value: '' });
+                },
+                onFinish: () => setKeySaving(false),
+            }
+        );
+    };
+
+    const handleRemoveOverride = (deviceKeyId: number) => {
+        if (!keysDevice) return;
+        if (!confirm(__('Are you sure you want to remove this override and revert to the software default?', {}, 'Revert to default?'))) return;
+        router.delete(
+            route('admin.serial-devices.keys.remove', [keysDevice.id, deviceKeyId]),
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: (page: any) => {
+                    const updatedList = page.props.devices?.data as Device[];
+                    const updated = updatedList?.find(d => d.id === keysDevice.id);
+                    if (updated) {
+                        setKeysDevice(updated);
+                        if (detail && detail.id === updated.id) {
+                            setDetail(updated);
+                        }
+                    }
+                },
+            }
+        );
+    };
 
     /* ── Filter helpers ──────────────────────────────────────────── */
 
@@ -571,6 +656,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                             <User className="w-4 h-4 me-2" />
                                                             {device.userDeviceAssignment?.user ? __('general.change_client') ?? 'Change Client' : __('general.assign_client') ?? 'Assign Client'}
                                                         </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => setKeysDevice(device)}>
+                                                            <Key className="w-4 h-4 me-2" />
+                                                            {__('general.manage_keys', {}, 'Manage Keys / Overrides')}
+                                                        </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {device.status !== 'active' && (
                                                             <DropdownMenuItem onClick={() => updateStatus(device, 'active')}>
@@ -737,15 +826,87 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                 />
                             } />
                             {detail.userDeviceAssignment?.user && (
-                                <Row label={__('general.profile_link') ?? 'Profile Link'} value={
-                                    <Link
-                                        href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
-                                        className="text-blue-600 hover:underline"
-                                    >
-                                        {__('general.view_client_profile') ?? 'View Client Profile'} &rarr;
-                                    </Link>
-                                } />
+                                <>
+                                    <Row label={__('general.profile_link') ?? 'Profile Link'} value={
+                                        <Link
+                                            href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            {__('general.view_client_profile') ?? 'View Client Profile'} &rarr;
+                                        </Link>
+                                    } />
+                                    <Row
+                                        label={__('general.license_expiration', {}, 'License Expiration')}
+                                        value={
+                                            detail.userDeviceAssignment.expires_at ? (
+                                                detail.userDeviceAssignment.is_expired ? (
+                                                    <Badge variant="destructive" className="text-xs">
+                                                        {__('general.expired', {}, 'Expired')} ({detail.userDeviceAssignment.expires_at_formatted})
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-300">
+                                                        {__('general.remaining_days', { days: String(detail.userDeviceAssignment.remaining_days ?? 0) }, `${detail.userDeviceAssignment.remaining_days ?? 0} days remaining`)}
+                                                    </Badge>
+                                                )
+                                            ) : (
+                                                <Badge variant="outline" className="text-xs bg-slate-100 text-slate-800">
+                                                    {__('general.lifetime', {}, 'Lifetime')}
+                                                </Badge>
+                                            )
+                                        }
+                                    />
+                                </>
                             )}
+                            <Separator />
+                            {/* Resolved Custom Keys Section */}
+                            <div className="space-y-2 pt-1">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-semibold uppercase text-muted-foreground">
+                                        {__('general.resolved_custom_keys', {}, 'Active Configuration Keys')}
+                                    </span>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setKeysDevice(detail)}
+                                        className="h-6 text-xs gap-1 text-blue-600 hover:text-blue-700"
+                                    >
+                                        <Key className="w-3 h-3" />
+                                        <span>{__('general.customize', {}, 'Customize')}</span>
+                                    </Button>
+                                </div>
+                                {detail.resolved_custom_keys && Object.keys(detail.resolved_custom_keys).length > 0 ? (
+                                    <div className="border rounded-md divide-y text-xs">
+                                        {Object.entries(detail.resolved_custom_keys).map(([k, v]) => {
+                                            const isOverridden = detail.device_keys?.some(dk => {
+                                                const sk = detail.software?.custom_keys?.find(s => s.id === dk.serial_software_key_id);
+                                                return sk?.key === k;
+                                            });
+                                            return (
+                                                <div key={k} className="p-2 flex items-center justify-between gap-2">
+                                                    <span className="font-mono font-medium">{k}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">{v}</span>
+                                                        {isOverridden ? (
+                                                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-800">
+                                                                {__('general.override', {}, 'Override')}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-muted-foreground">
+                                                                {__('general.default', {}, 'Default')}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-muted-foreground italic py-1">
+                                        {__('general.no_custom_keys_resolved', {}, 'No custom keys configured.')}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     )}
                 </DialogContent>
@@ -805,6 +966,191 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             <div className="flex justify-end gap-2 pt-2">
                                 <Button variant="outline" size="sm" onClick={() => setAssignUserDevice(null)}>
                                     {__('general.close') ?? 'Close'}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Device Key Overrides Dialog */}
+            <Dialog open={keysDevice !== null} onOpenChange={open => !open && setKeysDevice(null)}>
+                <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Key className="w-5 h-5 text-muted-foreground" />
+                            <span>{__('general.device_key_overrides', {}, 'Device Key Overrides')}</span>
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    {keysDevice && (
+                        <div className="space-y-5 pt-2 text-sm">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border space-y-1 text-xs">
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground">{__('general.machine')}:</span>
+                                    <span className="font-medium text-end">{keysDevice.machine_name}</span>
+                                </div>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground">{__('general.device_id')}:</span>
+                                    <span className="font-mono text-[11px] text-end break-all">{keysDevice.device_id}</span>
+                                </div>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground">{__('general.software')}:</span>
+                                    <span className="font-medium text-end">{keysDevice.software?.name ?? '—'}</span>
+                                </div>
+                            </div>
+
+                            {/* Available Software Keys & Overrides */}
+                            <div className="space-y-3">
+                                <Label className="text-xs font-semibold uppercase text-muted-foreground">
+                                    {__('general.available_keys', {}, 'Available Software Keys & Effective Values')}
+                                </Label>
+
+                                {(!keysDevice.software?.custom_keys || keysDevice.software.custom_keys.length === 0) ? (
+                                    <div className="p-4 border rounded-lg text-center text-xs text-muted-foreground bg-muted/20">
+                                        {__('general.no_keys_in_software_yet', {}, 'No keys are defined for this software yet. Add keys in Software Registry first.')}
+                                    </div>
+                                ) : (
+                                    <div className="border rounded-lg overflow-hidden">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow className="bg-muted/40">
+                                                    <TableHead className="text-xs font-semibold">{__('general.key_name', {}, 'Key')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.default_value', {}, 'Default')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.effective_value', {}, 'Device Value')}</TableHead>
+                                                    <TableHead className="w-16 text-end"></TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {keysDevice.software.custom_keys.map((sk) => {
+                                                    const override = keysDevice.device_keys?.find(dk => dk.serial_software_key_id === sk.id);
+                                                    const effectiveValue = override ? override.value : (sk.default_value ?? '');
+
+                                                    return (
+                                                        <TableRow key={sk.id}>
+                                                            <TableCell>
+                                                                <div className="font-mono text-xs font-medium">{sk.key}</div>
+                                                                {sk.description && (
+                                                                    <div className="text-[11px] text-muted-foreground truncate max-w-[140px]" title={sk.description}>
+                                                                        {sk.description}
+                                                                    </div>
+                                                                )}
+                                                            </TableCell>
+                                                            <TableCell className="font-mono text-xs text-muted-foreground">
+                                                                {sk.default_value !== null && sk.default_value !== '' ? sk.default_value : '—'}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span className="font-mono text-xs font-semibold text-foreground">
+                                                                        {effectiveValue || '—'}
+                                                                    </span>
+                                                                    {override ? (
+                                                                        <Badge variant="secondary" className="text-[10px] px-1 py-0 bg-blue-100 text-blue-800">
+                                                                            {__('general.override', {}, 'Override')}
+                                                                        </Badge>
+                                                                    ) : (
+                                                                        <Badge variant="outline" className="text-[10px] px-1 py-0 text-muted-foreground">
+                                                                            {__('general.default', {}, 'Default')}
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell className="text-end">
+                                                                {override ? (
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-7 text-xs text-destructive hover:bg-destructive/10"
+                                                                        onClick={() => handleRemoveOverride(override.id)}
+                                                                        title={__('general.revert_to_default', {}, 'Revert to Default')}
+                                                                    >
+                                                                        <Trash2 className="w-3.5 h-3.5 me-1" />
+                                                                        <span className="text-[10px]">{__('general.revert', {}, 'Revert')}</span>
+                                                                    </Button>
+                                                                ) : (
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        className="h-7 text-xs text-muted-foreground"
+                                                                        onClick={() => setOverrideForm({ serial_software_key_id: sk.id, value: sk.default_value ?? '' })}
+                                                                    >
+                                                                        {__('general.override', {}, 'Override')}
+                                                                    </Button>
+                                                                )}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Form to Set/Update Override */}
+                            {keysDevice.software?.custom_keys && keysDevice.software.custom_keys.length > 0 && (
+                                <form onSubmit={handleSetOverride} className="p-3 border rounded-lg bg-muted/20 space-y-3">
+                                    <Label className="text-xs font-semibold uppercase text-muted-foreground">
+                                        {__('general.set_key_override', {}, 'Set Custom Value Override for this Device')}
+                                    </Label>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div className="space-y-1">
+                                            <Label className="text-xs">{__('general.select_key', {}, 'Select Key')}</Label>
+                                            <Select
+                                                value={overrideForm.serial_software_key_id ? String(overrideForm.serial_software_key_id) : ''}
+                                                onValueChange={(v) => {
+                                                    const skId = Number(v);
+                                                    const sk = keysDevice.software?.custom_keys?.find(k => k.id === skId);
+                                                    const existingOverride = keysDevice.device_keys?.find(dk => dk.serial_software_key_id === skId);
+                                                    setOverrideForm({
+                                                        serial_software_key_id: skId,
+                                                        value: existingOverride ? existingOverride.value : (sk?.default_value ?? ''),
+                                                    });
+                                                }}
+                                            >
+                                                <SelectTrigger className="h-8 text-xs">
+                                                    <SelectValue placeholder={__('general.select_key', {}, 'Select Key')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {keysDevice.software.custom_keys.map(sk => (
+                                                        <SelectItem key={sk.id} value={String(sk.id)} className="text-xs font-mono">
+                                                            {sk.key}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <Label className="text-xs">{__('general.override_value', {}, 'Override Value')}</Label>
+                                            <Input
+                                                placeholder={__('general.custom_value', {}, 'e.g. 5')}
+                                                value={overrideForm.value}
+                                                onChange={e => setOverrideForm({ ...overrideForm, value: e.target.value })}
+                                                className="h-8 font-mono text-xs"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end gap-2 pt-1">
+                                        <Button
+                                            type="submit"
+                                            size="sm"
+                                            disabled={keySaving || !overrideForm.serial_software_key_id}
+                                            className="h-8 text-xs gap-1.5"
+                                        >
+                                            <Key className="w-3.5 h-3.5" />
+                                            <span>{keySaving ? __('general.saving', {}, 'Saving...') : __('general.save_override', {}, 'Save Override')}</span>
+                                        </Button>
+                                    </div>
+                                </form>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-1">
+                                <Button variant="outline" size="sm" onClick={() => setKeysDevice(null)}>
+                                    {__('general.close', {}, 'Close')}
                                 </Button>
                             </div>
                         </div>

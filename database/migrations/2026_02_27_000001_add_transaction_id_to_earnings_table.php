@@ -13,15 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasColumn('earnings', 'transaction_id')) {
+        if (! Schema::hasColumn('earnings', 'transaction_id')) {
             Schema::table('earnings', function (Blueprint $table) {
-                $foreignExists = collect(DB::select('SHOW CREATE TABLE earnings'))->first();
-                if ($foreignExists && strpos($foreignExists->{'Create Table'} ?? '', 'transaction_id') !== false) {
-                    $indexExists = collect(DB::select("SHOW INDEX FROM earnings WHERE Column_name = 'transaction_id'"))->isNotEmpty();
-                    if (! $indexExists || strpos($foreignExists->{'Create Table'} ?? '', 'transactions') === false) {
-                        $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('set null');
-                    }
-                }
+                $table->foreignId('transaction_id')->nullable()->constrained('transactions')->nullOnDelete();
             });
         }
     }

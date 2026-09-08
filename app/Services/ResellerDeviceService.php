@@ -51,7 +51,20 @@ class ResellerDeviceService extends BaseService
     {
         $cairoNow = now()->setTimezone('Africa/Cairo');
 
-        $baseQuery = SerialUserDevice::where('reseller_id', $reseller->id);
+        $baseQuery = SerialUserDevice::query();
+
+        if ($reseller->canViewAllDevices()) {
+            $allocatedSoftwareIds = SerialSoftwareReseller::where('user_id', $reseller->id)
+                ->where('status', SerialSoftwareReseller::STATUS_ACTIVE)
+                ->pluck('serial_software_id')
+                ->toArray();
+
+            $baseQuery->whereHas('devices', function ($q) use ($allocatedSoftwareIds) {
+                $q->whereIn('serial_software_id', $allocatedSoftwareIds);
+            });
+        } else {
+            $baseQuery->where('reseller_id', $reseller->id);
+        }
 
         $totalDevices = (clone $baseQuery)->count();
         $activeDevices = (clone $baseQuery)->where('status', SerialUserDevice::STATUS_ACTIVE)
@@ -97,8 +110,20 @@ class ResellerDeviceService extends BaseService
         }
 
         $query = SerialUserDevice::query()
-            ->with(['user:' . $userCols, 'devices.software:id,name'])
-            ->where('reseller_id', $reseller->id);
+            ->with(['user:' . $userCols, 'reseller:id,name,email', 'devices.software:id,name']);
+
+        if ($reseller->canViewAllDevices()) {
+            $allocatedSoftwareIds = SerialSoftwareReseller::where('user_id', $reseller->id)
+                ->where('status', SerialSoftwareReseller::STATUS_ACTIVE)
+                ->pluck('serial_software_id')
+                ->toArray();
+
+            $query->whereHas('devices', function ($q) use ($allocatedSoftwareIds) {
+                $q->whereIn('serial_software_id', $allocatedSoftwareIds);
+            });
+        } else {
+            $query->where('reseller_id', $reseller->id);
+        }
 
         // Filter by search
         if (! empty($filters['search'])) {

@@ -58,6 +58,7 @@ use App\Http\Controllers\AdminNoteController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\BackgroundTaskController;
 use App\Http\Controllers\Billing\InvoiceController;
+use App\Http\Controllers\Client\ToolStoreController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PublicToolsController;
 use App\Http\Controllers\Client\ClientProjectBoardController;
@@ -343,8 +344,8 @@ Route::middleware('auth')->group(function () {
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::match(['get', 'post'], '/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
+    Route::match(['get', 'post'], '/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 
     // FCM Device Token
     Route::post('/device-tokens', [DeviceTokenController::class, 'store'])->name('device-tokens.store');
@@ -615,6 +616,10 @@ Route::post('/guest-tickets/submit', [GuestTicketSubmissionController::class, 's
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
+    // Commissions Schedule (Operations)
+    Route::get('/commissions', [App\Http\Controllers\Admin\AdminCommissionController::class, 'index'])->name('commissions.index');
+    Route::post('/commissions/{earning}/clear', [App\Http\Controllers\Admin\AdminCommissionController::class, 'clearNow'])->name('commissions.clear');
+
     // Website Services
     Route::resource('website-services', WebsiteServiceController::class)->except(['show']);
 
@@ -806,6 +811,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::put('/users/{user}/loans/{loan}', [AdminUserLoanController::class, 'update'])->name('users.loans.update');
     Route::delete('/users/{user}/loans/{loan}', [AdminUserLoanController::class, 'destroy'])->name('users.loans.destroy');
     Route::post('/users/{user}/loans/{loan}/repayments', [AdminUserLoanController::class, 'storeRepayment'])->name('users.loans.repayments.store');
+    Route::post('/users/{user}/loans/{loan}/recharge-balance', [AdminUserLoanController::class, 'rechargeBalance'])->name('users.loans.recharge-balance');
 
     Route::post('/users/{id}/toggle-block', [UsersController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::get('/users/{id}/subscriptions/create', [UsersController::class, 'createSubscription'])->name('users.subscriptions.create');
@@ -815,6 +821,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/users/{id}/update-role', [UsersController::class, 'updateRole'])->name('users.update-role');
     Route::post('/users/{user}/reseller-softwares', [UsersController::class, 'allocateResellerSoftware'])->name('users.reseller-softwares.store');
     Route::delete('/users/{user}/reseller-softwares/{allocation}', [UsersController::class, 'deallocateResellerSoftware'])->name('users.reseller-softwares.destroy');
+    Route::post('/users/{user}/toggle-reseller-all-devices', [UsersController::class, 'toggleResellerAllDevices'])->name('users.toggle-reseller-all-devices');
 
     // ── Points Control ───────────────────────────────────────────────
     Route::get('/points_controller', [AdminPointsController::class, 'index'])->name('points.index');
@@ -880,6 +887,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/serial-softwares', [SerialSoftwareController::class, 'store'])->name('serial-softwares.store');
     Route::patch('/serial-softwares/{serialSoftware}/status', [SerialSoftwareController::class, 'updateStatus'])->name('serial-softwares.status');
     Route::delete('/serial-softwares/{serialSoftware}', [SerialSoftwareController::class, 'destroy'])->name('serial-softwares.destroy');
+    Route::post('/serial-softwares/{serialSoftware}/keys', [SerialSoftwareController::class, 'storeKey'])->name('serial-softwares.keys.store');
+    Route::delete('/serial-softwares/{serialSoftware}/keys/{serialSoftwareKey}', [SerialSoftwareController::class, 'destroyKey'])->name('serial-softwares.keys.destroy');
+    Route::patch('/serial-softwares/{serialSoftware}/payment', [SerialSoftwareController::class, 'updatePaymentSettings'])->name('serial-softwares.payment');
 
     // Device registry (auto-created by API check-in, admin manages status)
     Route::get('/serial-devices', [SerialDeviceController::class, 'index'])->name('serial-devices.index');
@@ -889,6 +899,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::patch('/serial-devices/{serialDevice}/status', [SerialDeviceController::class, 'updateStatus'])->name('serial-devices.status');
     Route::delete('/serial-devices/{serialDevice}', [SerialDeviceController::class, 'destroy'])->name('serial-devices.destroy');
     Route::post('/serial-devices/{serialDevice}/assign-user', [SerialDeviceController::class, 'assignUser'])->name('serial-devices.assign-user');
+    Route::post('/serial-devices/{serialDevice}/keys', [SerialDeviceController::class, 'setKeyOverride'])->name('serial-devices.keys.set');
+    Route::delete('/serial-devices/{serialDevice}/keys/{serialDeviceKey}', [SerialDeviceController::class, 'removeKeyOverride'])->name('serial-devices.keys.remove');
 
     // User-Device assignments (admin maps device → user)
     Route::get('/serial-user-devices', [SerialUserDeviceController::class, 'index'])->name('serial-user-devices.index');
@@ -896,6 +908,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/serial-user-devices/assign', [SerialUserDeviceController::class, 'assign'])->name('serial-user-devices.assign');
     Route::post('/serial-user-devices', [SerialUserDeviceController::class, 'store'])->name('serial-user-devices.store');
     Route::patch('/serial-user-devices/{serialUserDevice}/status', [SerialUserDeviceController::class, 'updateStatus'])->name('serial-user-devices.status');
+    Route::patch('/serial-user-devices/{serialUserDevice}/expires-at', [SerialUserDeviceController::class, 'updateExpiresAt'])->name('serial-user-devices.update-expires-at');
     Route::patch('/serial-user-devices/users/{user}/status', [SerialUserDeviceController::class, 'updateUserStatus'])->name('serial-user-devices.update-user-status');
     Route::patch('/serial-user-devices/users/{user}/temp-valid', [SerialUserDeviceController::class, 'updateUserTempValid'])->name('serial-user-devices.update-user-temp-valid');
     Route::delete('/serial-user-devices/{serialUserDevice}', [SerialUserDeviceController::class, 'destroy'])->name('serial-user-devices.destroy');
@@ -947,7 +960,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/subscriptions/kashier/checkout', [SubscriptionController::class, 'checkoutKashier'])->name('subscriptions.kashier.checkout');
     Route::get('/subscriptions/kashier/success', [SubscriptionController::class, 'kashierSuccess'])->name('subscriptions.kashier.success');
     Route::get('/subscriptions/kashier/failure', [SubscriptionController::class, 'kashierFailure'])->name('subscriptions.kashier.failure');
+
+    // User Licenses
+    Route::get('/my-licenses', [ToolStoreController::class, 'myLicenses'])->name('store.tools.my-licenses');
 });
+
+// Software & Tools Store Public Routes
+Route::get('/store/tools', [ToolStoreController::class, 'index'])->name('store.tools.index');
+Route::post('/store/tools/{serialSoftware}/purchase', [ToolStoreController::class, 'purchase'])->name('store.tools.purchase');
 
 require __DIR__.'/auth.php';
 

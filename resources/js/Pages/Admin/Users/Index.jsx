@@ -430,6 +430,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                                         required
                                     >
                                         <option value="client">{__("erp.client")}</option>
+                                        <option value="software_reseller">{__("general.software_reseller") || "Software Reseller"}</option>
                                         <option value="admin">{__("admin.admin")}</option>
                                         <option value="manager">{__("general.manager")}</option>
                                         <option value="employee">{__("general.employee")}</option>

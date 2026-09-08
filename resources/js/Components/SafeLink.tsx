@@ -43,9 +43,6 @@ export function isExternalRoute(href?: string): boolean {
 
     // External protocols
     if (
-        href.startsWith('http://') ||
-        href.startsWith('https://') ||
-        href.startsWith('//') ||
         href.startsWith('mailto:') ||
         href.startsWith('tel:') ||
         href.startsWith('#') ||
@@ -61,8 +58,9 @@ export function isExternalRoute(href?: string): boolean {
         if (href.startsWith('/')) {
             path = href.split('?')[0].split('#')[0];
         } else {
-            const parsed = new URL(href, window.location.origin);
-            if (parsed.origin !== window.location.origin) {
+            const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://www.musoftwares.com';
+            const parsed = new URL(href, currentOrigin);
+            if (typeof window !== 'undefined' && parsed.origin !== window.location.origin) {
                 return true;
             }
             path = parsed.pathname;
@@ -114,7 +112,8 @@ export interface SafeLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElem
  * ensuring full page browser navigation and preventing Inertia srcdoc iframe issues.
  */
 export default function SafeLink({ href, external, children, className, method, as, data, preserveState, preserveScroll, only, ...props }: SafeLinkProps) {
-    if (external || isExternalRoute(href)) {
+    const isNonGet = method && method.toLowerCase() !== 'get';
+    if (!isNonGet && (external || isExternalRoute(href))) {
         return (
             <a href={href} className={className} {...props}>
                 {children}

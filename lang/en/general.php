@@ -6271,6 +6271,8 @@ return array (
   'select_project' => 'Choose project:name',
   'select_provider' => 'Choose Provider',
   'select_role' => 'Choose the role',
+  'software_reseller' => 'Software Reseller',
+  'allocate_software' => 'Allocate Software (Reseller)',
   'select_sender' => 'Choose sender',
   'select_source_project' => 'Choose Source Project',
   'select_source_target' => 'Choose source and target currencies.',

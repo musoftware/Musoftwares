@@ -319,45 +319,32 @@ function AuthenticatedContent({
                                                                     </AccordionContent>
                                                                 </AccordionItem>
 
-                                                                {/* 2. iSAAS Cloud Systems */}
-                                                                <AccordionItem value="isaas" className="border-b-0">
+                                                                {/* 2. Core Solutions */}
+                                                                <AccordionItem value="core_solutions" className="border-b-0">
                                                                     <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 rounded-xl text-[#1d1d1f] dark:text-zinc-100 hover:no-underline">
                                                                         <div className="flex items-center gap-3 font-medium">
-                                                                            <Sparkles className="w-5 h-5 text-[#0071e3]" /> {__('general.cloud_apps') || 'iSAAS'}
+                                                                            <Sparkles className="w-5 h-5 text-[#0071e3]" /> {__('general.cloud_apps') || 'Solutions'}
                                                                         </div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-5 ps-4">
-                                                                            <SafeLink href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <Building2 className="w-4 h-4 text-[#0071e3]" /> ERP
-                                                                                </div>
-                                                                                {!activeModules.erp && <Lock className="w-3 h-3 text-[#1d1d1f]/40 dark:text-zinc-500" />}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <Megaphone className="w-4 h-4 text-[#0071e3]" /> {__('general.lead_gen_crm')}
-                                                                                </div>
-                                                                                {!activeModules.crm && <Lock className="w-3 h-3 text-[#1d1d1f]/40 dark:text-zinc-500" />}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <Calendar className="w-4 h-4 text-[#0071e3]" /> {__('general.booking')}
-                                                                                </div>
-                                                                                {!activeModules.booking && <Lock className="w-3 h-3 text-[#1d1d1f]/40 dark:text-zinc-500" />}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('fbmb.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Activity className="w-4 h-4 text-[#0071e3]" /> {__('general.isaas_fb_lookup')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('whatsapp.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <MessageSquare className="w-4 h-4 text-emerald-600" /> WhatsApp API
+                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Coins className="w-4 h-4 text-amber-500" /> {__('general.gold_savers') || 'Gold Saver'}
                                                                             </SafeLink>
                                                                             <SafeLink href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <MessageSquare className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway')}
+                                                                                <CreditCard className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway') || 'Payment Gateway'}
                                                                             </SafeLink>
-                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'toolsys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Wrench className="w-4 h-4 text-purple-600" /> {__('general.tools_amp_plugins')}
+                                                                            <SafeLink href={safeRoute('store.tools.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Wrench className="w-4 h-4 text-[#0071e3]" /> {__('general.tools_amp_plugins') || 'Software Store'}
                                                                             </SafeLink>
+                                                                            <SafeLink href={safeRoute('store.tools.my-licenses')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Key className="w-4 h-4 text-emerald-500" /> My Licenses & Devices
+                                                                            </SafeLink>
+                                                                            {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
+                                                                                <SafeLink href={safeRoute('portal.devices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#0071e3]/10 dark:hover:bg-[#0071e3]/20 text-[#0071e3] font-semibold">
+                                                                                    <Laptop className="w-4 h-4 text-[#0071e3]" /> Reseller Portal
+                                                                                </SafeLink>
+                                                                            )}
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
@@ -404,9 +391,6 @@ function AuthenticatedContent({
                                                                             </SafeLink>
                                                                             <SafeLink href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.subscription')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Coins className="w-4 h-4 text-yellow-600" /> {__('general.gold_savers')}
                                                                             </SafeLink>
                                                                         </div>
                                                                     </AccordionContent>
@@ -519,95 +503,60 @@ function AuthenticatedContent({
                                                     />
                                                 </div>
 
-                                                {/* Column 2: iSAAS Cloud Systems */}
+                                                {/* Column 2: Core Solutions */}
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.cloud_apps') || 'iSAAS'}</p>
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.cloud_apps') || 'Solutions'}</p>
                                                     </div>
                                                     
                                                     <UnifiedMenuItem
-                                                        href={activeModules.erp ? safeRoute('sso.redirect', { system: 'erp' }) : safeRoute('subscriptions.plans', { module: 'erp' })}
-                                                        icon={Building2}
-                                                        title="ERP"
-                                                        description={!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
-                                                        isActive={isErpActive}
-                                                        badge={
-                                                            isErpActive ? (
-                                                                <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span>
-                                                            ) : !activeModules.erp ? (
-                                                                <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40 dark:text-zinc-500" />
-                                                            ) : null
-                                                        }
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={activeModules.crm ? safeRoute('sso.redirect', { system: 'crm' }) : safeRoute('subscriptions.plans', { module: 'crm' })}
-                                                        icon={Megaphone}
-                                                        title={__('general.lead_gen_crm')}
-                                                        description={!activeModules.crm ? 'Subscribe to access' : 'Capture leads & campaigns'}
-                                                        isActive={isCrmActive}
-                                                        badge={
-                                                            isCrmActive ? (
-                                                                <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span>
-                                                            ) : !activeModules.crm ? (
-                                                                <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40 dark:text-zinc-500" />
-                                                            ) : null
-                                                        }
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={activeModules.booking ? safeRoute('sso.redirect', { system: 'bookingsys' }) : safeRoute('subscriptions.plans', { module: 'booking' })}
-                                                        icon={Calendar}
-                                                        title={__('general.booking')}
-                                                        description={!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
-                                                        isActive={isBookingActive}
-                                                        badge={
-                                                            isBookingActive ? (
-                                                                <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span>
-                                                            ) : !activeModules.booking ? (
-                                                                <Lock className="w-3.5 h-3.5 text-[#1d1d1f]/40 dark:text-zinc-500" />
-                                                            ) : null
-                                                        }
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('fbmb.index')}
-                                                        icon={Activity}
-                                                        title={__('general.isaas_fb_lookup')}
-                                                        description={__('general.search_mobile_by_fbid')}
-                                                        isActive={isFbmbMenuActive}
-                                                        badge={isFbmbMenuActive ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('whatsapp.index')}
-                                                        icon={MessageSquare}
-                                                        color="emerald"
-                                                        title="WhatsApp API"
-                                                        description="Meta Cloud API & Webhooks"
-                                                        isActive={isWhatsappMenuActive}
-                                                        badge={isWhatsappMenuActive ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
+                                                        href={safeRoute('sso.redirect', { system: 'goldsaversys' })}
+                                                        icon={Coins}
+                                                        color="amber"
+                                                        title={__('general.gold_savers') || 'Gold Saver'}
+                                                        description="Real-time gold vault, hedging & savings"
                                                     />
 
                                                     <UnifiedMenuItem
                                                         href={safeRoute('sms-payment-gateway.index')}
-                                                        icon={MessageSquare}
+                                                        icon={CreditCard}
                                                         color="rose"
-                                                        title={__('general.payment_gateway')}
-                                                        description={__('general.android_automated_sms')}
+                                                        title={__('general.payment_gateway') || 'Payment Gateway'}
+                                                        description={__('general.android_automated_sms') || 'Automated SMS & partner payments'}
                                                         isActive={isSmsGatewayMenuActive}
                                                         badge={isSmsGatewayMenuActive ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
                                                     />
 
                                                     <UnifiedMenuItem
-                                                        href={safeRoute('sso.redirect', { system: 'toolsys' })}
+                                                        href={safeRoute('store.tools.index')}
                                                         icon={Wrench}
-                                                        color="purple"
-                                                        title={__('general.tools_amp_plugins')}
-                                                        description={__('general.extensions_amp_licensing')}
-                                                        isActive={isToolsActive}
-                                                        badge={isToolsActive ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
+                                                        color="blue"
+                                                        title={__('general.tools_amp_plugins') || 'Software & Tools Store'}
+                                                        description="Desktop utilities with automated email activation"
+                                                        isActive={route().current('store.tools.*')}
+                                                        badge={route().current('store.tools.*') ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
                                                     />
+
+                                                    <UnifiedMenuItem
+                                                        href={safeRoute('store.tools.my-licenses')}
+                                                        icon={Key}
+                                                        color="emerald"
+                                                        title="My Licenses & Devices"
+                                                        description="View active licenses and machine bindings"
+                                                        isActive={route().current('store.tools.my-licenses')}
+                                                    />
+
+                                                    {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
+                                                        <UnifiedMenuItem
+                                                            href={safeRoute('portal.devices.index')}
+                                                            icon={Laptop}
+                                                            color="blue"
+                                                            title="Reseller Portal"
+                                                            description="Licenses & client devices"
+                                                            isActive={route().current('portal.devices.*')}
+                                                            badge={<span className="text-[10px] font-semibold px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20 rounded-full">Reseller</span>}
+                                                        />
+                                                    )}
                                                 </div>
 
                                                 {/* Column 3: Financials & Ledger */}
@@ -693,14 +642,6 @@ function AuthenticatedContent({
                                                         title={__('general.subscription')}
                                                         description={__('general.manage_plans_and_addons') || 'Plans, modules & addons'}
                                                         isActive={isSubscriptionsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('sso.redirect', { system: 'goldsaversys' })}
-                                                        icon={Coins}
-                                                        color="amber"
-                                                        title={__('general.gold_savers')}
-                                                        description={__('general.gold_vault_hedging') || 'Gold savings & assets'}
                                                     />
                                                 </div>
                                             </DropdownMenuContent>
@@ -858,7 +799,7 @@ function AuthenticatedContent({
                                                     >
                                                         <Building2 className="me-2 h-3.5 w-3.5 text-[#0071e3] dark:text-[#3898ec]" />Seller Portal</DropdownMenuItem>
                                                 )}
-                                                {(user?.roles?.includes('software_reseller') || user?.role === 'admin') && (
+                                                {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
                                                     <DropdownMenuItem 
                                                         className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#0071e3] dark:text-[#3898ec] bg-[#0071e3]/10 dark:bg-[#0071e3]/20 hover:bg-[#0071e3]/20 mb-1 p-2"
                                                         render={<SafeLink href={safeRoute('portal.devices.index')} className="flex items-center w-full font-bold" />}

@@ -42,7 +42,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
 
     // Serial Devices States
     const [isAssignDeviceOpen, setIsAssignDeviceOpen] = useState(false);
-    const [assignDeviceForm, setAssignDeviceForm] = useState({ device_id: '', notes: '' });
+    const [assignDeviceForm, setAssignDeviceForm] = useState({ device_id: '', expires_at: '', notes: '' });
     const [tempValidUntil, setTempValidUntil] = useState(client.temp_valid_until || '');
 
     // Reseller Software Allocation States
@@ -143,6 +143,12 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
     const submitDeallocateSoftware = (allocationId) => {
         if (!confirm('Are you sure you want to remove this software allocation from this reseller?')) return;
         router.delete(`/admin/users/${client.id}/reseller-softwares/${allocationId}`, {
+            preserveState: true,
+        });
+    };
+
+    const submitToggleResellerAllDevices = () => {
+        router.post(`/admin/users/${client.id}/toggle-reseller-all-devices`, {}, {
             preserveState: true,
         });
     };
@@ -270,6 +276,10 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                             <Key className="me-2 h-4 w-4 text-emerald-600" />
                                             <span>Partner Gateway (API & Wallet)</span>
                                         </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setIsAllocateSoftwareOpen(true)} className="w-full cursor-pointer flex items-center bg-blue-500/10 text-[#0071e3] font-semibold rounded-md">
+                                        <ShieldCheck className="me-2 h-4 w-4 text-[#0071e3]" />
+                                        <span>{__('general.allocate_software') || 'Allocate Software (Reseller)'}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/tasks/add`} className="w-full cursor-pointer flex items-center">
@@ -447,7 +457,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                             preserveState: true,
                             onSuccess: () => {
                                 setIsAssignDeviceOpen(false);
-                                setAssignDeviceForm({ device_id: '', notes: '' });
+                                setAssignDeviceForm({ device_id: '', expires_at: '', notes: '' });
                             }
                         });
                     }}>
@@ -473,6 +483,18 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+                            <div>
+                                <div className="flex items-center justify-between">
+                                    <Label>{__('general.license_expiration') || 'License Expiration (Optional)'}</Label>
+                                    <span className="text-xs text-slate-400">{__('general.leave_blank_for_lifetime') || 'Leave empty for lifetime'}</span>
+                                </div>
+                                <Input
+                                    type="date"
+                                    className="mt-1"
+                                    value={assignDeviceForm.expires_at || ''}
+                                    onChange={e => setAssignDeviceForm({...assignDeviceForm, expires_at: e.target.value})}
+                                />
                             </div>
                             <div>
                                 <Label>{__('general.notes') || 'Notes'}</Label>
@@ -609,7 +631,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 >
                                     <option value="client">{__("erp.client")}</option>
                                     <option value="user">{__("general.user")}</option>
-                                    <option value="software_reseller">Software Reseller</option>
+                                    <option value="software_reseller">{__("general.software_reseller") || "Software Reseller"}</option>
                                     <option value="admin">{__("admin.admin")}</option>
                                     <option value="manager">{__("general.manager")}</option>
                                     <option value="employee">{__("general.employee")}</option>
@@ -830,7 +852,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                         <div className="space-y-4 text-sm">
                             <div className="grid grid-cols-2 gap-2">
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.currency')}</span><span className="font-medium text-slate-900 break-words">{client.currency || <span className="text-slate-400 italic">{__('general.default')}</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Hour Rate ({client.currency || 'USD'})</span><span className="font-medium text-slate-900 break-words">{client.hour_rate || "0.00"}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Hour Rate ({client.currency})</span><span className="font-medium text-slate-900 break-words">{client.hour_rate || "0.00"}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.phone')}</span><span className="font-medium text-slate-900 break-words">{client.phone || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
@@ -1120,6 +1142,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                             <th className="p-3 font-bold text-slate-600 text-start">{__('general.device_id') || 'Device ID'}</th>
                                             <th className="p-3 font-bold text-slate-600 text-start">{__('general.software_applications') || 'Software Applications'}</th>
                                             <th className="p-3 font-bold text-slate-600 text-start">{__('general.environment') || 'Environment / Machine'}</th>
+                                            <th className="p-3 font-bold text-slate-600 text-start">{__('general.license_expiration') || 'Expiration'}</th>
                                             <th className="p-3 font-bold text-slate-600 text-center">{__('general.status') || 'Status'}</th>
                                             <th className="p-3 text-end font-bold text-slate-600">{__('general.actions') || 'Actions'}</th>
                                         </tr>
@@ -1155,6 +1178,27 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                                         </div>
                                                     ) : (
                                                         <span className="text-slate-400 text-xs">—</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-3">
+                                                    {assignment.expires_at ? (
+                                                        assignment.is_expired ? (
+                                                            <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
+                                                                {__('general.expired') || 'Expired'} ({assignment.expires_at_formatted})
+                                                            </span>
+                                                        ) : (
+                                                            <span className={`px-2 py-0.5 rounded text-xs font-semibold border ${
+                                                                (assignment.remaining_days ?? 0) <= 7
+                                                                    ? 'bg-amber-100 text-amber-800 border-amber-200'
+                                                                    : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                                                            }`}>
+                                                                {assignment.remaining_days ?? 0} {__('general.days_remaining') || 'days left'}
+                                                            </span>
+                                                        )
+                                                    ) : (
+                                                        <span className="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                            {__('general.lifetime') || 'Lifetime'}
+                                                        </span>
                                                     )}
                                                 </td>
                                                 <td className="p-3 text-center">
@@ -1200,15 +1244,30 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                     </div>
 
                     {/* Software Reseller Allocations & Quotas */}
-                    {(client.role === 'software_reseller' || (client.roles && client.roles.includes('software_reseller')) || (resellerAllocations && resellerAllocations.length > 0)) && (
-                        <div id="reseller-allocations" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">
-                            <div className="flex justify-between items-center mb-4 border-b pb-2">
-                                <div>
-                                    <h2 className="text-lg font-bold font-sora text-slate-900 flex items-center gap-2">
-                                        <ShieldCheck size={18} className="text-[#0071e3]" />Software Reseller Allocations & Quotas
-                                    </h2>
-                                    <p className="text-xs text-slate-500 mt-0.5">Software products allocated to this user for distribution and device management.</p>
-                                </div>
+                    <div id="reseller-allocations" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b pb-4">
+                            <div>
+                                <h2 className="text-lg font-bold font-sora text-slate-900 flex items-center gap-2">
+                                    <ShieldCheck size={18} className="text-[#0071e3]" />Software Reseller Allocations & Quotas
+                                </h2>
+                                <p className="text-xs text-slate-500 mt-0.5">Software products allocated to this user for distribution and device management.</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={submitToggleResellerAllDevices}
+                                    className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition flex items-center gap-1.5 ${
+                                        client.can_view_all_devices
+                                            ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                                            : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
+                                    }`}
+                                    title="Toggle whether this reseller can view all devices or only their own"
+                                >
+                                    <span className={`w-2 h-2 rounded-full ${client.can_view_all_devices ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                                    <span>Scope: {client.can_view_all_devices ? 'All Allocated Devices' : 'Own Devices Only'}</span>
+                                </Button>
+
                                 <Button 
                                     onClick={() => setIsAllocateSoftwareOpen(true)}
                                     className="bg-[#0071e3] text-white text-xs px-3 py-1.5 rounded-lg hover:bg-[#0077ed] transition flex items-center gap-1 font-semibold"
@@ -1216,63 +1275,63 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                     <Plus size={14} /> Allocate Software
                                 </Button>
                             </div>
-
-                            {resellerAllocations && resellerAllocations.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-start text-sm">
-                                        <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
-                                            <tr>
-                                                <th className="p-3">Software</th>
-                                                <th className="p-3 text-center">Active Devices</th>
-                                                <th className="p-3 text-center">Device Quota</th>
-                                                <th className="p-3 text-center">Remaining</th>
-                                                <th className="p-3 text-center">Status</th>
-                                                <th className="p-3 text-end">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100">
-                                            {resellerAllocations.map((alloc) => (
-                                                <tr key={alloc.id} className="hover:bg-slate-50/70">
-                                                    <td className="p-3 font-semibold text-slate-900">
-                                                        {alloc.software_name}
-                                                        {alloc.notes && <div className="text-xs font-normal text-slate-400">{alloc.notes}</div>}
-                                                    </td>
-                                                    <td className="p-3 text-center font-bold text-emerald-600">
-                                                        {alloc.active_devices_count}
-                                                    </td>
-                                                    <td className="p-3 text-center text-slate-700">
-                                                        {alloc.is_unlimited ? 'Unlimited' : alloc.max_devices}
-                                                    </td>
-                                                    <td className="p-3 text-center font-medium text-slate-700">
-                                                        {alloc.is_unlimited ? 'Unlimited' : alloc.remaining_quota}
-                                                    </td>
-                                                    <td className="p-3 text-center">
-                                                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                            {alloc.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="p-3 text-end">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                                                            onClick={() => submitDeallocateSoftware(alloc.id)}
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
-                                <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">
-                                    No software allocated to this reseller yet. Click "Allocate Software" to grant access.
-                                </p>
-                            )}
                         </div>
-                    )}
+
+                        {resellerAllocations && resellerAllocations.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-start text-sm">
+                                    <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
+                                        <tr>
+                                            <th className="p-3">Software</th>
+                                            <th className="p-3 text-center">Active Devices</th>
+                                            <th className="p-3 text-center">Device Quota</th>
+                                            <th className="p-3 text-center">Remaining</th>
+                                            <th className="p-3 text-center">Status</th>
+                                            <th className="p-3 text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {resellerAllocations.map((alloc) => (
+                                            <tr key={alloc.id} className="hover:bg-slate-50/70">
+                                                <td className="p-3 font-semibold text-slate-900">
+                                                    {alloc.software_name}
+                                                    {alloc.notes && <div className="text-xs font-normal text-slate-400">{alloc.notes}</div>}
+                                                </td>
+                                                <td className="p-3 text-center font-bold text-emerald-600">
+                                                    {alloc.active_devices_count}
+                                                </td>
+                                                <td className="p-3 text-center text-slate-700">
+                                                    {alloc.is_unlimited ? 'Unlimited' : alloc.max_devices}
+                                                </td>
+                                                <td className="p-3 text-center font-medium text-slate-700">
+                                                    {alloc.is_unlimited ? 'Unlimited' : alloc.remaining_quota}
+                                                </td>
+                                                <td className="p-3 text-center">
+                                                    <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                        {alloc.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-3 text-end">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                                                        onClick={() => submitDeallocateSoftware(alloc.id)}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">
+                                No software allocated to this reseller yet. Click "Allocate Software" to grant access.
+                            </p>
+                        )}
+                    </div>
 
                     {/* User Subscriptions List */}
                     <div id="subscriptions" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">

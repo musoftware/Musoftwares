@@ -16,6 +16,7 @@ class UserLoan extends Model
         'paid_amount',
         'currency_id',
         'status',
+        'type',
         'date',
         'note',
     ];
@@ -39,5 +40,15 @@ class UserLoan extends Model
     public function repayments()
     {
         return $this->hasMany(UserLoanRepayment::class);
+    }
+
+    public function isOnBusiness(): bool
+    {
+        return $this->type === 'on_business';
+    }
+
+    public function isOnClient(): bool
+    {
+        return $this->type === 'on_client';
     }
 }

@@ -30,6 +30,7 @@ class UserResource extends JsonResource
             'avatar_url' => 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s=200&d=mp',
             'initials' => $initials,
             'role' => $this->whenLoaded('roles', fn () => $this->roles->first()?->name ?? 'user', 'user'),
+            'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')->all(), []),
             'account_status' => $this->account_status ?? 'active',
             'block_reason' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports') || $request->routeIs('admin.users.problematic'), $this->block_reason),
             'email_verified_at' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->email_verified_at),
@@ -77,6 +78,7 @@ class UserResource extends JsonResource
             'enable_3d_dashboard' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (bool) ($this->enable_3d_dashboard ?? true)),
             'affiliate_commission_percentage' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->affiliate_commission_percentage),
             'add_commission_to_total' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (bool) $this->add_commission_to_total),
+            'can_view_all_devices' => (bool) $this->can_view_all_devices,
             'ref_user_id' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->ref_user_id),
 
             'subscription_date' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->subscription_date),

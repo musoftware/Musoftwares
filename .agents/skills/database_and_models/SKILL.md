@@ -23,13 +23,12 @@ Musoftwares uses a Modular Monolith architecture via `nwidart/laravel-modules`. 
 - **Modular Schema**: Module-specific models and migrations MUST strictly reside in `Modules/{ModuleName}/Models/` and `Modules/{ModuleName}/Database/Migrations/`.
 - **Cross-Module References**: Avoid hard foreign key constraints between separate bounded contexts if it creates tight coupling. Use polymorphic relationships or soft references where appropriate to maintain module independence.
 
-## 3. Mandatory Use of Soft Deletes
+## 3. Mandatory Use of Soft Deletes & Column Preservation
 
 Data integrity and historical auditing are paramount for core business records.
-- **Enforcement**: Soft deletes are MANDATORY on transactional entity tables (e.g., Users, Invoices, Transactions, Projects, Leads, etc.) to maintain historical integrity and prevent accidental data loss.
-- **Lookup/Static Tables Exempt**: Reference tables with fixed IDs, lookup configurations, or immutable rows (e.g., `currencies`, `currencies_exchanges`, or simple junction pivots) must NOT use `SoftDeletes` unless specifically designed with historical versioning.
-- **Trait-to-Schema Invariant (CRITICAL)**: NEVER add `use SoftDeletes;` to an Eloquent model without verifying that a database migration exists and that `$table->softDeletes()` is present on the table schema. Adding the trait to a model without the column causes immediate SQL crashes on all queries.
-- **Implementation**: Always use the `Illuminate\Database\Eloquent\SoftDeletes` trait in your models and add `$table->softDeletes()` in your migrations.
+- **Enforcement**: Soft deletes are MANDATORY on models across the application.
+- **Strict Invariant**: NEVER remove `use SoftDeletes;` or the `SoftDeletes` trait from any Eloquent model.
+- **Missing Column Resolution**: If a model uses `SoftDeletes` and the underlying table lacks `deleted_at`, you MUST create and run a database migration adding `$table->softDeletes()` to the table. NEVER remove `SoftDeletes` from the model to bypass the error.
 - **Permanent Deletion**: Hard deletes should only be used in specific, well-justified cleanup jobs or temporary tables.
 
 ## 4. Spatie Model States

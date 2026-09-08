@@ -289,7 +289,10 @@ class DashboardService extends BaseService
     {
         $stats = $this->getClientStats($user);
         $userBalanceVal = $stats['walletBalance'] ?? (float) ($user->user_balance ?? 0);
-        $currencySymbol = isset($stats['currency']) ? $stats['currency']->symbol : (optional($user->currencyRelation)->symbol ?? 'EGP');
+        $userCurrency = Currency::findCached($user->currency_id) ?? optional($user->currencyRelation);
+        $currencySymbol = isset($stats['currency']) && !empty($stats['currency']->symbol)
+            ? $stats['currency']->symbol
+            : ($userCurrency?->symbol ?? $userCurrency?->currency ?? '$');
         $userBalanceFormatted = number_format($userBalanceVal, 2) . ' ' . $currencySymbol;
         $userPoints = $stats['pointsBalance'] ?? $user->points ?? 0;
 
@@ -344,7 +347,8 @@ class DashboardService extends BaseService
         // 2. Real Unpaid Invoice Alerts
         if (method_exists($user, 'invoices')) {
             try {
-                $currencySymbol = optional($user->currencyRelation)->symbol ?? 'EGP';
+                $userCurrency = Currency::findCached($user->currency_id) ?? optional($user->currencyRelation);
+                $currencySymbol = $userCurrency?->symbol ?? $userCurrency?->currency ?? '$';
                 $unpaidInvoices = $user->invoices()
                     ->where('unpaid', '>', 0)
                     ->whereIn('status', ['unpaid', 'partially_paid'])
@@ -352,9 +356,11 @@ class DashboardService extends BaseService
                     ->get();
 
                 foreach ($unpaidInvoices as $inv) {
+                    $invCurrency = Currency::findCached($inv->currency_id) ?? optional($inv->currencyRelation);
+                    $invSymbol = $invCurrency?->symbol ?? $invCurrency?->currency ?? $currencySymbol;
                     $realNotifications->push([
                         'title' => 'Unpaid Invoice #' . $inv->id,
-                        'desc' => 'Due: ' . number_format($inv->unpaid, 2) . ' ' . $currencySymbol,
+                        'desc' => 'Due: ' . number_format($inv->unpaid, 2) . ' ' . $invSymbol,
                         'time' => $inv->created_at ? $inv->created_at->diffForHumans() : 'Action Needed',
                         'type' => 'warning',
                         'link' => url('/billing/invoices/' . $inv->id)
@@ -364,7 +370,8 @@ class DashboardService extends BaseService
         }
 
         // 3. Real Wallet Balance Notification
-        $currencySymbol = optional($user->currencyRelation)->symbol ?? 'EGP';
+        $userCurrency = Currency::findCached($user->currency_id) ?? optional($user->currencyRelation);
+        $currencySymbol = $userCurrency?->symbol ?? $userCurrency?->currency ?? '$';
         $userBalanceVal = (float) ($user->user_balance ?? 0);
         $userBalanceFormatted = number_format($userBalanceVal, 2) . ' ' . $currencySymbol;
 
@@ -493,7 +500,7 @@ class DashboardService extends BaseService
 
     private function getRecentTransactions(User $user)
     {
-        $userCurrency = Currency::find($user->currency_id);
+        $userCurrency = Currency::findCached($user->currency_id) ?? optional($user->currencyRelation);
 
         return Transaction::with('currency')->where('user_id', $user->id)
             ->latest()
@@ -502,13 +509,22 @@ class DashboardService extends BaseService
             ->map(function ($txn) use ($userCurrency) {
                 $isCredit = in_array($txn->type, ['received', 'earned']);
 
+                $txnCurrency = $txn->currency ?? Currency::findCached($txn->currency_id);
+                if (! $txnCurrency && preg_match('/Invoice\s*#(\d+)/i', (string) $txn->reason, $matches)) {
+                    $invoice = Invoice::find($matches[1]);
+                    if ($invoice) {
+                        $txnCurrency = Currency::findCached($invoice->currency_id) ?? optional($invoice->currencyRelation);
+                    }
+                }
+                $finalCurrency = $txnCurrency ?? $userCurrency;
+
                 return [
                     'id' => $txn->id,
                     'date' => $txn->created_at?->format('M d, Y') ?? '-',
                     'type' => $isCredit ? 'deposit' : 'expense',
                     'amount' => $isCredit ? (float) $txn->amount : -1 * (float) $txn->amount,
                     'method' => ucwords(str_replace('_', ' ', $txn->reason ?? 'Wallet')),
-                    'currency' => $txn->currency ?? $userCurrency,
+                    'currency' => $finalCurrency,
                 ];
             });
     }

@@ -45,6 +45,21 @@ class AdminUserPermissionsTest extends TestCase
         $this->assertFalse($freshUser->hasRole('Client') && $freshUser->hasRole('client'));
     }
 
+    public function test_admin_can_update_user_role_to_software_reseller(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->post("/admin/users/{$this->clientUser->id}/update-role", [
+                'role' => 'software_reseller',
+            ]);
+
+        $response->assertRedirect();
+        app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+        $freshUser = $this->clientUser->fresh();
+
+        $this->assertTrue($freshUser->hasRole('software_reseller'));
+        $this->assertTrue($freshUser->isReseller());
+    }
+
     public function test_cannot_update_user_role_with_invalid_role(): void
     {
         $response = $this->actingAs($this->admin)

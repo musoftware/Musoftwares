@@ -1845,7 +1845,7 @@ export default function Show({
                                     <div className="flex justify-end gap-4 text-xs text-gray-400 mt-1">
                                         <span>{__('general.business_currency_total')}</span>
                                         <span>
-                                            {formatCurrency(payServicePreview.total_usd, (payServicePreview as any).business_currency || 'USD')}
+                                            {formatCurrency(payServicePreview.total_usd, (payServicePreview as any).business_currency)}
                                         </span>
                                     </div>
                                 </div>

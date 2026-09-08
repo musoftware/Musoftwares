@@ -86,6 +86,11 @@ interface DeviceAssignment {
         email: string;
         phone: string | null;
     };
+    reseller?: {
+        id: number;
+        name: string;
+        email: string;
+    };
     devices?: Array<{
         id: number;
         serial_software_id: number;
@@ -118,6 +123,7 @@ interface Props {
         status?: string;
         per_page?: number;
     };
+    canViewAllDevices?: boolean;
 }
 
 export default function ResellerDevicesIndex({
@@ -126,6 +132,7 @@ export default function ResellerDevicesIndex({
     devices,
     availableDevices,
     filters,
+    canViewAllDevices = false,
 }: Props) {
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedSoftware, setSelectedSoftware] = useState(filters.software_id || '');
@@ -269,12 +276,19 @@ export default function ResellerDevicesIndex({
                         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-1">
                             <Shield className="w-4 h-4 text-[#0071e3]" />
                             <span>Reseller Portal</span>
+                            {canViewAllDevices && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                                    Full Scope (All Allocated Software Devices)
+                                </span>
+                            )}
                         </div>
                         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
                             Software Devices & License Control
                         </h1>
                         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                            Manage customer software assignments, control device activations, and renew 1-month or multi-month licenses.
+                            {canViewAllDevices
+                                ? 'Viewing and managing all customer devices across your allocated software products.'
+                                : 'Manage customer software assignments, control device activations, and renew 1-month or multi-month licenses.'}
                         </p>
                     </div>
 
@@ -455,6 +469,12 @@ export default function ResellerDevicesIndex({
                                                     {device.user?.phone && (
                                                         <div className="text-xs text-zinc-400 font-mono mt-0.5">
                                                             {device.user.phone}
+                                                        </div>
+                                                    )}
+                                                    {canViewAllDevices && device.reseller && (
+                                                        <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1">
+                                                            <span className="text-zinc-400">By:</span>
+                                                            <span className="font-medium text-zinc-700 dark:text-zinc-300">{device.reseller.name}</span>
                                                         </div>
                                                     )}
                                                 </td>

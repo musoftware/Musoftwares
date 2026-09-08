@@ -17,7 +17,7 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users')->ignore($this->route('id'))],
-            'role' => 'nullable|in:admin,client,user,employee,manager,moderator',
+            'role' => 'nullable|in:admin,client,user,employee,manager,moderator,software_reseller',
             'max_devices' => 'nullable|integer|min:0',
 
             // Allow all fields sent by Edit.jsx

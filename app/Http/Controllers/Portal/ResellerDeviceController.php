@@ -58,7 +58,34 @@ class ResellerDeviceController extends Controller
             'devices' => $devices,
             'availableDevices' => $availableDevices,
             'filters' => $filters,
+            'canViewAllDevices' => $user->canViewAllDevices(),
         ]);
+    }
+
+    /**
+     * Helper to verify if user has permission to modify this device assignment.
+     */
+    protected function authorizeDeviceModification(Request $request, SerialUserDevice $serialUserDevice): void
+    {
+        $user = $request->user();
+
+        if ($user->isAdmin() || $serialUserDevice->reseller_id === $user->id) {
+            return;
+        }
+
+        if ($user->canViewAllDevices()) {
+            $allocatedSoftwareIds = \App\Models\SerialSoftwareReseller::where('user_id', $user->id)
+                ->where('status', \App\Models\SerialSoftwareReseller::STATUS_ACTIVE)
+                ->pluck('serial_software_id')
+                ->toArray();
+
+            $deviceSoftwareIds = $serialUserDevice->devices()->pluck('serial_software_id')->toArray();
+            if (! empty(array_intersect($allocatedSoftwareIds, $deviceSoftwareIds))) {
+                return;
+            }
+        }
+
+        abort(403, __('Unauthorized to modify this device.'));
     }
 
     /**
@@ -76,11 +103,7 @@ class ResellerDeviceController extends Controller
      */
     public function renew(RenewDeviceRequest $request, SerialUserDevice $serialUserDevice): RedirectResponse
     {
-        $user = $request->user();
-
-        if ($serialUserDevice->reseller_id !== $user->id && ! $user->isAdmin()) {
-            abort(403, __('Unauthorized to modify this device.'));
-        }
+        $this->authorizeDeviceModification($request, $serialUserDevice);
 
         $this->resellerDeviceService->renewDevice(
             $serialUserDevice,
@@ -96,11 +119,7 @@ class ResellerDeviceController extends Controller
      */
     public function updateStatus(Request $request, SerialUserDevice $serialUserDevice): RedirectResponse
     {
-        $user = $request->user();
-
-        if ($serialUserDevice->reseller_id !== $user->id && ! $user->isAdmin()) {
-            abort(403, __('Unauthorized to modify this device.'));
-        }
+        $this->authorizeDeviceModification($request, $serialUserDevice);
 
         $request->validate([
             'status' => ['required', 'string', 'in:active,inactive'],
@@ -116,11 +135,7 @@ class ResellerDeviceController extends Controller
      */
     public function destroy(Request $request, SerialUserDevice $serialUserDevice): RedirectResponse
     {
-        $user = $request->user();
-
-        if ($serialUserDevice->reseller_id !== $user->id && ! $user->isAdmin()) {
-            abort(403, __('Unauthorized to unassign this device.'));
-        }
+        $this->authorizeDeviceModification($request, $serialUserDevice);
 
         $this->resellerDeviceService->unassignDevice($serialUserDevice);
 

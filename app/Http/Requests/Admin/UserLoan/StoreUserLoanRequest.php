@@ -17,6 +17,7 @@ class StoreUserLoanRequest extends FormRequest
         return [
             'amount' => ['required', 'numeric', 'min:0.01'],
             'currency_id' => ['required', Rule::exists('currencies', 'id')],
+            'type' => ['nullable', 'string', Rule::in(['on_client', 'on_business'])],
             'date' => ['required', 'date'],
             'note' => ['nullable', 'string'],
         ];

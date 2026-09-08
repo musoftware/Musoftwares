@@ -5,16 +5,23 @@ import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Shield, Search, Trash2, Plus, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Shield, Search, Trash2, Plus, Users, Calendar, Clock } from 'lucide-react';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 
 interface Assignment {
     id: number;
+    user_id?: number;
     device_id: string;
     status: string;
+    expires_at: string | null;
+    expires_at_formatted: string | null;
+    is_expired: boolean;
+    remaining_days: number | null;
     notes: string | null;
     created_at: string;
     user?: { id: number; name: string; email: string };
@@ -39,6 +46,48 @@ const statusColor: Record<string, string> = {
 export default function SerialUserDevicesIndex({ userDevices, filters, statuses, stats, perPageOptions }: Props) {
     const [search, setSearch] = useState(filters.search ?? '');
     const [pendingDelete, setPendingDelete] = useState<Assignment | null>(null);
+    const [editingExpiration, setEditingExpiration] = useState<Assignment | null>(null);
+    const [expiresAtInput, setExpiresAtInput] = useState<string>('');
+    const [savingExpiration, setSavingExpiration] = useState(false);
+
+    const openExpirationModal = (assignment: Assignment) => {
+        setEditingExpiration(assignment);
+        if (assignment.expires_at) {
+            setExpiresAtInput(assignment.expires_at.slice(0, 10));
+        } else {
+            setExpiresAtInput('');
+        }
+    };
+
+    const handleSaveExpiration = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingExpiration) return;
+        setSavingExpiration(true);
+        router.patch(
+            route('admin.serial-user-devices.update-expires-at', editingExpiration.id),
+            { expires_at: expiresAtInput || null },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    toastSuccess(__('general.expiration_updated', {}, 'License expiration updated successfully'));
+                    setEditingExpiration(null);
+                },
+                onError: () => toastError(__('general.error_occurred', {}, 'Failed to update expiration')),
+                onFinish: () => setSavingExpiration(false),
+            }
+        );
+    };
+
+    const setPresetDays = (days: number | null) => {
+        if (days === null) {
+            setExpiresAtInput('');
+            return;
+        }
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        setExpiresAtInput(d.toISOString().slice(0, 10));
+    };
 
     const applyFilter = (key: string, value: string) => {
         router.get(route('admin.serial-user-devices.index'), { ...filters, [key]: value || undefined }, { preserveState: true, replace: true });
@@ -130,13 +179,14 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.assigned_user')}</th>
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.notes')}</th>
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.assigned')}</th>
+                                        <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.license_expiration', {}, 'Expiration')}</th>
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.status')}</th>
                                         <th className="text-end px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {(userDevices.data as any).length === 0 && (
-                                        <tr><td colSpan={6} className="text-center py-12 text-slate-500">{__('general.no_assignments_found')}</td></tr>
+                                        <tr><td colSpan={7} className="text-center py-12 text-slate-500">{__('general.no_assignments_found')}</td></tr>
                                     )}
                                     {(userDevices.data as any).map(a => (
                                         <tr key={a.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
@@ -151,6 +201,41 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                             </td>
                                             <td className="px-4 py-3 text-slate-600 text-xs max-w-xs truncate">{a.notes ?? '—'}</td>
                                             <td className="px-4 py-3 text-slate-500 text-xs">{a.created_at}</td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-1.5">
+                                                    {a.expires_at ? (
+                                                        a.is_expired ? (
+                                                            <Badge variant="destructive" className="text-xs">
+                                                                {__('general.expired', {}, 'Expired')} ({a.expires_at_formatted})
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className={`text-xs ${
+                                                                    (a.remaining_days ?? 0) <= 7
+                                                                        ? 'bg-amber-50 text-amber-800 border-amber-300'
+                                                                        : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                                                }`}
+                                                            >
+                                                                {__('general.remaining_days', { days: String(a.remaining_days ?? 0) }, `${a.remaining_days ?? 0}d left`)}
+                                                            </Badge>
+                                                        )
+                                                    ) : (
+                                                        <Badge variant="outline" className="text-xs bg-slate-100 text-slate-700">
+                                                            {__('general.lifetime', {}, 'Lifetime')}
+                                                        </Badge>
+                                                    )}
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        onClick={() => openExpirationModal(a)}
+                                                        className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                                                        title={__('general.edit_expiration', {}, 'Edit Expiration')}
+                                                    >
+                                                        <Calendar className="w-3.5 h-3.5" />
+                                                    </Button>
+                                                </div>
+                                            </td>
                                             <td className="px-4 py-3">
                                                 <Select value={a.status} onValueChange={v => updateStatus(a, v)}>
                                                     <SelectTrigger className="w-24 h-7 text-xs">
@@ -177,6 +262,122 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Edit Expiration Modal */}
+            <Dialog open={editingExpiration !== null} onOpenChange={open => !open && setEditingExpiration(null)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-muted-foreground" />
+                            <span>{__('general.edit_license_expiration', {}, 'Edit License Expiration')}</span>
+                        </DialogTitle>
+                    </DialogHeader>
+                    {editingExpiration && (
+                        <form onSubmit={handleSaveExpiration} className="space-y-4 pt-2 text-sm">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border space-y-1 text-xs">
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground">{__('general.device_id')}:</span>
+                                    <span className="font-mono text-xs font-semibold text-end break-all">{editingExpiration.device_id}</span>
+                                </div>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground">{__('general.user')}:</span>
+                                    <span className="font-medium text-end">{editingExpiration.user?.name ?? '—'}</span>
+                                </div>
+                                <div className="flex justify-between gap-4">
+                                    <span className="text-muted-foreground">{__('general.current_status', {}, 'Current Expiration')}:</span>
+                                    <span className="font-medium text-end">
+                                        {editingExpiration.expires_at ? editingExpiration.expires_at_formatted : __('general.lifetime', {}, 'Lifetime (No Expiration)')}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-xs font-semibold uppercase text-muted-foreground">
+                                    {__('general.quick_presets', {}, 'Quick Presets')}
+                                </Label>
+                                <div className="flex flex-wrap gap-1.5">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(30)}
+                                    >
+                                        +30 {__('general.days', {}, 'Days')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(90)}
+                                    >
+                                        +90 {__('general.days', {}, 'Days')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(180)}
+                                    >
+                                        +6 {__('general.months', {}, 'Months')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(365)}
+                                    >
+                                        +1 {__('general.year', {}, 'Year')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(null)}
+                                    >
+                                        {__('general.lifetime', {}, 'Lifetime (Clear)')}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label htmlFor="expires-at-input" className="text-xs">
+                                    {__('general.expiration_date', {}, 'Expiration Date (Leave blank for Lifetime)')}
+                                </Label>
+                                <Input
+                                    id="expires-at-input"
+                                    type="date"
+                                    value={expiresAtInput}
+                                    onChange={e => setExpiresAtInput(e.target.value)}
+                                    className="h-9 text-xs"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setEditingExpiration(null)}
+                                >
+                                    {__('general.cancel')}
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    size="sm"
+                                    disabled={savingExpiration}
+                                >
+                                    {savingExpiration ? __('general.saving', {}, 'Saving...') : __('general.save_changes', {}, 'Save Changes')}
+                                </Button>
+                            </div>
+                        </form>
+                    )}
+                </DialogContent>
+            </Dialog>
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}

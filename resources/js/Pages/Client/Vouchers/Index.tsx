@@ -44,7 +44,7 @@ interface Props {
 }
 
 export default function Index({ auth, vouchers, redemptions }: Props) {
-    const userCurrency = auth.user?.currency || 'EGP';
+    const userCurrency = auth.user?.currency;
 
     return (
         <AuthenticatedLayout>

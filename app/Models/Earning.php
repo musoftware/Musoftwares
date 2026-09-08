@@ -12,6 +12,17 @@ class Earning extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'user_id',
+        'referred_user_id',
+        'referred_invoice_id',
+        'currency_id',
+        'amount',
+        'convert_to_balance_on',
+        'transaction_id',
+        'cost_transaction_id',
+    ];
+
     protected static function booted(): void
     {
         static::saving(function ($earning) {
@@ -60,6 +71,11 @@ class Earning extends Model
     public function currencyModel()
     {
         return $this->belongsTo(Currency::class, 'currency_id');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'referred_invoice_id');
     }
 
     public static function clearing_balance()

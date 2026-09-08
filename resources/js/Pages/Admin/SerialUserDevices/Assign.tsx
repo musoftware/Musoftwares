@@ -28,16 +28,29 @@ interface Props {
 
 export default function SerialUserDevicesAssign({ users, availableDevices }: Props) {
     const { auth } = usePage().props as any;
-    const [form, setForm] = useState({ user_id: '', device_id: '', status: 'active', notes: '' });
+    const [form, setForm] = useState({ user_id: '', device_id: '', status: 'active', expires_at: '', notes: '' });
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const setPresetDays = (days: number | null) => {
+        if (days === null) {
+            setForm(f => ({ ...f, expires_at: '' }));
+            return;
+        }
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        setForm(f => ({ ...f, expires_at: d.toISOString().slice(0, 10) }));
+    };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         setErrors({});
-        router.post(route('admin.serial-user-devices.store'), form, {
+        router.post(route('admin.serial-user-devices.store'), {
+            ...form,
+            expires_at: form.expires_at || null,
+        }, {
             onSuccess: () => {
                 toastSuccess(__('general.assignment_created') || 'Device assigned successfully');
-                setForm({ user_id: '', device_id: '', status: 'active', notes: '' });
+                setForm({ user_id: '', device_id: '', status: 'active', expires_at: '', notes: '' });
             },
             onError: (errs: any) => {
                 setErrors(errs);
@@ -116,6 +129,67 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                                     </SelectContent>
                                 </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label>{__('general.license_expiration', {}, 'License Expiration (Optional)')}</Label>
+                                    <span className="text-xs text-muted-foreground">{__('general.leave_blank_for_lifetime', {}, 'Leave blank for lifetime')}</span>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5 pb-1">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(30)}
+                                    >
+                                        +30 {__('general.days', {}, 'Days')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(90)}
+                                    >
+                                        +90 {__('general.days', {}, 'Days')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(180)}
+                                    >
+                                        +6 {__('general.months', {}, 'Months')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(365)}
+                                    >
+                                        +1 {__('general.year', {}, 'Year')}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => setPresetDays(null)}
+                                    >
+                                        {__('general.lifetime', {}, 'Lifetime (Clear)')}
+                                    </Button>
+                                </div>
+                                <Input
+                                    type="date"
+                                    value={form.expires_at}
+                                    onChange={e => setForm(f => ({ ...f, expires_at: e.target.value }))}
+                                    className="h-9 text-xs"
+                                />
+                                {errors.expires_at && <p className="text-sm text-destructive">{errors.expires_at}</p>}
                             </div>
 
                             <div className="space-y-2">

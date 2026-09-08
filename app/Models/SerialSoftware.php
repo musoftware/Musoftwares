@@ -20,6 +20,16 @@ class SerialSoftware extends Model
     protected $fillable = [
         'name',
         'default_status',
+        'requires_payment',
+        'price',
+        'currency',
+        'whatsapp_number',
+        'payment_instructions',
+    ];
+
+    protected $casts = [
+        'requires_payment' => 'boolean',
+        'price' => 'decimal:2',
     ];
 
     /**
@@ -47,5 +57,29 @@ class SerialSoftware extends Model
     public function resellers(): HasMany
     {
         return $this->hasMany(SerialSoftwareReseller::class, 'serial_software_id');
+    }
+
+    /**
+     * @return HasMany<SerialSoftwareKey>
+     */
+    public function customKeys(): HasMany
+    {
+        return $this->hasMany(SerialSoftwareKey::class, 'serial_software_id');
+    }
+
+    /**
+     * @return HasMany<SerialSoftwareLicense>
+     */
+    public function licenses(): HasMany
+    {
+        return $this->hasMany(SerialSoftwareLicense::class, 'serial_software_id');
+    }
+
+    /**
+     * @return HasMany<StoreTool>
+     */
+    public function storeTools(): HasMany
+    {
+        return $this->hasMany(StoreTool::class, 'serial_software_id');
     }
 }
