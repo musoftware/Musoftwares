@@ -54,6 +54,23 @@ class SerialDeviceController extends Controller
             ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
         );
 
+        // Inherit paid settings from alias if this is a newly created software (e.g. Trenz Extract vs WAContactsExtract)
+        if (! $softwareExisted && in_array($validated['program_name'], ['Trenz Extract', 'WAContactsExtract'])) {
+            $existingPaid = SerialSoftware::whereIn('name', ['WAContactsExtract', 'Trenz Extract'])
+                ->where('requires_payment', true)
+                ->first();
+            if ($existingPaid) {
+                $software->update([
+                    'requires_payment' => true,
+                    'price' => $existingPaid->price,
+                    'currency' => $existingPaid->currency,
+                    'whatsapp_number' => $existingPaid->whatsapp_number,
+                    'payment_instructions' => $existingPaid->payment_instructions,
+                    'default_status' => SerialSoftware::DEFAULT_STATUS_INACTIVE,
+                ]);
+            }
+        }
+
         // Auto-create device if first check-in from this machine for this software.
         $deviceExisted = SerialDevice::where('serial_software_id', $software->id)
             ->where('device_id', $validated['device_id'])
@@ -72,6 +89,31 @@ class SerialDeviceController extends Controller
                 'status' => $initialStatus,
             ]
         );
+
+        // Auto-register device in SerialUserDevice so it immediately appears in Devices management
+        $userDevice = \App\Models\SerialUserDevice::withTrashed()->where('device_id', $validated['device_id'])->first();
+
+        if (! $userDevice) {
+            $initialAssignmentStatus = $software->requires_payment
+                ? \App\Models\SerialUserDevice::STATUS_INACTIVE
+                : \App\Models\SerialUserDevice::STATUS_ACTIVE;
+
+            $userDevice = \App\Models\SerialUserDevice::create([
+                'device_id' => $validated['device_id'],
+                'user_id' => null,
+                'status' => $initialAssignmentStatus,
+                'notes' => 'Auto-registered: ' . ($validated['machine_name'] ?? $validated['user_name'] ?? 'Device'),
+            ]);
+
+            // If an active reseller is allocated to this software, auto-associate the reseller
+            $resellerAllocation = \App\Models\SerialSoftwareReseller::where('serial_software_id', $software->id)
+                ->where('status', \App\Models\SerialSoftwareReseller::STATUS_ACTIVE)
+                ->first();
+
+            if ($resellerAllocation) {
+                $userDevice->update(['reseller_id' => $resellerAllocation->user_id]);
+            }
+        }
 
         // Build update payload — always refresh last_check_date.
         $updates = ['last_check_date' => now()];
@@ -100,20 +142,14 @@ class SerialDeviceController extends Controller
             $device->save();
         }
 
-        // Check if device is linked to a user and check expiration
-        $userDevice = \App\Models\SerialUserDevice::where('device_id', $validated['device_id'])
-            ->whereNotNull('user_id')
-            ->whereHas('user')
-            ->first();
-
-        $hasLinkedUser = (bool) $userDevice;
+        $hasLinkedUser = (bool) ($userDevice && $userDevice->user_id && $userDevice->user);
         $isExpired = false;
         $status = $device->status;
         $hasActiveLicense = false;
 
         // If software requires payment, enforce active license or admin activation verification
         if ($software->requires_payment) {
-            if ($userDevice && $userDevice->user_id) {
+            if ($userDevice && $userDevice->user_id && \Illuminate\Support\Facades\Schema::hasTable('serial_software_licenses')) {
                 $userLicense = \App\Models\SerialSoftwareLicense::where('user_id', $userDevice->user_id)
                     ->where('serial_software_id', $software->id)
                     ->active()

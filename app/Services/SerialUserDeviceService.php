@@ -9,7 +9,16 @@ class SerialUserDeviceService extends BaseService
 {
     public function assignDevice(array $data): SerialUserDevice
     {
-        return SerialUserDevice::create($data);
+        return SerialUserDevice::withTrashed()->updateOrCreate(
+            ['device_id' => $data['device_id']],
+            [
+                'user_id' => $data['user_id'],
+                'status' => $data['status'] ?? SerialUserDevice::STATUS_ACTIVE,
+                'expires_at' => $data['expires_at'] ?? null,
+                'notes' => $data['notes'] ?? null,
+                'deleted_at' => null,
+            ]
+        );
     }
 
     public function updateStatus(SerialUserDevice $serialUserDevice, string $status): void

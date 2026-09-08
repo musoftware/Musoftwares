@@ -238,4 +238,42 @@ class SerialDeviceControllerExpirationTest extends TestCase
             'status' => 'inactive',
         ]);
     }
+
+    public function test_new_device_checkin_auto_registers_in_serial_user_devices_as_inactive_when_paid(): void
+    {
+        $this->software->update([
+            'requires_payment' => true,
+            'price' => 10.00,
+            'currency' => 'USD',
+        ]);
+
+        $response = $this->postJson('/api/serial/device', [
+            'program_name' => $this->software->name,
+            'device_id' => 'BRAND-NEW-DEVICE-999',
+            'machine_name' => 'Ahmed-Workstation',
+            'user_name' => 'Ahmed',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status' => 'inactive',
+            'requires_payment' => true,
+        ]);
+
+        // Assert SerialDevice was created as inactive
+        $this->assertDatabaseHas('serial_devices', [
+            'device_id' => 'BRAND-NEW-DEVICE-999',
+            'serial_software_id' => $this->software->id,
+            'status' => 'inactive',
+            'machine_name' => 'Ahmed-Workstation',
+        ]);
+
+        // Assert SerialUserDevice was auto-created with null user_id and status inactive
+        $this->assertDatabaseHas('serial_user_devices', [
+            'device_id' => 'BRAND-NEW-DEVICE-999',
+            'user_id' => null,
+            'status' => 'inactive',
+        ]);
+    }
 }
+

@@ -100,8 +100,8 @@ class SerialUserDeviceController extends Controller
     {
         $users = User::orderBy('name')->get(['id', 'name', 'email']);
 
-        // Only show devices not already assigned to someone
-        $assignedDeviceIds = SerialUserDevice::pluck('device_id')->toArray();
+        // Only show devices not already assigned to someone with a user
+        $assignedDeviceIds = SerialUserDevice::whereNotNull('user_id')->pluck('device_id')->toArray();
         $availableDevices = SerialDevice::whereNotIn('device_id', $assignedDeviceIds)
             ->select('device_id', 'machine_name', 'user_name', 'serial_software_id')
             ->with('software:id,name')

@@ -56,8 +56,7 @@ class NormalizeUserLedgers extends Command
 
                     $userCurrencyId = $user->currency_id ?? AdminSettings::business_currency();
 
-                    // Transactions table uses 'currency' column (though model fillable says currency_id)
-                    $currentCurrencyId = $transaction->currency ?? $transaction->currency_id ?? AdminSettings::business_currency();
+                    $currentCurrencyId = $transaction->currency_id ?? $transaction->currency ?? AdminSettings::business_currency();
 
                     if ($currentCurrencyId != $userCurrencyId) {
                         $date = $transaction->created_at ?? now();
@@ -82,7 +81,7 @@ class NormalizeUserLedgers extends Command
                             ->where('id', $transaction->id)
                             ->update([
                                 'amount' => $convertedAmount,
-                                'currency' => $userCurrencyId,
+                                'currency_id' => $userCurrencyId,
                                 'business_amount' => $businessAmount,
                             ]);
 
@@ -110,7 +109,7 @@ class NormalizeUserLedgers extends Command
                     }
 
                     $userCurrencyId = $user->currency_id ?? AdminSettings::business_currency();
-                    $currentCurrencyId = $earning->currency ?? $earning->currency_id ?? AdminSettings::business_currency();
+                    $currentCurrencyId = $earning->currency_id ?? $earning->currency ?? AdminSettings::business_currency();
 
                     if ($currentCurrencyId != $userCurrencyId) {
                         $date = $earning->created_at ?? now();
@@ -126,7 +125,7 @@ class NormalizeUserLedgers extends Command
                             ->where('id', $earning->id)
                             ->update([
                                 'amount' => $convertedAmount,
-                                'currency' => $userCurrencyId,
+                                'currency_id' => $userCurrencyId,
                             ]);
 
                         $count++;

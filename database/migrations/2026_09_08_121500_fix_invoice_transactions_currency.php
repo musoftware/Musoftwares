@@ -11,22 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Ultra-fast single SQL update to sync transaction currency from invoice
+        // Client ledger transactions must ALWAYS reflect the client's currency (users.currency_id)
         try {
             \Illuminate\Support\Facades\DB::statement("
                 UPDATE transactions t
-                INNER JOIN invoices i ON t.reason LIKE CONCAT('Invoice #', i.id, '%')
-                SET t.currency_id = i.currency_id
-                WHERE t.currency_id != i.currency_id AND i.currency_id IS NOT NULL
+                INNER JOIN users u ON t.user_id = u.id
+                SET t.currency_id = u.currency_id
+                WHERE u.currency_id IS NOT NULL AND t.currency_id != u.currency_id
             ");
         } catch (\Throwable $e) {
-            // Fallback for drivers that do not support multi-table UPDATE
-            $invoices = Invoice::whereNotNull('currency_id')->get();
-            foreach ($invoices as $inv) {
-                Transaction::where('reason', 'like', "Invoice #{$inv->id}%")
-                    ->where('currency_id', '!=', $inv->currency_id)
-                    ->update(['currency_id' => $inv->currency_id]);
-            }
+            // Log or ignore
         }
     }
 

@@ -43,7 +43,7 @@ class ResellerDeviceController extends Controller
 
         // Get unassigned device check-ins for the reseller's allocated softwares
         $softwareIds = $allocatedSoftwares->pluck('serial_software_id')->toArray();
-        $assignedDeviceIds = SerialUserDevice::pluck('device_id')->toArray();
+        $assignedDeviceIds = SerialUserDevice::whereNotNull('user_id')->pluck('device_id')->toArray();
 
         $availableDevices = SerialDevice::whereIn('serial_software_id', $softwareIds)
             ->whereNotIn('device_id', $assignedDeviceIds)

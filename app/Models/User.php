@@ -105,6 +105,31 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::creating(function ($user) {
+            if (empty($user->currency_id)) {
+                try {
+                    $ip = request()?->ip();
+                    if ($ip) {
+                        /** @var \App\Services\IpGeolocationService $geoService */
+                        $geoService = app(\App\Services\IpGeolocationService::class);
+                        $currency = $geoService->getCurrencyForIp($ip);
+                        if ($currency) {
+                            $user->currency_id = $currency->id;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Ignore and fallback
+                }
+
+                if (empty($user->currency_id)) {
+                    $user->currency_id = Currency::getDefault()?->id ?? AdminSettings::business_currency();
+                }
+            }
+        });
+    }
+
     /**
      * Cleanly resolves a User model from a User instance, ID, email, or user-like object.
      */

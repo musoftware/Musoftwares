@@ -49,7 +49,7 @@ class Transaction extends Model
                 }
 
                 $userCurrencyId = $transaction->user->currency_id;
-                $currentCurrencyId = $transaction->currency_id ?? $transaction->currency;
+                $currentCurrencyId = $transaction->currency_id;
 
                 if (! $currentCurrencyId) {
                     // If no currency was explicitly passed for the transaction, assume it is in the user's native currency.
@@ -69,7 +69,7 @@ class Transaction extends Model
                 }
             }
 
-            $currency = $transaction->currency_id ?? $transaction->currency;
+            $currency = $transaction->currency_id;
             if (! $currency) {
                 throw new \Exception('Transaction is missing an associated currency relation and no user fallback is available.');
             }

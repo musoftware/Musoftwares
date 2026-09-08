@@ -128,7 +128,7 @@ class SocialLoginController extends Controller
                 // Auto-assign currency based on GeoIP & DB country mappings
                 /** @var \App\Services\IpGeolocationService $geoService */
                 $geoService = app(\App\Services\IpGeolocationService::class);
-                $currency = $geoService->getCurrencyForIp($request->ip());
+                $currency = $geoService->getCurrencyForIp($request->ip()) ?? \App\Models\Currency::getDefault();
 
                 if ($currency) {
                     $user->currency_id = $currency->id;
