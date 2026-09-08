@@ -113,6 +113,95 @@ class SerialDeviceController extends Controller
         ]);
     }
 
+    public function show(SerialDevice $serialDevice): Response
+    {
+        $serialDevice->load([
+            'software.customKeys',
+            'deviceKeys.softwareKey',
+            'userDeviceAssignment.user',
+            'userDeviceAssignment.reseller',
+        ]);
+
+        $resolvedKeys = $serialDevice->getResolvedCustomKeys();
+
+        // Build list of software keys with default and device override info
+        $customKeysData = [];
+        if ($serialDevice->software && $serialDevice->software->customKeys) {
+            $deviceKeyMap = $serialDevice->deviceKeys->keyBy('serial_software_key_id');
+            foreach ($serialDevice->software->customKeys as $key) {
+                $override = $deviceKeyMap->get($key->id);
+                $customKeysData[] = [
+                    'id' => $key->id,
+                    'key' => $key->key,
+                    'label' => $key->label ?? $key->key,
+                    'description' => $key->description,
+                    'default_value' => $key->default_value,
+                    'override_id' => $override?->id,
+                    'override_value' => $override?->value,
+                    'effective_value' => $resolvedKeys[$key->key] ?? ($override?->value ?? $key->default_value),
+                    'is_overridden' => $override !== null,
+                ];
+            }
+        }
+
+        $assignment = $serialDevice->userDeviceAssignment;
+        $assignmentData = null;
+        if ($assignment) {
+            $assignmentData = [
+                'id' => $assignment->id,
+                'status' => $assignment->status,
+                'expires_at' => $assignment->expires_at?->toDateString(),
+                'expires_at_formatted' => $assignment->expires_at?->format('Y-m-d H:i'),
+                'is_expired' => $assignment->isExpired(),
+                'remaining_days' => $assignment->expires_at ? max(0, (int) ceil(now()->diffInDays($assignment->expires_at, false))) : null,
+                'notes' => $assignment->notes,
+                'user' => $assignment->user ? [
+                    'id' => $assignment->user->id,
+                    'name' => $assignment->user->name,
+                    'email' => $assignment->user->email,
+                    'phone' => $assignment->user->phone ?? null,
+                    'created_at' => $assignment->user->created_at?->toDateString(),
+                ] : null,
+                'reseller' => $assignment->reseller ? [
+                    'id' => $assignment->reseller->id,
+                    'name' => $assignment->reseller->name,
+                    'email' => $assignment->reseller->email,
+                ] : null,
+            ];
+        }
+
+        return Inertia::render('Admin/SerialDevices/Show', [
+            'device' => (new SerialDeviceResource($serialDevice))->resolve(),
+            'customKeys' => $customKeysData,
+            'assignment' => $assignmentData,
+            'users' => User::orderBy('name')->get(['id', 'name', 'email']),
+            'statuses' => SerialDevice::statuses(),
+        ]);
+    }
+
+    public function updateExpiresAt(Request $request, SerialDevice $serialDevice): RedirectResponse
+    {
+        $validated = $request->validate([
+            'expires_at' => ['nullable', 'date'],
+            'is_lifetime' => ['nullable', 'boolean'],
+        ]);
+
+        $assignment = $serialDevice->userDeviceAssignment;
+        if (! $assignment) {
+            return back()->with('error', 'No client assignment found for this device.');
+        }
+
+        if (! empty($validated['is_lifetime'])) {
+            $assignment->update(['expires_at' => null]);
+        } else {
+            $assignment->update([
+                'expires_at' => $validated['expires_at'] ? \Illuminate\Support\Carbon::parse($validated['expires_at'])->endOfDay() : null,
+            ]);
+        }
+
+        return back()->with('success', 'License expiration updated successfully.');
+    }
+
     public function updateStatus(UpdateSerialDeviceStatusRequest $request, SerialDevice $serialDevice): RedirectResponse
     {
         $this->serialDeviceService->updateStatus($serialDevice, $request->validated('status'));

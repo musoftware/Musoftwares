@@ -135,6 +135,92 @@ class ResellerDeviceController extends Controller
     }
 
     /**
+     * Reseller Device Details full page.
+     */
+    public function show(Request $request, SerialUserDevice $serialUserDevice): Response
+    {
+        $this->authorizeDeviceModification($request, $serialUserDevice);
+
+        $serialUserDevice->load([
+            'user',
+            'reseller',
+            'devices.software',
+        ]);
+
+        $firstDevice = $serialUserDevice->devices->first();
+
+        $expiryInfo = [
+            'expires_at' => $serialUserDevice->expires_at?->toDateString(),
+            'expires_at_formatted' => $serialUserDevice->expires_at?->format('Y-m-d H:i'),
+            'is_expired' => $serialUserDevice->isExpired(),
+            'is_expiring_soon' => $serialUserDevice->expires_at && ! $serialUserDevice->isExpired() && now()->diffInDays($serialUserDevice->expires_at, false) <= 7,
+            'remaining_days' => $serialUserDevice->expires_at ? max(0, (int) ceil(now()->diffInDays($serialUserDevice->expires_at, false))) : null,
+            'is_lifetime' => $serialUserDevice->expires_at === null,
+        ];
+
+        return Inertia::render('Portal/Devices/Show', [
+            'device' => [
+                'id' => $serialUserDevice->id,
+                'device_id' => $serialUserDevice->device_id,
+                'status' => $serialUserDevice->status,
+                'expires_at' => $serialUserDevice->expires_at?->toIso8601String(),
+                'notes' => $serialUserDevice->notes,
+                'created_at' => $serialUserDevice->created_at?->toDateString(),
+                'updated_at' => $serialUserDevice->updated_at?->toDateTimeString(),
+                'user' => $serialUserDevice->user ? [
+                    'id' => $serialUserDevice->user->id,
+                    'name' => $serialUserDevice->user->name,
+                    'email' => $serialUserDevice->user->email,
+                    'phone' => $serialUserDevice->user->phone ?? null,
+                    'created_at' => $serialUserDevice->user->created_at?->toDateString(),
+                ] : null,
+                'reseller' => $serialUserDevice->reseller ? [
+                    'id' => $serialUserDevice->reseller->id,
+                    'name' => $serialUserDevice->reseller->name,
+                    'email' => $serialUserDevice->reseller->email,
+                ] : null,
+                'telemetry' => $firstDevice ? [
+                    'id' => $firstDevice->id,
+                    'machine_name' => $firstDevice->machine_name,
+                    'user_name' => $firstDevice->user_name,
+                    'user_domain' => $firstDevice->user_domain,
+                    'os_version' => $firstDevice->os_version,
+                    'framework_version' => $firstDevice->framework_version,
+                    'is_64bit_os' => $firstDevice->is_64bit_os,
+                    'is_64bit_process' => $firstDevice->is_64bit_process,
+                    'current_directory' => $firstDevice->current_directory,
+                    'current_culture' => $firstDevice->current_culture,
+                    'last_check_date' => $firstDevice->last_check_date?->diffForHumans(),
+                    'last_check_date_full' => $firstDevice->last_check_date?->toDateTimeString(),
+                    'software' => $firstDevice->software ? [
+                        'id' => $firstDevice->software->id,
+                        'name' => $firstDevice->software->name,
+                    ] : null,
+                ] : null,
+            ],
+            'expiryInfo' => $expiryInfo,
+        ]);
+    }
+
+    /**
+     * Update reseller notes on a device.
+     */
+    public function updateNotes(Request $request, SerialUserDevice $serialUserDevice): RedirectResponse
+    {
+        $this->authorizeDeviceModification($request, $serialUserDevice);
+
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $serialUserDevice->update([
+            'notes' => $validated['notes'],
+        ]);
+
+        return back()->with('success', __('Notes updated successfully.'));
+    }
+
+    /**
      * Unassign a device.
      */
     public function destroy(Request $request, SerialUserDevice $serialUserDevice): RedirectResponse

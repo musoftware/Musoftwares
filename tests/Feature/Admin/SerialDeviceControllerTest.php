@@ -115,4 +115,57 @@ class SerialDeviceControllerTest extends TestCase
         $this->assertSoftDeleted('serial_devices', ['id' => $device1->id]);
         $this->assertSoftDeleted('serial_devices', ['id' => $device2->id]);
     }
+
+    public function test_admin_can_view_serial_device_show()
+    {
+        $device = SerialDevice::factory()->create([
+            'device_id' => 'DEV_SHOW_123',
+            'status' => 'active',
+            'machine_name' => 'Test Machine',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get("/admin/serial-devices/{$device->id}");
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/SerialDevices/Show')
+            ->has('device')
+            ->has('customKeys')
+            ->has('statuses')
+        );
+    }
+
+    public function test_non_admin_cannot_view_serial_device_show()
+    {
+        $device = SerialDevice::factory()->create([
+            'device_id' => 'DEV_SHOW_456',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($this->clientUser)->get("/admin/serial-devices/{$device->id}");
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_update_device_expiration()
+    {
+        $device = SerialDevice::factory()->create([
+            'device_id' => 'DEV_EXP_789',
+            'status' => 'active',
+        ]);
+
+        $userDevice = \App\Models\SerialUserDevice::create([
+            'user_id' => $this->clientUser->id,
+            'device_id' => $device->device_id,
+            'status' => 'active',
+            'expires_at' => now()->addDays(10),
+        ]);
+
+        $response = $this->actingAs($this->admin)->patch("/admin/serial-devices/{$device->id}/expires-at", [
+            'is_lifetime' => true,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertNull($userDevice->fresh()->expires_at);
+    }
 }

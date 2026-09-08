@@ -123,7 +123,7 @@ class SerialDeviceControllerExpirationTest extends TestCase
         ]);
     }
 
-    public function test_paid_software_without_license_deactivates_and_returns_inactive(): void
+    public function test_paid_software_new_device_is_inactive_and_admin_activation_remains_active(): void
     {
         $this->software->update([
             'requires_payment' => true,
@@ -131,31 +131,42 @@ class SerialDeviceControllerExpirationTest extends TestCase
             'currency' => 'USD',
         ]);
 
-        // Device existed as active from before software was marked as paid
-        $device = SerialDevice::create([
-            'serial_software_id' => $this->software->id,
-            'device_id' => 'DEVICE-PAID-TEST-1',
-            'status' => 'active',
-        ]);
-
-        $response = $this->postJson('/api/serial/device', [
+        // 1. New device checking in for a paid software is created as inactive
+        $response1 = $this->postJson('/api/serial/device', [
             'program_name' => 'MegaPos2026',
-            'device_id' => 'DEVICE-PAID-TEST-1',
+            'device_id' => 'DEVICE-PAID-NEW-1',
         ]);
 
-        $response->assertStatus(200);
-        $response->assertJson([
+        $response1->assertStatus(200);
+        $response1->assertJson([
             'status' => 'inactive',
             'requires_payment' => true,
             'price' => 20.00,
             'currency' => 'USD',
-            'has_active_license' => false,
         ]);
 
-        // Assert database record was automatically synced to inactive
+        $device = SerialDevice::where('device_id', 'DEVICE-PAID-NEW-1')->first();
+        $this->assertNotNull($device);
+        $this->assertEquals('inactive', $device->status);
+
+        // 2. Admin explicitly activates the device in the Admin panel
+        $device->update(['status' => SerialDevice::STATUS_ACTIVE]);
+
+        // 3. Device checks in again (or user clicks verify) -> MUST remain active!
+        $response2 = $this->postJson('/api/serial/device', [
+            'program_name' => 'MegaPos2026',
+            'device_id' => 'DEVICE-PAID-NEW-1',
+        ]);
+
+        $response2->assertStatus(200);
+        $response2->assertJson([
+            'status' => 'active',
+            'requires_payment' => true,
+        ]);
+
         $this->assertDatabaseHas('serial_devices', [
             'id' => $device->id,
-            'status' => 'inactive',
+            'status' => 'active',
         ]);
     }
 

@@ -139,7 +139,7 @@ function truncateId(id: string, max = 20) {
 export default function SerialDevicesIndex({ devices, filters, statuses, softwares, stats, perPageOptions, osVersions, users = [] }: Props) {
     const [search, setSearch]                     = useState(filters.search ?? '');
     const [user, setUser]                         = useState(filters.user ?? '');
-    const [detail, setDetail]                     = useState<Device | null>(null);
+
     const [selectedIds, setSelectedIds]            = useState<number[]>([]);
     const [showAdvanced, setShowAdvanced]          = useState(false);
     const [showReports, setShowReports]            = useState(false);
@@ -172,9 +172,6 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     const updated = updatedList?.find(d => d.id === keysDevice.id);
                     if (updated) {
                         setKeysDevice(updated);
-                        if (detail && detail.id === updated.id) {
-                            setDetail(updated);
-                        }
                     }
                     setOverrideForm({ serial_software_key_id: '', value: '' });
                 },
@@ -196,9 +193,6 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     const updated = updatedList?.find(d => d.id === keysDevice.id);
                     if (updated) {
                         setKeysDevice(updated);
-                        if (detail && detail.id === updated.id) {
-                            setDetail(updated);
-                        }
                     }
                 },
             }
@@ -583,7 +577,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                         <TableRow
                                             key={device.id}
                                             className={`cursor-pointer transition-colors ${selectedIds.includes(device.id) ? 'bg-muted/40' : ''}`}
-                                            onClick={() => setDetail(device)}
+                                            onClick={() => router.visit(route('admin.serial-devices.show', device.id))}
                                         >
                                             <TableCell onClick={e => e.stopPropagation()}>
                                                 <input
@@ -649,7 +643,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" side="bottom">
-                                                        <DropdownMenuItem onClick={() => setDetail(device)}>
+                                                        <DropdownMenuItem onClick={() => router.visit(route('admin.serial-devices.show', device.id))}>
                                                             <Monitor className="w-4 h-4 me-2" />
                                                             {__('general.view_details')}
                                                         </DropdownMenuItem>
@@ -728,7 +722,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             </div>
                         )}
                     </div>
-                    
+
                     {/* Pagination */}
                     <div className="w-full md:w-auto">
                         <Pagination links={devices.links} />
@@ -770,148 +764,6 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     )}
                 </div>
             </div>
-
-            {/* Device Detail Dialog */}
-            <Dialog open={!!detail} onOpenChange={open => !open && setDetail(null)}>
-                <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <Monitor className="w-4 h-4" />
-                            {__('general.device_details')}
-                        </DialogTitle>
-                    </DialogHeader>
-                    {detail && (
-                        <div className="mt-6 space-y-4 text-sm">
-                            <Row label={__('general.device_id')}    value={<span className="font-mono text-xs break-all">{detail.device_id}</span>} />
-                            <Row label={__('general.machine_name')} value={detail.machine_name} />
-                            <Row label={__('general.user_name')}    value={detail.user_name} />
-                            <Row label={__('general.user_domain')}  value={detail.user_domain} />
-                            <Row label={__('general.software')}     value={detail.software?.name ?? '—'} />
-                            <Row label={__('general.status')} value={
-                                <Badge variant={statusVariant[detail.status] ?? 'outline'} className="capitalize text-xs">
-                                    {__(detail.status.charAt(0).toUpperCase() + detail.status.slice(1))}
-                                </Badge>
-                            } />
-                            <Separator />
-                            <Row label={__('general.os_version')}     value={detail.os_version ?? '—'} />
-                            <Row label={__('general.framework')}      value={detail.framework_version ?? '—'} />
-                            <Row label={__('general.64_bit_os')}      value={detail.is_64bit_os == null ? '—' : detail.is_64bit_os ? __('general.yes') : __('general.no')} />
-                            <Row label={__('general.64_bit_process')} value={detail.is_64bit_process == null ? '—' : detail.is_64bit_process ? __('general.yes') : __('general.no')} />
-                            <Row label={__('general.culture')}        value={detail.current_culture ?? '—'} />
-                            <Row label={__('general.ui_culture')}     value={detail.current_ui_culture ?? '—'} />
-                            <Row label={__('general.directory')}      value={<span className="font-mono text-xs break-all">{detail.current_directory ?? '—'}</span>} />
-                            <Separator />
-                            <Row label={__('general.last_check')}  value={detail.last_check_date_full ?? '—'} />
-                            <Row label={__('general.registered')}  value={detail.created_at ?? '—'} />
-                            <Separator />
-                            <Row label={__('general.client_assignment') ?? 'Client Assignment'} value={
-                                <PremiumCombobox
-                                    value={detail.userDeviceAssignment?.user?.id ? String(detail.userDeviceAssignment.user.id) : ''}
-                                    onChange={(val) => {
-                                        router.post(route('admin.serial-devices.assign-user', detail.id), {
-                                            user_id: val ? Number(val) : null
-                                        }, {
-                                            preserveState: true,
-                                            onSuccess: (page) => {
-                                                const updatedDevices = page.props.devices as any;
-                                                const updatedDetail = updatedDevices?.data?.find((d: any) => d.id === detail.id);
-                                                if (updatedDetail) {
-                                                    setDetail(updatedDetail);
-                                                }
-                                            }
-                                        });
-                                    }}
-                                    options={[{ value: '', label: __('general.unassigned') ?? 'Unassigned' }, ...users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))]}
-                                    placeholder={__('general.unassigned') ?? 'Unassigned'}
-                                    searchPlaceholder={__('general.search_users')}
-                                />
-                            } />
-                            {detail.userDeviceAssignment?.user && (
-                                <>
-                                    <Row label={__('general.profile_link') ?? 'Profile Link'} value={
-                                        <Link
-                                            href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            {__('general.view_client_profile') ?? 'View Client Profile'} &rarr;
-                                        </Link>
-                                    } />
-                                    <Row
-                                        label={__('general.license_expiration', {}, 'License Expiration')}
-                                        value={
-                                            detail.userDeviceAssignment.expires_at ? (
-                                                detail.userDeviceAssignment.is_expired ? (
-                                                    <Badge variant="destructive" className="text-xs">
-                                                        {__('general.expired', {}, 'Expired')} ({detail.userDeviceAssignment.expires_at_formatted})
-                                                    </Badge>
-                                                ) : (
-                                                    <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-300">
-                                                        {__('general.remaining_days', { days: String(detail.userDeviceAssignment.remaining_days ?? 0) }, `${detail.userDeviceAssignment.remaining_days ?? 0} days remaining`)}
-                                                    </Badge>
-                                                )
-                                            ) : (
-                                                <Badge variant="outline" className="text-xs bg-slate-100 text-slate-800">
-                                                    {__('general.lifetime', {}, 'Lifetime')}
-                                                </Badge>
-                                            )
-                                        }
-                                    />
-                                </>
-                            )}
-                            <Separator />
-                            {/* Resolved Custom Keys Section */}
-                            <div className="space-y-2 pt-1">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-semibold uppercase text-muted-foreground">
-                                        {__('general.resolved_custom_keys', {}, 'Active Configuration Keys')}
-                                    </span>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setKeysDevice(detail)}
-                                        className="h-6 text-xs gap-1 text-blue-600 hover:text-blue-700"
-                                    >
-                                        <Key className="w-3 h-3" />
-                                        <span>{__('general.customize', {}, 'Customize')}</span>
-                                    </Button>
-                                </div>
-                                {detail.resolved_custom_keys && Object.keys(detail.resolved_custom_keys).length > 0 ? (
-                                    <div className="border rounded-md divide-y text-xs">
-                                        {Object.entries(detail.resolved_custom_keys).map(([k, v]) => {
-                                            const isOverridden = detail.device_keys?.some(dk => {
-                                                const sk = detail.software?.custom_keys?.find(s => s.id === dk.serial_software_key_id);
-                                                return sk?.key === k;
-                                            });
-                                            return (
-                                                <div key={k} className="p-2 flex items-center justify-between gap-2">
-                                                    <span className="font-mono font-medium">{k}</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">{v}</span>
-                                                        {isOverridden ? (
-                                                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-800">
-                                                                {__('general.override', {}, 'Override')}
-                                                            </Badge>
-                                                        ) : (
-                                                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-muted-foreground">
-                                                                {__('general.default', {}, 'Default')}
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                ) : (
-                                    <p className="text-xs text-muted-foreground italic py-1">
-                                        {__('general.no_custom_keys_resolved', {}, 'No custom keys configured.')}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </DialogContent>
-            </Dialog>
 
             {/* Assign User Dialog */}
             <Dialog open={assignUserDevice !== null} onOpenChange={open => !open && setAssignUserDevice(null)}>

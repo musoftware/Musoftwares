@@ -458,7 +458,11 @@ export default function ResellerDevicesIndex({
                                         const lastCheck = device.devices?.[0]?.last_check_date;
 
                                         return (
-                                            <tr key={device.id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                                            <tr
+                                                key={device.id}
+                                                onClick={() => router.visit(`/portal/devices/${device.id}`)}
+                                                className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                                            >
                                                 <td className="px-5 py-4">
                                                     <div className="font-medium text-zinc-900 dark:text-zinc-100">
                                                         {device.user?.name || 'Unknown User'}
@@ -527,7 +531,7 @@ export default function ResellerDevicesIndex({
                                                     )}
                                                 </td>
 
-                                                <td className="px-5 py-4 text-right">
+                                                <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                                                     <div className="flex items-center justify-end gap-2">
                                                         {/* 1-Click +1 Month Renew button */}
                                                         <Button
@@ -548,6 +552,14 @@ export default function ResellerDevicesIndex({
                                                                 </Button>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end" className="w-48">
+                                                                <DropdownMenuItem
+                                                                    onClick={() => router.visit(`/portal/devices/${device.id}`)}
+                                                                    className="text-xs cursor-pointer font-medium"
+                                                                >
+                                                                    <Monitor className="w-3.5 h-3.5 mr-2 text-zinc-500" />
+                                                                    View Details
+                                                                </DropdownMenuItem>
+
                                                                 <DropdownMenuItem
                                                                     onClick={() => {
                                                                         setRenewModalDevice(device);

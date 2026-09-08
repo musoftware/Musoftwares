@@ -178,4 +178,66 @@ class ResellerDeviceControllerTest extends TestCase
         $assignment->refresh();
         $this->assertEquals('inactive', $assignment->status);
     }
+
+    public function test_reseller_can_view_device_show()
+    {
+        $customer = User::factory()->create();
+
+        $assignment = SerialUserDevice::create([
+            'user_id' => $customer->id,
+            'reseller_id' => $this->reseller->id,
+            'device_id' => 'HWID-SHOW-01',
+            'status' => 'active',
+            'expires_at' => now()->addMonth(),
+        ]);
+
+        $response = $this->actingAs($this->reseller)->get("/portal/devices/{$assignment->id}");
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Portal/Devices/Show')
+            ->has('device')
+            ->has('expiryInfo')
+        );
+    }
+
+    public function test_unauthorized_reseller_cannot_view_another_resellers_device()
+    {
+        $customer = User::factory()->create();
+        $otherReseller = User::factory()->create(['onboarding_completed' => true]);
+        $otherReseller->assignRole('software_reseller');
+
+        $assignment = SerialUserDevice::create([
+            'user_id' => $customer->id,
+            'reseller_id' => $otherReseller->id,
+            'device_id' => 'HWID-OTHER-01',
+            'status' => 'active',
+            'expires_at' => now()->addMonth(),
+        ]);
+
+        $response = $this->actingAs($this->reseller)->get("/portal/devices/{$assignment->id}");
+        $response->assertStatus(403);
+    }
+
+    public function test_reseller_can_update_device_notes()
+    {
+        $customer = User::factory()->create();
+
+        $assignment = SerialUserDevice::create([
+            'user_id' => $customer->id,
+            'reseller_id' => $this->reseller->id,
+            'device_id' => 'HWID-NOTES-01',
+            'status' => 'active',
+            'expires_at' => now()->addMonth(),
+            'notes' => 'Old notes',
+        ]);
+
+        $response = $this->actingAs($this->reseller)->patch("/portal/devices/{$assignment->id}/notes", [
+            'notes' => 'Updated reseller notes for customer',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertEquals('Updated reseller notes for customer', $assignment->fresh()->notes);
+    }
 }

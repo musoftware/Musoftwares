@@ -356,6 +356,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified', 'onboarding'])->prefix('portal')->name('portal.')->group(function () {
     Route::get('/devices', [ResellerDeviceController::class, 'index'])->name('devices.index');
     Route::post('/devices', [ResellerDeviceController::class, 'store'])->name('devices.store');
+    Route::get('/devices/{serialUserDevice}', [ResellerDeviceController::class, 'show'])->name('devices.show');
+    Route::patch('/devices/{serialUserDevice}/notes', [ResellerDeviceController::class, 'updateNotes'])->name('devices.notes');
     Route::post('/devices/{serialUserDevice}/renew', [ResellerDeviceController::class, 'renew'])->name('devices.renew');
     Route::patch('/devices/{serialUserDevice}/status', [ResellerDeviceController::class, 'updateStatus'])->name('devices.status');
     Route::delete('/devices/{serialUserDevice}', [ResellerDeviceController::class, 'destroy'])->name('devices.destroy');
@@ -903,9 +905,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Device registry (auto-created by API check-in, admin manages status)
     Route::get('/serial-devices', [SerialDeviceController::class, 'index'])->name('serial-devices.index');
     Route::get('/serial-devices/export', [SerialDeviceController::class, 'export'])->name('serial-devices.export');
+    Route::get('/serial-devices/{serialDevice}', [SerialDeviceController::class, 'show'])->name('serial-devices.show');
     Route::post('/serial-devices/bulk-status', [SerialDeviceController::class, 'bulkUpdateStatus'])->name('serial-devices.bulk-status');
     Route::post('/serial-devices/bulk-delete', [SerialDeviceController::class, 'bulkDelete'])->name('serial-devices.bulk-delete');
     Route::patch('/serial-devices/{serialDevice}/status', [SerialDeviceController::class, 'updateStatus'])->name('serial-devices.status');
+    Route::patch('/serial-devices/{serialDevice}/expires-at', [SerialDeviceController::class, 'updateExpiresAt'])->name('serial-devices.expires-at');
     Route::delete('/serial-devices/{serialDevice}', [SerialDeviceController::class, 'destroy'])->name('serial-devices.destroy');
     Route::post('/serial-devices/{serialDevice}/assign-user', [SerialDeviceController::class, 'assignUser'])->name('serial-devices.assign-user');
     Route::post('/serial-devices/{serialDevice}/keys', [SerialDeviceController::class, 'setKeyOverride'])->name('serial-devices.keys.set');

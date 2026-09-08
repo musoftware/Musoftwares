@@ -111,7 +111,7 @@ class SerialDeviceController extends Controller
         $status = $device->status;
         $hasActiveLicense = false;
 
-        // If software requires payment, enforce active license verification
+        // If software requires payment, enforce active license or admin activation verification
         if ($software->requires_payment) {
             if ($userDevice && $userDevice->user_id) {
                 $userLicense = \App\Models\SerialSoftwareLicense::where('user_id', $userDevice->user_id)
@@ -124,24 +124,25 @@ class SerialDeviceController extends Controller
                     if ($userLicense->expires_at && (! $userDevice->expires_at || $userDevice->expires_at != $userLicense->expires_at)) {
                         $userDevice->update(['expires_at' => $userLicense->expires_at]);
                     }
+                    if ($device->status !== SerialDevice::STATUS_ACTIVE) {
+                        $device->update(['status' => SerialDevice::STATUS_ACTIVE]);
+                        $status = SerialDevice::STATUS_ACTIVE;
+                    }
                 }
             }
 
-            $hasTempOverride = $userDevice?->user?->temp_valid_until && now()->lessThanOrEqualTo($userDevice->user->temp_valid_until);
-
-            if (! $hasActiveLicense && ! $hasTempOverride) {
-                $status = SerialDevice::STATUS_INACTIVE;
-                if ($device->status === SerialDevice::STATUS_ACTIVE) {
-                    $device->update(['status' => SerialDevice::STATUS_INACTIVE]);
-                }
-                if ($userDevice && $userDevice->status === \App\Models\SerialUserDevice::STATUS_ACTIVE) {
-                    $userDevice->update(['status' => \App\Models\SerialUserDevice::STATUS_INACTIVE]);
+            // If the device has been explicitly activated by an admin ($device->status === 'active')
+            // or has an active license, it remains active.
+            // If it is NOT active and has NO license, check for user temp override.
+            if ($device->status !== SerialDevice::STATUS_ACTIVE && ! $hasActiveLicense) {
+                $hasTempOverride = $userDevice?->user?->temp_valid_until && now()->lessThanOrEqualTo($userDevice->user->temp_valid_until);
+                if ($hasTempOverride) {
+                    $status = SerialDevice::STATUS_ACTIVE;
+                } else {
+                    $status = SerialDevice::STATUS_INACTIVE;
                 }
             } else {
-                if ($device->status !== SerialDevice::STATUS_ACTIVE) {
-                    $device->update(['status' => SerialDevice::STATUS_ACTIVE]);
-                    $status = SerialDevice::STATUS_ACTIVE;
-                }
+                $status = SerialDevice::STATUS_ACTIVE;
             }
         }
 
@@ -224,7 +225,7 @@ class SerialDeviceController extends Controller
 
         $hasActiveLicense = (bool) $userLicense;
 
-        $targetStatus = (! $software->requires_payment || $hasActiveLicense)
+        $targetStatus = (! $software->requires_payment || $hasActiveLicense || $device->status === SerialDevice::STATUS_ACTIVE)
             ? SerialDevice::STATUS_ACTIVE
             : SerialDevice::STATUS_INACTIVE;
 
@@ -361,7 +362,7 @@ class SerialDeviceController extends Controller
 
         $hasActiveLicense = (bool) $userLicense;
 
-        $targetStatus = (! $software->requires_payment || $hasActiveLicense)
+        $targetStatus = (! $software->requires_payment || $hasActiveLicense || $device->status === SerialDevice::STATUS_ACTIVE)
             ? SerialDevice::STATUS_ACTIVE
             : SerialDevice::STATUS_INACTIVE;
 
