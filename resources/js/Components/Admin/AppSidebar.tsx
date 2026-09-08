@@ -110,6 +110,7 @@ const items: MenuItem[] = [
     url: "/admin/marketplace", 
     icon: Building2,
     subItems: [
+        { title: "Software & Tools Store", url: "/admin/store-tools" },
         { title: "Digital Books", url: "/admin/digital-products" },
         { title: "Upload Book (PDF)", url: "/admin/digital-products/create" },
         { title: "Book Categories", url: "/admin/digital-products/categories" },
@@ -151,6 +152,7 @@ const items: MenuItem[] = [
     url: "/admin/system", 
     icon: Settings,
     subItems: [
+        { title: "Software & Tools Store", url: "/admin/store-tools" },
         { title: "Musoftware Clients", url: "/admin/musoftware-clients" },
         { title: "Serial Softwares", url: "/admin/serial-softwares" },
         { title: "Serial Devices", url: "/admin/serial-devices" },

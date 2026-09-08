@@ -50,6 +50,7 @@ use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\SerialDeviceController;
 use App\Http\Controllers\Admin\SerialSoftwareController;
 use App\Http\Controllers\Admin\SerialUserDeviceController;
+use App\Http\Controllers\Admin\StoreToolController;
 use App\Http\Controllers\Admin\UserFileController;
 use App\Http\Controllers\Admin\UserNoteController;
 use App\Http\Controllers\Admin\UsersController;
@@ -891,6 +892,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/serial-softwares/{serialSoftware}/keys/{serialSoftwareKey}', [SerialSoftwareController::class, 'destroyKey'])->name('serial-softwares.keys.destroy');
     Route::patch('/serial-softwares/{serialSoftware}/payment', [SerialSoftwareController::class, 'updatePaymentSettings'])->name('serial-softwares.payment');
 
+    // Software & Tools Store Management (Admin catalog)
+    Route::get('/store-tools', [StoreToolController::class, 'index'])->name('store-tools.index');
+    Route::post('/store-tools', [StoreToolController::class, 'store'])->name('store-tools.store');
+    Route::put('/store-tools/{storeTool}', [StoreToolController::class, 'update'])->name('store-tools.update');
+    Route::delete('/store-tools/{storeTool}', [StoreToolController::class, 'destroy'])->name('store-tools.destroy');
+    Route::patch('/store-tools/{storeTool}/toggle-status', [StoreToolController::class, 'toggleStatus'])->name('store-tools.toggle-status');
+
     // Device registry (auto-created by API check-in, admin manages status)
     Route::get('/serial-devices', [SerialDeviceController::class, 'index'])->name('serial-devices.index');
     Route::get('/serial-devices/export', [SerialDeviceController::class, 'export'])->name('serial-devices.export');
@@ -967,7 +975,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Software & Tools Store Public Routes
 Route::get('/store/tools', [ToolStoreController::class, 'index'])->name('store.tools.index');
-Route::post('/store/tools/{serialSoftware}/purchase', [ToolStoreController::class, 'purchase'])->name('store.tools.purchase');
+Route::post('/store/tools/{storeTool}/purchase', [ToolStoreController::class, 'purchase'])->name('store.tools.purchase');
 
 require __DIR__.'/auth.php';
 

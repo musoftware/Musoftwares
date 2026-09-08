@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageShell } from '@/Components/ui/PageShell';
-import { PageHeroHeader } from '@/Components/ui/PageHeroHeader';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -15,35 +14,45 @@ import {
     DialogTitle 
 } from '@/Components/ui/dialog';
 import { 
-    Wrench, Laptop, CheckCircle2, Key, ArrowRight, 
-    Search, Download, Monitor, ShieldCheck, Mail, Sparkles 
+    Laptop, CheckCircle2, Key, ArrowRight, 
+    Search, Download, Monitor, Mail, Sparkles, Check
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-interface SoftwareItem {
+interface ToolItem {
     id: number;
     name: string;
-    default_status: string;
+    tagline?: string | null;
+    description?: string | null;
+    version?: string | null;
+    download_url?: string | null;
+    category?: string | null;
     requires_payment: boolean;
     price: number;
     currency: string;
-    payment_instructions: string | null;
-    whatsapp_number: string | null;
+    payment_instructions?: string | null;
+    whatsapp_number?: string | null;
+    features?: string[] | null;
+    serial_software_id?: number | null;
+    serial_software_name?: string | null;
     has_license: boolean;
     license_expires_at: string | null;
 }
 
 interface StoreProps {
-    softwares: SoftwareItem[];
+    tools?: ToolItem[];
+    softwares?: ToolItem[];
     userLicensesCount: number;
 }
 
-export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 }: StoreProps) {
+export default function StoreToolsIndex({ tools = [], softwares = [], userLicensesCount = 0 }: StoreProps) {
     const { auth } = usePage().props as any;
     const user = auth?.user;
 
+    const catalogTools: ToolItem[] = tools.length > 0 ? tools : softwares;
+
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedSoftware, setSelectedSoftware] = useState<SoftwareItem | null>(null);
+    const [selectedTool, setSelectedTool] = useState<ToolItem | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -53,12 +62,14 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
         device_id: '',
     });
 
-    const filteredSoftwares = softwares.filter(sw => 
-        sw.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredTools = catalogTools.filter(t => 
+        t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (t.tagline && t.tagline.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (t.category && t.category.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
-    const handleOpenPurchase = (software: SoftwareItem) => {
-        setSelectedSoftware(software);
+    const handleOpenPurchase = (tool: ToolItem) => {
+        setSelectedTool(tool);
         setData(prev => ({
             ...prev,
             email: user?.email || '',
@@ -71,9 +82,9 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedSoftware) return;
+        if (!selectedTool) return;
 
-        post(route('store.tools.purchase', selectedSoftware.id), {
+        post(route('store.tools.purchase', selectedTool.id), {
             preserveScroll: true,
             onSuccess: () => {
                 setIsDialogOpen(false);
@@ -122,7 +133,7 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
                             <Search className="w-4 h-4 text-[#1d1d1f]/40 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
-                                placeholder="Search software by name (e.g. WAContactsExtract)..."
+                                placeholder="Search software by name, category..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 text-sm bg-white dark:bg-zinc-900/80 border border-black/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0071e3] text-[#1d1d1f] dark:text-[#f8fafc] placeholder:text-[#1d1d1f]/40 dark:placeholder:text-zinc-500"
@@ -130,15 +141,15 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
                         </div>
 
                         <div className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 font-sans">
-                            Showing <span className="font-semibold text-[#1d1d1f] dark:text-white">{filteredSoftwares.length}</span> tools
+                            Showing <span className="font-semibold text-[#1d1d1f] dark:text-white">{filteredTools.length}</span> tools
                         </div>
                     </div>
 
                     {/* Software Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredSoftwares.map((software) => (
+                        {filteredTools.map((tool) => (
                             <div
-                                key={software.id}
+                                key={tool.id}
                                 className="group relative flex flex-col justify-between bg-white dark:bg-zinc-900/90 border border-black/5 dark:border-white/10 rounded-[24px] p-6 hover:border-[#0071e3]/40 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all shadow-xs"
                             >
                                 <div>
@@ -147,47 +158,86 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
                                             <Laptop className="w-6 h-6" />
                                         </div>
 
-                                        {software.has_license ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                                Active License
-                                            </span>
-                                        ) : (
-                                            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f]/70 dark:text-zinc-300 border border-black/5 dark:border-white/10">
-                                                {software.requires_payment && software.price > 0 
-                                                    ? `${software.price} ${software.currency}` 
-                                                    : 'Free License'}
+                                        <div className="flex flex-col items-end gap-1">
+                                            {tool.has_license ? (
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                                    Active License
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f]/70 dark:text-zinc-300 border border-black/5 dark:border-white/10">
+                                                    {tool.requires_payment && tool.price > 0 
+                                                        ? `${tool.price} ${tool.currency}` 
+                                                        : 'Free License'}
+                                                </span>
+                                            )}
+
+                                            {tool.version && (
+                                                <span className="text-[10px] font-mono text-zinc-400">
+                                                    {tool.version}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] tracking-tight transition-colors">
+                                            {tool.name}
+                                        </h3>
+                                        {tool.category && (
+                                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                                                {tool.category}
                                             </span>
                                         )}
                                     </div>
 
-                                    <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] tracking-tight transition-colors">
-                                        {software.name}
-                                    </h3>
-
                                     <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-2 leading-relaxed">
-                                        Windows automation tool. Seamless automated check-in and email-based device activation.
+                                        {tool.tagline || tool.description || 'Windows desktop automation utility with instant device licensing.'}
                                     </p>
 
-                                    {software.license_expires_at && (
+                                    {/* Feature highlights */}
+                                    {Array.isArray(tool.features) && tool.features.length > 0 && (
+                                        <div className="mt-4 space-y-1.5 pt-3 border-t border-black/5 dark:border-white/5">
+                                            {tool.features.slice(0, 3).map((feat, idx) => (
+                                                <div key={idx} className="flex items-center gap-2 text-xs text-[#1d1d1f]/80 dark:text-zinc-300">
+                                                    <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                                                    <span className="line-clamp-1">{feat}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {tool.license_expires_at && (
                                         <div className="mt-3 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
-                                            Valid until: {new Date(software.license_expires_at).toLocaleDateString()}
+                                            Valid until: {new Date(tool.license_expires_at).toLocaleDateString()}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="mt-6 pt-4 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
-                                    <div className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 font-mono">
-                                        Windows x64 / x86
-                                    </div>
+                                <div className="mt-6 pt-4 border-t border-black/5 dark:border-white/10 flex items-center justify-between gap-2">
+                                    {tool.download_url ? (
+                                        <a
+                                            href={tool.download_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="inline-flex items-center gap-1.5 text-xs text-[#1d1d1f]/70 dark:text-zinc-400 hover:text-[#0071e3] transition-colors"
+                                        >
+                                            <Download className="w-3.5 h-3.5" />
+                                            Download Tool
+                                        </a>
+                                    ) : (
+                                        <div className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 font-mono">
+                                            Windows x64 / x86
+                                        </div>
+                                    )}
 
                                     <Button
-                                        onClick={() => handleOpenPurchase(software)}
-                                        variant={software.has_license ? 'outline' : 'default'}
+                                        onClick={() => handleOpenPurchase(tool)}
+                                        variant={tool.has_license ? 'outline' : 'default'}
                                         size="sm"
                                         className="rounded-xl px-4 text-xs font-semibold"
                                     >
-                                        {software.has_license ? 'Renew / Bind Device' : 'Activate Software'}
+                                        {tool.has_license ? 'Renew / Bind Device' : 'Activate Software'}
                                         <ArrowRight className="w-3.5 h-3.5 ms-1.5" />
                                     </Button>
                                 </div>
@@ -195,7 +245,7 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
                         ))}
                     </div>
 
-                    {filteredSoftwares.length === 0 && (
+                    {filteredTools.length === 0 && (
                         <div className="text-center py-16 bg-white dark:bg-zinc-900/60 rounded-3xl border border-black/5 dark:border-white/10">
                             <Laptop className="w-12 h-12 text-[#1d1d1f]/20 dark:text-zinc-600 mx-auto mb-3" />
                             <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-white">No software tools found</h3>
@@ -212,7 +262,7 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
                                 <Key className="w-5 h-5" />
                             </div>
                             <DialogTitle className="text-lg font-bold">
-                                Activate Software: {selectedSoftware?.name}
+                                Activate Software: {selectedTool?.name}
                             </DialogTitle>
                             <DialogDescription className="text-xs text-[#1d1d1f]/60 dark:text-zinc-400 font-sans">
                                 Enter the email address to bind this license to. When you launch the program on your computer and type this email, your device will activate automatically.
@@ -267,12 +317,25 @@ export default function StoreToolsIndex({ softwares = [], userLicensesCount = 0 
                                 <div className="flex items-center justify-between text-xs font-semibold">
                                     <span>Pricing:</span>
                                     <span>
-                                        {selectedSoftware?.requires_payment && selectedSoftware?.price > 0
-                                            ? `${selectedSoftware?.price} ${selectedSoftware?.currency}`
+                                        {selectedTool?.requires_payment && selectedTool?.price > 0
+                                            ? `${selectedTool?.price} ${selectedTool?.currency}`
                                             : 'Free License'}
                                     </span>
                                 </div>
+                                {selectedTool?.whatsapp_number && (
+                                    <div className="flex items-center justify-between text-xs pt-1 border-t border-black/5 dark:border-white/5">
+                                        <span className="text-[#1d1d1f]/60 dark:text-zinc-400">WhatsApp Support:</span>
+                                        <span className="font-mono">{selectedTool.whatsapp_number}</span>
+                                    </div>
+                                )}
                             </div>
+
+                            {selectedTool?.payment_instructions && (
+                                <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200/60 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-200">
+                                    <p className="font-semibold mb-1">Payment Instructions:</p>
+                                    <p className="whitespace-pre-line text-[11px]">{selectedTool.payment_instructions}</p>
+                                </div>
+                            )}
 
                             <DialogFooter className="pt-2">
                                 <Button
