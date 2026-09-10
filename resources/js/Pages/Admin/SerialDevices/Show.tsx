@@ -195,7 +195,7 @@ export default function SerialDeviceShow({
 
     const handleRemoveKeyOverride = (keyItem: CustomKeyItem) => {
         if (!keyItem.override_id) return;
-        if (confirm(`Revert key "${keyItem.key}" to software default value?`)) {
+        if (confirm(__('general.revert_key_to_default_confirm', { key: keyItem.key }))) {
             router.delete(route('admin.serial-devices.keys.remove', [device.id, keyItem.override_id]), {
                 preserveScroll: true,
             });
@@ -405,7 +405,7 @@ export default function SerialDeviceShow({
                                     <div className="p-6 text-center text-sm text-muted-foreground">
                                         <Key className="w-8 h-8 mx-auto text-muted-foreground/50 mb-2" />
                                         <p className="font-medium">{__('general.no_keys_configured') ?? 'No custom keys configured for this software'}</p>
-                                        <p className="text-xs mt-1">Configure keys under Software Management to distribute dynamic parameters.</p>
+                                        <p className="text-xs mt-1">{__('general.configure_keys_under_software_management')}</p>
                                     </div>
                                 ) : (
                                     <div className="overflow-x-auto">
@@ -437,11 +437,11 @@ export default function SerialDeviceShow({
                                                         <TableCell>
                                                             {item.is_overridden ? (
                                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                                                                    Custom Override
+                                                                    {__('general.custom_override')}
                                                                 </span>
                                                             ) : (
                                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                                                                    Default
+                                                                    {__('general.default')}
                                                                 </span>
                                                             )}
                                                         </TableCell>
@@ -457,7 +457,7 @@ export default function SerialDeviceShow({
                                                                     }}
                                                                     className="h-7 text-xs"
                                                                 >
-                                                                    {item.is_overridden ? 'Edit' : 'Override'}
+                                                                    {item.is_overridden ? __('general.edit') : __('general.override')}
                                                                 </Button>
                                                                 {item.is_overridden && (
                                                                     <Button
@@ -467,7 +467,7 @@ export default function SerialDeviceShow({
                                                                         onClick={() => handleRemoveKeyOverride(item)}
                                                                         className="h-7 text-xs text-red-600 hover:text-red-700"
                                                                     >
-                                                                        Reset
+                                                                        {__('general.reset')}
                                                                     </Button>
                                                                 )}
                                                             </div>
@@ -512,20 +512,20 @@ export default function SerialDeviceShow({
                                                 href={route('admin.users.show', assignment.user.id)}
                                                 className="text-xs text-foreground font-medium hover:underline inline-flex items-center gap-1"
                                             >
-                                                <span>Profile</span>
+                                                <span>{__('general.profile')}</span>
                                                 <ExternalLink className="w-3 h-3" />
                                             </Link>
                                         </div>
 
                                         {assignment.user.phone && (
                                             <div className="text-xs text-muted-foreground">
-                                                Phone: <span className="text-foreground font-medium">{assignment.user.phone}</span>
+                                                {__('general.phone')}: <span className="text-foreground font-medium">{assignment.user.phone}</span>
                                             </div>
                                         )}
 
                                         {assignment.reseller && (
                                             <div className="text-xs text-muted-foreground border-t pt-2">
-                                                Assigned via Reseller: <span className="font-semibold text-foreground">{assignment.reseller.name}</span>
+                                                {__('general.assigned_via_reseller')}: <span className="font-semibold text-foreground">{assignment.reseller.name}</span>
                                             </div>
                                         )}
                                     </div>
@@ -539,13 +539,13 @@ export default function SerialDeviceShow({
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                                        {assignment?.user ? 'Change or Transfer Client' : 'Assign to Client'}
+                                        {assignment?.user ? __('general.change_or_transfer_client') : __('general.assign_to_client')}
                                     </Label>
                                     <PremiumCombobox
                                         value={assignment?.user?.id ? String(assignment.user.id) : ''}
                                         onChange={handleAssignClient}
                                         options={[
-                                            { value: '', label: __('general.unassigned') ?? 'Unassigned (Remove Client)' },
+                                            { value: '', label: __('general.unassigned_remove_client') },
                                             ...users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))
                                         ]}
                                         placeholder={__('general.select_client') ?? 'Select Client...'}
@@ -572,17 +572,17 @@ export default function SerialDeviceShow({
                                     <span className="text-xs text-muted-foreground font-medium">{__('general.current_status') ?? 'Current Status'}</span>
                                     {assignment?.expires_at ? (
                                         assignment.is_expired ? (
-                                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded border border-red-200 dark:border-red-800">
-                                                <XCircle className="w-3.5 h-3.5" /> Expired ({assignment.expires_at})
+                                             <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded border border-red-200 dark:border-red-800">
+                                                <XCircle className="w-3.5 h-3.5" /> {__('general.expired')} ({assignment.expires_at})
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                                                <CheckCircle2 className="w-3.5 h-3.5" /> {assignment.remaining_days} days left ({assignment.expires_at})
+                                                <CheckCircle2 className="w-3.5 h-3.5" /> {assignment.remaining_days} {__('general.remaining_days')} ({assignment.expires_at})
                                             </span>
                                         )
                                     ) : (
                                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 rounded border">
-                                            Lifetime License
+                                            {__('general.lifetime_license')}
                                         </span>
                                     )}
                                 </div>
@@ -625,7 +625,7 @@ export default function SerialDeviceShow({
                                     </form>
                                 ) : (
                                     <p className="text-xs text-muted-foreground italic text-center py-2">
-                                        Assign a client to enable license term controls.
+                                        {__('general.assign_client_to_enable_license_term_controls')}
                                     </p>
                                 )}
                             </CardContent>
@@ -639,7 +639,7 @@ export default function SerialDeviceShow({
                                     <span>{__('general.activity_timestamps') ?? 'Activity & Telemetry Timestamps'}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    All timestamps are recorded in Cairo timezone (Africa/Cairo).
+                                    {__('general.all_timestamps_cairo_timezone')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3 text-xs">
@@ -672,16 +672,16 @@ export default function SerialDeviceShow({
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-base">
                             <Key className="w-4 h-4" />
-                            <span>Override Configuration Key</span>
+                            <span>{__('general.override_configuration_key')}</span>
                         </DialogTitle>
                         <DialogDescription className="text-xs">
-                            Set a custom value for key <code className="font-mono font-bold text-foreground">{overrideKeyModal?.key}</code> on machine {device.machine_name || device.device_id}.
+                            {__('general.override_key_description', { key: overrideKeyModal?.key || '', machine: device.machine_name || device.device_id })}
                         </DialogDescription>
                     </DialogHeader>
                     {overrideKeyModal && (
                         <form onSubmit={handleSaveKeyOverride} className="space-y-4 pt-2">
                             <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">Software Default Value</Label>
+                                <Label className="text-xs text-muted-foreground">{__('general.software_default_value')}</Label>
                                 <Input
                                     value={overrideKeyModal.default_value || ''}
                                     readOnly
@@ -691,13 +691,13 @@ export default function SerialDeviceShow({
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="overrideInput" className="text-xs font-semibold">
-                                    Device Override Value
+                                    {__('general.device_override_value')}
                                 </Label>
                                 <Input
                                     id="overrideInput"
                                     value={overrideValueInput}
                                     onChange={(e) => setOverrideValueInput(e.target.value)}
-                                    placeholder="Enter device-specific value..."
+                                    placeholder={__('general.enter_device_specific_value')}
                                     className="text-xs font-mono h-9"
                                     autoFocus
                                     required
@@ -710,10 +710,10 @@ export default function SerialDeviceShow({
                                     size="sm"
                                     onClick={() => setOverrideKeyModal(null)}
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button type="submit" size="sm">
-                                    Save Override
+                                    {__('general.save_override')}
                                 </Button>
                             </DialogFooter>
                         </form>

@@ -182,7 +182,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
 
     const handleRemoveOverride = (deviceKeyId: number) => {
         if (!keysDevice) return;
-        if (!confirm(__('Are you sure you want to remove this override and revert to the software default?', {}, 'Revert to default?'))) return;
+        if (!confirm(__('general.confirm_remove_override'))) return;
         router.delete(
             route('admin.serial-devices.keys.remove', [keysDevice.id, deviceKeyId]),
             {
@@ -1045,7 +1045,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         <DialogTitle>{__('general.confirm_bulk_delete')}</DialogTitle>
                     </DialogHeader>
                     <p className="text-sm text-muted-foreground mt-2">
-                        {__('Are you sure you want to delete :count device(s)? This action cannot be undone.', { count: String(selectedIds.length) })}
+                        {__('general.confirm_delete_selected_devices', { count: String(selectedIds.length) })}
                     </p>
                     <div className="flex justify-end gap-2 mt-4">
                         <Button variant="outline" size="sm" onClick={() => setBulkDeleteConfirm(false)}>

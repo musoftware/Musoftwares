@@ -16,6 +16,11 @@ class SerialSoftwareService extends BaseService
         return SerialSoftware::create($data);
     }
 
+    public function updatePaymentSettings(SerialSoftware $serialSoftware, array $data): SerialSoftware
+    {
+        return $this->updateFullSettings($serialSoftware, $data);
+    }
+
     public function updateFullSettings(SerialSoftware $serialSoftware, array $data): SerialSoftware
     {
         // Sync requires_payment flag with pricing_type

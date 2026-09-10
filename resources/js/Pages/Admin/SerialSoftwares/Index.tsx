@@ -172,7 +172,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
 
   const handleDeleteKey = (keyId: number) => {
     if (!activeSoftwareForKeys) return;
-    if (!confirm(__('Are you sure you want to delete this key? Devices will lose this key unless overridden.', {}, 'Are you sure you want to delete this key?'))) return;
+    if (!confirm(__('general.confirm_delete_software_key'))) return;
     router.delete(
       route('admin.serial-softwares.keys.destroy', [activeSoftwareForKeys.id, keyId]),
       {
@@ -246,7 +246,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
   };
 
   const destroy = (sw: Software) => {
-    if (!confirm(__('Delete software ":name"? This will also delete all associated device records.', { name: sw.name }))) return;
+    if (!confirm(__('general.confirm_delete_software_modal', { name: sw.name }))) return;
     router.delete(route('admin.serial-softwares.destroy', sw.id), { preserveScroll: true });
   };
 

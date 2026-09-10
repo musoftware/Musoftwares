@@ -173,7 +173,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
   };
 
   const handleDeleteKey = (keyId: number) => {
-    if (!confirm(__('Are you sure you want to delete this key? Devices will lose this parameter unless overridden.', {}, 'Are you sure you want to delete this key?'))) {
+    if (!confirm(__('general.confirm_delete_software_key'))) {
       return;
     }
     router.delete(route('admin.serial-softwares.keys.destroy', [software.id, keyId]), {
@@ -273,7 +273,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
   };
 
   const handleDeletePackage = (packageId: number) => {
-    if (!confirm(__('Are you sure you want to delete this package?', {}, 'Are you sure you want to delete this package?'))) {
+    if (!confirm(__('general.confirm_delete_package'))) {
       return;
     }
     router.delete(route('admin.serial-softwares.packages.destroy', [software.id, packageId]), {
