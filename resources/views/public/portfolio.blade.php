@@ -39,19 +39,26 @@
     <div class="max-w-[1140px] mx-auto px-4 mb-12 space-y-6">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-4 border-b border-black/[0.08] pb-6">
             
-            <!-- Category Pills -->
-            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                @foreach($categories as $catKey => $catLabels)
-                    <button 
-                        @click="activeTab = '{{ $catKey }}'"
-                        :class="activeTab === '{{ $catKey }}' 
-                            ? 'bg-[#1d1d1f] text-white font-semibold' 
-                            : 'bg-[#f5f5f7] text-[#86868b] border border-black/[0.06] hover:text-[#1d1d1f]'"
-                        class="px-4 py-1.5 rounded-full text-[13px] transition-all"
-                    >
-                        {{ $catLabels[$locale] ?? $catLabels['en'] }}
-                    </button>
-                @endforeach
+            <!-- Category Pills with Interactive Mouse Scroll Container -->
+            <div class="mouse-scroll-wrapper relative flex-1 max-w-full lg:max-w-[700px] overflow-hidden py-1">
+                <div class="mouse-scroll-fade-left"></div>
+                <div 
+                    data-mouse-scroll
+                    class="mouse-scroll-container flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1"
+                >
+                    @foreach($categories as $catKey => $catLabels)
+                        <button 
+                            @click="activeTab = '{{ $catKey }}'"
+                            :class="activeTab === '{{ $catKey }}' 
+                                ? 'bg-[#1d1d1f] text-white font-semibold shadow-sm' 
+                                : 'bg-[#f5f5f7] text-[#86868b] border border-black/[0.06] hover:text-[#1d1d1f] hover:bg-[#e8e8ed]'"
+                            class="px-5 py-2 rounded-full text-[13px] transition-all shrink-0 whitespace-nowrap cursor-pointer"
+                        >
+                            {{ $catLabels[$locale] ?? $catLabels['en'] }}
+                        </button>
+                    @endforeach
+                </div>
+                <div class="mouse-scroll-fade-right"></div>
             </div>
 
             <!-- Search Filter -->
@@ -127,12 +134,19 @@
                             </div>
                         @endif
 
-                        <!-- Direct Link to Dedicated Page -->
+                        <!-- Direct Link to Dedicated Page or Live Platform -->
                         <div class="flex items-center justify-between text-xs pt-1">
-                            <a href="/portfolio/{{ $slug }}" class="text-[#0066cc] hover:underline font-semibold flex items-center gap-1">
-                                <span>{{ $locale === 'ar' ? 'دراسة المشروع' : 'Case Study' }}</span>
-                                <span>›</span>
-                            </a>
+                            @if(!empty($proj['live_url']))
+                                <a href="{{ $proj['live_url'] }}" target="_blank" rel="noopener noreferrer" class="text-[#0066cc] hover:underline font-semibold flex items-center gap-1">
+                                    <span>{{ $locale === 'ar' ? 'زيارة المنصة الحية' : 'Live Platform' }}</span>
+                                    <span>↗</span>
+                                </a>
+                            @else
+                                <a href="/portfolio/{{ $slug }}" class="text-[#0066cc] hover:underline font-semibold flex items-center gap-1">
+                                    <span>{{ $locale === 'ar' ? 'دراسة المشروع' : 'Case Study' }}</span>
+                                    <span>›</span>
+                                </a>
+                            @endif
 
                             <a href="https://wa.me/201015218548?text={{ urlencode('Hello Mahmoud, I would like to inquire about ' . $proj['title_en']) }}" target="_blank" rel="noopener noreferrer" class="text-[#86868b] hover:text-[#1d1d1f] transition-colors">
                                 {{ $locale === 'ar' ? 'استفسار ↗' : 'Inquire ↗' }}

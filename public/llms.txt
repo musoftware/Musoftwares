@@ -17,15 +17,12 @@ Full Comprehensive Index: http://localhost/llms-full.txt
 All endpoints automatically negotiate content and deliver pure JSON payload containing the full page props when accessed by AI user-agents or with `?format=json`.
 
 ## Service Categories
-- [Digital Goods](http://localhost/marketplace/categories/digital-goods): Discover services in this category.
 
 ## Featured Services
 
-### API Access Keys
-- **Category**: Digital Goods
-- **Starting Price**: $0
-- **Tagline**: 
-- **URL**: http://localhost/marketplace/services/1/api-access-keys
-
 ## Recent Blog Insights
+
+### Test Article
+- **Excerpt**: 
+- **URL**: http://localhost/blog/test-article
 

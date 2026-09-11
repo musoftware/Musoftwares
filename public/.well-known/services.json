@@ -1,17 +1,5 @@
 {
-    "updated_at": "2026-09-08T11:06:31+00:00",
-    "total_services": 1,
-    "services": [
-        {
-            "id": 1,
-            "title": "API Access Keys",
-            "slug": "api-access-keys",
-            "category": "Digital Goods",
-            "url": "http://localhost/marketplace/services/1/api-access-keys",
-            "tagline": null,
-            "starting_price": 0,
-            "packages": [],
-            "tags": []
-        }
-    ]
+    "updated_at": "2026-09-11T06:52:06+00:00",
+    "total_services": 0,
+    "services": []
 }

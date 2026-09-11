@@ -36,6 +36,7 @@ return [
     'estimator_title' => 'Calculate Your Exact Project Investment',
     'estimator_desc' => 'Transparent unit pricing: Web from $10/page, Mobile from $15/screen, Desktop from $25/screen + 20+ specialized production modules with live USD/EGP rates.',
     'estimator_unit_web' => 'Web App: from $10 / page',
+    'estimator_unit_landing' => 'Landing Page: from $60 / page',
     'estimator_unit_mobile' => 'Mobile App: from $15 / screen',
     'estimator_unit_desktop' => 'Desktop Software: from $25 / screen',
     'estimator_open_button' => 'LAUNCH INTERACTIVE ESTIMATOR ➔',

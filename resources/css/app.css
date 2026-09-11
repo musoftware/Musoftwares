@@ -411,4 +411,55 @@
   .dark ::-webkit-scrollbar-thumb:hover {
     background: #334155;
   }
+
+  /* --- Universal Mouse Scroll Container & Masks --- */
+  .mouse-scroll-container {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+    user-select: none;
+  }
+  .mouse-scroll-container:active {
+    cursor: grabbing;
+  }
+  .mouse-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+  .mouse-scroll-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .mouse-scroll-fade-left {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 48px;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.2s ease;
+    opacity: 0;
+    background: linear-gradient(to right, #ffffff, transparent);
+  }
+  .mouse-scroll-fade-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 48px;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.2s ease;
+    opacity: 0;
+    background: linear-gradient(to left, #ffffff, transparent);
+  }
+  :where(.dark, .dark *) .mouse-scroll-fade-left {
+    background: linear-gradient(to right, #090d16, transparent);
+  }
+  :where(.dark, .dark *) .mouse-scroll-fade-right {
+    background: linear-gradient(to left, #090d16, transparent);
+  }
 }

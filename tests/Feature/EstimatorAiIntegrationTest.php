@@ -21,11 +21,13 @@ class EstimatorAiIntegrationTest extends TestCase
             ->assertJsonStructure([
                 'platforms' => [
                     'web',
+                    'landing',
                     'mobile',
                     'desktop',
                 ],
                 'modules' => [
                     'web',
+                    'landing',
                     'mobile',
                     'desktop',
                 ],

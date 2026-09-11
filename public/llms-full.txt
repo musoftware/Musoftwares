@@ -13,17 +13,16 @@ Base URL: http://localhost
 - OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
 
 ## Service Categories
-- **Digital Goods**: http://localhost/marketplace/categories/digital-goods
 
 ## Full Services Catalog
 
-### API Access Keys
-- **ID**: 1
-- **Category**: Digital Goods
-- **URL**: http://localhost/marketplace/services/1/api-access-keys
-- **Starting Price**: $0
-- **Tagline**: 
-- **Description**: Vouchers
-
 ## Full Blog Articles Catalog
+
+### Test Article
+- **Slug**: test-article
+- **URL**: http://localhost/blog/test-article
+- **Published At**: 2026-09-11T06:52:06+00:00
+- **Excerpt**: 
+- **Content**:
+This is a test article.
 

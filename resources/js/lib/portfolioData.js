@@ -1,4 +1,14 @@
 export const portfolioItems = [
+    { 
+        slug: 'acelbay', 
+        img: '/images/portfolio/acelbay.png', 
+        titleKey: 'portfolio_acelbay_title', 
+        descKey: 'portfolio_acelbay_desc', 
+        contentKey: 'portfolio_acelbay_content', 
+        cat: 'Web App',
+        live_url: 'https://acelbay.com/',
+        techs: ['React', 'Tailwind CSS', 'High-End Animations', 'Luxury UI/UX']
+    },
     { slug: 'trenz-whatscrm', img: '/images/portfolio/trenz-whatscrm.png', titleKey: 'portfolio_trenz_whatscrm_title', descKey: 'portfolio_trenz_whatscrm_desc', contentKey: 'portfolio_trenz_whatscrm_content', cat: 'SaaS' },
     { slug: 'trenz-agency', img: '/images/portfolio/trenz-agency.png', titleKey: 'portfolio_trenz_agency_title', descKey: 'portfolio_trenz_agency_desc', contentKey: 'portfolio_trenz_agency_content', cat: 'Agency & Web' },
     { slug: 'kbdny', img: '/images/portfolio/kbdny.png', titleKey: 'portfolio_kbdny_title', descKey: 'portfolio_kbdny_desc', contentKey: 'portfolio_kbdny_content', cat: 'Platform' },

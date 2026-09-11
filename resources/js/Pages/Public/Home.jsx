@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import ProjectEstimator from '@/Components/Estimator/ProjectEstimator';
+import MouseScrollContainer from '@/Components/ui/MouseScrollContainer';
 
 const FEATURED_HERO_SLIDES = [
     {
@@ -45,6 +46,7 @@ const FEATURED_HERO_SLIDES = [
 
 const GALLERY_TABS = [
     { id: 'all', label: 'All Projects' },
+    { id: 'web', label: 'Web Apps' },
     { id: 'erp', label: 'Enterprise ERP & Ledgers' },
     { id: 'meta', label: 'Meta & WhatsApp Cloud' },
     { id: 'automation', label: 'Desktop RPA & Tools' },
@@ -52,6 +54,18 @@ const GALLERY_TABS = [
 ];
 
 const GALLERY_ITEMS = [
+    {
+        id: 'acelbay',
+        categoryKey: 'web',
+        category: 'Web App & Luxury Platform',
+        badge: 'Live Platform',
+        title: 'Acel Bay — Luxury Coastal Living & Destination Platform',
+        description: 'Bespoke beachfront luxury platform showcasing coastal resorts, residential units, dining, and online reservations.',
+        image: '/images/portfolio/acelbay.png',
+        link: 'https://acelbay.com/',
+        isExternal: true,
+        cardType: 'sage'
+    },
     {
         id: 'trenz-whatscrm',
         categoryKey: 'meta',
@@ -437,7 +451,8 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
 
 
                 {/* 4. OUR WORK, NEWS AND INSIGHTS (TABBED GALLERY) */}
-                <section id="work" className="py-24 sm:py-32 px-6 max-w-[1400px] mx-auto">
+                <section id="work" className="py-24 sm:py-32 px-6 max-w-[1400px] mx-auto relative">
+                    <span id="web" className="absolute -top-24" />
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                         <div>
                             <span className="text-xs font-semibold uppercase tracking-wider text-[#0071e3] block mb-2">
@@ -453,7 +468,10 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                     </div>
 
                     {/* Tab Navigation Filter Bar */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 border-b border-black/5 scrollbar-none">
+                    <MouseScrollContainer 
+                        className="pb-4 mb-12 border-b border-black/5"
+                        contentClassName="gap-2"
+                    >
                         {GALLERY_TABS.map((tab) => {
                             const isActive = activeGalleryTab === tab.id;
                             const count = tab.id === 'all' 
@@ -464,7 +482,7 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveGalleryTab(tab.id)}
-                                    className={`px-4 sm:px-5 py-2 text-xs font-semibold rounded-[980px] whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 ${
+                                    className={`px-4 sm:px-5 py-2 text-xs font-semibold rounded-[980px] whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
                                         isActive
                                             ? 'bg-[#0071e3] text-white shadow-sm'
                                             : 'bg-[#f5f5f7] text-[#1d1d1f]/75 hover:bg-black/5 hover:text-[#1d1d1f]'
@@ -479,7 +497,7 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                                 </button>
                             );
                         })}
-                    </div>
+                    </MouseScrollContainer>
 
                     {/* Dynamic Animated Gallery Grid */}
                     <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -527,13 +545,25 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
 
                                         {/* Action Link Footer */}
                                         <div className="px-6 sm:px-8 pb-6 pt-4 border-t border-black/5 flex items-center justify-between text-xs font-semibold text-[#0071e3] group-hover:underline">
-                                            <Link 
-                                                href={item.link}
-                                                className="flex items-center justify-between w-full"
-                                            >
-                                                <span className="tracking-wider uppercase">EXPLORE CASE STUDY</span>
-                                                <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                                            </Link>
+                                            {item.isExternal ? (
+                                                <a 
+                                                    href={item.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center justify-between w-full"
+                                                >
+                                                    <span className="tracking-wider uppercase">VISIT LIVE PLATFORM</span>
+                                                    <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                                </a>
+                                            ) : (
+                                                <Link 
+                                                    href={item.link}
+                                                    className="flex items-center justify-between w-full"
+                                                >
+                                                    <span className="tracking-wider uppercase">EXPLORE CASE STUDY</span>
+                                                    <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                                </Link>
+                                            )}
                                         </div>
                                     </motion.div>
                                 );

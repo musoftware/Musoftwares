@@ -443,6 +443,151 @@
             } else {
                 reveals.forEach(el => el.classList.add('is-revealed'));
             }
+
+            // Universal Mouse Proximity & Drag Horizontal Scroll Handler for Blade Views
+            function setupMouseScroll(container) {
+                if (!container || container.__mouseScrollReady) return;
+                container.__mouseScrollReady = true;
+
+                let animFrame = null;
+                let velocity = 0;
+                let isMouseDown = false;
+                let startX = 0;
+                let scrollLeftStart = 0;
+                let hasDragged = false;
+
+                const checkBoundaries = () => {
+                    const wrapper = container.closest('.mouse-scroll-wrapper');
+                    if (!wrapper) return;
+                    const leftFade = wrapper.querySelector('.mouse-scroll-fade-left');
+                    const rightFade = wrapper.querySelector('.mouse-scroll-fade-right');
+                    const isRtl = getComputedStyle(container).direction === 'rtl';
+                    const maxScroll = container.scrollWidth - container.clientWidth;
+
+                    if (maxScroll <= 2) {
+                        if (leftFade) leftFade.style.opacity = '0';
+                        if (rightFade) rightFade.style.opacity = '0';
+                        return;
+                    }
+
+                    if (isRtl) {
+                        const abs = Math.abs(container.scrollLeft);
+                        if (leftFade) leftFade.style.opacity = abs < maxScroll - 2 ? '1' : '0';
+                        if (rightFade) rightFade.style.opacity = abs > 2 ? '1' : '0';
+                    } else {
+                        if (leftFade) leftFade.style.opacity = container.scrollLeft > 2 ? '1' : '0';
+                        if (rightFade) rightFade.style.opacity = container.scrollLeft < maxScroll - 2 ? '1' : '0';
+                    }
+                };
+
+                const startLoop = () => {
+                    if (animFrame !== null) return;
+                    const loop = () => {
+                        if (velocity !== 0) {
+                            container.scrollLeft += velocity;
+                            checkBoundaries();
+                            animFrame = requestAnimationFrame(loop);
+                        } else {
+                            animFrame = null;
+                        }
+                    };
+                    animFrame = requestAnimationFrame(loop);
+                };
+
+                const stopLoop = () => {
+                    velocity = 0;
+                    if (animFrame !== null) {
+                        cancelAnimationFrame(animFrame);
+                        animFrame = null;
+                    }
+                };
+
+                container.addEventListener('mousemove', (e) => {
+                    if (isMouseDown) {
+                        const dx = e.pageX - startX;
+                        if (Math.abs(dx) > 5) hasDragged = true;
+                        container.scrollLeft = scrollLeftStart - dx;
+                        checkBoundaries();
+                        return;
+                    }
+
+                    const rect = container.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const width = rect.width;
+                    if (width <= 0) return;
+
+                    const zone = Math.max(40, width * 0.2);
+                    const isRtl = getComputedStyle(container).direction === 'rtl';
+
+                    if (mouseX < zone) {
+                        const intensity = 1 - Math.max(0, mouseX) / zone;
+                        const dir = isRtl ? 1 : -1;
+                        velocity = dir * 16 * intensity;
+                        startLoop();
+                    } else if (mouseX > width - zone) {
+                        const intensity = 1 - Math.max(0, width - mouseX) / zone;
+                        const dir = isRtl ? -1 : 1;
+                        velocity = dir * 16 * intensity;
+                        startLoop();
+                    } else {
+                        stopLoop();
+                    }
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    stopLoop();
+                    isMouseDown = false;
+                });
+
+                container.addEventListener('mousedown', (e) => {
+                    isMouseDown = true;
+                    hasDragged = false;
+                    startX = e.pageX;
+                    scrollLeftStart = container.scrollLeft;
+                });
+
+                window.addEventListener('mouseup', () => {
+                    isMouseDown = false;
+                });
+
+                container.addEventListener('click', (e) => {
+                    if (hasDragged) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        hasDragged = false;
+                    }
+                }, true);
+
+                container.addEventListener('wheel', (e) => {
+                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                        container.scrollLeft += e.deltaY;
+                        checkBoundaries();
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+
+                container.addEventListener('scroll', checkBoundaries, { passive: true });
+                window.addEventListener('resize', checkBoundaries);
+
+                // Auto-reveal child if partially cut off on hover/focus
+                container.querySelectorAll('button, a, .scroll-item').forEach((child) => {
+                    const reveal = () => {
+                        const cRect = container.getBoundingClientRect();
+                        const elRect = child.getBoundingClientRect();
+                        if (elRect.left < cRect.left || elRect.right > cRect.right) {
+                            child.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+                            setTimeout(checkBoundaries, 250);
+                        }
+                    };
+                    child.addEventListener('mouseenter', reveal);
+                    child.addEventListener('focus', reveal);
+                });
+
+                checkBoundaries();
+                setTimeout(checkBoundaries, 200);
+            }
+
+            document.querySelectorAll('[data-mouse-scroll], .mouse-scroll-container').forEach(setupMouseScroll);
         });
     </script>
 

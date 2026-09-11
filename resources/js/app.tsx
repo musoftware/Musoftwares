@@ -10,11 +10,13 @@ import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
 import { syncDocumentDirection } from '@/lib/i18n';
 import { initTheme } from '@/lib/theme';
+import { initAllMouseScrollContainers } from '@/lib/mouseScroll';
 // WebSockets disabled for main SaaS
 
 // Initialize Auto / System / Dark / Light theme reactivity
 if (typeof window !== 'undefined') {
     initTheme();
+    initAllMouseScrollContainers();
 }
 
 // Listen for Inertia page transitions to keep document lang & dir synced
@@ -75,15 +77,20 @@ const initScrollObserver = () => {
     // Re-check when DOM changes (useful for React/Inertia dynamic rendering)
     const mutationObserver = new MutationObserver(() => {
         observeElements();
+        initAllMouseScrollContainers();
     });
     mutationObserver.observe(document.body, { childList: true, subtree: true });
 };
 
 // Start the observer
 if (typeof window !== 'undefined') {
-    window.addEventListener('load', initScrollObserver);
+    window.addEventListener('load', () => {
+        initScrollObserver();
+        initAllMouseScrollContainers();
+    });
     if (document.readyState === 'complete') {
         initScrollObserver();
+        initAllMouseScrollContainers();
     }
 }
 const appElement = document.getElementById('app');

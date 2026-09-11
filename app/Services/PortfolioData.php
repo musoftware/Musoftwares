@@ -15,6 +15,37 @@ class PortfolioData
             // ==========================================
             // 1. Web Apps (تطبيقات ومواقع الويب)
             // ==========================================
+            'acelbay' => [
+                'slug' => 'acelbay',
+                'title_en' => 'Acel Bay Luxury Coastal Resort & Living Platform',
+                'title_ar' => 'منصة آسيل باي (Acel Bay) للمنتجعات والوجهات الساحلية الفاخرة',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'High-end luxury resort and coastal residential destination platform featuring responsive presentation, bespoke amenities showcase, and direct reservations.',
+                'desc_ar' => 'منصة ويب متقدمة وفاخرة لمنتجع ساحلي ومجتمع سكني سياحي، توفر استعراضاً تفاعلياً للمرافق، الشواطئ، الفنادق، وحجز الإقامة.',
+                'img' => '/images/portfolio/acelbay.png',
+                'techs' => ['React', 'Next.js / Vite', 'TailwindCSS', 'Framer Motion', 'Luxury UI/UX'],
+                'live_url' => 'https://acelbay.com/',
+                'metrics' => [
+                    'Status' => 'Live in Production',
+                    'Experience' => 'Beachfront Luxury',
+                    'Speed' => 'Ultra-Fast Performance',
+                    'Reservations' => 'Online Booking Gateway',
+                ],
+                'highlights_en' => [
+                    'Immersive visual experience with high-resolution media galleries and smooth transitions.',
+                    'Interactive showcases for beachfront residences, boutique hotels, and coastal amenities.',
+                    'Integrated reservations gateway and inquiry system for direct customer engagement.',
+                    'Ultra-fast, mobile-first responsive design engineered for pristine performance.',
+                ],
+                'highlights_ar' => [
+                    'تصميم بصري فاخر وتجربة مستخدم مخصصة مع مؤثرات حركية فائقة النعومة.',
+                    'استعراض تفاعلي للوحدات الفندقية والسكنية والمرافق الترفيهية والمطاعم.',
+                    'بوابة حجز إلكترونية وتواصل مباشر مع فريق الحجوزات والضيافة.',
+                    'واجهة متجاوبة بالكامل فائقة السرعة مهيأة لكافة الأجهزة والشاشات.',
+                ],
+            ],
+
             'kbdny' => [
                 'slug' => 'kbdny',
                 'title_en' => 'Kbdny Dropshipping & Multi-Vendor Ecosystem',

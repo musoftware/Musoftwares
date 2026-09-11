@@ -39,6 +39,7 @@ import {
     ArrowUpRight
 } from 'lucide-react';
 import axios from 'axios';
+import MouseScrollContainer from '@/Components/ui/MouseScrollContainer';
 
 export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = true, title = "Calculate Your Project Investment", subtitle = "Combine platforms and in-demand modules to calculate your transparent development estimate." }) {
     const { auth } = usePage().props || {};
@@ -52,6 +53,7 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
     // 2. Dedicated Screen/Page Counts per platform
     const [platformScreens, setPlatformScreens] = useState({
         web: 5,
+        landing: 1,
         mobile: 5,
         desktop: 5,
     });
@@ -76,6 +78,7 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
     // Rates config
     const rates = {
         web: { title: 'Website / Web App', rate: 10, unit: 'Page', icon: Globe, badge: '$10/page' },
+        landing: { title: 'Landing Page', rate: 60, unit: 'Page', icon: Sparkles, badge: '$60/page' },
         mobile: { title: 'Mobile App (iOS & Android)', rate: 15, unit: 'Screen', icon: Smartphone, badge: '$15/screen' },
         desktop: { title: 'Desktop Software', rate: 25, unit: 'Screen', icon: Monitor, badge: '$25/screen' },
     };
@@ -352,6 +355,62 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
                 platform: 'web',
                 icon: Zap,
                 desc: 'Query optimization, asset minification, Redis caching, and achieving 90+ Google PageSpeed score.',
+            },
+        ],
+        landing: [
+            {
+                id: 'landing_without_figma',
+                title: 'Without Figma Design (UI/UX from scratch)',
+                category: 'core',
+                price: 200,
+                platform: 'landing',
+                icon: Shield,
+                desc: 'Full bespoke UI/UX design in Figma from scratch before development (+10,000 EGP).',
+            },
+            {
+                id: 'landing_payload_cms',
+                title: 'Payload CMS Integration',
+                category: 'core',
+                price: 60,
+                platform: 'landing',
+                icon: Database,
+                desc: 'Modern headless Payload CMS setup to manage page texts, images, and content effortlessly.',
+            },
+            {
+                id: 'landing_wordpress_cms',
+                title: 'WordPress CMS Integration',
+                category: 'core',
+                price: 50,
+                platform: 'landing',
+                icon: Globe,
+                desc: 'Custom WordPress setup and integration for dynamic landing page content management.',
+            },
+            {
+                id: 'landing_rich_animations',
+                title: 'Advanced GSAP & Scroll Animations',
+                category: 'optimization',
+                price: 40,
+                platform: 'landing',
+                icon: Zap,
+                desc: 'Smooth interactive scroll animations, micro-interactions, and engaging motion effects.',
+            },
+            {
+                id: 'landing_long_details',
+                title: 'Extended Sections & Storytelling',
+                category: 'marketing',
+                price: 30,
+                platform: 'landing',
+                icon: Sparkles,
+                desc: 'Deep storytelling sections: product breakdown, comparison table, FAQ, social proof, and pricing.',
+            },
+            {
+                id: 'landing_lead_capture',
+                title: 'Lead Capture & WhatsApp Instant CTA',
+                category: 'marketing',
+                price: 25,
+                platform: 'landing',
+                icon: MessageSquare,
+                desc: 'High-converting lead generation form connected with direct WhatsApp alerts.',
             },
         ],
         mobile: [
@@ -768,7 +827,7 @@ Please let me know when we can review the technical specification!`;
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                                 {/* Web Project */}
                                 <button
                                     type="button"
@@ -794,6 +853,34 @@ Please let me know when we can review the technical specification!`;
                                     <div>
                                         <h4 className="font-semibold text-[#1d1d1f] text-sm">Website / Web App</h4>
                                         <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$10 per page</p>
+                                    </div>
+                                </button>
+
+                                {/* Landing Page */}
+                                <button
+                                    type="button"
+                                    onClick={() => togglePlatform('landing')}
+                                    className={`p-5 rounded-[20px] border text-start transition-all cursor-pointer flex flex-col justify-between h-44 ${
+                                        selectedPlatforms.includes('landing')
+                                            ? 'border-2 border-[#0071e3] bg-[#0071e3]/5 shadow-[0_8px_24px_rgba(0,113,227,0.12)] ring-4 ring-[#0071e3]/10'
+                                            : 'border-black/10 bg-white hover:border-black/30 hover:shadow-md'
+                                    }`}
+                                >
+                                    <div className="flex items-center justify-between w-full">
+                                        <div className={`p-2.5 rounded-xl ${selectedPlatforms.includes('landing') ? 'bg-[#0071e3] text-white shadow-sm' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`}>
+                                            <Sparkles className="h-5 w-5" />
+                                        </div>
+                                        <div className={`h-5 w-5 rounded-full flex items-center justify-center border transition-all ${
+                                            selectedPlatforms.includes('landing')
+                                                ? 'bg-[#0071e3] border-[#0071e3] text-white'
+                                                : 'border-black/20 bg-white'
+                                        }`}>
+                                            {selectedPlatforms.includes('landing') && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Landing Page</h4>
+                                        <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$60 per page (Animated &amp; CMS)</p>
                                     </div>
                                 </button>
 
@@ -954,13 +1041,16 @@ Please let me know when we can review the technical specification!`;
                             </div>
 
                             {/* Category Filter Tabs */}
-                            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none bg-[#f5f5f7] p-1.5 rounded-full border border-black/5">
+                            <MouseScrollContainer 
+                                className="bg-[#f5f5f7] p-1.5 rounded-full border border-black/5"
+                                contentClassName="gap-1.5"
+                            >
                                 {categories.map(cat => (
                                     <button
                                         key={cat.id}
                                         type="button"
                                         onClick={() => setActiveCategory(cat.id)}
-                                        className={`px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer text-xs ${
+                                        className={`px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer text-xs shrink-0 ${
                                             activeCategory === cat.id
                                                 ? 'bg-white text-[#1d1d1f] font-semibold shadow-sm'
                                                 : 'text-[#1d1d1f]/70 hover:text-[#1d1d1f]'
@@ -969,7 +1059,7 @@ Please let me know when we can review the technical specification!`;
                                         {cat.title}
                                     </button>
                                 ))}
-                            </div>
+                            </MouseScrollContainer>
 
                             {/* Modules Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">

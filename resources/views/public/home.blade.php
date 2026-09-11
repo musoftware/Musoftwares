@@ -274,17 +274,24 @@
                 </p>
             </div>
 
-            <!-- Top Filter Pill Container -->
-            <div class="inline-flex p-1.5 rounded-full bg-[#e8e8ed] border border-black/5 mb-10 shadow-inner">
-                <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 bg-white text-[#1d1d1f] shadow-sm" data-category="web">
-                    {{ $locale === 'ar' ? 'تطبيقات الويب' : 'Web Apps' }}
-                </button>
-                <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 text-[#1d1d1f]/70 hover:text-[#1d1d1f]" data-category="mobile">
-                    {{ $locale === 'ar' ? 'تطبيقات الموبايل' : 'Mobile Apps' }}
-                </button>
-                <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 text-[#1d1d1f]/70 hover:text-[#1d1d1f]" data-category="desktop">
-                    {{ $locale === 'ar' ? 'برامج الديسك توب' : 'Desktop Apps' }}
-                </button>
+            <!-- Top Filter Pill Container with Mouse Scroll -->
+            <div class="mouse-scroll-wrapper relative max-w-full sm:max-w-fit mx-auto mb-10 overflow-hidden">
+                <div class="mouse-scroll-fade-left"></div>
+                <div 
+                    data-mouse-scroll
+                    class="mouse-scroll-container inline-flex items-center p-1.5 rounded-full bg-[#e8e8ed] border border-black/5 shadow-inner gap-1 overflow-x-auto no-scrollbar"
+                >
+                    <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 bg-white text-[#1d1d1f] shadow-sm shrink-0 whitespace-nowrap cursor-pointer" data-category="web">
+                        {{ $locale === 'ar' ? 'تطبيقات الويب' : 'Web Apps' }}
+                    </button>
+                    <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 text-[#1d1d1f]/70 hover:text-[#1d1d1f] shrink-0 whitespace-nowrap cursor-pointer" data-category="mobile">
+                        {{ $locale === 'ar' ? 'تطبيقات الموبايل' : 'Mobile Apps' }}
+                    </button>
+                    <button class="gallery-category-pill px-6 py-2 rounded-full text-[13px] font-semibold transition duration-200 text-[#1d1d1f]/70 hover:text-[#1d1d1f] shrink-0 whitespace-nowrap cursor-pointer" data-category="desktop">
+                        {{ $locale === 'ar' ? 'برامج الديسك توب' : 'Desktop Apps' }}
+                    </button>
+                </div>
+                <div class="mouse-scroll-fade-right"></div>
             </div>
 
             <!-- Featured Stage with Side Floating Buttons -->
@@ -298,12 +305,12 @@
                 <!-- Center Showcase Card Container -->
                 <div class="w-full max-w-[880px] bg-white rounded-[24px] sm:rounded-[36px] border border-black/5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden transition-all duration-300 p-3 sm:p-5">
                     <div class="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-[18px] sm:rounded-[28px] overflow-hidden bg-[#f0f0f2] flex items-center justify-center">
-                        <img id="gallery-stage-img" src="/images/portfolio/kbdny.png" alt="Kbdny Affiliate" class="w-full h-full object-cover object-top transition duration-500 transform hover:scale-[1.02]">
+                        <img id="gallery-stage-img" src="/images/portfolio/acelbay.png" alt="Acel Bay" class="w-full h-full object-cover object-top transition duration-500 transform hover:scale-[1.02]">
                         
                         <!-- Floating Category Badge -->
                         <div class="absolute top-4 start-4 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md shadow-sm border border-black/5 text-[11px] font-semibold text-[#1d1d1f] flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-[#30d158]"></span>
-                            <span id="gallery-stage-badge">Web &amp; E-Commerce</span>
+                            <span id="gallery-stage-badge">Live Web Platform</span>
                         </div>
                     </div>
                 </div>
@@ -318,16 +325,16 @@
             <!-- Below Showcase Meta & Caption -->
             <div class="max-w-[680px] mx-auto mt-6 space-y-2">
                 <h4 id="gallery-stage-title" class="text-[20px] sm:text-[24px] font-semibold text-[#1d1d1f] tracking-tight">
-                    {{ $locale === 'ar' ? 'منصة كبدني للتجارة والتسويق بالعمولة' : 'Kbdny Affiliate' }}
+                    {{ $locale === 'ar' ? 'منصة آسيل باي — منتجع ووجهة ساحلية فاخرة' : 'Acel Bay' }}
                 </h4>
                 <p id="gallery-stage-desc" class="text-[14px] text-[#1d1d1f]/70 leading-relaxed">
-                    {{ $locale === 'ar' ? 'نظام متكامل واحترافي للتجارة الإلكترونية والدروبشيبينغ مع تتبع العمولات اللحظي.' : 'Multi-vendor affiliate platform with real-time commission tracking and payouts.' }}
+                    {{ $locale === 'ar' ? 'منصة ويب راقية وفاخرة لمنتجع ساحلي ومجتمع سكني سياحي مع استعراض للخدمات والمرافق وحجز الإقامة.' : 'Luxury coastal resort and destination web platform featuring beachfront living showcases and online reservations.' }}
                 </p>
                 <div class="pt-1 flex items-center justify-center gap-4 text-[13px]">
-                    <span id="gallery-stage-metric" class="font-medium text-[#1d1d1f]/80">5,000+ Affiliates</span>
+                    <span id="gallery-stage-metric" class="font-medium text-[#1d1d1f]/80">Live Luxury Resort</span>
                     <span class="text-black/20">•</span>
-                    <a id="gallery-stage-link" href="/portfolio/kbdny" class="font-semibold text-[#0071e3] hover:underline inline-flex items-center gap-1">
-                        {{ $locale === 'ar' ? 'عرض تفاصيل النظام >' : 'View case study >' }}
+                    <a id="gallery-stage-link" href="https://acelbay.com/" target="_blank" rel="noopener noreferrer" class="font-semibold text-[#0071e3] hover:underline inline-flex items-center gap-1">
+                        {{ $locale === 'ar' ? 'زيارة المنصة الحية ↗' : 'Visit live platform ↗' }}
                     </a>
                 </div>
             </div>
@@ -350,6 +357,17 @@
 
         const galleryData = {
             web: [
+                {
+                    title_en: "Acel Bay",
+                    title_ar: "منصة آسيل باي — منتجع ووجهة ساحلية فاخرة",
+                    badge: "Live Web Platform",
+                    desc_en: "Luxury coastal resort and destination web platform featuring beachfront living showcases and online reservations.",
+                    desc_ar: "منصة ويب راقية وفاخرة لمنتجع ساحلي ومجتمع سكني سياحي مع استعراض للخدمات والمرافق وحجز الإقامة.",
+                    img: "/images/portfolio/acelbay.png",
+                    slug: "acelbay",
+                    live_url: "https://acelbay.com/",
+                    metric: "Live Luxury Resort"
+                },
                 {
                     title_en: "Kbdny Affiliate",
                     title_ar: "منصة كبدني للتجارة والتسويق بالعمولة",
@@ -630,7 +648,17 @@
             titleEl.textContent = isArabic ? item.title_ar : item.title_en;
             descEl.textContent = isArabic ? item.desc_ar : item.desc_en;
             metricEl.textContent = item.metric;
-            linkEl.href = item.slug === 'portfolio' ? '/portfolio' : '/portfolio/' + item.slug;
+            if (item.live_url) {
+                linkEl.href = item.live_url;
+                linkEl.target = '_blank';
+                linkEl.rel = 'noopener noreferrer';
+                linkEl.textContent = isArabic ? 'زيارة المنصة الحية ↗' : 'Visit live platform ↗';
+            } else {
+                linkEl.href = item.slug === 'portfolio' ? '/portfolio' : '/portfolio/' + item.slug;
+                linkEl.removeAttribute('target');
+                linkEl.removeAttribute('rel');
+                linkEl.textContent = isArabic ? 'عرض تفاصيل النظام >' : 'View case study >';
+            }
 
             renderPagination(list.length, currentIndex);
         }
