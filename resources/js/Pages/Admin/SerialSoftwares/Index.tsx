@@ -59,6 +59,8 @@ interface Software {
   default_status: string;
   pricing_type?: 'free' | 'single' | 'packages';
   requires_payment?: boolean;
+  show_price?: boolean;
+  show_whatsapp?: boolean;
   price?: number | null;
   currency?: string | null;
   billing_cycle?: string;
@@ -192,6 +194,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
   const [activeSoftwareForPayment, setActiveSoftwareForPayment] = useState<Software | null>(null);
   const [paymentForm, setPaymentForm] = useState({
     requires_payment: false,
+    show_price: true,
+    show_whatsapp: true,
     price: '',
     currency: 'USD',
     whatsapp_number: '',
@@ -203,6 +207,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
     setActiveSoftwareForPayment(sw);
     setPaymentForm({
       requires_payment: !!sw.requires_payment,
+      show_price: sw.show_price !== undefined ? !!sw.show_price : true,
+      show_whatsapp: sw.show_whatsapp !== undefined ? !!sw.show_whatsapp : true,
       price: sw.price !== null && sw.price !== undefined ? String(sw.price) : '',
       currency: sw.currency || '',
       whatsapp_number: sw.whatsapp_number || '',
@@ -218,6 +224,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
       route('admin.serial-softwares.payment', activeSoftwareForPayment.id),
       {
         requires_payment: paymentForm.requires_payment,
+        show_price: paymentForm.show_price,
+        show_whatsapp: paymentForm.show_whatsapp,
         price: paymentForm.price !== '' ? parseFloat(paymentForm.price) : null,
         currency: paymentForm.currency || null,
         whatsapp_number: paymentForm.whatsapp_number || null,
@@ -901,6 +909,41 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                     onChange={(e) => setPaymentForm({ ...paymentForm, payment_instructions: e.target.value })}
                                     className="text-xs resize-none"
                                 />
+                            </div>
+
+                            {/* Activation Window Display Toggles */}
+                            <div className="pt-2 border-t space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                        <Label htmlFor="sw-show-price" className="text-xs font-medium cursor-pointer">
+                                            {__('general.show_price_in_dialog', {}, 'إظهار السعر في نافذة التفعيل')}
+                                        </Label>
+                                        <p className="text-[11px] text-muted-foreground">
+                                            {__('general.show_price_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء صف السعر والعملة داخل نافذة التفعيل للعميل.')}
+                                        </p>
+                                    </div>
+                                    <Switch
+                                        id="sw-show-price"
+                                        checked={paymentForm.show_price}
+                                        onCheckedChange={(checked) => setPaymentForm({ ...paymentForm, show_price: checked })}
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                        <Label htmlFor="sw-show-wa" className="text-xs font-medium cursor-pointer">
+                                            {__('general.show_whatsapp_in_dialog', {}, 'إظهار زر الواتساب في نافذة التفعيل')}
+                                        </Label>
+                                        <p className="text-[11px] text-muted-foreground">
+                                            {__('general.show_whatsapp_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء زر المراسلة المباشرة عبر واتساب.')}
+                                        </p>
+                                    </div>
+                                    <Switch
+                                        id="sw-show-wa"
+                                        checked={paymentForm.show_whatsapp}
+                                        onCheckedChange={(checked) => setPaymentForm({ ...paymentForm, show_whatsapp: checked })}
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex justify-end gap-2 pt-2">

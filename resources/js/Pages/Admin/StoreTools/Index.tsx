@@ -109,7 +109,7 @@ export default function AdminStoreToolsIndex({
   const [deletingTool, setDeletingTool] = useState<StoreToolItem | null>(null);
 
   // Form handling
-  const { data, setData, post, put, processing, errors, reset } = useForm({
+  const { data, setData, post, put, transform, processing, errors, reset } = useForm({
     name: '',
     tagline: '',
     description: '',
@@ -189,12 +189,13 @@ export default function AdminStoreToolsIndex({
       .map(f => f.trim())
       .filter(f => f.length > 0);
 
+    transform((formData) => ({
+      ...formData,
+      features,
+      serial_software_id: formData.serial_software_id ? Number(formData.serial_software_id) : null,
+    }));
+
     post(route('admin.store-tools.store'), {
-      data: {
-        ...data,
-        features,
-        serial_software_id: data.serial_software_id ? Number(data.serial_software_id) : null,
-      } as any,
       preserveScroll: true,
       onSuccess: () => {
         setIsCreateOpen(false);
@@ -212,12 +213,13 @@ export default function AdminStoreToolsIndex({
       .map(f => f.trim())
       .filter(f => f.length > 0);
 
+    transform((formData) => ({
+      ...formData,
+      features,
+      serial_software_id: formData.serial_software_id ? Number(formData.serial_software_id) : null,
+    }));
+
     put(route('admin.store-tools.update', editingTool.id), {
-      data: {
-        ...data,
-        features,
-        serial_software_id: data.serial_software_id ? Number(data.serial_software_id) : null,
-      } as any,
       preserveScroll: true,
       onSuccess: () => {
         setEditingTool(null);
@@ -362,8 +364,9 @@ export default function AdminStoreToolsIndex({
             <Select
               value={status}
               onValueChange={(val) => {
-                setStatus(val);
-                handleFilter(search, val, type);
+                const nextVal = val || 'all';
+                setStatus(nextVal);
+                handleFilter(search, nextVal, type);
               }}
             >
               <SelectTrigger className="text-xs h-9 w-[130px] border-black/10 dark:border-white/10">
@@ -379,8 +382,9 @@ export default function AdminStoreToolsIndex({
             <Select
               value={type}
               onValueChange={(val) => {
-                setType(val);
-                handleFilter(search, status, val);
+                const nextVal = val || 'all';
+                setType(nextVal);
+                handleFilter(search, status, nextVal);
               }}
             >
               <SelectTrigger className="text-xs h-9 w-[130px] border-black/10 dark:border-white/10">
@@ -601,7 +605,7 @@ export default function AdminStoreToolsIndex({
                   <Label className="text-xs font-semibold">Link with Serial Software Protection</Label>
                   <Select
                     value={String(data.serial_software_id)}
-                    onValueChange={(val) => setData('serial_software_id', val === 'none' ? '' : val)}
+                    onValueChange={(val) => setData('serial_software_id', (!val || val === 'none') ? '' : val)}
                   >
                     <SelectTrigger className="text-xs h-9">
                       <SelectValue placeholder="Select serial software to link (optional)" />
@@ -790,7 +794,7 @@ export default function AdminStoreToolsIndex({
                   <Label className="text-xs font-semibold">Link with Serial Software Protection</Label>
                   <Select
                     value={String(data.serial_software_id)}
-                    onValueChange={(val) => setData('serial_software_id', val === 'none' ? '' : val)}
+                    onValueChange={(val) => setData('serial_software_id', (!val || val === 'none') ? '' : val)}
                   >
                     <SelectTrigger className="text-xs h-9">
                       <SelectValue placeholder="Select serial software to link (optional)" />

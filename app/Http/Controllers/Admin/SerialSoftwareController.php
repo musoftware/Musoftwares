@@ -204,6 +204,8 @@ class SerialSoftwareController extends Controller
             'currency' => ['nullable', 'string', 'max:10'],
             'whatsapp_number' => ['nullable', 'string', 'max:50'],
             'payment_instructions' => ['nullable', 'string', 'max:2000'],
+            'show_price' => ['nullable', 'boolean'],
+            'show_whatsapp' => ['nullable', 'boolean'],
         ]);
 
         $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);
@@ -238,6 +240,8 @@ class SerialSoftwareController extends Controller
                 'default_status' => $serialSoftware->default_status,
                 'pricing_type' => $serialSoftware->pricing_type ?? ($serialSoftware->requires_payment ? 'single' : 'free'),
                 'requires_payment' => (bool) $serialSoftware->requires_payment,
+                'show_price' => (bool) ($serialSoftware->show_price ?? true),
+                'show_whatsapp' => (bool) ($serialSoftware->show_whatsapp ?? true),
                 'price' => $serialSoftware->price !== null ? (float) $serialSoftware->price : null,
                 'reseller_price' => $serialSoftware->reseller_price !== null ? (float) $serialSoftware->reseller_price : null,
                 'currency' => $serialSoftware->currency ?? 'USD',
@@ -274,6 +278,8 @@ class SerialSoftwareController extends Controller
             'billing_days' => ['nullable', 'integer', 'min:1'],
             'whatsapp_number' => ['nullable', 'string', 'max:50'],
             'payment_instructions' => ['nullable', 'string', 'max:5000'],
+            'show_price' => ['nullable', 'boolean'],
+            'show_whatsapp' => ['nullable', 'boolean'],
         ]);
 
         $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);

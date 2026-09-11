@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SerialDevice extends Model
@@ -19,13 +20,13 @@ class SerialDevice extends Model
     public const STATUS_BLOCKED = 'blocked';
 
     protected $fillable = [
+        'device_id',
+        'user_name',
+        'machine_name',
+        'user_domain',
         'serial_software_id',
         'package_id',
-        'device_id',
         'status',
-        'user_name',
-        'user_domain',
-        'machine_name',
         'os_version',
         'framework_version',
         'is_64bit_os',
@@ -37,6 +38,8 @@ class SerialDevice extends Model
     ];
 
     protected $casts = [
+        'is_64bit_os' => 'boolean',
+        'is_64bit_process' => 'boolean',
         'last_check_date' => 'datetime',
     ];
 
@@ -70,8 +73,10 @@ class SerialDevice extends Model
 
     /**
      * Get the user device assignment for this device.
+     *
+     * @return HasOne<SerialUserDevice, self>
      */
-    public function userDeviceAssignment()
+    public function userDeviceAssignment(): HasOne
     {
         return $this->hasOne(SerialUserDevice::class, 'device_id', 'device_id');
     }

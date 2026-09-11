@@ -44,11 +44,15 @@ class SerialSoftware extends Model
         'billing_days',
         'whatsapp_number',
         'payment_instructions',
+        'show_price',
+        'show_whatsapp',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'requires_payment' => 'boolean',
+        'show_price' => 'boolean',
+        'show_whatsapp' => 'boolean',
         'price' => 'decimal:2',
         'reseller_price' => 'decimal:2',
         'billing_days' => 'integer',

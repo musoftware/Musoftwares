@@ -5,6 +5,10 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\SerialDevice
+ * @property \App\Models\SerialDevice $resource
+ */
 class SerialDeviceResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -31,7 +35,7 @@ class SerialDeviceResource extends JsonResource
             'software' => $this->whenLoaded('software'),
             // Key matches frontend: device.userDeviceAssignment
             'userDeviceAssignment' => $this->whenLoaded('userDeviceAssignment'),
-            'resolved_custom_keys' => $this->getResolvedCustomKeys(),
+            'resolved_custom_keys' => $this->resource->getResolvedCustomKeys(),
             'device_keys' => $this->whenLoaded('deviceKeys'),
         ];
     }

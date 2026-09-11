@@ -65,6 +65,8 @@ interface Software {
   default_status: string;
   pricing_type: 'free' | 'single' | 'packages';
   requires_payment: boolean;
+  show_price?: boolean;
+  show_whatsapp?: boolean;
   price: number | null;
   reseller_price: number | null;
   currency: string;
@@ -100,6 +102,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     billing_days: software.billing_days !== null ? String(software.billing_days) : '',
     whatsapp_number: software.whatsapp_number || '',
     payment_instructions: software.payment_instructions || '',
+    show_price: software.show_price !== undefined ? Boolean(software.show_price) : true,
+    show_whatsapp: software.show_whatsapp !== undefined ? Boolean(software.show_whatsapp) : true,
   });
 
   const [saving, setSaving] = useState(false);
@@ -145,6 +149,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
         billing_days: form.pricing_type === 'single' && form.billing_cycle === 'custom' && form.billing_days !== '' ? parseInt(form.billing_days) : null,
         whatsapp_number: form.whatsapp_number || null,
         payment_instructions: form.payment_instructions || null,
+        show_price: form.show_price,
+        show_whatsapp: form.show_whatsapp,
       },
       {
         preserveScroll: true,
@@ -758,6 +764,85 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                   )}
                 </div>
               )}
+
+              {/* CONTACT & ACTIVATION DIALOG SETTINGS */}
+              <div className="pt-6 border-t space-y-4">
+                <div className="flex items-center gap-2">
+                  <PhoneCall className="w-4 h-4 text-primary" />
+                  <div>
+                    <h3 className="text-sm font-semibold">{__('general.activation_contact_settings', {}, 'إعدادات التواصل ونافذة التفعيل')}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {__('general.activation_contact_settings_desc', {}, 'التحكم في بيانات التواصل وطريقة ظهور السعر والواتساب في نافذة تفعيل البرنامج لدى العميل.')}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="software-whatsapp" className="text-xs font-semibold">
+                      {__('general.whatsapp_number', {}, 'Admin WhatsApp Number (With Country Code)')}
+                    </Label>
+                    <Input
+                      id="software-whatsapp"
+                      placeholder="e.g. +201012345678"
+                      value={form.whatsapp_number}
+                      onChange={(e) => setForm({ ...form, whatsapp_number: e.target.value })}
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      {__('general.whatsapp_hint', {}, 'Clients will see a direct 1-click button to contact this WhatsApp number with their Device ID.')}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="software-instructions" className="text-xs font-semibold">
+                      {__('general.payment_instructions', {}, 'Payment Instructions / Notes')}
+                    </Label>
+                    <Textarea
+                      id="software-instructions"
+                      rows={3}
+                      placeholder="e.g. Transfer fee to Vodafone Cash / USDT / Bank Account and send transfer receipt via WhatsApp."
+                      value={form.payment_instructions}
+                      onChange={(e) => setForm({ ...form, payment_instructions: e.target.value })}
+                      className="text-xs resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Display Toggles */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl border bg-muted/10">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="setting-show-price" className="text-xs font-medium cursor-pointer">
+                        {__('general.show_price_in_dialog', {}, 'إظهار السعر في نافذة التفعيل')}
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground">
+                        {__('general.show_price_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء صف السعر والعملة داخل نافذة التفعيل للعميل.')}
+                      </p>
+                    </div>
+                    <Switch
+                      id="setting-show-price"
+                      checked={form.show_price}
+                      onCheckedChange={(checked) => setForm({ ...form, show_price: checked })}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="setting-show-wa" className="text-xs font-medium cursor-pointer">
+                        {__('general.show_whatsapp_in_dialog', {}, 'إظهار زر الواتساب في نافذة التفعيل')}
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground">
+                        {__('general.show_whatsapp_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء زر المراسلة المباشرة عبر واتساب.')}
+                      </p>
+                    </div>
+                    <Switch
+                      id="setting-show-wa"
+                      checked={form.show_whatsapp}
+                      onCheckedChange={(checked) => setForm({ ...form, show_whatsapp: checked })}
+                    />
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 

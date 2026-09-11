@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -58,22 +59,34 @@ class Earning extends Model
         });
     }
 
-    public function user()
+    /**
+     * @return BelongsTo<User, self>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function referred_user()
+    /**
+     * @return BelongsTo<User, self>
+     */
+    public function referred_user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'referred_user_id');
     }
 
-    public function currencyModel()
+    /**
+     * @return BelongsTo<Currency, self>
+     */
+    public function currencyModel(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'currency_id');
     }
 
-    public function invoice()
+    /**
+     * @return BelongsTo<Invoice, self>
+     */
+    public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class, 'referred_invoice_id');
     }
