@@ -218,3 +218,14 @@ Route::prefix('v1/partner')->middleware([VerifyPartnerHmac::class])->group(funct
     Route::post('/lease/settle', [PartnerGatewayController::class, 'settleLease'])->name('api.partner.lease.settle');
 });
 
+// --- Model Context Protocol (MCP) Remote Server for External AI Clients ---
+Route::prefix('mcp')->group(function () {
+    Route::get('/sse', [\App\Http\Controllers\Api\McpQuotationController::class, 'sse'])->name('api.mcp.sse');
+    Route::post('/messages', [\App\Http\Controllers\Api\McpQuotationController::class, 'messages'])->name('api.mcp.messages');
+    Route::post('/rpc', [\App\Http\Controllers\Api\McpQuotationController::class, 'rpc'])->name('api.mcp.rpc');
+    Route::post('/', [\App\Http\Controllers\Api\McpQuotationController::class, 'rpc'])->name('api.mcp.index');
+    Route::get('/tools', [\App\Http\Controllers\Api\McpQuotationController::class, 'toolsList'])->name('api.mcp.tools');
+    Route::get('/openapi.json', [\App\Http\Controllers\Api\McpQuotationController::class, 'openapi'])->name('api.mcp.openapi');
+});
+
+

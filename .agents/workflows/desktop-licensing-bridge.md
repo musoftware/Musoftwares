@@ -21,12 +21,12 @@ The desktop client is a separate execution binary that relies on the Musoftwares
 ## 2. API Contract & Security Protocol
 
 ### A. Device Registration (`POST /api/serial/device`)
-* **Endpoint**: `/api/serial/device`
-* **Protection**: Throttle limits (60/min) + `VerifySerialDeviceHmac` middleware.
-* **Request Headers**:
-  * `X-Device-Id`: Hardware identifier derived from motherboard/CPU UUID.
-  * `X-Timestamp`: Current UTC ISO timestamp (reject requests if skewed > 300 seconds).
-  * `X-Signature`: `hash_hmac('sha256', device_id + timestamp + payload, shared_secret)`.
+* **Endpoints**: Primary (`https://www.musoftwares.com/api/serial/device`), Secondary Fallback (`https://www.mu-hub.com/api/serial/device`).
+* **Protection**: Throttled to 60 req/min per IP (`throttle:60,1`).
+* **Legacy C# Compatibility (CRITICAL)**:
+  * Public endpoint invoked by legacy C# programs on startup.
+  * Never impose mandatory HMAC headers, complex tokens, or breaking auth requirements on `/api/serial/device` as this breaks active legacy C# applications in the field.
+  * Request payload accepts standard environment parameters: `program_name`, `device_id`, `machine_name`, `user_name`, `os_version`, and `framework_version`.
 
 ### B. Status Resolution Hierarchy
 When a desktop client reports a hardware check-in:

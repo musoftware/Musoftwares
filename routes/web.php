@@ -184,6 +184,7 @@ Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('leg
 Route::get('/estimator', [HomeController::class, 'estimator'])->name('estimator');
 Route::post('/estimator/generate-quotation', [HomeController::class, 'generateQuotation'])->name('public.quotation.generate');
 Route::get('/quotation/{code}', [HomeController::class, 'showQuotation'])->name('public.quotation.show');
+Route::get('/quotation/{code}/pdf', [HomeController::class, 'downloadQuotationPdf'])->name('public.quotation.pdf');
 Route::get('/custom-solutions', [HomeController::class, 'customSolutions'])->name('custom-solutions');
 
 // Tech Comparisons & Benchmarks

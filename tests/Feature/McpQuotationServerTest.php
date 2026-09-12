@@ -106,7 +106,8 @@ class McpQuotationServerTest extends TestCase
         $viewResponse = $this->get("/quotation/{$code}");
         $viewResponse->assertStatus(200);
         $viewResponse->assertSee('Pepper Sauce Store');
-        $viewResponse->assertSee('Ahmed Rehab');
+        $viewResponse->assertSee('HotSauce Co.');
+        $viewResponse->assertSee('Mahmoud Amin M.');
 
         // Verify public quotation PDF endpoint
         $pdfResponse = $this->get("/quotation/{$code}/pdf");

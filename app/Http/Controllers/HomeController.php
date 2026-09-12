@@ -416,6 +416,10 @@ class HomeController extends Controller
     {
         $quote = Cache::get("quotation:{$code}");
 
+        if (!$quote && in_array($code, ['demo', 'preview'])) {
+            $quote = $this->getDemoQuotationPayload();
+        }
+
         if (!$quote) {
             // Fallback sample quote or 404
             abort(404, 'Quotation not found or has expired.');
@@ -442,6 +446,142 @@ class HomeController extends Controller
 
         return view('quotations.show', compact('quote', 'whatsappUrl'));
     }
+
+    /**
+     * Download or stream the quotation as an executive PDF document.
+     */
+    public function downloadQuotationPdf($code)
+    {
+        $quote = Cache::get("quotation:{$code}");
+
+        if (!$quote && in_array($code, ['demo', 'preview'])) {
+            $quote = $this->getDemoQuotationPayload();
+        }
+
+        if (!$quote) {
+            abort(404, 'Quotation not found or has expired.');
+        }
+
+        $quote['formatter'] = function($usdVal) use ($quote) {
+            if (!($quote['is_usd'] ?? true)) {
+                $egp = round($usdVal * ($quote['exchange_rate'] ?? 50.0));
+                return number_format($egp) . ' EGP';
+            }
+            return '$' . number_format($usdVal);
+        };
+
+        $whatsappUrl = null;
+
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('quotations.show', compact('quote', 'whatsappUrl'))
+                ->setPaper('a4', 'portrait')
+                ->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                    'defaultFont' => 'sans-serif',
+                ]);
+
+            return $pdf->download("{$code}.pdf");
+        }
+
+        return view('quotations.show', compact('quote', 'whatsappUrl'));
+    }
+
+    /**
+     * Sample executive quotation payload for previews.
+     */
+    private function getDemoQuotationPayload(): array
+    {
+        $nowCairo = now()->timezone('Africa/Cairo');
+
+        return [
+            'code' => 'QT-DEMO-EXECUTIVE',
+            'client_name' => 'Ahmed Rehab',
+            'client_business' => 'Hot Sauce Global Enterprise',
+            'client_mobile' => '+201015218548',
+            'client_email' => 'ahmed@hotsauce.com',
+            'platforms_summary' => 'Pepper Sauce Store & Digital Distribution Architecture',
+            'platform_items' => [
+                [
+                    'title' => 'E-Commerce Storefront & Catalog Architecture',
+                    'count' => 6,
+                    'unit' => 'Page',
+                    'rate' => 10,
+                    'cost' => 60,
+                    'total_usd' => 60,
+                ],
+                [
+                    'title' => 'Mobile Ordering App (iOS & Android)',
+                    'count' => 8,
+                    'unit' => 'Screen',
+                    'rate' => 15,
+                    'cost' => 120,
+                    'total_usd' => 120,
+                ],
+                [
+                    'title' => 'Desktop POS & Warehouse Inventory Software',
+                    'count' => 4,
+                    'unit' => 'Screen',
+                    'rate' => 25,
+                    'cost' => 100,
+                    'total_usd' => 100,
+                ],
+            ],
+            'itemized_addons' => [
+                [
+                    'title' => 'Multi-Currency Gateways (Stripe, PayPal, Fawry)',
+                    'cost' => 60,
+                    'price_usd' => 60,
+                    'desc' => 'Dual-currency ledger architecture with automated real-time exchange rates.',
+                ],
+                [
+                    'title' => 'WhatsApp Order & Dispatch Notification Engine',
+                    'cost' => 40,
+                    'price_usd' => 40,
+                    'desc' => 'Automated invoice and tracking delivery via WhatsApp business API.',
+                ],
+            ],
+            'subtotal_usd' => 380,
+            'discount_usd' => 30,
+            'total_usd' => 350,
+            'total_egp' => 17500,
+            'exchange_rate' => 50.0,
+            'is_usd' => true,
+            'executive_summary' => 'This comprehensive architectural specification details the multi-channel digital retail infrastructure for Pepper Sauce Global Enterprise. Designed to scale seamlessly across international and local markets, the ecosystem couples a high-speed web catalog with cross-platform native mobile applications and an offline-resilient desktop POS warehouse engine.',
+            'architectural_approach' => 'The system is organized into decoupled layers: a reactive customer-facing presentation layer, a resilient central API core, and isolated payment and warehouse micro-services. All financial transactions leverage atomic double-entry ledgers with automated exchange rate normalization and secure webhook verification.',
+            'tech_stack' => [
+                'Laravel 12 (Core API Engine)',
+                'React 18 & Inertia.js (Web Frontend)',
+                'Tailwind CSS v4 (Design System)',
+                'Flutter / Native Bridge (iOS & Android)',
+                'Electron / SQLite (Offline POS)',
+                'Stripe, PayPal & Local Wallets',
+            ],
+            'milestones' => [
+                [
+                    'phase' => 'Phase 01',
+                    'title' => 'Architecture, Data Schemas & UI/UX Blueprints',
+                    'duration' => 'Weeks 1 - 2',
+                    'deliverables' => 'Full relational database modeling, Figma-aligned component library, interactive wireframes, and API contract specifications.',
+                ],
+                [
+                    'phase' => 'Phase 02',
+                    'title' => 'Core Platform Engineering & Multi-Gateway Integration',
+                    'duration' => 'Weeks 3 - 4',
+                    'deliverables' => 'Storefront checkout flows, mobile catalog sync, desktop POS COM-port scanner integration, and automated WhatsApp triggers.',
+                ],
+                [
+                    'phase' => 'Phase 03',
+                    'title' => 'Security Audit, Performance Optimization & Cloud Deployment',
+                    'duration' => 'Week 5',
+                    'deliverables' => 'End-to-end automated test suites, database indexing under high concurrency, SSL/CDN configuration, and production handover.',
+                ],
+            ],
+            'cairo_date' => $nowCairo->format('M d, Y - h:i A') . ' (Cairo Time)',
+            'valid_until' => $nowCairo->copy()->addDays(30)->format('M d, Y'),
+        ];
+    }
+
 
     public function customSolutions()
     {

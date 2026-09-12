@@ -342,6 +342,42 @@ class McpQuotationController extends Controller
         $totalUsd = max(0, $subtotalUsd - $discountUsd);
         $totalEgp = round($totalUsd * $exchangeRate);
 
+        // Executive narrative and architectural specs
+        $executiveSummary = !empty($args['executive_summary']) 
+            ? trim($args['executive_summary']) 
+            : "This proposal establishes the technical architecture, execution roadmap, and commercial investment schedule for {$projectName}. The system is architected for enterprise stability, rapid response times, and multi-channel synchronization, ensuring high business continuity and full intellectual property ownership.";
+
+        $architecturalApproach = !empty($args['architectural_approach'])
+            ? trim($args['architectural_approach'])
+            : "The system is constructed using a decoupled domain-driven architecture. User-facing interfaces communicate with an event-driven application layer with strict transactional persistence. All third-party gateways and asynchronous tasks are isolated behind resilient retry queues with automated telemetry.";
+
+        $techStack = !empty($args['tech_stack']) && is_array($args['tech_stack'])
+            ? $args['tech_stack']
+            : ['Laravel 12 / PHP 8.4', 'React 18 & Inertia.js', 'Tailwind CSS v4', 'PostgreSQL / SQLite Engine', 'Real-time WebSocket Bus', 'Containerized Cloud Deploy'];
+
+        $milestones = !empty($args['milestones']) && is_array($args['milestones'])
+            ? $args['milestones']
+            : [
+                [
+                    'phase' => 'Phase 01',
+                    'title' => 'Architecture, Data Modeling & Interactive Prototype',
+                    'duration' => 'Week 1 - 2',
+                    'deliverables' => 'Relational database schema, API boundary contracts, and responsive UI wireframe prototypes.',
+                ],
+                [
+                    'phase' => 'Phase 02',
+                    'title' => 'Core Domain Engineering & Gateway Connectors',
+                    'duration' => 'Week 3 - 4',
+                    'deliverables' => 'Full business logic, payment gateway integration, automated webhooks, and administrative control panels.',
+                ],
+                [
+                    'phase' => 'Phase 03',
+                    'title' => 'Security Audit, E2E Verification & Cloud Launch',
+                    'duration' => 'Week 5',
+                    'deliverables' => 'Automated test suite verification, SSL / server hardening, DNS routing, and final handover.',
+                ],
+            ];
+
         // Timezone rule: Cairo timezone Africa/Cairo
         $nowCairo = now()->timezone('Africa/Cairo');
         $code = 'QT-' . $nowCairo->format('Ymd') . '-' . strtoupper(Str::random(5));
@@ -361,6 +397,10 @@ class McpQuotationController extends Controller
             'total_egp' => $totalEgp,
             'exchange_rate' => $exchangeRate,
             'is_usd' => $isUsd,
+            'executive_summary' => $executiveSummary,
+            'architectural_approach' => $architecturalApproach,
+            'tech_stack' => $techStack,
+            'milestones' => $milestones,
             'cairo_date' => $nowCairo->format('M d, Y - h:i A') . ' (Cairo Time)',
             'valid_until' => $nowCairo->copy()->addDays(30)->format('M d, Y'),
             'notes' => $args['notes'] ?? [],
@@ -524,6 +564,32 @@ class McpQuotationController extends Controller
                             'type' => 'number',
                             'default' => 0,
                             'description' => 'Discount amount in USD.',
+                        ],
+                        'executive_summary' => [
+                            'type' => 'string',
+                            'description' => 'High-level business brief and strategic objectives of the project.',
+                        ],
+                        'architectural_approach' => [
+                            'type' => 'string',
+                            'description' => 'Technical blueprint, architectural layer patterns, and engineering methodology.',
+                        ],
+                        'tech_stack' => [
+                            'type' => 'array',
+                            'items' => ['type' => 'string'],
+                            'description' => 'Technologies and tools utilized in the architecture.',
+                        ],
+                        'milestones' => [
+                            'type' => 'array',
+                            'description' => 'Implementation phases and sprint roadmap.',
+                            'items' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'phase' => ['type' => 'string'],
+                                    'title' => ['type' => 'string'],
+                                    'duration' => ['type' => 'string'],
+                                    'deliverables' => ['type' => 'string'],
+                                ],
+                            ],
                         ],
                         'notes' => [
                             'type' => 'array',

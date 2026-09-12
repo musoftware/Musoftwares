@@ -27,6 +27,7 @@ Detailed rules are maintained in individual markdown files under `.agents/rules/
 19. **[Dependency Direction](file:///.agents/rules/dependency-direction.md)**: Depend on abstractions not concretions, Law of Demeter, and Ports & Adapters architecture.
 20. **[Visual Hierarchy & UX](file:///.agents/rules/visual-hierarchy-and-ux.md)**: Clear focal points, 3-level typography scale, intentional whitespace, action priority, and predictable user feedback.
 21. **[Never Remove SoftDeletes](file:///.agents/rules/soft-deletes-preservation.md)**: Never remove SoftDeletes from models or drop deleted_at columns; always create a migration when deleted_at is missing.
+22. **[International Design Specifications](file:///.agents/rules/international-design-specifications.md)**: WCAG 2.2 accessibility, Apple HIG 8pt grid, Nielsen Norman usability heuristics, and Core Web Vitals ergonomics.
 
 ---
 
