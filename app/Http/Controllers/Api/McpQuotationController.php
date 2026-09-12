@@ -18,9 +18,35 @@ class McpQuotationController extends Controller
 
     /**
      * SSE Stream endpoint for Model Context Protocol (MCP) clients.
+     * Also gracefully accommodates non-streaming HTTP clients (ChatGPT, curl) by returning JSON instructions or handling POST directly.
      */
-    public function sse(Request $request): StreamedResponse
+    public function sse(Request $request)
     {
+        // If a client sends a POST to /sse, handle it as quotation generation
+        if ($request->isMethod('post')) {
+            return $this->generate($request);
+        }
+
+        $accept = strtolower((string)$request->header('Accept', ''));
+        // If client does not accept text/event-stream (e.g. ChatGPT web crawler, standard browser, curl without Accept header)
+        if (!str_contains($accept, 'text/event-stream')) {
+            return response()->json([
+                'status' => 'online',
+                'service' => 'Musoftware Official Quotation Engine',
+                'protocol' => 'MCP (Model Context Protocol) & REST Bridge',
+                'notice' => 'This is the MCP SSE streaming transport for Claude Desktop, Cursor, and Windsurf. For direct HTTP REST invocations (ChatGPT Actions, Custom GPTs, curl, or standard API calls), use the REST endpoints below.',
+                'direct_endpoints' => [
+                    'generate_quotation' => url('/api/mcp/generate'),
+                    'tool_call' => url('/api/mcp/tools/generate_premium_quotation_pdf'),
+                    'json_rpc' => url('/api/mcp/rpc'),
+                    'rate_card' => url('/api/mcp/rate-card'),
+                    'openapi_spec' => url('/api/mcp/openapi.json'),
+                    'tools_list' => url('/api/mcp/tools'),
+                ],
+                'instructions' => 'Send a POST request with your quotation parameters in JSON format to ' . url('/api/mcp/generate') . ' to obtain the live view URL and direct PDF link.',
+            ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        }
+
         $sessionId = (string) Str::uuid();
 
         return new StreamedResponse(function () use ($sessionId) {
@@ -67,6 +93,113 @@ class McpQuotationController extends Controller
             'Connection' => 'keep-alive',
             'X-Accel-Buffering' => 'no',
         ]);
+    }
+
+    /**
+     * Direct REST endpoint to generate an official quotation and obtain PDF and live URLs.
+     * Compatible with ChatGPT Actions, Custom GPTs, and standard HTTP clients.
+     */
+    public function generate(Request $request): JsonResponse
+    {
+        $payload = $request->json()->all();
+        if (empty($payload)) {
+            $payload = $request->all();
+        }
+
+        // Unpack if wrapped in JSON-RPC format or 'arguments' / 'params'
+        if (isset($payload['params']['arguments']) && is_array($payload['params']['arguments'])) {
+            $payload = $payload['params']['arguments'];
+        } elseif (isset($payload['arguments']) && is_array($payload['arguments'])) {
+            $payload = $payload['arguments'];
+        } elseif (isset($payload['params']) && is_array($payload['params'])) {
+            $payload = $payload['params'];
+        }
+
+        $result = $this->toolGenerateQuotation($payload);
+
+        $meta = $result['meta'] ?? [];
+        $code = $meta['code'] ?? null;
+        $publicUrl = $meta['public_url'] ?? null;
+        $pdfUrl = $meta['pdf_url'] ?? null;
+        $totalUsd = $meta['total_usd'] ?? 0;
+        $totalEgp = $meta['total_egp'] ?? 0;
+        $summaryText = $result['content'][0]['text'] ?? '';
+
+        return response()->json([
+            'success' => true,
+            'code' => $code,
+            'project_name' => $payload['project_name'] ?? 'Custom Software Infrastructure',
+            'client_business' => $payload['client_business'] ?? $payload['client_name'] ?? 'Enterprise Scope',
+            'total_usd' => $totalUsd,
+            'total_egp' => $totalEgp,
+            'currency' => $payload['currency'] ?? 'USD',
+            'view_url' => $publicUrl,
+            'pdf_url' => $pdfUrl,
+            'public_url' => $publicUrl,
+            'message' => "Official quotation {$code} generated successfully. Live proposal and PDF are available immediately.",
+            'content' => [
+                [
+                    'type' => 'text',
+                    'text' => $summaryText,
+                ],
+            ],
+            'data' => [
+                'code' => $code,
+                'view_url' => $publicUrl,
+                'pdf_url' => $pdfUrl,
+                'public_url' => $publicUrl,
+                'total_usd' => $totalUsd,
+                'total_egp' => $totalEgp,
+            ],
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Direct endpoint for /tools/generate_premium_quotation_pdf
+     */
+    public function toolGenerate(Request $request): JsonResponse
+    {
+        if ($request->isMethod('get')) {
+            $tools = $this->getToolsDefinition();
+            return response()->json($tools[0] ?? [], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        }
+
+        return $this->generate($request);
+    }
+
+    /**
+     * Direct REST endpoint to fetch the estimator rate card.
+     */
+    public function rateCard(Request $request): JsonResponse
+    {
+        $exchangeRate = (float)($request->query('exchange_rate', 50.0));
+        $estimatorService = new ProjectEstimatorDataService();
+        $data = $estimatorService->getEstimatorData($exchangeRate);
+
+        return response()->json([
+            'status' => 'success',
+            'exchange_rate' => $exchangeRate,
+            'rate_card' => $data,
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Look up an existing quotation by code.
+     */
+    public function getQuotationByCode(string $code): JsonResponse
+    {
+        $quote = Cache::get("quotation:{$code}");
+        if (!$quote) {
+            return response()->json(['error' => "Quotation #{$code} was not found or has expired."], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'code' => $code,
+            'view_url' => route('public.quotation.show', ['code' => $code]),
+            'pdf_url' => route('public.quotation.pdf', ['code' => $code]),
+            'quotation' => $quote,
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -132,21 +265,118 @@ class McpQuotationController extends Controller
      */
     public function openapi(): JsonResponse
     {
+        $tools = $this->getToolsDefinition();
+        $quotationSchema = $tools[0]['inputSchema'] ?? [];
+
         return response()->json([
             'openapi' => '3.1.0',
             'info' => [
                 'title' => 'Musoftware Official Quotation Engine API',
-                'description' => 'Automated, pixel-perfect executive project quotations and PDF generation from Musoftware.',
+                'description' => 'Automated, pixel-perfect executive project quotations and PDF generation from Musoftware. Supported via REST, OpenAPI, and Model Context Protocol (MCP).',
                 'version' => '1.0.0',
             ],
             'servers' => [
                 ['url' => url('/api/mcp')],
             ],
             'paths' => [
+                '/generate' => [
+                    'post' => [
+                        'summary' => 'Generate Official Executive Quotation & Downloadable PDF',
+                        'operationId' => 'generate_premium_quotation_pdf',
+                        'description' => 'Generates an official corporate multi-sheet quotation with live interactive view URL and downloadable pixel-perfect PDF. Returns proposal URLs and total investment calculations.',
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => $quotationSchema,
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => [
+                                'description' => 'Quotation generated successfully with live URLs',
+                                'content' => [
+                                    'application/json' => [
+                                        'schema' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'success' => ['type' => 'boolean'],
+                                                'code' => ['type' => 'string'],
+                                                'view_url' => ['type' => 'string'],
+                                                'pdf_url' => ['type' => 'string'],
+                                                'public_url' => ['type' => 'string'],
+                                                'total_usd' => ['type' => 'number'],
+                                                'total_egp' => ['type' => 'number'],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                '/tools/generate_premium_quotation_pdf' => [
+                    'post' => [
+                        'summary' => 'Alias for generate_premium_quotation_pdf',
+                        'operationId' => 'generate_premium_quotation_pdf_alias',
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => $quotationSchema,
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => [
+                                'description' => 'Quotation generated successfully',
+                            ],
+                        ],
+                    ],
+                ],
+                '/rate-card' => [
+                    'get' => [
+                        'summary' => 'Retrieve official Musoftware base rates for websites, mobile apps, desktop systems, and addons.',
+                        'operationId' => 'get_estimator_rate_card',
+                        'parameters' => [
+                            [
+                                'name' => 'exchange_rate',
+                                'in' => 'query',
+                                'description' => 'Exchange rate for EGP calculations (default: 50.0)',
+                                'schema' => ['type' => 'number', 'default' => 50.0],
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => [
+                                'description' => 'Official pricing matrix and rate cards',
+                            ],
+                        ],
+                    ],
+                ],
+                '/quotations/{code}' => [
+                    'get' => [
+                        'summary' => 'Look up an existing official quotation by its code',
+                        'operationId' => 'get_quotation',
+                        'parameters' => [
+                            [
+                                'name' => 'code',
+                                'in' => 'path',
+                                'required' => true,
+                                'description' => 'The unique quotation code (e.g., QT-20260912-ABCDE)',
+                                'schema' => ['type' => 'string'],
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => [
+                                'description' => 'Quotation details and URLs',
+                            ],
+                        ],
+                    ],
+                ],
                 '/rpc' => [
                     'post' => [
-                        'summary' => 'Execute MCP Tool or JSON-RPC Method',
-                        'operationId' => 'executeMcp',
+                        'summary' => 'Execute JSON-RPC 2.0 Method for Model Context Protocol',
+                        'operationId' => 'executeJsonRpc',
                         'requestBody' => [
                             'required' => true,
                             'content' => [
@@ -170,7 +400,7 @@ class McpQuotationController extends Controller
                     ],
                 ],
             ],
-        ]);
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -406,8 +636,17 @@ class McpQuotationController extends Controller
             'notes' => $args['notes'] ?? [],
         ];
 
-        // Cache for 30 days
+        // Cache for 30 days and persist to storage disk
         Cache::put("quotation:{$code}", $quoteData, now()->addDays(30));
+        try {
+            $dir = storage_path('app/quotations');
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            file_put_contents("{$dir}/{$code}.json", json_encode($quoteData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        } catch (\Throwable $e) {
+            // Ignore filesystem fallback error
+        }
 
         $publicUrl = route('public.quotation.show', ['code' => $code]);
         $pdfUrl = route('public.quotation.pdf', ['code' => $code]);

@@ -220,7 +220,12 @@ Route::prefix('v1/partner')->middleware([VerifyPartnerHmac::class])->group(funct
 
 // --- Model Context Protocol (MCP) Remote Server for External AI Clients ---
 Route::prefix('mcp')->group(function () {
-    Route::get('/sse', [\App\Http\Controllers\Api\McpQuotationController::class, 'sse'])->name('api.mcp.sse');
+    Route::match(['get', 'post'], '/sse', [\App\Http\Controllers\Api\McpQuotationController::class, 'sse'])->name('api.mcp.sse');
+    Route::post('/generate', [\App\Http\Controllers\Api\McpQuotationController::class, 'generate'])->name('api.mcp.generate');
+    Route::post('/quotations/generate', [\App\Http\Controllers\Api\McpQuotationController::class, 'generate'])->name('api.mcp.quotations.generate');
+    Route::match(['get', 'post'], '/tools/generate_premium_quotation_pdf', [\App\Http\Controllers\Api\McpQuotationController::class, 'toolGenerate'])->name('api.mcp.tool.generate');
+    Route::get('/rate-card', [\App\Http\Controllers\Api\McpQuotationController::class, 'rateCard'])->name('api.mcp.ratecard');
+    Route::get('/quotations/{code}', [\App\Http\Controllers\Api\McpQuotationController::class, 'getQuotationByCode'])->name('api.mcp.quotations.get');
     Route::post('/messages', [\App\Http\Controllers\Api\McpQuotationController::class, 'messages'])->name('api.mcp.messages');
     Route::post('/rpc', [\App\Http\Controllers\Api\McpQuotationController::class, 'rpc'])->name('api.mcp.rpc');
     Route::post('/', [\App\Http\Controllers\Api\McpQuotationController::class, 'rpc'])->name('api.mcp.index');

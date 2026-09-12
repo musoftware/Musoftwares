@@ -176,6 +176,95 @@ class McpQuotationServerTest extends TestCase
         $response->assertSee('MUSOFTWARE ARCHITECTURE');
         $response->assertSee('OFFICIAL');
     }
+
+    public function test_mcp_direct_rest_generate_endpoint(): void
+    {
+        $payload = [
+            'project_name' => 'E-Commerce Marketplace',
+            'client_name' => 'Global Retailers LLC',
+            'currency' => 'USD',
+            'platforms' => [
+                ['title' => 'Web App', 'count' => 5, 'unit' => 'Page', 'unit_price_usd' => 10.0],
+            ],
+            'addons' => [
+                ['title' => 'Stripe Payments', 'price_usd' => 50.0],
+            ],
+        ];
+
+        $response = $this->postJson('/api/mcp/generate', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'project_name' => 'E-Commerce Marketplace',
+            'total_usd' => 100,
+        ]);
+        $this->assertNotEmpty($response->json('pdf_url'));
+        $this->assertNotEmpty($response->json('view_url'));
+    }
+
+    public function test_mcp_direct_tool_endpoint(): void
+    {
+        $payload = [
+            'project_name' => 'Custom ERP Architecture',
+            'client_name' => 'Logistics Partner',
+            'currency' => 'USD',
+            'platforms' => [
+                ['title' => 'ERP Dashboard', 'count' => 10, 'unit' => 'Screen', 'unit_price_usd' => 20.0],
+            ],
+        ];
+
+        $response = $this->postJson('/api/mcp/tools/generate_premium_quotation_pdf', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'total_usd' => 200,
+        ]);
+        $this->assertNotEmpty($response->json('pdf_url'));
+    }
+
+    public function test_mcp_direct_rate_card_endpoint(): void
+    {
+        $response = $this->getJson('/api/mcp/rate-card');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'exchange_rate',
+            'rate_card' => ['platforms', 'modules'],
+        ]);
+    }
+
+    public function test_mcp_sse_non_streaming_graceful_response(): void
+    {
+        // When a non-streaming HTTP client (like ChatGPT) hits /api/mcp/sse
+        $response = $this->getJson('/api/mcp/sse');
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status' => 'online',
+        ]);
+        $this->assertNotEmpty($response->json('direct_endpoints.generate_quotation'));
+    }
+
+    public function test_mcp_sse_post_graceful_handling(): void
+    {
+        // When a client mistakenly POSTs to /api/mcp/sse
+        $payload = [
+            'project_name' => 'AI Generated Project',
+            'client_name' => 'Enterprise Client',
+            'platforms' => [
+                ['title' => 'Portal', 'count' => 4, 'unit_price_usd' => 10.0],
+            ],
+        ];
+
+        $response = $this->postJson('/api/mcp/sse', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+        $this->assertNotEmpty($response->json('pdf_url'));
+    }
 }
 
 

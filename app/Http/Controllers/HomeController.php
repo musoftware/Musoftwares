@@ -416,6 +416,13 @@ class HomeController extends Controller
     {
         $quote = Cache::get("quotation:{$code}");
 
+        if (!$quote) {
+            $filePath = storage_path("app/quotations/{$code}.json");
+            if (file_exists($filePath)) {
+                $quote = json_decode(file_get_contents($filePath), true);
+            }
+        }
+
         if (!$quote && in_array($code, ['demo', 'preview'])) {
             $quote = $this->getDemoQuotationPayload();
         }
@@ -453,6 +460,13 @@ class HomeController extends Controller
     public function downloadQuotationPdf($code)
     {
         $quote = Cache::get("quotation:{$code}");
+
+        if (!$quote) {
+            $filePath = storage_path("app/quotations/{$code}.json");
+            if (file_exists($filePath)) {
+                $quote = json_decode(file_get_contents($filePath), true);
+            }
+        }
 
         if (!$quote && in_array($code, ['demo', 'preview'])) {
             $quote = $this->getDemoQuotationPayload();
