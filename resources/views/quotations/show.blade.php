@@ -763,6 +763,206 @@
             background: #16a34a;
         }
 
+        .action-text-short {
+            display: none;
+        }
+
+        .action-text-long {
+            display: inline;
+        }
+
+        /* ── RESPONSIVE MOBILE STYLES (Apple HIG & International Standards) ── */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 16px 12px 110px;
+            }
+
+            .proposal-document {
+                gap: 28px;
+            }
+
+            .page-sheet {
+                padding: 28px 18px;
+                min-height: auto;
+                border-radius: 16px;
+            }
+
+            .cover-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding-bottom: 20px;
+            }
+
+            .cover-ref-badge {
+                text-align: left;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #f8fafc;
+                padding: 8px 12px;
+                border-radius: 8px;
+                border: 1px solid var(--border-light);
+            }
+
+            .cover-title {
+                font-size: 28px;
+                letter-spacing: -0.8px;
+                line-height: 1.2;
+                margin-bottom: 16px;
+            }
+
+            .cover-subtitle {
+                font-size: 14.5px;
+                margin-bottom: 24px;
+                line-height: 1.5;
+            }
+
+            .cover-spec-grid {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 16px 14px;
+                gap: 16px;
+            }
+
+            .spec-item {
+                padding: 0;
+                border-right: none;
+            }
+
+            .spec-item:nth-child(odd) {
+                border-right: 1px solid #edf2f7;
+                padding-right: 12px;
+            }
+
+            .spec-item:nth-child(even) {
+                padding-left: 12px;
+            }
+
+            .spec-value {
+                font-size: 13px;
+                white-space: normal;
+                word-break: break-word;
+            }
+
+            .cover-footer {
+                flex-direction: column-reverse;
+                align-items: flex-start;
+                gap: 24px;
+                margin-top: 32px;
+            }
+
+            .official-stamp-container {
+                align-self: center;
+            }
+
+            .roadmap-container {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-bottom: 20px;
+                border: 1px solid var(--border-light);
+                border-radius: 10px;
+            }
+
+            table.executive-table {
+                min-width: 480px;
+            }
+
+            .inner-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .inner-header-title h2 {
+                font-size: 18px;
+                line-height: 1.3;
+            }
+
+            .ledger-wrapper {
+                justify-content: stretch;
+            }
+
+            .ledger-box {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .signatures-grid {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 24px;
+                margin-top: 32px;
+            }
+
+            .sign-block {
+                width: 100%;
+                text-align: center;
+            }
+
+            /* Optimized Mobile Floating Bar */
+            .floating-action-bar {
+                bottom: 12px;
+                width: calc(100% - 20px);
+                max-width: 440px;
+                padding: 6px 8px;
+                gap: 6px;
+                justify-content: space-between;
+            }
+
+            .action-link {
+                padding: 8px 10px;
+                font-size: 11px;
+                gap: 5px;
+                flex: 1;
+                justify-content: center;
+                white-space: nowrap;
+            }
+
+            .action-link svg {
+                width: 13px;
+                height: 13px;
+            }
+
+            .action-text-long {
+                display: none;
+            }
+
+            .action-text-short {
+                display: inline;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .cover-spec-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .spec-item,
+            .spec-item:nth-child(odd),
+            .spec-item:nth-child(even) {
+                padding: 0 0 10px 0;
+                border-right: none;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            .spec-item:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .action-link {
+                padding: 8px 6px;
+                font-size: 10.5px;
+            }
+        }
+
         /* ── PRINT & PDF STYLES ── */
         @media print {
             body {
@@ -805,25 +1005,30 @@
     <nav class="floating-action-bar no-print" aria-label="Proposal Actions">
         <button onclick="window.print()" class="action-link primary" type="button">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            Print / Save as PDF
+            <span class="action-text-long">Print / Save as PDF</span>
+            <span class="action-text-short">Print</span>
         </button>
 
         @if(!empty($quote['code']))
             <a href="{{ route('public.quotation.pdf', ['code' => $quote['code']]) }}" class="action-link" target="_blank">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Direct PDF Download
+                <span class="action-text-long">Direct PDF Download</span>
+                <span class="action-text-short">PDF</span>
             </a>
         @endif
 
         @if(!empty($whatsappUrl))
             <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="action-link whatsapp">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                Discuss Scope on WhatsApp
+                <span class="action-text-long">Discuss Scope on WhatsApp</span>
+                <span class="action-text-short">WhatsApp</span>
             </a>
         @endif
 
         <a href="{{ route('estimator') }}" class="action-link">
-            &larr; Estimator
+            <span>&larr;</span>
+            <span class="action-text-long">Estimator</span>
+            <span class="action-text-short">Back</span>
         </a>
     </nav>
 
