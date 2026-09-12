@@ -128,8 +128,8 @@ class McpQuotationController extends Controller
         return response()->json([
             'success' => true,
             'code' => $code,
-            'project_name' => $payload['project_name'] ?? 'Custom Software Infrastructure',
-            'client_business' => $payload['client_business'] ?? $payload['client_name'] ?? 'Enterprise Scope',
+            'project_name' => $payload['project_name'] ?? ($payload['project'] ?? ($payload['title'] ?? 'Custom Software Infrastructure')),
+            'client_business' => $payload['client_business'] ?? ($payload['client_company'] ?? ($payload['business'] ?? ($payload['company'] ?? ($payload['client_name'] ?? 'Enterprise Scope')))),
             'total_usd' => $totalUsd,
             'total_egp' => $totalEgp,
             'currency' => $payload['currency'] ?? 'USD',
@@ -513,25 +513,56 @@ class McpQuotationController extends Controller
      */
     private function toolGenerateQuotation(array $args): array
     {
-        $projectName = trim($args['project_name'] ?? 'Custom Software Infrastructure');
-        $clientName = trim($args['client_name'] ?? 'Valued Client');
-        $clientBusiness = trim($args['client_business'] ?? '');
-        $clientEmail = trim($args['client_email'] ?? '');
-        $clientMobile = trim($args['client_mobile'] ?? '');
+        $projectName = trim($args['project_name'] ?? ($args['project'] ?? ($args['title'] ?? ($args['name'] ?? 'Custom Software Infrastructure'))));
+        $clientName = trim($args['client_name'] ?? ($args['client'] ?? 'Valued Client'));
+        $clientBusiness = trim($args['client_business'] ?? ($args['client_company'] ?? ($args['business'] ?? ($args['company'] ?? ($args['organization'] ?? '')))));
+        $clientEmail = trim($args['client_email'] ?? ($args['email'] ?? ''));
+        $clientMobile = trim($args['client_mobile'] ?? ($args['mobile'] ?? ($args['phone'] ?? '')));
         $currency = strtoupper($args['currency'] ?? 'USD');
         $isUsd = $currency !== 'EGP';
         $exchangeRate = (float)($args['exchange_rate'] ?? 50.0);
 
-        // Process platforms / pages
-        $rawPlatforms = $args['platforms'] ?? [];
+        // Build known estimator modules lookup dictionary
+        $moduleLookup = [];
+        try {
+            $estimatorService = new ProjectEstimatorDataService();
+            $estimatorData = $estimatorService->getEstimatorData($exchangeRate);
+            foreach ($estimatorData['modules'] ?? [] as $group) {
+                if (is_array($group)) {
+                    foreach ($group as $mod) {
+                        if (is_array($mod) && !empty($mod['id'])) {
+                            $moduleLookup[$mod['id']] = $mod;
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fallback gracefully
+        }
+
+        // Process platforms / pages (support 'platforms', 'pages', 'screens', 'items')
+        $rawPlatforms = $args['platforms'] ?? ($args['pages'] ?? ($args['screens'] ?? ($args['items'] ?? [])));
         $platformItems = [];
         $subtotalUsd = 0;
 
         foreach ($rawPlatforms as $item) {
-            $title = $item['title'] ?? 'Custom Module';
-            $count = max(1, (int)($item['count'] ?? 1));
-            $unit = $item['unit'] ?? 'Unit';
-            $unitPriceUsd = (float)($item['unit_price_usd'] ?? 10.0);
+            if (is_string($item)) {
+                $item = ['title' => $item];
+            }
+
+            $title = $item['title'] ?? ($item['name'] ?? ($item['label'] ?? 'Custom Interface Page'));
+            $count = max(1, (int)($item['count'] ?? ($item['qty'] ?? ($item['quantity'] ?? 1))));
+            
+            $platformKey = strtolower((string)($item['platform'] ?? 'web'));
+            $defaultUnit = match($platformKey) {
+                'landing' => 'Landing Page',
+                'mobile' => 'Screen',
+                'desktop' => 'Screen',
+                default => 'Page'
+            };
+            $unit = $item['unit'] ?? $defaultUnit;
+
+            $unitPriceUsd = (float)($item['unit_price_usd'] ?? ($item['rate_usd'] ?? ($item['price'] ?? ($item['rate'] ?? ($item['cost'] ?? 10.0)))));
             $totalItemUsd = $count * $unitPriceUsd;
 
             $subtotalUsd += $totalItemUsd;
@@ -548,13 +579,22 @@ class McpQuotationController extends Controller
             ];
         }
 
-        // Process add-ons
-        $rawAddons = $args['addons'] ?? [];
+        // Process add-ons / modules (support 'addons', 'modules', 'plugins', 'features')
+        $rawAddons = $args['addons'] ?? ($args['modules'] ?? ($args['plugins'] ?? ($args['features'] ?? [])));
         $itemizedAddons = [];
 
         foreach ($rawAddons as $addon) {
-            $title = $addon['title'] ?? 'Feature Module';
-            $priceUsd = (float)($addon['price_usd'] ?? 0);
+            if (is_string($addon)) {
+                $addon = ['id' => $addon, 'title' => $addon];
+            }
+
+            $modId = $addon['id'] ?? null;
+            $known = ($modId && isset($moduleLookup[$modId])) ? $moduleLookup[$modId] : null;
+
+            $title = $addon['title'] ?? ($addon['name'] ?? ($known['title'] ?? ucfirst(str_replace(['web_', '_'], ['', ' '], (string)($modId ?? 'Specialized Module')))));
+            $priceUsd = (float)($addon['price_usd'] ?? ($addon['cost'] ?? ($addon['price'] ?? ($known['price_usd'] ?? 0))));
+            $desc = $addon['description'] ?? ($addon['desc'] ?? ($known['desc'] ?? ''));
+
             $subtotalUsd += $priceUsd;
 
             $itemizedAddons[] = [
@@ -562,13 +602,13 @@ class McpQuotationController extends Controller
                 'cost' => $priceUsd,
                 'price_usd' => $priceUsd,
                 'price_egp' => round($priceUsd * $exchangeRate),
-                'desc' => $addon['description'] ?? ($addon['desc'] ?? ''),
-                'description' => $addon['description'] ?? ($addon['desc'] ?? ''),
+                'desc' => $desc,
+                'description' => $desc,
             ];
         }
 
         // Apply discount if provided
-        $discountUsd = max(0, (float)($args['discount_usd'] ?? 0));
+        $discountUsd = max(0, (float)($args['discount_usd'] ?? ($args['discount'] ?? 0)));
         $totalUsd = max(0, $subtotalUsd - $discountUsd);
         $totalEgp = round($totalUsd * $exchangeRate);
 
@@ -633,7 +673,7 @@ class McpQuotationController extends Controller
             'milestones' => $milestones,
             'cairo_date' => $nowCairo->format('M d, Y - h:i A') . ' (Cairo Time)',
             'valid_until' => $nowCairo->copy()->addDays(30)->format('M d, Y'),
-            'notes' => $args['notes'] ?? [],
+            'notes' => $args['notes'] ?? ($args['outOfScope'] ?? ($args['out_of_scope'] ?? [])),
         ];
 
         // Cache for 30 days and persist to storage disk
