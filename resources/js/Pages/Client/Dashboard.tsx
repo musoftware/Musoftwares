@@ -10,6 +10,11 @@ import {
     Server, Zap, Shield, MessageSquare, Laptop, Coins, CreditCard, Wrench, Key 
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import axios from 'axios';
+import { LoyaltyTierHeader } from './Components/LoyaltyTierHeader';
+import { ProjectProgressBar } from './Components/ProjectProgressBar';
+import { DataLockinVault } from './Components/DataLockinVault';
+import { RewardsCatalogModal } from './Components/RewardsCatalogModal';
 
 interface DashboardProps {
     stats?: any;
@@ -19,6 +24,13 @@ interface DashboardProps {
     userProjects?: any[];
     realNotifications?: any[];
     authUser?: any;
+    userTier?: string;
+    userLoyaltyPoints?: number;
+    pointsToMoneyRate?: number;
+    profileCompletion?: number;
+    vaultAssets?: any[];
+    vaultStats?: any;
+    loyaltyRewards?: any[];
     userBalanceVal?: number;
     currencySymbol?: string;
     userBalanceFormatted?: string;
@@ -37,6 +49,13 @@ export default function Dashboard({
     userProjects = [],
     realNotifications = [],
     authUser = {},
+    userTier = 'standard',
+    userLoyaltyPoints = 0,
+    pointsToMoneyRate = 1 / 30,
+    profileCompletion = 25,
+    vaultAssets = [],
+    vaultStats,
+    loyaltyRewards = [],
     userBalanceFormatted = '',
     userPoints = 0,
     unpaidCount = 0,
@@ -46,6 +65,22 @@ export default function Dashboard({
     const user = authUser?.name ? authUser : {};
     const walletBalance = stats?.walletBalance ?? 0;
     const currency = stats?.currency?.symbol || stats?.currency?.currency;
+
+    const [isRewardsOpen, setIsRewardsOpen] = useState(false);
+    const [currentLoyaltyPoints, setCurrentLoyaltyPoints] = useState<number>(userLoyaltyPoints || 0);
+    const [currentProfileCompletion, setCurrentProfileCompletion] = useState<number>(profileCompletion || 25);
+
+    const handleCompleteProfile = async () => {
+        try {
+            const res = await axios.post('/api/portal/profile/complete');
+            setCurrentProfileCompletion(100);
+            if (res.data?.data?.current_balance !== undefined) {
+                setCurrentLoyaltyPoints(res.data.data.current_balance);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const projectsList = (userProjects && userProjects.length > 0) 
         ? userProjects 
@@ -90,8 +125,27 @@ export default function Dashboard({
                     }
                 />
 
-                {/* 2. 3-PILLAR OPERATIONAL METRICS SUMMARY */}
+                {/* 2. CLIENT PORTAL ENGINE: LOYALTY, TIERS & PROJECT TRACKING */}
                 <PageShell maxWidth="7xl" className="space-y-12">
+                    {/* VIP Tier & Gamified Loyalty Header */}
+                    <LoyaltyTierHeader
+                        clientName={user?.name || ''}
+                        tier={userTier}
+                        loyaltyPoints={currentLoyaltyPoints}
+                        profileCompletion={currentProfileCompletion}
+                        currency={stats?.currency}
+                        pointsToMoneyRate={pointsToMoneyRate}
+                        onOpenRewardsModal={() => setIsRewardsOpen(true)}
+                        onCompleteProfile={handleCompleteProfile}
+                    />
+
+                    {/* Interactive 4-Stage Project Progress Tracker */}
+                    <ProjectProgressBar
+                        project={currentProject}
+                        onBriefSubmitted={() => window.location.reload()}
+                    />
+
+                    {/* 3-PILLAR OPERATIONAL METRICS SUMMARY */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Pillar 1: Projects & Sprints */}
                         <BentoStatCard
@@ -304,7 +358,22 @@ export default function Dashboard({
                             </div>
                         </ContentCard>
                     )}
+
+                    {/* 4. DATA LOCK-IN VAULT (Confidential Deliverables, Code & Contracts) */}
+                    <DataLockinVault
+                        assets={vaultAssets || []}
+                        vaultStats={vaultStats}
+                    />
                 </PageShell>
+
+                {/* Loyalty Rewards Catalog Modal */}
+                <RewardsCatalogModal
+                    isOpen={isRewardsOpen}
+                    onClose={() => setIsRewardsOpen(false)}
+                    userPoints={currentLoyaltyPoints}
+                    initialRewards={loyaltyRewards}
+                    onRewardRedeemed={(newBal) => setCurrentLoyaltyPoints(newBal)}
+                />
             </div>
         </AuthenticatedLayout>
     );

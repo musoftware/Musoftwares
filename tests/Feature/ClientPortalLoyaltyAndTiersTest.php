@@ -70,6 +70,21 @@ class ClientPortalLoyaltyAndTiersTest extends TestCase
             ->assertJsonFragment(['name' => '15% Off Next Invoice']);
     }
 
+    public function test_web_session_authenticated_user_can_access_portal_endpoints(): void
+    {
+        $user = $this->createClient([
+            'loyalty_points_balance' => 200,
+            'tier' => 'standard',
+        ]);
+
+        // Acting as a web session user (standard browser cookie session)
+        $this->actingAs($user, 'web');
+
+        $response = $this->getJson('/api/portal/loyalty/overview');
+        $response->assertStatus(200)
+            ->assertJsonPath('data.balance', 200);
+    }
+
     public function test_client_awarded_points_on_self_service_ticket_and_vip_priority_assigned(): void
     {
         $standardUser = $this->createClient([

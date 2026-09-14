@@ -67,6 +67,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/serial/device/*', // Serial link and user registration from desktop client dialogs
             'crm/whatsapp/webhook/*', // WhatsApp provider webhooks — external POST requests
             'sms-pay/*/verify', // Hosted checkout embedded via iframe across domains
+            'api/portal/*', // Client Portal AJAX actions using session/sanctum auth
+            'portal/*',
         ]);
 
         $middleware->alias([

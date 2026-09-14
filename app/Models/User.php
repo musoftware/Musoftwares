@@ -57,6 +57,10 @@ class User extends Authenticatable
         'booking_rate',
         'booking_rate_currency_id',
         'enable_3d_dashboard',
+        'tier',
+        'lifetime_spend',
+        'profile_completion_percentage',
+        'loyalty_points_balance',
     ];
 
     protected $hidden = [
@@ -102,6 +106,9 @@ class User extends Authenticatable
             'enable_notifications' => 'boolean',
             'enable_custom_hour_rate' => 'boolean',
             'enable_3d_dashboard' => 'boolean',
+            'lifetime_spend' => 'decimal:2',
+            'profile_completion_percentage' => 'integer',
+            'loyalty_points_balance' => 'integer',
         ];
     }
 
@@ -459,6 +466,21 @@ class User extends Authenticatable
     public function client_balance()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function loyaltyTransactions(): HasMany
+    {
+        return $this->hasMany(LoyaltyPointTransaction::class);
+    }
+
+    public function loyaltyRedemptions(): HasMany
+    {
+        return $this->hasMany(LoyaltyRedemption::class);
+    }
+
+    public function vaultAssets(): HasMany
+    {
+        return $this->hasMany(ClientVaultAsset::class);
     }
 
     public function try_pay_unpaid_invoices()

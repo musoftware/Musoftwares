@@ -233,4 +233,28 @@ Route::prefix('mcp')->group(function () {
     Route::get('/openapi.json', [\App\Http\Controllers\Api\McpQuotationController::class, 'openapi'])->name('api.mcp.openapi');
 });
 
+// --- Agency Client Portal (Gamification, Lock-in Vault & VIP Support) ---
+Route::middleware(['web', 'auth:web,sanctum'])->prefix('portal')->group(function () {
+    // Loyalty & Gamification
+    Route::get('/loyalty/overview', [\App\Http\Controllers\Api\ClientPortal\LoyaltyController::class, 'overview'])->name('api.portal.loyalty.overview');
+    Route::get('/loyalty/rewards', [\App\Http\Controllers\Api\ClientPortal\LoyaltyController::class, 'rewardsCatalog'])->name('api.portal.loyalty.rewards');
+    Route::post('/loyalty/rewards/{reward}/redeem', [\App\Http\Controllers\Api\ClientPortal\LoyaltyController::class, 'redeem'])->name('api.portal.loyalty.redeem');
+    Route::post('/profile/complete', [\App\Http\Controllers\Api\ClientPortal\LoyaltyController::class, 'completeProfile'])->name('api.portal.profile.complete');
+
+    // Project Progress & Milestone Trackers
+    Route::get('/projects', [\App\Http\Controllers\Api\ClientPortal\ProjectTrackerController::class, 'index'])->name('api.portal.projects.index');
+    Route::get('/projects/{project}', [\App\Http\Controllers\Api\ClientPortal\ProjectTrackerController::class, 'show'])->name('api.portal.projects.show');
+    Route::post('/projects/{project}/brief', [\App\Http\Controllers\Api\ClientPortal\ProjectTrackerController::class, 'submitBrief'])->name('api.portal.projects.brief');
+
+    // Central Data Lock-in Vault
+    Route::get('/vault/assets', [\App\Http\Controllers\Api\ClientPortal\VaultController::class, 'index'])->name('api.portal.vault.index');
+    Route::get('/vault/stats', [\App\Http\Controllers\Api\ClientPortal\VaultController::class, 'stats'])->name('api.portal.vault.stats');
+    Route::get('/vault/assets/{asset}/download', [\App\Http\Controllers\Api\ClientPortal\VaultController::class, 'download'])->name('api.portal.vault.download');
+
+    // VIP Support Desk
+    Route::get('/tickets', [\App\Http\Controllers\Api\ClientPortal\SupportDeskController::class, 'index'])->name('api.portal.tickets.index');
+    Route::post('/tickets', [\App\Http\Controllers\Api\ClientPortal\SupportDeskController::class, 'store'])->name('api.portal.tickets.store');
+});
+
+
 

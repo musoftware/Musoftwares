@@ -303,6 +303,12 @@ class DashboardService extends BaseService
         $unpaidAmount = $stats['unpaidAmount'] ?? 0;
         $totalDueFormatted = number_format($unpaidAmount, 2) . ' ' . $currencySymbol;
 
+        $vaultAssets = \App\Models\ClientVaultAsset::where('user_id', $user->id)
+            ->latest()
+            ->take(10)
+            ->get();
+        $vaultStats = app(\App\Services\ClientVaultService::class)->getVaultStats($user);
+
         return [
             'stats' => $stats,
             'recentTransactions' => $this->getRecentTransactions($user),
@@ -311,6 +317,13 @@ class DashboardService extends BaseService
             'userProjects' => $this->getUserProjects($user),
             'realNotifications' => $this->getUserRealNotifications($user),
             'authUser' => $user,
+            'userTier' => $user->tier ?? 'standard',
+            'userLoyaltyPoints' => (int) ($user->loyalty_points_balance ?? 0),
+            'pointsToMoneyRate' => \App\Services\LoyaltyService::POINTS_TO_CURRENCY_RATE,
+            'profileCompletion' => (int) ($user->profile_completion_percentage ?? 25),
+            'vaultAssets' => $vaultAssets,
+            'vaultStats' => $vaultStats,
+            'loyaltyRewards' => app(\App\Services\LoyaltyService::class)->getActiveRewards(),
             'userBalanceVal' => $userBalanceVal,
             'currencySymbol' => $currencySymbol,
             'userBalanceFormatted' => $userBalanceFormatted,
@@ -596,6 +609,7 @@ class DashboardService extends BaseService
         try {
             $projects = Project::where('user_id', $user->id)
                 ->where('archived', 0)
+                ->with('milestones')
                 ->withCount([
                     'tasks',
                     'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'done'),
@@ -609,15 +623,22 @@ class DashboardService extends BaseService
             return $projects->map(function ($p) {
                 $totalTasks = (int) $p->tasks_count;
                 $completedTasks = (int) $p->completed_tasks_count;
-                $progress = $totalTasks > 0 ? (int) round(($completedTasks / $totalTasks) * 100) : 0;
+                $calcProgress = $totalTasks > 0 ? (int) round(($completedTasks / $totalTasks) * 100) : 0;
+                $stageProgress = (int) ($p->progress_percentage ?? 0);
+                $finalProgress = $stageProgress > 0 ? $stageProgress : $calcProgress;
 
                 return [
                     'id' => $p->id,
                     'name' => $p->project_name,
                     'status' => $p->status ?? 'in_progress',
+                    'progress_stage' => $p->progress_stage ?? 'planning',
+                    'progress_percentage' => $finalProgress,
+                    'is_brief_complete' => (bool) ($p->is_brief_complete ?? false),
+                    'brief_details' => $p->brief_details,
+                    'milestones' => $p->milestones,
                     'total_tasks' => $totalTasks,
                     'completed_tasks' => $completedTasks,
-                    'progress' => $progress,
+                    'progress' => $finalProgress,
                     'reports_count' => (int) $p->published_reports_count,
                     'files_count' => (int) $p->files_count,
                     'updated_at' => $p->updated_at?->diffForHumans() ?? '-',

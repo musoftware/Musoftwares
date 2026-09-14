@@ -70,7 +70,23 @@ class AdminTransactionController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['user', 'project', 'currency', 'month', 'year', 'type']);
+        $filters = $request->only([
+            'user',
+            'project',
+            'currency',
+            'month',
+            'year',
+            'type',
+            'tx_type',
+            'search',
+            'from_date',
+            'to_date',
+            'min_amount',
+            'max_amount',
+            'sort',
+            'direction',
+            'per_page',
+        ]);
         $type = $filters['type'] ?? 'income'; // income, cost, revenue
 
         $filteredUser = null;
@@ -88,6 +104,16 @@ class AdminTransactionController extends Controller
             }
         }
 
+        $filterOptions = [
+            'users' => User::select('id', 'name', 'email')->orderBy('name')->get(),
+            'projects' => Project::select('id', 'project_name', 'user_id')->orderBy('project_name')->get(),
+            'currencies' => Currency::select('id', 'currency', 'symbol')->get(),
+            'types' => ['received', 'earned', 'used', 'refunded', 'sent'],
+        ];
+
+        $summary = $this->transactionService->getTransactionSummary($filters, $type);
+        $businessCurrency = CurrencyHelper::getBusinessCurrency();
+
         if ($type === 'income') {
             $transactions = $this->transactionService->getIncomeTransactions($filters)
                 ->withQueryString()
@@ -97,9 +123,11 @@ class AdminTransactionController extends Controller
                 'transactions' => $transactions,
                 'filters' => $filters,
                 'filteredUser' => $filteredUser,
+                'filterOptions' => $filterOptions,
+                'summary' => $summary,
+                'businessCurrency' => $businessCurrency,
             ]);
         } elseif ($type === 'cost') {
-            // Reusing TransactionResource or create CostTransactionResource if needed
             $transactions = $this->transactionService->getCostTransactions($filters)
                 ->withQueryString()
                 ->through(fn ($t) => (new TransactionResource($t))->resolve());
@@ -108,24 +136,39 @@ class AdminTransactionController extends Controller
                 'transactions' => $transactions,
                 'filters' => $filters,
                 'filteredUser' => $filteredUser,
+                'filterOptions' => $filterOptions,
+                'summary' => $summary,
+                'businessCurrency' => $businessCurrency,
             ]);
         } elseif ($type === 'revenue') {
-            // Detailed revenue logic
             $income = $this->transactionService->getIncomeTransactions($filters);
             $cost = $this->transactionService->getCostTransactions($filters);
+
+            $incomeSummary = $this->transactionService->getTransactionSummary($filters, 'income');
+            $costSummary = $this->transactionService->getTransactionSummary($filters, 'cost');
 
             return Inertia::render('Admin/Transactions/Revenue', [
                 'income' => $income->through(fn ($t) => (new TransactionResource($t))->resolve()),
                 'cost' => $cost->through(fn ($t) => (new TransactionResource($t))->resolve()),
                 'filters' => $filters,
                 'filteredUser' => $filteredUser,
-                'businessCurrency' => CurrencyHelper::getBusinessCurrency(),
+                'filterOptions' => $filterOptions,
+                'businessCurrency' => $businessCurrency,
+                'stats' => [
+                    'income_total' => $incomeSummary['total_business_amount'],
+                    'cost_total' => $costSummary['total_business_amount'],
+                    'income_count' => $incomeSummary['total_count'],
+                    'cost_count' => $costSummary['total_count'],
+                ],
             ]);
         }
 
         return Inertia::render('Admin/Transactions/Index', [
             'filters' => $filters,
             'filteredUser' => $filteredUser,
+            'filterOptions' => $filterOptions,
+            'summary' => $summary,
+            'businessCurrency' => $businessCurrency,
         ]);
     }
 

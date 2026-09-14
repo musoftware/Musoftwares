@@ -2,7 +2,7 @@ import React from 'react';
 import TransactionUserCard from './Components/TransactionUserCard';
 import { TransactionsPage } from '@/Components/TransactionsPage';
 
-export default function Income({ transactions, filters, filteredUser }) {
+export default function Income({ transactions, filters, filteredUser, filterOptions, summary, businessCurrency }: any) {
     return (
         <TransactionsPage
             type="income"
@@ -17,6 +17,9 @@ export default function Income({ transactions, filters, filteredUser }) {
             transactions={transactions}
             filters={filters}
             filteredUser={filteredUser}
+            filterOptions={filterOptions}
+            summary={summary}
+            businessCurrency={businessCurrency}
         >
             {() => filteredUser && <TransactionUserCard user={filteredUser} />}
         </TransactionsPage>

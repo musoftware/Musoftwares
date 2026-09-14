@@ -51,7 +51,20 @@ class Project extends Model
         'ai_questions' => 'array',
         'ai_actions_log' => 'array',
         'last_ai_charged_at' => 'datetime',
+        'progress_percentage' => 'integer',
+        'is_brief_complete' => 'boolean',
+        'delivered_at' => 'datetime',
     ];
+
+    public function milestones(): HasMany
+    {
+        return $this->hasMany(ProjectMilestone::class)->orderBy('order_index');
+    }
+
+    public function vaultAssets(): HasMany
+    {
+        return $this->hasMany(ClientVaultAsset::class);
+    }
 
     /**
      * Cleanly resolves a Project model from an instance or ID.

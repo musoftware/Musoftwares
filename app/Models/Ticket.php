@@ -18,6 +18,8 @@ class Ticket extends Model
         'ticket_message',
         'ticket_status',
         'priority',
+        'priority_score',
+        'is_self_service',
         'rate',
         'assigned_employee_id',
         'closed_at',
@@ -25,6 +27,8 @@ class Ticket extends Model
 
     protected $casts = [
         'closed_at' => 'datetime',
+        'priority_score' => 'integer',
+        'is_self_service' => 'boolean',
     ];
 
     public function close(): void

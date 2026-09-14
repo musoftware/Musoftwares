@@ -19,6 +19,9 @@ class LoyaltyService extends BaseService
         'invoice_paid'       => 200,
     ];
 
+    // How many currency units 1 loyalty point is worth (e.g. 1/30 ≈ 0.0333 EGP → 150 PTS = 5 EGP)
+    public const POINTS_TO_CURRENCY_RATE = 1 / 30;
+
     /**
      * Award loyalty points to a user for self-service or platform achievements.
      */
@@ -135,6 +138,7 @@ class LoyaltyService extends BaseService
             'profile_completion_percentage' => (int) ($user->profile_completion_percentage ?? 25),
             'recent_transactions' => $transactions,
             'recent_redemptions' => $redemptions,
+            'points_to_currency_rate' => self::POINTS_TO_CURRENCY_RATE,
         ];
     }
 }

@@ -5,6 +5,7 @@ window.axios = axios;
 window.__ = __;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.withCredentials = true;
 
 // Request Interceptor
 axios.interceptors.request.use((config) => {
