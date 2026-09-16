@@ -49,6 +49,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->configureRateLimiting();
 
+        // Register model observers
+        \App\Models\Ticket::observe(\App\Observers\TicketLoyaltyObserver::class);
+
+
+
         Event::listen(
             Lockout::class,
             function (Lockout $event) {

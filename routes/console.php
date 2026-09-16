@@ -79,5 +79,18 @@ Schedule::command('marketplace:generate-ai-files')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(10);
 
+// Loyalty tier-progress and invoice-due reminders daily at 08:00 Cairo Time
+Schedule::command(\App\Console\Commands\ProcessLoyaltyDueReminders::class)
+    ->dailyAt('08:00')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(5);
+
+// Win-back re-engagement campaigns daily at 09:00 Cairo Time
+Schedule::command(\App\Console\Commands\ProcessWinbackCampaigns::class)
+    ->dailyAt('09:00')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(5);
+
+
 
 

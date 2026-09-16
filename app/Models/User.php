@@ -61,6 +61,10 @@ class User extends Authenticatable
         'lifetime_spend',
         'profile_completion_percentage',
         'loyalty_points_balance',
+        'loyalty_lifetime_points',
+        'loyalty_tier_id',
+        'last_activity_type',
+        'winback_unsubscribed_at',
     ];
 
     protected $hidden = [
@@ -106,9 +110,12 @@ class User extends Authenticatable
             'enable_notifications' => 'boolean',
             'enable_custom_hour_rate' => 'boolean',
             'enable_3d_dashboard' => 'boolean',
-            'lifetime_spend' => 'decimal:2',
+            'lifetime_spend'               => 'decimal:2',
             'profile_completion_percentage' => 'integer',
-            'loyalty_points_balance' => 'integer',
+            'loyalty_points_balance'        => 'integer',
+            'loyalty_lifetime_points'       => 'integer',
+            'loyalty_tier_id'               => 'integer',
+            'winback_unsubscribed_at'       => 'datetime',
         ];
     }
 
@@ -135,7 +142,25 @@ class User extends Authenticatable
                 }
             }
         });
+
+        static::created(function ($user) {
+            // Award welcome loyalty points (Endowed Progress — user starts with a head start)
+            try {
+                /** @var \App\Services\LoyaltyService $loyaltyService */
+                $loyaltyService = app(\App\Services\LoyaltyService::class);
+                $loyaltyService->awardPointsForEvent(
+                    user: $user,
+                    eventType: 'user_welcome',
+                    context: ['channel' => 'system']
+                );
+            } catch (\Throwable $e) {
+                // Never fail registration due to loyalty points error
+                \Log::warning('Welcome loyalty points failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            }
+        });
     }
+
+
 
     /**
      * Cleanly resolves a User model from a User instance, ID, email, or user-like object.
@@ -179,6 +204,21 @@ class User extends Authenticatable
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class, 'user_id');
+    }
+
+    public function loyaltyTier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(LoyaltyTier::class, 'loyalty_tier_id');
+    }
+
+    public function loyaltyPointTransactions(): HasMany
+    {
+        return $this->hasMany(LoyaltyPointTransaction::class, 'user_id');
+    }
+
+    public function winbackEngagements(): HasMany
+    {
+        return $this->hasMany(WinbackEngagement::class, 'user_id');
     }
 
     public function emails(): HasMany

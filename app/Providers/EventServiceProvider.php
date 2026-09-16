@@ -11,6 +11,8 @@ use App\Events\InvoiceCancelled;
 use App\Events\InvoiceCreated;
 use App\Events\InvoiceItemAdded;
 use App\Events\InvoicePaid;
+use App\Events\LoyaltyPointsAwarded;
+use App\Events\LoyaltyTierUpgraded;
 use App\Events\MarketplaceOrderCompleted;
 use App\Events\MarketplaceOrderPlaced;
 use App\Events\MessageSent;
@@ -46,7 +48,15 @@ class EventServiceProvider extends ServiceProvider
         InvoiceCancelled::class => [NotificationEventListener::class],
         ContractSigned::class => [ActivityEventListener::class, NotificationEventListener::class],
         InventoryAdjusted::class => [ActivityEventListener::class],
-        InvoicePaid::class => [ActivityEventListener::class, NotificationEventListener::class],
+        InvoicePaid::class => [
+            ActivityEventListener::class,
+            NotificationEventListener::class,
+            \App\Listeners\LoyaltyInvoicePaidListener::class,
+        ],
+        LoyaltyPointsAwarded::class => [],
+        LoyaltyTierUpgraded::class  => [
+            \App\Listeners\LoyaltyTierUpgradedMailListener::class,
+        ],
         WalletCredited::class => [ActivityEventListener::class],
         WalletDebited::class => [ActivityEventListener::class],
         WithdrawalRequested::class => [ActivityEventListener::class, NotificationEventListener::class],
