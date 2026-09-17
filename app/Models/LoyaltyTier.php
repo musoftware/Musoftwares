@@ -17,6 +17,7 @@ class LoyaltyTier extends Model
         'discount_percentage',
         'ticket_priority_level',
         'badge_color',
+        'perks_payload',
         'order_index',
         'is_active',
     ];
@@ -26,7 +27,25 @@ class LoyaltyTier extends Model
         'discount_percentage' => 'decimal:2',
         'order_index'         => 'integer',
         'is_active'           => 'boolean',
+        'perks_payload'       => 'array',
     ];
+
+    protected $appends = [
+        'badge_image',
+        'badge_svg',
+    ];
+
+    public function getBadgeImageAttribute(): string
+    {
+        $slug = strtolower($this->slug ?: $this->name);
+        return "/images/tiers/{$slug}.png";
+    }
+
+    public function getBadgeSvgAttribute(): string
+    {
+        $slug = strtolower($this->slug ?: $this->name);
+        return "/images/tiers/{$slug}.svg";
+    }
 
     public function users(): HasMany
     {

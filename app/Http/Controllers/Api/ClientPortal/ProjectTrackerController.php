@@ -106,4 +106,63 @@ class ProjectTrackerController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Client confirms that the project has finished/delivered successfully.
+     */
+    public function completeProject(Request $request, Project $project): JsonResponse
+    {
+        if ($project->user_id !== $request->user()->id) {
+            abort(403, 'Unauthorized access to project.');
+        }
+
+        $validated = $request->validate([
+            'feedback' => ['nullable', 'string', 'max:2000'],
+            'rating'   => ['nullable', 'integer', 'min:1', 'max:5'],
+        ]);
+
+        $project->progress_stage = 'delivered';
+        $project->progress_percentage = 100;
+        $project->delivered_at = now();
+        $project->status = 'closed';
+
+        // Complete any open milestones
+        $project->milestones()->update([
+            'is_completed' => true,
+            'completed_at' => now(),
+        ]);
+
+        if (! empty($validated['feedback'])) {
+            $stamp = "\n\n[Client Handover Sign-off (" . now()->setTimezone('Africa/Cairo')->format('Y-m-d H:i') . " Cairo)]: " . $validated['feedback'];
+            $project->brief_details = ($project->brief_details ?? '') . $stamp;
+        }
+
+        $project->save();
+
+        // Award loyalty points for project completion & sign-off
+        $transaction = null;
+        try {
+            $transaction = $this->loyaltyService->awardPoints(
+                $request->user(),
+                'project_completed',
+                $project,
+                [
+                    'project_name' => $project->project_name,
+                    'rating'       => $validated['rating'] ?? 5,
+                    'channel'      => 'client_portal',
+                ]
+            );
+        } catch (\Throwable $e) {
+            // Graceful fallback
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Project marked as completed and delivered successfully! Thank you for partnering with us.',
+            'data'    => [
+                'project'        => $project->fresh(['milestones']),
+                'points_awarded' => $transaction ? ($transaction->points ?? 150) : 0,
+            ],
+        ]);
+    }
 }

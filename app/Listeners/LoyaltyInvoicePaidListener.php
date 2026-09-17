@@ -38,6 +38,31 @@ class LoyaltyInvoicePaidListener implements ShouldQueue
             ]
         );
 
+        // Award referral points to the referrer if this is the user's first paid invoice
+        if (! empty($user->ref_user_id)) {
+            $referrer = \App\Models\User::find($user->ref_user_id);
+            if ($referrer !== null) {
+                $hasPriorPaidInvoices = $user->invoices()
+                    ->where('status', 'paid')
+                    ->where('id', '!=', $invoice->id)
+                    ->exists();
+
+                if (! $hasPriorPaidInvoices) {
+                    $this->loyaltyService->awardPointsForEvent(
+                        user: $referrer,
+                        eventType: 'referral_first_payment',
+                        reference: $invoice,
+                        context: [
+                            'referred_user_id'   => $user->id,
+                            'referred_user_name' => $user->name,
+                            'invoice_id'         => $invoice->id,
+                            'channel'            => 'referral',
+                        ]
+                    );
+                }
+            }
+        }
+
         // Mark user as active — cancels any open win-back sequence immediately
         $this->winbackService->touchActivity($user, 'invoice_paid');
     }

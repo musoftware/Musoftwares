@@ -21,7 +21,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { 
     Key, Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
-    Settings, User, Users, History, Shield, CreditCard, Box, 
+    Settings, User, Users, History, Shield, CreditCard, Box, Award,
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
     MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download,
     FolderKanban,
@@ -315,6 +315,9 @@ function AuthenticatedContent({
                                                                             <SafeLink href={safeRoute('referrals.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <Users className="w-4 h-4 text-[#0071e3]" /> {__('general.referrals')}
                                                                             </SafeLink>
+                                                                            <SafeLink href={safeRoute('loyalty.index', undefined, '/loyalty')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Award className="w-4 h-4 text-[#0071e3]" /> {__('loyalty.loyalty_hub') || 'Loyalty & Points'}
+                                                                            </SafeLink>
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
@@ -500,6 +503,14 @@ function AuthenticatedContent({
                                                         title={__('general.referrals')}
                                                         description={__('general.referrals_desc')}
                                                         isActive={isReferralsMenuActive}
+                                                    />
+
+                                                    <UnifiedMenuItem
+                                                        href={safeRoute('loyalty.index', undefined, '/loyalty')}
+                                                        icon={Award}
+                                                        title={__('loyalty.loyalty_hub') || 'Loyalty & Points'}
+                                                        description={__('loyalty.loyalty_tagline') || 'Points ledger, rewards catalog & tier perks'}
+                                                        isActive={route().current('loyalty.*')}
                                                     />
                                                 </div>
 

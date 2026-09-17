@@ -84,7 +84,7 @@ export function BentoStatCard({
             data-slot="bento-stat-card"
             onClick={onClick}
             className={cn(
-                'group p-6 sm:p-7 rounded-[24px] shadow-sm transition-all flex items-center justify-between',
+                'group p-6 sm:p-7 rounded-[24px] shadow-sm transition-all flex flex-col justify-between',
                 'bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10',
                 toneConfig.borderHover,
                 'hover:shadow-md',
@@ -92,34 +92,38 @@ export function BentoStatCard({
                 className
             )}
         >
-            <div className="space-y-2 min-w-0 flex-1">
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 dark:text-zinc-400 block truncate">
+            {/* Top row: Label + Icon */}
+            <div className="flex items-start justify-between gap-3 mb-3">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 dark:text-zinc-400 block line-clamp-1 pt-1">
                     {label}
                 </span>
 
-                <div className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] dark:text-white tracking-tight font-sans">
+                {icon && (
+                    <div
+                        className={cn(
+                            'w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 overflow-hidden',
+                            toneConfig.container
+                        )}
+                    >
+                        {renderIcon()}
+                    </div>
+                )}
+            </div>
+
+            {/* Bottom: Value + Description + Action */}
+            <div className="space-y-1.5 min-w-0">
+                <div className="text-2xl sm:text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight font-sans truncate">
                     {value}
                 </div>
 
                 {description && (
-                    <div className="text-xs text-[#1d1d1f]/60 dark:text-zinc-400 leading-normal max-w-sm">
+                    <div className="text-xs text-[#1d1d1f]/60 dark:text-zinc-400 leading-normal">
                         {description}
                     </div>
                 )}
 
-                {action && <div className="pt-1">{action}</div>}
+                {action && <div className="pt-2">{action}</div>}
             </div>
-
-            {icon && (
-                <div
-                    className={cn(
-                        'w-14 h-14 rounded-2xl border flex items-center justify-center shrink-0 ms-4 transition-transform group-hover:scale-105',
-                        toneConfig.container
-                    )}
-                >
-                    {renderIcon()}
-                </div>
-            )}
         </div>
     );
 }

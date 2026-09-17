@@ -3,8 +3,8 @@
 return [
     'loyalty_hub'               => 'مركز النقاط ومستويات الولاء',
     'loyalty_tagline'           => 'شفافية كاملة. مكافآت مستحقة مع كل تعامل ودفع مبكر.',
-    'available_points'          => 'النقاط المتاحة للاستخدام',
-    'lifetime_points'           => 'إجمالي النقاط التراكمية',
+    'available_points'          => 'النقاط المتاحة',
+    'lifetime_points'           => 'إجمالي النقاط',
     'monetary_value'            => 'القيمة النقدية التقديرية',
     'points_abbreviation'       => 'نقطة',
     'current_tier'              => 'المستوى الحالي',

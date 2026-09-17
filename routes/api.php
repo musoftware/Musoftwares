@@ -245,6 +245,7 @@ Route::middleware(['web', 'auth:web,sanctum'])->prefix('portal')->group(function
     Route::get('/projects', [\App\Http\Controllers\Api\ClientPortal\ProjectTrackerController::class, 'index'])->name('api.portal.projects.index');
     Route::get('/projects/{project}', [\App\Http\Controllers\Api\ClientPortal\ProjectTrackerController::class, 'show'])->name('api.portal.projects.show');
     Route::post('/projects/{project}/brief', [\App\Http\Controllers\Api\ClientPortal\ProjectTrackerController::class, 'submitBrief'])->name('api.portal.projects.brief');
+    Route::post('/projects/{project}/complete', [\App\Http\Controllers\Api\ClientPortal\ProjectTrackerController::class, 'completeProject'])->name('api.portal.projects.complete');
 
     // Central Data Lock-in Vault
     Route::get('/vault/assets', [\App\Http\Controllers\Api\ClientPortal\VaultController::class, 'index'])->name('api.portal.vault.index');

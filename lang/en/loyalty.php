@@ -3,8 +3,8 @@
 return [
     'loyalty_hub'               => 'Loyalty & Points Hub',
     'loyalty_tagline'           => 'Complete transparency. Earn rewards on every interaction.',
-    'available_points'          => 'Available Loyalty Points',
-    'lifetime_points'           => 'Lifetime Accumulated Points',
+    'available_points'          => 'Available Points',
+    'lifetime_points'           => 'Lifetime Points',
     'monetary_value'            => 'Cash Value Equivalent',
     'points_abbreviation'       => 'PTS',
     'current_tier'              => 'Current Tier',

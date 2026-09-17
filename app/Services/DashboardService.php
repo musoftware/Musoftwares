@@ -293,7 +293,10 @@ class DashboardService extends BaseService
         $currencySymbol = isset($stats['currency']) && !empty($stats['currency']->symbol)
             ? $stats['currency']->symbol
             : ($userCurrency?->symbol ?? $userCurrency?->currency ?? '$');
-        $userBalanceFormatted = number_format($userBalanceVal, 2) . ' ' . $currencySymbol;
+        $roundedBalance = round($userBalanceVal, 2);
+        $userBalanceFormatted = ($roundedBalance == (int) $roundedBalance
+            ? number_format($roundedBalance, 0)
+            : number_format($roundedBalance, 2)) . ' ' . $currencySymbol;
         $userPoints = $stats['pointsBalance'] ?? $user->points ?? 0;
 
         $unpaidInvoices = method_exists($user, 'invoices')
@@ -301,7 +304,10 @@ class DashboardService extends BaseService
             : collect();
         $unpaidCount = $stats['unpaidInvoices'] ?? 0;
         $unpaidAmount = $stats['unpaidAmount'] ?? 0;
-        $totalDueFormatted = number_format($unpaidAmount, 2) . ' ' . $currencySymbol;
+        $roundedUnpaid = round($unpaidAmount, 2);
+        $totalDueFormatted = ($roundedUnpaid == (int) $roundedUnpaid
+            ? number_format($roundedUnpaid, 0)
+            : number_format($roundedUnpaid, 2)) . ' ' . $currencySymbol;
 
         $vaultAssets = \App\Models\ClientVaultAsset::where('user_id', $user->id)
             ->latest()
@@ -413,8 +419,8 @@ class DashboardService extends BaseService
 
     private function getClientStats(User $user): array
     {
-        $walletBalance = (float) ($user->user_balance ?? 0);
-        $earnedBalance = (float) ($user->pending_commission ?? 0);
+        $walletBalance = round((float) ($user->user_balance ?? 0), 2);
+        $earnedBalance = round((float) ($user->pending_commission ?? 0), 2);
         $pointsBalance = $user->points_balance ?? 0;
 
         $unpaidInvoices = clone $user->invoices()->whereIn('status', ['unpaid', 'partially_paid'])->where('is_suspended', false);
@@ -639,6 +645,8 @@ class DashboardService extends BaseService
                     'total_tasks' => $totalTasks,
                     'completed_tasks' => $completedTasks,
                     'progress' => $finalProgress,
+                    'is_delivered' => ($p->progress_stage === 'delivered' || (int) $finalProgress === 100 || $p->delivered_at !== null || $p->status === 'closed'),
+                    'delivered_at' => $p->delivered_at ? $p->delivered_at->format('M d, Y') : null,
                     'reports_count' => (int) $p->published_reports_count,
                     'files_count' => (int) $p->files_count,
                     'updated_at' => $p->updated_at?->diffForHumans() ?? '-',

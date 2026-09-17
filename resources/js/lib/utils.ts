@@ -17,6 +17,23 @@ const CURRENCY_FORMATS: Record<string, string> = {
     'IQD': '%v IQD'
 };
 
+export function formatCurrencyAmount(
+    amount: number | string | null | undefined,
+    options?: {
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+    }
+): string {
+    const num = typeof amount === 'string' ? parseFloat(amount) : Number(amount || 0);
+    if (isNaN(num)) return '0';
+    const rounded = Math.round(num * 100) / 100;
+    const isWhole = rounded % 1 === 0;
+    return rounded.toLocaleString('en-US', {
+        minimumFractionDigits: isWhole ? 0 : (options?.minimumFractionDigits ?? 2),
+        maximumFractionDigits: options?.maximumFractionDigits ?? 2,
+    });
+}
+
 export function formatMoney(amount: number | string, currency?: any) {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
 
@@ -40,25 +57,29 @@ export function formatMoney(amount: number | string, currency?: any) {
     curCode = curCode ? curCode.trim().toUpperCase() : '';
 
     if (!curCode) {
-        if (isNaN(numericAmount)) return '0.00';
+        if (isNaN(numericAmount)) return '0';
         const isNegative = numericAmount < 0;
         const absoluteAmount = Math.abs(numericAmount);
+        const roundedAmount = Math.round(absoluteAmount * 100) / 100;
+        const isWhole = roundedAmount % 1 === 0;
         const numberPart = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
+            minimumFractionDigits: isWhole ? 0 : 2,
             maximumFractionDigits: 2,
-        }).format(absoluteAmount);
+        }).format(roundedAmount);
         return isNegative ? `-${numberPart}` : numberPart;
     }
 
-    if (isNaN(numericAmount)) return `${curCode} 0.00`;
+    if (isNaN(numericAmount)) return `${curCode} 0`;
 
     const isNegative = numericAmount < 0;
     const absoluteAmount = Math.abs(numericAmount);
+    const roundedAmount = Math.round(absoluteAmount * 100) / 100;
+    const isWhole = roundedAmount % 1 === 0;
 
     const numberPart = new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 2,
+        minimumFractionDigits: isWhole ? 0 : 2,
         maximumFractionDigits: 2,
-    }).format(absoluteAmount);
+    }).format(roundedAmount);
 
     // Dynamic look up from window.currencies shared from database
     const dynamicCurrencies = (window as any).currencies;
@@ -118,6 +139,8 @@ export function formatMoney(amount: number | string, currency?: any) {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: curCode,
+            minimumFractionDigits: isWhole ? 0 : 2,
+            maximumFractionDigits: 2,
         }).format(numericAmount);
     } catch (e) {
         return `${curCode} ${numberPart}`;

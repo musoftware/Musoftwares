@@ -75,6 +75,18 @@ class AdminPointsController extends Controller
             'description' => $label,
         ]);
 
+        // Synchronize with modern Loyalty & Points engine for transparent client audit trail
+        try {
+            app(\App\Services\LoyaltyService::class)->adjustPointsManually(
+                user: $user,
+                points: $amount,
+                reason: $reason,
+                admin: $request->user()
+            );
+        } catch (\Throwable $e) {
+            // Graceful fallback
+        }
+
         $abs = abs($amount);
 
         if ($amount > 0) {

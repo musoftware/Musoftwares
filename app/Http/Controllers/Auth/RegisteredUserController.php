@@ -55,6 +55,34 @@ class RegisteredUserController extends Controller
             $user->save();
         }
 
+        // Attach referral if visitor arrived via referral campaign link
+        $refKey = $request->session()->get('referral');
+        if ($refKey) {
+            try {
+                $referral = \App\Models\UserReferral::resolveRef($refKey);
+                if ($referral && $referral->user_id && $referral->user_id !== $user->id) {
+                    $user->ref_user_id = $referral->user_id;
+                    $user->save();
+
+                    $referrer = \App\Models\User::find($referral->user_id);
+                    if ($referrer) {
+                        app(\App\Services\LoyaltyService::class)->awardPointsForEvent(
+                            user: $referrer,
+                            eventType: 'referral_registered',
+                            reference: $user,
+                            context: [
+                                'referred_user_id'   => $user->id,
+                                'referred_user_name' => $user->name,
+                                'channel'            => 'referral_link',
+                            ]
+                        );
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Non-blocking
+            }
+        }
+
         event(new Registered($user));
 
         Auth::login($user);

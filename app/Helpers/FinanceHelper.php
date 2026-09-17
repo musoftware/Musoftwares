@@ -32,7 +32,10 @@ class FinanceHelper
     public function format_money(float|int|string|null $amount, Currency|int|string|null $currency = null): string
     {
         $currencyModel = Currency::resolve($currency);
-        $formattedAmount = number_format((float) ($amount ?? 0), 2, '.', ',');
+        $val = (float) ($amount ?? 0);
+        $rounded = round($val, 2);
+        $decimals = ($rounded == (int) $rounded) ? 0 : 2;
+        $formattedAmount = number_format($rounded, $decimals, '.', ',');
 
         if ($currencyModel) {
             return $this->applyFormatPattern($currencyModel, (float) ($amount ?? 0), $formattedAmount);

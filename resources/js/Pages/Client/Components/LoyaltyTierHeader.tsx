@@ -1,5 +1,6 @@
 import React from 'react';
-import { Crown, Sparkles, Shield, ArrowUpRight, Award, Zap } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Crown, Sparkles, Shield, ArrowUpRight, Award, Zap, History } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
 
 interface LoyaltyTierHeaderProps {
@@ -23,33 +24,66 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
     onOpenRewardsModal,
     onCompleteProfile,
 }) => {
-    const cleanTier = (tier || 'standard').toLowerCase();
+    const cleanTier = (tier || 'bronze').toLowerCase();
 
     const getTierConfig = () => {
-        if (cleanTier === 'enterprise') {
+        if (cleanTier === 'obsidian' || cleanTier === 'apex' || cleanTier === 'crown') {
             return {
-                title: 'Enterprise Titanium VIP',
-                subtitle: 'Direct Core Team Routing • Priority Queue Slot #1 • Continuous Architecture Review',
+                title: 'Obsidian Imperial VIP',
+                subtitle: 'Direct CTO Line • Dedicated Engineering Squad • Custom Architecture • 25% Invoice Deduction',
                 icon: Crown,
-                badgeStyle: 'bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 text-black font-semibold shadow-sm',
-                accentColor: 'text-amber-400',
+                badge: '/images/tiers/obsidian.svg',
+                badgeStyle: 'bg-gradient-to-r from-[#18181B] via-[#3B0764] to-[#18181B] text-[#FEF08A] font-bold shadow-xs border border-[#F59E0B]/50',
+                accentColor: 'text-purple-400',
             };
         }
-        if (cleanTier === 'pro') {
+        if (cleanTier === 'diamond') {
             return {
-                title: 'Pro VIP Tier',
-                subtitle: 'Accelerated SLA Queue • 2x Loyalty Yield on Settlements • Senior Engineer Dispatch',
-                icon: Sparkles,
-                badgeStyle: 'bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-500 text-black font-semibold shadow-sm',
+                title: 'Diamond Elite Partner',
+                subtitle: '15-Min Guaranteed Engineering SLA • Comprehensive Code Audits • 20% Invoice Deduction',
+                icon: Crown,
+                badge: '/images/tiers/diamond.svg',
+                badgeStyle: 'bg-gradient-to-r from-cyan-600 via-teal-500 to-sky-600 text-white font-bold shadow-xs border border-cyan-300/60',
+                accentColor: 'text-cyan-400',
+            };
+        }
+        if (cleanTier === 'platinum' || cleanTier === 'enterprise') {
+            return {
+                title: 'Platinum VIP Tier',
+                subtitle: 'Executive Dedicated Engineering • Zero-Queue VIP SLA • 15% Invoice Deduction Privilege',
+                icon: Crown,
+                badge: '/images/tiers/platinum.svg',
+                badgeStyle: 'bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 text-white font-semibold shadow-xs border border-sky-300/40',
                 accentColor: 'text-sky-400',
             };
         }
+        if (cleanTier === 'gold') {
+            return {
+                title: 'Gold Tier Partner',
+                subtitle: 'Priority Queue Routing • 10% Invoice Deduction Privilege • Dedicated Technical Lead',
+                icon: Crown,
+                badge: '/images/tiers/gold.svg',
+                badgeStyle: 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-slate-950 font-bold shadow-xs border border-amber-300/60',
+                accentColor: 'text-amber-400',
+            };
+        }
+        if (cleanTier === 'silver' || cleanTier === 'pro') {
+            return {
+                title: 'Silver Tier Client',
+                subtitle: 'Accelerated Ticket Dispatch • 5% Invoice Deduction Privilege • Regular Milestone Audits',
+                icon: Sparkles,
+                badge: '/images/tiers/silver.svg',
+                badgeStyle: 'bg-gradient-to-r from-slate-200 via-zinc-200 to-slate-300 text-slate-900 dark:from-slate-800 dark:via-zinc-700 dark:to-slate-800 dark:text-slate-100 font-semibold shadow-xs border border-slate-300 dark:border-slate-600/40',
+                accentColor: 'text-slate-400',
+            };
+        }
         return {
-            title: 'Standard Tier Client',
-            subtitle: 'Automated Self-Service Studio • Complete Actions to Upgrade Automatically',
+            title: 'Bronze Tier Client',
+            subtitle: 'Automated Self-Service Studio • Earn Points with Every Milestone and Early Settlement',
             icon: Shield,
-            badgeStyle: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-black/10 dark:border-white/10 font-medium',
-            accentColor: 'text-zinc-500 dark:text-zinc-400',
+            badge: '/images/tiers/bronze.svg',
+            badgeStyle: 'bg-gradient-to-r from-[#7D320B] via-[#B25324] to-[#D9733E] text-white font-semibold shadow-xs border border-[#FFA875]/50',
+            accentColor: 'text-[#B25324] dark:text-[#FFA875]',
         };
     };
 
@@ -68,11 +102,26 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 {/* Client & Tier Metadata */}
                 <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-3">
+                        <img
+                            src={config.badge}
+                            alt={config.title}
+                            className="w-9 h-9 object-contain drop-shadow-md shrink-0"
+                            onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                            }}
+                        />
                         <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
                             {clientName || 'Private Client'}
                         </h1>
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wider uppercase ${config.badgeStyle}`}>
-                            <TierIcon className="w-3.5 h-3.5" />
+                            <img
+                                src={config.badge}
+                                alt=""
+                                className="w-3.5 h-3.5 object-contain shrink-0 drop-shadow-xs"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                }}
+                            />
                             <span>{config.title}</span>
                         </span>
                     </div>
@@ -97,14 +146,23 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                         )}
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={onOpenRewardsModal}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#1d1d1f] hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all duration-200 shadow-sm active:scale-98 cursor-pointer"
-                    >
-                        <Award className="w-4 h-4 text-white dark:text-black" />
-                        <span>Redeem Rewards</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/loyalty"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900 text-[#1d1d1f] dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all shadow-xs cursor-pointer"
+                        >
+                            <History className="w-3.5 h-3.5 text-zinc-500" />
+                            <span>Ledger & Tiers</span>
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={onOpenRewardsModal}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#1d1d1f] hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all duration-200 shadow-sm active:scale-98 cursor-pointer"
+                        >
+                            <Award className="w-4 h-4 text-white dark:text-black" />
+                            <span>Redeem</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

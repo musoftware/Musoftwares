@@ -197,7 +197,16 @@ export default function LoyaltyIndex({
                                     ? `${summary.points_to_next_tier} PTS to ${summary.next_tier.name}`
                                     : 'Highest tier attained'
                             }
-                            icon={Crown}
+                            icon={
+                                <img
+                                    src={`/images/tiers/${(summary?.current_tier?.slug || summary?.tier || 'bronze').toLowerCase()}.svg`}
+                                    alt={currentTierName}
+                                    className="w-9 h-9 object-contain drop-shadow-md"
+                                    onError={(e) => {
+                                        e.currentTarget.src = `/images/tiers/${(summary?.current_tier?.slug || summary?.tier || 'bronze').toLowerCase()}.png`;
+                                    }}
+                                />
+                            }
                             accentColor="amber"
                         />
                         <BentoStatCard
@@ -230,13 +239,17 @@ export default function LoyaltyIndex({
                             {summary?.next_tier && (
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400">
-                                        <span>{summary?.current_tier?.name || 'STANDARD'}</span>
+                                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                                            {summary?.current_tier?.name || 'Bronze'}
+                                        </span>
                                         <span className="font-bold text-[#0071e3]">{summary?.progress_percentage}%</span>
-                                        <span>{summary?.next_tier?.name}</span>
+                                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                                            {summary?.next_tier?.name}
+                                        </span>
                                     </div>
                                     <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
                                         <div 
-                                            className="bg-[#0071e3] h-full rounded-full transition-all duration-700" 
+                                            className="bg-gradient-to-r from-blue-500 to-sky-400 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(56,189,248,0.4)]" 
                                             style={{ width: `${Math.min(100, Math.max(0, summary?.progress_percentage || 0))}%` }}
                                         />
                                     </div>
@@ -244,61 +257,86 @@ export default function LoyaltyIndex({
                             )}
 
                             {/* Tiers Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                                 {tiers.map((tierItem) => {
                                     const isCurrent = summary?.current_tier?.id === tierItem.id;
                                     const isUnlocked = (summary?.lifetime_points || 0) >= tierItem.min_lifetime_points;
                                     const perks = tierItem.perks_payload?.perks || [];
+                                    const tierSlug = (tierItem.slug || tierItem.name).toLowerCase();
+                                    const badgeSrc = `/images/tiers/${tierSlug}.svg`;
+                                    const badgePngFallback = `/images/tiers/${tierSlug}.png`;
 
                                     return (
                                         <div
                                             key={tierItem.id}
-                                            className={`p-5 rounded-2xl border transition-all ${
+                                            className={`relative p-5 rounded-2xl border transition-all flex flex-col justify-between ${
                                                 isCurrent
-                                                    ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-500/40 shadow-sm ring-1 ring-blue-500/20'
+                                                    ? 'bg-blue-50/60 dark:bg-blue-950/20 border-[#0071e3]/50 shadow-md ring-1 ring-[#0071e3]/30'
                                                     : isUnlocked
-                                                    ? 'bg-zinc-50/50 dark:bg-zinc-900/50 border-black/5 dark:border-white/5'
-                                                    : 'bg-white/40 dark:bg-zinc-950/40 border-black/5 dark:border-white/5 opacity-70'
+                                                    ? 'bg-zinc-50/60 dark:bg-zinc-900/50 border-black/5 dark:border-white/5'
+                                                    : 'bg-white/40 dark:bg-zinc-950/40 border-black/5 dark:border-white/5 opacity-75'
                                             }`}
                                         >
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <Crown className={`w-4 h-4 ${isCurrent ? 'text-[#0071e3]' : 'text-zinc-400'}`} />
-                                                    <h4 className="font-semibold text-sm text-[#1d1d1f] dark:text-white">
+                                            {isCurrent && (
+                                                <div className="absolute -top-3 end-4">
+                                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#0071e3] text-white shadow-sm">
+                                                        CURRENT TIER
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            <div>
+                                                {/* 3D Tier Badge Showcase */}
+                                                <div className="flex flex-col items-center text-center p-3 mb-3 bg-gradient-to-b from-black/[0.02] to-transparent dark:from-white/[0.02] rounded-xl">
+                                                    <img
+                                                        src={badgeSrc}
+                                                        alt={tierItem.name}
+                                                        className="w-20 h-20 object-contain drop-shadow-md transition-transform hover:scale-105"
+                                                        onError={(e) => {
+                                                            e.currentTarget.src = badgePngFallback;
+                                                        }}
+                                                    />
+                                                    <h4 className="font-bold text-base text-[#1d1d1f] dark:text-white mt-2 font-sans">
                                                         {tierItem.name}
                                                     </h4>
+                                                    <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                                        {tierItem.min_lifetime_points > 0
+                                                            ? `${tierItem.min_lifetime_points.toLocaleString()} PTS Threshold`
+                                                            : 'Base Entry Level'}
+                                                    </span>
+                                                    {Number(tierItem.discount_percentage) > 0 && (
+                                                        <span className="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                                                            {tierItem.discount_percentage}% Invoice Deduction
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                {isCurrent && (
-                                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-[#0071e3] text-white">
-                                                        CURRENT
-                                                    </span>
-                                                )}
-                                            </div>
 
-                                            <div className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mb-4">
-                                                {tierItem.min_lifetime_points > 0
-                                                    ? `${tierItem.min_lifetime_points.toLocaleString()} PTS threshold`
-                                                    : 'Entry level'}
-                                                {tierItem.multiplier > 1 && (
-                                                    <span className="ms-2 px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 font-bold">
-                                                        {tierItem.multiplier}x Multiplier
-                                                    </span>
-                                                )}
+                                                <div className="pt-2 border-t border-black/5 dark:border-white/5">
+                                                    <div className="text-[10px] font-mono uppercase text-zinc-400 dark:text-zinc-500 mb-2 font-semibold">
+                                                        Tier Privileges
+                                                    </div>
+                                                    <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {perks.map((perk, pIdx) => (
+                                                            <li key={pIdx} className="flex items-start gap-2">
+                                                                <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                                                                <span className="leading-tight">{perk}</span>
+                                                            </li>
+                                                        ))}
+                                                        {perks.length === 0 && (
+                                                            <>
+                                                                <li className="flex items-start gap-2">
+                                                                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                                                                    <span className="leading-tight">Instant Support Ticket Priority</span>
+                                                                </li>
+                                                                <li className="flex items-start gap-2">
+                                                                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                                                                    <span className="leading-tight">Transparent Audit Ledger Tracking</span>
+                                                                </li>
+                                                            </>
+                                                        )}
+                                                    </ul>
+                                                </div>
                                             </div>
-
-                                            <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
-                                                {perks.map((perk, pIdx) => (
-                                                    <li key={pIdx} className="flex items-start gap-2">
-                                                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                                                        <span>{perk}</span>
-                                                    </li>
-                                                ))}
-                                                {perks.length === 0 && (
-                                                    <li className="flex items-center gap-2 text-zinc-400 italic">
-                                                        <span>Standard client tier privileges</span>
-                                                    </li>
-                                                )}
-                                            </ul>
                                         </div>
                                     );
                                 })}

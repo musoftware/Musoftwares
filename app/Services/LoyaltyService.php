@@ -87,6 +87,18 @@ class LoyaltyService extends BaseService
     }
 
     /**
+     * Convenient alias for awardPointsForEvent.
+     */
+    public function awardPoints(
+        User $user,
+        string $eventType,
+        mixed $reference = null,
+        array $context = []
+    ): ?LoyaltyPointTransaction {
+        return $this->awardPointsForEvent($user, $eventType, $reference, $context);
+    }
+
+    /**
      * Compute the final points value for a rule, applying any multipliers from conditions_payload.
      */
     public function calculatePoints(LoyaltyRule $rule, array $context): int
@@ -255,9 +267,18 @@ class LoyaltyService extends BaseService
      */
     public function getUserSummary(User $user): array
     {
-        $currentTier = $user->loyaltyTier;
-        $nextTier = $currentTier ? LoyaltyTier::nextAfter($currentTier) : LoyaltyTier::resolveForPoints(0);
         $lifetimePoints = (int) ($user->loyalty_lifetime_points ?? 0);
+        $currentTier = $user->loyaltyTier;
+
+        if (! $currentTier) {
+            $currentTier = LoyaltyTier::resolveForPoints($lifetimePoints);
+            if ($currentTier && ! $user->loyalty_tier_id) {
+                $user->loyalty_tier_id = $currentTier->id;
+                $user->saveQuietly();
+            }
+        }
+
+        $nextTier = $currentTier ? LoyaltyTier::nextAfter($currentTier) : null;
         $pointsToNextTier = $nextTier ? max(0, $nextTier->min_lifetime_points - $lifetimePoints) : 0;
         $progressPct = 0;
 
@@ -265,6 +286,9 @@ class LoyaltyService extends BaseService
             $range = $nextTier->min_lifetime_points - $currentTier->min_lifetime_points;
             $earned = $lifetimePoints - $currentTier->min_lifetime_points;
             $progressPct = $range > 0 ? min(100, (int) round(($earned / $range) * 100)) : 100;
+        } elseif (! $nextTier && $currentTier) {
+            // Reached highest tier
+            $progressPct = 100;
         }
 
         $transactions = LoyaltyPointTransaction::where('user_id', $user->id)
@@ -285,12 +309,129 @@ class LoyaltyService extends BaseService
             'next_tier'             => $nextTier,
             'points_to_next_tier'   => $pointsToNextTier,
             'progress_percentage'   => $progressPct,
-            'tier'                  => $user->tier ?? 'standard',
+            'tier'                  => $currentTier?->slug ?? 'bronze',
             'profile_completion'    => (int) ($user->profile_completion_percentage ?? 25),
             'recent_transactions'   => $transactions,
             'recent_redemptions'    => $redemptions,
             'points_to_currency_rate' => self::POINTS_TO_CURRENCY_RATE,
         ];
+    }
+
+    /**
+     * Manually adjust a user's points (admin override / courtesy grace points).
+     * Creates a fully transparent ledger transaction with the admin's mandatory reason.
+     */
+    public function adjustPointsManually(User $user, int $points, string $reason, ?User $admin = null): LoyaltyPointTransaction
+    {
+        if ($points === 0) {
+            throw new InvalidArgumentException('Points adjustment cannot be zero.');
+        }
+
+        return DB::transaction(function () use ($user, $points, $reason, $admin) {
+            $newBalance = max(0, ((int) $user->loyalty_points_balance) + $points);
+            $newLifetime = $points > 0 ? ((int) $user->loyalty_lifetime_points) + $points : (int) $user->loyalty_lifetime_points;
+
+            $txn = LoyaltyPointTransaction::create([
+                'user_id'          => $user->id,
+                'loyalty_rule_id'  => null,
+                'event_type'       => $points > 0 ? 'admin_manual_grant' : 'admin_manual_deduction',
+                'points'           => $points,
+                'balance_after'    => $newBalance,
+                'source_channel'   => 'admin',
+                'idempotency_key'  => 'manual_adj:' . $user->id . ':' . uniqid() . ':' . time(),
+                'reference_type'   => $admin ? get_class($admin) : null,
+                'reference_id'     => $admin ? $admin->id : null,
+                'metadata'         => [
+                    'reason'       => $reason,
+                    'admin_name'   => $admin?->name ?? 'Administrator',
+                    'admin_id'     => $admin?->id,
+                    'adjusted_at'  => now()->toISOString(),
+                ],
+            ]);
+
+            $user->loyalty_points_balance = $newBalance;
+            if ($points > 0) {
+                $user->loyalty_lifetime_points = $newLifetime;
+            }
+            $user->save();
+
+            if ($points > 0) {
+                $this->syncLoyaltyTier($user);
+            }
+
+            return $txn;
+        });
+    }
+
+    /**
+     * Fetch paginated points ledger with formatted human-readable details for complete transparency.
+     */
+    public function getPaginatedLedger(User $user, int $perPage = 15)
+    {
+        return LoyaltyPointTransaction::where('user_id', $user->id)
+            ->latest()
+            ->paginate($perPage)
+            ->through(function ($txn) {
+                return [
+                    'id'             => $txn->id,
+                    'event_type'     => $txn->event_type,
+                    'title'          => $this->resolveTransactionTitle($txn),
+                    'points'         => (int) $txn->points,
+                    'balance_after'  => (int) $txn->balance_after,
+                    'channel'        => $txn->source_channel ?? 'system',
+                    'reference_type' => $txn->reference_type ? class_basename($txn->reference_type) : null,
+                    'reference_id'   => $txn->reference_id,
+                    'metadata'       => $txn->metadata,
+                    'date'           => $txn->created_at ? $txn->created_at->setTimezone('Africa/Cairo')->format('Y-m-d H:i') : '-',
+                    'diff_for_humans'=> $txn->created_at ? $txn->created_at->diffForHumans() : '-',
+                ];
+            });
+    }
+
+    /**
+     * Resolve a clear human-readable title for ledger entries.
+     */
+    public function resolveTransactionTitle(LoyaltyPointTransaction $txn): string
+    {
+        $meta = $txn->metadata ?? [];
+
+        switch ($txn->event_type) {
+            case 'invoice_payment':
+                $invId = $txn->reference_id ?? $meta['invoice_id'] ?? '';
+                return $invId ? "Invoice Payment #{$invId}" : 'Invoice Payment Settlement';
+            case 'ticket_portal_created':
+                return 'Support Ticket Created via Client Portal';
+            case 'ticket_resolved_positive':
+                return 'Support Ticket Resolved with High Satisfaction';
+            case 'user_welcome':
+                return 'Welcome to Musoftwares Loyalty Community';
+            case 'profile_completed':
+                return 'Corporate Profile 100% Finalized';
+            case 'winback_bonus':
+                return 'Re-engagement & Welcome Back Courtesy Bonus';
+            case 'referral_registered':
+                return 'Referred Colleague Registered Account';
+            case 'referral_first_payment':
+                return 'Referred Colleague Paid First Invoice';
+            case 'reward_redemption':
+                return 'Points Redeemed for Service Benefit';
+            case 'admin_manual_grant':
+                $reason = $meta['reason'] ?? 'Courtesy Grace Points';
+                return "Admin Courtesy Bonus: {$reason}";
+            case 'admin_manual_deduction':
+                $reason = $meta['reason'] ?? 'Administrative Adjustment';
+                return "Admin Correction: {$reason}";
+            default:
+                return ucwords(str_replace('_', ' ', $txn->event_type));
+        }
+    }
+
+    /**
+     * List all loyalty tiers ordered by progression.
+     */
+    public function getAllTiers(): Collection
+    {
+        return LoyaltyTier::orderBy('min_lifetime_points', 'asc')->get();
     }
 
     /**

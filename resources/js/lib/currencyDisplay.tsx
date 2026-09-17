@@ -34,13 +34,16 @@ export function IsoCurrencyAmount({
 }: IsoCurrencyAmountProps) {
     const meta = getCurrencyMeta(currency?.currency);
     const numericAmount = Number(amount);
+    const validNumber = Number.isFinite(numericAmount) ? numericAmount : 0;
+    const rounded = Math.round(validNumber * 100) / 100;
+    const isWhole = rounded % 1 === 0;
     const formattedAmount = new Intl.NumberFormat(
         typeof document !== 'undefined' ? document.documentElement.lang || 'en' : 'en',
         {
-            minimumFractionDigits: 2,
+            minimumFractionDigits: isWhole ? 0 : 2,
             maximumFractionDigits: 2,
         },
-    ).format(Number.isFinite(numericAmount) ? numericAmount : 0);
+    ).format(rounded);
     const styles = SIZE_STYLES[size];
 
     return (

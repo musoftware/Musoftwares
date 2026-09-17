@@ -120,6 +120,22 @@ class ReferralService extends BaseService
         $user->ref_user_id = $referrer->id;
         $user->save();
 
+        // Award loyalty points to the referrer for successful client registration
+        try {
+            app(\App\Services\LoyaltyService::class)->awardPointsForEvent(
+                user: $referrer,
+                eventType: 'referral_registered',
+                reference: $user,
+                context: [
+                    'referred_user_id'   => $user->id,
+                    'referred_user_name' => $user->name,
+                    'channel'            => 'referral',
+                ]
+            );
+        } catch (\Throwable $e) {
+            // Gracefully ignore if loyalty rule isn't active
+        }
+
         event(new Registered($user));
 
         return $user;

@@ -269,6 +269,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
     ->middleware(['auth', 'verified'])->name('dashboard.directory');
 
+Route::get('/loyalty', [\App\Http\Controllers\Client\LoyaltyController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('loyalty.index');
+
 // ── Client Projects Portal ────────────────────────────────────────
 // Platform users (clients) view the admin-managed projects assigned to them, including a
 // per-day visual workflow board. Ownership is enforced per-route via ProjectPolicy.

@@ -156,7 +156,7 @@ export default function Create({ user, wallet }) {
                                 <div>
                                     <CardTitle className="text-sm font-medium">{__('general.your_platform_balance')}</CardTitle>
                                     <div className="text-lg font-bold text-foreground">
-                                        {Number(wallet.balance).toFixed(2)} <span className="text-xs font-normal text-muted-foreground">{wallet.currency}</span>
+                                        {Number(wallet.balance) % 1 === 0 ? Number(wallet.balance).toFixed(0) : Number(wallet.balance).toFixed(2)} <span className="text-xs font-normal text-muted-foreground">{wallet.currency}</span>
                                     </div>
                                 </div>
                             </div>
