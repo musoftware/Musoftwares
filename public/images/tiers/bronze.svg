@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="brz-base" x1="20" y1="10" x2="100" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E28448"/>
+      <stop offset="50%" stop-color="#B25324"/>
+      <stop offset="100%" stop-color="#6E2B0D"/>
+    </linearGradient>
+    <linearGradient id="brz-bevel" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFA875"/>
+      <stop offset="100%" stop-color="#4A1C06"/>
+    </linearGradient>
+    <linearGradient id="brz-star" x1="40" y1="35" x2="80" y2="75" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFF2E8"/>
+      <stop offset="40%" stop-color="#F2985D"/>
+      <stop offset="100%" stop-color="#7D320B"/>
+    </linearGradient>
+    <filter id="brz-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#E28448" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <!-- Outer Glow Frame -->
+  <polygon points="60,8 106,34 106,86 60,112 14,86 14,34" fill="url(#brz-bevel)" filter="url(#brz-glow)"/>
+  <!-- Main Hexagon Plate -->
+  <polygon points="60,14 100,37 100,83 60,106 20,83 20,37" fill="url(#brz-base)"/>
+  <!-- Inner Rim Highlight -->
+  <polygon points="60,20 94,40 94,80 60,100 26,80 26,40" fill="none" stroke="#FFA875" stroke-width="2" stroke-opacity="0.6"/>
+  <!-- Bottom Chevron Bands -->
+  <path d="M26,72 L60,92 L94,72 L94,80 L60,100 L26,80 Z" fill="#FFA875" fill-opacity="0.9"/>
+  <path d="M34,83 L60,98 L86,83 L86,89 L60,104 L34,89 Z" fill="#6E2B0D"/>
+  <!-- Central Star -->
+  <polygon points="60,34 66,50 82,50 69,60 74,76 60,66 46,76 51,60 38,50 54,50" fill="url(#brz-star)"/>
+</svg>

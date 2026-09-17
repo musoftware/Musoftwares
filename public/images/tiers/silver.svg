@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="slv-base" x1="20" y1="10" x2="100" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E2E8F0"/>
+      <stop offset="50%" stop-color="#94A3B8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="slv-bevel" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#CBD5E1"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="slv-wing" x1="0" y1="30" x2="120" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#64748B"/>
+    </linearGradient>
+    <filter id="slv-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#94A3B8" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Wings behind -->
+  <path d="M16,42 L4,36 L10,60 L24,68 Z" fill="url(#slv-wing)"/>
+  <path d="M104,42 L116,36 L110,60 L96,68 Z" fill="url(#slv-wing)"/>
+  <!-- Outer Glow Frame -->
+  <polygon points="60,10 102,34 102,86 60,110 18,86 18,34" fill="url(#slv-bevel)" filter="url(#slv-glow)"/>
+  <!-- Main Plate -->
+  <polygon points="60,16 96,37 96,83 60,104 24,83 24,37" fill="url(#slv-base)"/>
+  <!-- Inner Rim Highlight -->
+  <polygon points="60,22 90,40 90,80 60,98 30,80 30,40" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.7"/>
+  <!-- Bottom Chevrons -->
+  <path d="M30,72 L60,90 L90,72 L90,79 L60,97 L30,79 Z" fill="#FFFFFF" fill-opacity="0.9"/>
+  <!-- Two Silver Stars -->
+  <polygon points="45,46 49,56 60,56 51,63 54,73 45,67 36,73 39,63 30,56 41,56" fill="#FFFFFF"/>
+  <polygon points="75,46 79,56 90,56 81,63 84,73 75,67 66,73 69,63 60,56 71,56" fill="#FFFFFF"/>
+</svg>
