@@ -199,11 +199,11 @@ export default function LoyaltyIndex({
                             }
                             icon={
                                 <img
-                                    src={`/images/tiers/${(summary?.current_tier?.slug || summary?.tier || 'bronze').toLowerCase()}.svg`}
+                                    src={`/images/tiers/${(summary?.current_tier?.slug || summary?.tier || 'bronze').toLowerCase()}.png`}
                                     alt={currentTierName}
                                     className="w-9 h-9 object-contain drop-shadow-md"
                                     onError={(e) => {
-                                        e.currentTarget.src = `/images/tiers/${(summary?.current_tier?.slug || summary?.tier || 'bronze').toLowerCase()}.png`;
+                                        e.currentTarget.src = `/images/tiers/${(summary?.current_tier?.slug || summary?.tier || 'bronze').toLowerCase()}.svg`;
                                     }}
                                 />
                             }
@@ -257,14 +257,14 @@ export default function LoyaltyIndex({
                             )}
 
                             {/* Tiers Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {tiers.map((tierItem) => {
                                     const isCurrent = summary?.current_tier?.id === tierItem.id;
                                     const isUnlocked = (summary?.lifetime_points || 0) >= tierItem.min_lifetime_points;
                                     const perks = tierItem.perks_payload?.perks || [];
                                     const tierSlug = (tierItem.slug || tierItem.name).toLowerCase();
-                                    const badgeSrc = `/images/tiers/${tierSlug}.svg`;
-                                    const badgePngFallback = `/images/tiers/${tierSlug}.png`;
+                                    const badgeSrc = `/images/tiers/${tierSlug}.png`;
+                                    const badgeSvgFallback = `/images/tiers/${tierSlug}.svg`;
 
                                     return (
                                         <div
@@ -293,7 +293,7 @@ export default function LoyaltyIndex({
                                                         alt={tierItem.name}
                                                         className="w-20 h-20 object-contain drop-shadow-md transition-transform hover:scale-105"
                                                         onError={(e) => {
-                                                            e.currentTarget.src = badgePngFallback;
+                                                            e.currentTarget.src = badgeSvgFallback;
                                                         }}
                                                     />
                                                     <h4 className="font-bold text-base text-[#1d1d1f] dark:text-white mt-2 font-sans">

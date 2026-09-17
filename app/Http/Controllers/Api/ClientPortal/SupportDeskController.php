@@ -41,10 +41,24 @@ class SupportDeskController extends Controller
             'ticket_subject' => ['required', 'string', 'max:255'],
             'ticket_message' => ['required', 'string', 'min:10'],
             'urgency'        => ['nullable', 'in:low,normal,high,critical'],
+            'project_id'     => ['nullable', 'integer', 'exists:projects,id'],
         ]);
 
         $user = $request->user();
         $urgency = $validated['urgency'] ?? 'normal';
+
+        $projectId = null;
+        if (! empty($validated['project_id'])) {
+            $belongsToUser = \App\Models\Project::where('id', $validated['project_id'])
+                ->where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->orWhere('client_id', $user->id);
+                })
+                ->exists();
+            if ($belongsToUser) {
+                $projectId = (int) $validated['project_id'];
+            }
+        }
 
         // Ensure user tier is synced with lifetime spend
         $this->tierPriorityService->syncUserTier($user);
@@ -59,6 +73,7 @@ class SupportDeskController extends Controller
 
         $ticket = Ticket::create([
             'user_id'          => $user->id,
+            'project_id'       => $projectId,
             'ticket_subject'   => $validated['ticket_subject'],
             'ticket_message'   => $validated['ticket_message'],
             'ticket_status'    => 'open',
@@ -66,6 +81,9 @@ class SupportDeskController extends Controller
             'priority_score'   => $score,
             'is_self_service'  => true,
         ]);
+
+        // Dispatch FCM push to admins immediately
+        \App\Services\TicketNotificationService::notifyAdminOnTicketCreated($ticket);
 
         // Award 15 points automatically for self-service ticket creation
         $pointTxn = $this->loyaltyService->awardPoints(

@@ -81,10 +81,21 @@
                 </tr>
             </table>
 
+            <div style="text-align:center; margin:16px 0 24px;">
+                <img src="{{ rtrim(config('app.url'), '/') }}/images/tiers/{{ $nextTierSlug }}.png" width="92" height="92" style="display:inline-block; border:none; outline:none;" alt="{{ $nextTierName }}" />
+            </div>
+
             <div class="benefits" style="margin-top:24px;">
-                <h3>Unlock with {{ $nextTierName }}:</h3>
-                <div class="benefit-item">{{ $nextTierDiscount }}% discount on all future invoices</div>
-                <div class="benefit-item">{{ ucfirst($nextTierPriority) }} priority on support tickets</div>
+                <h3 style="margin:0 0 10px; font-size:14px; font-weight:700; color:#0f172a;">Exclusive Perks Unlocked with {{ $nextTierName }}:</h3>
+                <div class="benefit-item" style="font-weight:600; color:#0f172a;">⭐ {{ $nextTierDiscount }}% automatic discount on all invoices</div>
+                <div class="benefit-item" style="font-weight:600; color:#0f172a;">⚡ {{ ucfirst($nextTierPriority) }} priority routing on support tickets</div>
+                @if(!empty($perks))
+                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #cbd5e1;">
+                        @foreach($perks as $perk)
+                            <div class="benefit-item">✓ {{ $perk }}</div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
             <p style="color:#475569; font-size:14px; line-height:1.6;">

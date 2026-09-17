@@ -35,9 +35,25 @@ class SupportTicketController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('Client/Support/Tickets/Create');
+        $user = $request->user();
+        $projectId = $request->query('project_id');
+
+        $projects = collect();
+        if ($user) {
+            $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
+            $query = \App\Models\Project::query()->where('archived', 0);
+            if (! $isAdmin) {
+                $query->where('user_id', $user->id);
+            }
+            $projects = $query->orderBy('project_name')->get(['id', 'project_name']);
+        }
+
+        return Inertia::render('Client/Support/Tickets/Create', [
+            'projects' => $projects,
+            'initialProjectId' => $projectId ? (int) $projectId : null,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -46,6 +62,7 @@ class SupportTicketController extends Controller
             'subject' => 'required|string|max:255',
             'priority' => 'required|in:Low,Medium,High',
             'description' => 'required|string',
+            'project_id' => 'nullable|integer|exists:projects,id',
         ]);
 
         $user = $request->user();
@@ -62,7 +79,7 @@ class SupportTicketController extends Controller
 
     public function show(Request $request, int|string $id): Response
     {
-        $ticket = Ticket::with(['user', 'conversation.messages.sender'])->findOrFail($id);
+        $ticket = Ticket::with(['user', 'currency', 'project', 'conversation.messages.sender'])->findOrFail($id);
         $user = $request->user();
         $isAdmin = $this->authorizeAccess($ticket, $user);
 

@@ -158,7 +158,15 @@ class LoyaltyService extends BaseService
      */
     public function syncLoyaltyTier(User $user): void
     {
+        $balance = (int) ($user->loyalty_points_balance ?? 0);
         $lifetimePoints = (int) ($user->loyalty_lifetime_points ?? 0);
+
+        if ($lifetimePoints < $balance) {
+            $lifetimePoints = $balance;
+            $user->loyalty_lifetime_points = $balance;
+            $user->saveQuietly();
+        }
+
         $correctTier = LoyaltyTier::resolveForPoints($lifetimePoints);
 
         if ($correctTier === null) {
@@ -267,7 +275,16 @@ class LoyaltyService extends BaseService
      */
     public function getUserSummary(User $user): array
     {
+        $balance = (int) ($user->loyalty_points_balance ?? 0);
         $lifetimePoints = (int) ($user->loyalty_lifetime_points ?? 0);
+
+        // Self-healing / synchronization: Lifetime points can never be lower than the unspent points balance
+        if ($lifetimePoints < $balance) {
+            $lifetimePoints = $balance;
+            $user->loyalty_lifetime_points = $balance;
+            $user->saveQuietly();
+        }
+
         $currentTier = $user->loyaltyTier;
 
         if (! $currentTier) {

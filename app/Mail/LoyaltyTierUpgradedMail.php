@@ -43,6 +43,8 @@ class LoyaltyTierUpgradedMail extends Mailable
                 'newTierPriority'     => $this->newTier->ticket_priority_level,
                 'previousTierName'    => $this->previousTier?->name ?? 'Bronze',
                 'loyaltyBalance'      => (int) ($this->user->loyalty_points_balance ?? 0),
+                'newTierSlug'         => strtolower($this->newTier->slug ?? $this->newTier->name),
+                'perks'               => $this->newTier->perks_payload['perks'] ?? [],
             ],
         );
     }

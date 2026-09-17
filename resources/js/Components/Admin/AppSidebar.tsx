@@ -15,7 +15,7 @@ import {
   SidebarFooter
 } from '@/Components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/Components/ui/collapsible';
-import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
@@ -24,7 +24,7 @@ type MenuItem = {
   title: string;
   url: string;
   icon: any;
-  subItems?: { title: string; url: string; fullReload?: boolean }[];
+  subItems?: { title: string; url: string; fullReload?: boolean; badgeCountKey?: string }[];
 };
 
 const items: MenuItem[] = [
@@ -45,6 +45,7 @@ const items: MenuItem[] = [
     url: "/admin/tasks",
     icon: ListTodo,
         subItems: [
+            { title: "Pending Tasks", url: "/admin/tasks/pending", badgeCountKey: "pending_tasks" },
             { title: "Tasks List", url: "/admin/tasks/as_list" },
             { title: "Board Explorer", url: "/admin/tasks/board-explorer" },
             { title: "Task Calendar", url: "/admin/tasks/calendar" },
@@ -143,6 +144,11 @@ const items: MenuItem[] = [
     icon: Link2,
   },
   { 
+    title: "Email Templates", 
+    url: "/admin/email-templates", 
+    icon: LayoutTemplate,
+  },
+  { 
     title: "Outgoing Emails", 
     url: "/admin/outgoing-emails", 
     icon: Mail,
@@ -166,7 +172,7 @@ const items: MenuItem[] = [
 
 export function AppSidebar() {
   const { url, props } = usePage();
-  const { auth } = props as any;
+  const { auth, admin_counts } = props as any;
   const userRoles = auth?.user?.roles || [];
   
   const isAdmin = userRoles.includes('admin') || userRoles.includes('super_admin');
@@ -241,6 +247,7 @@ export function AppSidebar() {
                                     <SidebarMenuSub>
                                         {item.subItems?.map((subItem) => {
                                             const isSubActive = url === subItem.url || url.startsWith(subItem.url + '/');
+                                            const count = subItem.badgeCountKey ? admin_counts?.[subItem.badgeCountKey] : null;
                                             return (
                                                 <SidebarMenuSubItem key={subItem.title}>
                                                     <SidebarMenuSubButton
@@ -251,7 +258,14 @@ export function AppSidebar() {
                                                                 : <Link href={subItem.url} />
                                                         }
                                                     >
-                                                        {subItem.title}
+                                                        <span className="flex items-center justify-between w-full">
+                                                            <span>{subItem.title}</span>
+                                                            {typeof count === 'number' && count > 0 && (
+                                                                <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-900 text-white dark:bg-white dark:text-slate-900 leading-none">
+                                                                    {count}
+                                                                </span>
+                                                            )}
+                                                        </span>
                                                     </SidebarMenuSubButton>
                                                 </SidebarMenuSubItem>
                                             );

@@ -23,8 +23,22 @@ class TicketResource extends JsonResource
             'display_name' => $this->getDisplayName(),
             'display_email' => $this->getDisplayEmail(),
             'is_urgent' => $this->is_urgent(),
-            'needs_attention' => $this->needsAttention(),
             'assigned_employee_id' => $this->assigned_employee_id,
+            'price' => $this->price !== null ? (float) $this->price : null,
+            'currency_id' => $this->currency_id,
+            'currency_symbol' => $this->currency?->symbol ?? 'EGP',
+            'pricing_status' => $this->pricing_status ?? 'pending',
+            'pricing_notes' => $this->pricing_notes,
+            'quoted_at' => $this->quoted_at instanceof \DateTimeInterface
+                ? $this->quoted_at->toIso8601String()
+                : ($this->quoted_at ? \Illuminate\Support\Carbon::parse($this->quoted_at)->toIso8601String() : null),
+            'project_id' => $this->project_id,
+            'project' => $this->whenLoaded('project', function () {
+                return [
+                    'id' => $this->project->id,
+                    'name' => $this->project->project_name ?? $this->project->name,
+                ];
+            }),
 
             'user' => $this->whenLoaded('user', function () {
                 return [

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { Crown, Sparkles, Shield, ArrowUpRight, Award, Zap, History } from 'lucide-react';
+import { Crown, Sparkles, Shield, ArrowUpRight, Award, Zap, History, Gem } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
 
 interface LoyaltyTierHeaderProps {
@@ -32,7 +32,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 title: 'Obsidian Imperial VIP',
                 subtitle: 'Direct CTO Line • Dedicated Engineering Squad • Custom Architecture • 25% Invoice Deduction',
                 icon: Crown,
-                badge: '/images/tiers/obsidian.svg',
+                badge: '/images/tiers/obsidian.png',
                 badgeStyle: 'bg-gradient-to-r from-[#18181B] via-[#3B0764] to-[#18181B] text-[#FEF08A] font-bold shadow-xs border border-[#F59E0B]/50',
                 accentColor: 'text-purple-400',
             };
@@ -42,9 +42,19 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 title: 'Diamond Elite Partner',
                 subtitle: '15-Min Guaranteed Engineering SLA • Comprehensive Code Audits • 20% Invoice Deduction',
                 icon: Crown,
-                badge: '/images/tiers/diamond.svg',
+                badge: '/images/tiers/diamond.png',
                 badgeStyle: 'bg-gradient-to-r from-cyan-600 via-teal-500 to-sky-600 text-white font-bold shadow-xs border border-cyan-300/60',
                 accentColor: 'text-cyan-400',
+            };
+        }
+        if (cleanTier === 'ruby') {
+            return {
+                title: 'Ruby Prestige Enterprise',
+                subtitle: 'Dedicated Senior Architect • 2-Hour SLA • Complimentary Security Scans • 18% Invoice Deduction',
+                icon: Gem,
+                badge: '/images/tiers/ruby.png',
+                badgeStyle: 'bg-gradient-to-r from-rose-600 via-red-600 to-pink-600 text-white font-bold shadow-xs border border-rose-300/60',
+                accentColor: 'text-rose-400',
             };
         }
         if (cleanTier === 'platinum' || cleanTier === 'enterprise') {
@@ -52,9 +62,19 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 title: 'Platinum VIP Tier',
                 subtitle: 'Executive Dedicated Engineering • Zero-Queue VIP SLA • 15% Invoice Deduction Privilege',
                 icon: Crown,
-                badge: '/images/tiers/platinum.svg',
+                badge: '/images/tiers/platinum.png',
                 badgeStyle: 'bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 text-white font-semibold shadow-xs border border-sky-300/40',
                 accentColor: 'text-sky-400',
+            };
+        }
+        if (cleanTier === 'emerald') {
+            return {
+                title: 'Emerald Growth Partner',
+                subtitle: 'Priority Dispatch Routing • Architecture Sync Calls • Extended Warranty • 12% Invoice Deduction',
+                icon: Gem,
+                badge: '/images/tiers/emerald.png',
+                badgeStyle: 'bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white font-bold shadow-xs border border-emerald-300/60',
+                accentColor: 'text-emerald-400',
             };
         }
         if (cleanTier === 'gold') {
@@ -62,7 +82,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 title: 'Gold Tier Partner',
                 subtitle: 'Priority Queue Routing • 10% Invoice Deduction Privilege • Dedicated Technical Lead',
                 icon: Crown,
-                badge: '/images/tiers/gold.svg',
+                badge: '/images/tiers/gold.png',
                 badgeStyle: 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-slate-950 font-bold shadow-xs border border-amber-300/60',
                 accentColor: 'text-amber-400',
             };
@@ -72,7 +92,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 title: 'Silver Tier Client',
                 subtitle: 'Accelerated Ticket Dispatch • 5% Invoice Deduction Privilege • Regular Milestone Audits',
                 icon: Sparkles,
-                badge: '/images/tiers/silver.svg',
+                badge: '/images/tiers/silver.png',
                 badgeStyle: 'bg-gradient-to-r from-slate-200 via-zinc-200 to-slate-300 text-slate-900 dark:from-slate-800 dark:via-zinc-700 dark:to-slate-800 dark:text-slate-100 font-semibold shadow-xs border border-slate-300 dark:border-slate-600/40',
                 accentColor: 'text-slate-400',
             };
@@ -81,7 +101,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
             title: 'Bronze Tier Client',
             subtitle: 'Automated Self-Service Studio • Earn Points with Every Milestone and Early Settlement',
             icon: Shield,
-            badge: '/images/tiers/bronze.svg',
+            badge: '/images/tiers/bronze.png',
             badgeStyle: 'bg-gradient-to-r from-[#7D320B] via-[#B25324] to-[#D9733E] text-white font-semibold shadow-xs border border-[#FFA875]/50',
             accentColor: 'text-[#B25324] dark:text-[#FFA875]',
         };

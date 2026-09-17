@@ -22,10 +22,12 @@ use App\Models\TodoChecklistItem;
 use App\Models\User;
 use App\Services\Admin\TodoListQueryService;
 use App\Services\WhatsAppNotificationService;
+use App\Models\TaskAuditLog;
 use Carbon\Carbon;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -1394,5 +1396,428 @@ class AdminTaskController extends Controller
                 'total' => $paginator->total(),
             ],
         ]));
+    }
+
+    /**
+     * Display a unified view of all pending tasks with segmented tabs,
+     * client loyalty tiers, billing status, SLA timers, and ignore audit logs.
+     */
+    public function pending(Request $request): InertiaResponse
+    {
+        $search = trim((string) $request->input('search', ''));
+        $tab = (string) $request->input('tab', 'all');
+        $billingType = (string) $request->input('billing_type', 'all');
+        $priority = (string) $request->input('priority', 'all');
+        $perPage = max(10, min(100, (int) $request->input('per_page', 20)));
+
+        // Global stats for the tabs
+        $stats = [
+            'all' => Task::whereNull('deleted_at')
+                ->where(function ($q) {
+                    $q->where('billing_status', '!=', 'ignored')->orWhereNull('billing_status');
+                })
+                ->where('archived', 0)
+                ->count(),
+            'waiting_client' => Task::whereNull('deleted_at')
+                ->where(function ($q) {
+                    $q->where('billing_status', '!=', 'ignored')->orWhereNull('billing_status');
+                })
+                ->where('pending_reason', 'waiting_client')
+                ->count(),
+            'waiting_execution' => Task::whereNull('deleted_at')
+                ->where(function ($q) {
+                    $q->where('billing_status', '!=', 'ignored')->orWhereNull('billing_status');
+                })
+                ->where(function ($q) {
+                    $q->where('pending_reason', 'waiting_execution')
+                      ->orWhere(function ($sub) {
+                          $sub->whereNull('pending_reason')
+                              ->where(function ($s) {
+                                  $s->where('billing_status', 'open')->orWhereNull('billing_status');
+                              });
+                      });
+                })
+                ->count(),
+            'waiting_review' => Task::whereNull('deleted_at')
+                ->where(function ($q) {
+                    $q->where('billing_status', '!=', 'ignored')->orWhereNull('billing_status');
+                })
+                ->where('pending_reason', 'waiting_review')
+                ->count(),
+            'ready_to_invoice' => Task::whereNull('deleted_at')
+                ->where('billing_status', 'ready_to_invoice')
+                ->count(),
+            'ignored' => Task::whereNull('deleted_at')
+                ->where(function ($q) {
+                    $q->where('billing_status', 'ignored')->orWhereNotNull('ignored_at');
+                })
+                ->count(),
+        ];
+
+        $query = Task::query()
+            ->whereNull('deleted_at')
+            ->with([
+                'project.client',
+                'user',
+                'ignoredByUser',
+                'auditLogs.user',
+            ]);
+
+        // Tab filtering
+        if ($tab === 'ignored') {
+            $query->where(function ($q) {
+                $q->where('billing_status', 'ignored')->orWhereNotNull('ignored_at');
+            });
+        } else {
+            $query->where(function ($q) {
+                $q->where('billing_status', '!=', 'ignored')->orWhereNull('billing_status');
+            })->whereNull('ignored_at');
+
+            if ($tab === 'waiting_client') {
+                $query->where('pending_reason', 'waiting_client');
+            } elseif ($tab === 'waiting_execution') {
+                $query->where(function ($q) {
+                    $q->where('pending_reason', 'waiting_execution')
+                      ->orWhere(function ($sub) {
+                          $sub->whereNull('pending_reason')
+                              ->where(function ($s) {
+                                  $s->where('billing_status', 'open')->orWhereNull('billing_status');
+                              });
+                      });
+                });
+            } elseif ($tab === 'waiting_review') {
+                $query->where('pending_reason', 'waiting_review');
+            } elseif ($tab === 'ready_to_invoice') {
+                $query->where('billing_status', 'ready_to_invoice');
+            }
+        }
+
+        // Billing type filter
+        if (in_array($billingType, ['billable', 'non_billable'], true)) {
+            $query->where('billing_type', $billingType);
+        }
+
+        // Priority filter
+        if (in_array($priority, ['urgent', 'high', 'medium', 'low'], true)) {
+            $query->where('priority', $priority);
+        }
+
+        // Search filter
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('task_name', 'like', "%{$search}%")
+                  ->orWhere('task_description', 'like', "%{$search}%")
+                  ->orWhereHas('project', function ($pq) use ($search) {
+                      $pq->where('project_name', 'like', "%{$search}%")
+                         ->orWhereHas('client', function ($cq) use ($search) {
+                             $cq->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                         });
+                  })
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Ordering
+        if ($tab === 'ignored') {
+            $query->orderByDesc('ignored_at');
+        } else {
+            $query->orderByRaw('CASE WHEN sla_due_at IS NOT NULL THEN 0 ELSE 1 END, sla_due_at ASC')
+                  ->orderByDesc('created_at');
+        }
+
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        $loyaltyService = app(\App\Services\LoyaltyService::class);
+
+        $items = collect($paginator->items())->map(function (Task $task) use ($loyaltyService) {
+            $client = $task->project?->client ?? $task->user;
+            $clientSummary = null;
+
+            if ($client) {
+                try {
+                    $summary = $loyaltyService->getUserSummary($client);
+                    $clientSummary = [
+                        'id' => $client->id,
+                        'name' => $client->name,
+                        'email' => $client->email,
+                        'tier_name' => $summary['current_tier']['name'] ?? 'Bronze',
+                        'tier_slug' => $summary['current_tier']['slug'] ?? 'bronze',
+                        'tier_badge' => $summary['current_tier']['badge_url'] ?? '/images/tiers/bronze.png',
+                        'points_balance' => $summary['points_balance'] ?? 0,
+                        'points_discount_value' => $summary['points_discount_value'] ?? 0,
+                    ];
+                } catch (\Throwable $e) {
+                    $clientSummary = [
+                        'id' => $client->id,
+                        'name' => $client->name,
+                        'email' => $client->email,
+                        'tier_name' => 'Bronze',
+                        'tier_slug' => 'bronze',
+                        'tier_badge' => '/images/tiers/bronze.png',
+                        'points_balance' => 0,
+                        'points_discount_value' => 0,
+                    ];
+                }
+            }
+
+            return [
+                'id' => $task->id,
+                'task_name' => $task->task_name,
+                'task_description' => $task->task_description,
+                'priority' => $task->priority ?? 'medium',
+                'billing_type' => $task->billing_type ?? 'billable',
+                'billing_status' => $task->billing_status ?? 'open',
+                'pending_reason' => $task->pending_reason ?? 'waiting_execution',
+                'ignore_reason' => $task->ignore_reason,
+                'ignore_notes' => $task->ignore_notes,
+                'ignored_at' => $task->ignored_at ? Carbon::parse($task->ignored_at)->timezone('Africa/Cairo')->format('Y-m-d H:i') : null,
+                'ignored_by_user' => $task->ignoredByUser ? ['id' => $task->ignoredByUser->id, 'name' => $task->ignoredByUser->name] : null,
+                'sla_hours' => $task->sla_hours,
+                'sla_due_at' => $task->sla_due_at ? Carbon::parse($task->sla_due_at)->timezone('Africa/Cairo')->format('Y-m-d H:i') : null,
+                'created_at' => Carbon::parse($task->created_at)->timezone('Africa/Cairo')->format('Y-m-d H:i'),
+                'due_date' => $task->due_date,
+                'project' => $task->project ? [
+                    'id' => $task->project->id,
+                    'name' => $task->project->project_name ?? $task->project->name ?? ('#' . $task->project->id),
+                ] : null,
+                'client' => $clientSummary,
+                'audit_logs' => $task->auditLogs->take(8)->map(fn ($log) => [
+                    'id' => $log->id,
+                    'action' => $log->action,
+                    'reason' => $log->reason,
+                    'notes' => $log->notes,
+                    'user_name' => $log->user?->name ?? 'System',
+                    'created_at' => Carbon::parse($log->created_at)->timezone('Africa/Cairo')->format('Y-m-d H:i'),
+                ]),
+            ];
+        });
+
+        return Inertia::render('Admin/Tasks/PendingTasks', $this->sanitizeUtf8([
+            'tasks' => $items,
+            'stats' => $stats,
+            'filters' => [
+                'search' => $search,
+                'tab' => $tab,
+                'billing_type' => $billingType,
+                'priority' => $priority,
+                'per_page' => $perPage,
+            ],
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+        ]));
+    }
+
+    /**
+     * Formal ignore action for a pending task.
+     * Records mandatory reason and notes into task_audit_logs with Cairo timezone.
+     */
+    public function ignoreTask(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'ignore_reason' => ['required', 'string', 'in:non_billable,duplicate,entry_error,free_promo,client_cancelled,other'],
+            'ignore_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $cairoNow = Carbon::now('Africa/Cairo');
+        $oldBillingStatus = $task->billing_status;
+
+        $task->update([
+            'billing_status' => 'ignored',
+            'ignore_reason' => $validated['ignore_reason'],
+            'ignore_notes' => $validated['ignore_notes'] ?? null,
+            'ignored_by' => Auth::id(),
+            'ignored_at' => $cairoNow,
+        ]);
+
+        TaskAuditLog::create([
+            'task_id' => $task->id,
+            'user_id' => Auth::id(),
+            'action' => 'ignored',
+            'reason' => $validated['ignore_reason'],
+            'notes' => $validated['ignore_notes'] ?? null,
+            'old_values' => ['billing_status' => $oldBillingStatus],
+            'new_values' => [
+                'billing_status' => 'ignored',
+                'ignore_reason' => $validated['ignore_reason'],
+                'ignored_at' => $cairoNow->toDateTimeString(),
+            ],
+            'created_at' => $cairoNow,
+        ]);
+
+        return back()->with('success', 'Task has been moved to the Ignored list.');
+    }
+
+    /**
+     * Restore an ignored task back to pending execution.
+     */
+    public function restoreTask(Request $request, Task $task)
+    {
+        $cairoNow = Carbon::now('Africa/Cairo');
+        $oldReason = $task->ignore_reason;
+
+        $task->update([
+            'billing_status' => 'open',
+            'pending_reason' => 'waiting_execution',
+            'ignore_reason' => null,
+            'ignore_notes' => null,
+            'ignored_by' => null,
+            'ignored_at' => null,
+        ]);
+
+        TaskAuditLog::create([
+            'task_id' => $task->id,
+            'user_id' => Auth::id(),
+            'action' => 'restored',
+            'reason' => 'Restored from ignored list',
+            'notes' => $request->input('notes', 'Admin restored task to execution pipeline'),
+            'old_values' => ['billing_status' => 'ignored', 'ignore_reason' => $oldReason],
+            'new_values' => ['billing_status' => 'open', 'pending_reason' => 'waiting_execution'],
+            'created_at' => $cairoNow,
+        ]);
+
+        return back()->with('success', 'Task restored to active pending queue.');
+    }
+
+    /**
+     * Update billing status, classification, or pending reason on a task.
+     */
+    public function updateBillingStatus(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'billing_type' => ['nullable', 'string', 'in:billable,non_billable'],
+            'billing_status' => ['nullable', 'string', 'in:open,in_progress,ready_to_invoice,invoiced,ignored'],
+            'pending_reason' => ['nullable', 'string', 'in:waiting_client,waiting_execution,waiting_review,ready_to_invoice,other'],
+            'sla_hours' => ['nullable', 'integer', 'min:1', 'max:720'],
+        ]);
+
+        $cairoNow = Carbon::now('Africa/Cairo');
+        $oldValues = [
+            'billing_type' => $task->billing_type,
+            'billing_status' => $task->billing_status,
+            'pending_reason' => $task->pending_reason,
+            'sla_hours' => $task->sla_hours,
+        ];
+
+        $updateData = [];
+        if (isset($validated['billing_type'])) {
+            $updateData['billing_type'] = $validated['billing_type'];
+        }
+        if (isset($validated['billing_status'])) {
+            $updateData['billing_status'] = $validated['billing_status'];
+        }
+        if (isset($validated['pending_reason'])) {
+            $updateData['pending_reason'] = $validated['pending_reason'];
+        }
+        if (isset($validated['sla_hours'])) {
+            $updateData['sla_hours'] = $validated['sla_hours'];
+            $updateData['sla_due_at'] = $cairoNow->copy()->addHours($validated['sla_hours']);
+        }
+
+        $task->update($updateData);
+
+        TaskAuditLog::create([
+            'task_id' => $task->id,
+            'user_id' => Auth::id(),
+            'action' => 'status_updated',
+            'reason' => 'Manual admin update',
+            'notes' => 'Updated status, billing type, or SLA',
+            'old_values' => $oldValues,
+            'new_values' => $updateData,
+            'created_at' => $cairoNow,
+        ]);
+
+        return back()->with('success', 'Task updated successfully.');
+    }
+
+    /**
+     * Bulk actions on pending tasks (ignore, restore, mark ready to invoice).
+     */
+    public function bulkPendingAction(Request $request)
+    {
+        $validated = $request->validate([
+            'task_ids' => ['required', 'array', 'min:1'],
+            'task_ids.*' => ['integer', 'exists:tasks,id'],
+            'action' => ['required', 'string', 'in:ignore,restore,mark_ready_to_invoice,mark_billable,mark_non_billable'],
+            'ignore_reason' => ['required_if:action,ignore', 'nullable', 'string'],
+            'ignore_notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $cairoNow = Carbon::now('Africa/Cairo');
+        $tasks = Task::whereIn('id', $validated['task_ids'])->get();
+
+        DB::transaction(function () use ($tasks, $validated, $cairoNow) {
+            foreach ($tasks as $task) {
+                $oldStatus = $task->billing_status;
+
+                if ($validated['action'] === 'ignore') {
+                    $task->update([
+                        'billing_status' => 'ignored',
+                        'ignore_reason' => $validated['ignore_reason'],
+                        'ignore_notes' => $validated['ignore_notes'] ?? null,
+                        'ignored_by' => Auth::id(),
+                        'ignored_at' => $cairoNow,
+                    ]);
+
+                    TaskAuditLog::create([
+                        'task_id' => $task->id,
+                        'user_id' => Auth::id(),
+                        'action' => 'ignored',
+                        'reason' => $validated['ignore_reason'],
+                        'notes' => $validated['ignore_notes'] ?? null,
+                        'old_values' => ['billing_status' => $oldStatus],
+                        'new_values' => ['billing_status' => 'ignored'],
+                        'created_at' => $cairoNow,
+                    ]);
+                } elseif ($validated['action'] === 'restore') {
+                    $task->update([
+                        'billing_status' => 'open',
+                        'pending_reason' => 'waiting_execution',
+                        'ignore_reason' => null,
+                        'ignore_notes' => null,
+                        'ignored_by' => null,
+                        'ignored_at' => null,
+                    ]);
+
+                    TaskAuditLog::create([
+                        'task_id' => $task->id,
+                        'user_id' => Auth::id(),
+                        'action' => 'restored',
+                        'reason' => 'Bulk restore',
+                        'old_values' => ['billing_status' => $oldStatus],
+                        'new_values' => ['billing_status' => 'open'],
+                        'created_at' => $cairoNow,
+                    ]);
+                } elseif ($validated['action'] === 'mark_ready_to_invoice') {
+                    $task->update([
+                        'billing_status' => 'ready_to_invoice',
+                        'pending_reason' => 'ready_to_invoice',
+                    ]);
+
+                    TaskAuditLog::create([
+                        'task_id' => $task->id,
+                        'user_id' => Auth::id(),
+                        'action' => 'status_updated',
+                        'reason' => 'Marked ready to invoice in bulk',
+                        'old_values' => ['billing_status' => $oldStatus],
+                        'new_values' => ['billing_status' => 'ready_to_invoice'],
+                        'created_at' => $cairoNow,
+                    ]);
+                } elseif ($validated['action'] === 'mark_billable') {
+                    $task->update(['billing_type' => 'billable']);
+                } elseif ($validated['action'] === 'mark_non_billable') {
+                    $task->update(['billing_type' => 'non_billable']);
+                }
+            }
+        });
+
+        return back()->with('success', 'Bulk task action completed successfully.');
     }
 }

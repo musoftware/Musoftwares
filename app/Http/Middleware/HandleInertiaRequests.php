@@ -142,6 +142,25 @@ class HandleInertiaRequests extends Middleware
 
                 return null;
             },
+            'admin_counts' => function () use ($user) {
+                if ($user && method_exists($user, 'isAdmin') && $user->isAdmin()) {
+                    try {
+                        return [
+                            'pending_tasks' => \App\Models\Task::whereNull('deleted_at')
+                                ->where(function ($q) {
+                                    $q->where('billing_status', '!=', 'ignored')->orWhereNull('billing_status');
+                                })
+                                ->whereNull('ignored_at')
+                                ->where('archived', 0)
+                                ->count(),
+                        ];
+                    } catch (\Throwable $e) {
+                        return ['pending_tasks' => 0];
+                    }
+                }
+
+                return null;
+            },
             'wallet' => function () use ($user) {
                 if ($user) {
                     return [

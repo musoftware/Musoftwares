@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     ArrowLeft, Sparkles, Send, Paperclip, X, Download, FileText,
-    BrainCircuit, CheckCircle2, HelpCircle, Check, CreditCard, MessageCircle, Bug
+    BrainCircuit, CheckCircle2, HelpCircle, Check, CreditCard, MessageCircle, Bug,
+    LifeBuoy, Bot
 } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -13,6 +14,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Button } from '@/Components/ui/button';
 import { Textarea } from '@/Components/ui/textarea';
+
 import {
     Dialog,
     DialogContent,
@@ -113,6 +115,7 @@ export default function ProjectShow({
 
     // AI Debug & Activation State
     const [debugModalOpen, setDebugModalOpen] = useState(false);
+
     const [activationLoading, setActivationLoading] = useState(false);
     const [topupModalOpen, setTopupModalOpen] = useState(false);
     const [requiredAmount, setRequiredAmount] = useState(0);
@@ -317,13 +320,23 @@ export default function ProjectShow({
                         {/* Chat Bar Header */}
                         <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">🤖</div>
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+                                    <Bot className="h-4 w-4" />
+                                </div>
                                 <div>
                                     <span className="text-xs font-black text-slate-900">AI Project Manager</span>
                                     <span className="text-[10px] text-slate-400 block font-medium">Direct interactive chat — answers, estimates & invoice inline</span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                <Link
+                                    href={route('tickets.create', { project_id: project.id })}
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-blue-500/10 px-3 py-1 text-xs font-bold text-[#0071e3] hover:bg-blue-500/20 border border-blue-300/40 transition shadow-2xs cursor-pointer"
+                                    title="Open Support Ticket for this Project (+15 Loyalty Points)"
+                                >
+                                    <LifeBuoy className="h-3.5 w-3.5 text-[#0071e3]" />
+                                    <span>تذكرة للمشروع (+15 PTS)</span>
+                                </Link>
                                 <button
                                     onClick={() => setDebugModalOpen(true)}
                                     className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-700 hover:bg-amber-500/20 border border-amber-300/40 transition shadow-2xs"
@@ -718,7 +731,7 @@ export default function ProjectShow({
                                     }}
                                     className="text-[11px] text-indigo-400 hover:underline font-bold"
                                 >
-                                    نسخ JSON 📋
+                                    نسخ JSON
                                 </button>
                             </div>
                             <pre className="rounded-xl bg-slate-900 p-4 text-[11px] font-mono text-emerald-400 overflow-x-auto max-h-[350px] border border-slate-800 dir-ltr">
@@ -738,6 +751,8 @@ export default function ProjectShow({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+
         </AuthenticatedLayout>
     );
 }

@@ -41,11 +41,13 @@ class AdminTicketController extends Controller
 
         $supportAgents = User::role(['admin', 'moderator'])->get(['id', 'name', 'email']);
         $cannedResponses = TicketCannedResponse::all();
+        $currencies = \App\Models\Currency::all(['id', 'currency', 'symbol']);
 
         return Inertia::render('Admin/Tickets/Show', [
             'ticket' => (new TicketResource($ticket))->resolve(),
             'supportAgents' => $supportAgents,
             'cannedResponses' => $cannedResponses,
+            'currencies' => $currencies,
         ]);
     }
 
@@ -142,5 +144,50 @@ class AdminTicketController extends Controller
         ]);
 
         return redirect()->back()->with('success', __('general.canned_response_added_successfully'));
+    }
+
+    /**
+     * Set / Quote price for a ticket and notify Client & Admin via FCM.
+     */
+    public function setPrice(Request $request, Ticket $ticket)
+    {
+        $validated = $request->validate([
+            'price' => ['required', 'numeric', 'min:0'],
+            'currency_id' => ['nullable', 'exists:currencies,id'],
+            'pricing_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $currencyId = $validated['currency_id'] ?? ($ticket->user?->currency_id ?? 1);
+        $cairoNow = \Carbon\Carbon::now('Africa/Cairo');
+
+        $ticket->update([
+            'price' => $validated['price'],
+            'currency_id' => $currencyId,
+            'pricing_status' => 'quoted',
+            'pricing_notes' => $validated['pricing_notes'] ?? null,
+            'quoted_at' => $cairoNow,
+            'quoted_by' => Auth::id(),
+        ]);
+
+        // Post a message in the conversation for complete transparency
+        $currencySymbol = \App\Models\Currency::find($currencyId)?->symbol ?? 'EGP';
+        $priceFormatted = number_format((float) $validated['price'], 2);
+        $messageBody = "تم تسعير هذا الطلب بمبلغ {$priceFormatted} {$currencySymbol}.";
+        if (! empty($validated['pricing_notes'])) {
+            $messageBody .= "\n\nملاحظات التسعير: " . $validated['pricing_notes'];
+        }
+
+        $this->supportDeskService->replyToTicket(
+            $ticket,
+            Auth::id(),
+            $messageBody,
+            null,
+            false
+        );
+
+        // Dispatch FCM Push Notification to Client & Admin
+        \App\Services\TicketNotificationService::notifyOnTicketPriced($ticket);
+
+        return redirect()->back()->with('success', 'تم اعتماد التسعير وإرسال الإشعار للعميل بنجاح.');
     }
 }

@@ -14,7 +14,34 @@ class Task extends Model
 
     protected $guarded = [];
 
-    protected $fillable = ['task_name', 'task_description', 'project_id', 'user_id', 'swimlane_id', 'assigned_to_admin', 'due_date', 'priority', 'archived', 'invoice_id'];
+    protected $fillable = [
+        'task_name',
+        'task_description',
+        'project_id',
+        'user_id',
+        'swimlane_id',
+        'assigned_to_admin',
+        'due_date',
+        'priority',
+        'archived',
+        'invoice_id',
+        'billing_type',
+        'billing_status',
+        'pending_reason',
+        'ignore_reason',
+        'ignore_notes',
+        'ignored_by',
+        'ignored_at',
+        'sla_hours',
+        'sla_due_at',
+    ];
+
+    protected $casts = [
+        'ignored_at' => 'datetime',
+        'sla_due_at' => 'datetime',
+        'sla_hours' => 'integer',
+        'archived' => 'integer',
+    ];
 
     protected static function booted(): void
     {
@@ -240,5 +267,15 @@ class Task extends Model
     public function comments()
     {
         return $this->morphMany(ProjectComment::class, 'commentable');
+    }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(TaskAuditLog::class)->orderBy('created_at', 'desc');
+    }
+
+    public function ignoredByUser()
+    {
+        return $this->belongsTo(User::class, 'ignored_by');
     }
 }

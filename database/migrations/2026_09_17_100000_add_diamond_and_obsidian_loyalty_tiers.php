@@ -116,6 +116,10 @@ return new class extends Migration
                 ]);
             }
         }
+
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'loyalty_lifetime_points') && Schema::hasColumn('users', 'loyalty_points_balance')) {
+            DB::statement('UPDATE users SET loyalty_lifetime_points = loyalty_points_balance WHERE loyalty_lifetime_points < loyalty_points_balance');
+        }
     }
 
     public function down(): void

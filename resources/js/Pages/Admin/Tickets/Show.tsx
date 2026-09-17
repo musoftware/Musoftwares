@@ -16,7 +16,8 @@ import {
 import {
     ArrowLeft, CheckCircle, RotateCcw, Send, Paperclip, X,
     AlertTriangle, Clock, MessageSquare, User, Calendar, Tag,
-    Star, ExternalLink, FileText, Image as ImageIcon, Zap, Lock
+    Star, ExternalLink, FileText, Image as ImageIcon, Zap, Lock,
+    DollarSign
 } from 'lucide-react';
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -44,9 +45,16 @@ interface Ticket {
     needs_attention: boolean;
     assigned_employee_id?: number | null;
     rate?: number | null;
+    price?: number | null;
+    currency_id?: number | null;
+    currency_symbol?: string;
+    pricing_status?: string;
+    pricing_notes?: string | null;
+    quoted_at?: string | null;
     closed_at?: string | null;
     created_at: string;
     updated_at: string;
+    project?: { id: number; name: string } | null;
     user?: { id: number; name: string; email: string } | null;
     conversation?: { id: number; messages: Message[] } | null;
 }
@@ -55,6 +63,7 @@ interface Props {
     ticket: Ticket;
     supportAgents: { id: number; name: string; email?: string; avatar?: string }[];
     cannedResponses: { id: number; title: string; body: string }[];
+    currencies?: { id: number; currency: string; symbol: string }[];
 }
 
 /* ─── Helpers ───────────────────────────────────────────────── */
@@ -134,7 +143,7 @@ function AttachmentLink({ path }: { path: string }) {
 }
 
 /* ─── Main ──────────────────────────────────────────────────── */
-export default function Show({ ticket, supportAgents, cannedResponses }: Props) {
+export default function Show({ ticket, supportAgents, cannedResponses, currencies = [] }: Props) {
     const { toast } = useToast();
     const [replyBody, setReplyBody] = useState('');
     const [attachments, setAttachments] = useState<File[]>([]);
@@ -145,6 +154,36 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
     const [closeModalOpen, setCloseModalOpen] = useState(false);
     const [closeComment, setCloseComment] = useState('');
     const [assigningId, setAssigningId] = useState<string | number>('');
+
+    // Pricing & Quotation state (FCM)
+    const [pricingModalOpen, setPricingModalOpen] = useState(false);
+    const [priceInput, setPriceInput] = useState(ticket.price ? String(ticket.price) : '');
+    const [currencyInput, setCurrencyInput] = useState(ticket.currency_id ? String(ticket.currency_id) : (currencies[0]?.id ? String(currencies[0].id) : '1'));
+    const [pricingNotesInput, setPricingNotesInput] = useState(ticket.pricing_notes || '');
+    const [submittingPrice, setSubmittingPrice] = useState(false);
+
+    const handlePricingSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!priceInput || Number(priceInput) < 0) {
+            toast({ title: 'يرجى إدخال مبلغ تسعير صحيح', variant: 'destructive' });
+            return;
+        }
+        setSubmittingPrice(true);
+        router.post(route('admin.tickets.pricing', ticket.id), {
+            price: Number(priceInput),
+            currency_id: currencyInput ? Number(currencyInput) : undefined,
+            pricing_notes: pricingNotesInput,
+        }, {
+            onSuccess: () => {
+                toast({ title: 'تم اعتماد التسعير وإرسال إشعار FCM للعميل بنجاح!' });
+                setPricingModalOpen(false);
+            },
+            onError: () => {
+                toast({ title: 'تعذر حفظ التسعير، يرجى المحاولة ثانية', variant: 'destructive' });
+            },
+            onFinish: () => setSubmittingPrice(false),
+        });
+    };
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -605,6 +644,66 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         </div>
                     </div>
 
+                    {/* Ticket Pricing & Quotation (FCM enabled) */}
+                    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                        <div className="border-b border-slate-100 px-5 py-3 flex items-center justify-between">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                                <DollarSign className="h-3.5 w-3.5 text-slate-900" />
+                                {__('general.pricing_and_quotation') || 'تسعير التذكرة / Quotation'}
+                            </h3>
+                            {ticket.pricing_status && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    {ticket.pricing_status === 'quoted' ? 'تم التسعير' : ticket.pricing_status}
+                                </span>
+                            )}
+                        </div>
+                        <div className="p-5 space-y-3">
+                            {ticket.price ? (
+                                <div className="space-y-2">
+                                    <div className="flex items-baseline justify-between">
+                                        <span className="text-xs text-slate-500">المبلغ المحدد:</span>
+                                        <span className="text-xl font-bold text-slate-900 font-mono">
+                                            {Number(ticket.price).toLocaleString()} {ticket.currency_symbol || '$'}
+                                        </span>
+                                    </div>
+                                    {ticket.quoted_at && (
+                                        <p className="text-[11px] text-slate-400">
+                                            تم التحديد: {relativeTime(ticket.quoted_at)}
+                                        </p>
+                                    )}
+                                    {ticket.pricing_notes && (
+                                        <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-600 border border-slate-100 mt-2">
+                                            <p className="font-semibold text-slate-700 mb-1">ملاحظات التسعير:</p>
+                                            <p className="whitespace-pre-wrap">{ticket.pricing_notes}</p>
+                                        </div>
+                                    )}
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setPricingModalOpen(true)}
+                                        className="w-full mt-2 text-xs border-slate-300 hover:bg-slate-50"
+                                    >
+                                        تعديل التسعير وإرسال إشعار جديد
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="text-center py-2 space-y-3">
+                                    <p className="text-xs text-slate-500">
+                                        لم يتم تحديد تسعير لهذه التذكرة بعد.
+                                    </p>
+                                    <Button
+                                        type="button"
+                                        onClick={() => setPricingModalOpen(true)}
+                                        className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center justify-center gap-1.5"
+                                    >
+                                        <DollarSign className="h-3.5 w-3.5" />
+                                        تحديد سعر التذكرة (إرسال FCM)
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Quick actions */}
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <div className="border-b border-slate-100 px-5 py-3">
@@ -659,6 +758,90 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                             className="bg-slate-900 hover:bg-slate-900 text-white"
                         >{__('general.close_ticket')}</Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Set Pricing & Send FCM Dialog */}
+            <Dialog open={pricingModalOpen} onOpenChange={setPricingModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <DollarSign className="h-5 w-5 text-slate-900" />
+                            تحديد تسعير التذكرة #{ticket.id}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handlePricingSubmit} className="space-y-4 py-3">
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                قيمة التسعير / السعر المطلوب *
+                            </label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                required
+                                placeholder="0.00"
+                                value={priceInput}
+                                onChange={(e) => setPriceInput(e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900"
+                            />
+                        </div>
+
+                        {currencies.length > 0 && (
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                    العملة
+                                </label>
+                                <select
+                                    value={currencyInput}
+                                    onChange={(e) => setCurrencyInput(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+                                >
+                                    {currencies.map((c) => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.code} ({c.symbol}) - {c.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                تفاصيل وملاحظات التسعير (ستظهر للعميل)
+                            </label>
+                            <textarea
+                                rows={3}
+                                placeholder="مثال: يشمل العمل على تعديل كود الـ API بالإضافة إلى اختبارات التكامل..."
+                                value={pricingNotesInput}
+                                onChange={(e) => setPricingNotesInput(e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
+                            />
+                        </div>
+
+                        <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600">
+                            <p className="font-semibold text-slate-900 mb-0.5">إشعار فوري للعميل:</p>
+                            <p>بمجرد الحفظ، سيتم إرسال إشعار فوري (Push Notification) مباشرةً لهاتف وجهاز العميل لإعلامه بالسعر المحدد ورابط التذكرة.</p>
+                        </div>
+
+                        <DialogFooter className="gap-2 sm:gap-0 pt-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setPricingModalOpen(false)}
+                                disabled={submittingPrice}
+                            >
+                                إلغاء
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={submittingPrice}
+                                className="bg-slate-900 hover:bg-slate-800 text-white"
+                            >
+                                {submittingPrice ? 'جاري الحفظ والإرسال...' : 'اعتماد السعر وإرسال الإشعار'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
                 </DialogContent>
             </Dialog>
 

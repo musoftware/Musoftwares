@@ -58,6 +58,9 @@ class LoyaltyProgressMail extends Mailable
                 'nextTierColor'   => $this->nextTier->badge_color,
                 'nextTierDiscount' => $this->nextTier->discount_percentage,
                 'nextTierPriority' => $this->nextTier->ticket_priority_level,
+                'nextTierSlug'    => strtolower($this->nextTier->slug ?? $this->nextTier->name),
+                'currentTierSlug' => strtolower($this->user->loyaltyTier?->slug ?? 'bronze'),
+                'perks'           => $this->nextTier->perks_payload['perks'] ?? [],
             ],
         );
     }

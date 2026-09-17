@@ -106,10 +106,12 @@ class SupportDeskService extends BaseService
         return $this->executeInTransaction(function () use ($user, $data, $isAdmin) {
             $ticket = Ticket::create([
                 'user_id' => $user->id,
+                'project_id' => $data['project_id'] ?? null,
                 'ticket_subject' => $data['subject'],
                 'ticket_message' => $data['description'],
                 'ticket_status' => 'open',
                 'priority' => strtolower($data['priority']),
+                'is_self_service' => ! $isAdmin,
             ]);
 
             $conversation = Conversation::create([
@@ -138,6 +140,10 @@ class SupportDeskService extends BaseService
                         'role' => 'admin',
                     ]);
                 }
+            }
+
+            if (! $isAdmin) {
+                \App\Services\TicketNotificationService::notifyAdminOnTicketCreated($ticket);
             }
 
             return $ticket;

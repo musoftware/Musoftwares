@@ -12,6 +12,7 @@ class Ticket extends Model
 
     protected $fillable = [
         'user_id',
+        'project_id',
         'anonymous_name',
         'anonymous_email',
         'ticket_subject',
@@ -23,12 +24,20 @@ class Ticket extends Model
         'rate',
         'assigned_employee_id',
         'closed_at',
+        'price',
+        'currency_id',
+        'pricing_status',
+        'pricing_notes',
+        'quoted_at',
+        'quoted_by',
     ];
 
     protected $casts = [
         'closed_at' => 'datetime',
+        'quoted_at' => 'datetime',
         'priority_score' => 'integer',
         'is_self_service' => 'boolean',
+        'price' => 'decimal:2',
     ];
 
     public function close(): void
@@ -208,11 +217,26 @@ class Ticket extends Model
         return false;
     }
 
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
     /**
      * Link to the modern Conversation model in the new architecture.
      */
     public function conversation(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(Conversation::class, 'conversable');
+    }
+
+    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    public function quotedByUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'quoted_by');
     }
 }

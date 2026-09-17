@@ -56,6 +56,10 @@ class ProjectService extends BaseService
                 changes: ['after' => $project->only(self::PROJECT_WRITEABLE)],
             );
 
+            if ((float) ($project->budget ?? 0) > 0) {
+                \App\Services\TicketNotificationService::notifyOnProjectPriced($project, (float) $project->budget);
+            }
+
             return $project->fresh(['client', 'owner']);
         });
     }
@@ -83,6 +87,10 @@ class ProjectService extends BaseService
                     action: ProjectAuditLog::ACTION_UPDATED,
                     changes: ['before' => $before, 'after' => $after, 'changed' => array_keys($diff)],
                 );
+
+                if (isset($diff['budget']) && (float) ($after['budget'] ?? 0) > 0) {
+                    \App\Services\TicketNotificationService::notifyOnProjectPriced($project, (float) $after['budget']);
+                }
             }
 
             return $project->fresh(['client', 'owner']);

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminCurrencyController;
 use App\Http\Controllers\Admin\AdminCurrencyExchangeController;
 use App\Http\Controllers\Admin\AdminFreeDownloadController;
+use App\Http\Controllers\Admin\AdminEmailTemplateController;
 use App\Http\Controllers\Admin\AdminLanguageLineController;
 use App\Http\Controllers\Admin\AdminOutgoingEmailController;
 use App\Http\Controllers\Admin\AdminPartnerGatewayController;
@@ -610,6 +611,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admi
     Route::resource('tickets', AdminTicketController::class)->only(['index', 'show', 'update']);
     Route::post('tickets/{ticket}/reply', [AdminTicketController::class, 'reply'])->name('tickets.reply');
     Route::post('tickets/{ticket}/assign', [AdminTicketController::class, 'assign'])->name('tickets.assign');
+    Route::post('tickets/{ticket}/pricing', [AdminTicketController::class, 'setPrice'])->name('tickets.pricing');
     Route::post('tickets/canned-responses', [AdminTicketController::class, 'addCannedResponse'])->name('tickets.canned-responses.store');
     Route::resource('guest-tickets', GuestTicketController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::post('guest-tickets/{guest_ticket}/reply', [GuestTicketController::class, 'reply'])->name('guest-tickets.reply');
@@ -638,9 +640,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/notifications/search-users', [BroadcastNotificationController::class, 'searchUsers'])->name('notifications.search_users');
     Route::get('/notifications/broadcast/{id}', [BroadcastNotificationController::class, 'show'])->name('notifications.broadcast.show');
 
-    // Reports & Outgoing Emails
+    // Reports, Email Templates & Outgoing Emails
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/outgoing-emails', [AdminOutgoingEmailController::class, 'index'])->name('outgoing-emails.index');
+    Route::get('/email-templates', [AdminEmailTemplateController::class, 'index'])->name('email-templates.index');
+    Route::get('/email-templates/{key}/preview', [AdminEmailTemplateController::class, 'preview'])->name('email-templates.preview');
+    Route::post('/email-templates/{key}/send-test', [AdminEmailTemplateController::class, 'sendTest'])->name('email-templates.send-test');
 
     // Clients (thin ERP-linked view) - removed as per request
 
@@ -934,6 +939,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::patch('/serial-user-devices/users/{user}/status', [SerialUserDeviceController::class, 'updateUserStatus'])->name('serial-user-devices.update-user-status');
     Route::patch('/serial-user-devices/users/{user}/temp-valid', [SerialUserDeviceController::class, 'updateUserTempValid'])->name('serial-user-devices.update-user-temp-valid');
     Route::delete('/serial-user-devices/{serialUserDevice}', [SerialUserDeviceController::class, 'destroy'])->name('serial-user-devices.destroy');
+
+    // Admin Pending Tasks & Workflow Management
+    Route::get('/tasks/pending', [AdminTaskController::class, 'pending'])->name('tasks.pending');
+    Route::post('/tasks/{task}/ignore', [AdminTaskController::class, 'ignoreTask'])->name('tasks.ignore');
+    Route::post('/tasks/{task}/restore', [AdminTaskController::class, 'restoreTask'])->name('tasks.restore');
+    Route::post('/tasks/{task}/billing-status', [AdminTaskController::class, 'updateBillingStatus'])->name('tasks.billing-status');
+    Route::post('/tasks/bulk-pending-action', [AdminTaskController::class, 'bulkPendingAction'])->name('tasks.bulk-pending-action');
 
     // Admin Tasks List (platform checklist items)
     Route::get('/tasks/as_list', [AdminTaskController::class, 'asList'])->name('tasks.as_list');

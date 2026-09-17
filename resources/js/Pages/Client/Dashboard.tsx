@@ -7,7 +7,7 @@ import { BentoStatCard } from '@/Components/ui/BentoStatCard';
 import { ContentCard } from '@/Components/ui/ContentCard';
 import { 
     Folder, Wallet, FileText, ArrowRight, ArrowUpRight, 
-    Server, Zap, Shield, MessageSquare, Laptop, Coins, CreditCard, Wrench, Key 
+    Server, Zap, Shield, MessageSquare, Laptop, Coins, CreditCard, Wrench, Key, LifeBuoy 
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { formatCurrencyAmount } from '@/lib/utils';
@@ -130,17 +130,23 @@ export default function Dashboard({
                             : "All previous sprint deliverables have been finalized and signed off. Launch a new project or scope your next milestone."
                     }
                     actions={
-                        <div className="flex items-center space-x-4 rtl:space-x-reverse shrink-0">
+                        <div className="flex items-center space-x-3 rtl:space-x-reverse shrink-0">
                             {hasActiveProject && currentProject ? (
                                 <>
                                     <Link href={currentProject?.id ? `/projects/${currentProject.id}` : '/projects'}>
-                                        <button className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer">
+                                        <button className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer">
                                             <span>LAUNCH WORKSPACE</span>
                                             <ArrowRight className="w-4 h-4" />
                                         </button>
                                     </Link>
+                                    <Link href={route('tickets.create')}>
+                                        <button className="px-4 py-2.5 border border-blue-500/20 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
+                                            <LifeBuoy className="w-3.5 h-3.5" />
+                                            <span>OPEN TICKET (+15 PTS)</span>
+                                        </button>
+                                    </Link>
                                     <Link href="/estimator">
-                                        <button className="px-5 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm cursor-pointer">
+                                        <button className="px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm cursor-pointer">
                                             NEW SCOPE +
                                         </button>
                                     </Link>
@@ -148,13 +154,19 @@ export default function Dashboard({
                             ) : (
                                 <>
                                     <Link href="/projects/create-new">
-                                        <button className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer">
+                                        <button className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer">
                                             <span>START NEW PROJECT +</span>
                                             <ArrowRight className="w-4 h-4" />
                                         </button>
                                     </Link>
+                                    <Link href={route('tickets.create')}>
+                                        <button className="px-4 py-2.5 border border-blue-500/20 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
+                                            <LifeBuoy className="w-3.5 h-3.5" />
+                                            <span>OPEN TICKET (+15 PTS)</span>
+                                        </button>
+                                    </Link>
                                     <Link href="/projects">
-                                        <button className="px-5 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm cursor-pointer">
+                                        <button className="px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm cursor-pointer">
                                             VIEW ARCHIVE
                                         </button>
                                     </Link>
@@ -188,6 +200,35 @@ export default function Dashboard({
                     ) : (
                         <NewProjectPlaceholder completedProjects={completedProjects} />
                     )}
+
+                    {/* Support & Tickets Loyalty Incentive Guide */}
+                    <div className="rounded-2xl border border-blue-200/70 dark:border-blue-900/40 bg-linear-to-r from-blue-50/60 via-white to-indigo-50/40 dark:from-zinc-900 dark:via-zinc-900/80 dark:to-zinc-900 p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div className="space-y-2 max-w-2xl">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/80 dark:bg-blue-950/60 text-[#0071e3] dark:text-blue-400 text-[11px] font-bold tracking-wide">
+                                <LifeBuoy className="w-3.5 h-3.5" />
+                                <span>PORTAL SUPPORT DESK &bull; VIP TIER DISPATCH</span>
+                            </div>
+                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+                                Need Immediate Engineering Support or Scope Guidance?
+                            </h3>
+                            <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+                                Submit support requests through our portal to ensure strict SLA dispatch based on your loyalty tier. Every ticket opened awards you <strong className="text-slate-900 dark:text-white">+15 Loyalty Points</strong>, and <strong className="text-slate-900 dark:text-white">+25 Bonus Points</strong> on satisfactory resolution.
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                            <Link href={route('tickets.create')}>
+                                <button className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow-xs cursor-pointer">
+                                    <MessageSquare className="w-4 h-4" />
+                                    <span>Open Support Ticket</span>
+                                </button>
+                            </Link>
+                            <Link href="/tickets">
+                                <button className="px-4 py-2.5 border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+                                    View Tickets
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
 
                     {/* 3-PILLAR OPERATIONAL METRICS SUMMARY */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -427,6 +468,8 @@ export default function Dashboard({
                     initialRewards={loyaltyRewards}
                     onRewardRedeemed={(newBal) => setCurrentLoyaltyPoints(newBal)}
                 />
+
+
             </div>
         </AuthenticatedLayout>
     );

@@ -11,10 +11,10 @@
 <div style="background-color:#f4f4f5; padding:40px 16px;">
 <div style="background-color:#ffffff; border-radius:12px; max-width:560px; margin:0 auto; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
 
-    <div style="background-color:{{ $newTierColor }}; padding:40px; text-align:center;">
-        <div style="font-size:48px; line-height:1; font-weight:900; color:#0f172a;">★</div>
-        <h1 style="color:#0f172a; font-size:24px; margin:12px 0 4px; font-weight:700;">{{ $newTierName }} Tier Unlocked</h1>
-        <p style="color:#0f172a; opacity:0.7; font-size:14px; margin:0;">Congratulations — you earned it.</p>
+    <div style="background-color:{{ $newTierColor }}; padding:36px 24px; text-align:center;">
+        <img src="{{ rtrim(config('app.url'), '/') }}/images/tiers/{{ $newTierSlug }}.png" width="96" height="96" style="display:block; margin:0 auto 14px; border:none; outline:none;" alt="{{ $newTierName }}" />
+        <h1 style="color:#0f172a; font-size:24px; margin:0 0 4px; font-weight:800; letter-spacing:-0.02em;">{{ $newTierName }} Tier Unlocked</h1>
+        <p style="color:#0f172a; opacity:0.8; font-size:14px; margin:0; font-weight:500;">Congratulations — you have earned elite partnership status.</p>
     </div>
 
     <div style="padding:36px 40px; color:#475569; font-size:15px; line-height:1.7;">
@@ -25,16 +25,28 @@
             This is a real milestone, and it comes with real benefits.
         </p>
 
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin:20px 0;">
-            <h3 style="color:#0f172a; font-size:14px; margin:0 0 12px; font-weight:600;">Your {{ $newTierName }} Benefits</h3>
-            <div style="font-size:14px; color:#1e293b; padding:5px 0;">
-                <span style="font-weight:700;">{{ $newTierDiscount }}%</span> discount on all future invoices
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin:24px 0;">
+            <h3 style="color:#0f172a; font-size:14px; margin:0 0 12px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Your {{ $newTierName }} Privileges</h3>
+            
+            <div style="font-size:14px; color:#0f172a; padding:6px 0; font-weight:600;">
+                ⭐ <span style="color:#0071e3;">{{ $newTierDiscount }}%</span> automatic discount on all invoices
             </div>
-            <div style="font-size:14px; color:#1e293b; padding:5px 0;">
-                <span style="font-weight:700; text-transform:capitalize;">{{ $newTierPriority }}</span> priority on support tickets
+            <div style="font-size:14px; color:#0f172a; padding:6px 0; font-weight:600;">
+                ⚡ <span style="text-transform:capitalize;">{{ $newTierPriority }}</span> priority routing on support tickets
             </div>
-            <div style="font-size:14px; color:#1e293b; padding:5px 0;">
-                Current points balance: <span style="font-weight:700;">{{ number_format($loyaltyBalance) }}</span> points
+
+            @if(!empty($perks))
+                <div style="margin-top:12px; padding-top:12px; border-top:1px dashed #cbd5e1;">
+                    @foreach($perks as $perk)
+                        <div style="font-size:13px; color:#334155; padding:3px 0;">
+                            ✓ {{ $perk }}
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            <div style="margin-top:12px; padding-top:12px; border-top:1px solid #e2e8f0; font-size:13px; color:#64748b;">
+                Available Points Balance: <strong style="color:#0f172a;">{{ number_format($loyaltyBalance) }} PTS</strong>
             </div>
         </div>
 
