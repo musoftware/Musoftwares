@@ -678,11 +678,6 @@ parameters:
 			count: 4
 			path: app/Http/Controllers/Admin/AdminTaskController.php
 
-		-
-			message: '#^Relation ''user'' is not found in App\\Models\\Task model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Admin/AdminTaskController.php
 
 		-
 			message: '#^Relation ''user'' is not found in App\\Models\\Todo model\.$#'

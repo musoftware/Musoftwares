@@ -115,7 +115,7 @@ export default function Dashboard({
         <AuthenticatedLayout>
             <Head title="Client Console — Musoftwares Studio" />
 
-            <div className="w-full">
+            <div className="w-full max-w-full min-w-0 overflow-x-clip">
                 {/* 1. TOP ACTIVE PROJECT SHOWCASE (Apple Bento Hero Banner) */}
                 <PageHeroHeader
                     badge={hasActiveProject ? "Active Studio Delivery" : "Studio Workspace"}
@@ -130,45 +130,53 @@ export default function Dashboard({
                             : "All previous sprint deliverables have been finalized and signed off. Launch a new project or scope your next milestone."
                     }
                     actions={
-                        <div className="flex items-center space-x-3 rtl:space-x-reverse shrink-0">
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
                             {hasActiveProject && currentProject ? (
                                 <>
-                                    <Link href={currentProject?.id ? `/projects/${currentProject.id}` : '/projects'}>
-                                        <button className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer">
-                                            <span>LAUNCH WORKSPACE</span>
-                                            <ArrowRight className="w-4 h-4" />
-                                        </button>
+                                    <Link
+                                        href={currentProject?.id ? `/projects/${currentProject.id}` : '/projects'}
+                                        className="w-full sm:w-auto px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 active:scale-98 select-none cursor-pointer"
+                                    >
+                                        <span>LAUNCH WORKSPACE</span>
+                                        <ArrowRight className="w-4 h-4" />
                                     </Link>
-                                    <Link href={route('tickets.create')}>
-                                        <button className="px-4 py-2.5 border border-blue-500/20 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
-                                            <LifeBuoy className="w-3.5 h-3.5" />
-                                            <span>OPEN TICKET (+15 PTS)</span>
-                                        </button>
+                                    <Link
+                                        href={currentProject?.id ? `/tickets/create?project_id=${currentProject.id}` : '/tickets/create'}
+                                        className="flex-1 sm:flex-initial px-4 py-2.5 border border-blue-500/25 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
+                                    >
+                                        <LifeBuoy className="w-3.5 h-3.5 shrink-0" />
+                                        <span>OPEN TICKET</span>
+                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5">+15 PTS</span>
                                     </Link>
-                                    <Link href="/estimator">
-                                        <button className="px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm cursor-pointer">
-                                            NEW SCOPE +
-                                        </button>
+                                    <Link
+                                        href="/estimator"
+                                        className="flex-1 sm:flex-initial px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm active:scale-98 select-none cursor-pointer text-center flex items-center justify-center"
+                                    >
+                                        NEW SCOPE +
                                     </Link>
                                 </>
                             ) : (
                                 <>
-                                    <Link href="/projects/create-new">
-                                        <button className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer">
-                                            <span>START NEW PROJECT +</span>
-                                            <ArrowRight className="w-4 h-4" />
-                                        </button>
+                                    <Link
+                                        href="/projects/create-new"
+                                        className="w-full sm:w-auto px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 active:scale-98 select-none cursor-pointer"
+                                    >
+                                        <span>START NEW PROJECT +</span>
+                                        <ArrowRight className="w-4 h-4" />
                                     </Link>
-                                    <Link href={route('tickets.create')}>
-                                        <button className="px-4 py-2.5 border border-blue-500/20 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
-                                            <LifeBuoy className="w-3.5 h-3.5" />
-                                            <span>OPEN TICKET (+15 PTS)</span>
-                                        </button>
+                                    <Link
+                                        href="/tickets/create"
+                                        className="flex-1 sm:flex-initial px-4 py-2.5 border border-blue-500/25 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
+                                    >
+                                        <LifeBuoy className="w-3.5 h-3.5 shrink-0" />
+                                        <span>OPEN TICKET</span>
+                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5">+15 PTS</span>
                                     </Link>
-                                    <Link href="/projects">
-                                        <button className="px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm cursor-pointer">
-                                            VIEW ARCHIVE
-                                        </button>
+                                    <Link
+                                        href="/projects"
+                                        className="flex-1 sm:flex-initial px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm active:scale-98 select-none cursor-pointer text-center flex items-center justify-center"
+                                    >
+                                        VIEW ARCHIVE
                                     </Link>
                                 </>
                             )}
@@ -215,17 +223,19 @@ export default function Dashboard({
                                 Submit support requests through our portal to ensure strict SLA dispatch based on your loyalty tier. Every ticket opened awards you <strong className="text-slate-900 dark:text-white">+15 Loyalty Points</strong>, and <strong className="text-slate-900 dark:text-white">+25 Bonus Points</strong> on satisfactory resolution.
                             </p>
                         </div>
-                        <div className="flex items-center gap-3 shrink-0">
-                            <Link href={route('tickets.create')}>
-                                <button className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow-xs cursor-pointer">
-                                    <MessageSquare className="w-4 h-4" />
-                                    <span>Open Support Ticket</span>
-                                </button>
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto shrink-0">
+                            <Link
+                                href={currentProject?.id ? `/tickets/create?project_id=${currentProject.id}` : '/tickets/create'}
+                                className="w-full sm:w-auto px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-98 select-none"
+                            >
+                                <MessageSquare className="w-4 h-4" />
+                                <span>Open Support Ticket</span>
                             </Link>
-                            <Link href="/tickets">
-                                <button className="px-4 py-2.5 border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer">
-                                    View Tickets
-                                </button>
+                            <Link
+                                href="/tickets"
+                                className="w-full sm:w-auto px-4 py-2.5 border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer active:scale-98 select-none text-center flex items-center justify-center"
+                            >
+                                View Tickets
                             </Link>
                         </div>
                     </div>
@@ -468,8 +478,6 @@ export default function Dashboard({
                     initialRewards={loyaltyRewards}
                     onRewardRedeemed={(newBal) => setCurrentLoyaltyPoints(newBal)}
                 />
-
-
             </div>
         </AuthenticatedLayout>
     );

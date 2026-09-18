@@ -63,6 +63,14 @@ export default function Message({ message, isOwnMessage }) {
                                         className={`cursor-pointer rounded-lg transition-all ${isImageExpanded ? 'h-auto max-w-full' : 'h-32 w-48 object-cover'}`}
                                         onClick={() => setIsImageExpanded(!isImageExpanded)}
                                     />
+                                ) : /\.(mp3|wav|ogg|m4a|webm|aac)$/i.test(message.attachment) ? (
+                                    <div className="p-2 rounded-xl bg-black/5 dark:bg-white/10 my-1">
+                                        <audio controls src={formatAttachmentUrl(message.attachment)} className="w-full max-w-[280px]" />
+                                    </div>
+                                ) : /\.(mp4|webm|mov|m4v)$/i.test(message.attachment) ? (
+                                    <div className="my-1">
+                                        <video controls playsInline src={formatAttachmentUrl(message.attachment)} className="rounded-xl max-h-56 max-w-full shadow-sm" />
+                                    </div>
                                 ) : (
                                     <a
                                         href={formatAttachmentUrl(message.attachment)}

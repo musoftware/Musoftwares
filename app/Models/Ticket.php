@@ -6,6 +6,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property int|null $project_id
+ * @property string|null $anonymous_name
+ * @property string|null $anonymous_email
+ * @property string $ticket_subject
+ * @property string $ticket_message
+ * @property string $ticket_status
+ * @property string $priority
+ * @property int|null $priority_score
+ * @property bool $is_self_service
+ * @property int|null $rate
+ * @property int|null $assigned_employee_id
+ * @property \Illuminate\Support\Carbon|null $closed_at
+ * @property float|string|null $price
+ * @property int|null $currency_id
+ * @property string|null $pricing_status
+ * @property string|null $pricing_notes
+ * @property \Illuminate\Support\Carbon|null $quoted_at
+ * @property int|null $quoted_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\User|null $assignedEmployee
+ * @property-read \App\Models\Project|null $project
+ * @property-read \App\Models\Conversation|null $conversation
+ * @property-read \App\Models\Currency|null $currency
+ * @property-read \App\Models\User|null $quotedByUser
+ */
 class Ticket extends Model
 {
     use HasFactory, SoftDeletes;

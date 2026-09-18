@@ -8393,4 +8393,6 @@ return array (
   'this_week' => 'This Week',
   'this_year' => 'This Year',
   'yesterday' => 'Yesterday',
+  'back_to_tickets' => 'Back to Tickets',
+  'pricing_and_quotation' => 'Pricing & Quotation',
 );

@@ -29,11 +29,22 @@ class Message extends Model
             return [];
         }
 
+        $extension = strtolower(pathinfo($this->attachment, PATHINFO_EXTENSION));
+        $type = 'file';
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])) {
+            $type = 'image';
+        } elseif (in_array($extension, ['mp3', 'wav', 'ogg', 'm4a', 'webm', 'aac'])) {
+            $type = 'audio';
+        } elseif (in_array($extension, ['mp4', 'webm', 'mov', 'm4v', 'ogv'])) {
+            $type = 'video';
+        }
+
         return [
             [
                 'id' => $this->id,
-                'type' => 'image',
+                'type' => $type,
                 'path' => asset('storage/'.$this->attachment),
+                'name' => basename($this->attachment),
             ],
         ];
     }

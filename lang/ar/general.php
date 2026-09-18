@@ -8393,4 +8393,6 @@ return array (
   'this_week' => 'هذا الأسبوع',
   'this_year' => 'هذه السنة',
   'yesterday' => 'أمس',
+  'back_to_tickets' => 'العودة للتذاكر',
+  'pricing_and_quotation' => 'تسعير التذكرة والعرض المالي',
 );

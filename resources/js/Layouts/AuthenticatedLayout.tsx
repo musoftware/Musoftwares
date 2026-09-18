@@ -183,7 +183,7 @@ function AuthenticatedContent({
     );
 
     return (
-        <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#090d16] font-sans text-[#1d1d1f] dark:text-[#f8fafc] flex flex-col selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+        <div className="min-h-screen max-w-full overflow-x-clip bg-[#f5f5f7] dark:bg-[#090d16] font-sans text-[#1d1d1f] dark:text-[#f8fafc] flex flex-col selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
             {isImpersonating && (
                 <div
                     className="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-700 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0"
@@ -216,7 +216,7 @@ function AuthenticatedContent({
                     paddingBottom: '14px',
                 }}
             >
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-10">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
                     <div className="flex items-center justify-between">
                         {/* LEFT: Logo & Nav */}
                         <div className="flex items-center gap-8">
@@ -933,7 +933,7 @@ function AuthenticatedContent({
             )}
 
             {/* Main Content */}
-            <main className="flex-1 w-full relative">
+            <main className="flex-1 w-full max-w-full min-w-0 overflow-x-clip relative">
                 <PageTransition>{children}</PageTransition>
             </main>
 

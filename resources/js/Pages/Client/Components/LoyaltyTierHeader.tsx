@@ -114,23 +114,23 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
     const pointsMonetaryValue = +(loyaltyPoints * pointsToMoneyRate).toFixed(2);
 
     return (
-        <section className="relative overflow-hidden w-full rounded-2xl bg-gradient-to-br from-white via-[#fbfbfd] to-[#f5f5f7] dark:from-zinc-900/95 dark:via-[#18181b]/95 dark:to-zinc-950 border border-black/5 dark:border-white/10 p-6 sm:p-7 shadow-sm dark:shadow-2xl backdrop-blur-2xl transition-colors duration-200">
+        <section className="relative overflow-hidden w-full max-w-full min-w-0 rounded-2xl bg-gradient-to-br from-white via-[#fbfbfd] to-[#f5f5f7] dark:from-zinc-900/95 dark:via-[#18181b]/95 dark:to-zinc-950 border border-black/5 dark:border-white/10 p-4 sm:p-6 lg:p-7 shadow-sm dark:shadow-2xl backdrop-blur-2xl transition-colors duration-200">
             {/* Ambient Background Glow */}
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-blue-500/[0.04] dark:bg-white/[0.02] blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-5 sm:gap-6 w-full max-w-full min-w-0">
                 {/* Client & Tier Metadata */}
-                <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-3">
+                <div className="space-y-2 min-w-0 max-w-full">
+                    <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                         <img
                             src={config.badge}
                             alt={config.title}
-                            className="w-9 h-9 object-contain drop-shadow-md shrink-0"
+                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-md shrink-0"
                             onError={(e) => {
                                 e.currentTarget.style.display = 'none';
                             }}
                         />
-                        <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
+                        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans break-words min-w-0">
                             {clientName || 'Private Client'}
                         </h1>
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wider uppercase ${config.badgeStyle}`}>
@@ -145,13 +145,13 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                             <span>{config.title}</span>
                         </span>
                     </div>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 font-normal max-w-xl leading-relaxed">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 font-normal max-w-xl leading-relaxed break-words">
                         {config.subtitle}
                     </p>
                 </div>
 
                 {/* Apple Card Style Points & Reward Currency */}
-                <div className="flex items-center gap-4 self-stretch md:self-auto justify-between md:justify-end border-t md:border-t-0 pt-4 md:pt-0 border-black/5 dark:border-white/5">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 self-stretch md:self-auto justify-between md:justify-end border-t md:border-t-0 pt-4 md:pt-0 border-black/5 dark:border-white/5 w-full md:w-auto">
                     <div className="text-left md:text-right">
                         <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                             Available Loyalty Capital
@@ -166,7 +166,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                         )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                         <Link
                             href="/loyalty"
                             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900 text-[#1d1d1f] dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all shadow-xs cursor-pointer"

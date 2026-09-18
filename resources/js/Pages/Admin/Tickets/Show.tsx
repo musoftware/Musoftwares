@@ -63,7 +63,7 @@ interface Props {
     ticket: Ticket;
     supportAgents: { id: number; name: string; email?: string; avatar?: string }[];
     cannedResponses: { id: number; title: string; body: string }[];
-    currencies?: { id: number; currency: string; symbol: string }[];
+    currencies?: { id: number; currency: string; symbol: string; code?: string; name?: string }[];
 }
 
 /* ─── Helpers ───────────────────────────────────────────────── */
@@ -126,6 +126,39 @@ function AttachmentLink({ path }: { path: string }) {
     const url = `/storage/${path}`;
     const filename = path.split('/').pop() ?? 'Attachment';
     const isImg = isImageFile(path);
+    const isAudio = /\.(mp3|wav|ogg|m4a|webm|aac)$/i.test(path);
+    const isVideo = /\.(mp4|webm|mov|m4v)$/i.test(path);
+
+    if (isImg) {
+        return (
+            <div className="mt-2">
+                <a href={url} target="_blank" rel="noopener noreferrer" className="inline-block">
+                    <img src={url} alt={filename} className="max-h-48 rounded-xl border border-slate-200 object-cover hover:opacity-90 transition-opacity" />
+                </a>
+            </div>
+        );
+    }
+
+    if (isAudio) {
+        return (
+            <div className="mt-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl max-w-sm">
+                <div className="text-[11px] font-medium text-slate-500 mb-1.5 flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-blue-600" />
+                    <span className="truncate">{filename}</span>
+                </div>
+                <audio controls src={url} className="w-full h-8" />
+            </div>
+        );
+    }
+
+    if (isVideo) {
+        return (
+            <div className="mt-2">
+                <video controls playsInline src={url} className="max-h-56 max-w-full rounded-xl border border-slate-200 shadow-sm" />
+            </div>
+        );
+    }
+
     return (
         <a
             href={url}
@@ -133,9 +166,7 @@ function AttachmentLink({ path }: { path: string }) {
             rel="noopener noreferrer"
             className="mt-2 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-sm"
         >
-            {isImg
-                ? <ImageIcon className="h-3.5 w-3.5 text-slate-900 flex-shrink-0" />
-                : <FileText className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />}
+            <FileText className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
             <span className="max-w-[180px] truncate">{filename}</span>
             <ExternalLink className="h-3 w-3 text-slate-400 flex-shrink-0" />
         </a>
@@ -799,7 +830,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                 >
                                     {currencies.map((c) => (
                                         <option key={c.id} value={c.id}>
-                                            {c.code} ({c.symbol}) - {c.name}
+                                            {c.currency || c.code} ({c.symbol})
                                         </option>
                                     ))}
                                 </select>

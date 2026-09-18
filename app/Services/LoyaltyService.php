@@ -438,9 +438,149 @@ class LoyaltyService extends BaseService
             case 'admin_manual_deduction':
                 $reason = $meta['reason'] ?? 'Administrative Adjustment';
                 return "Admin Correction: {$reason}";
+            case 'points_quarterly_expired':
+                return 'Quarterly Points Expiration & Periodic Reset';
             default:
                 return ucwords(str_replace('_', ' ', $txn->event_type));
         }
+    }
+
+    /**
+     * Get quarterly points expiry calculation details in Cairo timezone.
+     */
+    public function getQuarterlyExpiryInfo(): array
+    {
+        $now = Carbon::now('Africa/Cairo');
+        $quarterEnd = $now->copy()->endOfQuarter()->endOfDay();
+        $daysRemaining = max(0, (int) $now->diffInDays($quarterEnd, false));
+        $quarterName = 'Q' . $now->quarter . ' ' . $now->year;
+
+        return [
+            'quarter_name'           => $quarterName,
+            'quarter_number'         => $now->quarter,
+            'expiry_date'            => $quarterEnd,
+            'expiry_date_formatted'  => $quarterEnd->format('M d, Y'),
+            'expiry_date_arabic'     => $quarterEnd->locale('ar')->isoFormat('D MMMM YYYY'),
+            'days_remaining'         => $daysRemaining,
+            'hours_remaining'        => max(0, (int) $now->diffInHours($quarterEnd, false)),
+        ];
+    }
+
+    /**
+     * Dispatch quarterly points expiration reminders to users with positive spendable balance.
+     * Uses tiered notification intervals (14 days, 7 days, 3 days, 1 day) to prevent spam.
+     */
+    public function sendQuarterlyPointsExpiryReminders(int $daysThreshold = 14, bool $dryRun = false): array
+    {
+        $expiryInfo = $this->getQuarterlyExpiryInfo();
+        $daysRemaining = $expiryInfo['days_remaining'];
+
+        if ($daysRemaining > $daysThreshold) {
+            return [
+                'sent_count'    => 0,
+                'days_remaining'=> $daysRemaining,
+                'reason'        => "Current days remaining ({$daysRemaining}) exceeds reminder threshold ({$daysThreshold}).",
+            ];
+        }
+
+        // Determine bucket for deduplication (14, 7, 3, 1)
+        $bucket = 14;
+        if ($daysRemaining <= 1) {
+            $bucket = 1;
+        } elseif ($daysRemaining <= 3) {
+            $bucket = 3;
+        } elseif ($daysRemaining <= 7) {
+            $bucket = 7;
+        }
+
+        $quarterName = $expiryInfo['quarter_name'];
+        $users = User::where('loyalty_points_balance', '>', 0)
+            ->whereNotNull('email')
+            ->get();
+
+        $sentCount = 0;
+        foreach ($users as $user) {
+            $fingerprint = "quarterly_expiry:{$user->id}:{$quarterName}:b{$bucket}";
+
+            if (LoyaltyNotificationLog::alreadySent($fingerprint)) {
+                continue;
+            }
+
+            if (! $dryRun) {
+                \App\Mail\LoyaltyPointsExpiringMail::sendToUser(
+                    $user,
+                    (int) $user->loyalty_points_balance,
+                    $daysRemaining,
+                    $expiryInfo['expiry_date']
+                );
+
+                LoyaltyNotificationLog::create([
+                    'user_id'                   => $user->id,
+                    'notification_type'         => 'quarterly_points_expiry',
+                    'deduplication_fingerprint' => $fingerprint,
+                    'status'                    => 'sent',
+                    'sent_at'                   => now(),
+                    'metadata'                  => [
+                        'points_balance' => (int) $user->loyalty_points_balance,
+                        'days_remaining' => $daysRemaining,
+                        'quarter_name'   => $quarterName,
+                        'bucket'         => $bucket,
+                    ],
+                ]);
+            }
+
+            $sentCount++;
+        }
+
+        return [
+            'sent_count'    => $sentCount,
+            'days_remaining'=> $daysRemaining,
+            'quarter_name'  => $quarterName,
+            'dry_run'       => $dryRun,
+        ];
+    }
+
+    /**
+     * Perform the actual quarterly reset: clears unspent loyalty points balance to 0,
+     * while completely preserving permanent lifetime points and tier status.
+     */
+    public function expireQuarterlyPoints(?string $quarterLabel = null): int
+    {
+        $quarterLabel = $quarterLabel ?? ('Q' . Carbon::now('Africa/Cairo')->quarter . ' ' . Carbon::now('Africa/Cairo')->year);
+
+        $users = User::where('loyalty_points_balance', '>', 0)->get();
+        $expiredCount = 0;
+
+        foreach ($users as $user) {
+            $unspent = (int) $user->loyalty_points_balance;
+            if ($unspent <= 0) {
+                continue;
+            }
+
+            DB::transaction(function () use ($user, $unspent, $quarterLabel) {
+                LoyaltyPointTransaction::create([
+                    'user_id'         => $user->id,
+                    'event_type'      => 'points_quarterly_expired',
+                    'points'          => -$unspent,
+                    'balance_after'   => 0,
+                    'source_channel'  => 'system',
+                    'idempotency_key' => "expiry:{$user->id}:{$quarterLabel}:" . time(),
+                    'metadata'        => [
+                        'reason'       => "Quarterly points expiration for {$quarterLabel}",
+                        'points_lost'  => $unspent,
+                        'quarter_name' => $quarterLabel,
+                        'expired_at'   => now()->toISOString(),
+                    ],
+                ]);
+
+                $user->loyalty_points_balance = 0;
+                $user->saveQuietly();
+            });
+
+            $expiredCount++;
+        }
+
+        return $expiredCount;
     }
 
     /**

@@ -112,6 +112,41 @@ class AdminEmailTemplateController extends Controller
                     ];
                 },
             ],
+            'loyalty_points_expiring' => [
+                'key' => 'loyalty_points_expiring',
+                'name' => 'Quarterly Loyalty Points Expiry Warning',
+                'name_ar' => 'تنبيه انتهاء صلاحية نقاط الولاء الدورية (كل 3 شهور)',
+                'description' => 'Dispatched approaching the end of each calendar quarter to warn clients that unspent points will reset to zero, driving rapid redemption on invoices and tickets.',
+                'description_ar' => 'يُرسل قرب نهاية كل ربع سنوي لتحذير العملاء من تصفير رصيد النقاط غير المستبدلة، لتحفيز استخدامها في خصومات الفواتير وتذاكر الدعم.',
+                'category' => 'loyalty',
+                'category_label' => 'Loyalty & Rewards',
+                'category_label_ar' => 'برنامج الولاء والرتب',
+                'blade_view' => 'emails.loyalty.points_expiring',
+                'blade_path' => 'resources/views/emails/loyalty/points_expiring.blade.php',
+                'subject' => 'تنبيه هام: رصيدك من نقاط الولاء (1,450 PTS) ينتهي خلال 12 يوماً',
+                'is_markdown' => false,
+                'data_generator' => function () {
+                    $now = Carbon::now('Africa/Cairo');
+                    $quarterEnd = $now->copy()->endOfQuarter()->endOfDay();
+                    $daysRemaining = max(0, (int) $now->diffInDays($quarterEnd, false));
+                    return [
+                        'clientName' => 'Mahmoud Mohamed',
+                        'clientFirstName' => 'Mahmoud',
+                        'pointsBalance' => 1450,
+                        'pointsCashValueFormatted' => '$48.33',
+                        'daysRemaining' => $daysRemaining ?: 12,
+                        'expiryDateFormatted' => $quarterEnd->format('M d, Y'),
+                        'expiryDateArabic' => $quarterEnd->locale('ar')->isoFormat('D MMMM YYYY'),
+                        'quarterName' => 'Q' . $quarterEnd->quarter . ' ' . $quarterEnd->year,
+                        'tierName' => 'Gold',
+                        'tierSlug' => 'gold',
+                        'tierDiscount' => 10,
+                        'portalUrl' => url('/client/loyalty'),
+                        'ticketsUrl' => url('/tickets/create'),
+                        'invoicesUrl' => url('/client/invoices'),
+                    ];
+                },
+            ],
             'loyalty_invoice_due_reminder' => [
                 'key' => 'loyalty_invoice_due_reminder',
                 'name' => 'Invoice Due Loyalty Reminder',

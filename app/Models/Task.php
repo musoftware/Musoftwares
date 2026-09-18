@@ -8,6 +8,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property string $task_name
+ * @property string|null $task_description
+ * @property int|null $project_id
+ * @property int|null $user_id
+ * @property string|null $due_date
+ * @property string $priority
+ * @property int $archived
+ * @property-read \App\Models\Project|null $project
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\Invoice|null $invoice
+ */
 class Task extends Model
 {
     use HasFactory, SoftDeletes;
@@ -218,22 +231,12 @@ class Task extends Model
         return 100.0;
     }
 
-    public function task_todo_items()
+    public function task_todo_items(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Todo::class);
     }
 
-    /* public function todo_swimlane()
-    {
-        return $this->belongsTo(TodoSwimlane::class, 'swimlane_id');
-    } */
-
-    /* public function todo_swimlane_team()
-    {
-        return optional($this->todo_swimlane)->title ?? 'None';
-    } */
-
-    public function sharedUsers()
+    public function sharedUsers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'tasks_share');
     }
@@ -249,32 +252,32 @@ class Task extends Model
         return true;
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function project()
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
-    public function invoice()
+    public function invoice(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Invoice::class);
     }
 
-    public function comments()
+    public function comments(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(ProjectComment::class, 'commentable');
     }
 
-    public function auditLogs()
+    public function auditLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(TaskAuditLog::class)->orderBy('created_at', 'desc');
     }
 
-    public function ignoredByUser()
+    public function ignoredByUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'ignored_by');
     }

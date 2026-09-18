@@ -63,7 +63,25 @@ class SupportTicketController extends Controller
             'priority' => 'required|in:Low,Medium,High',
             'description' => 'required|string',
             'project_id' => 'nullable|integer|exists:projects,id',
+            'attachment' => 'nullable|file|max:15360',
         ]);
+
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $mime = $file->getMimeType() ?? '';
+            $ext = strtolower($file->getClientOriginalExtension());
+            $isVideo = str_starts_with($mime, 'video/') || in_array($ext, ['mp4', 'webm', 'mov', 'm4v', 'ogv']);
+
+            // Strictly enforce 3MB limit for videos as requested
+            if ($isVideo && $file->getSize() > 3 * 1024 * 1024) {
+                return redirect()->back()->withErrors([
+                    'attachment' => 'حجم مقطع الفيديو يجب ألا يتجاوز 3 ميجابايت (3MB).'
+                ])->withInput();
+            }
+
+            $path = $file->store('tickets/attachments', 'public');
+            $validated['attachment'] = $path;
+        }
 
         $user = $request->user();
         $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);

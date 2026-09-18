@@ -18,8 +18,14 @@ import axios from 'axios';
 interface LoyaltyTier {
     id: number;
     name: string;
+    slug?: string;
+    discount_percentage?: number | string;
+    ticket_priority_level?: string;
+    badge_color?: string;
+    badge_image?: string;
+    badge_svg?: string;
     min_lifetime_points: number;
-    multiplier: number;
+    multiplier?: number;
     perks_payload?: {
         perks?: string[];
         badge_style?: string;
@@ -221,7 +227,7 @@ export default function LoyaltyIndex({
                             value={`${(referral?.points_earned || 0).toLocaleString()} PTS`}
                             description={`${referral?.total_users || 0} colleagues introduced`}
                             icon={Users}
-                            accentColor="violet"
+                            accentColor="purple"
                         />
                     </div>
 

@@ -19,6 +19,7 @@ class ProcessLoyaltyDueReminders extends Command
     {
         $this->processProgressReminders();
         $this->processInvoiceDueReminders();
+        $this->processQuarterlyExpiryReminders();
 
         return self::SUCCESS;
     }
@@ -118,5 +119,18 @@ class ProcessLoyaltyDueReminders extends Command
             });
 
         $this->info('Invoice due reminders processed.');
+    }
+
+    /**
+     * Find users with active loyalty points when approaching the end of the quarter (within 14 days)
+     * and send them the expiration reminder email.
+     */
+    private function processQuarterlyExpiryReminders(): void
+    {
+        /** @var \App\Services\LoyaltyService $loyaltyService */
+        $loyaltyService = app(\App\Services\LoyaltyService::class);
+        $result = $loyaltyService->sendQuarterlyPointsExpiryReminders(14);
+
+        $this->info("Quarterly points expiry reminders: {$result['sent_count']} sent (Days remaining: {$result['days_remaining']}).");
     }
 }

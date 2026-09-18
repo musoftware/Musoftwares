@@ -129,6 +129,7 @@ class SupportDeskService extends BaseService
             $conversation->messages()->create([
                 'sender_id' => $user->id,
                 'body' => $data['description'],
+                'attachment' => $data['attachment'] ?? null,
                 'is_system' => false,
             ]);
 

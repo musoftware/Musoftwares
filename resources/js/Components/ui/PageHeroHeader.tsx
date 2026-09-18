@@ -60,18 +60,18 @@ export function PageHeroHeader({
         <div
             data-slot="page-hero-header"
             className={cn(
-                'w-full py-8 px-6 sm:px-10 transition-colors duration-200',
+                'w-full max-w-full min-w-0 overflow-x-clip py-6 sm:py-8 px-4 sm:px-8 transition-colors duration-200',
                 'bg-white dark:bg-[#0f172a] border-b border-black/5 dark:border-white/10',
                 className
             )}
         >
             <div
                 className={cn(
-                    'mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6',
+                    'mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 w-full max-w-full min-w-0',
                     maxWidthMap[maxWidth]
                 )}
             >
-                <div className="space-y-2 min-w-0">
+                <div className="space-y-2 min-w-0 max-w-full">
                     {resolvedBackLink && (
                         <div>
                             <Link
@@ -84,20 +84,20 @@ export function PageHeroHeader({
                         </div>
                     )}
 
-                    {badge && <div className="flex items-center gap-3">{badge}</div>}
+                    {badge && <div className="flex flex-wrap items-center gap-2 sm:gap-3">{badge}</div>}
 
-                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans break-words min-w-0">
                         {title}
                     </h1>
 
                     {description && (
-                        <p className="text-xs sm:text-sm text-[#1d1d1f]/70 dark:text-zinc-400 font-sans max-w-2xl">
+                        <p className="text-xs sm:text-sm text-[#1d1d1f]/70 dark:text-zinc-400 font-sans max-w-2xl break-words">
                             {description}
                         </p>
                     )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full md:w-auto shrink-0 min-w-0">
                     {resolvedSearch && (
                         <div className="w-full sm:w-72 relative">
                             <Search className="w-4 h-4 text-[#1d1d1f]/40 dark:text-zinc-500 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />

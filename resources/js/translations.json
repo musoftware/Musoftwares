@@ -10597,7 +10597,9 @@
             "search_transactions_hint": "البحث بالمعرف (#123)، الوصف، العميل، أو المشروع...",
             "this_week": "هذا الأسبوع",
             "this_year": "هذه السنة",
-            "yesterday": "أمس"
+            "yesterday": "أمس",
+            "back_to_tickets": "العودة للتذاكر",
+            "pricing_and_quotation": "تسعير التذكرة والعرض المالي"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -23735,7 +23737,9 @@
             "search_transactions_hint": "Search ID (#123), description, client, or project...",
             "this_week": "This Week",
             "this_year": "This Year",
-            "yesterday": "Yesterday"
+            "yesterday": "Yesterday",
+            "back_to_tickets": "Back to Tickets",
+            "pricing_and_quotation": "Pricing & Quotation"
         },
         "gold_saver": {
             "achieved": "Achieved",

@@ -28,4 +28,27 @@ Interfaces that are overly complex or omit features on smaller screens create fr
 - **Only Inside Hamburger Menu**: All action buttons, links, and navigation items on mobile must be housed exclusively inside the slide-out hamburger menu drawer/sheet (`SheetContent`).
 - **Clean Header Header Aesthetic**: On mobile, the top bar should strictly consist of the Logo/Monogram, the Hamburger Menu button, and non-intrusive icons like Theme Toggle, Notification Bell, or Profile Avatar.
 
+### 6. Zero Horizontal Overflow Invariant (Zero-Scroll-X)
+- **Zero Horizontal Scrolling**: Under no circumstances may a page allow horizontal scrolling on mobile (`window.scrollX > 0` is strictly a bug).
+- **Layout Shells & Root Containers**: Every layout shell (`AuthenticatedLayout`, `PageShell`, `<main>`, and page containers) must enforce `max-w-full min-w-0 overflow-x-clip` (or `overflow-x-hidden`).
+- **Responsive Action Stacking & Wrapping**:
+  - Action button groups, hero action headers, and badge clusters must NEVER combine `shrink-0` with horizontal flex rows (`space-x-*` / `gap-*`) without `flex-wrap` or `flex-col sm:flex-row`.
+  - On mobile screens (`< 640px`), multi-button groups must either wrap (`flex-wrap`) or stack (`flex-col sm:flex-row w-full`), ensuring buttons stretch full-width (`w-full sm:w-auto`) or fit comfortably within narrow viewports.
+- **Table & Grid Safeguards**: Data tables must always be wrapped in dedicated scroll containers (`overflow-x-auto w-full max-w-full`) or transformed into stacked card lists on mobile so they never push the outer page container wider than the screen.
+
+### 7. Mobile Viewport Budgeting (360px - 414px Base)
+- **Minimum Viewport Baseline**: Design and test for a minimum width of **360px** (e.g., Galaxy S, iPhone SE).
+- **Container Padding**: Use responsive padding: `p-4 sm:p-6 lg:p-8` (never use static large padding like `p-8` or `px-10` on mobile).
+- **Typography & Breakpoints**: Long titles and headings must have `break-words` and `min-w-0` to avoid blowing out container boundaries:
+  - Use `text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words`.
+- **Badges & Metadata**: Always allow badges, pills, and metadata chips to wrap gracefully (`flex flex-wrap items-center gap-2`).
+
+### 8. Mandatory Mobile Pre-Flight Verification Checklist
+Before completing any frontend or UI task, the engineer/agent must verify:
+- [ ] Has the layout been inspected at mobile viewports (`375px` and `414px`)?
+- [ ] Is horizontal scrolling (`scrollX`) completely impossible on the entire page?
+- [ ] Do all button rows wrap or stack cleanly without pushing content offscreen?
+- [ ] Are all touch targets at least 44x44px for effortless thumb tapping?
+- [ ] Does the top navigation header fit cleanly without truncating or displacing logo, menu, or profile icons?
+
 ---

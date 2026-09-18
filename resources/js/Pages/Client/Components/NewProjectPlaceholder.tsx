@@ -20,19 +20,19 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
     const latestDelivered = completedProjects[0];
 
     return (
-        <section className="w-full bg-white dark:bg-[#141416]/95 border border-black/5 dark:border-white/10 rounded-2xl p-6 sm:p-8 shadow-sm dark:shadow-2xl backdrop-blur-2xl transition-colors duration-200">
+        <section className="w-full max-w-full min-w-0 rounded-2xl bg-white dark:bg-[#141416]/95 border border-black/5 dark:border-white/10 p-4 sm:p-6 lg:p-8 shadow-sm dark:shadow-2xl backdrop-blur-2xl transition-colors duration-200">
             {/* Header / Ready State */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/5 dark:border-white/5">
-                <div className="space-y-1.5">
-                    <div className="flex items-center gap-2.5">
-                        <span className="relative flex h-2.5 w-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/5 dark:border-white/5 w-full max-w-full min-w-0">
+                <div className="space-y-1.5 min-w-0 max-w-full">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="relative flex h-2.5 w-2.5 shrink-0">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0071e3]" />
                         </span>
-                        <h2 className="text-xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight font-sans">
+                        <h2 className="text-lg sm:text-xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight font-sans break-words min-w-0">
                             Ready for Your Next Project
                         </h2>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20 shrink-0">
                             Studio Available
                         </span>
                     </div>

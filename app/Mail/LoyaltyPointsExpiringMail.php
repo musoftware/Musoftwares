@@ -98,12 +98,12 @@ class LoyaltyPointsExpiringMail extends Mailable
     /**
      * Helper to send directly to a user.
      */
-    public static function sendToUser(User $user, ?int $pointsBalance = null, ?int $daysRemaining = null): void
+    public static function sendToUser(User $user, ?int $pointsBalance = null, ?int $daysRemaining = null, ?Carbon $quarterEnd = null): void
     {
         if (empty($user->email)) {
             return;
         }
 
-        Mail::to($user->email)->send(new self($user, $pointsBalance, $daysRemaining));
+        Mail::to($user->email)->send(new self($user, $pointsBalance, $daysRemaining, $quarterEnd));
     }
 }
