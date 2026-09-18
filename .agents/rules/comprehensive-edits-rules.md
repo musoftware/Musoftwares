@@ -19,6 +19,7 @@ Making a targeted edit in only one file or function without considering the broa
 - **Data Flow:** Trace the data flow from the backend to the frontend (and vice-versa). If you change a model or a controller response, ensure the frontend React/Inertia component is updated to handle the new structure.
 - **Dependencies:** If a service or helper method is changed, find all components or controllers that consume it and verify they still function correctly.
 - **Missing Logic:** Check if adding a new status, currency, or feature requires updates in dropdowns, validation rules, database migrations, or translation files.
+- **Form / Modal Migrations:** When migrating any user action or workflow from a Modal/Dialog to a dedicated full page, perform a mandatory repo-wide sweep for all existing trigger buttons, convert them to explicit page links (`<Link>`), pass query context, and delete the legacy modal component file and its state variables immediately.
 
 ### 3. Identify and Prevent Problems
 - Anticipate edge cases introduced by your changes.

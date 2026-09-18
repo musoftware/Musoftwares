@@ -1621,6 +1621,10 @@ class AdminTaskController extends Controller
      */
     public function ignoreTask(Request $request, Task $task)
     {
+        if ($request->isMethod('get') && ! $request->filled('ignore_reason')) {
+            return redirect()->route('admin.tasks.pending')->with('info', 'Please select a reason when ignoring a task.');
+        }
+
         $validated = $request->validate([
             'ignore_reason' => ['required', 'string', 'in:non_billable,duplicate,entry_error,free_promo,client_cancelled,other'],
             'ignore_notes' => ['nullable', 'string', 'max:1000'],
@@ -1639,20 +1643,15 @@ class AdminTaskController extends Controller
 
         TaskAuditLog::create([
             'task_id' => $task->id,
-            'user_id' => Auth::id(),
+            'changed_by' => Auth::id() ?? 1,
             'action' => 'ignored',
-            'reason' => $validated['ignore_reason'],
-            'notes' => $validated['ignore_notes'] ?? null,
-            'old_values' => ['billing_status' => $oldBillingStatus],
-            'new_values' => [
-                'billing_status' => 'ignored',
-                'ignore_reason' => $validated['ignore_reason'],
-                'ignored_at' => $cairoNow->toDateTimeString(),
-            ],
+            'reason' => $validated['ignore_reason'] . (! empty($validated['ignore_notes']) ? ' - ' . $validated['ignore_notes'] : ''),
+            'old_value' => $oldBillingStatus,
+            'new_value' => 'ignored',
             'created_at' => $cairoNow,
         ]);
 
-        return back()->with('success', 'Task has been moved to the Ignored list.');
+        return redirect()->route('admin.tasks.pending')->with('success', 'Task has been moved to the Ignored list.');
     }
 
     /**
@@ -1674,16 +1673,15 @@ class AdminTaskController extends Controller
 
         TaskAuditLog::create([
             'task_id' => $task->id,
-            'user_id' => Auth::id(),
+            'changed_by' => Auth::id() ?? 1,
             'action' => 'restored',
             'reason' => 'Restored from ignored list',
-            'notes' => $request->input('notes', 'Admin restored task to execution pipeline'),
-            'old_values' => ['billing_status' => 'ignored', 'ignore_reason' => $oldReason],
-            'new_values' => ['billing_status' => 'open', 'pending_reason' => 'waiting_execution'],
+            'old_value' => $oldReason ?? 'ignored',
+            'new_value' => 'open',
             'created_at' => $cairoNow,
         ]);
 
-        return back()->with('success', 'Task restored to active pending queue.');
+        return redirect()->route('admin.tasks.pending')->with('success', 'Task restored to active pending queue.');
     }
 
     /**
@@ -1691,6 +1689,10 @@ class AdminTaskController extends Controller
      */
     public function updateBillingStatus(Request $request, Task $task)
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.tasks.pending');
+        }
+
         $validated = $request->validate([
             'billing_type' => ['nullable', 'string', 'in:billable,non_billable'],
             'billing_status' => ['nullable', 'string', 'in:open,in_progress,ready_to_invoice,invoiced,ignored'],
@@ -1725,16 +1727,15 @@ class AdminTaskController extends Controller
 
         TaskAuditLog::create([
             'task_id' => $task->id,
-            'user_id' => Auth::id(),
+            'changed_by' => Auth::id() ?? 1,
             'action' => 'status_updated',
             'reason' => 'Manual admin update',
-            'notes' => 'Updated status, billing type, or SLA',
-            'old_values' => $oldValues,
-            'new_values' => $updateData,
+            'old_value' => (string) json_encode($oldValues),
+            'new_value' => (string) json_encode($updateData),
             'created_at' => $cairoNow,
         ]);
 
-        return back()->with('success', 'Task updated successfully.');
+        return redirect()->route('admin.tasks.pending')->with('success', 'Task updated successfully.');
     }
 
     /**
@@ -1768,12 +1769,11 @@ class AdminTaskController extends Controller
 
                     TaskAuditLog::create([
                         'task_id' => $task->id,
-                        'user_id' => Auth::id(),
+                        'changed_by' => Auth::id() ?? 1,
                         'action' => 'ignored',
                         'reason' => $validated['ignore_reason'],
-                        'notes' => $validated['ignore_notes'] ?? null,
-                        'old_values' => ['billing_status' => $oldStatus],
-                        'new_values' => ['billing_status' => 'ignored'],
+                        'old_value' => $oldStatus,
+                        'new_value' => 'ignored',
                         'created_at' => $cairoNow,
                     ]);
                 } elseif ($validated['action'] === 'restore') {
@@ -1788,11 +1788,11 @@ class AdminTaskController extends Controller
 
                     TaskAuditLog::create([
                         'task_id' => $task->id,
-                        'user_id' => Auth::id(),
+                        'changed_by' => Auth::id() ?? 1,
                         'action' => 'restored',
                         'reason' => 'Bulk restore',
-                        'old_values' => ['billing_status' => $oldStatus],
-                        'new_values' => ['billing_status' => 'open'],
+                        'old_value' => $oldStatus,
+                        'new_value' => 'open',
                         'created_at' => $cairoNow,
                     ]);
                 } elseif ($validated['action'] === 'mark_ready_to_invoice') {
@@ -1803,11 +1803,11 @@ class AdminTaskController extends Controller
 
                     TaskAuditLog::create([
                         'task_id' => $task->id,
-                        'user_id' => Auth::id(),
+                        'changed_by' => Auth::id() ?? 1,
                         'action' => 'status_updated',
                         'reason' => 'Marked ready to invoice in bulk',
-                        'old_values' => ['billing_status' => $oldStatus],
-                        'new_values' => ['billing_status' => 'ready_to_invoice'],
+                        'old_value' => $oldStatus,
+                        'new_value' => 'ready_to_invoice',
                         'created_at' => $cairoNow,
                     ]);
                 } elseif ($validated['action'] === 'mark_billable') {

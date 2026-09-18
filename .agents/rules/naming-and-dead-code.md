@@ -17,6 +17,7 @@ Identifiers are executable documentation. Dead code is technical debt. Keep name
 - Never commit commented-out code blocks; version control retains all historical implementations.
 - Remove all temporary diagnostic prints, ad-hoc console logs, and debugging breakpoints before completing a task.
 - Eliminate unused imports, unreferenced variables, and dead functions. Linters and compiler checks must pass cleanly with zero warnings.
+- Delete superseded components, obsolete modals, and legacy views immediately upon completing a page conversion or migration. Never leave orphaned subcomponents or dead templates in the tree.
 
 ---
 

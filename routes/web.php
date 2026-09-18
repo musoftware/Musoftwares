@@ -942,9 +942,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // Admin Pending Tasks & Workflow Management
     Route::get('/tasks/pending', [AdminTaskController::class, 'pending'])->name('tasks.pending');
-    Route::post('/tasks/{task}/ignore', [AdminTaskController::class, 'ignoreTask'])->name('tasks.ignore');
-    Route::post('/tasks/{task}/restore', [AdminTaskController::class, 'restoreTask'])->name('tasks.restore');
-    Route::post('/tasks/{task}/billing-status', [AdminTaskController::class, 'updateBillingStatus'])->name('tasks.billing-status');
+    Route::match(['get', 'post'], '/tasks/{task}/ignore', [AdminTaskController::class, 'ignoreTask'])->name('tasks.ignore');
+    Route::match(['get', 'post'], '/tasks/{task}/restore', [AdminTaskController::class, 'restoreTask'])->name('tasks.restore');
+    Route::match(['get', 'post'], '/tasks/{task}/billing-status', [AdminTaskController::class, 'updateBillingStatus'])->name('tasks.billing-status');
     Route::post('/tasks/bulk-pending-action', [AdminTaskController::class, 'bulkPendingAction'])->name('tasks.bulk-pending-action');
 
     // Admin Tasks List (platform checklist items)

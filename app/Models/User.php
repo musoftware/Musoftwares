@@ -823,7 +823,7 @@ class User extends Authenticatable
      * @param  Notification  $notification
      * @return string|array|null
      */
-    public function routeNotificationForFcm($notification)
+    public function routeNotificationForFcm($notification = null)
     {
         $tokens = $this->deviceTokens()->pluck('token')->toArray();
 

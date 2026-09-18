@@ -144,7 +144,7 @@ class SupportDeskService extends BaseService
             }
 
             if (! $isAdmin) {
-                \App\Services\TicketNotificationService::notifyAdminOnTicketCreated($ticket);
+                \App\Services\TicketNotificationService::notifyOnTicketCreated($ticket);
             }
 
             return $ticket;

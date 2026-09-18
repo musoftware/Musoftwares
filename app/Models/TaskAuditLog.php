@@ -37,6 +37,11 @@ class TaskAuditLog extends Model
         return $this->belongsTo(User::class, 'changed_by');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'changed_by');
+    }
+
     /**
      * Get Cairo formatted created_at string
      */

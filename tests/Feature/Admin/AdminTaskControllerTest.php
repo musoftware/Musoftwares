@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Task;
 use App\Models\Todo;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -146,5 +147,74 @@ class AdminTaskControllerTest extends TestCase
             ->has('clients', 1)
             ->where('clients.0.name', 'Alpha Client')
         );
+    }
+
+    public function test_admin_can_ignore_task_via_post(): void
+    {
+        $task = Task::create([
+            'user_id' => $this->clientUser->id,
+            'task_name' => 'Task to ignore',
+            'billing_status' => 'open',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.tasks.ignore', $task), [
+            'ignore_reason' => 'non_billable',
+            'ignore_notes' => 'Internal maintenance',
+        ]);
+
+        $response->assertRedirect(route('admin.tasks.pending'));
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'billing_status' => 'ignored',
+            'ignore_reason' => 'non_billable',
+            'ignore_notes' => 'Internal maintenance',
+        ]);
+    }
+
+    public function test_admin_safely_redirected_when_accessing_ignore_via_get(): void
+    {
+        $task = Task::create([
+            'user_id' => $this->clientUser->id,
+            'task_name' => 'Task to ignore via get',
+            'billing_status' => 'open',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.tasks.ignore', $task));
+
+        $response->assertRedirect(route('admin.tasks.pending'));
+        $response->assertSessionHas('info');
+    }
+
+    public function test_admin_can_restore_ignored_task(): void
+    {
+        $task = Task::create([
+            'user_id' => $this->clientUser->id,
+            'task_name' => 'Task to restore',
+            'billing_status' => 'ignored',
+            'ignore_reason' => 'non_billable',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.tasks.restore', $task));
+
+        $response->assertRedirect(route('admin.tasks.pending'));
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'billing_status' => 'open',
+            'ignore_reason' => null,
+        ]);
+    }
+
+    public function test_admin_safely_redirected_when_accessing_restore_via_get(): void
+    {
+        $task = Task::create([
+            'user_id' => $this->clientUser->id,
+            'task_name' => 'Task to restore via get',
+            'billing_status' => 'ignored',
+            'ignore_reason' => 'non_billable',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.tasks.restore', $task));
+
+        $response->assertRedirect(route('admin.tasks.pending'));
     }
 }

@@ -778,7 +778,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     </DialogHeader>
 
                     {ignoringTask && (
-                        <form onSubmit={submitIgnore} className="space-y-4 py-2">
+                        <form onSubmit={submitIgnore} method="post" className="space-y-4 py-2">
                             <div className="bg-muted/40 p-2.5 rounded text-xs border border-border/40">
                                 <span className="font-semibold text-slate-900 dark:text-white">
                                     {ignoringTask.task_name}

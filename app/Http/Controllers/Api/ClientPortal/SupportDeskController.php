@@ -82,8 +82,8 @@ class SupportDeskController extends Controller
             'is_self_service'  => true,
         ]);
 
-        // Dispatch FCM push to admins immediately
-        \App\Services\TicketNotificationService::notifyAdminOnTicketCreated($ticket);
+        // Dispatch notifications (Client email, Admin emails, and FCM)
+        \App\Services\TicketNotificationService::notifyOnTicketCreated($ticket);
 
         // Award 15 points automatically for self-service ticket creation
         $pointTxn = $this->loyaltyService->awardPoints(

@@ -18,6 +18,7 @@ use App\Models\ProjectReport;
 use App\Models\Task;
 use App\Models\Todo;
 use App\Services\ProjectBoardService;
+use App\Services\TaskNotificationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -166,6 +167,14 @@ class ClientProjectBoardController extends Controller
             array_key_exists('published_at', $data),
         );
 
+        $user = $request->user();
+        if ($user) {
+            $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
+            if (! $isAdmin) {
+                TaskNotificationService::notifyOnTaskCreated($task, $user, $project);
+            }
+        }
+
         return response()->json([
             'ok' => true,
             'card' => $this->taskToCard($task, $placement),
@@ -276,6 +285,14 @@ class ClientProjectBoardController extends Controller
             $data['published_at'] ?? null,
             array_key_exists('published_at', $data),
         );
+
+        $user = $request->user();
+        if ($user) {
+            $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
+            if (! $isAdmin) {
+                TaskNotificationService::notifyOnTodoCreated($todo, $user, $project);
+            }
+        }
 
         return response()->json([
             'ok' => true,

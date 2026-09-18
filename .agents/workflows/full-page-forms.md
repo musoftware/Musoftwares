@@ -36,3 +36,32 @@ Always define explicit routes for creating and editing resources:
 
 ### 4. Exceptions
 The *only* exception to this rule is for extremely simple, single-field, or highly contextual sub-actions where navigating away would disrupt a larger workflow (e.g., adding a quick tag, renaming a file, or a quick status change confirmation). For all standard CRUD operations on main models (e.g., Invoices, Clients, Products, Transactions, Appointments), full pages are mandatory.
+
+---
+
+## 5. Modal-to-Page Migration & Elimination Protocol
+
+When deprecating an existing modal, sheet, or dialog in favor of a dedicated full-page form:
+
+1. **System-Wide Trigger Sweep**:
+   - Grep the entire repository for references to the modal component, its state variables (e.g., `isTicketModalOpen`, `setIsModalOpen`), and action button labels.
+   - Update every trigger button across all pages, layouts, navigation bars, headers, and banners to be a direct navigation link:
+     ```tsx
+     // Before (Forbidden):
+     <button onClick={() => setIsModalOpen(true)}>Open Ticket</button>
+
+     // After (Mandatory):
+     <Link href={route('tickets.create')}>Open Ticket</Link>
+     ```
+
+2. **Preserve Context via Query Parameters**:
+   - If the previous modal received entity context (e.g., `projectId`), pass it via query parameters on the navigation link:
+     ```tsx
+     <Link href={currentProject?.id ? `/tickets/create?project_id=${currentProject.id}` : '/tickets/create'}>
+     ```
+   - Ensure the controller's `create()` method extracts query parameters and passes them as initial props (e.g., `initialProjectId`).
+
+3. **Immediate Dead Code Elimination**:
+   - Remove all modal imports and `useState` flags from parent views.
+   - Delete the obsolete modal component file immediately using `git rm`. Never leave dead modal components or zombie dialog triggers coexisting alongside dedicated pages.
+
