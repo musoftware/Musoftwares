@@ -33,6 +33,7 @@ class SerialSoftware extends Model
 
     protected $fillable = [
         'name',
+        'logo_path',
         'is_active',
         'default_status',
         'pricing_type',
@@ -48,6 +49,8 @@ class SerialSoftware extends Model
         'show_whatsapp',
     ];
 
+    protected $appends = ['logo_url'];
+
     protected $casts = [
         'is_active' => 'boolean',
         'requires_payment' => 'boolean',
@@ -61,6 +64,11 @@ class SerialSoftware extends Model
     /**
      * @return string[]
      */
+        public function getLogoUrlAttribute(): ?string
+    {
+        return $this->logo_path ? asset('storage/' . $this->logo_path) : null;
+    }
+
     public static function statuses(): array
     {
         return [

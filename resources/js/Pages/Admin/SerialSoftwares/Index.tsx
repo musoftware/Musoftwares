@@ -55,6 +55,7 @@ interface SoftwareKey {
 interface Software {
   id: number;
   name: string;
+  logo_url?: string | null;
   is_active: boolean;
   default_status: string;
   pricing_type?: 'free' | 'single' | 'packages';
@@ -507,8 +508,12 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                         href={route('admin.serial-devices.index', { software_id: sw.id })}
                         className="flex items-center gap-3 hover:underline">
                         
-                                                    <div className="w-8 h-8 rounded-lg border flex items-center justify-center bg-muted shrink-0">
-                                                        <Layers className="w-4 h-4 text-muted-foreground" />
+                                                    <div className="w-8 h-8 rounded-lg border flex items-center justify-center bg-muted shrink-0 overflow-hidden">
+                                                        {sw.logo_url ? (
+                                                            <img src={sw.logo_url} alt={sw.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <Layers className="w-4 h-4 text-muted-foreground" />
+                                                        )}
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="font-medium">{sw.name}</span>

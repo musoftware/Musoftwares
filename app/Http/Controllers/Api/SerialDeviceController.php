@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
+use App\Models\SerialSoftwareKey;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -47,11 +48,14 @@ class SerialDeviceController extends Controller
 
         // Track first-time-seen software as a notable audit event. The admin
         // console does not expect unknown programs to start checking in.
-        $softwareExisted = SerialSoftware::where('name', $validated['program_name'])->exists();
+        $softwareExisted = SerialSoftware::withTrashed()->where('name', $validated['program_name'])->exists();
 
-        $software = SerialSoftware::firstOrCreate(
-            ['name' => $validated['program_name']],
-            ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
+        $software = $this->findOrCreateSoftware($validated['program_name']);
+
+        // Ensure default max_channels setting exists for software if not present
+        SerialSoftwareKey::firstOrCreate(
+            ['serial_software_id' => $software->id, 'key' => 'max_channels'],
+            ['default_value' => '1', 'description' => 'Maximum allowed WhatsApp channels']
         );
 
         // Master Kill Switch: If software is not active as a whole, deny access to all devices
@@ -75,6 +79,8 @@ class SerialDeviceController extends Controller
                 'currency'             => $software->currency ?? 'USD',
                 'whatsapp_number'      => $software->whatsapp_number,
                 'payment_instructions' => $software->payment_instructions,
+                'logo_url'             => $software->logo_url,
+            'logo_url'             => $software->logo_url,
                 'message'              => 'This software is currently disabled by administrator.',
             ]);
         }
@@ -252,6 +258,7 @@ class SerialDeviceController extends Controller
             'currency'             => $software->currency ?? 'USD',
             'whatsapp_number'      => $software->whatsapp_number,
             'payment_instructions' => $software->payment_instructions,
+            'logo_url'             => $software->logo_url,
         ]);
     }
 
@@ -259,6 +266,80 @@ class SerialDeviceController extends Controller
      * Check if user exists by email and link device if found.
      * Called when client enters email in the connection/activation dialog.
      */
+    /**
+     * Get or initialize application software settings (e.g. max_channels).
+     * Creates the setting for the software if it doesn't exist yet.
+     * If it already exists, IT NEVER MODIFIES/OVERWRITES IT, and returns the authoritative server value.
+     */
+    public function settings(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'program_name'  => ['required', 'string', 'max:255'],
+            'device_id'     => ['nullable', 'string', 'max:255'],
+            'key'           => ['nullable', 'string', 'max:100'],
+            'default_value' => ['nullable', 'string', 'max:255'],
+            'description'   => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $software = $this->findOrCreateSoftware($validated['program_name']);
+
+        $targetKey = $validated['key'] ?? 'max_channels';
+        $defaultValue = $validated['default_value'] ?? '1';
+        $description = $validated['description'] ?? ($targetKey === 'max_channels' ? 'Maximum allowed WhatsApp channels' : null);
+
+        // 1. Create the setting for the application if not already present
+        // 2. If it already exists, NEVER modify it (preserves server-side value)
+        $softwareKey = SerialSoftwareKey::where('serial_software_id', $software->id)
+            ->where('key', $targetKey)
+            ->first();
+
+        if (! $softwareKey) {
+            $softwareKey = SerialSoftwareKey::create([
+                'serial_software_id' => $software->id,
+                'key'                => $targetKey,
+                'default_value'      => $defaultValue,
+                'description'        => $description,
+            ]);
+        }
+
+        // Always ensure max_channels exists as a base setting for the software
+        if ($targetKey !== 'max_channels') {
+            SerialSoftwareKey::firstOrCreate(
+                ['serial_software_id' => $software->id, 'key' => 'max_channels'],
+                ['default_value' => '1', 'description' => 'Maximum allowed WhatsApp channels']
+            );
+        }
+
+        // 3. Resolve value from server (checking device override if device_id is provided)
+        $device = null;
+        if (! empty($validated['device_id'])) {
+            $device = SerialDevice::where('serial_software_id', $software->id)
+                ->where('device_id', $validated['device_id'])
+                ->first();
+        }
+
+        $resolvedKeys = $device ? $device->getResolvedCustomKeys() : [];
+        if (empty($resolvedKeys)) {
+            $allKeys = SerialSoftwareKey::where('serial_software_id', $software->id)->get();
+            foreach ($allKeys as $k) {
+                $resolvedKeys[$k->key] = $k->default_value;
+            }
+        }
+
+        $effectiveValue = $resolvedKeys[$targetKey] ?? $softwareKey->default_value;
+
+        return response()->json([
+            'success'      => true,
+            'program_name' => $software->name,
+            'device_id'    => $validated['device_id'] ?? null,
+            'key'          => $targetKey,
+            'value'        => $effectiveValue,
+            'max_channels' => isset($resolvedKeys['max_channels']) ? (int) $resolvedKeys['max_channels'] : 1,
+            'settings'     => $resolvedKeys,
+            'logo_url'     => $software->logo_url,
+        ]);
+    }
+
     public function lookupOrLinkUser(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -280,10 +361,7 @@ class SerialDeviceController extends Controller
         }
 
         // Ensure software & device records exist
-        $software = SerialSoftware::firstOrCreate(
-            ['name' => $validated['program_name']],
-            ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
-        );
+        $software = $this->findOrCreateSoftware($validated['program_name']);
 
         if (! ($software->is_active ?? true)) {
             return response()->json([
@@ -440,10 +518,7 @@ class SerialDeviceController extends Controller
         }
 
         // Ensure software & device records exist
-        $software = SerialSoftware::firstOrCreate(
-            ['name' => $validated['program_name']],
-            ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
-        );
+        $software = $this->findOrCreateSoftware($validated['program_name']);
 
         if (! ($software->is_active ?? true)) {
             return response()->json([
@@ -545,6 +620,31 @@ class SerialDeviceController extends Controller
             'payment_instructions' => $software->payment_instructions,
             'message'              => $message,
         ]);
+    }
+
+    /**
+     * Find or create software while properly handling soft-deleted rows.
+     * When an admin soft-deletes a software and a client subsequently opens the app,
+     * the software is automatically restored (deleted_at becomes null) so it reappears.
+     */
+    private function findOrCreateSoftware(string $programName): SerialSoftware
+    {
+        $software = SerialSoftware::withTrashed()
+            ->where('name', $programName)
+            ->first();
+
+        if (! $software) {
+            return SerialSoftware::create([
+                'name'           => $programName,
+                'default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE,
+            ]);
+        }
+
+        if ($software->trashed()) {
+            $software->restore();
+        }
+
+        return $software;
     }
 
     /**

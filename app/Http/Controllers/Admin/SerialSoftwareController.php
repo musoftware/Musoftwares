@@ -11,6 +11,7 @@ use App\Models\SerialSoftware;
 use App\Services\SerialSoftwareService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -206,7 +207,22 @@ class SerialSoftwareController extends Controller
             'payment_instructions' => ['nullable', 'string', 'max:2000'],
             'show_price' => ['nullable', 'boolean'],
             'show_whatsapp' => ['nullable', 'boolean'],
+            'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp,svg', 'max:3072'],
+            'remove_logo' => ['nullable', 'boolean'],
         ]);
+
+        if ($request->boolean('remove_logo')) {
+            if ($serialSoftware->logo_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($serialSoftware->logo_path);
+                $validated['logo_path'] = null;
+            }
+        } elseif ($request->hasFile('logo')) {
+            if ($serialSoftware->logo_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($serialSoftware->logo_path);
+            }
+            $validated['logo_path'] = $request->file('logo')->store('software-logos', 'public');
+        }
+        unset($validated['logo'], $validated['remove_logo']);
 
         $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);
 
@@ -236,6 +252,7 @@ class SerialSoftwareController extends Controller
             'software' => [
                 'id' => $serialSoftware->id,
                 'name' => $serialSoftware->name,
+                'logo_url' => $serialSoftware->logo_url,
                 'is_active' => (bool) ($serialSoftware->is_active ?? true),
                 'default_status' => $serialSoftware->default_status,
                 'pricing_type' => $serialSoftware->pricing_type ?? ($serialSoftware->requires_payment ? 'single' : 'free'),
@@ -280,7 +297,23 @@ class SerialSoftwareController extends Controller
             'payment_instructions' => ['nullable', 'string', 'max:5000'],
             'show_price' => ['nullable', 'boolean'],
             'show_whatsapp' => ['nullable', 'boolean'],
+            'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp,svg', 'max:2048'],
+            'remove_logo' => ['nullable', 'boolean'],
         ]);
+
+        if ($request->boolean('remove_logo')) {
+            if ($serialSoftware->logo_path && Storage::disk('public')->exists($serialSoftware->logo_path)) {
+                Storage::disk('public')->delete($serialSoftware->logo_path);
+            }
+            $validated['logo_path'] = null;
+        } elseif ($request->hasFile('logo')) {
+            if ($serialSoftware->logo_path && Storage::disk('public')->exists($serialSoftware->logo_path)) {
+                Storage::disk('public')->delete($serialSoftware->logo_path);
+            }
+            $validated['logo_path'] = $request->file('logo')->store('serial-software-logos', 'public');
+        }
+
+        unset($validated['logo'], $validated['remove_logo']);
 
         $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);
 

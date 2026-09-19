@@ -28,6 +28,7 @@ class SerialSoftwareResource extends JsonResource
             'billing_days' => $this->billing_days,
             'whatsapp_number' => $this->whatsapp_number,
             'payment_instructions' => $this->payment_instructions,
+            'logo_url' => $this->logo_url,
             'total_devices' => $this->total_devices ?? 0,
             'active_count' => $this->active_count ?? 0,
             'inactive_count' => $this->inactive_count ?? 0,

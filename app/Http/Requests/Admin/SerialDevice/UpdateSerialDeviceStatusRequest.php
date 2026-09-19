@@ -17,6 +17,8 @@ class UpdateSerialDeviceStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', 'string', Rule::in(SerialDevice::statuses())],
+            'expires_at' => ['nullable', 'date'],
+            'is_lifetime' => ['nullable', 'boolean'],
         ];
     }
 }

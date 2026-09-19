@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Http\Controllers\Admin\AdminBlogArticleController;
 use App\Http\Controllers\Admin\AdminBusyTimesController;
@@ -904,7 +904,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/serial-softwares/{serialSoftware}/keys/{serialSoftwareKey}', [SerialSoftwareController::class, 'destroyKey'])->name('serial-softwares.keys.destroy');
     Route::patch('/serial-softwares/{serialSoftware}/payment', [SerialSoftwareController::class, 'updatePaymentSettings'])->name('serial-softwares.payment');
     Route::get('/serial-softwares/{serialSoftware}/settings', [SerialSoftwareController::class, 'settings'])->name('serial-softwares.settings');
-    Route::put('/serial-softwares/{serialSoftware}/settings', [SerialSoftwareController::class, 'updateSettings'])->name('serial-softwares.settings.update');
+    Route::match(['put', 'post'], '/serial-softwares/{serialSoftware}/settings', [SerialSoftwareController::class, 'updateSettings'])->name('serial-softwares.settings.update');
     Route::post('/serial-softwares/{serialSoftware}/packages', [SerialSoftwareController::class, 'storePackage'])->name('serial-softwares.packages.store');
     Route::put('/serial-softwares/{serialSoftware}/packages/{package}', [SerialSoftwareController::class, 'updatePackage'])->name('serial-softwares.packages.update');
     Route::delete('/serial-softwares/{serialSoftware}/packages/{package}', [SerialSoftwareController::class, 'destroyPackage'])->name('serial-softwares.packages.destroy');
@@ -928,6 +928,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/serial-devices/{serialDevice}/assign-user', [SerialDeviceController::class, 'assignUser'])->name('serial-devices.assign-user');
     Route::post('/serial-devices/{serialDevice}/keys', [SerialDeviceController::class, 'setKeyOverride'])->name('serial-devices.keys.set');
     Route::delete('/serial-devices/{serialDevice}/keys/{serialDeviceKey}', [SerialDeviceController::class, 'removeKeyOverride'])->name('serial-devices.keys.remove');
+    Route::get('/serial-devices-quick-activate', [SerialDeviceController::class, 'quickActivate'])->name('serial-devices.quick-activate');
+    Route::get('/serial-devices-lookup', [SerialDeviceController::class, 'lookupDevice'])->name('serial-devices.lookup');
+    Route::post('/serial-devices-quick-activate', [SerialDeviceController::class, 'executeQuickActivation'])->name('serial-devices.execute-quick-activate');
 
     // User-Device assignments (admin maps device → user)
     Route::get('/serial-user-devices', [SerialUserDeviceController::class, 'index'])->name('serial-user-devices.index');

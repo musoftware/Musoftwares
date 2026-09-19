@@ -34,7 +34,27 @@ class SerialDeviceResource extends JsonResource
             'updated_at' => $this->updated_at?->toDateTimeString(),
             'software' => $this->whenLoaded('software'),
             // Key matches frontend: device.userDeviceAssignment
-            'userDeviceAssignment' => $this->whenLoaded('userDeviceAssignment'),
+            'userDeviceAssignment' => $this->whenLoaded('userDeviceAssignment', function () {
+                $assignment = $this->userDeviceAssignment;
+                if (! $assignment) {
+                    return null;
+                }
+
+                return [
+                    'id' => $assignment->id,
+                    'status' => $assignment->status,
+                    'expires_at' => $assignment->expires_at?->toDateString(),
+                    'expires_at_formatted' => $assignment->expires_at?->format('Y-m-d H:i'),
+                    'is_expired' => $assignment->isExpired(),
+                    'remaining_days' => $assignment->expires_at ? max(0, (int) ceil(now()->diffInDays($assignment->expires_at, false))) : null,
+                    'notes' => $assignment->notes,
+                    'user' => $assignment->relationLoaded('user') && $assignment->user ? [
+                        'id' => $assignment->user->id,
+                        'name' => $assignment->user->name,
+                        'email' => $assignment->user->email,
+                    ] : null,
+                ];
+            }),
             'resolved_custom_keys' => $this->resource->getResolvedCustomKeys(),
             'device_keys' => $this->whenLoaded('deviceKeys'),
         ];

@@ -35,6 +35,9 @@ import {
     BarChart3,
     User,
     Key,
+    Calendar,
+    Clock,
+    CheckCircle2,
 } from 'lucide-react';
 
 /* ─── Types ─────────────────────────────────────────────────────── */
@@ -148,6 +151,49 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     const [bulkAction, setBulkAction]              = useState<string>('');
     const [assignUserDevice, setAssignUserDevice]  = useState<Device | null>(null);
     const [keysDevice, setKeysDevice]              = useState<Device | null>(null);
+    const [durationDevice, setDurationDevice]      = useState<Device | null>(null);
+    const [durationPreset, setDurationPreset]      = useState<'1m' | '3m' | '6m' | '1y' | 'lifetime' | 'custom'>('1m');
+    const [customDate, setCustomDate]              = useState<string>('');
+
+    const computeExpirationDate = (preset: '1m' | '3m' | '6m' | '1y' | 'lifetime' | 'custom', customVal: string): string | null => {
+        if (preset === 'lifetime') return null;
+        if (preset === 'custom') return customVal || null;
+        const now = new Date();
+        if (preset === '1m') now.setDate(now.getDate() + 30);
+        else if (preset === '3m') now.setDate(now.getDate() + 90);
+        else if (preset === '6m') now.setDate(now.getDate() + 180);
+        else if (preset === '1y') now.setDate(now.getDate() + 365);
+        return now.toISOString().split('T')[0];
+    };
+
+    const openActivateWithDuration = (device: Device) => {
+        setDurationDevice(device);
+        if (device.userDeviceAssignment?.expires_at) {
+            setDurationPreset('custom');
+            setCustomDate(device.userDeviceAssignment.expires_at);
+        } else {
+            setDurationPreset('1m');
+            setCustomDate('');
+        }
+    };
+
+    const handleSaveDuration = () => {
+        if (!durationDevice) return;
+        const isLifetime = durationPreset === 'lifetime';
+        const expiresAt = computeExpirationDate(durationPreset, customDate);
+
+        router.patch(route('admin.serial-devices.status', durationDevice.id), {
+            status: 'active',
+            is_lifetime: isLifetime,
+            expires_at: isLifetime ? null : expiresAt,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setDurationDevice(null);
+            },
+        });
+    };
     const [overrideForm, setOverrideForm]          = useState<{ serial_software_key_id: number | ''; value: string }>({
         serial_software_key_id: '',
         value: '',
@@ -631,10 +677,41 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             <TableCell className="text-muted-foreground text-xs" title={device.last_check_date_full ?? ''}>
                                                 {device.last_check_date ?? '—'}
                                             </TableCell>
-                                            <TableCell>
-                                                <Badge variant={statusVariant[device.status] ?? 'outline'} className="capitalize text-xs">
-                                                    {__(device.status.charAt(0).toUpperCase() + device.status.slice(1))}
-                                                </Badge>
+                                            <TableCell onClick={e => e.stopPropagation()}>
+                                                <div className="flex flex-col gap-1">
+                                                    <Badge variant={statusVariant[device.status] ?? 'outline'} className="capitalize text-xs w-fit">
+                                                        {__(device.status.charAt(0).toUpperCase() + device.status.slice(1))}
+                                                    </Badge>
+                                                    {device.status === 'active' && (
+                                                        device.userDeviceAssignment?.expires_at ? (
+                                                            <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-mono" title={device.userDeviceAssignment.expires_at_formatted ?? ''}>
+                                                                <span className={device.userDeviceAssignment.is_expired ? 'text-red-500 font-semibold' : 'text-slate-600 dark:text-slate-300'}>
+                                                                    {device.userDeviceAssignment.remaining_days !== null && device.userDeviceAssignment.remaining_days !== undefined
+                                                                        ? (device.userDeviceAssignment.remaining_days > 0 ? `${device.userDeviceAssignment.remaining_days}d left` : 'Expired')
+                                                                        : device.userDeviceAssignment.expires_at}
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => openActivateWithDuration(device)}
+                                                                    className="text-[10px] text-blue-600 hover:text-blue-700 hover:underline ms-0.5"
+                                                                >
+                                                                    ({__('general.edit') ?? 'edit'})
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                                                                <span>{__('general.lifetime', {}, 'Lifetime')}</span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => openActivateWithDuration(device)}
+                                                                    className="text-[10px] text-muted-foreground hover:text-foreground ms-0.5"
+                                                                >
+                                                                    ({__('general.edit') ?? 'edit'})
+                                                                </button>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell onClick={e => e.stopPropagation()} className="text-end">
                                                 <DropdownMenu>
@@ -657,8 +734,15 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {device.status !== 'active' && (
-                                                            <DropdownMenuItem onClick={() => updateStatus(device, 'active')}>
+                                                            <DropdownMenuItem onClick={() => openActivateWithDuration(device)}>
+                                                                <CheckCircle2 className="w-4 h-4 me-2 text-green-600" />
                                                                 {__('general.set_active')}
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {device.status === 'active' && (
+                                                            <DropdownMenuItem onClick={() => openActivateWithDuration(device)}>
+                                                                <Calendar className="w-4 h-4 me-2 text-blue-600" />
+                                                                {__('general.edit_duration', {}, 'Edit Duration / Expiration')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         {device.status !== 'inactive' && (
@@ -764,6 +848,117 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     )}
                 </div>
             </div>
+
+            {/* Activate / Set Duration Dialog */}
+            <Dialog open={durationDevice !== null} onOpenChange={open => !open && setDurationDevice(null)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-blue-600" />
+                            {durationDevice?.status === 'active'
+                                ? (__('general.edit_license_duration') ?? 'تعديل مدة الصلاحية')
+                                : (__('general.activate_device_with_duration') ?? 'تفعيل الجهاز وتحديد المدة')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    {durationDevice && (
+                        <div className="space-y-4 pt-2 text-sm">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border text-xs space-y-1">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{__('general.device_id') ?? 'Device ID'}:</span>
+                                    <span className="font-mono">{truncateId(durationDevice.device_id)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{__('general.machine') ?? 'Machine'}:</span>
+                                    <span className="font-medium">{durationDevice.machine_name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{__('general.software') ?? 'Software'}:</span>
+                                    <span className="font-medium">{durationDevice.software?.name ?? '—'}</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-xs font-semibold">{__('general.choose_duration') ?? 'اختر مدة الترخيص'}</Label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[
+                                        { key: '1m', label: __('general.one_month') ?? '1 Month (30d)' },
+                                        { key: '3m', label: __('general.three_months') ?? '3 Months (90d)' },
+                                        { key: '6m', label: __('general.six_months') ?? '6 Months (180d)' },
+                                        { key: '1y', label: __('general.one_year') ?? '1 Year (365d)' },
+                                        { key: 'lifetime', label: __('general.lifetime') ?? 'Lifetime (دائم)' },
+                                        { key: 'custom', label: __('general.custom_date') ?? 'Custom Date' },
+                                    ].map(item => (
+                                        <button
+                                            key={item.key}
+                                            type="button"
+                                            onClick={() => setDurationPreset(item.key as any)}
+                                            className={`px-2.5 py-2 rounded-md border text-xs font-medium transition-all text-center ${
+                                                durationPreset === item.key
+                                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                    : 'bg-card hover:bg-muted text-card-foreground border-border'
+                                            }`}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {durationPreset === 'custom' && (
+                                <div className="space-y-1.5 pt-1">
+                                    <Label className="text-xs">{__('general.select_expiration_date') ?? 'حدد تاريخ الانتهاء'}</Label>
+                                    <Input
+                                        type="date"
+                                        value={customDate}
+                                        min={new Date().toISOString().split('T')[0]}
+                                        onChange={e => setCustomDate(e.target.value)}
+                                        className="text-xs"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Summary / Preview Box */}
+                            <div className="rounded-lg p-3 border bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900 text-xs">
+                                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-medium">
+                                    <Clock className="w-4 h-4" />
+                                    <span>{__('general.result_preview') ?? 'معاينة الصلاحية'}:</span>
+                                </div>
+                                <p className="mt-1 text-slate-700 dark:text-slate-300">
+                                    {durationPreset === 'lifetime' ? (
+                                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                            {__('general.permanent_lifetime_no_expiry') ?? 'ترخيص دائم مدى الحياة (بدون تاريخ انتهاء)'}
+                                        </span>
+                                    ) : (
+                                        <span>
+                                            {__('general.expires_at') ?? 'ينتهي في'}:{' '}
+                                            <strong className="text-slate-900 dark:text-white font-mono">
+                                                {computeExpirationDate(durationPreset, customDate) || '—'}
+                                            </strong>
+                                        </span>
+                                    )}
+                                </p>
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2 border-t">
+                                <Button variant="outline" size="sm" onClick={() => setDurationDevice(null)}>
+                                    {__('general.cancel')}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    disabled={durationPreset === 'custom' && !customDate}
+                                    onClick={handleSaveDuration}
+                                >
+                                    <CheckCircle2 className="w-4 h-4 me-1.5" />
+                                    {durationDevice.status === 'active'
+                                        ? (__('general.save_duration') ?? 'حفظ المدة')
+                                        : (__('general.activate_now') ?? 'تفعيل الجهاز الآن')}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
 
             {/* Assign User Dialog */}
             <Dialog open={assignUserDevice !== null} onOpenChange={open => !open && setAssignUserDevice(null)}>

@@ -6238,7 +6238,7 @@ _**Agent (copilot/auto)**_
 @@ lines 8-8 @@
 
 ```
-SSH_PASSWORD=your_password_here
+SSH_PASSWORD=[REDACTED:generic-password]
 
 ```
 </details></tool-use>
@@ -6684,7 +6684,7 @@ _**Agent (copilot/auto)**_
 @@ lines 17-50 @@
 
 ```
-SSH_PASSWORD=%SSH_PASSWORD:~0,100%"
+SSH_PASSWORD=[REDACTED:generic-password],100%"
 set "PROJECT_NAME=%PROJECT_NAME:~0,50%"
 
 if not defined SSH_USER (
@@ -6832,7 +6832,7 @@ _**Agent (copilot/auto)**_
 @@ lines 17-50 @@
 
 ```
-SSH_PASSWORD=%SSH_PASSWORD:~0,100%"
+SSH_PASSWORD=[REDACTED:generic-password],100%"
 set "PROJECT_NAME=%PROJECT_NAME:~0,50%"
 
 if not defined SSH_USER (
@@ -7042,7 +7042,7 @@ SSH_USER=u962989541
 SSH_HOST=147.79.103.131
 SSH_PORT=65002
 REMOTE_PATH=/domains/musoftwares.com/public_html/
-SSH_PASSWORD=MKK8wjq8&
+SSH_PASSWORD=[REDACTED:generic-password]
 
 # اختياري: مسار المفتاح الخاص
 # SSH_KEY=/path/to/private/key
@@ -8288,7 +8288,7 @@ _**Agent (copilot/auto)**_
 الآن يطلب منك كلمة المرور. اكتب كلمة المرور وادخل:
 
 ```
-MKK8wjq8&
+[REDACTED:generic-password]
 ```
 
 ثم اضغط **Enter** ✨
@@ -8311,7 +8311,7 @@ _**Agent (copilot/auto)**_
 
 **الخطوات:**
 
-1. ✅ اكتب كلمة المرور: `MKK8wjq8&`
+1. ✅ اكتب كلمة المرور: `[REDACTED:generic-password]`
 2. ✅ اضغط Enter
 3. ✅ اجلس واتفرج على البناء يعمل بشكل تلقائي!
 
@@ -8400,7 +8400,7 @@ ssh-keygen -t ed25519
 
 ```powershell
 # مرة واحدة فقط: حفظ كلمة المرور
-"MKK8wjq8&" | ConvertTo-SecureString -AsPlainText -Force | ConvertFrom-SecureString | Out-File .password.enc
+"[REDACTED:generic-password]" | ConvertTo-SecureString -AsPlainText -Force | ConvertFrom-SecureString | Out-File .password.enc
 ```
 
 ---
@@ -8490,7 +8490,7 @@ _**Agent (copilot/auto)**_
 ssh -p 65002 u962989541@147.79.103.131 "ls -la ~/"
 ```
 
-ادخل كلمة المرور (`MKK8wjq8&`) وسترى المجلدات الموجودة.
+ادخل كلمة المرور (`[REDACTED:generic-password]`) وسترى المجلدات الموجودة.
 
 ---
 
@@ -8575,7 +8575,7 @@ SSH_USER=u962989541
 SSH_HOST=147.79.103.131
 SSH_PORT=65002
 REMOTE_PATH=/home/u962989541/domains/musoftwares.com/public_html/
-SSH_PASSWORD=MKK8wjq8&
+SSH_PASSWORD=[REDACTED:generic-password]
 
 # اختياري: مسار المفتاح الخاص
 # SSH_KEY=/path/to/private/key

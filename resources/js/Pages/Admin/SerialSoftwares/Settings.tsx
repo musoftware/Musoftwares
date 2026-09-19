@@ -30,6 +30,8 @@ import {
   Package as PackageIcon,
   ShieldAlert,
   ShieldCheck,
+  Upload,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 interface SoftwareKey {
@@ -61,6 +63,7 @@ interface SoftwarePackage {
 interface Software {
   id: number;
   name: string;
+  logo_url?: string | null;
   is_active: boolean;
   default_status: string;
   pricing_type: 'free' | 'single' | 'packages';
@@ -107,6 +110,28 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
   });
 
   const [saving, setSaving] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(software.logo_url || null);
+  const [removeLogo, setRemoveLogo] = useState(false);
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      setRemoveLogo(false);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    setRemoveLogo(true);
+  };
 
   // Master Key Form State
   const [keyForm, setKeyForm] = useState({ key: '', default_value: '', description: '' });
@@ -135,24 +160,33 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     e.preventDefault();
     setSaving(true);
 
-    router.put(
+    const payload: Record<string, any> = {
+      _method: 'PUT',
+      name: form.name,
+      is_active: form.is_active ? 1 : 0,
+      default_status: form.default_status,
+      pricing_type: form.pricing_type,
+      price: form.pricing_type === 'single' && form.price !== '' ? parseFloat(form.price) : null,
+      reseller_price: form.pricing_type === 'single' && form.reseller_price !== '' ? parseFloat(form.reseller_price) : null,
+      currency: form.currency,
+      billing_cycle: form.pricing_type === 'single' ? form.billing_cycle : null,
+      billing_days: form.pricing_type === 'single' && form.billing_cycle === 'custom' && form.billing_days !== '' ? parseInt(form.billing_days) : null,
+      whatsapp_number: form.whatsapp_number || null,
+      payment_instructions: form.payment_instructions || null,
+      show_price: form.show_price ? 1 : 0,
+      show_whatsapp: form.show_whatsapp ? 1 : 0,
+      remove_logo: removeLogo ? 1 : 0,
+    };
+
+    if (logoFile) {
+      payload.logo = logoFile;
+    }
+
+    router.post(
       route('admin.serial-softwares.settings.update', software.id),
+      payload,
       {
-        name: form.name,
-        is_active: form.is_active,
-        default_status: form.default_status,
-        pricing_type: form.pricing_type,
-        price: form.pricing_type === 'single' && form.price !== '' ? parseFloat(form.price) : null,
-        reseller_price: form.pricing_type === 'single' && form.reseller_price !== '' ? parseFloat(form.reseller_price) : null,
-        currency: form.currency,
-        billing_cycle: form.pricing_type === 'single' ? form.billing_cycle : null,
-        billing_days: form.pricing_type === 'single' && form.billing_cycle === 'custom' && form.billing_days !== '' ? parseInt(form.billing_days) : null,
-        whatsapp_number: form.whatsapp_number || null,
-        payment_instructions: form.payment_instructions || null,
-        show_price: form.show_price,
-        show_whatsapp: form.show_whatsapp,
-      },
-      {
+        forceFormData: true,
         preserveScroll: true,
         onFinish: () => setSaving(false),
       }
@@ -403,6 +437,70 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                   checked={form.is_active}
                   onCheckedChange={(checked) => setForm({ ...form, is_active: checked })}
                 />
+              </div>
+
+              {/* Program Logo Upload */}
+              <div className="p-4 rounded-xl border bg-muted/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs font-semibold">
+                      {__('general.program_logo', {}, 'Program Logo')}
+                    </Label>
+                    <p className="text-[11px] text-muted-foreground">
+                      {__('general.program_logo_hint', {}, 'Upload a logo for this software (PNG, JPG, SVG, WebP, max 2MB). Shown in client desktop activation & licensing dialogs.')}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  {logoPreview ? (
+                    <div className="relative group shrink-0">
+                      <img
+                        src={logoPreview}
+                        alt="Software Logo"
+                        className="w-20 h-20 object-contain rounded-xl border bg-background p-1.5 shadow-xs"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl border border-dashed flex flex-col items-center justify-center bg-muted/30 text-muted-foreground shrink-0">
+                      <ImageIcon className="w-8 h-8 opacity-40 mb-1" />
+                      <span className="text-[10px]">{__('general.no_logo', {}, 'No logo')}</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="file"
+                      id="software-logo-input"
+                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                      className="hidden"
+                      onChange={handleLogoChange}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 text-xs"
+                      onClick={() => document.getElementById('software-logo-input')?.click()}
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{logoPreview ? __('general.change_logo', {}, 'Change Logo') : __('general.upload_logo', {}, 'Upload Logo')}</span>
+                    </Button>
+
+                    {logoPreview && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1 text-xs text-destructive hover:bg-destructive/10"
+                        onClick={handleRemoveLogo}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>{__('general.remove_logo', {}, 'Remove Logo')}</span>
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Identity & Default Device Status */}

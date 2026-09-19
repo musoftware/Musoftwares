@@ -52,6 +52,14 @@ Route::post('serial/device/register-user',
     [SerialDeviceController::class, 'registerUserAndDevice']
 )->middleware(['force.json', 'throttle:60,1']);
 
+Route::match(['get', 'post'], 'serial/settings',
+    [SerialDeviceController::class, 'settings']
+)->middleware(['force.json', 'throttle:60,1']);
+
+Route::match(['get', 'post'], 'serial/device/settings',
+    [SerialDeviceController::class, 'settings']
+)->middleware(['force.json', 'throttle:60,1']);
+
 // ── Paid Commission Play (PUBLIC - NO AUTH) ──────────────────────────────────
 // CRITICAL NOTE FOR AI / DEVELOPERS: DO NOT ADD AUTH / SANCTUM TO THIS ROUTE.
 // The user explicitly specified that this endpoint must remain accessible

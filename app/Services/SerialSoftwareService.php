@@ -16,6 +16,24 @@ class SerialSoftwareService extends BaseService
         return SerialSoftware::create($data);
     }
 
+    public function findOrCreateSoftware(string $name, array $defaults = []): SerialSoftware
+    {
+        $software = SerialSoftware::withTrashed()->where('name', $name)->first();
+
+        if (! $software) {
+            return SerialSoftware::create(array_merge([
+                'name' => $name,
+                'default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE,
+            ], $defaults));
+        }
+
+        if ($software->trashed()) {
+            $software->restore();
+        }
+
+        return $software;
+    }
+
     public function updatePaymentSettings(SerialSoftware $serialSoftware, array $data): SerialSoftware
     {
         return $this->updateFullSettings($serialSoftware, $data);

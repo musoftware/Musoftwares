@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -162,6 +162,7 @@ const items: MenuItem[] = [
         { title: "Musoftware Clients", url: "/admin/musoftware-clients" },
         { title: "Serial Softwares", url: "/admin/serial-softwares" },
         { title: "Serial Devices", url: "/admin/serial-devices" },
+        { title: "Quick Activate", url: "/admin/serial-devices-quick-activate" },
         
         { title: "Partner Gateway (B2B API)", url: "/admin/partner-gateway" },
         { title: "Settings", url: "/admin/settings" },

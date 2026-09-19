@@ -21,7 +21,7 @@ The desktop client is a separate execution binary that relies on the Musoftwares
 ## 2. API Contract & Security Protocol
 
 ### A. Device Registration (`POST /api/serial/device`)
-* **Endpoints**: Primary (`https://www.musoftwares.com/api/serial/device`), Secondary Fallback (`https://www.mu-hub.com/api/serial/device`).
+* **Endpoints**: Fixed dual infrastructure mirrors: Primary (`https://www.musoftwares.com/api/serial/device`) and Fallback (`https://www.mu-hub.com/api/serial/device`). These endpoints are immutable infrastructure fixtures and must never be changed or removed by consumer apps.
 * **Protection**: Throttled to 60 req/min per IP (`throttle:60,1`).
 * **Legacy C# Compatibility (CRITICAL)**:
   * Public endpoint invoked by legacy C# programs on startup.
@@ -33,7 +33,13 @@ When a desktop client reports a hardware check-in:
 1. **User Temporary Override**: If `user.temp_valid_until` is in the future, return status `active`.
 2. **User-Device Assignment**: If `SerialUserDevice.status` is `active`, return `active`.
 3. **Software Default**: If `SerialDevice.status` is `active` and `software.default_status` is `active`, return `active`.
-4. **Fallback**: Return `inactive` or `expired` with payment/linking instructions.
+4. **Inactive**: Return `inactive` or `expired` with payment/linking instructions.
+
+### C. Software Lifecycle & Soft-Delete Restoration
+* **Auto-Restoration on Startup**:
+  * When an application checks in via `POST /api/serial/device`, the backend queries `SerialSoftware::withTrashed()`.
+  * If the software was previously soft-deleted by an administrator (`$software->trashed()`), the system must immediately restore it (`$software->restore()`, setting `deleted_at = null`).
+  * This ensures that when a client launches an application, it automatically reappears in the Admin panel without creating duplicate database rows or throwing unique constraint violations.
 
 ---
 

@@ -177,6 +177,31 @@ class SerialSoftwareControllerTest extends TestCase
         $this->assertSoftDeleted('serial_softwares', ['id' => $sw->id]);
     }
 
+    public function test_soft_deleted_software_is_restored_when_app_opens_and_checks_in(): void
+    {
+        $sw = SerialSoftware::factory()->create(['name' => 'AudFinder']);
+        $sw->delete();
+        $this->assertSoftDeleted('serial_softwares', ['id' => $sw->id]);
+
+        // Client opens the app, which registers / checks in via API
+        $response = $this->postJson('/api/serial/device', [
+            'program_name' => 'AudFinder',
+            'device_id' => 'HWID-TEST-RESTORE-123',
+        ]);
+
+        $response->assertSuccessful();
+
+        // Software should have deleted_at set back to null
+        $sw->refresh();
+        $this->assertNull($sw->deleted_at);
+        $this->assertNotSoftDeleted('serial_softwares', ['id' => $sw->id]);
+
+        // Software should reappear in admin index
+        $indexResponse = $this->actingAs($this->admin)->get(route('admin.serial-softwares.index'));
+        $indexResponse->assertSuccessful();
+        $indexResponse->assertInertia(fn ($page) => $page->where('stats.total_softwares', 1));
+    }
+
     // ─── EXPORT ───────────────────────────────────────────────────────
 
     public function test_export_returns_csv(): void
