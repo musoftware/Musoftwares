@@ -237,6 +237,11 @@ class SerialDeviceController extends Controller
             ])->values()->all();
         }
 
+        $trialEnabled = (bool) ($software->trial_enabled ?? false);
+        $trialDays = (int) ($software->trial_days ?? 1);
+        $trialClaimed = (bool) ($device->trial_claimed_at !== null || ($userDevice && $userDevice->trial_claimed_at !== null));
+        $canClaimTrial = $trialEnabled && ! $trialClaimed && $status !== SerialDevice::STATUS_ACTIVE && ! $isExpired;
+
         // Return the device status — client software acts on this.
         return response()->json([
             'status'               => $status,
@@ -259,6 +264,98 @@ class SerialDeviceController extends Controller
             'whatsapp_number'      => $software->whatsapp_number,
             'payment_instructions' => $software->payment_instructions,
             'logo_url'             => $software->logo_url,
+            'trial_enabled'        => $trialEnabled,
+            'trial_days'           => $trialDays,
+            'trial_claimed'        => $trialClaimed,
+            'can_claim_trial'      => $canClaimTrial,
+        ]);
+    }
+
+    /**
+     * Claim free trial for a device.
+     * Called when client requests trial via link API or activation dialog.
+     * The trial is NOT activated automatically on check-in.
+     */
+    public function claimTrial(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'program_name' => ['required', 'string', 'max:255'],
+            'device_id'    => ['required', 'string', 'max:255'],
+        ]);
+
+        $software = SerialSoftware::withTrashed()->where('name', $validated['program_name'])->first();
+
+        if (! $software || ! ($software->is_active ?? true)) {
+            return response()->json([
+                'success' => false,
+                'status'  => SerialDevice::STATUS_INACTIVE,
+                'message' => 'Software not found or currently disabled.',
+            ], 404);
+        }
+
+        if (! ($software->trial_enabled ?? false)) {
+            return response()->json([
+                'success' => false,
+                'status'  => SerialDevice::STATUS_INACTIVE,
+                'message' => 'Free trial is not enabled for this software.',
+            ], 400);
+        }
+
+        $device = SerialDevice::where('serial_software_id', $software->id)
+            ->where('device_id', $validated['device_id'])
+            ->first();
+
+        if (! $device) {
+            $device = $this->findOrCreateDevice($software, $validated['device_id'], SerialDevice::STATUS_INACTIVE);
+        }
+
+        $userDevice = \App\Models\SerialUserDevice::withTrashed()->where('device_id', $validated['device_id'])->first();
+
+        // Check if trial was already claimed on this device
+        if ($device->trial_claimed_at !== null || ($userDevice && $userDevice->trial_claimed_at !== null)) {
+            return response()->json([
+                'success' => false,
+                'status'  => $device->status,
+                'message' => 'A free trial has already been claimed on this device.',
+            ], 400);
+        }
+
+        $trialDays = max(1, (int) ($software->trial_days ?? 1));
+        $expiresAt = now()->addDays($trialDays);
+
+        $device->update([
+            'trial_claimed_at' => now(),
+            'status'           => SerialDevice::STATUS_ACTIVE,
+        ]);
+
+        if (! $userDevice) {
+            $userDevice = \App\Models\SerialUserDevice::create([
+                'device_id'        => $validated['device_id'],
+                'user_id'          => null,
+                'status'           => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+                'trial_claimed_at' => now(),
+                'expires_at'       => $expiresAt,
+                'notes'            => 'Free Trial (' . $trialDays . ' day' . ($trialDays > 1 ? 's' : '') . ') claimed on ' . now()->toFormattedDateString(),
+            ]);
+        } else {
+            if ($userDevice->trashed()) {
+                $userDevice->restore();
+            }
+            $userDevice->update([
+                'status'           => \App\Models\SerialUserDevice::STATUS_ACTIVE,
+                'trial_claimed_at' => now(),
+                'expires_at'       => $expiresAt,
+                'notes'            => 'Free Trial (' . $trialDays . ' day' . ($trialDays > 1 ? 's' : '') . ') claimed on ' . now()->toFormattedDateString(),
+            ]);
+        }
+
+        return response()->json([
+            'success'            => true,
+            'status'             => SerialDevice::STATUS_ACTIVE,
+            'is_active'          => true,
+            'trial_days'         => $trialDays,
+            'expires_at'         => $expiresAt->toIso8601String(),
+            'message'            => "Free trial activated successfully for {$trialDays} day(s).",
         ]);
     }
 

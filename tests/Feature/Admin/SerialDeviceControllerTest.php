@@ -168,4 +168,57 @@ class SerialDeviceControllerTest extends TestCase
         $response->assertSessionHas('success');
         $this->assertNull($userDevice->fresh()->expires_at);
     }
+
+    public function test_admin_can_view_quick_activate(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.serial-devices.quick-activate'));
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/SerialDevices/QuickActivate')
+            ->has('softwares')
+            ->has('recentActivations')
+            ->has('users')
+        );
+    }
+
+    public function test_admin_can_lookup_device(): void
+    {
+        $software = \App\Models\SerialSoftware::factory()->create();
+        $device = SerialDevice::factory()->create([
+            'serial_software_id' => $software->id,
+            'device_id' => 'DEV_LOOKUP_123',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.serial-devices.lookup', [
+            'device_id' => 'DEV_LOOKUP_123',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'found' => true,
+            'clean_device_id' => 'DEV_LOOKUP_123',
+        ]);
+    }
+
+    public function test_admin_can_execute_quick_activation(): void
+    {
+        $software = \App\Models\SerialSoftware::factory()->create([
+            'billing_cycle' => 'monthly',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.serial-devices.execute-quick-activate'), [
+            'device_id' => 'NEW-DEV-999',
+            'software_id' => $software->id,
+            'duration_type' => 'software_default',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('serial_devices', [
+            'serial_software_id' => $software->id,
+            'device_id' => 'NEW-DEV-999',
+            'status' => 'active',
+        ]);
+    }
 }
+

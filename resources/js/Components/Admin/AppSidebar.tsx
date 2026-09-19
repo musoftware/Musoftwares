@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -159,7 +159,7 @@ const items: MenuItem[] = [
     icon: Settings,
     subItems: [
         { title: "Software & Tools Store", url: "/admin/store-tools" },
-        { title: "Musoftware Clients", url: "/admin/musoftware-clients" },
+        { title: "User Assignments", url: "/admin/serial-user-devices" },
         { title: "Serial Softwares", url: "/admin/serial-softwares" },
         { title: "Serial Devices", url: "/admin/serial-devices" },
         { title: "Quick Activate", url: "/admin/serial-devices-quick-activate" },
@@ -212,10 +212,10 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-border/50 p-4 bg-sidebar">
-        <Link href="/" className="flex items-center gap-2 px-2">
+        <a href="/" className="flex items-center gap-2 px-2">
             <ApplicationLogo className="w-6 h-6 text-slate-900 fill-current" />
             <span className="font-semibold text-lg tracking-tight">{__('general.admin_panel')}</span>
-        </Link>
+        </a>
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarGroup>

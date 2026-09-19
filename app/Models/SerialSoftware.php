@@ -47,6 +47,8 @@ class SerialSoftware extends Model
         'payment_instructions',
         'show_price',
         'show_whatsapp',
+        'trial_enabled',
+        'trial_days',
     ];
 
     protected $appends = ['logo_url'];
@@ -56,6 +58,8 @@ class SerialSoftware extends Model
         'requires_payment' => 'boolean',
         'show_price' => 'boolean',
         'show_whatsapp' => 'boolean',
+        'trial_enabled' => 'boolean',
+        'trial_days' => 'integer',
         'price' => 'decimal:2',
         'reseller_price' => 'decimal:2',
         'billing_days' => 'integer',
@@ -64,9 +68,22 @@ class SerialSoftware extends Model
     /**
      * @return string[]
      */
-        public function getLogoUrlAttribute(): ?string
+    public function getLogoUrlAttribute(): ?string
     {
-        return $this->logo_path ? asset('storage/' . $this->logo_path) : null;
+        if (! $this->logo_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->logo_path, 'http://') || str_starts_with($this->logo_path, 'https://')) {
+            return $this->logo_path;
+        }
+
+        $path = ltrim($this->logo_path, '/');
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, 8);
+        }
+
+        return asset($path);
     }
 
     public static function statuses(): array

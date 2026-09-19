@@ -32,6 +32,7 @@ import {
   ShieldCheck,
   Upload,
   Image as ImageIcon,
+  Clock,
 } from 'lucide-react';
 
 interface SoftwareKey {
@@ -70,6 +71,8 @@ interface Software {
   requires_payment: boolean;
   show_price?: boolean;
   show_whatsapp?: boolean;
+  trial_enabled?: boolean;
+  trial_days?: number;
   price: number | null;
   reseller_price: number | null;
   currency: string;
@@ -107,6 +110,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     payment_instructions: software.payment_instructions || '',
     show_price: software.show_price !== undefined ? Boolean(software.show_price) : true,
     show_whatsapp: software.show_whatsapp !== undefined ? Boolean(software.show_whatsapp) : true,
+    trial_enabled: Boolean(software.trial_enabled),
+    trial_days: software.trial_days !== null && software.trial_days !== undefined ? String(software.trial_days) : '1',
   });
 
   const [saving, setSaving] = useState(false);
@@ -168,13 +173,15 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
       pricing_type: form.pricing_type,
       price: form.pricing_type === 'single' && form.price !== '' ? parseFloat(form.price) : null,
       reseller_price: form.pricing_type === 'single' && form.reseller_price !== '' ? parseFloat(form.reseller_price) : null,
-      currency: form.currency,
-      billing_cycle: form.pricing_type === 'single' ? form.billing_cycle : null,
+      currency: form.currency || 'USD',
+      billing_cycle: form.billing_cycle || 'lifetime',
       billing_days: form.pricing_type === 'single' && form.billing_cycle === 'custom' && form.billing_days !== '' ? parseInt(form.billing_days) : null,
       whatsapp_number: form.whatsapp_number || null,
       payment_instructions: form.payment_instructions || null,
       show_price: form.show_price ? 1 : 0,
       show_whatsapp: form.show_whatsapp ? 1 : 0,
+      trial_enabled: form.trial_enabled ? 1 : 0,
+      trial_days: form.trial_days !== '' ? parseInt(form.trial_days) : 1,
       remove_logo: removeLogo ? 1 : 0,
     };
 
@@ -543,6 +550,67 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 </div>
               </div>
             </CardContent>
+          </Card>
+
+          {/* SECTION 1.5: Free Trial Configuration */}
+          <Card className="w-full border-border/80 shadow-xs">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Clock className="w-4 h-4 text-emerald-600" />
+                    <span>{__('general.free_trial_configuration', {}, 'Free Trial for New Devices')}</span>
+                  </CardTitle>
+                  <CardDescription>
+                    {__('general.free_trial_desc', {}, 'Allow new devices to request a temporary free trial. The trial does NOT activate automatically on check-in; it must be requested via the API link or activation dialog.')}
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={form.trial_enabled}
+                    onCheckedChange={(checked) => setForm({ ...form, trial_enabled: checked })}
+                    id="sw-trial-enabled"
+                  />
+                  <Label htmlFor="sw-trial-enabled" className="text-xs font-semibold cursor-pointer">
+                    {form.trial_enabled ? __('general.enabled', {}, 'Enabled') : __('general.disabled', {}, 'Disabled')}
+                  </Label>
+                </div>
+              </div>
+            </CardHeader>
+            {form.trial_enabled && (
+              <CardContent className="pt-0">
+                <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="sw-trial-days" className="text-xs font-semibold">
+                        {__('general.trial_duration_days', {}, 'Trial Duration (Days)')}
+                      </Label>
+                      <Input
+                        id="sw-trial-days"
+                        type="number"
+                        min="1"
+                        max="365"
+                        value={form.trial_days}
+                        onChange={(e) => setForm({ ...form, trial_days: e.target.value })}
+                        placeholder="1"
+                        className="h-9 text-xs"
+                      />
+                      <p className="text-[11px] text-muted-foreground">
+                        {__('general.trial_duration_hint', {}, 'Number of days the device remains active before authorization expires (default: 1 day).')}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-background/80 rounded-lg border border-border/60 text-xs text-muted-foreground flex flex-col justify-center">
+                      <span className="font-semibold text-foreground mb-1">
+                        {__('general.trial_claim_rule', {}, 'Single-Claim Rule (Anti-Abuse)')}
+                      </span>
+                      <span>
+                        {__('general.trial_claim_rule_desc', {}, 'Each device ID can only claim this trial once per software. Once the trial expires, the device becomes inactive and requires an admin license.')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            )}
           </Card>
 
           {/* SECTION 2: Pricing Strategy & Packages */}

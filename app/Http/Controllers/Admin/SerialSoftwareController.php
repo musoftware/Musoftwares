@@ -12,6 +12,7 @@ use App\Services\SerialSoftwareService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -211,18 +212,12 @@ class SerialSoftwareController extends Controller
             'remove_logo' => ['nullable', 'boolean'],
         ]);
 
-        if ($request->boolean('remove_logo')) {
-            if ($serialSoftware->logo_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($serialSoftware->logo_path);
-                $validated['logo_path'] = null;
-            }
-        } elseif ($request->hasFile('logo')) {
-            if ($serialSoftware->logo_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($serialSoftware->logo_path);
-            }
-            $validated['logo_path'] = $request->file('logo')->store('software-logos', 'public');
-        }
+        $this->handleLogoUpload($request, $serialSoftware, $validated);
         unset($validated['logo'], $validated['remove_logo']);
+
+        if (empty($validated['currency'])) {
+            $validated['currency'] = $serialSoftware->currency ?: 'USD';
+        }
 
         $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);
 
@@ -259,6 +254,8 @@ class SerialSoftwareController extends Controller
                 'requires_payment' => (bool) $serialSoftware->requires_payment,
                 'show_price' => (bool) ($serialSoftware->show_price ?? true),
                 'show_whatsapp' => (bool) ($serialSoftware->show_whatsapp ?? true),
+                'trial_enabled' => (bool) ($serialSoftware->trial_enabled ?? false),
+                'trial_days' => (int) ($serialSoftware->trial_days ?? 1),
                 'price' => $serialSoftware->price !== null ? (float) $serialSoftware->price : null,
                 'reseller_price' => $serialSoftware->reseller_price !== null ? (float) $serialSoftware->reseller_price : null,
                 'currency' => $serialSoftware->currency ?? 'USD',
@@ -297,27 +294,62 @@ class SerialSoftwareController extends Controller
             'payment_instructions' => ['nullable', 'string', 'max:5000'],
             'show_price' => ['nullable', 'boolean'],
             'show_whatsapp' => ['nullable', 'boolean'],
+            'trial_enabled' => ['nullable', 'boolean'],
+            'trial_days' => ['nullable', 'integer', 'min:1', 'max:365'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp,svg', 'max:2048'],
             'remove_logo' => ['nullable', 'boolean'],
         ]);
 
-        if ($request->boolean('remove_logo')) {
-            if ($serialSoftware->logo_path && Storage::disk('public')->exists($serialSoftware->logo_path)) {
-                Storage::disk('public')->delete($serialSoftware->logo_path);
-            }
-            $validated['logo_path'] = null;
-        } elseif ($request->hasFile('logo')) {
-            if ($serialSoftware->logo_path && Storage::disk('public')->exists($serialSoftware->logo_path)) {
-                Storage::disk('public')->delete($serialSoftware->logo_path);
-            }
-            $validated['logo_path'] = $request->file('logo')->store('serial-software-logos', 'public');
+        $this->handleLogoUpload($request, $serialSoftware, $validated);
+        unset($validated['logo'], $validated['remove_logo']);
+
+        if (empty($validated['billing_cycle'])) {
+            $validated['billing_cycle'] = SerialSoftware::CYCLE_LIFETIME;
         }
 
-        unset($validated['logo'], $validated['remove_logo']);
+        if (empty($validated['currency'])) {
+            $validated['currency'] = $serialSoftware->currency ?: 'USD';
+        }
 
         $this->serialSoftwareService->updateFullSettings($serialSoftware, $validated);
 
         return back()->with('success', 'Software settings saved successfully.');
+    }
+
+    /**
+     * Store software logos directly in public/serial-software-logos.
+     */
+    private function handleLogoUpload(Request $request, SerialSoftware $serialSoftware, array &$validated): void
+    {
+        if ($request->boolean('remove_logo')) {
+            if ($serialSoftware->logo_path) {
+                if (file_exists(public_path($serialSoftware->logo_path))) {
+                    @unlink(public_path($serialSoftware->logo_path));
+                }
+                if (Storage::disk('public')->exists($serialSoftware->logo_path)) {
+                    Storage::disk('public')->delete($serialSoftware->logo_path);
+                }
+            }
+            $validated['logo_path'] = null;
+        } elseif ($request->hasFile('logo')) {
+            if ($serialSoftware->logo_path) {
+                if (file_exists(public_path($serialSoftware->logo_path))) {
+                    @unlink(public_path($serialSoftware->logo_path));
+                }
+                if (Storage::disk('public')->exists($serialSoftware->logo_path)) {
+                    Storage::disk('public')->delete($serialSoftware->logo_path);
+                }
+            }
+
+            $file = $request->file('logo');
+            $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
+            $targetDir = public_path('serial-software-logos');
+            if (! file_exists($targetDir)) {
+                mkdir($targetDir, 0755, true);
+            }
+            $file->move($targetDir, $filename);
+            $validated['logo_path'] = 'serial-software-logos/' . $filename;
+        }
     }
 
     /**

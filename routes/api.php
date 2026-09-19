@@ -52,6 +52,14 @@ Route::post('serial/device/register-user',
     [SerialDeviceController::class, 'registerUserAndDevice']
 )->middleware(['force.json', 'throttle:60,1']);
 
+Route::post('serial/device/claim-trial',
+    [SerialDeviceController::class, 'claimTrial']
+)->middleware(['force.json', 'throttle:60,1']);
+
+Route::post('serial/device/trial',
+    [SerialDeviceController::class, 'claimTrial']
+)->middleware(['force.json', 'throttle:60,1']);
+
 Route::match(['get', 'post'], 'serial/settings',
     [SerialDeviceController::class, 'settings']
 )->middleware(['force.json', 'throttle:60,1']);

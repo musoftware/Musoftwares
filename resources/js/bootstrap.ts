@@ -22,17 +22,59 @@ axios.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
+function sanitizeInertiaResponse(res: any) {
+    if (!res || !res.headers) return;
+    const headers = res.headers;
+    const hasInertia = headers['x-inertia'] || headers['X-Inertia'] || (typeof headers.get === 'function' && headers.get('x-inertia'));
+    if (!hasInertia) return;
+
+    let data = res.data;
+    if (typeof data === 'string') {
+        try {
+            data = JSON.parse(data);
+        } catch {
+            delete headers['x-inertia'];
+            delete headers['X-Inertia'];
+            if (typeof headers.delete === 'function') headers.delete('x-inertia');
+            return;
+        }
+    }
+
+    if (data && typeof data === 'object') {
+        if (!data.component) {
+            delete headers['x-inertia'];
+            delete headers['X-Inertia'];
+            if (typeof headers.delete === 'function') headers.delete('x-inertia');
+            return;
+        }
+
+        if (!data.url) {
+            const fallbackUrl = res.config?.url || (typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/');
+            data.url = fallbackUrl;
+            if (typeof res.data === 'string') {
+                res.data = JSON.stringify(data);
+            } else {
+                res.data = data;
+            }
+        }
+    }
+}
+
 // Response Interceptor
 axios.interceptors.response.use(
     (response) => {
         if ((response.config as any).__timeoutId) {
             clearTimeout((response.config as any).__timeoutId);
         }
+        sanitizeInertiaResponse(response);
         return response;
     },
     (error) => {
         if (error.config && (error.config as any).__timeoutId) {
             clearTimeout((error.config as any).__timeoutId);
+        }
+        if (error.response) {
+            sanitizeInertiaResponse(error.response);
         }
 
         if (axios.isCancel(error) || error.code === 'ERR_CANCELED' || error.name === 'AbortError' || error.message === 'canceled') {

@@ -35,12 +35,14 @@ class SerialDevice extends Model
         'current_culture',
         'current_ui_culture',
         'last_check_date',
+        'trial_claimed_at',
     ];
 
     protected $casts = [
         'is_64bit_os' => 'boolean',
         'is_64bit_process' => 'boolean',
         'last_check_date' => 'datetime',
+        'trial_claimed_at' => 'datetime',
     ];
 
     /**

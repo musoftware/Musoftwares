@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
@@ -126,7 +126,7 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
         setLookupLoading(true);
         const params: Record<string, string> = { device_id: id };
         if (softwareId) params.software_id = softwareId;
-        axios.get(route('serial-devices.lookup'), { params })
+        axios.get(route('admin.serial-devices.lookup'), { params })
             .then(res => setLookupResult(res.data))
             .catch(() => setLookupResult(null))
             .finally(() => setLookupLoading(false));
@@ -137,7 +137,7 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
         if (!deviceId.trim() || !softwareId) return;
         setSubmitting(true);
         router.post(
-            route('serial-devices.execute-quick-activate'),
+            route('admin.serial-devices.execute-quick-activate'),
             {
                 device_id:     deviceId.trim(),
                 software_id:   softwareId,

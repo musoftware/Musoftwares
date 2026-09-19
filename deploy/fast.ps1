@@ -135,6 +135,8 @@ if ($AssetsOnly) {
     $hasFrontendChanges = $false
 
     foreach ($file in $rawGitFiles) {
+        $file = $file.Trim().Trim("`r", "`n")
+        if ([string]::IsNullOrWhiteSpace($file)) { continue }
         $normalized = $file -replace '\\', '/'
         $skip = $false
         foreach ($pat in $excludedPatterns) {
@@ -150,7 +152,9 @@ if ($AssetsOnly) {
         }
 
         if (Test-Path (Join-Path $PROJECT_ROOT $file) -PathType Leaf) {
-            $filesToUpload.Add($file)
+            if (-not $filesToUpload.Contains($file)) {
+                $filesToUpload.Add($file)
+            }
         }
     }
 
@@ -205,7 +209,16 @@ foreach ($relFile in $filesToUpload) {
     if (-not (Test-Path $destFolder)) {
         New-Item -ItemType Directory -Path $destFolder -Force | Out-Null
     }
-    Copy-Item -Path $src -Destination $dest -Force
+
+    # Auto-sanitize UTF-8 BOM if present
+    $fileBytes = [System.IO.File]::ReadAllBytes($src)
+    if ($fileBytes.Length -ge 3 -and $fileBytes[0] -eq 0xEF -and $fileBytes[1] -eq 0xBB -and $fileBytes[2] -eq 0xBF) {
+        Write-Host "  [!] Stripping UTF-8 BOM from $relFile" -ForegroundColor Yellow
+        $cleanBytes = $fileBytes[3..($fileBytes.Length - 1)]
+        [System.IO.File]::WriteAllBytes($dest, $cleanBytes)
+    } else {
+        Copy-Item -Path $src -Destination $dest -Force
+    }
 }
 
 # Copy public/build into staging if requested
@@ -215,9 +228,13 @@ if ($includeBuildFolder) {
     Copy-Item -Path (Join-Path $PROJECT_ROOT "public\build\*") -Destination $buildDest -Recurse -Force
 }
 
-# Compress staging into zip
-Add-Type -AssemblyName "System.IO.Compression.FileSystem"
-[System.IO.Compression.ZipFile]::CreateFromDirectory($stageContents, $zipFile)
+# Compress staging into zip (uses tar.exe for POSIX forward slash paths)
+if ($null -ne (Get-Command tar.exe -ErrorAction SilentlyContinue)) {
+    & tar.exe -a -cf $zipFile -C $stageContents .
+} else {
+    Add-Type -AssemblyName "System.IO.Compression.FileSystem"
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($stageContents, $zipFile)
+}
 $zipSizeMB = '{0:N2}' -f ((Get-Item $zipFile).Length / 1MB)
 Pass "Archive created: $zipFile ($zipSizeMB MB)"
 
@@ -231,7 +248,7 @@ $remoteExtractCmd = "cd $REMOTE_PATH && unzip -oq $remoteZip && rm -f $remoteZip
 
 if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
     # Accept host key if not cached
-    cmd.exe /c "echo y | plink.exe -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST exit 2>nul"
+    & plink.exe -batch -T -P $SSH_PORT -pw $SSH_PASSWORD "${SSH_USER}@${SSH_HOST}" exit 2>$null
 
     # Upload zip in one go
     & pscp.exe -sftp -batch -P $SSH_PORT -pw $SSH_PASSWORD $zipFile "${SSH_USER}@${SSH_HOST}:$remoteZip"
@@ -240,9 +257,12 @@ if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
         exit 1
     }
 
-    # Extract and clear cache
-    $plinkCmd = "echo. | plink.exe -batch -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST ""$remoteExtractCmd"""
-    cmd.exe /c $plinkCmd
+    # Extract and clear cache directly via plink
+    & plink.exe -batch -T -P $SSH_PORT -pw $SSH_PASSWORD "${SSH_USER}@${SSH_HOST}" $remoteExtractCmd
+    if ($LASTEXITCODE -ne 0) {
+        Fail "Remote extraction or cache clear failed."
+        exit 1
+    }
 } else {
     & scp -P $SSH_PORT -o StrictHostKeyChecking=no $zipFile "${SSH_USER}@${SSH_HOST}:$remoteZip"
     if ($LASTEXITCODE -ne 0) {

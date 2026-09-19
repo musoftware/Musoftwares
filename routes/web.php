@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Http\Controllers\Admin\AdminBlogArticleController;
 use App\Http\Controllers\Admin\AdminBusyTimesController;
@@ -1365,8 +1365,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
 
 });
 
-Route::get('/sso/{system}', [SsoController::class, 'redirect'])->name('sso.redirect');
 Route::get('/sso/redirect/{system}', [SsoController::class, 'redirect']);
+Route::get('/sso/{system}', [SsoController::class, 'redirect'])->name('sso.redirect');
 
 // Win-back unsubscribe — signed URL, no auth required
 Route::get('/winback/unsubscribe/{user}', function (\App\Models\User $user) {

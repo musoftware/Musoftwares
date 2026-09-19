@@ -24,11 +24,13 @@ class SerialUserDevice extends Model
         'device_id',
         'status',
         'expires_at',
+        'trial_claimed_at',
         'notes',
     ];
 
     protected $casts = [
         'expires_at' => 'datetime',
+        'trial_claimed_at' => 'datetime',
     ];
 
     /**

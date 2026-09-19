@@ -46,6 +46,15 @@ class SerialSoftwareService extends BaseService
             $data['requires_payment'] = ($data['pricing_type'] !== SerialSoftware::PRICING_FREE);
         }
 
+        // Guarantee fallback for non-nullable DB columns when null/empty is passed
+        if (array_key_exists('billing_cycle', $data) && empty($data['billing_cycle'])) {
+            $data['billing_cycle'] = SerialSoftware::CYCLE_LIFETIME;
+        }
+
+        if (array_key_exists('currency', $data) && empty($data['currency'])) {
+            $data['currency'] = $serialSoftware->currency ?: 'USD';
+        }
+
         $serialSoftware->update($data);
 
         if (! empty($data['requires_payment'])) {

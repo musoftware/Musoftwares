@@ -41,8 +41,7 @@ class SsoControllerTest extends TestCase
         ]);
 
         $token = SsoToken::where('user_id', $user->id)->first();
-        $response->assertStatus(409); // Inertia::location returns 409 conflict with X-Inertia-Location header
-        $this->assertSame("https://gold.musoftwares.com/sso/callback?token={$token->token}", $response->headers->get('X-Inertia-Location'));
+        $response->assertRedirect("https://gold.musoftwares.com/sso/callback?token={$token->token}");
     }
 
     public function test_redirect_handles_gold_aliases(): void
@@ -51,7 +50,9 @@ class SsoControllerTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get('/sso/gold-saver');
-        $response->assertStatus(409);
+        $token = SsoToken::where('user_id', $user->id)->first();
+
+        $response->assertRedirect("https://gold.musoftwares.com/sso/callback?token={$token->token}");
 
         $this->assertDatabaseHas('sso_tokens', [
             'user_id' => $user->id,
@@ -172,7 +173,11 @@ class SsoControllerTest extends TestCase
         $badResponse->assertStatus(401);
         $badResponse->assertJson(['error' => 'invalid_signature']);
 
-        // Correct signature
+        // Since wrong signature failed verification, token was NOT consumed
+        $token = SsoToken::where('token', 'hmac-token-111')->first();
+        $this->assertNull($token->used_at);
+
+        // Correct signature succeeds and consumes the token
         $timestamp = (string) now()->timestamp;
         $validSignature = hash_hmac('sha256', $timestamp.'.hmac-token-111', 'super-secret-hmac');
 
@@ -184,5 +189,8 @@ class SsoControllerTest extends TestCase
         ]);
 
         $goodResponse->assertOk();
+
+        $token->refresh();
+        $this->assertNotNull($token->used_at);
     }
 }
