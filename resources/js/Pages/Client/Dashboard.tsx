@@ -51,7 +51,7 @@ export default function Dashboard({
     userProjects = [],
     realNotifications = [],
     authUser = {},
-    userTier = 'standard',
+    userTier = 'bronze',
     userLoyaltyPoints = 0,
     pointsToMoneyRate = 1 / 30,
     profileCompletion = 25,
@@ -65,6 +65,7 @@ export default function Dashboard({
     totalDueFormatted = ''
 }: DashboardProps) {
     const user = authUser?.name ? authUser : {};
+    const effectiveTier = (userTier && userTier !== 'standard' ? userTier : (authUser?.loyalty_tier?.slug || (authUser?.tier && authUser?.tier !== 'standard' ? authUser?.tier : 'bronze'))) || 'bronze';
     const walletBalance = stats?.walletBalance ?? 0;
     const currency = stats?.currency?.symbol || stats?.currency?.currency;
 
@@ -189,7 +190,7 @@ export default function Dashboard({
                     {/* VIP Tier & Gamified Loyalty Header */}
                     <LoyaltyTierHeader
                         clientName={user?.name || ''}
-                        tier={userTier}
+                        tier={effectiveTier}
                         loyaltyPoints={currentLoyaltyPoints}
                         profileCompletion={currentProfileCompletion}
                         currency={stats?.currency}

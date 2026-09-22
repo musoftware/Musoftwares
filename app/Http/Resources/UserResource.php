@@ -23,6 +23,39 @@ class UserResource extends JsonResource
             ->take(2)
             ->implode('');
 
+        $tier = $this->relationLoaded('loyaltyTier') ? $this->loyaltyTier : null;
+        if (! $tier && $this->loyalty_tier_id) {
+            $tier = $this->loyaltyTier;
+        }
+
+        $points = max(
+            (int) ($this->loyalty_lifetime_points ?? 0),
+            (int) ($this->loyalty_points_balance ?? 0)
+        );
+
+        if (! $tier || ($tier->min_lifetime_points ?? 0) < $points) {
+            $resolved = \App\Models\LoyaltyTier::resolveForPoints($points);
+            if ($resolved && (! $tier || $resolved->min_lifetime_points >= ($tier->min_lifetime_points ?? 0))) {
+                $tier = $resolved;
+            }
+        }
+
+        $tierSlug = strtolower($tier?->slug ?? 'bronze');
+        $tierName = $tier?->name ?? 'Bronze';
+
+        $tierTitles = [
+            'bronze' => 'Bronze Tier Client',
+            'silver' => 'Silver Tier Client',
+            'gold' => 'Gold Tier Partner',
+            'emerald' => 'Emerald Growth Partner',
+            'platinum' => 'Platinum VIP Tier',
+            'ruby' => 'Ruby Prestige Enterprise',
+            'diamond' => 'Diamond Elite Partner',
+            'obsidian' => 'Obsidian Imperial VIP',
+        ];
+
+        $tierTitle = $tierTitles[$tierSlug] ?? "{$tierName} Tier Client";
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -32,6 +65,15 @@ class UserResource extends JsonResource
             'role' => $this->whenLoaded('roles', fn () => $this->roles->first()?->name ?? 'user', 'user'),
             'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')->all(), []),
             'account_status' => $this->account_status ?? 'active',
+            'loyalty_tier' => [
+                'id' => $tier?->id,
+                'name' => $tierName,
+                'title' => $tierTitle,
+                'slug' => $tierSlug,
+                'badge_url' => "/images/tiers/{$tierSlug}.png",
+                'points_balance' => (int) ($this->loyalty_points_balance ?? 0),
+                'lifetime_points' => (int) ($this->loyalty_lifetime_points ?? 0),
+            ],
             'block_reason' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports') || $request->routeIs('admin.users.problematic'), $this->block_reason),
             'email_verified_at' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->email_verified_at),
             'phone' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->phone_number),

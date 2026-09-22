@@ -202,6 +202,68 @@ class User extends Authenticatable
         $this->attributes['currency_id'] = $value;
     }
 
+    /**
+     * Single Source of Truth for client tier.
+     * Always resolves the authentic loyalty tier slug instead of stale legacy columns.
+     */
+    public function getTierAttribute(?string $value = null): string
+    {
+        $points = max(
+            (int) ($this->loyalty_lifetime_points ?? 0),
+            (int) ($this->loyalty_points_balance ?? 0)
+        );
+
+        $currentTier = $this->relationLoaded('loyaltyTier') ? $this->getRelation('loyaltyTier') : null;
+        if (! $currentTier && $this->loyalty_tier_id) {
+            $currentTier = $this->loyaltyTier;
+        }
+
+        // If no tier assigned or user has earned points qualifying for a higher tier, resolve dynamically
+        if (! $currentTier || ($currentTier->min_lifetime_points ?? 0) < $points) {
+            $resolved = LoyaltyTier::resolveForPoints($points);
+            if ($resolved && (! $currentTier || $resolved->min_lifetime_points >= ($currentTier->min_lifetime_points ?? 0))) {
+                $currentTier = $resolved;
+            }
+        }
+
+        if ($currentTier) {
+            return strtolower($currentTier->slug);
+        }
+
+        if (! empty($value) && $value !== 'standard') {
+            return strtolower($value);
+        }
+
+        return 'bronze';
+    }
+
+    public function setTierAttribute($value): void
+    {
+        $this->attributes['tier'] = strtolower((string) $value);
+    }
+
+    public function getEffectiveLoyaltyTierAttribute(): ?LoyaltyTier
+    {
+        $points = max(
+            (int) ($this->loyalty_lifetime_points ?? 0),
+            (int) ($this->loyalty_points_balance ?? 0)
+        );
+
+        $currentTier = $this->relationLoaded('loyaltyTier') ? $this->getRelation('loyaltyTier') : null;
+        if (! $currentTier && $this->loyalty_tier_id) {
+            $currentTier = $this->loyaltyTier;
+        }
+
+        if (! $currentTier || ($currentTier->min_lifetime_points ?? 0) < $points) {
+            $resolved = LoyaltyTier::resolveForPoints($points);
+            if ($resolved && (! $currentTier || $resolved->min_lifetime_points >= ($currentTier->min_lifetime_points ?? 0))) {
+                $currentTier = $resolved;
+            }
+        }
+
+        return $currentTier ?? LoyaltyTier::where('slug', 'bronze')->first();
+    }
+
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class, 'user_id');

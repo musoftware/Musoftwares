@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck, Plus, TrendingUp, TrendingDown, RefreshCcw, FolderKanban, ExternalLink, Archive } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import ClientTierBadge from '@/Components/ClientTierBadge';
 import HiddenAmount from '@/Components/HiddenAmount';
 import {
     DropdownMenu,
@@ -802,7 +803,14 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                     {client.initials || "U"}
                 </div>
                 <div className="flex-1">
-                    <h2 className="text-2xl font-bold font-sora text-slate-900 mb-1">{client.name}</h2>
+                    <div className="flex items-center justify-center md:justify-start gap-3 flex-wrap mb-1">
+                        <h2 className="text-2xl font-bold font-sora text-slate-900">{client.name}</h2>
+                        <ClientTierBadge
+                            tier={client.loyalty_tier?.slug}
+                            title={client.loyalty_tier?.title}
+                            size="sm"
+                        />
+                    </div>
                     <p className="text-slate-500 mb-4">
                         {client.email}
                         {(client.aliases_count ?? 0) > 0 && (

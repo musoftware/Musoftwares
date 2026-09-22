@@ -152,4 +152,29 @@ describe('Clients Index', () => {
         // Verify custom dialog shows success and credentials
         expect(await screen.findByText('new-password-123')).toBeInTheDocument();
     });
+
+    it('renders client loyalty tier badge and points balance in the table', () => {
+        const clientsWithTier = {
+            data: [
+                {
+                    id: 2,
+                    name: 'Ahmed Maher',
+                    email: 'ahmedmaher@example.com',
+                    role: 'client',
+                    loyalty_tier: {
+                        name: 'Gold',
+                        title: 'Gold Tier Partner',
+                        slug: 'gold',
+                        badge_url: '/images/tiers/gold.png',
+                        points_balance: 1250,
+                    }
+                }
+            ]
+        };
+
+        render(<Index clients={clientsWithTier} filters={{}} />);
+        expect(screen.getByText('Ahmed Maher')).toBeInTheDocument();
+        expect(screen.getByText('Gold Tier Partner')).toBeInTheDocument();
+        expect(screen.getByText('1,250 PTS')).toBeInTheDocument();
+    });
 });

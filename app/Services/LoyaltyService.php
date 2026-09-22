@@ -178,9 +178,13 @@ class LoyaltyService extends BaseService
         if ($changed) {
             $previousTier = $user->loyalty_tier_id ? LoyaltyTier::find($user->loyalty_tier_id) : null;
             $user->loyalty_tier_id = $correctTier->id;
+            $user->tier = strtolower($correctTier->slug);
             $user->save();
 
             event(new LoyaltyTierUpgraded($user, $correctTier, $previousTier));
+        } elseif ($user->tier !== strtolower($correctTier->slug)) {
+            $user->tier = strtolower($correctTier->slug);
+            $user->saveQuietly();
         }
 
         $this->checkProgressThreshold($user, $correctTier, $lifetimePoints);
@@ -275,6 +279,9 @@ class LoyaltyService extends BaseService
      */
     public function getUserSummary(User $user): array
     {
+        $this->syncLoyaltyTier($user);
+        $user->refresh();
+
         $balance = (int) ($user->loyalty_points_balance ?? 0);
         $lifetimePoints = (int) ($user->loyalty_lifetime_points ?? 0);
 
@@ -291,6 +298,7 @@ class LoyaltyService extends BaseService
             $currentTier = LoyaltyTier::resolveForPoints($lifetimePoints);
             if ($currentTier && ! $user->loyalty_tier_id) {
                 $user->loyalty_tier_id = $currentTier->id;
+                $user->tier = strtolower($currentTier->slug);
                 $user->saveQuietly();
             }
         }

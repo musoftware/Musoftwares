@@ -103,7 +103,7 @@ class UsersController extends Controller
         ];
 
         // Apply tab scope (Customers vs Leads)
-        $query = (clone $baseQuery)->with('roles');
+        $query = (clone $baseQuery)->with(['roles', 'loyaltyTier']);
         if ($type === 'customers') {
             $query->where(function ($q) {
                 $q->whereHas('transactions')->orWhereHas('invoices');
@@ -161,7 +161,7 @@ class UsersController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets', 'roles', 'loans.currency', 'loans.repayments'])
+        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets', 'roles', 'loans.currency', 'loans.repayments', 'loyaltyTier'])
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))

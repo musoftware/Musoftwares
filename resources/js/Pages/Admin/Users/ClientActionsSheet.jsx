@@ -9,6 +9,7 @@ import {
 } from '@/Components/ui/dialog';
 import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
+import ClientTierBadge from '@/Components/ClientTierBadge';
 import {
     Eye,
     ClipboardEdit,
@@ -81,19 +82,29 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                 </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
                                     <DialogTitle className="text-white text-base sm:text-lg font-semibold truncate group-hover:underline underline-offset-2">
                                         {client.name}
                                     </DialogTitle>
+                                    <ClientTierBadge
+                                        tier={client.loyalty_tier?.slug}
+                                        title={client.loyalty_tier?.title}
+                                        size="xs"
+                                    />
                                     {client.role && (
                                         <span className="px-1.5 py-0.5 bg-white/10 text-slate-300 rounded text-[9px] font-semibold uppercase tracking-wider shrink-0">
                                             {client.role}
                                         </span>
                                     )}
                                 </div>
-                                <DialogDescription className="text-slate-400 text-xs sm:text-sm truncate mt-0.5">
-                                    {client.email}
-                                </DialogDescription>
+                                <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400 truncate">
+                                    <span>{client.email}</span>
+                                    {client.loyalty_tier?.points_balance !== undefined && (
+                                        <span className="font-mono text-amber-300 font-semibold text-[11px]">
+                                            • {client.loyalty_tier.points_balance.toLocaleString()} PTS
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </Link>
                         <Link

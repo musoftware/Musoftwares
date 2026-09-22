@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import ClientActionsSheet from './ClientActionsSheet';
+import ClientTierBadge from '@/Components/ClientTierBadge';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DataTable } from '@/Components/ui/DataTable';
 import { MoreHorizontal, Eye, Edit, LogIn, Key, Wallet, Users, User, FolderOpen, FileText, ShieldCheck, CheckCircle2, Copy } from 'lucide-react';
@@ -151,7 +152,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
             sortable: true,
             render: (client) => (
                 <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border border-slate-200">
+                    <Avatar className="h-10 w-10 border border-slate-200 shrink-0">
                         <AvatarImage src={client.avatar_url || ''} alt={client.name} />
                         <AvatarFallback className="bg-slate-50 text-slate-700">
                             <User className="h-5 w-5" />
@@ -162,18 +163,40 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                             setSelectedClient(client);
                             setIsSheetOpen(true);
                         }}
-                        className="flex flex-col text-start group"
+                        className="flex flex-col text-start group min-w-0"
                     >
-                        <span className="font-semibold text-slate-900 group-hover:text-slate-900 transition-colors">
-                            {client.name}
-                        </span>
-                        <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {client.loyalty_tier?.badge_url && (
+                                <img
+                                    src={client.loyalty_tier.badge_url}
+                                    alt=""
+                                    className="w-4 h-4 sm:w-5 sm:h-5 object-contain drop-shadow-xs shrink-0"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                    }}
+                                />
+                            )}
+                            <span className="font-semibold text-slate-900 group-hover:text-slate-900 transition-colors">
+                                {client.name}
+                            </span>
+                            <ClientTierBadge
+                                tier={client.loyalty_tier?.slug}
+                                title={client.loyalty_tier?.title}
+                                size="xs"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                             <span className="text-sm text-slate-500">
                                 {client.email}
                             </span>
                             <span className="px-1.5 py-0.5 bg-slate-50 text-slate-900 rounded-full text-[9px] font-black uppercase border border-slate-50/50 tracking-wider">
                                 {client.role || 'client'}
                             </span>
+                            {client.loyalty_tier?.points_balance !== undefined && (
+                                <span className="text-[10px] font-mono font-semibold text-amber-700 bg-amber-50 border border-amber-200/70 px-1.5 py-0.5 rounded">
+                                    {client.loyalty_tier.points_balance.toLocaleString()} PTS
+                                </span>
+                            )}
                         </div>
                     </button>
                 </div>

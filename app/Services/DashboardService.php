@@ -323,7 +323,7 @@ class DashboardService extends BaseService
             'userProjects' => $this->getUserProjects($user),
             'realNotifications' => $this->getUserRealNotifications($user),
             'authUser' => $user,
-            'userTier' => $user->tier ?? 'standard',
+            'userTier' => $user->tier,
             'userLoyaltyPoints' => (int) ($user->loyalty_points_balance ?? 0),
             'pointsToMoneyRate' => \App\Services\LoyaltyService::POINTS_TO_CURRENCY_RATE,
             'profileCompletion' => (int) ($user->profile_completion_percentage ?? 25),
