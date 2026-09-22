@@ -15,7 +15,7 @@ class SupportDeskService extends BaseService
 {
     public function getTickets(array $filters, int $perPage = 15)
     {
-        $query = Ticket::with('user');
+        $query = Ticket::with(['user.loyaltyTier', 'project', 'currency']);
 
         // Search
         if (! empty($filters['search'])) {
@@ -26,6 +26,37 @@ class SupportDeskService extends BaseService
                     ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%"));
             });
+        }
+
+        // View / Segment Filters
+        if (! empty($filters['view'])) {
+            switch ($filters['view']) {
+                case 'vip':
+                    $query->where(function ($q) {
+                        $q->where('priority_score', '>=', 50)
+                            ->orWhere('priority', 'high')
+                            ->orWhereHas('user', function ($uq) {
+                                $uq->whereIn('tier', ['enterprise', 'pro'])
+                                    ->orWhereHas('loyaltyTier', function ($lt) {
+                                        $lt->whereIn('slug', ['obsidian', 'diamond', 'ruby', 'emerald', 'platinum']);
+                                    });
+                            });
+                    });
+                    break;
+                case 'needs_reply':
+                    $query->whereIn('ticket_status', ['open', 'user_replied']);
+                    break;
+                case 'sla_urgent':
+                    $query->whereIn('ticket_status', ['open', 'user_replied'])
+                        ->where(function ($q) {
+                            $q->where('priority_score', '>=', 40)
+                                ->orWhere('priority', 'high');
+                        });
+                    break;
+                case 'closed':
+                    $query->whereIn('ticket_status', ['closed', 'resolved']);
+                    break;
+            }
         }
 
         // Status filter
@@ -39,7 +70,7 @@ class SupportDeskService extends BaseService
         }
 
         // Dynamic sort
-        $allowedSorts = ['id', 'created_at', 'ticket_subject', 'priority', 'ticket_status'];
+        $allowedSorts = ['id', 'created_at', 'ticket_subject', 'priority', 'ticket_status', 'priority_score'];
         $sort = in_array($filters['sort'] ?? '', $allowedSorts) ? $filters['sort'] : 'created_at';
         $direction = ($filters['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sort, $direction);

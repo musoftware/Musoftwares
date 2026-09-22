@@ -209,4 +209,102 @@ class AdminTicketControllerTest extends TestCase
 
         $response->assertSessionHasErrors('title');
     }
+
+    public function test_admin_can_bulk_close_tickets(): void
+    {
+        $t1 = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Ticket 1',
+            'ticket_message' => 'Help 1',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+        $t2 = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Ticket 2',
+            'ticket_message' => 'Help 2',
+            'ticket_status' => 'open',
+            'priority' => 'medium',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.bulk'), [
+            'action' => 'close',
+            'ids' => [$t1->id, $t2->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertEquals('closed', $t1->fresh()->ticket_status);
+        $this->assertEquals('closed', $t2->fresh()->ticket_status);
+        $this->assertNotNull($t1->fresh()->closed_at);
+        $this->assertNotNull($t2->fresh()->closed_at);
+    }
+
+    public function test_admin_can_bulk_reopen_tickets(): void
+    {
+        $t1 = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Ticket 1',
+            'ticket_message' => 'Help 1',
+            'ticket_status' => 'closed',
+            'priority' => 'low',
+            'closed_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.bulk'), [
+            'action' => 'reopen',
+            'ids' => [$t1->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertEquals('open', $t1->fresh()->ticket_status);
+        $this->assertNull($t1->fresh()->closed_at);
+    }
+
+    public function test_admin_can_bulk_delete_tickets(): void
+    {
+        $t1 = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Ticket 1',
+            'ticket_message' => 'Help 1',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.bulk'), [
+            'action' => 'delete',
+            'ids' => [$t1->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        // Verify soft-deleted
+        $this->assertSoftDeleted('tickets', ['id' => $t1->id]);
+    }
+
+    public function test_admin_can_bulk_update_priority(): void
+    {
+        $t1 = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Ticket 1',
+            'ticket_message' => 'Help 1',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.bulk'), [
+            'action' => 'priority',
+            'ids' => [$t1->id],
+            'priority' => 'high',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertEquals('high', $t1->fresh()->priority);
+    }
 }

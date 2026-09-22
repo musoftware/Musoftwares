@@ -18,7 +18,7 @@ import { buttonVariants } from './button';
 // ── Column format A: legacy {key, label, render?, sortable?}
 export interface ColumnDefKey {
     key: string;
-    label: string;
+    label: React.ReactNode;
     sortable?: boolean;
     className?: string;
     render?: (row: any) => React.ReactNode;
@@ -26,7 +26,7 @@ export interface ColumnDefKey {
 
 // ── Column format B: TanStack-style {header, cell, accessorKey?}
 export interface ColumnDefHeader {
-    header: string;
+    header: React.ReactNode;
     accessorKey?: string;
     sortable?: boolean;
     className?: string;
@@ -38,7 +38,7 @@ export type ColumnDef = ColumnDefKey | ColumnDefHeader;
 /** Normalizes both column formats into a unified internal shape */
 function normalizeColumn(col: ColumnDef): {
     key: string;
-    label: string;
+    label: React.ReactNode;
     sortable: boolean;
     className?: string;
     render: (row: any) => React.ReactNode;
@@ -53,7 +53,7 @@ function normalizeColumn(col: ColumnDef): {
         };
     }
     // ColumnDefHeader format
-    const key = col.accessorKey ?? col.header.toLowerCase().replace(/\s+/g, '_');
+    const key = col.accessorKey ?? (typeof col.header === 'string' ? col.header.toLowerCase().replace(/\s+/g, '_') : 'col');
     return {
         key,
         label: col.header,

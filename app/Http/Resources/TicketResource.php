@@ -12,6 +12,27 @@ class TicketResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $tier = $this->user?->loyaltyTier;
+        $tierSlug = strtolower($tier?->slug ?? $this->user?->tier ?? 'standard');
+        $tierName = $tier?->name ?? ucfirst($tierSlug);
+        $tierColor = $tier?->badge_color ?? 'slate';
+
+        $slaMinutes = match ($tierSlug) {
+            'obsidian' => 15,
+            'diamond' => 30,
+            'ruby', 'emerald' => 60,
+            'platinum' => 120,
+            'gold' => 240,
+            'silver' => 480,
+            default => 1440,
+        };
+
+        $createdAt = $this->created_at ? \Illuminate\Support\Carbon::parse($this->created_at) : now();
+        $slaDueAt = $createdAt->copy()->addMinutes($slaMinutes);
+        $isClosed = in_array($this->ticket_status, ['closed', 'resolved']);
+        $isOverdue = ! $isClosed && now()->greaterThan($slaDueAt);
+        $isVip = in_array($tierSlug, ['obsidian', 'diamond', 'ruby', 'emerald', 'platinum']) || ($this->priority_score ?? 0) >= 50;
+
         return [
             'id' => $this->id,
             'ticket_subject' => $this->ticket_subject,
@@ -35,6 +56,18 @@ class TicketResource extends JsonResource
             'quoted_at' => $this->quoted_at instanceof \DateTimeInterface
                 ? $this->quoted_at->toIso8601String()
                 : ($this->quoted_at ? \Illuminate\Support\Carbon::parse($this->quoted_at)->toIso8601String() : null),
+            'priority_score' => (int) ($this->priority_score ?? 0),
+            'sla_target_minutes' => $slaMinutes,
+            'sla_due_at' => $slaDueAt->toIso8601String(),
+            'is_overdue' => $isOverdue,
+            'is_vip' => $isVip,
+            'client_tier' => [
+                'slug' => $tierSlug,
+                'name' => $tierName,
+                'color' => $tierColor,
+                'badge_svg' => $tier?->badge_svg,
+            ],
+
             'project_id' => $this->project_id,
             'project' => $this->whenLoaded('project', function () {
                 return [
@@ -48,6 +81,14 @@ class TicketResource extends JsonResource
                     'id' => $this->user->id,
                     'name' => $this->user->name,
                     'email' => $this->user->email,
+                    'tier' => $this->user->tier,
+                    'loyalty_points_balance' => $this->user->loyalty_points_balance,
+                    'loyalty_tier' => $this->user->loyaltyTier ? [
+                        'name' => $this->user->loyaltyTier->name,
+                        'slug' => $this->user->loyaltyTier->slug,
+                        'badge_color' => $this->user->loyaltyTier->badge_color,
+                        'badge_svg' => $this->user->loyaltyTier->badge_svg,
+                    ] : null,
                 ];
             }),
 

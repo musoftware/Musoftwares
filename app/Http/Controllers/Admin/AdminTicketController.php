@@ -21,7 +21,7 @@ class AdminTicketController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['status', 'priority', 'search', 'sort', 'direction']);
+        $filters = $request->only(['status', 'priority', 'search', 'sort', 'direction', 'view']);
 
         $tickets = $this->supportDeskService->getTickets($filters)
             ->withQueryString()
@@ -214,5 +214,63 @@ class AdminTicketController extends Controller
         \App\Services\TicketNotificationService::notifyOnTicketPriced($ticket);
 
         return redirect()->back()->with('success', 'تم اعتماد التسعير وإرسال الإشعار للعميل بنجاح.');
+    }
+
+    /**
+     * Handle bulk actions on tickets (delete, close, reopen, priority, assign).
+     */
+    public function bulk(Request $request)
+    {
+        $validated = $request->validate([
+            'action' => 'required|in:delete,close,reopen,priority,assign',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:tickets,id',
+            'priority' => 'nullable|required_if:action,priority|in:low,medium,high',
+            'assigned_employee_id' => 'nullable|required_if:action,assign|exists:users,id',
+        ]);
+
+        $ids = $validated['ids'];
+        $action = $validated['action'];
+        $count = count($ids);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($action, $ids, $validated) {
+            if ($action === 'delete') {
+                Ticket::whereIn('id', $ids)->delete();
+            } elseif ($action === 'close') {
+                Ticket::whereIn('id', $ids)->update([
+                    'ticket_status' => 'closed',
+                    'closed_at' => now(),
+                ]);
+                Conversation::where('conversable_type', Ticket::class)
+                    ->whereIn('conversable_id', $ids)
+                    ->update(['status' => 'closed']);
+            } elseif ($action === 'reopen') {
+                Ticket::whereIn('id', $ids)->update([
+                    'ticket_status' => 'open',
+                    'closed_at' => null,
+                ]);
+                Conversation::where('conversable_type', Ticket::class)
+                    ->whereIn('conversable_id', $ids)
+                    ->update(['status' => 'open']);
+            } elseif ($action === 'priority') {
+                Ticket::whereIn('id', $ids)->update([
+                    'priority' => $validated['priority'],
+                ]);
+            } elseif ($action === 'assign') {
+                Ticket::whereIn('id', $ids)->update([
+                    'assigned_employee_id' => $validated['assigned_employee_id'],
+                ]);
+            }
+        });
+
+        $messages = [
+            'delete' => "تم حذف {$count} تذكرة بنجاح.",
+            'close' => "تم إغلاق {$count} تذكرة بنجاح.",
+            'reopen' => "تم إعادة فتح {$count} تذكرة بنجاح.",
+            'priority' => "تم تحديث أولوية {$count} تذكرة بنجاح.",
+            'assign' => "تم تعيين {$count} تذكرة بنجاح.",
+        ];
+
+        return redirect()->back()->with('success', $messages[$action] ?? 'تم تنفيذ الإجراء الجماعي بنجاح.');
     }
 }

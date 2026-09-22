@@ -609,6 +609,7 @@ if (file_exists(base_path('Modules/CRM/routes/web.php'))) {
 
 // Admin Tickets (Accessible by Admin and Moderator)
 Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admin')->name('admin.')->group(function () {
+    Route::post('tickets/bulk', [AdminTicketController::class, 'bulk'])->name('tickets.bulk');
     Route::resource('tickets', AdminTicketController::class)->only(['index', 'show', 'update']);
     Route::post('tickets/{ticket}/reply', [AdminTicketController::class, 'reply'])->name('tickets.reply');
     Route::post('tickets/{ticket}/assign', [AdminTicketController::class, 'assign'])->name('tickets.assign');
