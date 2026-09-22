@@ -244,7 +244,7 @@ Step "Uploading and extracting on remote server..."
 $hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue) -and $null -ne (Get-Command pscp -ErrorAction SilentlyContinue)
 $remoteZip = "/tmp/fast_deploy.zip"
 
-$remoteExtractCmd = "cd $REMOTE_PATH && unzip -oq $remoteZip && rm -f $remoteZip && php artisan optimize:clear"
+$remoteExtractCmd = "cd $REMOTE_PATH && unzip -oq $remoteZip && rm -f $remoteZip && php artisan migrate --force && php artisan optimize:clear"
 
 if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
     # Accept host key if not cached
