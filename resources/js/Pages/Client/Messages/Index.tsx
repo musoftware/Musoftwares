@@ -419,6 +419,8 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                         conversationId={activeConv.id}
                                         participants={(activeConv.participants?.map((p) => p.user).filter(Boolean) || []) as any}
                                         readOnly={activeConv.status === 'closed'}
+                                        showHeader={false}
+                                        className="h-full border-0 rounded-none shadow-none"
                                     />
                                 </div>
                             </div>

@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\ProjectContractController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectAdminNoteController;
 use App\Http\Controllers\Admin\ProjectFileController;
+use App\Http\Controllers\Admin\AdminProjectVaultController;
 use App\Http\Controllers\Admin\ProjectReportController;
 use App\Http\Controllers\Admin\RecurringBusinessController;
 use App\Http\Controllers\Admin\RecurringInvoiceController;
@@ -699,6 +700,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/projects/{project}/files', [ProjectFileController::class, 'index'])->name('projects.files.index');
     Route::post('/projects/{project}/files', [ProjectFileController::class, 'store'])->name('projects.files.store');
     Route::delete('/projects/{project}/files/{file}', [ProjectFileController::class, 'destroy'])->name('projects.files.destroy');
+
+    // ── Sovereign Client Vault (Deliverables: Source Code, Production Builds, Contracts) ──
+    Route::get('/projects/{project}/vault', [AdminProjectVaultController::class, 'index'])->name('projects.vault.index');
+    Route::post('/projects/{project}/vault', [AdminProjectVaultController::class, 'store'])->name('projects.vault.store');
+    Route::delete('/projects/{project}/vault/{asset}', [AdminProjectVaultController::class, 'destroy'])->name('projects.vault.destroy');
+    Route::get('/projects/{project}/vault/{asset}/download', [AdminProjectVaultController::class, 'download'])->name('projects.vault.download');
 
     // ── Project Board (canvas + lanes) — admin "view project" landing ──
     Route::get('/projects/{project}/board', [ProjectController::class, 'boardIndex'])->name('projects.board.index');

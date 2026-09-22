@@ -99,14 +99,13 @@ class ConversationController extends Controller
     }
 
     /**
-     * Helper to resolve conversation by ID or ticket ID.
+     * Resolve a conversation strictly by its own ID.
+     * The frontend must always supply the real conversation ID (from ticket.conversation.id),
+     * never the ticket ID. This prevents cross-contamination with unrelated conversations.
      */
     private function resolveConversation(int|string $id): Conversation
     {
-        $conversation = Conversation::find($id)
-            ?? Conversation::where('conversable_type', Ticket::class)
-                ->where('conversable_id', $id)
-                ->first();
+        $conversation = Conversation::find($id);
 
         if (! $conversation) {
             abort(404, __('general.conversation_not_found'));

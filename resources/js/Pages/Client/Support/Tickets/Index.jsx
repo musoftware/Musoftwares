@@ -197,9 +197,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     <span className="capitalize">{openTicket.priority || 'medium'}</span>
                                 </SheetDescription>
                             </SheetHeader>
-                            <div className="flex h-[60vh] flex-col p-0">
+                            <div className="flex h-[60vh] flex-col p-0 overflow-hidden">
                                 <ChatWindow
-                                    conversationId={openTicket.conversation_id || openTicket.id}
+                                    conversationId={openTicket.conversation?.id}
                                     participants={[
                                         {
                                             id: openTicket.user_id,
@@ -207,6 +207,8 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                         },
                                     ]}
                                     readOnly={openTicket.ticket_status === 'closed' || openTicket.ticket_status === 'resolved'}
+                                    showHeader={false}
+                                    className="h-full border-0 rounded-none shadow-none"
                                 />
                             </div>
                             <div className="border-t border-black/5 p-4 bg-[#f5f5f7]/30">

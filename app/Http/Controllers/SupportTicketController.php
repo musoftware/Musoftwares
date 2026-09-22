@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Conversation;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Rules\Recaptcha;
@@ -21,7 +22,7 @@ class SupportTicketController extends Controller
         $user = $request->user();
         $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : $user->hasRole(['admin', 'super_admin']);
 
-        $query = Ticket::with(['user', 'conversation.messages.sender']);
+        $query = Ticket::with(['user', 'conversation']);
 
         if (! $isAdmin) {
             $query->where('user_id', $user->id);
@@ -100,6 +101,42 @@ class SupportTicketController extends Controller
         $ticket = Ticket::with(['user', 'currency', 'project', 'conversation.messages.sender'])->findOrFail($id);
         $user = $request->user();
         $isAdmin = $this->authorizeAccess($ticket, $user);
+
+        if (! $ticket->conversation) {
+            $conversation = Conversation::create([
+                'conversable_type' => Ticket::class,
+                'conversable_id' => $ticket->id,
+                'type' => 'support_ticket',
+                'status' => in_array($ticket->ticket_status, ['closed', 'resolved']) ? 'closed' : 'open',
+            ]);
+
+            if ($ticket->user_id) {
+                $conversation->participants()->firstOrCreate([
+                    'user_id' => $ticket->user_id,
+                    'role' => 'client',
+                ]);
+            }
+
+            $admins = rescue(fn () => User::role('admin')->get(), collect());
+            foreach ($admins as $admin) {
+                if ($admin->id !== $ticket->user_id) {
+                    $conversation->participants()->firstOrCreate([
+                        'user_id' => $admin->id,
+                        'role' => 'admin',
+                    ]);
+                }
+            }
+
+            if (! empty($ticket->ticket_message)) {
+                $conversation->messages()->create([
+                    'sender_id' => $ticket->user_id,
+                    'body' => $ticket->ticket_message,
+                    'is_system' => false,
+                ]);
+            }
+
+            $ticket->load('conversation.messages.sender');
+        }
 
         return Inertia::render('Client/Support/Tickets/Show', [
             'ticket' => $ticket,

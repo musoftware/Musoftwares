@@ -97,6 +97,7 @@ class ClientPortalLoyaltyAndTiersTest extends TestCase
             'lifetime_spend' => 15000.00,
         ]);
 
+        $stdInitial = (int) $standardUser->fresh()->loyalty_points_balance;
         // 1. Standard user submits ticket
         Sanctum::actingAs($standardUser);
         $resStd = $this->postJson('/api/portal/tickets', [
@@ -106,10 +107,11 @@ class ClientPortalLoyaltyAndTiersTest extends TestCase
         ]);
 
         $resStd->assertStatus(201);
-        $this->assertEquals(15, $standardUser->fresh()->loyalty_points_balance);
+        $this->assertEquals($stdInitial + 15, $standardUser->fresh()->loyalty_points_balance);
         $stdTicket = Ticket::latest('id')->first();
         $this->assertTrue($stdTicket->is_self_service);
 
+        $entInitial = (int) $enterpriseUser->fresh()->loyalty_points_balance;
         // 2. Enterprise user submits ticket
         Sanctum::actingAs($enterpriseUser);
         $resEnt = $this->postJson('/api/portal/tickets', [
@@ -119,7 +121,7 @@ class ClientPortalLoyaltyAndTiersTest extends TestCase
         ]);
 
         $resEnt->assertStatus(201);
-        $this->assertEquals(15, $enterpriseUser->fresh()->loyalty_points_balance);
+        $this->assertEquals($entInitial + 15, $enterpriseUser->fresh()->loyalty_points_balance);
         $entTicket = Ticket::latest('id')->first();
 
         // Algorithmic check: Enterprise ticket priority score must far exceed Standard

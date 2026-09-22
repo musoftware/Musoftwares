@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\ClientPortal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Conversation;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Services\LoyaltyService;
 use App\Services\TierPriorityService;
 use Illuminate\Http\JsonResponse;
@@ -81,6 +83,34 @@ class SupportDeskController extends Controller
             'priority_score'   => $score,
             'is_self_service'  => true,
         ]);
+
+        $conversation = Conversation::create([
+            'conversable_type' => Ticket::class,
+            'conversable_id'   => $ticket->id,
+            'type'             => 'support_ticket',
+            'status'           => 'open',
+        ]);
+
+        $conversation->participants()->create([
+            'user_id' => $user->id,
+            'role'    => 'client',
+        ]);
+
+        $conversation->messages()->create([
+            'sender_id' => $user->id,
+            'body'      => $validated['ticket_message'],
+            'is_system' => false,
+        ]);
+
+        $adminUsers = rescue(fn () => User::role('admin')->get(), collect());
+        foreach ($adminUsers as $admin) {
+            if ($admin->id !== $user->id) {
+                $conversation->participants()->firstOrCreate([
+                    'user_id' => $admin->id,
+                    'role'    => 'admin',
+                ]);
+            }
+        }
 
         // Dispatch notifications (Client email, Admin emails, and FCM)
         \App\Services\TicketNotificationService::notifyOnTicketCreated($ticket);

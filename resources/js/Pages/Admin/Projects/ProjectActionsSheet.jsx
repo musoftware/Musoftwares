@@ -26,7 +26,8 @@ import {
     ListTodo,
     ClipboardEdit,
     Folder,
-    User
+    User,
+    Lock
 } from 'lucide-react';
 
 export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }) {
@@ -176,6 +177,12 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                                 <Link href={`/admin/projects/${project.id}/contracts`}>
                                     <FileText className="h-4 w-4 text-slate-700" /> 
                                     <span className="font-normal text-slate-700">{__('general.contracts_proposals')}</span>
+                                </Link>
+                            </Button>
+                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
+                                <Link href={`/admin/projects/${project.id}/vault`}>
+                                    <Lock className="h-4 w-4 text-[#0071e3]" /> 
+                                    <span className="font-normal text-slate-700">{__('general.client_vault') || 'Client Vault'}</span>
                                 </Link>
                             </Button>
                         </div>

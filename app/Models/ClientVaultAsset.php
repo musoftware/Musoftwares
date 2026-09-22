@@ -13,11 +13,18 @@ class ClientVaultAsset extends Model
 
     protected $guarded = ['id'];
 
+    protected $appends = ['human_size'];
+
     protected $casts = [
         'file_size_bytes' => 'integer',
         'download_count' => 'integer',
         'last_accessed_at' => 'datetime',
     ];
+
+    public function getHumanSizeAttribute(): string
+    {
+        return $this->humanSize();
+    }
 
     public function user(): BelongsTo
     {

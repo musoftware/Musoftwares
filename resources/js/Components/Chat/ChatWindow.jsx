@@ -2,11 +2,16 @@ import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Message from './Message';
+import { Paperclip, Send, X, WifiOff, FileText, Lock } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function ChatWindow({
     conversationId,
     participants = [],
     readOnly = false,
+    showHeader = true,
+    className = '',
 }) {
     const { auth } = usePage().props;
     const [messages, setMessages] = useState([]);
@@ -15,12 +20,12 @@ export default function ChatWindow({
     const [preview, setPreview] = useState(null);
     const [typingUsers, setTypingUsers] = useState([]);
     const [fetchError, setFetchError] = useState(null);
-
     const [isConnected, setIsConnected] = useState(true);
 
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     const typingTimeoutsRef = useRef({});
+    const textareaRef = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -44,7 +49,7 @@ export default function ChatWindow({
                 `/api/conversations/${conversationId}/messages`,
             );
             const newMessages = res.data.data.reverse();
-            setMessages(prev => {
+            setMessages((prev) => {
                 const prevLastId = prev.length > 0 ? prev[prev.length - 1].id : null;
                 const newLastId = newMessages.length > 0 ? newMessages[newMessages.length - 1].id : null;
                 if (prevLastId !== newLastId || prev.length !== newMessages.length) {
@@ -55,7 +60,7 @@ export default function ChatWindow({
             setFetchError(null);
         } catch (err) {
             console.error('Error fetching messages:', err);
-            setFetchError("Failed to load messages. Please try again.");
+            setFetchError('Failed to load messages. Please try again.');
         }
     }, [conversationId]);
 
@@ -63,21 +68,16 @@ export default function ChatWindow({
     useEffect(() => {
         if (!conversationId) return;
 
-        // Fetch initial messages
         fetchMessages();
 
-        // Subscribe to real-time events
         if (window.Echo) {
             window.Echo.private(`conversation.${conversationId}`)
                 .listen('MessageSent', (e) => {
                     setMessages((prev) => {
-                        // Prevent duplicates
-                        if (prev.find((m) => m.id === e.message.id))
-                            return prev;
+                        if (prev.find((m) => m.id === e.message.id)) return prev;
                         return [...prev, e.message];
                     });
 
-                    // Mark as read if window is focused
                     if (document.hasFocus()) {
                         markAsRead();
                     }
@@ -91,7 +91,6 @@ export default function ChatWindow({
                             return prev;
                         });
 
-                        // Clear individual typing indicator after 2 seconds of inactivity
                         if (typingTimeoutsRef.current[e.userId]) {
                             clearTimeout(typingTimeoutsRef.current[e.userId]);
                         }
@@ -105,7 +104,6 @@ export default function ChatWindow({
                     }
                 });
 
-            // Connection state monitoring for graceful degradation
             if (window.Echo.connector.pusher) {
                 const handleStateChange = (states) => {
                     if (states.current === 'connected') {
@@ -125,11 +123,8 @@ export default function ChatWindow({
                     window.Echo.connector.pusher.connection.unbind('state_change');
                 }
             }
-            // Clear all typing timeouts
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             Object.values(typingTimeoutsRef.current).forEach(clearTimeout);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationId]);
 
     // Polling fallback when offline
@@ -138,7 +133,7 @@ export default function ChatWindow({
         if (!isConnected && conversationId) {
             pollInterval = setInterval(() => {
                 fetchMessages();
-            }, 5000); // Poll every 5 seconds
+            }, 5000);
         }
         return () => clearInterval(pollInterval);
     }, [isConnected, conversationId, fetchMessages]);
@@ -164,12 +159,16 @@ export default function ChatWindow({
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File size must be less than 5MB');
+            if (file.size > 15 * 1024 * 1024) {
+                alert('File size must be less than 15MB');
                 return;
             }
             setAttachment(file);
-            setPreview(URL.createObjectURL(file));
+            if (file.type.startsWith('image/')) {
+                setPreview(URL.createObjectURL(file));
+            } else {
+                setPreview(null);
+            }
         }
     };
 
@@ -180,18 +179,21 @@ export default function ChatWindow({
     };
 
     const sendMessage = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (readOnly) return;
         if (!newMessage.trim() && !attachment) return;
 
+        const bodyToSend = newMessage.trim();
+        const attachmentToSend = attachment;
+
         const formData = new FormData();
-        if (newMessage.trim()) formData.append('body', newMessage.trim());
-        if (attachment) formData.append('attachment', attachment);
+        if (bodyToSend) formData.append('body', bodyToSend);
+        if (attachmentToSend) formData.append('attachment', attachmentToSend);
 
         // Optimistic UI update
         const tempMessage = {
             id: Date.now(),
-            body: newMessage.trim(),
+            body: bodyToSend,
             sender_id: auth.user.id,
             sender: auth.user,
             created_at: new Date().toISOString(),
@@ -220,26 +222,22 @@ export default function ChatWindow({
                     headers: { 'Content-Type': 'multipart/form-data' },
                 },
             );
-            // Replace temp message with real one
             setMessages((prev) =>
                 prev.map((m) => (m.id === tempMessage.id ? res.data : m)),
             );
         } catch (error) {
             console.error('Error sending message:', error);
-            // Remove temp message on error
             setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
             alert('Failed to send message');
         }
     };
 
-    // Derived values for the header
     const otherParticipants = participants.filter((p) => p.id !== auth.user.id);
     const chatTitle =
         otherParticipants.length > 0
             ? otherParticipants.map((p) => p.name).join(', ')
             : `Conversation #${conversationId}`;
 
-    // Calculate unread separator index
     const firstUnreadIndex = messages.findIndex(
         (m) => !m.read && m.sender_id !== auth.user.id,
     );
@@ -248,34 +246,47 @@ export default function ChatWindow({
 
     return (
         <div
-            className="flex h-[600px] flex-col rounded-lg border bg-white shadow-sm"
+            className={cn(
+                'flex flex-col h-full min-h-0 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-zinc-100 font-sans',
+                showHeader ? 'rounded-2xl border border-black/5 dark:border-white/10 shadow-sm' : '',
+                className
+            )}
             onFocus={handleFocus}
-            tabIndex="0"
+            tabIndex={0}
         >
-            {/* Header */}
-            <div className="flex flex-col border-b bg-gray-50">
-                <div className="flex items-center gap-3 p-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-700">
-                        {chatTitle.charAt(0)}
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-gray-900">{chatTitle}</h3>
-                        <p className="text-xs text-gray-500">
-                            {readOnly ? 'Read Only' : 'Active'}
-                        </p>
+            {/* Optional Standalone Header */}
+            {showHeader && (
+                <div className="flex flex-col border-b border-black/5 dark:border-white/10 bg-[#fbfbfd] dark:bg-zinc-800/60 px-5 py-3.5 shrink-0">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0071e3]/10 text-[#0071e3] font-bold text-sm">
+                                {chatTitle.charAt(0)}
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-sm text-[#1d1d1f] dark:text-zinc-100 leading-tight">
+                                    {chatTitle}
+                                </h3>
+                                <p className="text-[11px] text-[#1d1d1f]/50 dark:text-zinc-400">
+                                    {readOnly ? __('general.read_only', {}, 'للقراءة فقط') : __('general.active', {}, 'نشط')}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {!isConnected && (
-                    <div className="bg-yellow-50 px-4 py-1.5 text-xs text-yellow-700 font-medium flex items-center justify-center border-t border-yellow-100">
-                        ⚠️ Real-time connection lost. Switched to polling mode. Messages might be delayed.
-                    </div>
-                )}
-            </div>
+            )}
 
-            {/* Messages Area */}
-            <div className="flex flex-1 flex-col overflow-y-auto bg-gray-50 p-4">
+            {/* Offline Connection Warning */}
+            {!isConnected && (
+                <div className="bg-amber-50 dark:bg-amber-950/40 px-4 py-2 text-xs text-amber-800 dark:text-amber-300 font-medium flex items-center justify-center gap-2 border-b border-amber-200/50 dark:border-amber-900/50 shrink-0">
+                    <WifiOff className="w-3.5 h-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>Real-time connection paused. Polling every 5s.</span>
+                </div>
+            )}
+
+            {/* Messages Scrollable Area */}
+            <div className="flex flex-1 min-h-0 flex-col overflow-y-auto bg-[#f5f5f7]/40 dark:bg-zinc-900/40 p-4 sm:p-6 space-y-2">
                 {fetchError ? (
-                    <div className="flex flex-1 items-center justify-center text-red-500 font-medium" data-testid="error-message">
+                    <div className="flex flex-1 items-center justify-center text-rose-500 dark:text-rose-400 font-medium text-xs sm:text-sm" data-testid="error-message">
                         {fetchError}
                     </div>
                 ) : (
@@ -286,10 +297,12 @@ export default function ChatWindow({
                             return (
                                 <React.Fragment key={msg.id}>
                                     {showUnreadSeparator && (
-                                        <div className="flex items-center my-4">
-                                            <div className="flex-1 border-t border-red-300"></div>
-                                            <span className="px-2 text-xs text-red-500 font-medium">── {unreadCount} new message{unreadCount !== 1 ? 's' : ''} ──</span>
-                                            <div className="flex-1 border-t border-red-300"></div>
+                                        <div className="flex items-center my-4 select-none">
+                                            <div className="flex-1 border-t border-rose-200 dark:border-rose-900/40" />
+                                            <span className="px-3 text-[11px] text-rose-600 dark:text-rose-400 font-semibold uppercase tracking-wider">
+                                                {unreadCount} {__('general.new_messages', {}, 'رسائل جديدة')}
+                                            </span>
+                                            <div className="flex-1 border-t border-rose-200 dark:border-rose-900/40" />
                                         </div>
                                     )}
                                     <Message
@@ -301,8 +314,13 @@ export default function ChatWindow({
                         })}
 
                         {typingUsers.length > 0 && (
-                            <div className="flex items-center gap-2 text-gray-500 text-sm mt-2 ms-10">
-                                <span className="italic">{typingUsers.join(', ')} is typing...</span>
+                            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 ms-10 py-1">
+                                <span className="flex gap-1 items-center">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse delay-150" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse delay-300" />
+                                </span>
+                                <span className="text-[11px]">{typingUsers.join(', ')} is typing...</span>
                             </div>
                         )}
 
@@ -311,74 +329,100 @@ export default function ChatWindow({
                 )}
             </div>
 
-            {/* Input Area */}
-            <div className="rounded-b-lg border-t bg-white p-4">
-                {preview && (
-                    <div className="group relative mb-2 inline-block">
-                        <img
-                            src={preview}
-                            alt="Preview"
-                            className="h-20 w-20 rounded-md border object-cover"
+            {/* Input Composer Area */}
+            <div className="border-t border-black/5 dark:border-white/10 bg-white dark:bg-zinc-900 p-3 sm:p-4 shrink-0">
+                {readOnly ? (
+                    <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium">
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>{__('general.conversation_closed_notice', {}, 'تم إغلاق هذه التذكرة ولا يمكن إرسال ردود جديدة بها.')}</span>
+                    </div>
+                ) : (
+                    <div>
+                        {/* Selected Attachment Preview */}
+                        {attachment && (
+                            <div className="mb-3 flex items-center gap-2.5 p-2 rounded-xl bg-[#f5f5f7] dark:bg-zinc-800 border border-black/5 dark:border-white/10 max-w-fit">
+                                {preview ? (
+                                    <img
+                                        src={preview}
+                                        alt="Preview"
+                                        className="h-12 w-12 rounded-lg object-cover border border-black/10"
+                                    />
+                                ) : (
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 text-zinc-600 dark:text-zinc-400">
+                                        <FileText className="w-6 h-6" />
+                                    </div>
+                                )}
+                                <div className="max-w-[200px] min-w-0">
+                                    <p className="truncate text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                                        {attachment.name}
+                                    </p>
+                                    <p className="text-[10px] text-zinc-500">
+                                        {(attachment.size / 1024).toFixed(1)} KB
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={removeAttachment}
+                                    className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-black/5 transition-colors cursor-pointer"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Hidden File Input */}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            onChange={handleFileChange}
+                            disabled={readOnly}
+                            className="hidden"
+                            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip"
                         />
-                        <button
-                            onClick={removeAttachment}
-                            className="absolute -top-2 -end-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                            &times;
-                        </button>
+
+                        {/* Composer Form */}
+                        <form onSubmit={sendMessage} className="flex items-end gap-2">
+                            {/* Attachment Button */}
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={readOnly}
+                                className="h-10 w-10 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-40 cursor-pointer shrink-0"
+                                title={__('general.attach_file', {}, 'إرفاق ملف أو صورة')}
+                            >
+                                <Paperclip className="w-4 h-4" />
+                            </button>
+
+                            {/* Textarea */}
+                            <textarea
+                                ref={textareaRef}
+                                value={newMessage}
+                                onChange={handleTyping}
+                                placeholder={__('general.type_a_message', {}, 'اكتب رسالتك هنا...')}
+                                disabled={readOnly}
+                                rows={1}
+                                className="flex-1 min-h-[42px] max-h-32 resize-none rounded-xl border border-black/10 dark:border-white/10 bg-[#f5f5f7] dark:bg-zinc-800/80 px-3.5 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#0071e3] transition-all"
+                                dir="auto"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        sendMessage();
+                                    }
+                                }}
+                            />
+
+                            {/* Send Button */}
+                            <button
+                                type="submit"
+                                disabled={readOnly || (!newMessage.trim() && !attachment)}
+                                className="h-10 w-10 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-sm shrink-0 cursor-pointer"
+                                title={__('general.send', {}, 'إرسال')}
+                            >
+                                <Send className="w-4 h-4 rtl:-scale-x-100" />
+                            </button>
+                        </form>
                     </div>
                 )}
-
-                <form onSubmit={sendMessage} className="flex items-end gap-2">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept="image/*"
-                        className="hidden"
-                        disabled={readOnly}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={readOnly}
-                        className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
-                        title={__('general.attach_image')}
-                    >
-                        <span role="img" aria-label="attachment">
-                            📎
-                        </span>
-                    </button>
-
-                    <textarea
-                        value={newMessage}
-                        onChange={handleTyping}
-                        placeholder={
-                            readOnly ? 'Chat is closed' : 'Type a message...'
-                        }
-                        disabled={readOnly}
-                        className="max-h-32 min-h-[44px] flex-1 resize-none rounded-lg border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
-                        rows="1"
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                sendMessage(e);
-                            }
-                        }}
-                    />
-
-                    <button
-                        type="submit"
-                        disabled={
-                            readOnly || (!newMessage.trim() && !attachment)
-                        }
-                        className="rounded-lg bg-indigo-600 p-2 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        <span role="img" aria-label="send">
-                            Send →
-                        </span>
-                    </button>
-                </form>
             </div>
         </div>
     );
