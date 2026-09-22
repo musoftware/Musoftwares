@@ -7,7 +7,7 @@ import { BentoStatCard } from '@/Components/ui/BentoStatCard';
 import { ContentCard } from '@/Components/ui/ContentCard';
 import { 
     Folder, Wallet, FileText, ArrowRight, ArrowUpRight, 
-    Server, Zap, Shield, MessageSquare, Laptop, Coins, CreditCard, Wrench, Key, LifeBuoy 
+    Server, Zap, Shield, MessageSquare, Laptop, Coins, CreditCard, Wrench, Key, LifeBuoy, Sparkles 
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { formatCurrencyAmount } from '@/lib/utils';
@@ -150,6 +150,13 @@ export default function Dashboard({
                                         <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5">+15 PTS</span>
                                     </Link>
                                     <Link
+                                        href="/micro-services"
+                                        className="flex-1 sm:flex-initial px-4 py-2.5 border border-purple-500/25 bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
+                                    >
+                                        <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                                        <span>MICRO SERVICES</span>
+                                    </Link>
+                                    <Link
                                         href="/estimator"
                                         className="flex-1 sm:flex-initial px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm active:scale-98 select-none cursor-pointer text-center flex items-center justify-center"
                                     >
@@ -172,6 +179,13 @@ export default function Dashboard({
                                         <LifeBuoy className="w-3.5 h-3.5 shrink-0" />
                                         <span>OPEN TICKET</span>
                                         <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5">+15 PTS</span>
+                                    </Link>
+                                    <Link
+                                        href="/micro-services"
+                                        className="flex-1 sm:flex-initial px-4 py-2.5 border border-purple-500/25 bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
+                                    >
+                                        <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                                        <span>MICRO SERVICES</span>
                                     </Link>
                                     <Link
                                         href="/projects"

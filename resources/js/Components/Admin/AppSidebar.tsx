@@ -94,6 +94,7 @@ const items: MenuItem[] = [
     subItems: [
         { title: "Bulk Notify", url: "/admin/notifications/broadcast" },
         { title: "Website Services", url: "/admin/website-services" },
+        { title: "Micro Services", url: "/admin/micro-services" },
         { title: "Guest Tickets", url: "/admin/guest-tickets" },
         { title: "Tickets", url: "/admin/tickets" },
         { title: "Busy Times", url: "/admin/busy-times" },

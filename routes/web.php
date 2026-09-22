@@ -634,6 +634,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Website Services
     Route::resource('website-services', WebsiteServiceController::class)->except(['show']);
 
+    // Micro Services Management
+    Route::get('micro-services', [\App\Http\Controllers\Admin\AdminMicroServiceController::class, 'index'])->name('micro-services.index');
+    Route::post('micro-services', [\App\Http\Controllers\Admin\AdminMicroServiceController::class, 'storeService'])->name('micro-services.store');
+    Route::put('micro-services/{microService}', [\App\Http\Controllers\Admin\AdminMicroServiceController::class, 'updateService'])->name('micro-services.update');
+    Route::delete('micro-services/{microService}', [\App\Http\Controllers\Admin\AdminMicroServiceController::class, 'destroyService'])->name('micro-services.destroy');
+    Route::post('micro-services/orders/{order}/complete', [\App\Http\Controllers\Admin\AdminMicroServiceController::class, 'completeOrder'])->name('micro-services.orders.complete');
+
     // Broadcast Notifications
     Route::get('/notifications/broadcast', [BroadcastNotificationController::class, 'index'])->name('notifications.broadcast');
     Route::post('/notifications/broadcast/send', [BroadcastNotificationController::class, 'send'])
@@ -1026,6 +1033,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/tickets', [SupportTicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/{id}', [SupportTicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{id}/resolve', [SupportTicketController::class, 'resolve'])->name('tickets.resolve');
+
+    // Micro Services
+    Route::get('/micro-services', [\App\Http\Controllers\Client\MicroServiceController::class, 'index'])->name('micro-services.index');
+    Route::post('/micro-services/{microService}/order', [\App\Http\Controllers\Client\MicroServiceController::class, 'order'])->name('micro-services.order');
 });
 
 // KYC Routes
