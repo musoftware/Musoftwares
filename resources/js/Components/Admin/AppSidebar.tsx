@@ -51,6 +51,7 @@ const items: MenuItem[] = [
             { title: "Task Calendar", url: "/admin/tasks/calendar" },
             { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
             { title: "Employee Todos", url: "/admin/employee-todos" },
+            { title: "Tickets", url: "/admin/tickets", badgeCountKey: "open_tickets" },
         ]
   },
   {

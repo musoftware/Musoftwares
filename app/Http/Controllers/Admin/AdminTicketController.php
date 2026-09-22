@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TicketResource;
+use App\Models\Conversation;
 use App\Models\Ticket;
 use App\Models\TicketCannedResponse;
 use App\Models\User;
@@ -37,6 +38,30 @@ class AdminTicketController extends Controller
 
     public function show(Ticket $ticket)
     {
+        if (! $ticket->conversation) {
+            $conversation = Conversation::create([
+                'conversable_type' => Ticket::class,
+                'conversable_id' => $ticket->id,
+                'type' => 'support_ticket',
+                'status' => in_array($ticket->ticket_status, ['closed', 'resolved']) ? 'closed' : 'open',
+            ]);
+
+            if ($ticket->user_id) {
+                $conversation->participants()->firstOrCreate([
+                    'user_id' => $ticket->user_id,
+                    'role' => 'client',
+                ]);
+            }
+
+            if (! empty($ticket->ticket_message)) {
+                $conversation->messages()->create([
+                    'sender_id' => $ticket->user_id,
+                    'body' => $ticket->ticket_message,
+                    'is_system' => false,
+                ]);
+            }
+        }
+
         $ticket->load(['user', 'conversation.messages.sender']);
 
         $supportAgents = User::role(['admin', 'moderator'])->get(['id', 'name', 'email']);

@@ -153,9 +153,12 @@ class HandleInertiaRequests extends Middleware
                                 ->whereNull('ignored_at')
                                 ->where('archived', 0)
                                 ->count(),
+                            'open_tickets' => \App\Models\Ticket::whereNull('deleted_at')
+                                ->whereIn('ticket_status', ['open', 'in_progress', 'agent_replied'])
+                                ->count(),
                         ];
                     } catch (\Throwable $e) {
-                        return ['pending_tasks' => 0];
+                        return ['pending_tasks' => 0, 'open_tickets' => 0];
                     }
                 }
 
