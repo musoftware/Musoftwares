@@ -96,6 +96,8 @@ class AdminTicketController extends Controller
                 $ticket->conversation->update(['status' => 'open']);
             }
 
+            \App\Services\TicketNotificationService::notifyOnTicketStatusChanged($ticket, 'open');
+
             $message = 'Ticket reopened successfully.';
         }
 
@@ -151,6 +153,11 @@ class AdminTicketController extends Controller
         $ticket->update([
             'assigned_employee_id' => $request->assigned_employee_id,
         ]);
+
+        $assignedAgent = User::find($request->assigned_employee_id);
+        if ($assignedAgent) {
+            \App\Services\TicketNotificationService::notifyOnTicketAssigned($ticket, $assignedAgent);
+        }
 
         return redirect()->back()->with('success', __('general.ticket_assigned_successfully'));
     }
@@ -262,6 +269,22 @@ class AdminTicketController extends Controller
                 ]);
             }
         });
+
+        // Dispatch notifications for bulk updates
+        if (in_array($action, ['close', 'reopen', 'assign'])) {
+            $tickets = Ticket::whereIn('id', $ids)->get();
+            $assignedAgent = ($action === 'assign') ? User::find($validated['assigned_employee_id']) : null;
+
+            foreach ($tickets as $ticket) {
+                if ($action === 'close') {
+                    \App\Services\TicketNotificationService::notifyOnTicketStatusChanged($ticket, 'closed');
+                } elseif ($action === 'reopen') {
+                    \App\Services\TicketNotificationService::notifyOnTicketStatusChanged($ticket, 'open');
+                } elseif ($action === 'assign' && $assignedAgent) {
+                    \App\Services\TicketNotificationService::notifyOnTicketAssigned($ticket, $assignedAgent);
+                }
+            }
+        }
 
         $messages = [
             'delete' => "تم حذف {$count} تذكرة بنجاح.",

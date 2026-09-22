@@ -65,14 +65,21 @@ class ConversationController extends Controller
 
         $message->load(['sender', 'conversation']);
 
-        // Notify recipient via FCM & Database notification
-        $conversation->load('participants.user');
-        $recipients = $conversation->participants
-            ->pluck('user')
-            ->filter(fn ($u) => $u && (int) $u->id !== (int) $user->id);
+        // Notify recipient via FCM & Email
+        if ($conversation->conversable_type === \App\Models\Ticket::class && $conversation->conversable_id) {
+            $ticket = \App\Models\Ticket::find($conversation->conversable_id);
+            if ($ticket) {
+                \App\Services\TicketNotificationService::notifyOnTicketReplied($ticket, $message, $user, false);
+            }
+        } else {
+            $conversation->load('participants.user');
+            $recipients = $conversation->participants
+                ->pluck('user')
+                ->filter(fn ($u) => $u && (int) $u->id !== (int) $user->id);
 
-        foreach ($recipients as $recipient) {
-            $recipient->notify(new \App\Notifications\NewMessageNotification($message));
+            foreach ($recipients as $recipient) {
+                $recipient->notify(new \App\Notifications\NewMessageNotification($message));
+            }
         }
 
         // Touch conversation updated_at timestamp

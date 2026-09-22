@@ -65,10 +65,11 @@ class GuestTicketCreator extends BaseService
     private function notifyAdmins(GuestTicket $ticket): void
     {
         try {
-            $admins = User::role(['admin', 'Admin'])->get();
+            $admins = \App\Services\TicketNotificationService::getStaffUsers();
             if ($admins->isNotEmpty()) {
                 Notification::send($admins, new GuestTicketReplyNotification($ticket));
             }
+            \App\Services\TicketNotificationService::notifyOnGuestTicketCreated($ticket);
         } catch (\Throwable $e) {
             Log::warning('Admin notification failed for guest ticket', ['ticket_id' => $ticket->id, 'error' => $e->getMessage()]);
         }

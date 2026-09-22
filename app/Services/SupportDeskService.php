@@ -106,6 +106,11 @@ class SupportDeskService extends BaseService
                 ]);
             }
 
+            $sender = User::find($adminId);
+            if ($sender) {
+                \App\Services\TicketNotificationService::notifyOnTicketReplied($ticket, $message, $sender, $isInternal);
+            }
+
             return $message;
         });
     }
@@ -119,6 +124,8 @@ class SupportDeskService extends BaseService
                 $ticket->conversation->update(['status' => 'closed']);
             }
         });
+
+        \App\Services\TicketNotificationService::notifyOnTicketStatusChanged($ticket, 'closed');
     }
 
     public function getTicketStats(): array
