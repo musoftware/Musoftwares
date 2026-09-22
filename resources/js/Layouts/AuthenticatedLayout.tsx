@@ -125,7 +125,7 @@ function AuthenticatedContent({
     const isWithdrawalsMenuActive = isRouteActive('financial.withdrawals');
     const isPayoutMethodsMenuActive = isRouteActive('financial.payout-methods');
     const isReferralsMenuActive = isRouteActive('referrals');
-    const isTicketsMenuActive = isRouteActive('tickets');
+    const isTicketsMenuActive = isRouteActive('tickets') || isRouteActive('admin.tickets');
     const isServicesMenuActive = isRouteActive('marketplace.services');
     const isEstimatorMenuActive = isRouteActive('estimator');
     const isSubscriptionsMenuActive = isRouteActive('subscriptions');
@@ -309,15 +309,6 @@ function AuthenticatedContent({
                                                                             <SafeLink href={safeRoute('messages.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <MessageSquare className="w-4 h-4 text-[#0071e3]" /> {__('general.messages')}
                                                                             </SafeLink>
-                                                                            <SafeLink href={safeRoute('tickets.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <LifeBuoy className="w-4 h-4 text-[#0071e3]" /> {__('general.support_tickets')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('referrals.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Users className="w-4 h-4 text-[#0071e3]" /> {__('general.referrals')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('loyalty.index', undefined, '/loyalty')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Award className="w-4 h-4 text-[#0071e3]" /> {__('loyalty.loyalty_hub') || 'Loyalty & Points'}
-                                                                            </SafeLink>
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
@@ -331,17 +322,17 @@ function AuthenticatedContent({
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-5 ps-4">
-                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Coins className="w-4 h-4 text-amber-500" /> {__('general.gold_savers') || 'Gold Saver'}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <CreditCard className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway') || 'Payment Gateway'}
-                                                                            </SafeLink>
                                                                             <SafeLink href={safeRoute('store.tools.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <Wrench className="w-4 h-4 text-[#0071e3]" /> {__('general.tools_amp_plugins') || 'Software Store'}
                                                                             </SafeLink>
                                                                             <SafeLink href={safeRoute('store.tools.my-licenses')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <Key className="w-4 h-4 text-emerald-500" /> My Licenses & Devices
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <CreditCard className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway') || 'Payment Gateway'}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Coins className="w-4 h-4 text-amber-500" /> {__('general.gold_savers') || 'Gold Saver'}
                                                                             </SafeLink>
                                                                             {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
                                                                                 <SafeLink href={safeRoute('portal.devices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#0071e3]/10 dark:hover:bg-[#0071e3]/20 text-[#0071e3] font-semibold">
@@ -373,27 +364,36 @@ function AuthenticatedContent({
                                                                             <SafeLink href={safeRoute('financial.payout-methods.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.payout_methods')}
                                                                             </SafeLink>
+                                                                            <SafeLink href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.subscription')}
+                                                                            </SafeLink>
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
 
-                                                                {/* 4. Services & Tools */}
-                                                                <AccordionItem value="services_tools" className="border-b-0">
+                                                                {/* 4. Support & Resources */}
+                                                                <AccordionItem value="support_resources" className="border-b-0">
                                                                     <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 rounded-xl text-[#1d1d1f] dark:text-zinc-100 hover:no-underline font-medium">
                                                                         <div className="flex items-center gap-3 font-medium">
-                                                                            <Briefcase className="w-5 h-5 text-[#0071e3]" /> {__('general.services_tools') || __('general.services')}
+                                                                            <LifeBuoy className="w-5 h-5 text-[#0071e3]" /> {__('general.support_and_resources') || 'Support & Resources'}
                                                                         </div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-5 ps-4">
+                                                                            <SafeLink href={user?.is_admin || user?.role === 'admin' ? safeRoute('admin.tickets.index', undefined, '/admin/tickets') : safeRoute('tickets.index', undefined, '/tickets')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#0071e3] dark:text-[#3898ec] font-semibold">
+                                                                                <LifeBuoy className="w-4 h-4 text-[#0071e3]" /> {__('general.support_tickets')}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('loyalty.index', undefined, '/loyalty')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Award className="w-4 h-4 text-amber-500" /> {__('loyalty.loyalty_hub') || 'Loyalty & Points'}
+                                                                            </SafeLink>
+                                                                            <SafeLink href={safeRoute('referrals.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Users className="w-4 h-4 text-[#0071e3]" /> {__('general.referrals')}
+                                                                            </SafeLink>
                                                                             <SafeLink href={safeRoute('marketplace.services.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <Briefcase className="w-4 h-4 text-[#0071e3]" /> {__('general.services')}
                                                                             </SafeLink>
                                                                             <SafeLink href={safeRoute('estimator', undefined, '/estimator')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <Calculator className="w-4 h-4 text-[#0071e3]" /> {__('general.estimator') || 'Estimator'}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.subscription')}
                                                                             </SafeLink>
                                                                         </div>
                                                                     </AccordionContent>
@@ -459,7 +459,7 @@ function AuthenticatedContent({
                                                 )}
                                             </div>
                                             <DropdownMenuContent align="start" className="w-[960px] max-h-[85vh] overflow-y-auto p-5 grid grid-cols-4 gap-5 rounded-[24px] border border-black/10 dark:border-white/10 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl text-[#1d1d1f] dark:text-zinc-100 isolate z-50 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:shadow-2xl">
-                                                {/* Column 1: Workspace & Projects */}
+                                                {/* Column 1: Workspace & Execution */}
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
                                                         <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.workspace_projects') || __('general.workspace')}</p>
@@ -488,44 +488,31 @@ function AuthenticatedContent({
                                                         description={__('general.messages_desc')}
                                                         isActive={isMessagesMenuActive}
                                                     />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('tickets.index')}
-                                                        icon={LifeBuoy}
-                                                        title={__('general.support_tickets')}
-                                                        description={__('general.support_tickets_desc')}
-                                                        isActive={isTicketsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('referrals.index')}
-                                                        icon={Users}
-                                                        title={__('general.referrals')}
-                                                        description={__('general.referrals_desc')}
-                                                        isActive={isReferralsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('loyalty.index', undefined, '/loyalty')}
-                                                        icon={Award}
-                                                        title={__('loyalty.loyalty_hub') || 'Loyalty & Points'}
-                                                        description={__('loyalty.loyalty_tagline') || 'Points ledger, rewards catalog & tier perks'}
-                                                        isActive={route().current('loyalty.*')}
-                                                    />
                                                 </div>
 
-                                                {/* Column 2: Core Solutions */}
+                                                {/* Column 2: Core Solutions & Cloud Apps */}
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
                                                         <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.cloud_apps') || 'Solutions'}</p>
                                                     </div>
-                                                    
+
                                                     <UnifiedMenuItem
-                                                        href={safeRoute('sso.redirect', { system: 'goldsaversys' })}
-                                                        icon={Coins}
-                                                        color="amber"
-                                                        title={__('general.gold_savers') || 'Gold Saver'}
-                                                        description="Real-time gold vault, hedging & savings"
+                                                        href={safeRoute('store.tools.index')}
+                                                        icon={Wrench}
+                                                        color="blue"
+                                                        title={__('general.tools_amp_plugins') || 'Software Store'}
+                                                        description="Desktop utilities with automated email activation"
+                                                        isActive={route().current('store.tools.*')}
+                                                        badge={route().current('store.tools.*') ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
+                                                    />
+
+                                                    <UnifiedMenuItem
+                                                        href={safeRoute('store.tools.my-licenses')}
+                                                        icon={Key}
+                                                        color="emerald"
+                                                        title="My Licenses & Devices"
+                                                        description="View active licenses and machine bindings"
+                                                        isActive={route().current('store.tools.my-licenses')}
                                                     />
 
                                                     <UnifiedMenuItem
@@ -539,22 +526,11 @@ function AuthenticatedContent({
                                                     />
 
                                                     <UnifiedMenuItem
-                                                        href={safeRoute('store.tools.index')}
-                                                        icon={Wrench}
-                                                        color="blue"
-                                                        title={__('general.tools_amp_plugins') || 'Software & Tools Store'}
-                                                        description="Desktop utilities with automated email activation"
-                                                        isActive={route().current('store.tools.*')}
-                                                        badge={route().current('store.tools.*') ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('store.tools.my-licenses')}
-                                                        icon={Key}
-                                                        color="emerald"
-                                                        title="My Licenses & Devices"
-                                                        description="View active licenses and machine bindings"
-                                                        isActive={route().current('store.tools.my-licenses')}
+                                                        href={safeRoute('sso.redirect', { system: 'goldsaversys' })}
+                                                        icon={Coins}
+                                                        color="amber"
+                                                        title={__('general.gold_savers') || 'Gold Saver'}
+                                                        description="Real-time gold vault, hedging & savings"
                                                     />
 
                                                     {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
@@ -570,7 +546,7 @@ function AuthenticatedContent({
                                                     )}
                                                 </div>
 
-                                                {/* Column 3: Financials & Ledger */}
+                                                {/* Column 3: Financials & Billing */}
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
                                                         <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.financials_billing') || __('general.financials')}</p>
@@ -593,6 +569,14 @@ function AuthenticatedContent({
                                                     />
 
                                                     <UnifiedMenuItem
+                                                        href={safeRoute('financial.add-balance')}
+                                                        icon={Plus}
+                                                        color="emerald"
+                                                        title={__('general.add_balance')}
+                                                        description={__('general.deposit_to_wallet') || 'Top-up wallet balance'}
+                                                    />
+
+                                                    <UnifiedMenuItem
                                                         href={safeRoute('financial.withdrawals')}
                                                         icon={ArrowUpRight}
                                                         title={__('general.request_withdrawal')}
@@ -609,26 +593,48 @@ function AuthenticatedContent({
                                                     />
 
                                                     <UnifiedMenuItem
-                                                        href={safeRoute('financial.add-balance')}
-                                                        icon={Plus}
-                                                        color="emerald"
-                                                        title={__('general.add_balance')}
-                                                        description={__('general.deposit_to_wallet') || 'Top-up wallet balance'}
+                                                        href={safeRoute('subscriptions.plans')}
+                                                        icon={CreditCard}
+                                                        title={__('general.subscription')}
+                                                        description={__('general.manage_plans_and_addons') || 'Plans, modules & addons'}
+                                                        isActive={isSubscriptionsMenuActive}
                                                     />
                                                 </div>
 
-                                                {/* Column 4: Services & Tools */}
+                                                {/* Column 4: Support & Resources (Far Right Column) */}
                                                 <div className="flex flex-col gap-1.5">
-                                                    <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.services_tools') || __('general.services')}</p>
+                                                    <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10 flex items-center justify-between">
+                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">
+                                                            {__('general.support_and_resources') || 'Support & Resources'}
+                                                        </p>
                                                     </div>
 
+                                                    {/* Support Tickets - Prominent in Right Column */}
                                                     <UnifiedMenuItem
-                                                        href="/partner-gateway"
-                                                        icon={Key}
-                                                        color="emerald"
-                                                        title="Partner Gateway API"
-                                                        description="Developer Keys & B2B Usage Wallet"
+                                                        href={user?.is_admin || user?.role === 'admin' ? safeRoute('admin.tickets.index', undefined, '/admin/tickets') : safeRoute('tickets.index', undefined, '/tickets')}
+                                                        icon={LifeBuoy}
+                                                        color="blue"
+                                                        title={__('general.support_tickets')}
+                                                        description={__('general.support_tickets_desc') || 'Get instant help, raise tickets & track SLA'}
+                                                        isActive={isTicketsMenuActive}
+                                                        badge={<span className="text-[10px] font-semibold px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20 rounded-full">SLA Live</span>}
+                                                    />
+
+                                                    <UnifiedMenuItem
+                                                        href={safeRoute('loyalty.index', undefined, '/loyalty')}
+                                                        icon={Award}
+                                                        color="amber"
+                                                        title={__('loyalty.loyalty_hub') || 'Loyalty & Points'}
+                                                        description={__('loyalty.loyalty_tagline') || 'Points ledger, rewards catalog & tier perks'}
+                                                        isActive={route().current('loyalty.*')}
+                                                    />
+
+                                                    <UnifiedMenuItem
+                                                        href={safeRoute('referrals.index')}
+                                                        icon={Users}
+                                                        title={__('general.referrals')}
+                                                        description={__('general.referrals_desc')}
+                                                        isActive={isReferralsMenuActive}
                                                     />
 
                                                     <UnifiedMenuItem
@@ -648,11 +654,11 @@ function AuthenticatedContent({
                                                     />
 
                                                     <UnifiedMenuItem
-                                                        href={safeRoute('subscriptions.plans')}
-                                                        icon={CreditCard}
-                                                        title={__('general.subscription')}
-                                                        description={__('general.manage_plans_and_addons') || 'Plans, modules & addons'}
-                                                        isActive={isSubscriptionsMenuActive}
+                                                        href="/partner-gateway"
+                                                        icon={Key}
+                                                        color="emerald"
+                                                        title="Partner Gateway API"
+                                                        description="Developer Keys & B2B Usage Wallet"
                                                     />
                                                 </div>
                                             </DropdownMenuContent>
@@ -709,6 +715,18 @@ function AuthenticatedContent({
                                     </SafeLink>
                                 </div>
                             )}
+
+                            {/* Support Tickets Quick Action (Global Top-Right Quick Access) */}
+                            <SafeLink
+                                href={user?.is_admin || user?.role === 'admin' ? safeRoute('admin.tickets.index', undefined, '/admin/tickets') : safeRoute('tickets.index', undefined, '/tickets')}
+                                className={cn(
+                                    "w-8 h-8 rounded-full bg-white dark:bg-zinc-900 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 border border-black/10 dark:border-white/10 inline-flex items-center justify-center text-[#1d1d1f]/75 dark:text-zinc-300 hover:text-[#0071e3] dark:hover:text-[#3898ec] transition-all relative outline-none shrink-0 cursor-pointer shadow-2xs",
+                                    isTicketsMenuActive && "text-[#0071e3] dark:text-[#3898ec] border-[#0071e3]/30 bg-[#0071e3]/5"
+                                )}
+                                title={__('general.support_tickets') || 'Support Desk & Tickets'}
+                            >
+                                <LifeBuoy className="w-3.5 h-3.5" />
+                            </SafeLink>
 
                             {/* Notifications */}
                             <DropdownMenu>
