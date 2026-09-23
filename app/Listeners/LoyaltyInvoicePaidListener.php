@@ -38,6 +38,9 @@ class LoyaltyInvoicePaidListener implements ShouldQueue
             ]
         );
 
+        // Check and award monthly spend milestone bonuses (10,000 EGP => 600 pts, 15,000 EGP => +1,000 pts)
+        $this->loyaltyService->checkMonthlySpendMilestones($user, $invoice);
+
         // Award referral points to the referrer if this is the user's first paid invoice
         if (! empty($user->ref_user_id)) {
             $referrer = \App\Models\User::find($user->ref_user_id);

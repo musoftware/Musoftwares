@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Events\LoyaltyPointsAwarded;
 use App\Events\LoyaltyTierUpgraded;
 use App\Jobs\SendLoyaltyProgressEmailJob;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\LoyaltyNotificationLog;
 use App\Models\LoyaltyPointTransaction;
@@ -41,7 +43,7 @@ class LoyaltyService extends BaseService
             return null;
         }
 
-        $idempotencyKey = $this->buildIdempotencyKey($eventType, $reference);
+        $idempotencyKey = $context['idempotency_key'] ?? $this->buildIdempotencyKey($eventType, $reference);
 
         // Guard: prevent duplicate awards for the same event instance
         if (LoyaltyPointTransaction::where('idempotency_key', $idempotencyKey)->exists()) {
@@ -96,6 +98,100 @@ class LoyaltyService extends BaseService
         array $context = []
     ): ?LoyaltyPointTransaction {
         return $this->awardPointsForEvent($user, $eventType, $reference, $context);
+    }
+
+    /**
+     * Check if a user's total paid invoices in the current calendar month (Africa/Cairo)
+     * crossed the monthly spend milestones (10,000 EGP and 15,000 EGP), and award bonus points.
+     *
+     * @return array<LoyaltyPointTransaction>
+     */
+    public function checkMonthlySpendMilestones(User $user, ?Invoice $currentInvoice = null, ?Carbon $asOfDate = null): array
+    {
+        $invoiceDate = $currentInvoice?->paid_at ? Carbon::parse($currentInvoice->paid_at) : null;
+        $cairoDate = ($asOfDate ?? $invoiceDate ?? Carbon::now('Africa/Cairo'))->copy()->setTimezone('Africa/Cairo');
+        $startOfMonth = $cairoDate->copy()->startOfMonth();
+        $endOfMonth = $cairoDate->copy()->endOfMonth();
+        $monthKey = $cairoDate->format('Y-m');
+
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
+        $egpCurrencyId = $egpCurrency?->id;
+
+        // Fetch all paid invoices for the user within this Cairo month
+        $invoices = Invoice::where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->where(function ($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('paid_at', [$startOfMonth, $endOfMonth])
+                    ->orWhere(function ($sq) use ($startOfMonth, $endOfMonth) {
+                        $sq->whereNull('paid_at')
+                            ->whereBetween('updated_at', [$startOfMonth, $endOfMonth]);
+                    });
+            })
+            ->get();
+
+        $totalPaidEgp = 0.0;
+        foreach ($invoices as $inv) {
+            $amount = (float) ($inv->paid ?? $inv->total());
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $invCurrencyId = $inv->currency_id ?? $inv->currency;
+            if ($egpCurrencyId && $invCurrencyId && (int) $invCurrencyId !== (int) $egpCurrencyId) {
+                $converted = (float) CurrenciesExchange::RateToday($amount, $invCurrencyId, $egpCurrencyId);
+                $totalPaidEgp += $converted;
+            } else {
+                $totalPaidEgp += $amount;
+            }
+        }
+
+        $awarded = [];
+
+        // Milestone 1: 10,000 EGP -> 600 points
+        if ($totalPaidEgp >= 10000.0) {
+            $idempotencyKey10k = "monthly_spend_10k:{$user->id}:{$monthKey}";
+            $txn10k = $this->awardPointsForEvent(
+                user: $user,
+                eventType: 'monthly_spend_10k',
+                reference: $currentInvoice,
+                context: [
+                    'idempotency_key' => $idempotencyKey10k,
+                    'month'           => $monthKey,
+                    'threshold_egp'   => 10000,
+                    'total_paid_egp'  => round($totalPaidEgp, 2),
+                    'channel'         => 'monthly_milestone',
+                    'invoice_id'      => $currentInvoice?->id,
+                ]
+            );
+
+            if ($txn10k !== null) {
+                $awarded[] = $txn10k;
+            }
+        }
+
+        // Milestone 2: 15,000 EGP (an additional 5,000 EGP) -> 1,000 points
+        if ($totalPaidEgp >= 15000.0) {
+            $idempotencyKey15k = "monthly_spend_15k:{$user->id}:{$monthKey}";
+            $txn15k = $this->awardPointsForEvent(
+                user: $user,
+                eventType: 'monthly_spend_15k',
+                reference: $currentInvoice,
+                context: [
+                    'idempotency_key' => $idempotencyKey15k,
+                    'month'           => $monthKey,
+                    'threshold_egp'   => 15000,
+                    'total_paid_egp'  => round($totalPaidEgp, 2),
+                    'channel'         => 'monthly_milestone',
+                    'invoice_id'      => $currentInvoice?->id,
+                ]
+            );
+
+            if ($txn15k !== null) {
+                $awarded[] = $txn15k;
+            }
+        }
+
+        return $awarded;
     }
 
     /**

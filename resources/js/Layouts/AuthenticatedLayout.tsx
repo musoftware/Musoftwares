@@ -653,7 +653,7 @@ function AuthenticatedContent({
                                                         icon={Sparkles}
                                                         color="purple"
                                                         title={__('general.micro_services') || 'Micro Services'}
-                                                        description="خدمات سريعة وفورية بأسعار بسيطة من الرصيد"
+                                                        description={__('general.micro_services_desc') || 'Fast on-demand digital services at wallet balance rates'}
                                                         isActive={route().current('micro-services.*')}
                                                     />
 
@@ -669,8 +669,8 @@ function AuthenticatedContent({
                                                         href="/partner-gateway"
                                                         icon={Key}
                                                         color="emerald"
-                                                        title="Partner Gateway API"
-                                                        description="Developer Keys & B2B Usage Wallet"
+                                                        title={__('general.partner_gateway_api') || 'Partner Gateway API'}
+                                                        description={__('general.partner_gateway_desc') || 'Developer Keys & B2B Usage Wallet'}
                                                     />
                                                 </div>
                                             </DropdownMenuContent>
