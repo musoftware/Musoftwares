@@ -30,6 +30,7 @@ Detailed rules are maintained in individual markdown files under `.agents/rules/
 22. **[International Design Specifications](file:///.agents/rules/international-design-specifications.md)**: WCAG 2.2 accessibility, Apple HIG 8pt grid, Nielsen Norman usability heuristics, and Core Web Vitals ergonomics.
 23. **[Mobile-First Invariants & Zero Overflow](file:///.agents/rules/mobile-parity-and-extreme-ux-simplicity.md)**: Zero horizontal overflow (`overflow-x-clip`), responsive action wrapping, strict 360px viewport budgeting, and mandatory mobile verification before completing any frontend task.
 24. **[Homepage OS Unified Framework](file:///.agents/rules/homepage-os-unified-framework.md)**: Universal UI & UX diagnostic filter preventing keyword dumping, enforcing said-vs-meant translation, progressive disclosure, 10-layer visual engineering, and anti-AI footprint design rules.
+25. **[Local Serve Invariant](file:///.agents/rules/local-environment-serve-rules.md)**: Always run `artisan serve` with `C:\tools\php83\php.exe` and `--env=local` to ensure `.env.local` database credentials are used.
 
 ---
 

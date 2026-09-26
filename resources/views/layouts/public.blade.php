@@ -30,7 +30,7 @@
         })();
     </script>
 
-    <title>{{ $title ?? 'Musoftwares | Boutique Software Engineering Studio' }}</title>
+    <title>{{ $title ?? ($locale === 'ar' ? 'موسوفت ويرز | تطوير البرمجيات والأنظمة السحابية والـ ERP' : 'Musoftwares | Enterprise Software, Cloud ERP & Custom Development') }}</title>
     <meta name="description" content="{{ $description ?? 'Custom web applications, mobile apps, and enterprise automation platforms engineered by Mahmoud Amin in Suez, Egypt.' }}">
 
     @php
@@ -130,12 +130,12 @@
             padding: 8px 18px;
             font-size: 14px;
             line-height: 1.42857;
-            font-weight: 400;
+            font-weight: 500;
             letter-spacing: -0.01em;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
         .apple-pill-primary {
             background-color: #0071e3;
@@ -143,17 +143,17 @@
         }
         .apple-pill-primary:hover {
             background-color: #0077ed;
-            transform: scale(1.02);
+            transform: translateY(-1px);
         }
         .apple-pill-secondary {
             background-color: #f5f5f7;
-            color: #0066cc;
+            color: #1d1d1f;
             border: 1px solid #d2d2d7;
         }
         .apple-pill-secondary:hover {
             background-color: #e8e8ed;
             color: #0071e3;
-            transform: scale(1.02);
+            transform: translateY(-1px);
         }
         .apple-link-cta {
             color: #0066cc;
@@ -167,6 +167,54 @@
         .apple-link-cta:hover {
             text-decoration: underline;
             gap: 7px;
+        }
+
+        /* Boutique Studio Design System Tokens & Buttons */
+        .btn-studio-primary {
+            min-height: 44px;
+            padding: 10px 22px;
+            border-radius: 12px;
+            background-color: #0071e3;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-studio-primary:hover {
+            background-color: #0077ed;
+            box-shadow: 0 4px 14px rgba(0, 113, 227, 0.25);
+            transform: translateY(-1px);
+        }
+        .btn-studio-primary:active {
+            transform: translateY(0);
+        }
+        .btn-studio-secondary {
+            min-height: 44px;
+            padding: 10px 22px;
+            border-radius: 12px;
+            background-color: #ffffff;
+            color: #1d1d1f;
+            font-size: 15px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-studio-secondary:hover {
+            background-color: #f5f5f7;
+            border-color: rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+        .btn-studio-secondary:active {
+            transform: translateY(0);
         }
 
         /* Apple Scroll Reveal Micro-interactions */
@@ -193,7 +241,10 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased bg-[#ffffff] text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white">
 
-    <!-- Apple Exact Global Navigation Bar (Unified with React thickness & layout) -->
+    <!-- Navigation Bar -->
+    @hasSection('custom_header')
+        @yield('custom_header')
+    @else
     <header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-black/5 transition-all duration-200">
         <div class="max-w-[1280px] mx-auto flex items-center justify-between px-6 sm:px-10 min-h-[56px] py-3">
             
@@ -304,21 +355,19 @@
             @endauth
         </div>
     </header>
+    @endif
 
-    <!-- Apple Exact Announcement Ribbon Banner -->
-    <div class="w-full bg-[#fbfbfd] border-b border-black/[0.06] py-2.5 px-4 text-center text-[12px] sm:text-[13px] text-[#1d1d1f]/80">
-        <span>
-            {{ $locale === 'ar' 
-                ? 'استوديو تطوير برمجي متخصص: ملكية كاملة للكود المصدري بدون وسطاء أو اشتراكات شهرية.' 
-                : 'Boutique Studio: 100% Direct Source Code Ownership & Lifelong Sovereignty.' }}
-        </span>
-    </div>
+    <!-- Main Content Stream -->
 
     <!-- Main Content Stream -->
     <main class="flex-1 w-full bg-[#ffffff]">
         @yield('content')
     </main>
 
+    <!-- Footer -->
+    @hasSection('custom_footer')
+        @yield('custom_footer')
+    @else
     <!-- Apple Exact 5-Column Global Directory Light Footer -->
     <footer class="w-full bg-[#f5f5f7] border-t border-black/[0.08] pt-10 pb-12 px-6 sm:px-12 text-[#86868b] text-[12px]">
         <div class="max-w-[1024px] mx-auto space-y-6">
@@ -425,6 +474,7 @@
 
         </div>
     </footer>
+    @endif
 
     <!-- Apple Smooth Scroll Reveal Script -->
     <script>
