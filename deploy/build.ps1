@@ -135,13 +135,16 @@ if ($dbStatus -eq "ONLINE") {
     Write-Host "-> Database connection is OFFLINE. Running dynamic public/edge verification only..." -ForegroundColor Yellow
 }
 
+$E2E_PORT = 8188
+$env:PLAYWRIGHT_TEST_BASE_URL = "http://127.0.0.1:$E2E_PORT"
+
 $serverAlreadyRunning = $false
-$tcpConnection = New-Object System.Net.Sockets.TcpClient
 try {
-    $tcpConnection.Connect("127.0.0.1", 8000)
-    $serverAlreadyRunning = $true
-    $tcpConnection.Close()
-    Write-Host "-> Local web server is already running on port 8000." -ForegroundColor DarkGray
+    $resp = Invoke-WebRequest -Uri "http://127.0.0.1:$E2E_PORT" -TimeoutSec 2 -UseBasicParsing -ErrorAction SilentlyContinue
+    if ($resp.StatusCode -ge 200 -and $resp.StatusCode -lt 500) {
+        $serverAlreadyRunning = $true
+        Write-Host "-> Local web server is already running on port $E2E_PORT." -ForegroundColor DarkGray
+    }
 } catch {
     # Not running
 }
@@ -150,9 +153,17 @@ $serverProcess = $null
 $testExitCode = 0
 try {
     if (-not $serverAlreadyRunning) {
-        Write-Host "-> Starting local Laravel server on port 8000..." -ForegroundColor DarkGray
-        $serverProcess = Start-Process "$PHP_BIN" -ArgumentList "artisan serve --host=127.0.0.1 --port=8000 --env=local" -PassThru -NoNewWindow
-        Start-Sleep -Seconds 3
+        Write-Host "-> Starting local Laravel server on port $E2E_PORT..." -ForegroundColor DarkGray
+        $serverProcess = Start-Process "$PHP_BIN" -ArgumentList "artisan serve --host=127.0.0.1 --port=$E2E_PORT --env=local" -PassThru -NoNewWindow
+        for ($i = 0; $i -lt 12; $i++) {
+            Start-Sleep -Milliseconds 600
+            try {
+                $resp = Invoke-WebRequest -Uri "http://127.0.0.1:$E2E_PORT" -TimeoutSec 2 -UseBasicParsing -ErrorAction SilentlyContinue
+                if ($resp.StatusCode -ge 200 -and $resp.StatusCode -lt 500) {
+                    break
+                }
+            } catch {}
+        }
     }
 
     Write-Host "-> Running Playwright Dynamic Health Audit suite..." -ForegroundColor DarkGray
@@ -164,7 +175,7 @@ try {
     $testExitCode = $LASTEXITCODE
 } finally {
     if (-not $serverAlreadyRunning -and $serverProcess) {
-        Write-Host "-> Stopping local Laravel server..." -ForegroundColor DarkGray
+        Write-Host "-> Stopping local Laravel server on port $E2E_PORT..." -ForegroundColor DarkGray
         Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
     }
 }

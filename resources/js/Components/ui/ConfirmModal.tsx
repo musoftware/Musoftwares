@@ -21,7 +21,7 @@ export interface ConfirmModalProps {
     description?: string;
     confirmLabel?: string;
     cancelLabel?: string;
-    variant?: 'danger' | 'default';
+    variant?: 'danger' | 'destructive' | 'default';
     onConfirm: () => void;
     onCancel: () => void;
     loading?: boolean;
@@ -38,12 +38,14 @@ export function ConfirmModal({
     onCancel,
     loading = false,
 }: ConfirmModalProps) {
+    const isDanger = variant === 'danger' || variant === 'destructive';
+
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
             <DialogContent className="sm:max-w-[420px]">
                 <DialogHeader>
                     <div className="flex items-center gap-3">
-                        {variant === 'danger' ? (
+                        {isDanger ? (
                             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 border border-red-100">
                                 <AlertTriangle className="h-4 w-4 text-red-600" />
                             </div>
@@ -76,7 +78,7 @@ export function ConfirmModal({
                         disabled={loading}
                         className={cn(
                             'shadow-none',
-                            variant === 'danger'
+                            isDanger
                                 ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
                                 : ''
                         )}

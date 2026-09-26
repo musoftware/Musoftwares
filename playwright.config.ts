@@ -14,7 +14,7 @@ export default defineConfig({
   use: {
     actionTimeout: 0,
     trace: 'on-first-retry',
-    baseURL: 'http://127.0.0.1:8000',
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://127.0.0.1:8188',
     screenshot: 'only-on-failure',
   },
   projects: [

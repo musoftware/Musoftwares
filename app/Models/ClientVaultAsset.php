@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,9 +22,24 @@ class ClientVaultAsset extends Model
         'last_accessed_at' => 'datetime',
     ];
 
-    public function getHumanSizeAttribute(): string
+    /**
+     * @return Attribute<string, never>
+     */
+    protected function humanSize(): Attribute
     {
-        return $this->humanSize();
+        return Attribute::make(
+            get: function (): string {
+                $bytes = (float) $this->file_size_bytes;
+                $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+                $i = 0;
+                while ($bytes >= 1024 && $i < count($units) - 1) {
+                    $bytes /= 1024;
+                    $i++;
+                }
+
+                return round($bytes, 1).' '.$units[$i];
+            }
+        );
     }
 
     public function user(): BelongsTo
@@ -34,18 +50,5 @@ class ClientVaultAsset extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
-    }
-
-    public function humanSize(): string
-    {
-        $bytes = (float) $this->file_size_bytes;
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $i = 0;
-        while ($bytes >= 1024 && $i < count($units) - 1) {
-            $bytes /= 1024;
-            $i++;
-        }
-
-        return round($bytes, 1).' '.$units[$i];
     }
 }

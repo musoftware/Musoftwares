@@ -18,15 +18,16 @@
         }
 
         :root {
-            --bg-base: #f8fafc;
-            --surface: #ffffff;
+            --bg-base: #ece5dc;
+            --surface: #F5EFEB;
             --text-main: #090d16;
             --text-muted: #4b5563;
             --text-subtle: #8a99ad;
-            --border-light: #e4e9f0;
+            --border-light: #d8ccbe;
             --border-dark: #090d16;
             --accent-brand: #0284c7;
             --accent-navy: #0f172a;
+            --accent-orange: #FF5722;
             --stamp-blue: #1e3a8a;
         }
 
@@ -53,10 +54,13 @@
 
         /* Individual Page Sheets (A4 proportions on screen) */
         .page-sheet {
-            background: var(--surface);
-            border: 1px solid var(--border-light);
+            background-color: var(--surface);
+            background-image: radial-gradient(#d8ccbe 0.75px, transparent 0.75px), radial-gradient(#d8ccbe 0.75px, #F5EFEB 0.75px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            border: 1.5px solid var(--border-light);
             border-radius: 20px;
-            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03);
+            box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
             padding: 64px 60px;
             position: relative;
             overflow: hidden;

@@ -80,7 +80,6 @@ class SerialDeviceController extends Controller
                 'whatsapp_number'      => $software->whatsapp_number,
                 'payment_instructions' => $software->payment_instructions,
                 'logo_url'             => $software->logo_url,
-            'logo_url'             => $software->logo_url,
                 'message'              => 'This software is currently disabled by administrator.',
             ]);
         }

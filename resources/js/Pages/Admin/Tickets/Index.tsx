@@ -739,7 +739,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                 description={`أنت على وشك حذف ${selectedIds.length} تذكرة محددة. سيتم نقلها إلى المحذوفات (Soft Delete) ويمكن استرجاعها من قاعدة البيانات.`}
                 confirmLabel="تأكيد الحذف"
                 cancelLabel="إلغاء"
-                variant="destructive"
+                variant="danger"
                 onConfirm={() => {
                     setBulkDeleteModalOpen(false);
                     executeBulk('delete');

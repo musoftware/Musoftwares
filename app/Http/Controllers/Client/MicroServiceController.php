@@ -30,7 +30,7 @@ class MicroServiceController extends Controller
         $services = MicroService::active()
             ->with('currency')
             ->get()
-            ->map(function (MicroService $s) use ($userCurrencyId, $userCurrencySymbol) {
+            ->map(function (MicroService $s) use ($userCurrencyId) {
                 $baseCurrencyId = $s->currency_id ?: (CurrenciesExchange::BusinessCurrency() ?: 1);
                 $convertedPrice = (float) CurrenciesExchange::RateToday(
                     (float) $s->price,

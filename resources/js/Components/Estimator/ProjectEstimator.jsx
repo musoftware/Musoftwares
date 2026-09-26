@@ -36,10 +36,14 @@ import {
     Radio,
     Clock,
     Filter,
-    ArrowUpRight
+    ArrowUpRight,
+    FileText,
+    Download,
+    Loader2
 } from 'lucide-react';
 import axios from 'axios';
 import MouseScrollContainer from '@/Components/ui/MouseScrollContainer';
+import { downloadProposalPdf } from '@/Utils/proposalPdfExport';
 
 export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = true, title = "Calculate Your Project Investment", subtitle = "Combine platforms and in-demand modules to calculate your transparent development estimate." }) {
     const { auth } = usePage().props || {};
@@ -74,6 +78,7 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
     const [leadBusiness, setLeadBusiness] = useState('');
     const [leadSaved, setLeadSaved] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(null); // 'ar' | 'en' | null
 
     // Rates config
     const rates = {
@@ -781,6 +786,42 @@ Please let me know when we can review the technical specification!`;
         }
     };
 
+    // Handle Direct Kraft-Paper Proposal PDF Download
+    const handleDownloadPdf = async (lang) => {
+        if (isGeneratingPdf) return;
+        setIsGeneratingPdf(lang);
+        toast({
+            title: lang === 'ar' ? 'جاري تجهيز وثيقة العرض...' : 'Preparing Proposal PDF...',
+            description: lang === 'ar' ? 'يتم الآن تصميم وتوليد ملف الـ PDF عالي الدقة بطابع الورق الطبيعي.' : 'Rendering high-resolution Kraft-paper proposal PDF...',
+        });
+
+        try {
+            const res = await downloadProposalPdf({
+                costBreakdown,
+                selectedPlatforms,
+                platformScreens,
+                rates,
+                exchangeRate,
+                isUsd,
+                lang,
+            });
+
+            toast({
+                title: lang === 'ar' ? 'تم تنزيل العرض بنجاح! 📄' : 'Proposal Downloaded! 📄',
+                description: lang === 'ar' ? `تم حفظ الملف: ${res.fileName}` : `Saved file: ${res.fileName}`,
+            });
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            toast({
+                title: lang === 'ar' ? 'فشل التوليد' : 'Download Failed',
+                description: lang === 'ar' ? 'تعذر إنشاء ملف الـ PDF، يرجى المحاولة مجدداً.' : 'Could not generate proposal PDF, please retry.',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsGeneratingPdf(null);
+        }
+    };
+
     return (
         <div className="w-full text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
             <div className="mx-auto max-w-[1280px] space-y-10">
@@ -1180,6 +1221,61 @@ Please let me know when we can review the technical specification!`;
                                     <MessageSquare className="w-4 h-4" />
                                     <span>Discuss Scope on WhatsApp</span>
                                 </a>
+
+                                {/* Executive Kraft-Paper Proposal PDF Download Box */}
+                                <div className="pt-3 border-t border-black/5 space-y-2">
+                                    <div className="flex items-center justify-between text-xs px-1">
+                                        <span className="flex items-center gap-1.5 font-semibold text-[#1d1d1f]">
+                                            <FileText className="w-3.5 h-3.5 text-[#ff5722]" />
+                                            <span>وثيقة العرض الهندسي (PDF)</span>
+                                        </span>
+                                        <span className="text-[10px] font-bold text-[#ff5722] bg-[#ff5722]/10 px-2 py-0.5 rounded-full">
+                                            طابع ورق كرافت
+                                        </span>
+                                    </div>
+                                    <p className="text-[11px] text-[#1d1d1f]/60 px-1 leading-relaxed">
+                                        تحميل دراسة جدوى فنية فورية وتفصيلية للمشروع بتصميم الورق الطبيعي ومخطط الـ MVP.
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-2 pt-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDownloadPdf('ar')}
+                                            disabled={!!isGeneratingPdf}
+                                            className="w-full flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#F5EFEB] hover:bg-[#ebdccf] text-[#0F172A] border border-[#d3c2b2] text-[11px] font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                                        >
+                                            {isGeneratingPdf === 'ar' ? (
+                                                <>
+                                                    <Loader2 className="w-3 h-3 animate-spin text-[#ff5722]" />
+                                                    <span>جاري التوليد...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Download className="w-3 h-3 text-[#ff5722]" />
+                                                    <span>تحميل بالعربية 📄</span>
+                                                </>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDownloadPdf('en')}
+                                            disabled={!!isGeneratingPdf}
+                                            className="w-full flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#F5EFEB] hover:bg-[#ebdccf] text-[#0F172A] border border-[#d3c2b2] text-[11px] font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                                        >
+                                            {isGeneratingPdf === 'en' ? (
+                                                <>
+                                                    <Loader2 className="w-3 h-3 animate-spin text-[#0071e3]" />
+                                                    <span>Generating...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Download className="w-3 h-3 text-[#0071e3]" />
+                                                    <span>English PDF 📄</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
 
                                 <Link
                                     href="/estimator"
