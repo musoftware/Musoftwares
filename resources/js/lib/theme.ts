@@ -24,14 +24,29 @@ export function isDarkActive(theme: ThemeMode = useAppStore.getState().theme): b
 export function applyTheme(theme: ThemeMode): void {
     if (typeof window === 'undefined' || !document.documentElement) return;
 
-    const isDark = isDarkActive(theme);
     const root = document.documentElement;
+
+    // Fixed theme guard: If the layout enforces a fixed theme (e.g. public marketing website), keep it strictly light
+    if (root.getAttribute('data-theme') === 'light' || root.getAttribute('data-theme-fixed') === 'true') {
+        root.classList.remove('dark');
+        root.classList.add('light');
+        root.style.colorScheme = 'light';
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', '#ffffff');
+        }
+        return;
+    }
+
+    const isDark = isDarkActive(theme);
 
     if (isDark) {
         root.classList.add('dark');
+        root.classList.remove('light');
         root.style.colorScheme = 'dark';
     } else {
         root.classList.remove('dark');
+        root.classList.add('light');
         root.style.colorScheme = 'light';
     }
 
@@ -46,7 +61,13 @@ export function applyTheme(theme: ThemeMode): void {
  * Initializes real-time theme listener and zustand subscriber.
  */
 export function initTheme(): () => void {
-    if (typeof window === 'undefined') return () => {};
+    if (typeof window === 'undefined' || !document.documentElement) return () => {};
+
+    const root = document.documentElement;
+    if (root.getAttribute('data-theme') === 'light' || root.getAttribute('data-theme-fixed') === 'true') {
+        applyTheme('light');
+        return () => {};
+    }
 
     // 1. Initial application
     const initialTheme = useAppStore.getState().theme || 'system';

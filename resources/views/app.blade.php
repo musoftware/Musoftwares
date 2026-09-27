@@ -1,9 +1,12 @@
+@php
+    $isPublicPage = !request()->is('admin*', 'dashboard*', 'portal*', 'client*', 'settings*', 'workspace*', 'whatsapp*');
+@endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" @if($isPublicPage) data-theme="light" data-theme-fixed="true" class="light" @endif>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-        <meta name="theme-color" content="#0f0f11">
+        <meta name="theme-color" content="{{ $isPublicPage ? '#ffffff' : '#0f0f11' }}">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,6 +16,15 @@
         <script>
             (function() {
                 try {
+                    var isPublic = {{ $isPublicPage ? 'true' : 'false' }};
+                    if (isPublic) {
+                        document.documentElement.classList.remove('dark');
+                        document.documentElement.classList.add('light');
+                        document.documentElement.setAttribute('data-theme', 'light');
+                        document.documentElement.setAttribute('data-theme-fixed', 'true');
+                        document.documentElement.style.colorScheme = 'light';
+                        return;
+                    }
                     var theme = 'system';
                     var stored = localStorage.getItem('app-storage');
                     if (stored) {

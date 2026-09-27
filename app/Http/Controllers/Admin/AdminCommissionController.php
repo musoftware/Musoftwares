@@ -36,10 +36,10 @@ class AdminCommissionController extends Controller
 
         $query = Earning::query()
             ->with([
-                'user:id,name,email,avatar_url',
-                'referred_user:id,name,email,avatar_url',
+                'user:id,name,email,profile_photo_path',
+                'referred_user:id,name,email,profile_photo_path',
                 'currencyModel:id,currency,symbol',
-                'invoice:id,invoice_number,date',
+                'invoice:id,created_at',
             ]);
 
         $this->applySearchFilter($query, $filters['search']);
@@ -76,7 +76,7 @@ class AdminCommissionController extends Controller
                     'avatar_url' => $earning->referred_user->avatar_url,
                 ] : null,
                 'referred_invoice_id' => $earning->referred_invoice_id,
-                'invoice_number' => $earning->invoice?->invoice_number,
+                'invoice_number' => (string) ($earning->invoice?->id ?? $earning->referred_invoice_id ?? ''),
                 'amount' => (float) $earning->amount,
                 'currency' => $earning->currencyModel?->currency ?? 'EGP',
                 'convert_to_balance_on' => $ctb,

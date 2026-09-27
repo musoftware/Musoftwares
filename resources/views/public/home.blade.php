@@ -35,13 +35,47 @@
             <a href="#cta-hire" class="hover:text-[#0071e3] transition-colors">{{ $isAr ? 'التوظيف' : 'Hire' }}</a>
         </nav>
 
-        <!-- Right Solid Royal Blue CTA Button (Matching Apple musoftwares.com) -->
-        <div class="flex items-center gap-4">
-            <a href="/company/contact" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg text-white text-[14px] font-medium shadow-sm hover:bg-[#0077ed] transition">
+        <!-- Right Actions: Sign in + Contact us / Dashboard -->
+        <div class="flex items-center gap-3 sm:gap-4">
+            @auth
+                <a href="/dashboard" class="inline-flex items-center gap-1.5 text-[14px] font-medium text-[#1d1d1f] hover:text-[#0071e3] transition-colors px-2.5 py-1.5 rounded-lg hover:bg-black/5">
+                    <span>{{ $isAr ? 'لوحة التحكم' : 'Dashboard' }}</span>
+                    <span class="rtl:rotate-180">➔</span>
+                </a>
+            @else
+                <a href="/login" class="inline-flex items-center text-[14px] font-medium text-[#1d1d1f] hover:text-[#0071e3] transition-colors px-3 py-1.5 rounded-lg hover:bg-black/5">
+                    <span>{{ $isAr ? 'تسجيل الدخول' : 'Sign in' }}</span>
+                </a>
+            @endauth
+
+            <a href="/company/contact" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-5 sm:px-6 py-2.5 rounded-lg text-white text-[14px] font-medium shadow-sm hover:bg-[#0077ed] transition">
                 <span>{{ $isAr ? 'تواصل معنا' : 'Contact us' }}</span>
             </a>
+
+            <!-- Mobile Hamburger Toggle -->
+            <button type="button" onclick="document.getElementById('mobile-home-menu').classList.toggle('hidden')" class="md:hidden p-2 text-[#1d1d1f] hover:text-[#0071e3] transition-colors" aria-label="Toggle navigation">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
         </div>
 
+    </div>
+
+    <!-- Mobile Navigation Dropdown -->
+    <div id="mobile-home-menu" class="hidden md:hidden border-t border-gray-100 bg-white/98 backdrop-blur-md px-6 py-5 space-y-3 shadow-lg text-[15px] font-medium text-[#1d1d1f]">
+        <a href="/about/mahmoud-amin" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'من نحن' : 'About us' }}</a>
+        <a href="#services-overview" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'الخدمات' : 'Services' }}</a>
+        <a href="#case-studies" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'أعمالنا' : 'Case Studies' }}</a>
+        <a href="/compare/laravel-vs-nodejs" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'المدونة' : 'Blog' }}</a>
+        <a href="#how-it-works" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'كيف نعمل' : 'How it Works' }}</a>
+        <a href="#cta-hire" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'التوظيف' : 'Hire' }}</a>
+        <div class="pt-2 flex items-center gap-3">
+            @auth
+                <a href="/dashboard" class="flex-1 text-center py-2.5 rounded-lg border border-gray-200 text-sm font-semibold hover:bg-gray-50 transition">{{ $isAr ? 'لوحة التحكم ➔' : 'Dashboard ➔' }}</a>
+            @else
+                <a href="/login" class="flex-1 text-center py-2.5 rounded-lg border border-gray-200 text-sm font-semibold hover:bg-gray-50 transition">{{ $isAr ? 'تسجيل الدخول' : 'Sign in' }}</a>
+            @endauth
+            <a href="/company/contact" class="flex-1 text-center py-2.5 rounded-lg bg-[#0071e3] text-white text-sm font-semibold hover:bg-[#0077ed] transition">{{ $isAr ? 'تواصل معنا' : 'Contact us' }}</a>
+        </div>
     </div>
 </header>
 @endsection

@@ -38,6 +38,7 @@ const items: MenuItem[] = [
         { title: "Projects", url: "/admin/projects" },
         { title: "Plans", url: "/admin/plans" },
         { title: "Blog Articles", url: "/admin/blog-articles" },
+        { title: "Prompt Gallery", url: "/admin/prompts" },
     ]
   },
   {

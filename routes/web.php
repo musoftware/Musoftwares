@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminPaymentMethodController;
 use App\Http\Controllers\Client\ClientPartnerGatewayController;
 use App\Http\Controllers\Admin\AdminPointPackageController;
 use App\Http\Controllers\Admin\AdminPointsController;
+use App\Http\Controllers\Admin\AdminPromptController;
 use App\Http\Controllers\Admin\AdminQuotationController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminTaskController;
@@ -663,6 +664,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/{user}/kyc/documents', [App\Http\Controllers\Admin\KycController::class, 'showUserDocuments'])->name('users.kyc-documents');
     Route::post('/kyc/{user}/approve', [App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
     Route::post('/kyc/{user}/reject', [App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
+
+    // ── Admin Prompt Gallery ────────────────────────────────────────
+    Route::get('/prompts', [AdminPromptController::class, 'index'])->name('prompts.index');
+    Route::post('/prompts', [AdminPromptController::class, 'store'])->name('prompts.store');
+    Route::put('/prompts/{prompt}', [AdminPromptController::class, 'update'])->name('prompts.update');
+    Route::delete('/prompts/{prompt}', [AdminPromptController::class, 'destroy'])->name('prompts.destroy');
+    Route::post('/prompts/{prompt}/copy', [AdminPromptController::class, 'copy'])->name('prompts.copy');
 
     // ── Admin Blog Articles ─────────────────────────────────────────
     Route::post('/blog-articles/generate', [AdminBlogArticleController::class, 'generate'])->name('blog-articles.generate');

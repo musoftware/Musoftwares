@@ -9,7 +9,8 @@ import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
 import { syncDocumentDirection } from '@/lib/i18n';
-import { initTheme } from '@/lib/theme';
+import { initTheme, applyTheme } from '@/lib/theme';
+import { useAppStore } from '@/store/useAppStore';
 import { initAllMouseScrollContainers } from '@/lib/mouseScroll';
 // WebSockets disabled for main SaaS
 
@@ -21,7 +22,8 @@ if (typeof window !== 'undefined') {
 
 // Listen for Inertia page transitions to keep document lang & dir synced
 router.on('navigate', (event) => {
-    const props = event.detail.page.props as any;
+    const page = event.detail.page as any;
+    const props = page.props as any;
     if (props?.locale) {
         syncDocumentDirection(props.locale);
     }
@@ -32,6 +34,23 @@ router.on('navigate', (event) => {
         (window as any).defaultCurrency = props.wallet.currency;
     } else if (props?.settings?.base_currency) {
         (window as any).defaultCurrency = props.settings.base_currency;
+    }
+
+    // Keep public pages strictly locked to light theme during client-side navigation
+    if (page?.component?.startsWith('Public/') || page?.component === 'Frontend/Contract/Show') {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-theme-fixed', 'true');
+        document.documentElement.style.colorScheme = 'light';
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', '#ffffff');
+        }
+    } else {
+        document.documentElement.removeAttribute('data-theme-fixed');
+        document.documentElement.removeAttribute('data-theme');
+        applyTheme(useAppStore.getState().theme || 'system');
     }
 });
 

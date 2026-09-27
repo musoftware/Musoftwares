@@ -35,6 +35,22 @@ class Invoice extends Model
     ];
 
     /**
+     * Accessor for invoice number.
+     */
+    public function getInvoiceNumberAttribute(): string
+    {
+        return (string) $this->id;
+    }
+
+    /**
+     * Accessor for invoice date.
+     */
+    public function getDateAttribute(): ?string
+    {
+        return $this->created_at?->format('Y-m-d');
+    }
+
+    /**
      * Cleanly resolves an Invoice model from an instance or ID.
      */
     public static function resolve(mixed $invoice): ?self

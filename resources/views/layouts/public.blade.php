@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" data-theme="light" data-theme-fixed="true" class="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
-    <script>document.documentElement.style.colorScheme='light';</script>
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-theme-fixed', 'true');
+        document.documentElement.style.colorScheme = 'light';
+    </script>
 
 
     <title>{{ $title ?? ($locale === 'ar' ? 'موسوفت ويرز | تطوير البرمجيات والأنظمة السحابية والـ ERP' : 'Musoftwares | Enterprise Software, Cloud ERP & Custom Development') }}</title>
@@ -81,6 +87,12 @@
             --apple-link: #0066cc;
             --apple-border: #d2d2d7;
             --apple-border-light: rgba(0, 0, 0, 0.08);
+        }
+        html,
+        html body {
+            background-color: #ffffff !important;
+            color: #1d1d1f !important;
+            color-scheme: light !important;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Cairo", sans-serif;
