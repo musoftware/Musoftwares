@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\PaymentLink;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -62,14 +61,12 @@ class PaymentLinkController extends Controller
 
         $currencies = Currency::all();
 
-        $clients = $this->loadClientList();
 
         return Inertia::render('Admin/Finance/PaymentLinks/Index', [
             'paymentLinks' => $paymentLinks,
-            'currencies' => $currencies,
-            'clients' => $clients,
-            'filters' => $request->only(['search', 'status', 'currency_id', 'date_from', 'date_to', 'per_page']),
-            'stats' => $stats,
+            'currencies'   => $currencies,
+            'filters'      => $request->only(['search', 'status', 'currency_id', 'date_from', 'date_to', 'per_page']),
+            'stats'        => $stats,
             'canForceMarkPaid' => Auth::user()?->hasAnyRole(['super_admin', 'superadmin']) ?? false,
         ]);
     }
@@ -189,28 +186,14 @@ class PaymentLinkController extends Controller
         }
 
         return [
-            'total' => (clone $base)->count(),
-            'paid' => (clone $base)->where('status', PaymentLink::STATUS_PAID)->count(),
-            'pending' => (clone $base)->where('status', PaymentLink::STATUS_PENDING)->count(),
+            'total'     => (clone $base)->count(),
+            'paid'      => (clone $base)->where('status', PaymentLink::STATUS_PAID)->count(),
+            'pending'   => (clone $base)->where('status', PaymentLink::STATUS_PENDING)->count(),
             'cancelled' => (clone $base)->where('status', PaymentLink::STATUS_CANCELLED)->count(),
-            'expired' => (clone $base)->where('status', PaymentLink::STATUS_PENDING)
+            'expired'   => (clone $base)->where('status', PaymentLink::STATUS_PENDING)
                 ->whereNotNull('expires_at')
                 ->where('expires_at', '<', now())
                 ->count(),
         ];
-    }
-
-    protected function loadClientList(): array
-    {
-        if (! Auth::user()?->isAdmin()) {
-            return [];
-        }
-
-        return User::query()
-            ->orderBy('name')
-            ->limit(200)
-            ->get(['id', 'name', 'email'])
-            ->map(fn ($u) => ['id' => $u->id, 'name' => $u->name, 'email' => $u->email])
-            ->all();
     }
 }

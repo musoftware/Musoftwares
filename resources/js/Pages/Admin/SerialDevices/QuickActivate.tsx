@@ -6,6 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { Separator } from '@/Components/ui/separator';
 import { Badge } from '@/Components/ui/badge';
 import { Textarea } from '@/Components/ui/textarea';
@@ -331,19 +332,19 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                     <Label htmlFor="user_id">
                                         Assign to user <span className="text-muted-foreground text-xs">(optional)</span>
                                     </Label>
-                                    <Select value={userId} onValueChange={v => setUserId(v ?? "")}>
-                                        <SelectTrigger id="user_id">
-                                            <SelectValue placeholder="No user assignment" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="">No assignment</SelectItem>
-                                            {users.map(u => (
-                                                <SelectItem key={u.id} value={String(u.id)}>
-                                                    {u.name} ({u.email})
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <PremiumCombobox
+                                        value={userId ? String(userId) : ''}
+                                        onChange={(val) => setUserId(val ? String(val) : '')}
+                                        options={[
+                                            { value: '', label: 'No assignment' },
+                                            ...users.map(u => ({
+                                                value: String(u.id),
+                                                label: `${u.name} (${u.email})`
+                                            }))
+                                        ]}
+                                        placeholder="No user assignment"
+                                        searchPlaceholder="Search users..."
+                                    />
                                 </div>
 
                                 <div className="space-y-1.5">

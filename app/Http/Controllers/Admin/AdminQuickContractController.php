@@ -7,7 +7,6 @@ use App\Models\Contract;
 use App\Models\ContractVersion;
 use App\Models\Currency;
 use App\Models\Project;
-use App\Models\User;
 use App\Services\AI\ScopePricingEngine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -28,9 +27,6 @@ class AdminQuickContractController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Contracts/QuickCreate', [
-            'clients'    => User::whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'admin');
-            })->get(['id', 'name', 'email']),
             'currencies' => Currency::all(),
         ]);
     }

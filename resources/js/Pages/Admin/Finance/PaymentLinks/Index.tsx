@@ -38,6 +38,7 @@ import {
 } from '@/Components/ui/dialog';
 import { Label } from '@/Components/ui/label';
 import { CurrencySelect } from '@/Components/CurrencySelect';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
 
@@ -69,14 +70,12 @@ interface Filters {
 export default function Index({
     paymentLinks,
     currencies,
-    clients = [],
     filters = {},
     stats,
     canForceMarkPaid = false,
 }: {
     paymentLinks: any;
     currencies: any[];
-    clients?: any[];
     filters?: Filters;
     stats?: { total: number; paid: number; pending: number; cancelled: number; expired: number };
     canForceMarkPaid?: boolean;
@@ -536,21 +535,16 @@ export default function Index({
                                     error={createForm.errors.currency_id}
                                 />
                             </div>
-                            {clients.length > 0 && (
-                                <div>
-                                    <Label>{__('admin.select_client')}</Label>
-                                    <select
-                                        value={createForm.data.client_id}
-                                        onChange={(e) => createForm.setData('client_id', e.target.value)}
-                                        className="w-full h-9 rounded-md border border-gray-300 px-2 text-sm bg-white"
-                                    >
-                                        <option value="">—</option>
-                                        {clients.map((c: any) => (
-                                            <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
+                            <div className="space-y-1.5">
+                                <Label>{__('admin.select_client')}</Label>
+                                <PremiumCombobox
+                                    value={createForm.data.client_id ? String(createForm.data.client_id) : ''}
+                                    onChange={(val) => createForm.setData('client_id', val ? String(val) : '')}
+                                    asyncEndpoint={route('admin.users.search')}
+                                    placeholder={__('admin.select_client')}
+                                    searchPlaceholder={__('general.search_users') || 'Search users...'}
+                                />
+                            </div>
                             <div>
                                 <Label>{__('general.expires_at') || 'Expires At'}</Label>
                                 <Input

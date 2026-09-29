@@ -28,6 +28,7 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { formatMoney } from '@/lib/utils';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
 
@@ -606,18 +607,20 @@ export function TransactionsPage(props: TransactionsPageProps) {
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
                                 {__('general.client') || 'Client'}
                             </label>
-                            <select
-                                value={filters?.user || ''}
-                                onChange={(e) => applyFilters({ user: e.target.value, project: '' })}
-                                className="w-full h-8 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-2 text-xs text-slate-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-zinc-100 truncate"
-                            >
-                                <option value="">{__('general.all_clients') || 'All Clients'}</option>
-                                {(filterOptions.users || []).map((u) => (
-                                    <option key={u.id} value={u.id}>
-                                        {u.name} ({u.email})
-                                    </option>
-                                ))}
-                            </select>
+                            <PremiumCombobox
+                                className="w-full"
+                                value={filters?.user ? String(filters.user) : ''}
+                                onChange={(val) => applyFilters({ user: val ? String(val) : '', project: '' })}
+                                options={[
+                                    { value: '', label: __('general.all_clients') || 'All Clients' },
+                                    ...(filterOptions.users || []).map((u) => ({
+                                        value: String(u.id),
+                                        label: u.email ? `${u.name} (${u.email})` : u.name,
+                                    }))
+                                ]}
+                                placeholder={__('general.all_clients') || 'All Clients'}
+                                searchPlaceholder={__('general.search_users') || 'Search users...'}
+                            />
                         </div>
 
                         {/* Project Filter */}

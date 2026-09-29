@@ -1279,4 +1279,32 @@ class UsersController extends Controller
 
         return back()->with('success', __('erp.role_updated_success'));
     }
+
+    /**
+     * JSON search for client comboboxes.
+     * Returns up to 30 users matching the query by name or email.
+     * Excludes users with the admin role.
+     */
+    public function search(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $q = trim((string) $request->query('q', ''));
+
+        $query = User::query()
+            ->whereDoesntHave('roles', fn ($r) => $r->where('name', 'admin'))
+            ->orderBy('name')
+            ->limit(30)
+            ->select(['id', 'name', 'email']);
+
+        if ($q !== '') {
+            $like = '%' . $q . '%';
+            $query->where(fn ($w) => $w->where('name', 'like', $like)->orWhere('email', 'like', $like));
+        }
+
+        return response()->json(
+            $query->get()->map(fn ($u) => [
+                'value' => (string) $u->id,
+                'label' => "{$u->name} ({$u->email})",
+            ])
+        );
+    }
 }

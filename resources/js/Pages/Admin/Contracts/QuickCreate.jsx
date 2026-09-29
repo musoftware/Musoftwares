@@ -8,9 +8,10 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/Components/ui/dialog';
 import { Calculator, FileText, Share2, Copy, Check, Sparkles, UserPlus, ArrowRight, ShieldCheck, DollarSign, Clock } from 'lucide-react';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import axios from 'axios';
 
-export default function QuickCreate({ clients = [], currencies = [] }) {
+export default function QuickCreate({ currencies = [] }) {
     const { flash } = usePage().props;
     const [calculating, setCalculating] = useState(false);
     const [valuation, setValuation] = useState(null);
@@ -187,18 +188,13 @@ export default function QuickCreate({ clients = [], currencies = [] }) {
                             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-xs font-bold text-slate-700">اختيار العميل (اختياري)</Label>
-                                    <select
-                                        value={data.client_id}
-                                        onChange={(e) => setData('client_id', e.target.value)}
-                                        className="w-full h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
-                                    >
-                                        <option value="">-- يربط تلقائياً عند تسجيل دخول العميل --</option>
-                                        {clients.map((c) => (
-                                            <option key={c.id} value={c.id}>
-                                                {c.name} ({c.email})
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <PremiumCombobox
+                                        value={data.client_id ? String(data.client_id) : ''}
+                                        onChange={(val) => setData('client_id', val ? String(val) : '')}
+                                        asyncEndpoint={route('admin.users.search')}
+                                        placeholder="-- يربط تلقائياً عند تسجيل دخول العميل --"
+                                        searchPlaceholder="بحث عن عميل..."
+                                    />
                                 </div>
 
                                 <div className="space-y-2">

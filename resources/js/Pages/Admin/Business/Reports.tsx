@@ -27,6 +27,7 @@ import {
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Button } from '@/Components/ui/button';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { formatMoney, cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import {
@@ -287,25 +288,28 @@ export default function Reports({
                                 <Users className="w-3.5 h-3.5" />
                                 {__('general.client') || 'Client'}
                             </label>
-                            <select
-                                value={clientId}
-                                onChange={e => {
-                                    const newClientId = e.target.value;
+                            <PremiumCombobox
+                                value={clientId ? String(clientId) : ''}
+                                onChange={(val) => {
+                                    const newClientId = val ? String(val) : '';
                                     setClientId(newClientId);
                                     if (newClientId && projectId) {
                                         const p = projects.find((proj: any) => String(proj.id) === String(projectId));
-                                        if (p && String(p.user_id) !== String(newClientId)) {
+                                        if (p && String(p.user_id) !== newClientId) {
                                             setProjectId('');
                                         }
                                     }
                                 }}
-                                className="w-full text-slate-800 text-sm border border-slate-200 rounded-lg p-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
-                            >
-                                <option value="">{__('general.all_clients') || 'All Clients'}</option>
-                                {clients.map((c: any) => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
+                                options={[
+                                    { value: '', label: __('general.all_clients') || 'All Clients' },
+                                    ...clients.map((c: any) => ({
+                                        value: String(c.id),
+                                        label: c.email ? `${c.name} (${c.email})` : c.name,
+                                    }))
+                                ]}
+                                placeholder={__('general.all_clients') || 'All Clients'}
+                                searchPlaceholder={__('general.search_users') || 'Search clients...'}
+                            />
                         </div>
                         <div>
                             <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">

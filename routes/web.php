@@ -795,6 +795,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
+    Route::get('/users/search', [UsersController::class, 'search'])->name('users.search');
     Route::get('/users', [UsersController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UsersController::class, 'create'])->name('users.create');
     Route::get('/users/bulk-create', [UsersController::class, 'bulkCreate'])->name('users.bulk-create');
